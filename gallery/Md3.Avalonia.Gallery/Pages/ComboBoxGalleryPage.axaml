@@ -1,0 +1,80 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.ComboBoxGalleryPage"
+             mc:Ignorable="d"
+             d:DesignWidth="900" d:DesignHeight="760">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="26">
+    <StackPanel Spacing="8">
+      <TextBlock Classes="h1" Text="Combo box" />
+      <TextBlock Classes="body"
+                 Text="MdComboBox implements Material's exposed dropdown menu while retaining Avalonia selection and keyboard behavior." />
+    </StackPanel>
+
+    <StackPanel Spacing="12">
+      <TextBlock Classes="h2" Text="Filled and outlined" />
+      <StackPanel Orientation="Horizontal" Spacing="20">
+        <md:MdComboBox Width="300" Label="Framework" PlaceholderText="Choose a framework"
+                       SupportingText="Select one option">
+          <ComboBoxItem Content="Avalonia" />
+          <ComboBoxItem Content="MAUI" />
+          <ComboBoxItem Content="WPF" />
+          <ComboBoxItem Content="WinUI" />
+        </md:MdComboBox>
+
+        <md:MdComboBox Width="300" Label="Platform" Variant="Outlined" SelectedIndex="0">
+          <ComboBoxItem Content="Android" />
+          <ComboBoxItem Content="Windows" />
+          <ComboBoxItem Content="macOS" />
+          <ComboBoxItem Content="Linux" />
+        </md:MdComboBox>
+      </StackPanel>
+    </StackPanel>
+
+    <StackPanel Spacing="12">
+      <TextBlock Classes="h2" Text="Leading icon and editable" />
+      <StackPanel Orientation="Horizontal" Spacing="20">
+        <md:MdComboBox Width="300" Label="Region" SelectedIndex="1">
+          <md:MdComboBox.LeadingIcon><TextBlock Text="◎" /></md:MdComboBox.LeadingIcon>
+          <ComboBoxItem Content="Americas" />
+          <ComboBoxItem Content="Asia Pacific" />
+          <ComboBoxItem Content="Europe" />
+        </md:MdComboBox>
+
+        <md:MdComboBox Width="300" Label="Search or select" Variant="Outlined"
+                       IsEditable="True" PlaceholderText="Start typing">
+          <ComboBoxItem Content="Alpha" />
+          <ComboBoxItem Content="Beta" />
+          <ComboBoxItem Content="Gamma" />
+        </md:MdComboBox>
+      </StackPanel>
+    </StackPanel>
+
+    <StackPanel Spacing="12">
+      <TextBlock Classes="h2" Text="Error and disabled" />
+      <StackPanel Orientation="Horizontal" Spacing="20">
+        <md:MdComboBox Width="320" Label="Required option" Variant="Outlined"
+                       IsError="True" ErrorText="Choose an option">
+          <ComboBoxItem Content="First option" />
+          <ComboBoxItem Content="Second option" />
+        </md:MdComboBox>
+
+        <md:MdComboBox Width="280" Label="Disabled" SelectedIndex="0" IsEnabled="False">
+          <ComboBoxItem Content="Unavailable" />
+        </md:MdComboBox>
+      </StackPanel>
+    </StackPanel>
+
+    <Border Padding="20" CornerRadius="20"
+            Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+      <TextBlock Classes="body" TextWrapping="Wrap"
+                 Text="Open a menu by clicking the field or pressing Alt+Down. Arrow keys change the active option; Enter commits selection and Escape dismisses the popup." />
+    </Border>
+    <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdComboBox Label=&quot;Country&quot; ItemsSource=&quot;{Binding Countries}&quot;&#10;                SelectedItem=&quot;{Binding Country}&quot; Variant=&quot;Outlined&quot; /&gt;" CSharpCode="var country = new MdComboBox&#10;{&#10;    Label = &quot;Country&quot;,&#10;    Variant = MdTextBoxVariant.Outlined,&#10;    ItemsSource = viewModel.Countries&#10;};" /></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

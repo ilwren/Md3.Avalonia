@@ -1,0 +1,112 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdIcon}" TargetType="md:MdIcon">
+    <Setter Property="FontFamily" Value="{DynamicResource Md.Sys.Typeface.Symbols.Rounded}" />
+    <Setter Property="FontSize" Value="24" />
+    <Setter Property="FontWeight" Value="Normal" />
+    <Setter Property="TextAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type md:MdSymbolPresenter}" TargetType="md:MdSymbolPresenter">
+    <Setter Property="FontFamily" Value="{DynamicResource Md.Sys.Typeface.Symbols.Rounded}" />
+  </ControlTheme>
+
+  <!-- Scoped field-like anchor used only by the self-contained Material date/time pickers. -->
+  <ControlTheme x:Key="MdPickerAnchorButtonTheme" TargetType="Button">
+    <Setter Property="MinHeight" Value="56" />
+    <Setter Property="Padding" Value="16,0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Outline.Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Button">
+        <Border x:Name="PART_Container"
+                MinHeight="{TemplateBinding MinHeight}"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                ClipToBounds="True">
+          <Grid>
+            <ContentPresenter Margin="{TemplateBinding Padding}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Foreground="{TemplateBinding Foreground}" />
+            <Border x:Name="PART_StateLayer"
+                    Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                    IsHitTestVisible="False"
+                    Opacity="0" />
+            <md:MdRipplePresenter RippleBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.10" /></Style>
+    <Style Selector="^:focus-visible"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="2" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdRipplePresenter}" TargetType="md:MdRipplePresenter">
+    <Setter Property="MaxOpacity" Value="{DynamicResource Md.Sys.Motion.Ripple.Opacity}" />
+    <Setter Property="Duration" Value="0:0:0.45" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdDropdownMenu}" TargetType="md:MdDropdownMenu">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdDropdownMenu">
+        <Popup x:Name="PART_Popup"
+               MinWidth="{TemplateBinding MinimumMenuWidth}"
+               IsOpen="{TemplateBinding IsPopupOpen}"
+               IsLightDismissEnabled="True"
+               OverlayDismissEventPassThrough="True"
+               Placement="BottomEdgeAlignedLeft"
+               PlacementTarget="{TemplateBinding PlacementTarget}"
+               VerticalOffset="0"
+               InheritsTransform="True"
+               ShouldUseOverlayLayer="False"
+               WindowManagerAddShadowHint="False">
+          <Popup.Styles>
+            <Style Selector="PopupRoot">
+              <Setter Property="Background" Value="Transparent" />
+              <Setter Property="TransparencyLevelHint" Value="Transparent" />
+              <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
+            </Style>
+          </Popup.Styles>
+          <Border x:Name="PART_Surface"
+                  Padding="{DynamicResource Md.Comp.Dropdown.Padding}"
+                  Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                  BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}"
+                  CornerRadius="{DynamicResource Md.Comp.Dropdown.Attached.Shape}"
+                  ClipToBounds="True"
+                  Opacity="0"
+                  RenderTransform="scale(0.8) translate(0px, -8px)"
+                  RenderTransformOrigin="50%,0%">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+          </Border>
+        </Popup>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:open /template/ Border#PART_Surface">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="scale(1) translate(0px, 0px)" />
+    </Style>
+    <Style Selector="^:closing /template/ Border#PART_Surface">
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="RenderTransform" Value="scale(0.96) translate(0px, -4px)" />
+    </Style>
+    <Style Selector="^:reduced-motion /template/ Border#PART_Surface">
+      <Setter Property="RenderTransform" Value="scale(1) translate(0px, 0px)" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

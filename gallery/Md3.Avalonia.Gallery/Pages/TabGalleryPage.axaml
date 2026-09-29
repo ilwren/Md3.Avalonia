@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.TabGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Tabs" />
+        <TextBlock Classes="body" Text="Tabs organize peer content across screens and views while retaining native selection and keyboard navigation." />
+      </StackPanel>
+
+      <StackPanel Width="720" HorizontalAlignment="Left" Spacing="12">
+        <TextBlock Classes="h2" Text="Primary tabs" />
+        <md:MdTabs x:Name="PrimaryTabs" SelectedIndex="0" SelectionChanged="PrimarySelectionChanged">
+          <md:MdTabItem Content="Flights"><md:MdTabItem.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Language}" /></md:MdTabItem.Icon></md:MdTabItem>
+          <md:MdTabItem Content="Trips"><md:MdTabItem.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Work}" /></md:MdTabItem.Icon></md:MdTabItem>
+          <md:MdTabItem Content="Explore"><md:MdTabItem.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Search}" /></md:MdTabItem.Icon><md:MdTabItem.Badge><md:MdBadge Variant="Dot" /></md:MdTabItem.Badge></md:MdTabItem>
+        </md:MdTabs>
+        <Border Height="104" Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20">
+          <TextBlock x:Name="PrimaryContent" VerticalAlignment="Center" FontSize="18" Text="Flights content" />
+        </Border>
+      </StackPanel>
+
+      <StackPanel Width="720" HorizontalAlignment="Left" Spacing="12">
+        <TextBlock Classes="h2" Text="Secondary tabs" />
+        <md:MdTabs Variant="Secondary" SelectedIndex="0">
+          <md:MdTabItem Content="Overview" />
+          <md:MdTabItem Content="Specifications" />
+          <md:MdTabItem Content="Reviews" />
+        </md:MdTabs>
+      </StackPanel>
+
+      <StackPanel Width="720" HorizontalAlignment="Left" Spacing="12">
+        <TextBlock Classes="h2" Text="Scrollable and inline icon" />
+        <md:MdTabs IsScrollable="True" SelectedIndex="1">
+          <md:MdTabItem Content="Today" Icon="{x:Static md:MdSymbols.Today}" IsIconInline="True" />
+          <md:MdTabItem Content="Upcoming" Icon="{x:Static md:MdSymbols.Schedule}" IsIconInline="True" />
+          <md:MdTabItem Content="Favorites" Icon="{x:Static md:MdSymbols.Favorite}" IsIconInline="True" />
+          <md:MdTabItem Content="Archived" Icon="{x:Static md:MdSymbols.Description}" IsIconInline="True" />
+          <md:MdTabItem Content="Shared" Icon="{x:Static md:MdSymbols.Share}" IsIconInline="True" />
+        </md:MdTabs>
+      </StackPanel>
+
+      <StackPanel Width="720" HorizontalAlignment="Left" Spacing="12">
+        <TextBlock Classes="h2" Text="Tab view" />
+        <StackPanel Orientation="Horizontal" Spacing="8"><md:MdButton Content="Rapid-switch 100×" Variant="Outlined" Click="StressTabSwitch" /><TextBlock x:Name="TabStressStatus" VerticalAlignment="Center" Classes="body" Text="Ready" /></StackPanel>
+        <md:MdTabView x:Name="DemoTabView" Height="220" SelectedIndex="0">
+          <md:MdTabViewItem Header="Overview" Icon="{x:Static md:MdSymbols.Home}"><Border Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"><TextBlock Text="Overview page content" /></Border></md:MdTabViewItem>
+          <md:MdTabViewItem Header="Activity" Icon="{x:Static md:MdSymbols.Schedule}"><Border Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"><TextBlock Text="Activity page content" /></Border></md:MdTabViewItem>
+        </md:MdTabView>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdTabs SelectedItem=&quot;{Binding Section}&quot;&#10;           IsScrollable=&quot;True&quot;&gt;&#10;  &lt;md:MdTabItem Content=&quot;Overview&quot; Icon=&quot;...&quot; /&gt;&#10;  &lt;md:MdTabItem Content=&quot;Activity&quot; Icon=&quot;...&quot; /&gt;&#10;&lt;/md:MdTabs&gt;" CSharpCode="var tabs = new MdTabs { Variant = MdTabVariant.Primary };&#10;tabs.Items.Add(new MdTabItem { Content = &quot;Overview&quot; });&#10;tabs.SelectedIndex = 0;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

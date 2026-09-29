@@ -1,0 +1,92 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.AdaptiveGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel MinHeight="1500" Spacing="32">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Navigation rail &amp; adaptive" />
+        <TextBlock Classes="body" Text="Navigation destinations change real content; the suite can be driven across compact, medium and expanded breakpoints without resizing the operating-system window." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Navigation rail" />
+        <Border Width="720" Height="380" HorizontalAlignment="Left" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24" ClipToBounds="True">
+          <Grid ColumnDefinitions="Auto,*">
+            <md:MdNavigationRail x:Name="DemoRail" SelectedIndex="0" SelectionChanged="RailSelectionChanged">
+              <md:MdNavigationRail.Header><md:MdFloatingActionButton Icon="{x:Static md:MdSymbols.Add}" Size="Small" /></md:MdNavigationRail.Header>
+              <md:MdNavigationRailItem Icon="{x:Static md:MdSymbols.Home}" Label="Home" />
+              <md:MdNavigationRailItem Icon="{x:Static md:MdSymbols.Search}" Label="Search" />
+              <md:MdNavigationRailItem Icon="{x:Static md:MdSymbols.Favorite}" Label="Saved" />
+            </md:MdNavigationRail>
+            <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+              <TextBlock x:Name="RailDestinationTitle" FontSize="24" Text="Home" />
+              <TextBlock x:Name="RailDestinationDescription" Classes="body" Text="Home destination content is active." />
+            </StackPanel>
+          </Grid>
+        </Border>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Adaptive navigation suite" />
+        <TextBlock Classes="body" Text="Select a simulated viewport. Auto mode swaps bar → rail → drawer at 600 and 1000 dp." />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <md:MdButton Content="Compact · 480" Tag="480" Variant="Outlined" Click="SetSuiteWidth" />
+          <md:MdButton Content="Medium · 760" Tag="760" Variant="Outlined" Click="SetSuiteWidth" />
+          <md:MdButton Content="Expanded · 1040" Tag="1040" Variant="Outlined" Click="SetSuiteWidth" />
+        </StackPanel>
+        <TextBlock x:Name="SuiteStatus" Classes="body" Text="Medium viewport · navigation rail · Home destination." />
+        <md:MdNavigationSuite x:Name="DemoSuite" Width="760" Height="360" HorizontalAlignment="Left"
+                              Mode="Auto" RailBreakpoint="600" DrawerBreakpoint="1000">
+          <md:MdNavigationSuite.NavigationBar>
+            <md:MdNavigationBar SelectedIndex="0" SelectionChanged="SuiteDestinationChanged">
+              <md:MdNavigationBarItem Icon="{x:Static md:MdSymbols.Home}" Label="Home" />
+              <md:MdNavigationBarItem Icon="{x:Static md:MdSymbols.Search}" Label="Search" />
+              <md:MdNavigationBarItem Icon="{x:Static md:MdSymbols.Settings}" Label="Settings" />
+            </md:MdNavigationBar>
+          </md:MdNavigationSuite.NavigationBar>
+          <md:MdNavigationSuite.NavigationRail>
+            <md:MdNavigationRail SelectedIndex="0" SelectionChanged="SuiteDestinationChanged">
+              <md:MdNavigationRailItem Icon="{x:Static md:MdSymbols.Home}" Label="Home" />
+              <md:MdNavigationRailItem Icon="{x:Static md:MdSymbols.Search}" Label="Search" />
+              <md:MdNavigationRailItem Icon="{x:Static md:MdSymbols.Settings}" Label="Settings" />
+            </md:MdNavigationRail>
+          </md:MdNavigationSuite.NavigationRail>
+          <md:MdNavigationSuite.NavigationDrawer>
+            <Border Width="280" Padding="12" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}">
+              <StackPanel Spacing="4">
+                <TextBlock Margin="12" FontWeight="Medium" Text="Expanded destinations" />
+                <md:MdButton Content="Home" Tag="0" Variant="Tonal" HorizontalContentAlignment="Left" Click="SuiteDrawerDestinationChanged" />
+                <md:MdButton Content="Search" Tag="1" Variant="Text" HorizontalContentAlignment="Left" Click="SuiteDrawerDestinationChanged" />
+                <md:MdButton Content="Settings" Tag="2" Variant="Text" HorizontalContentAlignment="Left" Click="SuiteDrawerDestinationChanged" />
+              </StackPanel>
+            </Border>
+          </md:MdNavigationSuite.NavigationDrawer>
+          <Border Padding="32" Background="{DynamicResource Md.Sys.Color.Surface.Brush}">
+            <StackPanel VerticalAlignment="Center" Spacing="8">
+              <TextBlock x:Name="SuiteDestinationTitle" FontSize="26" Text="Home" />
+              <TextBlock x:Name="SuiteDestinationDescription" Classes="body" Text="Home summary in the simulated medium viewport." />
+            </StackPanel>
+          </Border>
+        </md:MdNavigationSuite>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Material scaffold" />
+        <md:MdScaffold Width="800" Height="420" HorizontalAlignment="Left">
+          <md:MdScaffold.TopBar><md:MdTopAppBar Title="Inbox" Variant="Small" /></md:MdScaffold.TopBar>
+          <md:MdScaffold.Navigation><md:MdNavigationRail SelectedIndex="0"><md:MdNavigationRailItem Icon="{x:Static md:MdSymbols.Mail}" Label="Inbox" /><md:MdNavigationRailItem Icon="{x:Static md:MdSymbols.Star}" Label="Starred" /></md:MdNavigationRail></md:MdScaffold.Navigation>
+          <md:MdScaffold.FloatingActionButton><md:MdFloatingActionButton Icon="{x:Static md:MdSymbols.Edit}" /></md:MdScaffold.FloatingActionButton>
+          <md:MdScaffold.Snackbar><md:MdSnackbar Content="Draft saved" IsOpen="True" Duration="0:0:0" /></md:MdScaffold.Snackbar>
+          <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"><TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Text="Page body" /></Border>
+        </md:MdScaffold>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdNavigationSuite Mode=&quot;Auto&quot;&gt;&#10;  &lt;md:MdNavigationSuite.NavigationBar&gt;...&lt;/md:MdNavigationSuite.NavigationBar&gt;&#10;  &lt;md:MdNavigationSuite.NavigationRail&gt;...&lt;/md:MdNavigationSuite.NavigationRail&gt;&#10;  &lt;md:MdNavigationSuite.NavigationDrawer&gt;...&lt;/md:MdNavigationSuite.NavigationDrawer&gt;&#10;  &lt;views:Page /&gt;&#10;&lt;/md:MdNavigationSuite&gt;" CSharpCode="var scaffold = new MdScaffold&#10;{&#10;    TopBar = appBar,&#10;    Navigation = navigationSuite,&#10;    Content = page,&#10;    FloatingActionButton = composeFab&#10;};" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

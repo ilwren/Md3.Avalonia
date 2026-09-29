@@ -1,0 +1,64 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="MdSearchInternalButtonTheme" TargetType="Button">
+    <Setter Property="Width" Value="40" /><Setter Property="Height" Value="40" /><Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /><Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template"><ControlTemplate TargetType="Button"><Border x:Name="PART_State" Background="{TemplateBinding Background}" CornerRadius="20"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" /></Border></ControlTemplate></Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdSearchBar}" TargetType="md:MdSearchBar">
+    <Setter Property="MinHeight" Value="56" /><Setter Property="MinWidth" Value="240" /><Setter Property="Padding" Value="16,0" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" /><Setter Property="PlaceholderForeground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="CornerRadius" Value="28" /><Setter Property="BorderThickness" Value="0" /><Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="SelectionBrush" Value="{DynamicResource Md.Sys.Color.PrimarySelection.Brush}" /><Setter Property="CaretBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="Cursor" Value="IBeam" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdSearchBar">
+        <Border x:Name="PART_Container" MinHeight="{TemplateBinding MinHeight}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" ClipToBounds="True">
+          <Grid>
+            <Grid Margin="{TemplateBinding Padding}" ColumnDefinitions="40,*,Auto,Auto" ColumnSpacing="4">
+              <md:MdIcon x:Name="PART_DefaultLeading" Grid.Column="0" Glyph="{DynamicResource Md.Icon.Search}" Size="24" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              <ContentPresenter x:Name="PART_Leading" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding LeadingContent}" IsVisible="False" />
+              <ScrollViewer x:Name="PART_ScrollViewer" Grid.Column="1" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
+                <Panel>
+                  <TextBlock x:Name="PART_Placeholder" VerticalAlignment="Center" Foreground="{TemplateBinding PlaceholderForeground}" IsHitTestVisible="False" Text="{TemplateBinding PlaceholderText}" />
+                  <TextPresenter x:Name="PART_TextPresenter" VerticalAlignment="Center" CaretBlinkInterval="{TemplateBinding CaretBlinkInterval}" CaretBrush="{TemplateBinding CaretBrush}" CaretIndex="{TemplateBinding CaretIndex}" SelectionBrush="{TemplateBinding SelectionBrush}" SelectionEnd="{TemplateBinding SelectionEnd}" SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}" SelectionStart="{TemplateBinding SelectionStart}" Text="{TemplateBinding Text, Mode=TwoWay}" TextWrapping="NoWrap" />
+                </Panel>
+              </ScrollViewer>
+              <ContentPresenter x:Name="PART_Trailing" Grid.Column="2" VerticalAlignment="Center" Content="{TemplateBinding TrailingContent}" IsVisible="False" />
+              <Button x:Name="PART_ClearButton" Grid.Column="3" Theme="{StaticResource MdSearchInternalButtonTheme}" IsVisible="False"><md:MdIcon Glyph="{DynamicResource Md.Icon.Close}" Size="20" /></Button>
+            </Grid>
+            <Border x:Name="PART_StateLayer" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsHitTestVisible="False" Opacity="0" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:empty /template/ TextPresenter#PART_TextPresenter"><Setter Property="Opacity" Value="0" /></Style>
+    <Style Selector="^:has-text /template/ TextBlock#PART_Placeholder"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:has-leading /template/ md|MdIcon#PART_DefaultLeading"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:has-leading /template/ ContentPresenter#PART_Leading"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:has-trailing /template/ ContentPresenter#PART_Trailing"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:clear-visible /template/ Button#PART_ClearButton"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.04" /></Style>
+    <Style Selector="^:focus-within"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="2" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdSearchView}" TargetType="md:MdSearchView">
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="VerticalContentAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdSearchView">
+        <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="28" ClipToBounds="True">
+          <Grid RowDefinitions="Auto,*">
+            <ContentPresenter Grid.Row="0" Margin="8" Content="{TemplateBinding Header}" />
+            <ContentPresenter x:Name="PART_Results" Grid.Row="1" Margin="16" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" IsVisible="False" Opacity="0" RenderTransform="translate(0px,-12px)" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:present /template/ ContentPresenter#PART_Results"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:open /template/ ContentPresenter#PART_Results"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="translate(0px,0px)" /></Style>
+    <Style Selector="^:reduced-motion /template/ ContentPresenter#PART_Results"><Setter Property="RenderTransform" Value="translate(0px,0px)" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

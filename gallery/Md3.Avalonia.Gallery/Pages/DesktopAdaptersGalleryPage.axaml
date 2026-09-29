@@ -1,0 +1,76 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.DesktopAdaptersGalleryPage"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="900">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel MinHeight="1180" Spacing="28">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Desktop adapters" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="Scoped Material controls for desktop input, scrolling, semantic surfaces, and responsive content. Native Avalonia controls are not globally restyled." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Autocomplete and numeric input" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdAutoCompleteBox x:Name="TechnologyAutoComplete" Width="320" Margin="0,0,20,16"
+                                Label="Technology" PlaceholderText="Start typing"
+                                SupportingText="Native filtering and keyboard selection"
+                                FilterMode="ContainsOrdinal" IsTextCompletionEnabled="True" />
+          <md:MdNumericBox Width="260" Margin="0,0,0,16" Label="Quantity" Value="12"
+                           Minimum="0" Maximum="100" Increment="1"
+                           SupportingText="Wheel, keyboard, and MVVM Value" />
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Semantic surfaces and type scale" />
+        <WrapPanel>
+          <md:MdSurface Width="210" Height="120" Margin="0,0,12,12" Padding="20" Variant="ContainerLow">
+            <StackPanel Spacing="8"><md:MdText StyleRole="TitleMedium" Text="Container low" /><md:MdText StyleRole="BodyMedium" TextWrapping="Wrap" Text="Theme-aware color roles and shape." /></StackPanel>
+          </md:MdSurface>
+          <md:MdSurface Width="210" Height="120" Margin="0,0,12,12" Padding="20" Variant="ContainerHigh" Elevation="{DynamicResource Md.Sys.Elevation.Level2}">
+            <StackPanel Spacing="8"><md:MdText StyleRole="TitleMedium" Text="Container high" /><md:MdText StyleRole="BodyMedium" TextWrapping="Wrap" Text="Optional semantic elevation." /></StackPanel>
+          </md:MdSurface>
+          <md:MdSurface Width="210" Height="120" Padding="20" Variant="Inverse">
+            <StackPanel Spacing="8"><md:MdText StyleRole="TitleMedium" Foreground="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" Text="Inverse" /><md:MdText StyleRole="BodyMedium" Foreground="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" Text="Inverse surface roles." /></StackPanel>
+          </md:MdSurface>
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Responsive content" />
+        <TextBlock Classes="body" Text="Resize the Gallery. The control chooses compact, medium, or expanded content from its own width." />
+        <md:MdAdaptiveLayout Height="150" MediumBreakpoint="560" ExpandedBreakpoint="760">
+          <md:MdAdaptiveLayout.CompactContent><md:MdSurface Padding="24" Variant="Container"><md:MdText StyleRole="TitleLarge" Text="Compact layout" /></md:MdSurface></md:MdAdaptiveLayout.CompactContent>
+          <md:MdAdaptiveLayout.MediumContent><md:MdSurface Padding="24" Variant="ContainerLow"><md:MdText StyleRole="HeadlineSmall" Text="Medium layout · two-pane ready" /></md:MdSurface></md:MdAdaptiveLayout.MediumContent>
+          <md:MdAdaptiveLayout.ExpandedContent><md:MdSurface Padding="24" Variant="ContainerHigh"><md:MdText StyleRole="HeadlineMedium" Text="Expanded layout · navigation + body + supporting pane" /></md:MdSurface></md:MdAdaptiveLayout.ExpandedContent>
+        </md:MdAdaptiveLayout>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Material scrolling surface" />
+        <md:MdScrollViewer Height="180" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Spacing="8">
+            <md:MdSurface Padding="14" Variant="ContainerLow" Content="Scrollable item 1" />
+            <md:MdSurface Padding="14" Variant="ContainerLow" Content="Scrollable item 2" />
+            <md:MdSurface Padding="14" Variant="ContainerLow" Content="Scrollable item 3" />
+            <md:MdSurface Padding="14" Variant="ContainerLow" Content="Scrollable item 4" />
+            <md:MdSurface Padding="14" Variant="ContainerLow" Content="Scrollable item 5" />
+            <md:MdSurface Padding="14" Variant="ContainerLow" Content="Scrollable item 6" />
+          </StackPanel>
+        </md:MdScrollViewer>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdAutoCompleteBox Label=&quot;City&quot; ItemsSource=&quot;{Binding Cities}&quot; /&gt;&#10;&lt;md:MdNumericBox Label=&quot;Quantity&quot; Value=&quot;{Binding Quantity}&quot; /&gt;&#10;&lt;md:MdScrollViewer&gt;...&lt;/md:MdScrollViewer&gt;"
+                             CSharpCode="var amount = new MdNumericBox { Label = &quot;Amount&quot;, Minimum = 0, Maximum = 100 };&#10;var scroll = new MdScrollViewer { Content = longContent };" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

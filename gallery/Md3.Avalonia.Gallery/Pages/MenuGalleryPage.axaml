@@ -1,0 +1,64 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.MenuGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+      <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Menus"/><TextBlock Classes="body" Text="Temporary surfaces expose a concise list of choices with optional leading and trailing content."/></StackPanel>
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="40">
+        <StackPanel Grid.Column="0" Spacing="12">
+          <TextBlock Classes="h2" Text="Popup menu"/>
+          <md:MdButton x:Name="MenuTrigger" Content="Open menu" Variant="Filled" Click="ToggleMenu"/>
+          <md:MdDropdownMenu x:Name="DemoMenu" PlacementTarget="{Binding #MenuTrigger}" MinimumMenuWidth="220">
+            <md:MdMenu>
+              <md:MdMenuItem Content="New document"><md:MdMenuItem.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.Add}"/></md:MdMenuItem.LeadingContent><md:MdMenuItem.TrailingContent><TextBlock Text="Ctrl+N"/></md:MdMenuItem.TrailingContent></md:MdMenuItem>
+              <md:MdMenuItem Content="Open"><md:MdMenuItem.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.Description}"/></md:MdMenuItem.LeadingContent><md:MdMenuItem.TrailingContent><TextBlock Text="Ctrl+O"/></md:MdMenuItem.TrailingContent></md:MdMenuItem>
+              <md:MdMenuItem Content="Save a copy" IsSelected="True"><md:MdMenuItem.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.Download}"/></md:MdMenuItem.LeadingContent></md:MdMenuItem>
+            </md:MdMenu>
+          </md:MdDropdownMenu>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Width="280" HorizontalAlignment="Left" Spacing="12">
+          <TextBlock Classes="h2" Text="Menu surface"/>
+          <md:MdMenu>
+            <md:MdMenuItem Content="Profile"><md:MdMenuItem.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.Person}"/></md:MdMenuItem.LeadingContent></md:MdMenuItem>
+            <md:MdMenuItem Content="Settings"><md:MdMenuItem.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.Settings}"/></md:MdMenuItem.LeadingContent></md:MdMenuItem>
+            <md:MdMenuItem Content="Sign out"><md:MdMenuItem.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.ArrowBack}"/></md:MdMenuItem.LeadingContent></md:MdMenuItem>
+          </md:MdMenu>
+        </StackPanel>
+      </Grid>
+      <TextBlock x:Name="MenuResult" Classes="body" Text="Choose a menu action." />
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Right-click menu" />
+        <Border x:Name="ContextMenuTarget" Width="520" Height="112" HorizontalAlignment="Left"
+                PointerPressed="OpenContextMenu"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20">
+          <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Right-click this surface" />
+        </Border>
+        <md:MdDropdownMenu x:Name="ContextDemoMenu" PlacementTarget="{Binding #ContextMenuTarget}" MinimumMenuWidth="190">
+          <md:MdMenu>
+            <md:MdMenuItem Content="Copy" />
+            <md:MdMenuItem Content="Share" />
+            <md:MdMenuItem Content="Delete" />
+          </md:MdMenu>
+        </md:MdDropdownMenu>
+      </StackPanel>
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Menu anchor and submenu" />
+        <md:MdMenuAnchor Width="180" HorizontalAlignment="Left">
+          <md:MdMenuAnchor.Menu>
+            <md:MdMenu>
+              <md:MdMenuItem Content="Rename" />
+              <md:MdSubMenuItem Content="Share with">
+                <md:MdSubMenuItem.Submenu><md:MdMenu><md:MdMenuItem Content="Team" /><md:MdMenuItem Content="Anyone with link" /></md:MdMenu></md:MdSubMenuItem.Submenu>
+              </md:MdSubMenuItem>
+              <md:MdMenuItem Content="Delete" />
+            </md:MdMenu>
+          </md:MdMenuAnchor.Menu>
+          <md:MdButton Content="Anchored menu" Variant="Outlined" />
+        </md:MdMenuAnchor>
+      </StackPanel>
+      <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdDropdownMenu IsOpen=&quot;{Binding IsMenuOpen}&quot;&#10;                       PlacementTarget=&quot;{Binding #Trigger}&quot;&gt;&#10;  &lt;md:MdMenu&gt;&#10;    &lt;md:MdMenuItem Content=&quot;Settings&quot; Command=&quot;{Binding SettingsCommand}&quot; /&gt;&#10;  &lt;/md:MdMenu&gt;&#10;&lt;/md:MdDropdownMenu&gt;" CSharpCode="var menu = new MdDropdownMenu { PlacementTarget = trigger };&#10;menu.Content = new MdMenu { Items = { new MdMenuItem { Content = &quot;Settings&quot; } } };&#10;menu.IsOpen = true;"/></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

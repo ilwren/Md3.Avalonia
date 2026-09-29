@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.CarouselGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+    <StackPanel Spacing="8">
+      <TextBlock Classes="h1" Text="Carousel" />
+      <TextBlock Classes="body" Text="Horizontal collections reveal images, video, or labeled destinations while preserving native selection and keyboard navigation." />
+    </StackPanel>
+    <StackPanel Spacing="12">
+      <TextBlock Classes="h2" Text="Multi-browse" />
+      <md:MdCarousel Height="230" ItemHeight="210" ItemWidth="250">
+        <Grid Background="#FF6F61"><StackPanel Margin="20" VerticalAlignment="Bottom"><TextBlock FontSize="24" Foreground="White" Text="Coastal route"/><TextBlock Foreground="White" Text="12 places"/></StackPanel></Grid>
+        <Grid Background="#FF8A3D"><StackPanel Margin="20" VerticalAlignment="Bottom"><TextBlock FontSize="24" Foreground="White" Text="Desert light"/><TextBlock Foreground="White" Text="8 places"/></StackPanel></Grid>
+        <Grid Background="#477A64"><StackPanel Margin="20" VerticalAlignment="Bottom"><TextBlock FontSize="24" Foreground="White" Text="Forest stays"/><TextBlock Foreground="White" Text="16 places"/></StackPanel></Grid>
+        <Grid Background="#5367B5"><StackPanel Margin="20" VerticalAlignment="Bottom"><TextBlock FontSize="24" Foreground="White" Text="City nights"/><TextBlock Foreground="White" Text="20 places"/></StackPanel></Grid>
+      </md:MdCarousel>
+    </StackPanel>
+    <StackPanel Spacing="12">
+      <TextBlock Classes="h2" Text="Hero" />
+      <md:MdCarousel Height="270" Variant="Hero">
+        <Grid Background="#78536A"><TextBlock Margin="24" VerticalAlignment="Bottom" FontSize="28" Foreground="White" Text="Featured story"/></Grid>
+        <Grid Background="#44606D"><TextBlock Margin="24" VerticalAlignment="Bottom" FontSize="28" Foreground="White" Text="A slower weekend"/></Grid>
+        <Grid Background="#766446"><TextBlock Margin="24" VerticalAlignment="Bottom" FontSize="28" Foreground="White" Text="Local favorites"/></Grid>
+      </md:MdCarousel>
+    </StackPanel>
+    <StackPanel Spacing="10">
+      <TextBlock Classes="h2" Text="Usage" />
+      <gallery:CodeExample XamlCode="&lt;md:MdCarousel ItemsSource=&quot;{Binding Destinations}&quot;&#10;               SelectedItem=&quot;{Binding SelectedDestination}&quot;&gt;&#10;  &lt;md:MdCarousel.ItemTemplate&gt;...&lt;/md:MdCarousel.ItemTemplate&gt;&#10;&lt;/md:MdCarousel&gt;" CSharpCode="var carousel = new MdCarousel&#10;{&#10;    ItemsSource = viewModel.Destinations,&#10;    SelectedItem = viewModel.SelectedDestination&#10;};" />
+    </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

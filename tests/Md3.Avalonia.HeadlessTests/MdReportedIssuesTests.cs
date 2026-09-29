@@ -1,0 +1,314 @@
+using System.Collections.ObjectModel;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Headless;
+using Avalonia.Headless.XUnit;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Threading;
+using System.Globalization;
+using Avalonia.VisualTree;
+using Md3.Avalonia.Controls;
+using Md3.Avalonia.Ecosystem.Controls;
+using Md3.Avalonia.Ecosystem.Infrastructure;
+using Md3.Avalonia.Gallery;
+using Md3.Avalonia.Gallery.Pages;
+using Xunit;
+
+namespace Md3.Avalonia.HeadlessTests;
+
+/// <summary>Regression coverage for the 23-item dark-theme acceptance report.</summary>
+public sealed class MdReportedIssuesTests
+{
+    [AvaloniaFact]
+    public void Gallery_Search_CtrlK_And_Query_Filter_Work_In_The_Navigation_Page_Lifecycle()
+    {
+        var page = new SearchGalleryPage();
+        using var host = Show(page, 900, 700);
+        host.Window.KeyPress(Key.K, RawInputModifiers.Control, PhysicalKey.K, "k");
+        host.Window.KeyRelease(Key.K, RawInputModifiers.Control, PhysicalKey.K, "k");
+        Dispatcher.UIThread.RunJobs();
+
+        var view = page.GetVisualDescendants().OfType<MdSearchView>().Single();
+        var query = page.GetVisualDescendants().OfType<MdSearchBar>().Single(control => control.Name == "ExpandedSearchBar");
+        var results = page.GetVisualDescendants().OfType<MdList>().Single();
+        Assert.True(view.IsOpen);
+
+        query.Text = "tokens";
+        Dispatcher.UIThread.RunJobs();
+        Assert.Single(results.Items.Cast<object>());
+    }
+
+    [AvaloniaFact]
+    public void Reorderable_List_Uses_Real_Pointer_Drag_And_Drop_Targets()
+    {
+        var source = new ObservableCollection<string> { "Design", "Core", "Gallery", "Android" };
+        var list = new MdReorderableList { Width = 360, Height = 260, ItemsSource = source };
+        using var host = Show(list, 440, 320);
+        var rows = list.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
+        Assert.Equal(4, rows.Length);
+        var handle = rows[0].GetVisualDescendants().OfType<Border>().Single(border => border.Name == "PART_DragHandle");
+        var from = handle.TranslatePoint(new Point(handle.Bounds.Width / 2, handle.Bounds.Height / 2), host.Window)!.Value;
+        var to = rows[2].TranslatePoint(new Point(rows[2].Bounds.Width - 24, rows[2].Bounds.Height / 2), host.Window)!.Value;
+
+        host.Window.MouseMove(from, RawInputModifiers.None);
+        host.Window.MouseDown(from, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseMove(to, RawInputModifiers.LeftMouseButton);
+        host.Window.MouseUp(to, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(new[] { "Core", "Gallery", "Design", "Android" }, source);
+        Assert.DoesNotContain(":reordering", list.Classes);
+    }
+
+    [AvaloniaFact]
+    public void GridTile_And_Bar_Expose_Observable_Activation_And_Favorite_State()
+    {
+        var bar = new MdGridTileBar { IsInteractive = true, Title = "Aurora" };
+        var tile = new MdGridTile { Footer = bar };
+        var barInvoked = 0;
+        bar.Invoked += (_, _) => barInvoked++;
+        Assert.True(bar.Invoke());
+        tile.Activate();
+        tile.ToggleFavorite();
+
+        Assert.Equal(1, barInvoked);
+        Assert.True(tile.IsActivated);
+        Assert.True(tile.IsFavorite);
+        Assert.Contains(":activated", tile.Classes);
+        Assert.Contains(":favorite", tile.Classes);
+    }
+
+    [AvaloniaFact]
+    public void AsyncSelect_Commit_Fills_The_Field_Closes_And_Can_Reopen()
+    {
+        // Keep this state-machine test detached because the headless platform intentionally
+        // has neither a native popup implementation nor an overlay host.
+        var select = new MdAsyncSelect { ItemsSource = new[] { "Alabama", "Alaska", "Arizona" }, Debounce = TimeSpan.Zero };
+        select.IsDropDownOpen = true;
+        select.Commit("Alaska");
+        Assert.Equal("Alaska", select.SelectedItem);
+        Assert.Equal("Alaska", select.Query);
+        Assert.False(select.IsDropDownOpen);
+
+        select.IsDropDownOpen = true;
+        Assert.True(select.IsDropDownOpen);
+        Assert.Contains("Alaska", select.Results);
+    }
+
+    [AvaloniaFact]
+    public void Calendar_Range_Gesture_Normalizes_A_Continuous_Drag_In_Either_Direction()
+    {
+        var calendar = new MdCalendar { SelectionMode = MdCalendarSelectionMode.Range };
+        var start = new DateTimeOffset(2026, 9, 18, 0, 0, 0, TimeSpan.Zero);
+        var end = new DateTimeOffset(2026, 9, 12, 0, 0, 0, TimeSpan.Zero);
+        Assert.True(calendar.BeginRangeSelection(start));
+        Assert.True(calendar.UpdateRangeSelection(end));
+        Assert.True(calendar.CompleteRangeSelection());
+        Assert.Equal(end, calendar.SelectedDate);
+        Assert.Equal(start, calendar.RangeEnd);
+        Assert.Equal(7, calendar.VisibleDays.Count(day => day.IsSelected));
+    }
+
+    [AvaloniaFact]
+    public void Cascader_Field_Uses_A_Single_Centered_Path_And_Commits_Only_At_A_Leaf()
+    {
+        var leaf = new MdCascaderItem("desktop", "Desktop");
+        var root = new MdCascaderItem("engineering", "Engineering", [leaf]);
+        var cascader = new MdCascader { ItemsSource = new[] { root } };
+        var commits = 0;
+        cascader.SelectionChanged += (_, _) => commits++;
+        cascader.Select(0, root);
+        Assert.Equal("Engineering", cascader.DisplayText);
+        Assert.True(cascader.IsDropDownOpen || commits == 0);
+        cascader.Select(1, leaf);
+        Assert.Equal("Engineering / Desktop", cascader.DisplayText);
+        Assert.Equal(1, commits);
+        Assert.False(cascader.IsDropDownOpen);
+    }
+
+    [AvaloniaFact]
+    public void Transfer_Moves_Actual_Items_When_Dropped_On_The_Other_List()
+    {
+        var transfer = new MdTransfer
+        {
+            Width = 760,
+            Height = 320,
+            ItemsSource = new[] { "Accessibility", "Android", "Desktop" },
+            SelectedItems = new[] { "Desktop" }
+        };
+        using var host = Show(transfer, 840, 400);
+        var lists = transfer.GetVisualDescendants().OfType<ListBox>().ToArray();
+        Assert.Equal(2, lists.Length);
+        var sourceRow = lists[0].GetVisualDescendants().OfType<ListBoxItem>().First();
+        var from = sourceRow.TranslatePoint(new Point(24, sourceRow.Bounds.Height / 2), host.Window)!.Value;
+        var to = lists[1].TranslatePoint(new Point(40, Math.Max(70, lists[1].Bounds.Height / 2)), host.Window)!.Value;
+
+        host.Window.MouseMove(from, RawInputModifiers.None);
+        host.Window.MouseDown(from, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseMove(to, RawInputModifiers.LeftMouseButton);
+        host.Window.MouseUp(to, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Contains("Accessibility", transfer.TargetItems);
+        Assert.DoesNotContain("Accessibility", transfer.AvailableItems);
+    }
+
+    [AvaloniaFact]
+    public void BuiltIn_Rich_Editor_Adapter_Changes_Source_And_Rendered_Preview()
+    {
+        var editor = new TextBox { Text = "Material editor" };
+        var preview = new StackPanel();
+        var adapter = new MdTextBoxRichEditorAdapter(editor, preview);
+        editor.SelectionStart = 0;
+        editor.SelectionEnd = 8;
+        adapter.Execute(MdRichEditorCommand.Bold);
+
+        Assert.Equal("**Material** editor", editor.Text);
+        Assert.NotEmpty(preview.Children);
+        Assert.Equal(MdRichEditorCommand.Bold, adapter.LastCommand);
+    }
+
+    [AvaloniaFact]
+    public void Chat_Supports_MultiSelect_Cancel_Delete_Quote_And_Failed_Retry()
+    {
+        var first = new MdChatMessage("1", MdChatMessageRole.Assistant, "First", DateTimeOffset.Now, "Assistant");
+        var second = new MdChatMessage("2", MdChatMessageRole.User, "Second", DateTimeOffset.Now, "You");
+        var failed = new MdChatMessage("3", MdChatMessageRole.User, "Failed", DateTimeOffset.Now, "You", MdAsyncRequestState.Error);
+        var chat = new MdChatView { MessagesSource = new[] { first, second, failed } };
+        chat.ToggleMessageSelection(first);
+        chat.ToggleMessageSelection(second);
+        Assert.Equal(2, chat.SelectionCount);
+        Assert.True(chat.QuoteSelected());
+        Assert.Equal(second, chat.QuotedMessage);
+        Assert.Equal(0, chat.SelectionCount);
+
+        var retried = false;
+        chat.RetryRequested += (_, message) => retried = ReferenceEquals(message, failed);
+        Assert.True(chat.Retry(failed));
+        Assert.True(retried);
+
+        IReadOnlyList<MdChatMessage>? deleted = null;
+        chat.DeleteRequested += (_, messages) => deleted = messages;
+        chat.ToggleMessageSelection(first);
+        Assert.True(chat.DeleteSelected());
+        Assert.Single(deleted!);
+        chat.CancelQuote();
+        Assert.Null(chat.QuotedMessage);
+    }
+
+    [AvaloniaFact]
+    public void Pin_Input_Accepts_Rapid_Continuous_Digits_And_Shows_One_Active_Caret_Cell()
+    {
+        var pin = new MdPinInput { Length = 6 };
+        using var host = Show(pin, 430, 140);
+        var input = pin.GetVisualDescendants().OfType<TextBox>().Single(control => control.Name == "PART_Input");
+        input.Focus();
+        foreach (var text in new[] { "1", "12", "123", "1234", "12345", "123456" }) input.Text = text;
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal("123456", pin.Code);
+        Assert.Equal(6, pin.Cells.Count(cell => cell.IsFilled));
+        Assert.Single(pin.Cells, cell => cell.IsActive);
+    }
+
+    [AvaloniaFact]
+    public void Tree_Toggle_Button_Expands_And_Collapses_Without_A_Guide_Through_The_Arrow()
+    {
+        var root = new MdTreeNode("root", "Root", [new MdTreeNode("child", "Child")]);
+        var tree = new MdTreeView { Roots = new[] { root }, Width = 420, Height = 220 };
+        using var host = Show(tree, 480, 280);
+        var toggle = tree.GetVisualDescendants().OfType<ToggleButton>().Single();
+        toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(root.IsExpanded);
+        Assert.Equal(2, tree.VisibleRows.Count);
+        Assert.False(tree.ShowGuides);
+
+        toggle = tree.GetVisualDescendants().OfType<ToggleButton>().First();
+        toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Assert.False(root.IsExpanded);
+    }
+
+    [AvaloniaFact]
+    public void Rating_Can_Increase_And_Decrease_To_The_Exact_Half_Star()
+    {
+        var rating = new MdRating { ItemSize = 32, Spacing = 4, Precision = .5, Value = 1 };
+        rating.SetValueFromPosition(3 * 36 + 28);
+        Assert.Equal(4, rating.Value);
+        rating.SetValueFromPosition(36 + 8);
+        Assert.Equal(1.5, rating.Value);
+    }
+
+    [AvaloniaFact]
+    public void Language_Switch_Recreates_The_Active_Page_For_Closed_Popups_And_Virtualized_Data()
+    {
+        var previousCulture = CultureInfo.CurrentCulture;
+        var previousUiCulture = CultureInfo.CurrentUICulture;
+        var window = new MainWindow();
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var selector = window.GetVisualDescendants().OfType<MdComboBox>().Single(control => control.Name == "LanguageSelector");
+            var host = window.GetVisualDescendants().OfType<ContentControl>().Single(control => control.Name == "PageHost");
+            var englishPage = host.Content;
+            selector.SelectedIndex = 1;
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal("zh", CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
+            Assert.NotSame(englishPage, host.Content);
+            Assert.Contains("按钮", window.GetVisualDescendants().OfType<TextBlock>().Select(text => text.Text));
+        }
+        finally
+        {
+            window.Close();
+            CultureInfo.CurrentCulture = previousCulture;
+            CultureInfo.CurrentUICulture = previousUiCulture;
+        }
+    }
+
+    [AvaloniaFact]
+    public void Borderless_Window_Computes_FAStyle_Template_Settings_And_Preserves_Native_Frame()
+    {
+        var adapter = new CapturingAdapter();
+        var window = new MdBorderlessWindow { PlatformAdapter = adapter, TitleBarHeight = 44, PreserveNativeBorder = true };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.NotNull(adapter.Options);
+            Assert.True(adapter.Options!.PreserveNativeBorder);
+            Assert.Equal(44, window.TemplateSettings.TitleBarHeight);
+            Assert.Equal(44, window.TemplateSettings.ContentMargin.Top);
+            Assert.True(window.TemplateSettings.IsClientAreaExtended);
+        }
+        finally { window.Close(); }
+    }
+
+    private static Scope Show(Control content, double width, double height)
+    {
+        var window = new Window { Width = width, Height = height, Content = content };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        return new Scope(window);
+    }
+
+    private sealed class Scope(Window window) : IDisposable
+    {
+        public Window Window { get; } = window;
+        public void Dispose() => Window.Close();
+    }
+
+    private sealed class CapturingAdapter : IMdWindowPlatformAdapter
+    {
+        public MdWindowPlatform Platform => MdWindowPlatform.Windows;
+        public MdWindowCapabilities Capabilities => MdWindowCapabilities.All;
+        public MdBorderlessWindowOptions? Options { get; private set; }
+        public void Apply(MdBorderlessWindow window, MdBorderlessWindowOptions options) => Options = options;
+        public bool TryBeginMove(MdBorderlessWindow window, PointerPressedEventArgs args) => true;
+        public bool TryBeginResize(MdBorderlessWindow window, WindowEdge edge, PointerPressedEventArgs args) => true;
+        public bool TryShowSystemMenu(MdBorderlessWindow window, Point clientPoint) => false;
+    }
+}

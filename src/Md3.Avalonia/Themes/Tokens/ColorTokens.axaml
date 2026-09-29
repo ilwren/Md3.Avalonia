@@ -1,0 +1,140 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <Color x:Key="Md.Sys.Color.Primary">#6750A4</Color>
+      <Color x:Key="Md.Sys.Color.OnPrimary">#FFFFFF</Color>
+      <Color x:Key="Md.Sys.Color.PrimaryAction">#6750A4</Color>
+      <Color x:Key="Md.Sys.Color.OnPrimaryAction">#FFFFFF</Color>
+      <Color x:Key="Md.Sys.Color.PrimaryContainer">#EADDFF</Color>
+      <Color x:Key="Md.Sys.Color.OnPrimaryContainer">#21005D</Color>
+      <Color x:Key="Md.Sys.Color.Secondary">#625B71</Color>
+      <Color x:Key="Md.Sys.Color.OnSecondary">#FFFFFF</Color>
+      <Color x:Key="Md.Sys.Color.SecondaryContainer">#E8DEF8</Color>
+      <Color x:Key="Md.Sys.Color.OnSecondaryContainer">#1D192B</Color>
+      <Color x:Key="Md.Sys.Color.Tertiary">#7D5260</Color>
+      <Color x:Key="Md.Sys.Color.OnTertiary">#FFFFFF</Color>
+      <Color x:Key="Md.Sys.Color.TertiaryContainer">#FFD8E4</Color>
+      <Color x:Key="Md.Sys.Color.OnTertiaryContainer">#31111D</Color>
+      <Color x:Key="Md.Sys.Color.Surface">#FFFBFE</Color>
+      <Color x:Key="Md.Sys.Color.SurfaceContainer">#F3EDF7</Color>
+      <Color x:Key="Md.Sys.Color.SurfaceContainerLow">#F7F2FA</Color>
+      <Color x:Key="Md.Sys.Color.SurfaceContainerHigh">#ECE6F0</Color>
+      <Color x:Key="Md.Sys.Color.SurfaceContainerHighest">#E6E0E9</Color>
+      <Color x:Key="Md.Sys.Color.OnSurface">#1D1B20</Color>
+      <Color x:Key="Md.Sys.Color.OnSurfaceVariant">#49454F</Color>
+      <Color x:Key="Md.Sys.Color.Error">#B3261E</Color>
+      <Color x:Key="Md.Sys.Color.OnError">#FFFFFF</Color>
+      <Color x:Key="Md.Sys.Color.OnErrorContainer">#410E0B</Color>
+      <Color x:Key="Md.Sys.Color.Outline">#79747E</Color>
+      <Color x:Key="Md.Sys.Color.OutlineVariant">#CAC4D0</Color>
+      <Color x:Key="Md.Sys.Color.InverseSurface">#322F35</Color>
+      <Color x:Key="Md.Sys.Color.InverseOnSurface">#F5EFF7</Color>
+      <Color x:Key="Md.Sys.Color.InversePrimary">#D0BCFF</Color>
+
+      <SolidColorBrush x:Key="Md.Sys.Color.Primary.Brush" Color="{StaticResource Md.Sys.Color.Primary}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnPrimary.Brush" Color="{StaticResource Md.Sys.Color.OnPrimary}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.PrimaryAction.Brush" Color="{StaticResource Md.Sys.Color.PrimaryAction}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnPrimaryAction.Brush" Color="{StaticResource Md.Sys.Color.OnPrimaryAction}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.PrimaryContainer.Brush" Color="{StaticResource Md.Sys.Color.PrimaryContainer}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnPrimaryContainer.Brush" Color="{StaticResource Md.Sys.Color.OnPrimaryContainer}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.PrimarySelection.Brush" Color="#526750A4" />
+      <SolidColorBrush x:Key="Md.Sys.Color.Secondary.Brush" Color="{StaticResource Md.Sys.Color.Secondary}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnSecondary.Brush" Color="{StaticResource Md.Sys.Color.OnSecondary}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.SecondaryContainer.Brush" Color="{StaticResource Md.Sys.Color.SecondaryContainer}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnSecondaryContainer.Brush" Color="{StaticResource Md.Sys.Color.OnSecondaryContainer}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.Tertiary.Brush" Color="{StaticResource Md.Sys.Color.Tertiary}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnTertiary.Brush" Color="{StaticResource Md.Sys.Color.OnTertiary}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.TertiaryContainer.Brush" Color="{StaticResource Md.Sys.Color.TertiaryContainer}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnTertiaryContainer.Brush" Color="{StaticResource Md.Sys.Color.OnTertiaryContainer}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.Surface.Brush" Color="{StaticResource Md.Sys.Color.Surface}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.SurfaceContainer.Brush" Color="{StaticResource Md.Sys.Color.SurfaceContainer}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.SurfaceContainerLow.Brush" Color="{StaticResource Md.Sys.Color.SurfaceContainerLow}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.SurfaceContainerHigh.Brush" Color="{StaticResource Md.Sys.Color.SurfaceContainerHigh}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.SurfaceContainerHighest.Brush" Color="{StaticResource Md.Sys.Color.SurfaceContainerHighest}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnSurface.Brush" Color="{StaticResource Md.Sys.Color.OnSurface}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnSurfaceVariant.Brush" Color="{StaticResource Md.Sys.Color.OnSurfaceVariant}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.Error.Brush" Color="{StaticResource Md.Sys.Color.Error}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnError.Brush" Color="{StaticResource Md.Sys.Color.OnError}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnErrorContainer.Brush" Color="{StaticResource Md.Sys.Color.OnErrorContainer}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.Outline.Brush" Color="{StaticResource Md.Sys.Color.Outline}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OutlineVariant.Brush" Color="{StaticResource Md.Sys.Color.OutlineVariant}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.InverseSurface.Brush" Color="{StaticResource Md.Sys.Color.InverseSurface}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.InverseOnSurface.Brush" Color="{StaticResource Md.Sys.Color.InverseOnSurface}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.InversePrimary.Brush" Color="{StaticResource Md.Sys.Color.InversePrimary}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.DisabledContainer.Brush" Color="#1A1D1B20" />
+      <SolidColorBrush x:Key="Md.Sys.Color.DisabledContent.Brush" Color="#611D1B20" />
+      <SolidColorBrush x:Key="Md.Sys.Color.DisabledFilledField.Brush" Color="#0A1D1B20" />
+      <SolidColorBrush x:Key="Md.Sys.Color.DisabledIndicator.Brush" Color="#611D1B20" />
+      <SolidColorBrush x:Key="Md.Sys.Color.DisabledOutline.Brush" Color="#1F1D1B20" />
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="Dark">
+      <Color x:Key="Md.Sys.Color.Primary">#D0BCFF</Color>
+      <Color x:Key="Md.Sys.Color.OnPrimary">#381E72</Color>
+      <Color x:Key="Md.Sys.Color.PrimaryAction">#6750A4</Color>
+      <Color x:Key="Md.Sys.Color.OnPrimaryAction">#FFFFFF</Color>
+      <Color x:Key="Md.Sys.Color.PrimaryContainer">#4F378B</Color>
+      <Color x:Key="Md.Sys.Color.OnPrimaryContainer">#EADDFF</Color>
+      <Color x:Key="Md.Sys.Color.Secondary">#CCC2DC</Color>
+      <Color x:Key="Md.Sys.Color.OnSecondary">#332D41</Color>
+      <Color x:Key="Md.Sys.Color.SecondaryContainer">#4A4458</Color>
+      <Color x:Key="Md.Sys.Color.OnSecondaryContainer">#E8DEF8</Color>
+      <Color x:Key="Md.Sys.Color.Tertiary">#EFB8C8</Color>
+      <Color x:Key="Md.Sys.Color.OnTertiary">#492532</Color>
+      <Color x:Key="Md.Sys.Color.TertiaryContainer">#633B48</Color>
+      <Color x:Key="Md.Sys.Color.OnTertiaryContainer">#FFD8E4</Color>
+      <Color x:Key="Md.Sys.Color.Surface">#141218</Color>
+      <Color x:Key="Md.Sys.Color.SurfaceContainer">#211F26</Color>
+      <Color x:Key="Md.Sys.Color.SurfaceContainerLow">#1D1B20</Color>
+      <Color x:Key="Md.Sys.Color.SurfaceContainerHigh">#2B2930</Color>
+      <Color x:Key="Md.Sys.Color.SurfaceContainerHighest">#36343B</Color>
+      <Color x:Key="Md.Sys.Color.OnSurface">#E6E0E9</Color>
+      <Color x:Key="Md.Sys.Color.OnSurfaceVariant">#CAC4D0</Color>
+      <Color x:Key="Md.Sys.Color.Error">#F2B8B5</Color>
+      <Color x:Key="Md.Sys.Color.OnError">#601410</Color>
+      <Color x:Key="Md.Sys.Color.OnErrorContainer">#F9DEDC</Color>
+      <Color x:Key="Md.Sys.Color.Outline">#938F99</Color>
+      <Color x:Key="Md.Sys.Color.OutlineVariant">#49454F</Color>
+      <Color x:Key="Md.Sys.Color.InverseSurface">#E6E0E9</Color>
+      <Color x:Key="Md.Sys.Color.InverseOnSurface">#322F35</Color>
+      <Color x:Key="Md.Sys.Color.InversePrimary">#6750A4</Color>
+
+      <SolidColorBrush x:Key="Md.Sys.Color.Primary.Brush" Color="{StaticResource Md.Sys.Color.Primary}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnPrimary.Brush" Color="{StaticResource Md.Sys.Color.OnPrimary}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.PrimaryAction.Brush" Color="{StaticResource Md.Sys.Color.PrimaryAction}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnPrimaryAction.Brush" Color="{StaticResource Md.Sys.Color.OnPrimaryAction}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.PrimaryContainer.Brush" Color="{StaticResource Md.Sys.Color.PrimaryContainer}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnPrimaryContainer.Brush" Color="{StaticResource Md.Sys.Color.OnPrimaryContainer}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.PrimarySelection.Brush" Color="#52D0BCFF" />
+      <SolidColorBrush x:Key="Md.Sys.Color.Secondary.Brush" Color="{StaticResource Md.Sys.Color.Secondary}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnSecondary.Brush" Color="{StaticResource Md.Sys.Color.OnSecondary}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.SecondaryContainer.Brush" Color="{StaticResource Md.Sys.Color.SecondaryContainer}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnSecondaryContainer.Brush" Color="{StaticResource Md.Sys.Color.OnSecondaryContainer}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.Tertiary.Brush" Color="{StaticResource Md.Sys.Color.Tertiary}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnTertiary.Brush" Color="{StaticResource Md.Sys.Color.OnTertiary}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.TertiaryContainer.Brush" Color="{StaticResource Md.Sys.Color.TertiaryContainer}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnTertiaryContainer.Brush" Color="{StaticResource Md.Sys.Color.OnTertiaryContainer}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.Surface.Brush" Color="{StaticResource Md.Sys.Color.Surface}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.SurfaceContainer.Brush" Color="{StaticResource Md.Sys.Color.SurfaceContainer}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.SurfaceContainerLow.Brush" Color="{StaticResource Md.Sys.Color.SurfaceContainerLow}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.SurfaceContainerHigh.Brush" Color="{StaticResource Md.Sys.Color.SurfaceContainerHigh}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.SurfaceContainerHighest.Brush" Color="{StaticResource Md.Sys.Color.SurfaceContainerHighest}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnSurface.Brush" Color="{StaticResource Md.Sys.Color.OnSurface}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnSurfaceVariant.Brush" Color="{StaticResource Md.Sys.Color.OnSurfaceVariant}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.Error.Brush" Color="{StaticResource Md.Sys.Color.Error}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnError.Brush" Color="{StaticResource Md.Sys.Color.OnError}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OnErrorContainer.Brush" Color="{StaticResource Md.Sys.Color.OnErrorContainer}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.Outline.Brush" Color="{StaticResource Md.Sys.Color.Outline}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.OutlineVariant.Brush" Color="{StaticResource Md.Sys.Color.OutlineVariant}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.InverseSurface.Brush" Color="{StaticResource Md.Sys.Color.InverseSurface}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.InverseOnSurface.Brush" Color="{StaticResource Md.Sys.Color.InverseOnSurface}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.InversePrimary.Brush" Color="{StaticResource Md.Sys.Color.InversePrimary}" />
+      <SolidColorBrush x:Key="Md.Sys.Color.DisabledContainer.Brush" Color="#1AE6E0E9" />
+      <SolidColorBrush x:Key="Md.Sys.Color.DisabledContent.Brush" Color="#61E6E0E9" />
+      <SolidColorBrush x:Key="Md.Sys.Color.DisabledFilledField.Brush" Color="#0AE6E0E9" />
+      <SolidColorBrush x:Key="Md.Sys.Color.DisabledIndicator.Brush" Color="#61E6E0E9" />
+      <SolidColorBrush x:Key="Md.Sys.Color.DisabledOutline.Brush" Color="#1FE6E0E9" />
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

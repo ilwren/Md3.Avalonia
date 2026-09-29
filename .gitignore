@@ -1,0 +1,16 @@
+**/bin/
+**/obj/
+.vs/
+.idea/
+*.user
+*.suo
+TestResults/
+artifacts/
+*.dll
+*.pdb
+*.nupkg
+*.snupkg
+*.apk
+*.aab
+*.deps.json
+*.runtimeconfig.json

@@ -1,0 +1,83 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="MdListGeneratedItemTheme" TargetType="ListBoxItem">
+    <Setter Property="MinHeight" Value="56" />
+    <Setter Property="Padding" Value="16,8" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ListBoxItem">
+        <Border x:Name="PART_Container" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" ClipToBounds="True">
+          <Grid>
+            <ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="Center" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Foreground="{TemplateBinding Foreground}" />
+            <Border x:Name="PART_StateLayer" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsHitTestVisible="False" Opacity="0" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:selected"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" /></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.10" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdListItem}" TargetType="md:MdListItem">
+    <Setter Property="MinHeight" Value="64" />
+    <Setter Property="Padding" Value="16,8" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdListItem">
+        <Border x:Name="PART_Container" MinHeight="{TemplateBinding MinHeight}" Background="{TemplateBinding Background}"
+                CornerRadius="{TemplateBinding CornerRadius}" ClipToBounds="True">
+          <Grid>
+            <Grid Margin="{TemplateBinding Padding}" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
+              <ContentPresenter x:Name="PART_Leading" Grid.Column="0" Width="40" Height="40" VerticalAlignment="Center"
+                                Content="{TemplateBinding LeadingContent}" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" IsVisible="False" />
+              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                <ContentPresenter Content="{TemplateBinding Headline}" FontSize="16" Foreground="{TemplateBinding Foreground}" />
+                <ContentPresenter x:Name="PART_Supporting" Content="{TemplateBinding SupportingText}" FontSize="14"
+                                  Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" IsVisible="False" />
+              </StackPanel>
+              <ContentPresenter x:Name="PART_Trailing" Grid.Column="2" VerticalAlignment="Center"
+                                Content="{TemplateBinding TrailingContent}" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" IsVisible="False" />
+            </Grid>
+            <Border x:Name="PART_StateLayer" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsHitTestVisible="False" Opacity="0" />
+            <md:MdRipplePresenter RippleBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:has-leading /template/ ContentPresenter#PART_Leading"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:has-supporting-text /template/ ContentPresenter#PART_Supporting"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:has-trailing /template/ ContentPresenter#PART_Trailing"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:selected"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" /></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.10" /></Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_Container"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="2" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdList}" TargetType="md:MdList">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="ItemSpacing" Value="0" />
+    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+    <Setter Property="ItemsPanel"><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></Setter>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdList">
+        <md:MdScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+          <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
+        </md:MdScrollViewer>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:segmented"><Setter Property="ItemSpacing" Value="8" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

@@ -1,0 +1,324 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <!-- Complete local themes for native collection primitives. Md3 does not install a global
+       Avalonia ListBox theme, so every internal list must provide its own presenter/template. -->
+  <ControlTheme x:Key="MdFlutterListBoxTheme" TargetType="ListBox">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ListBox">
+        <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}" ClipToBounds="True">
+          <md:MdScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <ItemsPresenter x:Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+          </md:MdScrollViewer>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+  <ControlTheme x:Key="MdFlutterListItemTheme" TargetType="ListBoxItem">
+    <Setter Property="MinHeight" Value="48" />
+    <Setter Property="Padding" Value="12,8" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ListBoxItem">
+        <Border x:Name="PART_Root" Background="{TemplateBinding Background}"
+                CornerRadius="12" ClipToBounds="True">
+          <Grid>
+            <ContentPresenter Margin="{TemplateBinding Padding}"
+                              Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" />
+            <Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                    CornerRadius="12" IsHitTestVisible="False" Opacity="0" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.12" /></Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_State"><Setter Property="Opacity" Value="0.10" /></Style>
+    <Style Selector="^:selected"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /></Style>
+  </ControlTheme>
+
+  <!-- Flutter Material phase 2: collections -->
+  <ControlTheme x:Key="{x:Type md:MdPaginatedDataTable}" TargetType="md:MdPaginatedDataTable">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdPaginatedDataTable">
+        <Border Background="{TemplateBinding Background}" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                BorderThickness="1" CornerRadius="16">
+          <Border Margin="1" Background="{TemplateBinding Background}" CornerRadius="15" ClipToBounds="True">
+            <Grid RowDefinitions="56,*,64">
+            <Border Padding="16,0" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
+                    BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,0,1">
+              <ContentPresenter VerticalAlignment="Center" Content="{TemplateBinding Header}" Foreground="{TemplateBinding Foreground}" />
+            </Border>
+            <ListBox Grid.Row="1" Theme="{StaticResource MdFlutterListBoxTheme}"
+                     ItemsSource="{TemplateBinding PageItems}" ItemTemplate="{TemplateBinding ItemTemplate}"
+                     ItemContainerTheme="{StaticResource MdDataTableGeneratedRowTheme}"
+                     Background="Transparent" BorderThickness="0" />
+            <Border Grid.Row="2" Padding="12,0" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,1,0,0">
+              <Grid ColumnDefinitions="*,Auto,92,Auto,Auto" ColumnSpacing="6">
+                <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                           Text="{TemplateBinding PageLabel}" />
+                <TextBlock Grid.Column="1" Margin="8,0" VerticalAlignment="Center" FontSize="12"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Rows per page" />
+                <md:MdComboBox Grid.Column="2" MinWidth="84" MinHeight="48" ItemsSource="{TemplateBinding AvailableRowsPerPage}"
+                               SelectedItem="{TemplateBinding RowsPerPage, Mode=TwoWay}" />
+                <md:MdIconButton x:Name="PART_PreviousPageButton" Grid.Column="3" Icon="{DynamicResource Md.Icon.ChevronLeft}"
+                                 AutomationProperties.Name="Previous page" />
+                <md:MdIconButton x:Name="PART_NextPageButton" Grid.Column="4" Icon="{DynamicResource Md.Icon.ChevronRight}"
+                                 AutomationProperties.Name="Next page" />
+              </Grid>
+            </Border>
+              <Border x:Name="PART_LoadingLayer" Grid.RowSpan="3" Background="#66000000" IsVisible="False">
+                <md:MdCircularProgressIndicator HorizontalAlignment="Center" VerticalAlignment="Center" IsIndeterminate="True" />
+              </Border>
+            </Grid>
+          </Border>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:first-page /template/ md|MdIconButton#PART_PreviousPageButton"><Setter Property="IsEnabled" Value="False" /></Style>
+    <Style Selector="^:last-page /template/ md|MdIconButton#PART_NextPageButton"><Setter Property="IsEnabled" Value="False" /></Style>
+    <Style Selector="^:loading /template/ Border#PART_LoadingLayer"><Setter Property="IsVisible" Value="True" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="MdReorderableListItemTheme" TargetType="ListBoxItem">
+    <Setter Property="MinHeight" Value="56" /><Setter Property="Padding" Value="16,8" />
+    <Setter Property="Margin" Value="0,2" /><Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" /><Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ListBoxItem">
+        <Border x:Name="PART_Root" MinHeight="{TemplateBinding MinHeight}"
+                Background="{TemplateBinding Background}" CornerRadius="12"
+                BoxShadow="{DynamicResource Md.Sys.Elevation.Level0}">
+          <Grid>
+            <Grid Margin="{TemplateBinding Padding}" ColumnDefinitions="*,48">
+              <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                                Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+              <Border x:Name="PART_DragHandle" Grid.Column="1" Width="48" Height="48" Background="Transparent" CornerRadius="24">
+                <Path Width="18" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Data="M4,5 A2,2 0 1 0 4.01,5 M14,5 A2,2 0 1 0 14.01,5 M4,12 A2,2 0 1 0 4.01,12 M14,12 A2,2 0 1 0 14.01,12 M4,19 A2,2 0 1 0 4.01,19 M14,19 A2,2 0 1 0 14.01,19"
+                      Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              </Border>
+            </Grid>
+            <Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                    CornerRadius="12" IsHitTestVisible="False" Opacity="0" />
+            <Border x:Name="PART_DropIndicator" BorderBrush="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                    BorderThickness="2" CornerRadius="12" IsHitTestVisible="False" IsVisible="False" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.12" /></Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_State"><Setter Property="Opacity" Value="0.10" /></Style>
+    <Style Selector="^:selected"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /></Style>
+    <Style Selector="^.dragging"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" /><Setter Property="Opacity" Value="0.96" /></Style>
+    <Style Selector="^.dragging /template/ Border#PART_Root"><Setter Property="BoxShadow" Value="{DynamicResource Md.Sys.Elevation.Level3}" /></Style>
+    <Style Selector="^.drop-target /template/ Border#PART_DropIndicator"><Setter Property="IsVisible" Value="True" /></Style>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type md:MdReorderableList}" TargetType="md:MdReorderableList">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Setter Property="BorderThickness" Value="1" /><Setter Property="CornerRadius" Value="16" /><Setter Property="Padding" Value="4" />
+    <Setter Property="ItemsPanel"><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></Setter>
+    <Setter Property="ItemContainerTheme" Value="{StaticResource MdReorderableListItemTheme}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdReorderableList">
+        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}" ClipToBounds="True">
+          <md:MdScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <ItemsPresenter x:Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+          </md:MdScrollViewer>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:reordering"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdGridTileBar}" TargetType="md:MdGridTileBar">
+    <Setter Property="Foreground" Value="White" /><Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdGridTileBar">
+        <Border MinHeight="56" Background="#B3000000" ClipToBounds="True">
+          <Grid>
+            <Grid Margin="12,8" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+              <ContentPresenter Grid.Column="0" VerticalAlignment="Center" Content="{TemplateBinding Leading}" />
+              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                <ContentPresenter Content="{TemplateBinding Title}" ContentTemplate="{TemplateBinding ContentTemplate}" FontWeight="Medium" Foreground="{TemplateBinding Foreground}" />
+                <ContentPresenter Content="{TemplateBinding Subtitle}" FontSize="12" Foreground="{TemplateBinding Foreground}" />
+              </StackPanel>
+              <ContentPresenter Grid.Column="2" VerticalAlignment="Center" Content="{TemplateBinding Trailing}" />
+            </Grid>
+            <Border x:Name="PART_State" Background="White" IsHitTestVisible="False" Opacity="0" />
+            <Border x:Name="PART_Focus" Margin="2" BorderBrush="White" BorderThickness="2" IsHitTestVisible="False" IsVisible="False" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:interactive:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.14" /></Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_Focus"><Setter Property="IsVisible" Value="True" /></Style>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type md:MdGridTile}" TargetType="md:MdGridTile">
+    <Setter Property="MinWidth" Value="160" /><Setter Property="MinHeight" Value="160" />
+    <Setter Property="Padding" Value="0" /><Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdGridTile">
+        <Border Background="{TemplateBinding Background}" CornerRadius="16" ClipToBounds="True">
+          <Grid>
+            <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                              Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+            <ContentPresenter VerticalAlignment="Top" Content="{TemplateBinding Header}" />
+            <ContentPresenter VerticalAlignment="Bottom" Content="{TemplateBinding Footer}" />
+            <Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsHitTestVisible="False" Opacity="0" />
+            <Border x:Name="PART_ActivatedOutline" Margin="2" BorderBrush="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                    BorderThickness="3" CornerRadius="14" IsHitTestVisible="False" IsVisible="False" />
+            <Border x:Name="PART_FavoriteIndicator" Width="12" Height="12" Margin="12"
+                    HorizontalAlignment="Right" VerticalAlignment="Top" Background="{DynamicResource Md.Sys.Color.Tertiary.Brush}"
+                    CornerRadius="6" IsHitTestVisible="False" IsVisible="False" />
+            <Border x:Name="PART_Focus" Margin="3" BorderBrush="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                    BorderThickness="3" CornerRadius="13" IsHitTestVisible="False" IsVisible="False" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.12" /></Style>
+    <Style Selector="^:activated /template/ Border#PART_ActivatedOutline"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:favorite /template/ Border#PART_FavoriteIndicator"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_Focus"><Setter Property="IsVisible" Value="True" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdDismissible}" TargetType="md:MdDismissible">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdDismissible">
+        <Border x:Name="PART_Root" Height="{TemplateBinding VisualHeight}" CornerRadius="14"
+                ClipToBounds="True" IsVisible="False">
+          <Grid>
+            <ContentPresenter x:Name="PART_StartBackground" HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                              Content="{TemplateBinding BackgroundContent}" />
+            <ContentPresenter x:Name="PART_EndBackground" HorizontalAlignment="Right" VerticalAlignment="Stretch"
+                              Content="{TemplateBinding SecondaryBackgroundContent}" />
+            <Border x:Name="PART_Foreground" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
+                    CornerRadius="14" Opacity="1">
+              <Border.RenderTransform><TranslateTransform X="{TemplateBinding DragOffset}" /></Border.RenderTransform>
+              <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+            </Border>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:present /template/ Border#PART_Root"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:confirming /template/ Border#PART_Foreground"><Setter Property="Opacity" Value="0.72" /></Style>
+    <Style Selector="^:dismissed /template/ Border#PART_Foreground"><Setter Property="Opacity" Value="0" /></Style>
+    <Style Selector="^:start /template/ ContentPresenter#PART_EndBackground"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:end /template/ ContentPresenter#PART_StartBackground"><Setter Property="IsVisible" Value="False" /></Style>
+  </ControlTheme>
+
+  <!-- Flutter Material phase 3: form and dialog helpers -->
+  <ControlTheme x:Key="{x:Type md:MdForm}" TargetType="md:MdForm">
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdForm"><ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" /></ControlTemplate></Setter>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type md:MdFormField}" TargetType="md:MdFormField">
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdFormField"><StackPanel Spacing="4"><ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" /><ContentPresenter Content="{TemplateBinding SupportingText}" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /><TextBlock x:Name="PART_Error" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.Error.Brush}" Text="{TemplateBinding ErrorText}" IsVisible="False" /></StackPanel></ControlTemplate></Setter>
+    <Style Selector="^:invalid /template/ TextBlock#PART_Error"><Setter Property="IsVisible" Value="True" /></Style>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type md:MdDropdownFormField}" TargetType="md:MdDropdownFormField" BasedOn="{StaticResource {x:Type md:MdFormField}}">
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdDropdownFormField"><StackPanel Spacing="4"><md:MdComboBox x:Name="PART_Editor" Label="{TemplateBinding Label}" ItemsSource="{TemplateBinding ItemsSource}" ItemTemplate="{TemplateBinding ItemTemplate}" SelectedItem="{TemplateBinding Value, Mode=TwoWay}" Variant="Outlined" /><ContentPresenter Content="{TemplateBinding SupportingText}" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /><TextBlock x:Name="PART_Error" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.Error.Brush}" Text="{TemplateBinding ErrorText}" IsVisible="False" /></StackPanel></ControlTemplate></Setter>
+    <Style Selector="^:invalid /template/ md|MdComboBox#PART_Editor"><Setter Property="IsError" Value="True" /></Style>
+    <Style Selector="^:invalid /template/ TextBlock#PART_Error"><Setter Property="IsVisible" Value="True" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdSimpleDialog}" TargetType="md:MdSimpleDialog">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdSimpleDialog">
+        <Border x:Name="PART_Surface" MinWidth="320" MaxWidth="560" MaxHeight="640" Padding="24,20"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="28"
+                BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}" IsVisible="False" IsHitTestVisible="False"
+                Opacity="0" RenderTransform="scale(0.9)" RenderTransformOrigin="50%,50%">
+          <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+            <ContentPresenter Content="{TemplateBinding Title}" FontSize="24"
+                              Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+            <ListBox x:Name="PART_ItemsHost" Grid.Row="1" Theme="{StaticResource MdFlutterListBoxTheme}"
+                     ItemContainerTheme="{StaticResource MdFlutterListItemTheme}" MaxHeight="480"
+                     ItemsSource="{TemplateBinding ItemsSource}" ItemTemplate="{TemplateBinding ItemTemplate}"
+                     SelectedItem="{TemplateBinding SelectedItem, Mode=TwoWay}" Background="Transparent" BorderThickness="0" />
+            <md:MdButton x:Name="PART_CancelButton" Grid.Row="2" HorizontalAlignment="Right"
+                         Content="{TemplateBinding CancelText}" Size="ExtraSmall" Variant="Text" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:present /template/ Border#PART_Surface"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:open /template/ Border#PART_Surface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+    <Style Selector="^:reduced-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdAboutDialog}" TargetType="md:MdAboutDialog">
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdAboutDialog"><Border MinWidth="320" MaxWidth="560" Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="28"><Grid ColumnDefinitions="Auto,*" ColumnSpacing="20"><ContentPresenter Content="{TemplateBinding ApplicationIcon}" /><StackPanel Grid.Column="1" Spacing="6"><TextBlock FontSize="24" Text="{TemplateBinding ApplicationName}" /><TextBlock Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{TemplateBinding ApplicationVersion}" /><TextBlock Margin="0,8,0,0" TextWrapping="Wrap" Text="{TemplateBinding Legalese}" /><ContentPresenter Margin="0,8,0,0" Content="{TemplateBinding Content}" /></StackPanel></Grid></Border></ControlTemplate></Setter>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type md:MdLicensePage}" TargetType="md:MdLicensePage">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdLicensePage">
+        <Grid ColumnDefinitions="260,*" ColumnSpacing="16">
+          <Grid RowDefinitions="Auto,*" RowSpacing="10">
+            <md:MdTextBox Label="{TemplateBinding FilterLabel}" ShowClearButton="True"
+                          Text="{TemplateBinding Filter, Mode=TwoWay}" Variant="Outlined" />
+            <ListBox Grid.Row="1" Theme="{StaticResource MdFlutterListBoxTheme}"
+                     ItemContainerTheme="{StaticResource MdFlutterListItemTheme}"
+                     ItemsSource="{TemplateBinding FilteredLicenses}"
+                     SelectedItem="{TemplateBinding SelectedLicense, Mode=TwoWay}">
+              <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="md:MdLicenseEntry">
+                  <StackPanel Spacing="2"><TextBlock FontWeight="Medium" Text="{Binding Package}" /><TextBlock FontSize="12" Text="{Binding License}" /></StackPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </Grid>
+          <Border Grid.Column="1" Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
+            <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+              <StackPanel Spacing="8">
+                <TextBlock FontSize="24" Text="{Binding SelectedLicense.Package, RelativeSource={RelativeSource TemplatedParent}}" />
+                <TextBlock Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{Binding SelectedLicense.License, RelativeSource={RelativeSource TemplatedParent}}" />
+                <TextBlock TextWrapping="Wrap" Text="{Binding SelectedLicense.Text, RelativeSource={RelativeSource TemplatedParent}}" />
+              </StackPanel>
+            </md:MdScrollViewer>
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- Flutter Material phase 4: advanced surfaces and adaptation -->
+  <ControlTheme x:Key="{x:Type md:MdDraggableScrollableSheet}" TargetType="md:MdDraggableScrollableSheet">
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdDraggableScrollableSheet"><Grid ClipToBounds="True"><Border x:Name="PART_Surface" Height="{TemplateBinding SheetHeight}" MinHeight="80" VerticalAlignment="Bottom" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="28,28,0,0" BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}" ClipToBounds="True"><Grid RowDefinitions="Auto,*"><Border x:Name="PART_DragHandle" MinHeight="36" Background="Transparent" Cursor="SizeNorthSouth"><StackPanel><Border Width="32" Height="4" Margin="0,8,0,4" HorizontalAlignment="Center" Background="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" CornerRadius="2" /><ContentPresenter Margin="16,0,16,8" Content="{TemplateBinding Header}" /></StackPanel></Border><ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"><ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" /></ScrollViewer></Grid></Border></Grid></ControlTemplate></Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdAdaptiveSwitch}" TargetType="md:MdAdaptiveSwitch" BasedOn="{StaticResource {x:Type md:MdSwitch}}">
+    <Style Selector="^:cupertino"><Setter Property="MinWidth" Value="51" /><Setter Property="MinHeight" Value="31" /></Style>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type md:MdAdaptiveProgressIndicator}" TargetType="md:MdAdaptiveProgressIndicator">
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdAdaptiveProgressIndicator"><md:MdCircularProgressIndicator Size="{TemplateBinding Size}" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}" Value="{TemplateBinding Value}" IsIndeterminate="{TemplateBinding IsIndeterminate}" /></ControlTemplate></Setter>
+    <Style Selector="^:cupertino /template/ md|MdCircularProgressIndicator"><Setter Property="StrokeThickness" Value="3" /><Setter Property="TrackBrush" Value="Transparent" /></Style>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type md:MdHero}" TargetType="md:MdHero"><Setter Property="Template"><ControlTemplate TargetType="md:MdHero"><ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" /></ControlTemplate></Setter></ControlTheme>
+  <ControlTheme x:Key="{x:Type md:MdFocusTraversalGroup}" TargetType="md:MdFocusTraversalGroup">
+    <Setter Property="KeyboardNavigation.TabNavigation" Value="Continue" />
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdFocusTraversalGroup"><ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" /></ControlTemplate></Setter>
+    <Style Selector="^:cycle"><Setter Property="KeyboardNavigation.TabNavigation" Value="Cycle" /></Style>
+    <Style Selector="^:skip-traversal"><Setter Property="KeyboardNavigation.TabNavigation" Value="None" /></Style>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type md:MdShortcutScope}" TargetType="md:MdShortcutScope"><Setter Property="Focusable" Value="True" /><Setter Property="Template"><ControlTemplate TargetType="md:MdShortcutScope"><ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" /></ControlTemplate></Setter></ControlTheme>
+</ResourceDictionary>

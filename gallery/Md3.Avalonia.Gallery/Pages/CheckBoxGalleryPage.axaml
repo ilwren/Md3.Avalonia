@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.CheckBoxGalleryPage"
+             mc:Ignorable="d"
+             d:DesignWidth="900" d:DesignHeight="760">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+    <StackPanel Spacing="8">
+      <TextBlock Classes="h1" Text="Checkbox" />
+      <TextBlock Classes="body"
+                 Text="Checkboxes let users select one or more items, or turn an item on or off." />
+    </StackPanel>
+
+    <Grid ColumnDefinitions="*,*" ColumnSpacing="48">
+      <StackPanel Grid.Column="0" Spacing="10">
+        <TextBlock Classes="h2" Margin="0,0,0,8" Text="Selection states" />
+        <md:MdCheckBox Content="Unselected" />
+        <md:MdCheckBox Content="Selected" IsChecked="True" />
+        <md:MdCheckBox Content="Indeterminate" IsThreeState="True" IsChecked="{x:Null}" />
+      </StackPanel>
+
+      <StackPanel Grid.Column="1" Spacing="10">
+        <TextBlock Classes="h2" Margin="0,0,0,8" Text="Error states" />
+        <md:MdCheckBox Content="Unselected error" IsError="True" />
+        <md:MdCheckBox Content="Selected error" IsChecked="True" IsError="True" />
+        <md:MdCheckBox Content="Indeterminate error" IsThreeState="True"
+                            IsChecked="{x:Null}" IsError="True" />
+      </StackPanel>
+    </Grid>
+
+    <Grid ColumnDefinitions="*,*" ColumnSpacing="48">
+      <StackPanel Grid.Column="0" Spacing="10">
+        <TextBlock Classes="h2" Margin="0,0,0,8" Text="Disabled" />
+        <md:MdCheckBox Content="Disabled unselected" IsEnabled="False" />
+        <md:MdCheckBox Content="Disabled selected" IsEnabled="False" IsChecked="True" />
+        <md:MdCheckBox Content="Disabled indeterminate" IsEnabled="False"
+                            IsThreeState="True" IsChecked="{x:Null}" />
+      </StackPanel>
+
+      <Border Grid.Column="1" Padding="22" CornerRadius="20"
+              Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h2" Text="Interaction" />
+          <TextBlock Classes="body" TextWrapping="Wrap"
+                     Text="The 18-DIP checkbox stays inside a 40-DIP state layer and a 48-DIP hit target. Tab reveals the keyboard focus indicator; click cycles native Avalonia CheckBox state." />
+        </StackPanel>
+      </Border>
+    </Grid>
+    <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdCheckBox Content=&quot;Receive updates&quot;&#10;               IsChecked=&quot;{Binding ReceiveUpdates}&quot; /&gt;" CSharpCode="var updates = new MdCheckBox { Content = &quot;Receive updates&quot;, IsChecked = true };" /></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.AppBarGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8"><TextBlock Classes="h1" Text="App bars"/><TextBlock Classes="body" Text="Top app bars provide navigation, screen identity, and contextual actions."/></StackPanel>
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Small" />
+        <Panel>
+          <md:MdTopAppBar Title="Inbox">
+            <md:MdTopAppBar.LeadingContent><md:MdIconButton Icon="{x:Static md:MdSymbols.Menu}" /></md:MdTopAppBar.LeadingContent>
+            <md:MdTopAppBar.TrailingContent>
+              <StackPanel Orientation="Horizontal">
+                <md:MdIconButton Icon="{x:Static md:MdSymbols.Search}" />
+                <md:MdIconButton x:Name="SmallMoreButton" Icon="{x:Static md:MdSymbols.MoreVert}" Click="ToggleSmallMenu" />
+                <md:MdDropdownMenu x:Name="SmallMenu" PlacementTarget="{Binding #SmallMoreButton}" MinimumMenuWidth="180">
+                  <StackPanel><md:MdButton Content="Mark all as read" Variant="Text" HorizontalContentAlignment="Left" Click="CloseMenus"/><md:MdButton Content="Inbox settings" Variant="Text" HorizontalContentAlignment="Left" Click="CloseMenus"/></StackPanel>
+                </md:MdDropdownMenu>
+              </StackPanel>
+            </md:MdTopAppBar.TrailingContent>
+          </md:MdTopAppBar>
+        </Panel>
+      </StackPanel>
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Centered small" />
+        <Panel>
+          <md:MdTopAppBar Title="Messages" IsTitleCentered="True" IsScrolled="True">
+            <md:MdTopAppBar.LeadingContent><md:MdIconButton Icon="{x:Static md:MdSymbols.ArrowBack}" /></md:MdTopAppBar.LeadingContent>
+            <md:MdTopAppBar.TrailingContent><md:MdBadgedBox Badge="3" BadgeVariant="Label"><md:MdIconButton Icon="{x:Static md:MdSymbols.Notifications}"/></md:MdBadgedBox></md:MdTopAppBar.TrailingContent>
+          </md:MdTopAppBar>
+        </Panel>
+      </StackPanel>
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Medium flexible" />
+        <Panel>
+          <md:MdTopAppBar Title="Your library" Subtitle="Updated moments ago" Variant="MediumFlexible">
+            <md:MdTopAppBar.LeadingContent><md:MdIconButton Icon="{x:Static md:MdSymbols.ArrowBack}" /></md:MdTopAppBar.LeadingContent>
+            <md:MdTopAppBar.TrailingContent>
+              <StackPanel Orientation="Horizontal">
+                <md:MdIconButton x:Name="LibraryMoreButton" Icon="{x:Static md:MdSymbols.MoreVert}" Click="ToggleLibraryMenu" />
+                <md:MdDropdownMenu x:Name="LibraryMenu" PlacementTarget="{Binding #LibraryMoreButton}" MinimumMenuWidth="180">
+                  <StackPanel><md:MdButton Content="Sort library" Variant="Text" HorizontalContentAlignment="Left" Click="CloseMenus"/><md:MdButton Content="Manage storage" Variant="Text" HorizontalContentAlignment="Left" Click="CloseMenus"/></StackPanel>
+                </md:MdDropdownMenu>
+              </StackPanel>
+            </md:MdTopAppBar.TrailingContent>
+          </md:MdTopAppBar>
+        </Panel>
+      </StackPanel>
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Large flexible" />
+        <Panel>
+          <md:MdTopAppBar Title="Photos and memories" Subtitle="September 2026" Variant="LargeFlexible">
+            <md:MdTopAppBar.LeadingContent><md:MdIconButton Icon="{x:Static md:MdSymbols.ArrowBack}" /></md:MdTopAppBar.LeadingContent>
+            <md:MdTopAppBar.TrailingContent><StackPanel Orientation="Horizontal"><md:MdIconButton Icon="{x:Static md:MdSymbols.Search}"/><md:MdIconButton Icon="{x:Static md:MdSymbols.MoreVert}"/></StackPanel></md:MdTopAppBar.TrailingContent>
+          </md:MdTopAppBar>
+        </Panel>
+      </StackPanel>
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Bottom app bar — compatibility" />
+        <Panel>
+          <md:MdBottomAppBar>
+            <md:MdBottomAppBar.Actions><StackPanel Orientation="Horizontal"><md:MdIconButton Icon="{x:Static md:MdSymbols.Check}"/><md:MdIconButton Icon="{x:Static md:MdSymbols.Edit}"/><md:MdIconButton Icon="{x:Static md:MdSymbols.Delete}"/></StackPanel></md:MdBottomAppBar.Actions>
+            <md:MdBottomAppBar.FloatingAction><md:MdFloatingActionButton Icon="{x:Static md:MdSymbols.Add}"/></md:MdBottomAppBar.FloatingAction>
+          </md:MdBottomAppBar>
+        </Panel>
+      </StackPanel>
+      <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdTopAppBar Title=&quot;Inbox&quot;&gt;&#10;  &lt;md:MdTopAppBar.LeadingContent&gt;...&lt;/md:MdTopAppBar.LeadingContent&gt;&#10;&lt;/md:MdTopAppBar&gt;" CSharpCode="var bar = new MdTopAppBar { Title = &quot;Inbox&quot; };&#10;bar.TrailingContent = new MdIconButton { Icon = MdSymbols.MoreVert };" /></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

@@ -1,0 +1,58 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdSplitButton}" TargetType="md:MdSplitButton">
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdSplitButton">
+        <Grid x:Name="PART_Root" ColumnDefinitions="*,2,Auto">
+          <md:MdButton x:Name="PART_PrimaryButton"
+                       Grid.Column="0"
+                       Content="{TemplateBinding Content}"
+                       ContentTemplate="{TemplateBinding ContentTemplate}"
+                       Command="{TemplateBinding Command}"
+                       CommandParameter="{TemplateBinding CommandParameter}"
+                       LeadingIcon="{TemplateBinding LeadingIcon}"
+                       Size="{TemplateBinding Size}" />
+          <md:MdToggleIconButton x:Name="PART_TrailingButton"
+                                 Grid.Column="2"
+                                 MinWidth="0"
+                                 Icon="{DynamicResource Md.Icon.ExpandMore}"
+                                 SelectedIcon="{DynamicResource Md.Icon.ExpandLess}"
+                                 Shape="Square"
+                                 EnableSelectedShapeMorph="False"
+                                 Size="{TemplateBinding Size}"
+                                 Command="{TemplateBinding TrailingCommand}"
+                                 CommandParameter="{TemplateBinding TrailingCommandParameter}"
+                                 IsChecked="{TemplateBinding IsDropDownOpen, Mode=TwoWay}" />
+          <md:MdDropdownMenu Grid.ColumnSpan="3"
+                             Content="{TemplateBinding DropDownContent}"
+                             IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                             MinimumMenuWidth="{Binding Bounds.Width, ElementName=PART_Root}"
+                             PlacementTarget="{Binding #PART_Root}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:filled /template/ md|MdButton#PART_PrimaryButton"><Setter Property="Variant" Value="Filled" /></Style>
+    <Style Selector="^:filled /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="Variant" Value="Filled" /><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryAction.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimaryAction.Brush}" /><Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnPrimaryAction.Brush}" /></Style>
+    <Style Selector="^:tonal /template/ md|MdButton#PART_PrimaryButton"><Setter Property="Variant" Value="Tonal" /></Style>
+    <Style Selector="^:tonal /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="Variant" Value="Tonal" /><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" /></Style>
+    <Style Selector="^:outlined /template/ md|MdButton#PART_PrimaryButton"><Setter Property="Variant" Value="Outlined" /></Style>
+    <Style Selector="^:outlined /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="Variant" Value="Outlined" /><Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" /><Setter Property="BorderThickness" Value="1" /></Style>
+    <Style Selector="^:elevated /template/ md|MdButton#PART_PrimaryButton"><Setter Property="Variant" Value="Elevated" /></Style>
+    <Style Selector="^:elevated /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="Variant" Value="Filled" /><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+
+    <Style Selector="^:xsmall /template/ md|MdButton#PART_PrimaryButton"><Setter Property="ContainerCornerRadius" Value="16,4,4,16" /></Style>
+    <Style Selector="^:xsmall /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerWidth" Value="48" /><Setter Property="IconSize" Value="22" /><Setter Property="ContainerCornerRadius" Value="4,16,16,4" /></Style>
+    <Style Selector="^:small /template/ md|MdButton#PART_PrimaryButton"><Setter Property="ContainerCornerRadius" Value="20,4,4,20" /></Style>
+    <Style Selector="^:small /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerWidth" Value="48" /><Setter Property="IconSize" Value="22" /><Setter Property="ContainerCornerRadius" Value="4,20,20,4" /></Style>
+    <Style Selector="^:medium /template/ md|MdButton#PART_PrimaryButton"><Setter Property="ContainerCornerRadius" Value="28,4,4,28" /></Style>
+    <Style Selector="^:medium /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerWidth" Value="56" /><Setter Property="IconSize" Value="26" /><Setter Property="ContainerCornerRadius" Value="4,28,28,4" /></Style>
+    <Style Selector="^:large /template/ md|MdButton#PART_PrimaryButton"><Setter Property="ContainerCornerRadius" Value="48,8,8,48" /></Style>
+    <Style Selector="^:large /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerWidth" Value="96" /><Setter Property="IconSize" Value="38" /><Setter Property="ContainerCornerRadius" Value="8,48,48,8" /></Style>
+    <Style Selector="^:xlarge /template/ md|MdButton#PART_PrimaryButton"><Setter Property="ContainerCornerRadius" Value="68,12,12,68" /></Style>
+    <Style Selector="^:xlarge /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerWidth" Value="136" /><Setter Property="IconSize" Value="50" /><Setter Property="ContainerCornerRadius" Value="12,68,68,12" /></Style>
+
+  </ControlTheme>
+</ResourceDictionary>

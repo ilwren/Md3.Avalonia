@@ -1,0 +1,51 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- M3 Expressive generated button size tokens v0_11_0. -->
+  <x:Double x:Key="Md.Comp.Button.XSmall.Container.Height">32</x:Double>
+  <Thickness x:Key="Md.Comp.Button.XSmall.Content.Padding">16,0</Thickness>
+  <x:Double x:Key="Md.Comp.Button.XSmall.Icon.Size">20</x:Double>
+  <x:Double x:Key="Md.Comp.Button.XSmall.Icon.LabelSpace">8</x:Double>
+  <CornerRadius x:Key="Md.Comp.Button.XSmall.Shape.Round">16</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.Button.XSmall.Shape.Square">12</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.Button.XSmall.Shape.Pressed">8</CornerRadius>
+
+  <x:Double x:Key="Md.Comp.Button.Small.Container.Height">40</x:Double>
+  <Thickness x:Key="Md.Comp.Button.Small.Content.Padding">16,0</Thickness>
+  <x:Double x:Key="Md.Comp.Button.Small.Icon.Size">20</x:Double>
+  <x:Double x:Key="Md.Comp.Button.Small.Icon.LabelSpace">8</x:Double>
+  <CornerRadius x:Key="Md.Comp.Button.Small.Shape.Round">20</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.Button.Small.Shape.Square">12</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.Button.Small.Shape.Pressed">8</CornerRadius>
+
+  <x:Double x:Key="Md.Comp.Button.Medium.Container.Height">56</x:Double>
+  <Thickness x:Key="Md.Comp.Button.Medium.Content.Padding">24,0</Thickness>
+  <x:Double x:Key="Md.Comp.Button.Medium.Icon.Size">24</x:Double>
+  <x:Double x:Key="Md.Comp.Button.Medium.Icon.LabelSpace">8</x:Double>
+  <CornerRadius x:Key="Md.Comp.Button.Medium.Shape.Round">28</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.Button.Medium.Shape.Square">16</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.Button.Medium.Shape.Pressed">12</CornerRadius>
+
+  <x:Double x:Key="Md.Comp.Button.Large.Container.Height">96</x:Double>
+  <Thickness x:Key="Md.Comp.Button.Large.Content.Padding">48,0</Thickness>
+  <x:Double x:Key="Md.Comp.Button.Large.Icon.Size">32</x:Double>
+  <x:Double x:Key="Md.Comp.Button.Large.Icon.LabelSpace">12</x:Double>
+  <CornerRadius x:Key="Md.Comp.Button.Large.Shape.Round">48</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.Button.Large.Shape.Square">28</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.Button.Large.Shape.Pressed">16</CornerRadius>
+
+  <x:Double x:Key="Md.Comp.Button.XLarge.Container.Height">136</x:Double>
+  <Thickness x:Key="Md.Comp.Button.XLarge.Content.Padding">64,0</Thickness>
+  <x:Double x:Key="Md.Comp.Button.XLarge.Icon.Size">40</x:Double>
+  <x:Double x:Key="Md.Comp.Button.XLarge.Icon.LabelSpace">16</x:Double>
+  <CornerRadius x:Key="Md.Comp.Button.XLarge.Shape.Round">68</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.Button.XLarge.Shape.Square">28</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.Button.XLarge.Shape.Pressed">16</CornerRadius>
+
+  <x:Double x:Key="Md.Sys.State.Hover.Opacity">0.08</x:Double>
+  <x:Double x:Key="Md.Sys.State.Focus.Opacity">0.10</x:Double>
+  <x:Double x:Key="Md.Sys.State.Pressed.Opacity">0.10</x:Double>
+
+  <BoxShadows x:Key="Md.Sys.Elevation.Level0">0 0 0 0 #00000000</BoxShadows>
+  <BoxShadows x:Key="Md.Sys.Elevation.Level1">0 1 2 0 #4D000000</BoxShadows>
+  <BoxShadows x:Key="Md.Sys.Elevation.Level2">0 2 6 0 #42000000</BoxShadows>
+</ResourceDictionary>

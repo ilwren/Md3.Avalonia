@@ -1,0 +1,78 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Icon-font contract. Core never installs a look-alike fallback family: an optional provider
+       such as Md3.Avalonia.Icons defines Md.Sys.Typeface.Symbols.Rounded at application scope.
+       Leaving that family token unresolved lets normal text inheritance apply while the zero-width
+       glyph fallbacks below keep unavailable icon slots invisible instead of drawing tofu. -->
+  <x:String x:Key="Md.Icon.Add">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.CalendarMonth">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.Check">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.ChevronLeft">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.ChevronRight">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.Close">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.Done">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.ExpandLess">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.ExpandMore">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.Forward10">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.Fullscreen">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.FullscreenExit">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.Image">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.MusicNote">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.Pause">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.PlayArrow">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.Refresh">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.Replay10">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.RotateRight">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.Schedule">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.Search">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.SkipNext">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.SkipPrevious">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.Slideshow">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.Visibility">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.VisibilityOff">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.VolumeOff">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.VolumeUp">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.ZoomIn">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.ZoomOut">&#x200B;</x:String>
+
+  <!-- M3 motion physics. Spatial springs may overshoot; effects springs are critically damped. -->
+  <x:Double x:Key="Md.Sys.Motion.Expressive.FastSpatial.DampingRatio">0.6</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.Expressive.FastSpatial.Stiffness">800</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.Expressive.DefaultSpatial.DampingRatio">0.8</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.Expressive.DefaultSpatial.Stiffness">380</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.Expressive.SlowSpatial.DampingRatio">0.8</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.Expressive.SlowSpatial.Stiffness">200</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.FastEffects.DampingRatio">1</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.FastEffects.Stiffness">3800</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.DefaultEffects.DampingRatio">1</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.DefaultEffects.Stiffness">1600</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.SlowEffects.DampingRatio">1</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.SlowEffects.Stiffness">800</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.Ripple.DurationMilliseconds">450</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.Ripple.Opacity">0.16</x:Double>
+
+  <x:Double x:Key="Md.Comp.RadioButton.Target.Size">48</x:Double>
+  <x:Double x:Key="Md.Comp.RadioButton.StateLayer.Size">40</x:Double>
+  <x:Double x:Key="Md.Comp.RadioButton.Icon.Size">20</x:Double>
+  <x:Double x:Key="Md.Comp.RadioButton.Dot.Size">10</x:Double>
+  <Thickness x:Key="Md.Comp.RadioButton.Label.Margin">8,0,0,0</Thickness>
+
+  <x:Double x:Key="Md.Comp.Badge.Small.Size">6</x:Double>
+  <CornerRadius x:Key="Md.Comp.Badge.Small.Shape">3</CornerRadius>
+  <x:Double x:Key="Md.Comp.Badge.Large.Height">16</x:Double>
+  <x:Double x:Key="Md.Comp.Badge.Large.MinWidth">16</x:Double>
+  <CornerRadius x:Key="Md.Comp.Badge.Large.Shape">8</CornerRadius>
+  <Thickness x:Key="Md.Comp.Badge.Large.Padding">4,0</Thickness>
+
+  <x:Double x:Key="Md.Comp.AppBar.Small.Height">64</x:Double>
+  <x:Double x:Key="Md.Comp.AppBar.MediumFlexible.Height">112</x:Double>
+  <x:Double x:Key="Md.Comp.AppBar.MediumFlexible.LargeHeight">136</x:Double>
+  <x:Double x:Key="Md.Comp.AppBar.LargeFlexible.Height">120</x:Double>
+  <x:Double x:Key="Md.Comp.AppBar.LargeFlexible.LargeHeight">152</x:Double>
+  <Thickness x:Key="Md.Comp.AppBar.HorizontalPadding">4,0</Thickness>
+  <Thickness x:Key="Md.Comp.AppBar.Flexible.TitleMargin">16,0,16,20</Thickness>
+  <x:Double x:Key="Md.Comp.BottomAppBar.Height">80</x:Double>
+
+  <CornerRadius x:Key="Md.Comp.Dropdown.Attached.Shape">0,0,4,4</CornerRadius>
+  <Thickness x:Key="Md.Comp.Dropdown.Padding">4</Thickness>
+</ResourceDictionary>

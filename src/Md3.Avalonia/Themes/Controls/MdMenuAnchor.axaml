@@ -1,0 +1,82 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdMenuAnchor}" TargetType="md:MdMenuAnchor">
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdMenuAnchor">
+        <Grid>
+          <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+          <Popup x:Name="PART_Popup"
+                 IsOpen="{TemplateBinding IsPopupOpen}"
+                 IsLightDismissEnabled="True"
+                 OverlayDismissEventPassThrough="True"
+                 Placement="{TemplateBinding Placement}"
+                 PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                 ShouldUseOverlayLayer="False"
+                 WindowManagerAddShadowHint="False">
+            <Popup.Styles>
+              <Style Selector="PopupRoot">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="TransparencyLevelHint" Value="Transparent" />
+                <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
+              </Style>
+            </Popup.Styles>
+            <Border x:Name="PART_MenuSurface"
+                    Padding="0"
+                    Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
+                    BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}"
+                    CornerRadius="4"
+                    ClipToBounds="True"
+                    Opacity="0"
+                    RenderTransform="scale(0.8) translate(0px,-8px)"
+                    RenderTransformOrigin="0%,0%">
+              <ContentPresenter Content="{TemplateBinding Menu}" />
+            </Border>
+          </Popup>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:open /template/ Border#PART_MenuSurface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
+    <Style Selector="^:reduced-motion /template/ Border#PART_MenuSurface"><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdSubMenuItem}"
+                TargetType="md:MdSubMenuItem"
+                BasedOn="{StaticResource {x:Type md:MdMenuItem}}">
+    <Setter Property="TrailingContent" Value="›" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdSubMenuItem">
+        <Grid>
+          <Border x:Name="PART_Row" MinHeight="48" Padding="12,0"
+                  Background="{TemplateBinding Background}" CornerRadius="4">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <ContentPresenter Content="{TemplateBinding LeadingContent}" />
+              <ContentPresenter Grid.Column="1" Margin="12,0" VerticalAlignment="Center"
+                                Content="{TemplateBinding Content}" />
+              <ContentPresenter Grid.Column="2" VerticalAlignment="Center"
+                                Content="{TemplateBinding TrailingContent}" />
+            </Grid>
+          </Border>
+          <Popup x:Name="PART_SubmenuPopup"
+                 IsOpen="{TemplateBinding IsSubmenuOpen, Mode=TwoWay}"
+                 IsLightDismissEnabled="True"
+                 Placement="RightEdgeAlignedTop"
+                 PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                 HorizontalOffset="-4"
+                 ShouldUseOverlayLayer="False"
+                 WindowManagerAddShadowHint="False">
+            <Popup.Styles>
+              <Style Selector="PopupRoot">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="TransparencyLevelHint" Value="Transparent" />
+                <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
+              </Style>
+            </Popup.Styles>
+            <ContentPresenter Content="{TemplateBinding Submenu}" />
+          </Popup>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

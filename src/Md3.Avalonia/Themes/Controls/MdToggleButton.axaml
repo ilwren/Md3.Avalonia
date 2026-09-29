@@ -1,0 +1,66 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdToggleButton}" TargetType="md:MdToggleButton">
+    <Setter Property="MinHeight" Value="48" />
+    <Setter Property="MinWidth" Value="48" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdToggleButton">
+        <Grid MinHeight="48">
+          <Border x:Name="PART_Container" Height="{TemplateBinding ContainerHeight}"
+                  HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                  Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="True" CornerRadius="{TemplateBinding ContainerCornerRadius}">
+            <Grid>
+              <Border x:Name="PART_StateLayer" Background="{TemplateBinding StateLayerBrush}" CornerRadius="{TemplateBinding ContainerCornerRadius}" Opacity="0" IsHitTestVisible="False" />
+              <md:MdRipplePresenter RippleBrush="{TemplateBinding StateLayerBrush}" />
+              <StackPanel Margin="{TemplateBinding Padding}" Orientation="Horizontal" Spacing="{TemplateBinding IconSpacing}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Viewbox x:Name="PART_LeadingIcon" Width="{TemplateBinding IconSize}" Height="{TemplateBinding IconSize}" IsVisible="False"><md:MdSymbolPresenter Content="{TemplateBinding LeadingIcon}" Foreground="{TemplateBinding Foreground}"/></Viewbox>
+                <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center"/>
+                <Viewbox x:Name="PART_TrailingIcon" Width="{TemplateBinding IconSize}" Height="{TemplateBinding IconSize}" IsVisible="False"><md:MdSymbolPresenter Content="{TemplateBinding TrailingIcon}" Foreground="{TemplateBinding Foreground}"/></Viewbox>
+              </StackPanel>
+            </Grid>
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:has-leading-icon /template/ Viewbox#PART_LeadingIcon"><Setter Property="IsVisible" Value="True"/></Style>
+    <Style Selector="^:has-trailing-icon /template/ Viewbox#PART_TrailingIcon"><Setter Property="IsVisible" Value="True"/></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}"/></Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Focus.Opacity}"/></Style>
+    <Style Selector="^:pressed /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}"/></Style>
+
+    <Style Selector="^:xsmall"><Setter Property="ContainerHeight" Value="{DynamicResource Md.Comp.Button.XSmall.Container.Height}"/><Setter Property="Padding" Value="{DynamicResource Md.Comp.Button.XSmall.Content.Padding}"/><Setter Property="IconSize" Value="{DynamicResource Md.Comp.Button.XSmall.Icon.Size}"/><Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.XSmall.Icon.LabelSpace}"/></Style>
+    <Style Selector="^:small"><Setter Property="ContainerHeight" Value="{DynamicResource Md.Comp.Button.Small.Container.Height}"/><Setter Property="Padding" Value="{DynamicResource Md.Comp.Button.Small.Content.Padding}"/><Setter Property="IconSize" Value="{DynamicResource Md.Comp.Button.Small.Icon.Size}"/><Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.Small.Icon.LabelSpace}"/></Style>
+    <Style Selector="^:medium"><Setter Property="ContainerHeight" Value="{DynamicResource Md.Comp.Button.Medium.Container.Height}"/><Setter Property="Padding" Value="{DynamicResource Md.Comp.Button.Medium.Content.Padding}"/><Setter Property="IconSize" Value="{DynamicResource Md.Comp.Button.Medium.Icon.Size}"/><Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.Medium.Icon.LabelSpace}"/></Style>
+    <Style Selector="^:large"><Setter Property="ContainerHeight" Value="{DynamicResource Md.Comp.Button.Large.Container.Height}"/><Setter Property="Padding" Value="{DynamicResource Md.Comp.Button.Large.Content.Padding}"/><Setter Property="IconSize" Value="{DynamicResource Md.Comp.Button.Large.Icon.Size}"/><Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.Large.Icon.LabelSpace}"/></Style>
+    <Style Selector="^:xlarge"><Setter Property="ContainerHeight" Value="{DynamicResource Md.Comp.Button.XLarge.Container.Height}"/><Setter Property="Padding" Value="{DynamicResource Md.Comp.Button.XLarge.Content.Padding}"/><Setter Property="IconSize" Value="{DynamicResource Md.Comp.Button.XLarge.Icon.Size}"/><Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.XLarge.Icon.LabelSpace}"/></Style>
+
+    <Style Selector="^:xsmall:round"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.XSmall.Shape.Round}"/></Style><Style Selector="^:xsmall:square"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.XSmall.Shape.Square}"/></Style>
+    <Style Selector="^:small:round"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Small.Shape.Round}"/></Style><Style Selector="^:small:square"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Small.Shape.Square}"/></Style>
+    <Style Selector="^:medium:round"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Medium.Shape.Round}"/></Style><Style Selector="^:medium:square"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Medium.Shape.Square}"/></Style>
+    <Style Selector="^:large:round"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Large.Shape.Round}"/></Style><Style Selector="^:large:square"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Large.Shape.Square}"/></Style>
+    <Style Selector="^:xlarge:round"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.XLarge.Shape.Round}"/></Style><Style Selector="^:xlarge:square"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.XLarge.Shape.Square}"/></Style>
+    <Style Selector="^:xsmall:round:selected-shape-morph:checked"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.XSmall.Shape.Square}"/></Style><Style Selector="^:xsmall:square:selected-shape-morph:checked"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.XSmall.Shape.Round}"/></Style>
+    <Style Selector="^:small:round:selected-shape-morph:checked"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Small.Shape.Square}"/></Style><Style Selector="^:small:square:selected-shape-morph:checked"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Small.Shape.Round}"/></Style>
+    <Style Selector="^:medium:round:selected-shape-morph:checked"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Medium.Shape.Square}"/></Style><Style Selector="^:medium:square:selected-shape-morph:checked"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Medium.Shape.Round}"/></Style>
+    <Style Selector="^:large:round:selected-shape-morph:checked"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Large.Shape.Square}"/></Style><Style Selector="^:large:square:selected-shape-morph:checked"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Large.Shape.Round}"/></Style>
+    <Style Selector="^:xlarge:round:selected-shape-morph:checked"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.XLarge.Shape.Square}"/></Style><Style Selector="^:xlarge:square:selected-shape-morph:checked"><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.XLarge.Shape.Round}"/></Style>
+
+    <Style Selector="^:filled"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"/><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"/><Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"/></Style>
+    <Style Selector="^:filled:checked"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryAction.Brush}"/><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimaryAction.Brush}"/><Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnPrimaryAction.Brush}"/></Style>
+    <Style Selector="^:tonal"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"/><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}"/><Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}"/></Style>
+    <Style Selector="^:tonal:checked"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Secondary.Brush}"/><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondary.Brush}"/><Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnSecondary.Brush}"/></Style>
+    <Style Selector="^:outlined"><Setter Property="Background" Value="Transparent"/><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"/><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"/><Setter Property="BorderThickness" Value="1"/></Style>
+    <Style Selector="^:outlined:checked"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.InverseSurface.Brush}"/><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}"/><Setter Property="BorderThickness" Value="0"/><Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}"/></Style>
+    <Style Selector="^:elevated"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"/><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}"/></Style>
+    <Style Selector="^:elevated:checked"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryAction.Brush}"/><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimaryAction.Brush}"/></Style>
+    <Style Selector="^:disabled"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.DisabledContainer.Brush}"/><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}"/><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.DisabledOutline.Brush}"/></Style>
+  </ControlTheme>
+</ResourceDictionary>

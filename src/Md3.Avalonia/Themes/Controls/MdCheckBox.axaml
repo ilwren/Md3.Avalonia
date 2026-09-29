@@ -1,0 +1,194 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <StreamGeometry x:Key="Md.Comp.CheckBox.CheckGlyph.Data">M5.5 10.586 1.707 6.793A1 1 0 0 0 .293 8.207l4.5 4.5a1 1 0 0 0 1.414 0l11-11A1 1 0 0 0 15.793.293L5.5 10.586Z</StreamGeometry>
+
+  <ControlTheme x:Key="{x:Type md:MdCheckBox}"
+                TargetType="md:MdCheckBox">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource Md.Comp.CheckBox.Container.OutlineWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Md.Comp.CheckBox.Container.Shape}" />
+    <Setter Property="MinHeight" Value="{DynamicResource Md.Comp.CheckBox.Target.Size}" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Comp.CheckBox.Label.FontSize}" />
+    <Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="FocusIndicatorBrush" Value="{DynamicResource Md.Sys.Color.Secondary.Brush}" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdCheckBox">
+        <Grid MinHeight="{DynamicResource Md.Comp.CheckBox.Target.Size}"
+              ColumnDefinitions="Auto,*">
+          <Grid x:Name="PART_InteractiveArea"
+                Grid.Column="0"
+                Width="{DynamicResource Md.Comp.CheckBox.Target.Size}"
+                Height="{DynamicResource Md.Comp.CheckBox.Target.Size}"
+                Background="Transparent">
+            <Border x:Name="PART_StateLayer"
+                    Width="{DynamicResource Md.Comp.CheckBox.StateLayer.Size}"
+                    Height="{DynamicResource Md.Comp.CheckBox.StateLayer.Size}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{TemplateBinding StateLayerBrush}"
+                    CornerRadius="{DynamicResource Md.Comp.CheckBox.StateLayer.Shape}"
+                    IsHitTestVisible="False"
+                    Opacity="0" />
+
+            <Border x:Name="PART_FocusIndicator"
+                    Width="{DynamicResource Md.Comp.CheckBox.StateLayer.Size}"
+                    Height="{DynamicResource Md.Comp.CheckBox.StateLayer.Size}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BorderBrush="{TemplateBinding FocusIndicatorBrush}"
+                    BorderThickness="2"
+                    CornerRadius="{DynamicResource Md.Comp.CheckBox.StateLayer.Shape}"
+                    IsHitTestVisible="False"
+                    IsVisible="False" />
+
+            <Border x:Name="PART_Container"
+                    Width="{DynamicResource Md.Comp.CheckBox.Container.Size}"
+                    Height="{DynamicResource Md.Comp.CheckBox.Container.Size}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    IsHitTestVisible="False">
+              <Grid>
+                <Viewbox Width="12"
+                         Height="10"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Stretch="Uniform">
+                  <Path x:Name="PART_CheckGlyph"
+                        Width="14"
+                        Height="12"
+                        Data="M 1,6 L 5,10 L 13,1"
+                        Fill="Transparent"
+                        Stroke="{DynamicResource Md.Sys.Color.OnPrimary.Brush}"
+                        StrokeThickness="2"
+                        StrokeDashArray="18,18"
+                        StrokeDashOffset="18"
+                        Opacity="0"
+                        RenderTransform="scale(0.8)"
+                        RenderTransformOrigin="50%,50%" />
+                </Viewbox>
+
+                <Border x:Name="PART_IndeterminateGlyph"
+                        Width="10"
+                        Height="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Background="{DynamicResource Md.Sys.Color.OnPrimary.Brush}"
+                        CornerRadius="1"
+                        Opacity="0"
+                        RenderTransform="scale(0.6)"
+                        RenderTransformOrigin="50%,50%" />
+              </Grid>
+            </Border>
+          </Grid>
+
+          <ContentPresenter x:Name="PART_ContentPresenter"
+                            Grid.Column="1"
+                            Margin="{DynamicResource Md.Comp.CheckBox.Label.Margin}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Foreground="{TemplateBinding Foreground}"
+                            RecognizesAccessKey="True"
+                            TextWrapping="Wrap" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Selection states. -->
+    <Style Selector="^:checked">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+      <Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:checked /template/ Path#PART_CheckGlyph">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="StrokeDashOffset" Value="0" />
+      <Setter Property="RenderTransform" Value="scale(1)" />
+    </Style>
+    <Style Selector="^:indeterminate">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+      <Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:indeterminate /template/ Border#PART_IndeterminateGlyph">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="scale(1)" />
+    </Style>
+
+    <!-- State layer; touch never receives the pointer-over branch. -->
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Comp.CheckBox.StateLayer.HoverOpacity}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Comp.CheckBox.StateLayer.FocusOpacity}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusIndicator">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Comp.CheckBox.StateLayer.PressedOpacity}" />
+    </Style>
+    <Style Selector="^:pointerover">
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    </Style>
+    <Style Selector="^:pressed">
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    </Style>
+
+    <!-- Error applies to unselected, selected and indeterminate states. -->
+    <Style Selector="^:md-error">
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+    </Style>
+    <Style Selector="^:md-error:checked">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+    </Style>
+    <Style Selector="^:md-error:indeterminate">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+    </Style>
+    <Style Selector="^:md-error /template/ Path#PART_CheckGlyph">
+      <Setter Property="Stroke" Value="{DynamicResource Md.Sys.Color.OnError.Brush}" />
+    </Style>
+    <Style Selector="^:md-error /template/ Border#PART_IndeterminateGlyph">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnError.Brush}" />
+    </Style>
+
+    <!-- Disabled uses the exact 38% OnSurface roles from CheckboxTokens. -->
+    <Style Selector="^:disabled">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+    </Style>
+    <Style Selector="^:disabled /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="^:disabled:checked">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+    </Style>
+    <Style Selector="^:disabled:indeterminate">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+    </Style>
+    <Style Selector="^:disabled /template/ Path#PART_CheckGlyph">
+      <Setter Property="Stroke" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+    </Style>
+    <Style Selector="^:disabled /template/ Border#PART_IndeterminateGlyph">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

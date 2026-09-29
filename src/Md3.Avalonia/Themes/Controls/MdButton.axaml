@@ -1,0 +1,311 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdButton}"
+                TargetType="md:MdButton">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryAction.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimaryAction.Brush}" />
+    <Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnPrimaryAction.Brush}" />
+    <Setter Property="FocusIndicatorBrush" Value="{DynamicResource Md.Sys.Color.Secondary.Brush}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="{DynamicResource Md.Comp.Button.Small.Content.Padding}" />
+    <Setter Property="ContainerHeight" Value="{DynamicResource Md.Comp.Button.Small.Container.Height}" />
+    <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Small.Shape.Round}" />
+    <Setter Property="IconSize" Value="{DynamicResource Md.Comp.Button.Small.Icon.Size}" />
+    <Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.Small.Icon.LabelSpace}" />
+    <Setter Property="MinWidth" Value="48" />
+    <Setter Property="MinHeight" Value="48" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdButton">
+        <!-- The outer 48-DIP target remains hit-testable for XS/S while the visible
+             container preserves the M3 32/40-DIP measurements. -->
+        <Grid MinWidth="{TemplateBinding MinWidth}"
+              MinHeight="{TemplateBinding MinHeight}"
+              Background="Transparent">
+          <Border x:Name="PART_Container"
+                  Height="{TemplateBinding ContainerHeight}"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Center"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  BoxShadow="{DynamicResource Md.Sys.Elevation.Level0}"
+                  ClipToBounds="True"
+                  CornerRadius="{TemplateBinding ContainerCornerRadius}">
+            <Grid>
+              <Border x:Name="PART_StateLayer"
+                      Background="{TemplateBinding StateLayerBrush}"
+                      CornerRadius="{TemplateBinding ContainerCornerRadius}"
+                      IsHitTestVisible="False"
+                      Opacity="0" />
+
+              <md:MdRipplePresenter RippleBrush="{TemplateBinding StateLayerBrush}" />
+
+              <StackPanel Margin="{TemplateBinding Padding}"
+                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                          IsHitTestVisible="False"
+                          Orientation="Horizontal"
+                          Spacing="{TemplateBinding IconSpacing}">
+                <Viewbox x:Name="PART_LeadingIcon"
+                         Width="{TemplateBinding IconSize}"
+                         Height="{TemplateBinding IconSize}"
+                         IsVisible="False"
+                         Stretch="Uniform">
+                  <md:MdSymbolPresenter Content="{TemplateBinding LeadingIcon}"
+                                    Foreground="{TemplateBinding Foreground}" />
+                </Viewbox>
+
+                <ContentPresenter x:Name="PART_ContentPresenter"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Content="{TemplateBinding Content}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  Foreground="{TemplateBinding Foreground}" />
+
+                <Viewbox x:Name="PART_TrailingIcon"
+                         Width="{TemplateBinding IconSize}"
+                         Height="{TemplateBinding IconSize}"
+                         IsVisible="False"
+                         Stretch="Uniform">
+                  <md:MdSymbolPresenter Content="{TemplateBinding TrailingIcon}"
+                                    Foreground="{TemplateBinding Foreground}" />
+                </Viewbox>
+              </StackPanel>
+
+              <Border x:Name="PART_FocusIndicator"
+                      Margin="2"
+                      BorderBrush="{TemplateBinding FocusIndicatorBrush}"
+                      BorderThickness="2"
+                      CornerRadius="{TemplateBinding ContainerCornerRadius}"
+                      IsHitTestVisible="False"
+                      Opacity="0" />
+            </Grid>
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Color configurations. M3 calls these configurations rather than separate controls. -->
+    <Style Selector="^:filled">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryAction.Brush}" />
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimaryAction.Brush}" />
+      <Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnPrimaryAction.Brush}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+
+    <Style Selector="^:tonal">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
+      <Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+
+    <Style Selector="^:outlined">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+      <Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style Selector="^:text">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+      <Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+
+    <Style Selector="^:elevated">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+      <Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+
+    <!-- Five M3 Expressive sizes. -->
+    <Style Selector="^:xsmall">
+      <Setter Property="Padding" Value="{DynamicResource Md.Comp.Button.XSmall.Content.Padding}" />
+      <Setter Property="ContainerHeight" Value="{DynamicResource Md.Comp.Button.XSmall.Container.Height}" />
+      <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.XSmall.Shape.Round}" />
+      <Setter Property="IconSize" Value="{DynamicResource Md.Comp.Button.XSmall.Icon.Size}" />
+      <Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.XSmall.Icon.LabelSpace}" />
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontWeight" Value="Medium" />
+    </Style>
+
+    <Style Selector="^:small">
+      <Setter Property="Padding" Value="{DynamicResource Md.Comp.Button.Small.Content.Padding}" />
+      <Setter Property="ContainerHeight" Value="{DynamicResource Md.Comp.Button.Small.Container.Height}" />
+      <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Small.Shape.Round}" />
+      <Setter Property="IconSize" Value="{DynamicResource Md.Comp.Button.Small.Icon.Size}" />
+      <Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.Small.Icon.LabelSpace}" />
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontWeight" Value="Medium" />
+    </Style>
+
+    <Style Selector="^:medium">
+      <Setter Property="Padding" Value="{DynamicResource Md.Comp.Button.Medium.Content.Padding}" />
+      <Setter Property="ContainerHeight" Value="{DynamicResource Md.Comp.Button.Medium.Container.Height}" />
+      <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Medium.Shape.Round}" />
+      <Setter Property="IconSize" Value="{DynamicResource Md.Comp.Button.Medium.Icon.Size}" />
+      <Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.Medium.Icon.LabelSpace}" />
+      <Setter Property="FontSize" Value="16" />
+      <Setter Property="FontWeight" Value="Medium" />
+    </Style>
+
+    <Style Selector="^:large">
+      <Setter Property="Padding" Value="{DynamicResource Md.Comp.Button.Large.Content.Padding}" />
+      <Setter Property="ContainerHeight" Value="{DynamicResource Md.Comp.Button.Large.Container.Height}" />
+      <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Large.Shape.Round}" />
+      <Setter Property="IconSize" Value="{DynamicResource Md.Comp.Button.Large.Icon.Size}" />
+      <Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.Large.Icon.LabelSpace}" />
+      <Setter Property="FontSize" Value="24" />
+      <Setter Property="FontWeight" Value="Normal" />
+      <Setter Property="MinHeight" Value="96" />
+    </Style>
+
+    <Style Selector="^:xlarge">
+      <Setter Property="Padding" Value="{DynamicResource Md.Comp.Button.XLarge.Content.Padding}" />
+      <Setter Property="ContainerHeight" Value="{DynamicResource Md.Comp.Button.XLarge.Container.Height}" />
+      <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.XLarge.Shape.Round}" />
+      <Setter Property="IconSize" Value="{DynamicResource Md.Comp.Button.XLarge.Icon.Size}" />
+      <Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.XLarge.Icon.LabelSpace}" />
+      <Setter Property="FontSize" Value="32" />
+      <Setter Property="FontWeight" Value="Normal" />
+      <Setter Property="MinHeight" Value="136" />
+    </Style>
+
+    <!-- Resting square shapes. -->
+    <Style Selector="^:xsmall:square">
+      <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.XSmall.Shape.Square}" />
+    </Style>
+    <Style Selector="^:small:square">
+      <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Small.Shape.Square}" />
+    </Style>
+    <Style Selector="^:medium:square">
+      <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Medium.Shape.Square}" />
+    </Style>
+    <Style Selector="^:large:square">
+      <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Large.Shape.Square}" />
+    </Style>
+    <Style Selector="^:xlarge:square">
+      <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.XLarge.Shape.Square}" />
+    </Style>
+
+    <!-- Expressive pressed shape morph. -->
+    <Style Selector="^:xsmall:pressed">
+      <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.XSmall.Shape.Pressed}" />
+    </Style>
+    <Style Selector="^:small:pressed">
+      <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Small.Shape.Pressed}" />
+    </Style>
+    <Style Selector="^:medium:pressed">
+      <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Medium.Shape.Pressed}" />
+    </Style>
+    <Style Selector="^:large:pressed">
+      <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Large.Shape.Pressed}" />
+    </Style>
+    <Style Selector="^:xlarge:pressed">
+      <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.XLarge.Shape.Pressed}" />
+    </Style>
+
+    <!-- Size-dependent outlined widths. -->
+    <Style Selector="^:xsmall:outlined">
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="^:small:outlined">
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="^:medium:outlined">
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="^:large:outlined">
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+    <Style Selector="^:xlarge:outlined">
+      <Setter Property="BorderThickness" Value="3" />
+    </Style>
+
+    <!-- Optional icon slots only participate in layout when populated. -->
+    <Style Selector="^:has-leading-icon /template/ Viewbox#PART_LeadingIcon">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-trailing-icon /template/ Viewbox#PART_TrailingIcon">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- State layers. -->
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Focus.Opacity}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusIndicator">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+
+    <!-- Elevation. -->
+    <Style Selector="^:elevated /template/ Border#PART_Container">
+      <Setter Property="BoxShadow" Value="{DynamicResource Md.Sys.Elevation.Level1}" />
+    </Style>
+    <Style Selector="^:filled:pointerover /template/ Border#PART_Container">
+      <Setter Property="BoxShadow" Value="{DynamicResource Md.Sys.Elevation.Level1}" />
+    </Style>
+    <Style Selector="^:tonal:pointerover /template/ Border#PART_Container">
+      <Setter Property="BoxShadow" Value="{DynamicResource Md.Sys.Elevation.Level1}" />
+    </Style>
+    <Style Selector="^:elevated:pointerover /template/ Border#PART_Container">
+      <Setter Property="BoxShadow" Value="{DynamicResource Md.Sys.Elevation.Level2}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_Container">
+      <Setter Property="BoxShadow" Value="{DynamicResource Md.Sys.Elevation.Level0}" />
+    </Style>
+    <Style Selector="^:elevated:pressed /template/ Border#PART_Container">
+      <Setter Property="BoxShadow" Value="{DynamicResource Md.Sys.Elevation.Level1}" />
+    </Style>
+
+    <!-- Disabled values: container 10%, label/icon 38%, elevation 0. -->
+    <Style Selector="^:disabled">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="StateLayerBrush" Value="Transparent" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+    <Style Selector="^:filled:disabled">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.DisabledContainer.Brush}" />
+    </Style>
+    <Style Selector="^:tonal:disabled">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.DisabledContainer.Brush}" />
+    </Style>
+    <Style Selector="^:elevated:disabled">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.DisabledContainer.Brush}" />
+    </Style>
+    <Style Selector="^:outlined:disabled">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    </Style>
+    <Style Selector="^:text:disabled">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="^:disabled /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="^:disabled /template/ Border#PART_FocusIndicator">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="^:disabled /template/ Border#PART_Container">
+      <Setter Property="BoxShadow" Value="{DynamicResource Md.Sys.Elevation.Level0}" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

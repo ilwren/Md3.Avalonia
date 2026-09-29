@@ -1,0 +1,14 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdStandardButtonGroup}" TargetType="md:MdStandardButtonGroup">
+    <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="{Binding $parent[md:MdStandardButtonGroup].ItemSpacing}"/></ItemsPanelTemplate></Setter>
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdStandardButtonGroup"><ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}"/></ControlTemplate></Setter>
+    <Style Selector="^:xsmall"><Setter Property="ItemSpacing" Value="{DynamicResource Md.Comp.ButtonGroup.XSmall.Space}"/></Style><Style Selector="^:small"><Setter Property="ItemSpacing" Value="{DynamicResource Md.Comp.ButtonGroup.Small.Space}"/></Style><Style Selector="^:medium"><Setter Property="ItemSpacing" Value="{DynamicResource Md.Comp.ButtonGroup.Medium.Space}"/></Style><Style Selector="^:large"><Setter Property="ItemSpacing" Value="{DynamicResource Md.Comp.ButtonGroup.Large.Space}"/></Style><Style Selector="^:xlarge"><Setter Property="ItemSpacing" Value="{DynamicResource Md.Comp.ButtonGroup.XLarge.Space}"/></Style>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type md:MdConnectedButtonGroup}" TargetType="md:MdConnectedButtonGroup">
+    <Setter Property="ItemSpacing" Value="{DynamicResource Md.Comp.ConnectedButtonGroup.Space}"/>
+    <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="{Binding $parent[md:MdConnectedButtonGroup].ItemSpacing}"/></ItemsPanelTemplate></Setter>
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdConnectedButtonGroup"><ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}"/></ControlTemplate></Setter>
+  </ControlTheme>
+</ResourceDictionary>

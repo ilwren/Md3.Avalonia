@@ -1,0 +1,68 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <StreamGeometry x:Key="Md.Comp.Slider.ValueIndicator.Shape">M24 0C10.745 0 0 10.745 0 24C0 35.5 7.75 44.9 18.3 47.4L24 58L29.7 47.4C40.25 44.9 48 35.5 48 24C48 10.745 37.255 0 24 0Z</StreamGeometry>
+
+  <ControlTheme x:Key="MdSliderDecreaseTrackButtonTheme" TargetType="RepeatButton">
+    <Setter Property="Background" Value="Transparent" /><Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template"><ControlTemplate TargetType="RepeatButton"><Grid><Border Height="16" VerticalAlignment="Center" Background="{TemplateBinding Background}" CornerRadius="8,2,2,8" /><ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="{TemplateBinding Content}" /></Grid></ControlTemplate></Setter>
+  </ControlTheme>
+  <ControlTheme x:Key="MdSliderIncreaseTrackButtonTheme" TargetType="RepeatButton">
+    <Setter Property="Background" Value="Transparent" /><Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template"><ControlTemplate TargetType="RepeatButton"><Grid><Border Height="16" VerticalAlignment="Center" Background="{TemplateBinding Background}" CornerRadius="2,8,8,2" /><ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Content="{TemplateBinding Content}" /></Grid></ControlTemplate></Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="MdSliderThumbTheme" TargetType="md:MdSliderThumb">
+    <Setter Property="Width" Value="4" /><Setter Property="Height" Value="44" /><Setter Property="ClipToBounds" Value="False" /><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdSliderThumb">
+        <Canvas Width="4" Height="44">
+          <Border x:Name="PART_ThumbStateLayer" Canvas.Left="-18" Canvas.Top="2" Width="40" Height="40"
+                  Background="{DynamicResource Md.Sys.Color.Primary.Brush}" CornerRadius="20"
+                  IsHitTestVisible="False" Opacity="0" RenderTransform="scale(0.8)" RenderTransformOrigin="50%,50%" />
+          <Border x:Name="PART_Handle" Width="4" Height="44" Background="{TemplateBinding Background}" CornerRadius="2" />
+          <Canvas x:Name="PART_ThumbValue" Canvas.Left="-22" Canvas.Top="-60" Width="48" Height="58"
+                  Opacity="0" RenderTransform="scale(0.8)" RenderTransformOrigin="50%,100%">
+            <Path Width="48" Height="58" Data="{StaticResource Md.Comp.Slider.ValueIndicator.Shape}"
+                  Fill="{DynamicResource Md.Sys.Color.InverseSurface.Brush}" Stretch="Fill" />
+            <TextBlock Canvas.Top="13" Width="48" HorizontalAlignment="Center" TextAlignment="Center"
+                       FontSize="14" FontWeight="Medium"
+                       Foreground="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}"
+                       Text="{TemplateBinding DisplayValue}" />
+          </Canvas>
+        </Canvas>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_ThumbStateLayer"><Setter Property="Opacity" Value="0.08" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_ThumbStateLayer"><Setter Property="Opacity" Value="0.12" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+    <Style Selector="^:show-value /template/ Canvas#PART_ThumbValue"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+    <Style Selector="^:reduced-motion /template/ Border#PART_ThumbStateLayer"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+    <Style Selector="^:reduced-motion /template/ Canvas#PART_ThumbValue"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdSlider}" TargetType="md:MdSlider">
+    <Setter Property="MinWidth" Value="160" /><Setter Property="MinHeight" Value="72" /><Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdSlider">
+        <Track x:Name="PART_Track" Height="44" Margin="2,20,2,0" VerticalAlignment="Center"
+               Orientation="{TemplateBinding Orientation}" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+               Value="{TemplateBinding VisualValue, Mode=TwoWay}" IsDirectionReversed="{TemplateBinding IsDirectionReversed}">
+          <Track.DecreaseButton><RepeatButton Background="{DynamicResource Md.Sys.Color.Primary.Brush}" Theme="{StaticResource MdSliderDecreaseTrackButtonTheme}" /></Track.DecreaseButton>
+          <Track.Thumb><md:MdSliderThumb x:Name="PART_Thumb" DisplayValue="{TemplateBinding DisplayValue}" ShowValueIndicator="{TemplateBinding ShowValueIndicator}" Theme="{StaticResource MdSliderThumbTheme}" /></Track.Thumb>
+          <Track.IncreaseButton>
+            <RepeatButton Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" Theme="{StaticResource MdSliderIncreaseTrackButtonTheme}">
+              <Ellipse x:Name="PART_StopIndicator" Width="4" Height="4" Margin="0,0,6,0" HorizontalAlignment="Right" VerticalAlignment="Center" Fill="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" IsVisible="False" />
+            </RepeatButton>
+          </Track.IncreaseButton>
+        </Track>
+      </ControlTemplate>
+    </Setter>
+    <!-- Reserve four physical pixels above the 58-DIP droplet. Rendering exactly at y=0 clips
+         Skia's antialiased top edge and makes the value indicator look flat-cut. -->
+    <Style Selector="^:value-indicator"><Setter Property="MinHeight" Value="112" /></Style>
+    <Style Selector="^:value-indicator /template/ Track#PART_Track"><Setter Property="Margin" Value="2,60,2,0" /></Style>
+    <Style Selector="^:stop-indicator /template/ Ellipse#PART_StopIndicator"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

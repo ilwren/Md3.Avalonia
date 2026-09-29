@@ -1,0 +1,104 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- IconButton size tokens 14_1_0 / v0_11_0. -->
+  <x:Double x:Key="Md.Comp.IconButton.XSmall.Height">32</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.XSmall.IconSize">20</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.XSmall.NarrowWidth">28</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.XSmall.DefaultWidth">32</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.XSmall.WideWidth">40</x:Double>
+  <CornerRadius x:Key="Md.Comp.IconButton.XSmall.RoundShape">16</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.IconButton.XSmall.SquareShape">12</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.IconButton.XSmall.PressedShape">8</CornerRadius>
+
+  <x:Double x:Key="Md.Comp.IconButton.Small.Height">40</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.Small.IconSize">24</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.Small.NarrowWidth">32</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.Small.DefaultWidth">40</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.Small.WideWidth">52</x:Double>
+  <CornerRadius x:Key="Md.Comp.IconButton.Small.RoundShape">20</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.IconButton.Small.SquareShape">12</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.IconButton.Small.PressedShape">8</CornerRadius>
+
+  <x:Double x:Key="Md.Comp.IconButton.Medium.Height">56</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.Medium.IconSize">24</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.Medium.NarrowWidth">48</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.Medium.DefaultWidth">56</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.Medium.WideWidth">72</x:Double>
+  <CornerRadius x:Key="Md.Comp.IconButton.Medium.RoundShape">28</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.IconButton.Medium.SquareShape">16</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.IconButton.Medium.PressedShape">12</CornerRadius>
+
+  <x:Double x:Key="Md.Comp.IconButton.Large.Height">96</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.Large.IconSize">32</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.Large.NarrowWidth">80</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.Large.DefaultWidth">96</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.Large.WideWidth">128</x:Double>
+  <CornerRadius x:Key="Md.Comp.IconButton.Large.RoundShape">48</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.IconButton.Large.SquareShape">28</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.IconButton.Large.PressedShape">16</CornerRadius>
+
+  <x:Double x:Key="Md.Comp.IconButton.XLarge.Height">136</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.XLarge.IconSize">40</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.XLarge.NarrowWidth">112</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.XLarge.DefaultWidth">136</x:Double>
+  <x:Double x:Key="Md.Comp.IconButton.XLarge.WideWidth">184</x:Double>
+  <CornerRadius x:Key="Md.Comp.IconButton.XLarge.RoundShape">68</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.IconButton.XLarge.SquareShape">28</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.IconButton.XLarge.PressedShape">16</CornerRadius>
+
+  <!-- SplitButton size tokens 18_0_18. -->
+  <x:Double x:Key="Md.Comp.SplitButton.Gap">2</x:Double>
+  <x:Double x:Key="Md.Comp.SplitButton.XSmall.TrailingWidth">32</x:Double>
+  <x:Double x:Key="Md.Comp.SplitButton.Small.TrailingWidth">40</x:Double>
+  <x:Double x:Key="Md.Comp.SplitButton.Medium.TrailingWidth">56</x:Double>
+  <x:Double x:Key="Md.Comp.SplitButton.Large.TrailingWidth">72</x:Double>
+  <x:Double x:Key="Md.Comp.SplitButton.XLarge.TrailingWidth">88</x:Double>
+
+  <!-- Button groups. -->
+  <x:Double x:Key="Md.Comp.ButtonGroup.XSmall.Space">18</x:Double>
+  <x:Double x:Key="Md.Comp.ButtonGroup.Small.Space">12</x:Double>
+  <x:Double x:Key="Md.Comp.ButtonGroup.Medium.Space">8</x:Double>
+  <x:Double x:Key="Md.Comp.ButtonGroup.Large.Space">8</x:Double>
+  <x:Double x:Key="Md.Comp.ButtonGroup.XLarge.Space">8</x:Double>
+  <x:Double x:Key="Md.Comp.ConnectedButtonGroup.Space">2</x:Double>
+
+  <!-- FAB v0_14_0. -->
+  <x:Double x:Key="Md.Comp.Fab.Small.Size">40</x:Double>
+  <x:Double x:Key="Md.Comp.Fab.Small.IconSize">24</x:Double>
+  <CornerRadius x:Key="Md.Comp.Fab.Small.Shape">12</CornerRadius>
+  <x:Double x:Key="Md.Comp.Fab.Regular.Size">56</x:Double>
+  <x:Double x:Key="Md.Comp.Fab.Regular.IconSize">24</x:Double>
+  <CornerRadius x:Key="Md.Comp.Fab.Regular.Shape">16</CornerRadius>
+  <x:Double x:Key="Md.Comp.Fab.Medium.Size">80</x:Double>
+  <x:Double x:Key="Md.Comp.Fab.Medium.IconSize">28</x:Double>
+  <CornerRadius x:Key="Md.Comp.Fab.Medium.Shape">24</CornerRadius>
+  <x:Double x:Key="Md.Comp.Fab.Large.Size">96</x:Double>
+  <x:Double x:Key="Md.Comp.Fab.Large.IconSize">32</x:Double>
+  <CornerRadius x:Key="Md.Comp.Fab.Large.Shape">28</CornerRadius>
+
+  <!-- Extended FAB v0_14_0. -->
+  <x:Double x:Key="Md.Comp.ExtendedFab.Small.Height">56</x:Double>
+  <Thickness x:Key="Md.Comp.ExtendedFab.Small.Padding">16,0</Thickness>
+  <x:Double x:Key="Md.Comp.ExtendedFab.Small.IconSize">24</x:Double>
+  <x:Double x:Key="Md.Comp.ExtendedFab.Small.IconSpace">8</x:Double>
+  <CornerRadius x:Key="Md.Comp.ExtendedFab.Small.Shape">16</CornerRadius>
+  <x:Double x:Key="Md.Comp.ExtendedFab.Medium.Height">80</x:Double>
+  <Thickness x:Key="Md.Comp.ExtendedFab.Medium.Padding">26,0</Thickness>
+  <x:Double x:Key="Md.Comp.ExtendedFab.Medium.IconSize">28</x:Double>
+  <x:Double x:Key="Md.Comp.ExtendedFab.Medium.IconSpace">16</x:Double>
+  <CornerRadius x:Key="Md.Comp.ExtendedFab.Medium.Shape">24</CornerRadius>
+  <x:Double x:Key="Md.Comp.ExtendedFab.Large.Height">96</x:Double>
+  <Thickness x:Key="Md.Comp.ExtendedFab.Large.Padding">28,0</Thickness>
+  <x:Double x:Key="Md.Comp.ExtendedFab.Large.IconSize">32</x:Double>
+  <x:Double x:Key="Md.Comp.ExtendedFab.Large.IconSpace">20</x:Double>
+  <CornerRadius x:Key="Md.Comp.ExtendedFab.Large.Shape">28</CornerRadius>
+
+  <!-- FAB menu baseline v0_14_0. -->
+  <x:Double x:Key="Md.Comp.FabMenu.ItemSpacing">4</x:Double>
+  <x:Double x:Key="Md.Comp.FabMenu.CloseButtonSpacing">8</x:Double>
+  <x:Double x:Key="Md.Comp.FabMenu.CloseButton.Size">56</x:Double>
+  <CornerRadius x:Key="Md.Comp.FabMenu.CloseButton.Shape">28</CornerRadius>
+
+  <BoxShadows x:Key="Md.Sys.Elevation.Level3">0 4 8 1 #3D000000</BoxShadows>
+  <BoxShadows x:Key="Md.Sys.Elevation.Level4">0 6 10 2 #38000000</BoxShadows>
+</ResourceDictionary>

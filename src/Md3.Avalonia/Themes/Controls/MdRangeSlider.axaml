@@ -1,0 +1,15 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdRangeSlider}" TargetType="md:MdRangeSlider">
+    <Setter Property="MinWidth" Value="200" />
+    <Setter Property="MinHeight" Value="72" />
+    <Setter Property="ActiveTrackBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="InactiveTrackBrush" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
+    <Setter Property="HandleBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="OverlayBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="ValueIndicatorBrush" Value="{DynamicResource Md.Sys.Color.InverseSurface.Brush}" />
+    <Setter Property="ValueIndicatorForeground" Value="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Style Selector="^:value-indicator"><Setter Property="MinHeight" Value="104" /></Style>
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

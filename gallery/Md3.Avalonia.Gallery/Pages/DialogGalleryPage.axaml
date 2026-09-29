@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.DialogGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+      <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Dialogs"/><TextBlock Classes="body" Text="Dialogs interrupt a flow with an important prompt. MdDialogHost supports declarative AXAML and awaitable direct C# usage."/></StackPanel>
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Basic dialog" />
+        <md:MdDialogHost x:Name="BasicDialogHost" Height="330">
+          <Border Padding="24" CornerRadius="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+              <TextBlock Text="Dialog host content remains in the visual tree." />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <md:MdButton Content="Open basic dialog" Variant="Filled" Click="OpenBasicDialog" />
+                <md:MdButton Content="Open full-screen" Variant="Outlined" Click="OpenFullScreenDialog" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+          <md:MdDialogHost.Dialog>
+            <md:MdDialog x:Name="DemoDialog" Headline="Discard draft?">
+              <md:MdDialog.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Warning}" Size="24"/></md:MdDialog.Icon>
+              <TextBlock Width="340" TextWrapping="Wrap" Text="This draft has unsaved changes. Discarding it cannot be undone." />
+              <md:MdDialog.Actions>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <md:MdButton Content="Cancel" Variant="Text" Click="CloseDialog" />
+                  <md:MdButton Content="Discard" Variant="Text" Click="CloseDialog" />
+                </StackPanel>
+              </md:MdDialog.Actions>
+            </md:MdDialog>
+          </md:MdDialogHost.Dialog>
+        </md:MdDialogHost>
+      </StackPanel>
+      <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Escape and optional scrim click dismiss the active dialog. IsOpen is two-way bindable; ShowAsync returns the result supplied to Close(result)." />
+      </Border>
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="AXAML and C#" />
+        <gallery:CodeExample
+          XamlCode="&lt;md:MdDialogHost IsOpen=&quot;{Binding IsDeleteDialogOpen}&quot;&gt;&#10;  &lt;md:MdDialogHost.Dialog&gt;&#10;    &lt;md:MdDialog Headline=&quot;Delete item?&quot;&gt;...&lt;/md:MdDialog&gt;&#10;  &lt;/md:MdDialogHost.Dialog&gt;&#10;&lt;/md:MdDialogHost&gt;"
+          CSharpCode="var dialog = new MdDialog { Headline = &quot;Delete item?&quot;, Content = message };&#10;var result = await dialogHost.ShowAsync(dialog);&#10;dialogHost.Close(result: true);" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

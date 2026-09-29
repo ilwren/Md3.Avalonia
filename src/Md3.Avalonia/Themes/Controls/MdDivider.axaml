@@ -1,0 +1,16 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdDivider}" TargetType="md:MdDivider">
+    <Setter Property="LineBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Setter Property="LineThickness" Value="1" />
+    <Setter Property="MinHeight" Value="1" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Style Selector="^:vertical">
+      <Setter Property="MinWidth" Value="1" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

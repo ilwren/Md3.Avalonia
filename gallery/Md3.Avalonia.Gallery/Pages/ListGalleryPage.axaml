@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.ListGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+      <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Lists"/><TextBlock Classes="body" Text="Continuous vertical indexes with expressive segmented styling, flexible slots, and native selection."/></StackPanel>
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+        <StackPanel Grid.Column="0" Spacing="12">
+          <TextBlock Classes="h2" Text="Standard" />
+          <md:MdList SelectionMode="Single">
+            <md:MdListItem Headline="Photos" SupportingText="1,248 items" IsSelected="True"><md:MdListItem.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.Photo}"/></md:MdListItem.LeadingContent><md:MdListItem.TrailingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.ChevronRight}"/></md:MdListItem.TrailingContent></md:MdListItem>
+            <md:MdListItem Headline="Downloads" SupportingText="42 items"><md:MdListItem.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.Download}"/></md:MdListItem.LeadingContent></md:MdListItem>
+            <md:MdListItem Headline="Favorites"><md:MdListItem.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.Favorite}"/></md:MdListItem.LeadingContent></md:MdListItem>
+          </md:MdList>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Spacing="12">
+          <TextBlock Classes="h2" Text="Expressive segmented" />
+          <md:MdList Variant="Segmented" SelectionMode="Multiple">
+            <md:MdListItem Headline="Design system" SupportingText="Updated today" IsSelected="True"><md:MdListItem.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.Palette}"/></md:MdListItem.LeadingContent></md:MdListItem>
+            <md:MdListItem Headline="Android build" SupportingText="Ready to test"><md:MdListItem.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.Code}"/></md:MdListItem.LeadingContent></md:MdListItem>
+            <md:MdListItem Headline="Documentation" SupportingText="6 contributors"><md:MdListItem.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.Description}"/></md:MdListItem.LeadingContent></md:MdListItem>
+          </md:MdList>
+        </StackPanel>
+      </Grid>
+      <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdList ItemsSource=&quot;{Binding Files}&quot; SelectedItem=&quot;{Binding File}&quot;&gt;&#10;  &lt;md:MdList.ItemTemplate&gt;...&lt;/md:MdList.ItemTemplate&gt;&#10;&lt;/md:MdList&gt;" CSharpCode="var list = new MdList { ItemsSource = viewModel.Files };&#10;list.SelectionMode = SelectionMode.Single;&#10;list.SelectionChanged += OnFileSelected;" /></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

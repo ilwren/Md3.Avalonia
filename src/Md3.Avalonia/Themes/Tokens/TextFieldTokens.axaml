@@ -1,0 +1,30 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- M3 text-field measurements, frozen from the 2026-09-22 specification. -->
+  <x:Double x:Key="Md.Comp.TextField.Container.MinHeight">56</x:Double>
+  <Thickness x:Key="Md.Comp.TextField.Content.Padding">16,0</Thickness>
+  <Thickness x:Key="Md.Comp.TextField.Content.Padding.LeadingIcon">12,0,16,0</Thickness>
+  <Thickness x:Key="Md.Comp.TextField.Content.Padding.TrailingIcon">16,0,12,0</Thickness>
+  <Thickness x:Key="Md.Comp.TextField.Content.Padding.BothIcons">12,0</Thickness>
+  <x:Double x:Key="Md.Comp.TextField.Icon.Size">24</x:Double>
+  <Thickness x:Key="Md.Comp.TextField.LeadingIcon.Margin">0,0,16,0</Thickness>
+  <Thickness x:Key="Md.Comp.TextField.TrailingIcon.Margin">16,0,0,0</Thickness>
+  <Thickness x:Key="Md.Comp.TextField.Supporting.Row.Margin">16,4,16,0</Thickness>
+  <x:Double x:Key="Md.Comp.TextField.Supporting.BetweenSpace">16</x:Double>
+
+  <CornerRadius x:Key="Md.Comp.TextField.Filled.Container.Shape">4,4,0,0</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.TextField.Outlined.Container.Shape">4</CornerRadius>
+  <x:Double x:Key="Md.Comp.TextField.Indicator.Width">1</x:Double>
+  <x:Double x:Key="Md.Comp.TextField.Indicator.FocusWidth">2</x:Double>
+  <Thickness x:Key="Md.Comp.TextField.Outline.Width">1</Thickness>
+  <Thickness x:Key="Md.Comp.TextField.Outline.FocusWidth">2</Thickness>
+
+  <x:Double x:Key="Md.Comp.TextField.Input.FontSize">16</x:Double>
+  <x:Double x:Key="Md.Comp.TextField.Label.Resting.FontSize">16</x:Double>
+  <x:Double x:Key="Md.Comp.TextField.Label.Floating.FontSize">12</x:Double>
+  <x:Double x:Key="Md.Comp.TextField.Supporting.FontSize">12</x:Double>
+  <Thickness x:Key="Md.Comp.TextField.Filled.Label.FloatingMargin">0,6,0,0</Thickness>
+  <Thickness x:Key="Md.Comp.TextField.Outlined.Label.FloatingMargin">-4,-8,0,0</Thickness>
+  <Thickness x:Key="Md.Comp.TextField.Label.NotchedPadding">4,0</Thickness>
+  <Thickness x:Key="Md.Comp.TextField.Input.FloatingMargin">0,16,0,0</Thickness>
+</ResourceDictionary>

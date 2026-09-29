@@ -1,0 +1,47 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdTooltip}" TargetType="md:MdTooltip">
+    <Setter Property="MaxWidth" Value="200" />
+    <Setter Property="VerticalAlignment" Value="Top" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.InverseSurface.Brush}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdTooltip">
+        <Border x:Name="PART_Surface" MinHeight="24" MaxWidth="{TemplateBinding MaxWidth}" Padding="8,4" Background="{TemplateBinding Background}" CornerRadius="4" Opacity="0" RenderTransform="scale(0.96) translate(0px, 2px)" RenderTransformOrigin="50%,50%">
+          <StackPanel Spacing="8">
+            <ContentPresenter x:Name="PART_Title" Content="{TemplateBinding Title}" FontSize="14" FontWeight="Medium" Foreground="{TemplateBinding Foreground}" IsVisible="False" />
+            <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" FontSize="12" Foreground="{TemplateBinding Foreground}" TextWrapping="Wrap" />
+            <ContentPresenter x:Name="PART_Action" HorizontalAlignment="Left" Content="{TemplateBinding ActionContent}" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" IsVisible="False" />
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:open /template/ Border#PART_Surface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1) translate(0px, 0px)" /></Style>
+    <Style Selector="^:reduced-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1) translate(0px, 0px)" /></Style>
+    <Style Selector="^:rich"><Setter Property="MaxWidth" Value="312" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" /><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" /></Style>
+    <Style Selector="^:rich /template/ Border#PART_Surface"><Setter Property="MinWidth" Value="200" /><Setter Property="MinHeight" Value="0" /><Setter Property="Padding" Value="16,12,16,8" /><Setter Property="CornerRadius" Value="12" /><Setter Property="BoxShadow" Value="{DynamicResource Md.Sys.Elevation.Level2}" /></Style>
+    <Style Selector="^:rich:has-title /template/ ContentPresenter#PART_Title"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:rich:has-action /template/ ContentPresenter#PART_Action"><Setter Property="IsVisible" Value="True" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdTooltipHost}" TargetType="md:MdTooltipHost">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdTooltipHost">
+        <Grid>
+          <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+          <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}" IsLightDismissEnabled="True" OverlayDismissEventPassThrough="True" Placement="{TemplateBinding Placement}" PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}" HorizontalOffset="{TemplateBinding HorizontalOffset}" VerticalOffset="{TemplateBinding VerticalOffset}" InheritsTransform="True" ShouldUseOverlayLayer="False" WindowManagerAddShadowHint="False">
+            <Popup.Styles>
+              <Style Selector="PopupRoot">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="TransparencyLevelHint" Value="Transparent" />
+                <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.InverseSurface.Brush}" />
+              </Style>
+            </Popup.Styles>
+            <ContentPresenter Content="{TemplateBinding Tooltip}" />
+          </Popup>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

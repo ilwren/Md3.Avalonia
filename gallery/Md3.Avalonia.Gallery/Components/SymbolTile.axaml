@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             x:Class="Md3.Avalonia.Gallery.Components.SymbolTile"
+             x:Name="Root">
+  <md:MdCard Width="148" Height="112" Margin="0,0,10,10" Variant="Outlined" Click="CopySymbol">
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+      <md:MdIcon Glyph="{Binding Glyph, ElementName=Root}" Size="32" />
+      <TextBlock HorizontalAlignment="Center" Text="{Binding SymbolName, ElementName=Root}" />
+      <TextBlock HorizontalAlignment="Center" FontSize="10"
+                 Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                 Text="Click to copy name" />
+    </StackPanel>
+  </md:MdCard>
+</UserControl>

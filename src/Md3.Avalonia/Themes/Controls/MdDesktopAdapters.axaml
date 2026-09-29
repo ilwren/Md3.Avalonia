@@ -1,0 +1,421 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:chrome="using:Avalonia.Controls.Chrome"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <!-- Scroll infrastructure is opt-in: native Avalonia controls are never globally restyled. -->
+  <ControlTheme x:Key="MdScrollThumbTheme" TargetType="Thumb">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="Template"><ControlTemplate><Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" /></ControlTemplate></Setter>
+    <Style Selector="^:pointerover /template/ Border"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" /></Style>
+    <Style Selector="^:pressed /template/ Border"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="MdScrollPageButtonTheme" TargetType="RepeatButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template"><ControlTemplate><Border Background="{TemplateBinding Background}" /></ControlTemplate></Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdScrollBar}" TargetType="md:MdScrollBar">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="AllowAutoHide" Value="True" />
+    <Setter Property="MinWidth" Value="8" />
+    <Setter Property="MinHeight" Value="8" />
+    <Style Selector="^:vertical">
+      <Setter Property="Width" Value="8" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Track Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                 Value="{TemplateBinding Value, Mode=TwoWay}" ViewportSize="{TemplateBinding ViewportSize}"
+                 Orientation="Vertical" IsDirectionReversed="True">
+            <Track.DecreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.DecreaseButton>
+            <Track.Thumb><Thumb Width="6" MinHeight="24" Margin="1" Theme="{StaticResource MdScrollThumbTheme}" /></Track.Thumb>
+            <Track.IncreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.IncreaseButton>
+          </Track>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="^:thumb-hidden /template/ Thumb"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:track-visible"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" /></Style>
+    <Style Selector="^:horizontal">
+      <Setter Property="Height" Value="8" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Track Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                 Value="{TemplateBinding Value, Mode=TwoWay}" ViewportSize="{TemplateBinding ViewportSize}"
+                 Orientation="Horizontal">
+            <Track.DecreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.DecreaseButton>
+            <Track.Thumb><Thumb Height="6" MinWidth="24" Margin="1" Theme="{StaticResource MdScrollThumbTheme}" /></Track.Thumb>
+            <Track.IncreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.IncreaseButton>
+          </Track>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdScrollViewer}" TargetType="md:MdScrollViewer">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid ColumnDefinitions="*,Auto" RowDefinitions="*,Auto">
+          <ScrollContentPresenter Name="PART_ContentPresenter" Grid.Row="0" Grid.Column="0"
+                                  Background="{TemplateBinding Background}"
+                                  HorizontalSnapPointsType="{TemplateBinding HorizontalSnapPointsType}"
+                                  VerticalSnapPointsType="{TemplateBinding VerticalSnapPointsType}"
+                                  HorizontalSnapPointsAlignment="{TemplateBinding HorizontalSnapPointsAlignment}"
+                                  VerticalSnapPointsAlignment="{TemplateBinding VerticalSnapPointsAlignment}"
+                                  Padding="{TemplateBinding Padding}"
+                                  ScrollViewer.IsScrollInertiaEnabled="{TemplateBinding IsScrollInertiaEnabled}">
+            <ScrollContentPresenter.GestureRecognizers>
+              <ScrollGestureRecognizer CanHorizontallyScroll="{Binding CanHorizontallyScroll, ElementName=PART_ContentPresenter}"
+                                       CanVerticallyScroll="{Binding CanVerticallyScroll, ElementName=PART_ContentPresenter}"
+                                       IsScrollInertiaEnabled="{Binding (ScrollViewer.IsScrollInertiaEnabled), ElementName=PART_ContentPresenter}"
+                                       Offset="{Binding Offset, ElementName=PART_ContentPresenter}"
+                                       Viewport="{Binding Viewport, ElementName=PART_ContentPresenter}"
+                                       Extent="{Binding Extent, ElementName=PART_ContentPresenter}" />
+            </ScrollContentPresenter.GestureRecognizers>
+          </ScrollContentPresenter>
+          <md:MdScrollBar Name="PART_HorizontalScrollBar" Grid.Row="1" Grid.Column="0" Orientation="Horizontal" />
+          <md:MdScrollBar Name="PART_VerticalScrollBar" Grid.Row="0" Grid.Column="1" Orientation="Vertical" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^[AllowAutoHide=True] /template/ ScrollContentPresenter#PART_ContentPresenter">
+      <Setter Property="Grid.RowSpan" Value="2" /><Setter Property="Grid.ColumnSpan" Value="2" />
+    </Style>
+    <Style Selector="^[AllowAutoHide=True] /template/ md|MdScrollBar#PART_VerticalScrollBar">
+      <Setter Property="Grid.Column" Value="0" /><Setter Property="HorizontalAlignment" Value="Right" /><Setter Property="Margin" Value="0,4,2,4" />
+    </Style>
+    <Style Selector="^[AllowAutoHide=True] /template/ md|MdScrollBar#PART_HorizontalScrollBar">
+      <Setter Property="Grid.Row" Value="0" /><Setter Property="VerticalAlignment" Value="Bottom" /><Setter Property="Margin" Value="4,0,4,2" />
+    </Style>
+  </ControlTheme>
+
+  <StreamGeometry x:Key="Md.Numeric.Plus">M8 3H10V8H15V10H10V15H8V10H3V8H8Z</StreamGeometry>
+  <StreamGeometry x:Key="Md.Numeric.Minus">M3 8H15V10H3Z</StreamGeometry>
+  <ControlTheme x:Key="MdNumericSpinnerButtonTheme" TargetType="RepeatButton">
+    <Setter Property="MinWidth" Value="32" /><Setter Property="MinHeight" Value="20" />
+    <Setter Property="Width" Value="32" /><Setter Property="Height" Value="20" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="Transparent" CornerRadius="12" ClipToBounds="True">
+          <Grid>
+            <Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" Opacity="0" />
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                              Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.12" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="MdNumericSpinnerTheme" TargetType="ButtonSpinner">
+    <Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="VerticalContentAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <!-- Spinner actions overlay the field's reserved trailing slot. A separate grid column made
+             the +/- buttons appear outside the outlined container, especially with supporting text. -->
+        <Grid>
+          <ContentPresenter Name="PART_ContentPresenter"
+                            Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+          <StackPanel Name="PART_SpinnerPanel" Width="32" Height="42"
+                      Margin="0,8,8,0" VerticalAlignment="Top" HorizontalAlignment="Right"
+                      Background="Transparent" Spacing="2" ZIndex="2"
+                      IsVisible="{TemplateBinding ShowButtonSpinner}">
+            <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}">
+              <Path Width="12" Height="12" Data="{StaticResource Md.Numeric.Plus}" Stretch="Uniform"
+                    Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+            </RepeatButton>
+            <RepeatButton Name="PART_DecreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}">
+              <Path Width="12" Height="12" Data="{StaticResource Md.Numeric.Minus}" Stretch="Uniform"
+                    Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+            </RepeatButton>
+          </StackPanel>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^[ButtonSpinnerLocation=Left] /template/ StackPanel#PART_SpinnerPanel">
+      <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="Margin" Value="8,8,0,0" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdNumericBox}" TargetType="md:MdNumericBox">
+    <Setter Property="MinWidth" Value="160" /><Setter Property="MinHeight" Value="56" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ButtonSpinner Name="PART_Spinner" Theme="{StaticResource MdNumericSpinnerTheme}"
+                       AllowSpin="{TemplateBinding AllowSpin}" ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
+                       ButtonSpinnerLocation="{TemplateBinding ButtonSpinnerLocation}">
+          <md:MdTextBox Name="PART_TextBox" Variant="{TemplateBinding Variant}" Label="{TemplateBinding Label}"
+                        SupportingText="{TemplateBinding SupportingText}" IsError="{TemplateBinding IsError}"
+                        Text="{TemplateBinding Text}" PlaceholderText="{TemplateBinding PlaceholderText}"
+                        IsReadOnly="{TemplateBinding IsReadOnly}" TextAlignment="{TemplateBinding TextAlignment}"
+                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}">
+            <md:MdTextBox.TrailingIcon>
+              <Border Width="32" Height="24" Background="Transparent"
+                      IsVisible="{TemplateBinding ShowButtonSpinner}" />
+            </md:MdTextBox.TrailingIcon>
+          </md:MdTextBox>
+        </ButtonSpinner>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdAutoCompleteBox}" TargetType="md:MdAutoCompleteBox">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" />
+    <Setter Property="MaxDropDownHeight" Value="320" /><Setter Property="MinimumPrefixLength" Value="1" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid Name="PART_LayoutRoot">
+          <md:MdTextBox Name="PART_TextBox" Variant="{TemplateBinding Variant}" Label="{TemplateBinding Label}"
+                        SupportingText="{TemplateBinding SupportingText}" IsError="{TemplateBinding IsError}"
+                        PlaceholderText="{TemplateBinding PlaceholderText}" Foreground="{TemplateBinding Foreground}"
+                        ShowClearButton="True"
+                        CaretIndex="{TemplateBinding CaretIndex, Mode=TwoWay}" MaxLength="{TemplateBinding MaxLength}"
+                        ClearSelectionOnLostFocus="{TemplateBinding ClearSelectionOnLostFocus}"
+                        LeadingIcon="{TemplateBinding InnerLeftContent}" TrailingIcon="{TemplateBinding InnerRightContent}" />
+          <Popup Name="PART_Popup" MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
+                 MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                 IsOpen="{TemplateBinding IsPopupOpen}"
+                 IsLightDismissEnabled="True" OverlayDismissEventPassThrough="True"
+                 Placement="BottomEdgeAlignedLeft" PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                 InheritsTransform="True" ShouldUseOverlayLayer="False" WindowManagerAddShadowHint="False">
+            <Popup.Styles>
+              <Style Selector="PopupRoot">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="TransparencyLevelHint" Value="Transparent" />
+                <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
+              </Style>
+            </Popup.Styles>
+            <Border Name="PART_SuggestionsContainer" Padding="4" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
+                    BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1"
+                    CornerRadius="0,0,4,4" ClipToBounds="True" BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}"
+                    Opacity="0" RenderTransform="scale(0.8) translate(0px,-8px)" RenderTransformOrigin="0%,0%">
+              <md:MdList Name="PART_SelectingItemsControl" ItemTemplate="{TemplateBinding ItemTemplate}"
+                         Background="Transparent" BorderThickness="0" SelectionMode="Single" />
+            </Border>
+          </Popup>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^[IsDropDownOpen=true] /template/ Border#PART_SuggestionsContainer">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" />
+    </Style>
+    <Style Selector="^:reduced-motion /template/ Border#PART_SuggestionsContainer">
+      <Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdAdaptiveLayout}" TargetType="md:MdAdaptiveLayout">
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="VerticalContentAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid>
+          <ContentPresenter Name="PART_Compact" Content="{TemplateBinding CompactContent}" IsVisible="False" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+          <ContentPresenter Name="PART_Medium" Content="{TemplateBinding MediumContent}" IsVisible="False" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+          <ContentPresenter Name="PART_Expanded" Content="{TemplateBinding ExpandedContent}" IsVisible="False" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+          <ContentPresenter Name="PART_Large" Content="{TemplateBinding ResolvedLargeContent}" IsVisible="False" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+          <ContentPresenter Name="PART_ExtraLarge" Content="{TemplateBinding ResolvedExtraLargeContent}" IsVisible="False" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:compact /template/ ContentPresenter#PART_Compact"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:medium /template/ ContentPresenter#PART_Medium"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:expanded /template/ ContentPresenter#PART_Expanded"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:large /template/ ContentPresenter#PART_Expanded"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:large /template/ ContentPresenter#PART_Large"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:extra-large /template/ ContentPresenter#PART_Expanded"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:extra-large /template/ ContentPresenter#PART_ExtraLarge"><Setter Property="IsVisible" Value="True" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdSurface}" TargetType="md:MdSurface">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="CornerRadius" Value="12" /><Setter Property="Template"><ControlTemplate><Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" BoxShadow="{TemplateBinding Elevation}" CornerRadius="{TemplateBinding CornerRadius}"><ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" /></Border></ControlTemplate></Setter>
+    <Style Selector="^:lowest"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" /></Style>
+    <Style Selector="^:low"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" /></Style>
+    <Style Selector="^:container"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" /></Style>
+    <Style Selector="^:high"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /></Style>
+    <Style Selector="^:highest"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" /></Style>
+    <Style Selector="^:inverse"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.InverseSurface.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdText}" TargetType="md:MdText">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Style Selector="^:display-large"><Setter Property="FontSize" Value="57" /><Setter Property="LineHeight" Value="64" /></Style>
+    <Style Selector="^:display-medium"><Setter Property="FontSize" Value="45" /><Setter Property="LineHeight" Value="52" /></Style>
+    <Style Selector="^:display-small"><Setter Property="FontSize" Value="36" /><Setter Property="LineHeight" Value="44" /></Style>
+    <Style Selector="^:headline-large"><Setter Property="FontSize" Value="32" /><Setter Property="LineHeight" Value="40" /></Style>
+    <Style Selector="^:headline-medium"><Setter Property="FontSize" Value="28" /><Setter Property="LineHeight" Value="36" /></Style>
+    <Style Selector="^:headline-small"><Setter Property="FontSize" Value="24" /><Setter Property="LineHeight" Value="32" /></Style>
+    <Style Selector="^:title-large"><Setter Property="FontSize" Value="22" /><Setter Property="LineHeight" Value="28" /></Style>
+    <Style Selector="^:title-medium"><Setter Property="FontSize" Value="16" /><Setter Property="LineHeight" Value="24" /><Setter Property="FontWeight" Value="Medium" /></Style>
+    <Style Selector="^:title-small"><Setter Property="FontSize" Value="14" /><Setter Property="LineHeight" Value="20" /><Setter Property="FontWeight" Value="Medium" /></Style>
+    <Style Selector="^:body-large"><Setter Property="FontSize" Value="16" /><Setter Property="LineHeight" Value="24" /></Style>
+    <Style Selector="^:body-medium"><Setter Property="FontSize" Value="14" /><Setter Property="LineHeight" Value="20" /></Style>
+    <Style Selector="^:body-small"><Setter Property="FontSize" Value="12" /><Setter Property="LineHeight" Value="16" /></Style>
+    <Style Selector="^:label-large"><Setter Property="FontSize" Value="14" /><Setter Property="LineHeight" Value="20" /><Setter Property="FontWeight" Value="Medium" /></Style>
+    <Style Selector="^:label-medium"><Setter Property="FontSize" Value="12" /><Setter Property="LineHeight" Value="16" /><Setter Property="FontWeight" Value="Medium" /></Style>
+    <Style Selector="^:label-small"><Setter Property="FontSize" Value="11" /><Setter Property="LineHeight" Value="16" /><Setter Property="FontWeight" Value="Medium" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdStateLayer}" TargetType="md:MdStateLayer">
+    <Setter Property="StateBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type md:MdFocusRing}" TargetType="md:MdFocusRing">
+    <Setter Property="RingBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="RingThickness" Value="3" />
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type md:MdWindow}" TargetType="md:MdWindow">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+  </ControlTheme>
+
+  <!-- A complete custom-chrome window template. The native frame remains available through
+       BorderOnly while Material owns the title content, clipping, outline and caption visuals. -->
+  <ControlTheme x:Key="{x:Type md:MdBorderlessWindow}" TargetType="md:MdBorderlessWindow"
+                BasedOn="{StaticResource {x:Type md:MdWindow}}">
+    <Setter Property="UseLayoutRounding" Value="True" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdBorderlessWindow">
+        <Grid Background="Transparent">
+          <Border x:Name="PART_WindowFrame"
+                  Margin="1"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                  BorderThickness="1"
+                  CornerRadius="9"
+                  ClipToBounds="True">
+            <Grid>
+              <ContentPresenter x:Name="PART_ContentPresenter"
+                                Margin="{Binding TemplateSettings.ContentMargin, RelativeSource={RelativeSource TemplatedParent}}"
+                                Padding="{TemplateBinding Padding}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                Foreground="{TemplateBinding Foreground}"
+                                chrome:WindowDecorationProperties.ElementRole="User" />
+              <md:MdWindowTitleBar x:Name="PART_DefaultTitleBar"
+                                   Height="{Binding TemplateSettings.TitleBarHeight, RelativeSource={RelativeSource TemplatedParent}}"
+                                   VerticalAlignment="Top"
+                                   Content="{TemplateBinding Title}"
+                                   ShowMinimizeButton="{TemplateBinding ShowMinimizeButton}"
+                                   ShowMaximizeButton="{TemplateBinding ShowMaximizeButton}"
+                                   ShowCloseButton="{TemplateBinding ShowCloseButton}"
+                                   chrome:WindowDecorationProperties.ElementRole="TitleBar" />
+            </Grid>
+          </Border>
+
+          <md:MdWindowResizeGrip Classes="window-resize-grip" Edge="North" Height="6" VerticalAlignment="Top"
+                                HorizontalAlignment="Stretch" chrome:WindowDecorationProperties.ElementRole="ResizeN" />
+          <md:MdWindowResizeGrip Classes="window-resize-grip" Edge="South" Height="6" VerticalAlignment="Bottom"
+                                HorizontalAlignment="Stretch" chrome:WindowDecorationProperties.ElementRole="ResizeS" />
+          <md:MdWindowResizeGrip Classes="window-resize-grip" Edge="East" Width="6" HorizontalAlignment="Right"
+                                VerticalAlignment="Stretch" chrome:WindowDecorationProperties.ElementRole="ResizeE" />
+          <md:MdWindowResizeGrip Classes="window-resize-grip" Edge="West" Width="6" HorizontalAlignment="Left"
+                                VerticalAlignment="Stretch" chrome:WindowDecorationProperties.ElementRole="ResizeW" />
+          <md:MdWindowResizeGrip Classes="window-resize-grip" Edge="NorthEast" Width="10" Height="10"
+                                HorizontalAlignment="Right" VerticalAlignment="Top" chrome:WindowDecorationProperties.ElementRole="ResizeNE" />
+          <md:MdWindowResizeGrip Classes="window-resize-grip" Edge="NorthWest" Width="10" Height="10"
+                                HorizontalAlignment="Left" VerticalAlignment="Top" chrome:WindowDecorationProperties.ElementRole="ResizeNW" />
+          <md:MdWindowResizeGrip Classes="window-resize-grip" Edge="SouthEast" Width="10" Height="10"
+                                HorizontalAlignment="Right" VerticalAlignment="Bottom" chrome:WindowDecorationProperties.ElementRole="ResizeSE" />
+          <md:MdWindowResizeGrip Classes="window-resize-grip" Edge="SouthWest" Width="10" Height="10"
+                                HorizontalAlignment="Left" VerticalAlignment="Bottom" chrome:WindowDecorationProperties.ElementRole="ResizeSW" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:maximized /template/ Border#PART_WindowFrame">
+      <Setter Property="Margin" Value="0" /><Setter Property="BorderThickness" Value="0" /><Setter Property="CornerRadius" Value="0" />
+    </Style>
+    <Style Selector="^:maximized /template/ md|MdWindowResizeGrip.window-resize-grip"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:not(:custom-chrome) /template/ md|MdWindowTitleBar#PART_DefaultTitleBar"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:not(:custom-chrome) /template/ md|MdWindowResizeGrip.window-resize-grip"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^[CanResize=False] /template/ md|MdWindowResizeGrip.window-resize-grip"><Setter Property="IsVisible" Value="False" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdWindowTitleBar}" TargetType="md:MdWindowTitleBar">
+    <Setter Property="Height" Value="40" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdWindowTitleBar">
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,0,1"
+                chrome:WindowDecorationProperties.ElementRole="TitleBar">
+          <Grid ColumnDefinitions="Auto,*,Auto,Auto" Height="{TemplateBinding Height}">
+            <ContentPresenter Grid.Column="0" Margin="8,0" VerticalAlignment="Center"
+                              Content="{TemplateBinding LeadingContent}" Foreground="{TemplateBinding Foreground}"
+                              chrome:WindowDecorationProperties.ElementRole="User" />
+            <StackPanel Grid.Column="1" Margin="12,0" VerticalAlignment="Center">
+              <ContentPresenter Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" />
+              <ContentPresenter Content="{TemplateBinding Subtitle}" FontSize="11"
+                                Foreground="{TemplateBinding Foreground}" Opacity="0.7" />
+            </StackPanel>
+            <ContentPresenter Grid.Column="2" VerticalAlignment="Center"
+                              Content="{TemplateBinding TrailingContent}"
+                              chrome:WindowDecorationProperties.ElementRole="User" />
+            <StackPanel Grid.Column="3" Orientation="Horizontal" IsVisible="{TemplateBinding ShowCaptionButtons}">
+              <md:MdCaptionButton Kind="Minimize" IsVisible="{TemplateBinding ShowMinimizeButton}"
+                                  Foreground="{TemplateBinding Foreground}">
+                <Path Width="12" Height="12" Stretch="Uniform"
+                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=md:MdCaptionButton}}" StrokeThickness="1"
+                      Data="M1,6 L11,6" />
+              </md:MdCaptionButton>
+              <md:MdCaptionButton Kind="MaximizeRestore" IsVisible="{TemplateBinding ShowMaximizeButton}"
+                                  Foreground="{TemplateBinding Foreground}">
+                <Grid Width="12" Height="12">
+                  <Path x:Name="PART_MaximizeGlyph" Stretch="Uniform"
+                        Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=md:MdCaptionButton}}" StrokeThickness="1"
+                        Data="M1.5,1.5 L10.5,1.5 L10.5,10.5 L1.5,10.5 Z" />
+                  <Path x:Name="PART_RestoreGlyph" Stretch="Uniform" IsVisible="False"
+                        Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=md:MdCaptionButton}}" StrokeThickness="1"
+                        Data="M3.5,1.5 L10.5,1.5 L10.5,8.5 M1.5,3.5 L8.5,3.5 L8.5,10.5 L1.5,10.5 Z" />
+                </Grid>
+              </md:MdCaptionButton>
+              <md:MdCaptionButton Kind="Close" IsVisible="{TemplateBinding ShowCloseButton}"
+                                  Foreground="{TemplateBinding Foreground}">
+                <Path Width="12" Height="12" Stretch="Uniform"
+                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=md:MdCaptionButton}}" StrokeThickness="1"
+                      Data="M1.5,1.5 L10.5,10.5 M10.5,1.5 L1.5,10.5" />
+              </md:MdCaptionButton>
+            </StackPanel>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:inactive"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /></Style>
+    <Style Selector="^ /template/ md|MdCaptionButton:restore Path#PART_MaximizeGlyph"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^ /template/ md|MdCaptionButton:restore Path#PART_RestoreGlyph"><Setter Property="IsVisible" Value="True" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdCaptionButton}" TargetType="md:MdCaptionButton">
+    <Setter Property="Width" Value="46" /><Setter Property="Height" Value="40" /><Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template"><ControlTemplate><Border Background="{TemplateBinding Background}"><ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" /></Border></ControlTemplate></Setter>
+    <Style Selector="^:pointerover"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" /></Style>
+    <Style Selector="^:pressed"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceVariant.Brush}" /></Style>
+    <Style Selector="^[Kind=Close]:pointerover"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnError.Brush}" /></Style>
+    <Style Selector="^[Kind=Close]:pressed"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.ErrorContainer.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnErrorContainer.Brush}" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdWindowDragRegion}" TargetType="md:MdWindowDragRegion">
+    <Setter Property="chrome:WindowDecorationProperties.ElementRole" Value="TitleBar" />
+    <Setter Property="Template"><ControlTemplate><ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" /></ControlTemplate></Setter>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type md:MdWindowResizeGrip}" TargetType="md:MdWindowResizeGrip">
+    <Setter Property="Width" Value="8" /><Setter Property="Height" Value="8" />
+  </ControlTheme>
+</ResourceDictionary>

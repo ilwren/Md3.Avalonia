@@ -1,0 +1,88 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             x:Class="Md3.Avalonia.Gallery.Pages.ComponentsOverviewGalleryPage">
+  <md:MdScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <StackPanel Spacing="40" Margin="0,0,8,40">
+      <StackPanel MaxWidth="760" HorizontalAlignment="Left" Spacing="12">
+        <TextBlock Classes="h1" Text="Components" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="Components are interactive building blocks for creating a user interface. They can be organized into categories based on their purpose: Action, containment, communication, navigation, selection, and text input." />
+      </StackPanel>
+
+      <WrapPanel Orientation="Horizontal">
+        <Border Classes="gallery-section" Width="292" Margin="0,0,16,16">
+          <StackPanel Spacing="12">
+            <TextBlock Classes="h2" FontSize="24" Text="Action" />
+            <TextBlock Classes="body" FontSize="14" TextWrapping="Wrap" Text="Controls that start or expose an action." />
+            <md:MdButton Content="Buttons" Tag="Buttons" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Icon buttons" Tag="Icon buttons" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="FABs" Tag="FABs" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Toolbars" Tag="Toolbars" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+          </StackPanel>
+        </Border>
+
+        <Border Classes="gallery-section" Width="292" Margin="0,0,16,16">
+          <StackPanel Spacing="12">
+            <TextBlock Classes="h2" FontSize="24" Text="Containment" />
+            <TextBlock Classes="body" FontSize="14" TextWrapping="Wrap" Text="Surfaces that group information and related actions." />
+            <md:MdButton Content="Cards" Tag="Cards" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Carousel" Tag="Carousel" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Lists" Tag="Lists" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Divider" Tag="Divider" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+          </StackPanel>
+        </Border>
+
+        <Border Classes="gallery-section" Width="292" Margin="0,0,16,16">
+          <StackPanel Spacing="12">
+            <TextBlock Classes="h2" FontSize="24" Text="Communication" />
+            <TextBlock Classes="body" FontSize="14" TextWrapping="Wrap" Text="Status, progress, prompts, and transient messages." />
+            <md:MdButton Content="Badges" Tag="Badges" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Dialogs" Tag="Dialogs" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Snackbar" Tag="Snackbar" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Tooltips" Tag="Tooltips" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Loading" Tag="Loading" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Progress" Tag="Progress" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+          </StackPanel>
+        </Border>
+
+        <Border Classes="gallery-section" Width="292" Margin="0,0,16,16">
+          <StackPanel Spacing="12">
+            <TextBlock Classes="h2" FontSize="24" Text="Navigation" />
+            <TextBlock Classes="body" FontSize="14" TextWrapping="Wrap" Text="Components for moving through destinations and views." />
+            <md:MdButton Content="App bars" Tag="App bars" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Navigation bar" Tag="Navigation bar" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Navigation drawer" Tag="Navigation drawer" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Adaptive layout" Tag="Adaptive layout" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Tabs" Tag="Tabs" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+          </StackPanel>
+        </Border>
+
+        <Border Classes="gallery-section" Width="292" Margin="0,0,16,16">
+          <StackPanel Spacing="12">
+            <TextBlock Classes="h2" FontSize="24" Text="Selection" />
+            <TextBlock Classes="body" FontSize="14" TextWrapping="Wrap" Text="Controls for choosing values, dates, and options." />
+            <md:MdButton Content="Checkbox" Tag="Checkbox" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Radio buttons" Tag="Radio buttons" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Chips" Tag="Chips" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Date and time pickers" Tag="Date and time pickers" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Slider" Tag="Slider" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Switch" Tag="Switch" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+          </StackPanel>
+        </Border>
+
+        <Border Classes="gallery-section" Width="292" Margin="0,0,16,16">
+          <StackPanel Spacing="12">
+            <TextBlock Classes="h2" FontSize="24" Text="Text input" />
+            <TextBlock Classes="body" FontSize="14" TextWrapping="Wrap" Text="Fields and temporary surfaces for entering or choosing data." />
+            <md:MdButton Content="Text fields" Tag="Text fields" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Search" Tag="Search" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Combo box" Tag="Combo box" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Menus" Tag="Menus" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Sheets" Tag="Sheets" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+          </StackPanel>
+        </Border>
+      </WrapPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

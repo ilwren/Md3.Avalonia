@@ -1,0 +1,22 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdLoadingIndicator}" TargetType="md:MdLoadingIndicator">
+    <Setter Property="IndicatorBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="ContainerBrush" Value="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdLinearProgressIndicator}" TargetType="md:MdLinearProgressIndicator">
+    <Setter Property="IndicatorBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="TrackBrush" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
+    <Setter Property="Height" Value="12" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdLinearProgressIndicator"><Border x:Name="PART_Indicator" Background="Transparent" /></ControlTemplate></Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdCircularProgressIndicator}" TargetType="md:MdCircularProgressIndicator">
+    <Setter Property="IndicatorBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="TrackBrush" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdCircularProgressIndicator"><Border x:Name="PART_Indicator" Background="Transparent" /></ControlTemplate></Setter>
+  </ControlTheme>
+</ResourceDictionary>

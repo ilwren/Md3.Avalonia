@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.NavigationDrawerGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+      <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Navigation drawer"/><TextBlock Classes="body" Text="Standard and modal drawers expose top-level destinations on larger or temporarily constrained layouts."/></StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="8"><md:MdButton Content="Standard" Variant="Tonal" Click="ShowStandard"/><md:MdButton Content="Modal" Variant="Filled" Click="ShowModal"/><md:MdButton Content="Close" Variant="Text" Click="CloseDrawer"/></StackPanel>
+      <md:MdNavigationDrawer x:Name="DemoDrawer" Width="800" Height="400" HorizontalAlignment="Left" DrawerWidth="300" IsOpen="True">
+        <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"><StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"><md:MdIcon Glyph="{x:Static md:MdSymbols.Photo}" Size="48"/><TextBlock FontSize="22" Text="Main content"/></StackPanel></Border>
+        <md:MdNavigationDrawer.DrawerContent>
+          <StackPanel Spacing="12">
+            <TextBlock Margin="16,16,16,8" FontSize="20" Text="Workspace"/>
+            <md:MdList Variant="Segmented" SelectionMode="Single" SelectedIndex="0">
+              <md:MdListItem Headline="Inbox"><md:MdListItem.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.Mail}"/></md:MdListItem.LeadingContent></md:MdListItem>
+              <md:MdListItem Headline="Favorites"><md:MdListItem.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.Favorite}"/></md:MdListItem.LeadingContent></md:MdListItem>
+              <md:MdListItem Headline="Settings"><md:MdListItem.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.Settings}"/></md:MdListItem.LeadingContent></md:MdListItem>
+            </md:MdList>
+          </StackPanel>
+        </md:MdNavigationDrawer.DrawerContent>
+      </md:MdNavigationDrawer>
+      <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdNavigationDrawer IsOpen=&quot;{Binding IsDrawerOpen}&quot; IsModal=&quot;True&quot;&gt;&#10;  &lt;md:MdNavigationDrawer.DrawerContent&gt;...&lt;/md:MdNavigationDrawer.DrawerContent&gt;&#10;  &lt;views:CurrentPage /&gt;&#10;&lt;/md:MdNavigationDrawer&gt;" CSharpCode="drawer.IsModal = true;&#10;drawer.IsOpen = true;&#10;// Escape or a scrim click closes a modal drawer."/></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

@@ -1,0 +1,5 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdDateRangePicker}" TargetType="md:MdDateRangePicker">
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdDateRangePicker"><Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="12"><md:MdDatePicker Grid.Column="0" Label="{TemplateBinding StartLabel}" MinimumDate="{TemplateBinding MinimumDate}" MaximumDate="{TemplateBinding MaximumDate}" Mode="{TemplateBinding Mode}" SelectedDate="{TemplateBinding StartDate, Mode=TwoWay}" /><TextBlock Grid.Column="1" VerticalAlignment="Center" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="—" /><md:MdDatePicker Grid.Column="2" Label="{TemplateBinding EndLabel}" MinimumDate="{TemplateBinding StartDate}" MaximumDate="{TemplateBinding MaximumDate}" Mode="{TemplateBinding Mode}" SelectedDate="{TemplateBinding EndDate, Mode=TwoWay}" /></Grid></ControlTemplate></Setter>
+  </ControlTheme>
+</ResourceDictionary>

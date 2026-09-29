@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <RootNamespace>Md3.Avalonia.Icons</RootNamespace>
+    <AssemblyName>Md3.Avalonia.Icons</AssemblyName>
+    <Description>Optional icon catalogs, font registration, codepoints and font resources for Md3.Avalonia.</Description>
+    <PackageId>Md3.Avalonia.Icons</PackageId>
+    <Version>0.1.0-preview.1</Version>
+    <Authors>Md3.Avalonia contributors</Authors>
+    <PackageTags>avalonia;icons;fonts;material-symbols;material-design</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IsPackable>true</IsPackable>
+    <!-- The official font is intentionally not committed. Supply it offline at this path, or
+         override MaterialSymbolsRoundedFontFile with an absolute path when invoking MSBuild. -->
+    <MaterialSymbolsRoundedFontFile Condition="'$(MaterialSymbolsRoundedFontFile)' == ''">$(MSBuildProjectDirectory)/Assets/Fonts/MaterialSymbolsRounded.ttf</MaterialSymbolsRoundedFontFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <AvaloniaResource Include="$(MaterialSymbolsRoundedFontFile)"
+                      Link="Assets/Fonts/MaterialSymbolsRounded.ttf"
+                      Condition="Exists('$(MaterialSymbolsRoundedFontFile)')" />
+    <AvaloniaResource Include="Assets/Fonts/MaterialSymbolsRounded.codepoints" />
+    <None Update="Assets/Fonts/MaterialSymbolsRounded-LICENSE.txt" Pack="true" PackagePath="licenses/MaterialSymbolsRounded-LICENSE.txt" />
+    <None Include="../../README.md" Pack="true" PackagePath="/" Link="README.md" />
+    <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />
+  </ItemGroup>
+
+  <Target Name="RequireMaterialSymbolsRoundedFont"
+          BeforeTargets="PrepareForBuild;Pack"
+          Condition="'$(DesignTimeBuild)' != 'true'">
+    <Error Condition="!Exists('$(MaterialSymbolsRoundedFontFile)')"
+           Text="Material Symbols Rounded font is required. Copy the official font to '$(MSBuildProjectDirectory)/Assets/Fonts/MaterialSymbolsRounded.ttf' or build with -p:MaterialSymbolsRoundedFontFile=/absolute/path/to/font.ttf. The font binary is intentionally not included in this repository." />
+  </Target>
+</Project>

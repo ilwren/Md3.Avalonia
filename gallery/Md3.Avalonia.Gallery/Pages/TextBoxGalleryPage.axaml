@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.TextBoxGalleryPage"
+             mc:Ignorable="d"
+             d:DesignWidth="900" d:DesignHeight="760">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="24">
+    <StackPanel Spacing="8">
+      <TextBlock Classes="h1" Text="Text fields" />
+      <TextBlock Classes="body"
+                 Text="Click an empty label to inspect the stable 150 ms animation, or right-click any editable field for the localized Material editing menu." />
+    </StackPanel>
+
+    <StackPanel Spacing="12">
+      <TextBlock Classes="h2" Text="Variants" />
+      <StackPanel Orientation="Horizontal" Spacing="20">
+        <md:MdTextBox Width="300" Label="Filled label" PlaceholderText="Type a value"
+                      SupportingText="Supporting text" />
+        <md:MdTextBox Width="300" Label="Outlined label" Variant="Outlined"
+                      PlaceholderText="Type a value" SupportingText="Supporting text" />
+      </StackPanel>
+    </StackPanel>
+
+    <StackPanel Spacing="12">
+      <TextBlock Classes="h2" Text="Populated and disabled" />
+      <StackPanel Orientation="Horizontal" Spacing="20">
+        <md:MdTextBox Width="300" Label="Project name" Text="Md3.Avalonia"
+                      ShowCharacterCounter="True" MaxLength="40" />
+        <md:MdTextBox Width="300" Label="Read only value" Text="Material 3"
+                      Variant="Outlined" IsReadOnly="True" />
+        <md:MdTextBox Width="220" Label="Disabled" Text="Unavailable" IsEnabled="False" />
+      </StackPanel>
+    </StackPanel>
+
+    <StackPanel Spacing="12">
+      <TextBlock Classes="h2" Text="Clear and password actions" />
+      <StackPanel Orientation="Horizontal" Spacing="20">
+        <md:MdTextBox Width="300" Label="Search" Text="Material components" ShowClearButton="True" />
+        <md:MdTextBox Width="300" Label="Password" Text="expressive-motion" IsPassword="True" Variant="Outlined" />
+      </StackPanel>
+    </StackPanel>
+
+    <StackPanel Spacing="12">
+      <TextBlock Classes="h2" Text="Slots, prefix/suffix and error" />
+      <StackPanel Orientation="Horizontal" Spacing="20">
+        <md:MdTextBox Width="300" Label="Amount" PrefixText="$" SuffixText="USD" Text="120">
+          <md:MdTextBox.LeadingIcon><TextBlock Text="#" FontWeight="Medium" /></md:MdTextBox.LeadingIcon>
+        </md:MdTextBox>
+        <md:MdTextBox Width="340" Label="Email" Text="name@" Variant="Outlined"
+                      IsError="True" ErrorText="Enter a valid email address">
+          <md:MdTextBox.TrailingIcon><TextBlock Text="!" FontWeight="Bold" /></md:MdTextBox.TrailingIcon>
+        </md:MdTextBox>
+      </StackPanel>
+    </StackPanel>
+    <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdTextBox Label=&quot;Email&quot; Text=&quot;{Binding Email}&quot;&#10;              ShowClearButton=&quot;True&quot; Variant=&quot;Outlined&quot; /&gt;" CSharpCode="var email = new MdTextBox&#10;{&#10;    Label = &quot;Email&quot;,&#10;    Variant = MdTextBoxVariant.Outlined,&#10;    ShowClearButton = true&#10;};" /></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

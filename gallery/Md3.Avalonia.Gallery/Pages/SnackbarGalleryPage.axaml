@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.SnackbarGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+      <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Snackbar"/><TextBlock Classes="body" Text="Snackbars briefly report an app process and may offer one action or a close affordance."/></StackPanel>
+      <md:MdButton Width="180" HorizontalAlignment="Left" Content="Show snackbar" Variant="Filled" Click="ShowSnackbar"/>
+      <Border Width="760" Height="300" HorizontalAlignment="Left" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24">
+        <Grid>
+          <TextBlock x:Name="SnackbarResult" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" Text="Draft moved to archive"/>
+          <md:MdSnackbar x:Name="DemoSnackbar" Margin="24" Content="Draft archived" ActionContent="Undo" ActionInvoked="UndoArchive" IsDismissible="True" Duration="0:0:0" IsOpen="True"/>
+        </Grid>
+      </Border>
+      <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Configurations"/><md:MdSnackbar Content="Connection restored" Duration="0:0:0" IsOpen="True"/><md:MdSnackbar Content="Message deleted" ActionContent="Undo" ActionInvoked="UndoArchive" Duration="0:0:0" IsOpen="True"/></StackPanel>
+      <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdSnackbar IsOpen=&quot;{Binding IsMessageVisible}&quot;&#10;                 Content=&quot;Draft archived&quot;&#10;                 ActionContent=&quot;Undo&quot;&#10;                 ActionCommand=&quot;{Binding UndoCommand}&quot; /&gt;" CSharpCode="snackbar.Content = &quot;Draft archived&quot;;&#10;snackbar.ActionContent = &quot;Undo&quot;;&#10;snackbar.Show();"/></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

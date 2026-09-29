@@ -1,0 +1,44 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="MdSnackbarActionButtonTheme" TargetType="md:MdButton" BasedOn="{StaticResource {x:Type md:MdButton}}">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" />
+    <Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" />
+    <Style Selector="^:text"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" /><Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" /></Style>
+  </ControlTheme>
+  <ControlTheme x:Key="MdSnackbarDismissButtonTheme" TargetType="md:MdIconButton" BasedOn="{StaticResource {x:Type md:MdIconButton}}">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" />
+    <Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" />
+    <Style Selector="^:standard"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" /><Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdSnackbar}" TargetType="md:MdSnackbar">
+    <Setter Property="MinWidth" Value="288" /><Setter Property="MaxWidth" Value="568" /><Setter Property="MinHeight" Value="48" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" /><Setter Property="HorizontalAlignment" Value="Center" /><Setter Property="VerticalAlignment" Value="Bottom" />
+    <Setter Property="IsVisible" Value="False" /><Setter Property="Opacity" Value="0" /><Setter Property="RenderTransform" Value="translate(0px,16px)" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdSnackbar">
+        <Border x:Name="PART_Container" MinHeight="{TemplateBinding MinHeight}" Padding="16,0,8,0" Background="{DynamicResource Md.Sys.Color.InverseSurface.Brush}" BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}" CornerRadius="24">
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="4">
+            <ContentPresenter Grid.Column="0" Margin="0,14" VerticalAlignment="Center" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" FontSize="14" Foreground="{TemplateBinding Foreground}" />
+            <md:MdButton x:Name="PART_ActionButton" Grid.Column="1" VerticalAlignment="Center"
+                         Theme="{StaticResource MdSnackbarActionButtonTheme}"
+                         Content="{TemplateBinding ActionContent}"
+                         Foreground="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}"
+                         FontWeight="DemiBold" Size="ExtraSmall" Variant="Text" IsVisible="False" />
+            <md:MdIconButton x:Name="PART_DismissButton" Grid.Column="2" VerticalAlignment="Center"
+                             Theme="{StaticResource MdSnackbarDismissButtonTheme}"
+                             Icon="{DynamicResource Md.Icon.Close}"
+                             Foreground="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}"
+                             Opacity="1" Size="ExtraSmall" Variant="Standard" IsVisible="False" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:present"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:open"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="translate(0px,0px)" /></Style>
+    <Style Selector="^:reduced-motion"><Setter Property="RenderTransform" Value="translate(0px,0px)" /></Style>
+    <Style Selector="^:has-action /template/ md|MdButton#PART_ActionButton"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:dismissible /template/ md|MdIconButton#PART_DismissButton"><Setter Property="IsVisible" Value="True" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.DividerGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+      <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Divider"/><TextBlock Classes="body" Text="A thin outline-variant line groups related content in lists and containers."/></StackPanel>
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Full-width and inset" />
+        <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+          <StackPanel Spacing="16">
+            <TextBlock Text="Account"/><md:MdDivider/><TextBlock Text="Notifications"/><md:MdDivider Inset="56"/><TextBlock Margin="56,0,0,0" Text="Privacy"/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+      <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Vertical"/><StackPanel Height="64" Orientation="Horizontal" Spacing="16"><TextBlock VerticalAlignment="Center" Text="Day"/><md:MdDivider Orientation="Vertical"/><TextBlock VerticalAlignment="Center" Text="Week"/><md:MdDivider Orientation="Vertical"/><TextBlock VerticalAlignment="Center" Text="Month"/></StackPanel></StackPanel>
+      <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdDivider Inset=&quot;56&quot; /&gt;&#10;&lt;md:MdDivider Orientation=&quot;Vertical&quot; /&gt;" CSharpCode="var divider = new MdDivider { Inset = 56 };&#10;var vertical = new MdDivider { Orientation = Orientation.Vertical };" /></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

@@ -1,0 +1,101 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdDialog}" TargetType="md:MdDialog">
+    <Setter Property="MinWidth" Value="280" />
+    <Setter Property="MaxWidth" Value="560" />
+    <Setter Property="Padding" Value="24" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="CornerRadius" Value="28" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdDialog">
+        <Border x:Name="PART_Container"
+                MinWidth="{TemplateBinding MinWidth}"
+                MaxWidth="{TemplateBinding MaxWidth}"
+                Padding="{TemplateBinding Padding}"
+                Background="{TemplateBinding Background}"
+                BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                ClipToBounds="True">
+          <Grid RowDefinitions="Auto,Auto,*,Auto">
+            <ContentPresenter x:Name="PART_Icon"
+                              Grid.Row="0"
+                              Margin="0,0,0,16"
+                              HorizontalAlignment="Center"
+                              Content="{TemplateBinding Icon}"
+                              Foreground="{DynamicResource Md.Sys.Color.Secondary.Brush}"
+                              IsVisible="False" />
+            <ContentPresenter x:Name="PART_Headline"
+                              Grid.Row="1"
+                              Margin="0,0,0,16"
+                              HorizontalAlignment="Left"
+                              Content="{TemplateBinding Headline}"
+                              FontSize="24"
+                              Foreground="{TemplateBinding Foreground}"
+                              IsVisible="False" />
+            <ContentPresenter Grid.Row="2"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              FontSize="14"
+                              Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+            <ContentPresenter x:Name="PART_Actions"
+                              Grid.Row="3"
+                              Margin="0,24,0,0"
+                              HorizontalAlignment="Right"
+                              Content="{TemplateBinding Actions}"
+                              IsVisible="False" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:has-icon /template/ ContentPresenter#PART_Icon"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:has-headline /template/ ContentPresenter#PART_Headline"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:has-actions /template/ ContentPresenter#PART_Actions"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:full-screen">
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="MaxWidth" Value="Infinity" />
+      <Setter Property="CornerRadius" Value="0" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdDialogHost}" TargetType="md:MdDialogHost">
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdDialogHost">
+        <Grid>
+          <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+          <Grid x:Name="PART_Overlay" IsVisible="False" Opacity="0">
+            <Border x:Name="PART_Scrim" Background="{DynamicResource Md.Sys.Color.Scrim.Brush}" Opacity="0.32" />
+            <ContentPresenter x:Name="PART_DialogPresenter"
+                              Margin="24"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding Dialog}"
+                              Opacity="0"
+                              RenderTransform="scale(0.9)"
+                              RenderTransformOrigin="50%,50%" />
+          </Grid>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:present /template/ Grid#PART_Overlay"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:open /template/ Grid#PART_Overlay"><Setter Property="Opacity" Value="1" /></Style>
+    <Style Selector="^:open /template/ ContentPresenter#PART_DialogPresenter"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+    <Style Selector="^:reduced-motion /template/ ContentPresenter#PART_DialogPresenter"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+    <Style Selector="^:full-screen-dialog /template/ ContentPresenter#PART_DialogPresenter">
+      <Setter Property="Margin" Value="0" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="VerticalContentAlignment" Value="Stretch" />
+      <Setter Property="RenderTransform" Value="scale(1)" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

@@ -1,0 +1,85 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.ToolbarGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Toolbars" />
+        <TextBlock Classes="body" Text="Docked and floating toolbars keep frequently used actions close to page content." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Floating · standard" />
+        <Border Width="720" Height="128" HorizontalAlignment="Left" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24">
+          <md:MdToolbar HorizontalAlignment="Center" VerticalAlignment="Center">
+            <md:MdIconButton Icon="{x:Static md:MdSymbols.Edit}" />
+            <md:MdIconButton Icon="{x:Static md:MdSymbols.ContentCopy}" />
+            <md:MdIconButton Icon="{x:Static md:MdSymbols.Share}" />
+            <md:MdIconButton Icon="{x:Static md:MdSymbols.Delete}" />
+          </md:MdToolbar>
+        </Border>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Floating · vibrant with primary action" />
+        <Border Width="720" Height="128" HorizontalAlignment="Left" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24">
+          <md:MdToolbar Variant="Vibrant" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <md:MdIconButton Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" Icon="{x:Static md:MdSymbols.Check}" />
+            <md:MdIconButton Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" Icon="{x:Static md:MdSymbols.Edit}" />
+            <md:MdIconButton Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" Icon="{x:Static md:MdSymbols.Delete}" />
+            <md:MdToolbar.TrailingContent><md:MdButton Content="Apply" Variant="Filled" /></md:MdToolbar.TrailingContent>
+          </md:MdToolbar>
+        </Border>
+      </StackPanel>
+
+      <StackPanel Width="720" HorizontalAlignment="Left" Spacing="12">
+        <TextBlock Classes="h2" Text="Docked" />
+        <md:MdToolbar Mode="Docked" HorizontalAlignment="Stretch">
+          <md:MdToolbar.LeadingContent><md:MdIconButton Icon="{x:Static md:MdSymbols.Close}" /></md:MdToolbar.LeadingContent>
+          <md:MdIconButton Icon="{x:Static md:MdSymbols.Refresh}" />
+          <md:MdIconButton Icon="{x:Static md:MdSymbols.Sort}" />
+          <md:MdIconButton Icon="{x:Static md:MdSymbols.FilterAlt}" />
+          <md:MdToolbar.TrailingContent><md:MdIconButton Icon="{x:Static md:MdSymbols.MoreVert}" /></md:MdToolbar.TrailingContent>
+        </md:MdToolbar>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Click-triggered floating toolbar" />
+        <Border Width="720" Height="160" HorizontalAlignment="Left"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24">
+          <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+            <TextBlock Classes="body" Text="Select content, then open the contextual toolbar." />
+            <md:MdButton x:Name="ContextToolbarTrigger" Content="Show contextual toolbar" Variant="Outlined" Click="ToggleContextToolbar" />
+            <TextBlock x:Name="ContextToolbarStatus" Classes="body" Text="No contextual action selected." HorizontalAlignment="Center" />
+            <md:MdDropdownMenu x:Name="ContextToolbarPopup" PlacementTarget="{Binding #ContextToolbarTrigger}">
+              <md:MdToolbar>
+                <md:MdIconButton x:Name="ContextEditAction" Tag="Edit" Icon="{x:Static md:MdSymbols.Edit}" ToolTip.Tip="Edit" Click="RunContextToolbarAction" />
+                <md:MdIconButton Tag="Copy" Icon="{x:Static md:MdSymbols.ContentCopy}" ToolTip.Tip="Copy" Click="RunContextToolbarAction" />
+                <md:MdIconButton Tag="Share" Icon="{x:Static md:MdSymbols.Share}" ToolTip.Tip="Share" Click="RunContextToolbarAction" />
+              </md:MdToolbar>
+            </md:MdDropdownMenu>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Vertical floating" />
+        <Border Width="180" Height="280" HorizontalAlignment="Left" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24">
+          <md:MdToolbar Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <md:MdIconButton Icon="{x:Static md:MdSymbols.Edit}" />
+            <md:MdIconButton Icon="{x:Static md:MdSymbols.Photo}" />
+            <md:MdIconButton Icon="{x:Static md:MdSymbols.AttachFile}" />
+            <md:MdIconButton Icon="{x:Static md:MdSymbols.MoreVert}" />
+          </md:MdToolbar>
+        </Border>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdToolbar Mode=&quot;Floating&quot; Variant=&quot;Standard&quot;&gt;&#10;  &lt;md:MdIconButton Icon=&quot;{x:Static md:MdSymbols.Edit}&quot; /&gt;&#10;  &lt;md:MdIconButton Icon=&quot;{x:Static md:MdSymbols.Share}&quot; /&gt;&#10;&lt;/md:MdToolbar&gt;" CSharpCode="var toolbar = new MdToolbar&#10;{&#10;    Mode = MdToolbarMode.Floating,&#10;    Variant = MdToolbarVariant.Standard&#10;};&#10;toolbar.Items.Add(new MdIconButton { Icon = MdSymbols.Edit });" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

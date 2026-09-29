@@ -1,0 +1,58 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdTabViewItem}" TargetType="md:MdTabViewItem">
+    <Setter Property="MinHeight" Value="48" />
+    <Setter Property="MinWidth" Value="96" />
+    <Setter Property="Padding" Value="16,0" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdTabViewItem">
+        <Border Background="Transparent">
+          <Grid RowDefinitions="*,3">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Spacing="8">
+              <md:MdSymbolPresenter x:Name="PART_Icon" Content="{TemplateBinding Icon}" FontSize="20"
+                                    Foreground="{TemplateBinding Foreground}" IsVisible="False" />
+              <ContentPresenter Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                Foreground="{TemplateBinding Foreground}" />
+              <ContentPresenter x:Name="PART_Badge" Content="{TemplateBinding Badge}" IsVisible="False" />
+            </StackPanel>
+            <Border x:Name="PART_Indicator" Grid.Row="1" Width="24" Height="3" HorizontalAlignment="Center"
+                    Background="Transparent" CornerRadius="3,3,0,0" />
+            <Border x:Name="PART_State" Grid.RowSpan="2" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" Opacity="0" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:has-icon /template/ md|MdSymbolPresenter#PART_Icon"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:has-badge /template/ ContentPresenter#PART_Badge"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:selected"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Style Selector="^:selected /template/ Border#PART_Indicator"><Setter Property="Width" Value="32" /><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdTabView}" TargetType="md:MdTabView">
+    <Setter Property="ItemsPanel"><ItemsPanelTemplate><UniformGrid Rows="1" /></ItemsPanelTemplate></Setter>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdTabView">
+        <Grid RowDefinitions="Auto,*">
+          <Border BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,0,1">
+            <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
+              <ItemsPresenter x:Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+            </ScrollViewer>
+          </Border>
+          <!-- TabControl owns this one and only selected-content presenter. A short opacity
+               transition preserves motion without attempting to parent the content twice. -->
+          <ContentPresenter x:Name="PART_SelectedContentHost"
+                            Grid.Row="1"
+                            ContentTemplate="{TemplateBinding SelectedContentTemplate}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:scrollable"><Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></Setter></Style>
+  </ControlTheme>
+</ResourceDictionary>

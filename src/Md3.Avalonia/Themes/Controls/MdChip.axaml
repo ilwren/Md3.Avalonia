@@ -1,0 +1,124 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdChip}" TargetType="md:MdChip">
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="Padding" Value="12,0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Outline.Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdChip">
+        <Border x:Name="PART_Container"
+                MinHeight="{TemplateBinding MinHeight}"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                ClipToBounds="True">
+          <Grid>
+            <Grid Margin="{TemplateBinding Padding}" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+              <Grid x:Name="PART_LeadingHost" Grid.Column="0" IsVisible="False">
+                <ContentPresenter x:Name="PART_LeadingIcon"
+                                  Width="18" Height="18"
+                                  Content="{TemplateBinding LeadingIcon}"
+                                  Foreground="{TemplateBinding Foreground}"
+                                  IsVisible="False" />
+                <md:MdIcon x:Name="PART_SelectedIcon"
+                           Glyph="{DynamicResource Md.Icon.Done}"
+                           Size="18"
+                           Foreground="{TemplateBinding Foreground}"
+                           IsVisible="False" Opacity="0" />
+              </Grid>
+              <ContentPresenter Grid.Column="1"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                FontSize="14"
+                                FontWeight="Medium"
+                                Foreground="{TemplateBinding Foreground}" />
+              <Grid x:Name="PART_TrailingHost" Grid.Column="2" IsVisible="False">
+                <ContentPresenter x:Name="PART_TrailingIcon"
+                                  Width="18" Height="18"
+                                  Content="{TemplateBinding TrailingIcon}"
+                                  Foreground="{TemplateBinding Foreground}"
+                                  IsVisible="False" />
+                <md:MdIconButton x:Name="PART_RemoveButton"
+                                 AutomationProperties.Name="Remove chip"
+                                 Icon="{DynamicResource Md.Icon.Close}"
+                                 Size="ExtraSmall"
+                                 Variant="Standard"
+                                 IsVisible="False" />
+              </Grid>
+            </Grid>
+            <Border x:Name="PART_StateLayer"
+                    Background="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                    IsHitTestVisible="False"
+                    Opacity="0" />
+            <md:MdRipplePresenter RippleBrush="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:assist">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    </Style>
+    <Style Selector="^:suggestion">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    </Style>
+    <Style Selector="^:has-leading-icon /template/ Grid#PART_LeadingHost">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-leading-icon /template/ ContentPresenter#PART_LeadingIcon">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-trailing-icon /template/ Grid#PART_TrailingHost">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-trailing-icon /template/ ContentPresenter#PART_TrailingIcon">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:removable /template/ Grid#PART_TrailingHost">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:removable /template/ md|MdIconButton#PART_RemoveButton">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:filter:checked">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="Padding" Value="8,0,12,0" />
+    </Style>
+    <Style Selector="^:filter:checked /template/ Grid#PART_LeadingHost">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:filter /template/ md|MdIcon#PART_SelectedIcon">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:filter:checked /template/ ContentPresenter#PART_LeadingIcon">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="^:filter:checked /template/ md|MdIcon#PART_SelectedIcon">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="0.08" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="0.10" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_Container">
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.DisabledOutline.Brush}" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

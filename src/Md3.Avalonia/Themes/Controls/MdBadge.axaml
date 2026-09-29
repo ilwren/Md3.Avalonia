@@ -1,0 +1,65 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdBadge}" TargetType="md:MdBadge">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnError.Brush}" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="IsHitTestVisible" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdBadge">
+        <Border x:Name="PART_Container"
+                MinWidth="{TemplateBinding MinWidth}"
+                Height="{TemplateBinding Height}"
+                Padding="{TemplateBinding Padding}"
+                Background="{TemplateBinding Background}"
+                CornerRadius="{TemplateBinding CornerRadius}">
+          <ContentPresenter x:Name="PART_Content"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Foreground="{TemplateBinding Foreground}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:dot">
+      <Setter Property="MinWidth" Value="{DynamicResource Md.Comp.Badge.Small.Size}" />
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.Badge.Small.Size}" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="CornerRadius" Value="{DynamicResource Md.Comp.Badge.Small.Shape}" />
+    </Style>
+    <Style Selector="^:dot /template/ ContentPresenter#PART_Content">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:label">
+      <Setter Property="MinWidth" Value="{DynamicResource Md.Comp.Badge.Large.MinWidth}" />
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.Badge.Large.Height}" />
+      <Setter Property="Padding" Value="{DynamicResource Md.Comp.Badge.Large.Padding}" />
+      <Setter Property="CornerRadius" Value="{DynamicResource Md.Comp.Badge.Large.Shape}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdBadgedBox}" TargetType="md:MdBadgedBox">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdBadgedBox">
+        <!-- Reserve the same 5dp used by the M3 overlap so neither the dot nor the
+             label badge is clipped by the BadgedBox's measured bounds. -->
+        <Grid Margin="0,5,5,0" ClipToBounds="False">
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+          <md:MdBadge HorizontalAlignment="Right"
+                      VerticalAlignment="Top"
+                      Content="{TemplateBinding Badge}"
+                      Variant="{TemplateBinding BadgeVariant}"
+                      RenderTransform="translate(5px, -5px)" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

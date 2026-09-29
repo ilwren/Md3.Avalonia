@@ -1,0 +1,11 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls" x:Class="Md3.Avalonia.Gallery.Pages.StylesGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+      <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Styles"/><TextBlock Classes="body" TextWrapping="Wrap" Text="Material color roles, type scale, shape and motion are exposed as dynamic resources rather than global native-control overrides."/></StackPanel>
+      <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Color roles"/><WrapPanel><md:MdSurface Width="210" Height="112" Margin="0,0,12,12" Padding="18" Variant="ContainerLow"><StackPanel><md:MdText StyleRole="TitleMedium" Text="Surface container"/><md:MdText StyleRole="BodyMedium" Text="Layered hierarchy"/></StackPanel></md:MdSurface><md:MdSurface Width="210" Height="112" Margin="0,0,12,12" Padding="18" Variant="Inverse"><md:MdText Foreground="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" StyleRole="TitleMedium" Text="Inverse surface"/></md:MdSurface></WrapPanel></StackPanel>
+      <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Type scale"/><md:MdText StyleRole="HeadlineLarge" Text="Headline large"/><md:MdText StyleRole="TitleMedium" Text="Title medium"/><md:MdText StyleRole="BodyMedium" Text="Body medium supports readable application content."/></StackPanel>
+      <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Shape and motion"/><WrapPanel><md:MdButton Content="Expressive filled" Margin="0,0,12,12"/><md:MdButton Content="Tonal" Variant="Tonal" Margin="0,0,12,12"/><md:MdLoadingIndicator Size="48"/></WrapPanel></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

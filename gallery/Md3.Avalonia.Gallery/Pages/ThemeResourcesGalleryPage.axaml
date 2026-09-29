@@ -1,0 +1,93 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.ThemeResourcesGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,28">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Theme Lab"/>
+        <TextBlock Classes="body" MaxWidth="760" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Generate an HCT-based Material 3 color system from any seed. Tune mode, contrast, palette strategy, motion, typography and shape, then export the configuration as JSON."/>
+      </StackPanel>
+
+      <Border Padding="22" CornerRadius="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+        <StackPanel Spacing="18">
+          <TextBlock Classes="h2" Text="Theme controls"/>
+          <WrapPanel Orientation="Horizontal">
+            <md:MdTextBox x:Name="SeedBox" Width="220" Margin="0,0,12,12" Label="Seed color" Text="#6750A4" PlaceholderText="#RRGGBB"/>
+            <md:MdComboBox x:Name="VariantBox" Width="190" Margin="0,0,12,12" Label="Scheme variant" Variant="Outlined"/>
+            <md:MdComboBox x:Name="ContrastBox" Width="170" Margin="0,0,12,12" Label="Contrast" Variant="Outlined"/>
+            <md:MdComboBox x:Name="ModeBox" Width="150" Margin="0,0,12,12" Label="Theme mode" Variant="Outlined"/>
+            <md:MdComboBox x:Name="MotionBox" Width="170" Margin="0,0,12,12" Label="Motion" Variant="Outlined"/>
+            <md:MdComboBox x:Name="FontBox" Width="150" Margin="0,0,12,12" Label="Typography" Variant="Outlined"/>
+            <md:MdComboBox x:Name="ShapeBox" Width="160" Margin="0,0,12,12" Label="Shape" Variant="Outlined"/>
+          </WrapPanel>
+          <WrapPanel Orientation="Horizontal">
+            <md:MdButton Content="Apply theme" Margin="0,0,10,10" Click="ApplyTheme"/>
+            <md:MdButton Content="Reset" Variant="Outlined" Margin="0,0,10,10" Click="ResetTheme"/>
+            <md:MdButton Content="Copy JSON" Variant="Tonal" Margin="0,0,10,10" Click="CopyJson"/>
+            <md:MdButton Content="Export file" Variant="Text" Margin="0,0,10,10" Click="ExportJson"/>
+            <md:MdButton Content="Import file" Variant="Text" Margin="0,0,10,10" Click="ImportJson"/>
+          </WrapPanel>
+          <TextBlock x:Name="StatusText" Classes="body" Text="Ready. Changes are applied application-wide through DynamicResource."/>
+        </StackPanel>
+      </Border>
+
+      <StackPanel Spacing="14">
+        <TextBlock Classes="h2" Text="Generated color roles"/>
+        <WrapPanel x:Name="SwatchesPanel" Orientation="Horizontal"/>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Contrast diagnostics"/>
+        <TextBlock Classes="body" Text="WCAG relative-luminance checks for each key on-color and its container."/>
+        <StackPanel x:Name="DiagnosticsPanel" Spacing="8"/>
+      </StackPanel>
+
+      <StackPanel Spacing="14">
+        <TextBlock Classes="h2" Text="Cross-component preview"/>
+        <Border Padding="22" CornerRadius="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}">
+          <StackPanel Spacing="20">
+            <WrapPanel Orientation="Horizontal">
+              <md:MdButton Content="Filled" Margin="0,0,12,12"/>
+              <md:MdButton Content="Tonal" Variant="Tonal" Margin="0,0,12,12"/>
+              <md:MdButton Content="Outlined" Variant="Outlined" Margin="0,0,12,12"/>
+              <md:MdToggleButton Content="Toggle" IsChecked="True" Margin="0,0,12,12"/>
+              <md:MdIconButton Icon="{x:Static md:MdSymbols.Favorite}" ToolTip.Tip="Favorite" Margin="0,0,12,12"/>
+            </WrapPanel>
+            <WrapPanel Orientation="Horizontal">
+              <md:MdCheckBox Content="Checkbox" IsChecked="True" Margin="0,0,24,12"/>
+              <md:MdSwitch Content="Switch" IsChecked="True" Margin="0,0,24,12"/>
+              <md:MdRadioButton Content="Radio" IsChecked="True" Margin="0,0,24,12"/>
+            </WrapPanel>
+            <WrapPanel Orientation="Horizontal">
+              <md:MdTextBox Width="260" Label="Text field" Text="Dynamic color" Margin="0,0,14,12"/>
+              <md:MdSearchBar Width="320" PlaceholderText="Search components" Margin="0,0,14,12"/>
+            </WrapPanel>
+            <WrapPanel Orientation="Horizontal">
+              <md:MdAssistChip Content="Assist" Margin="0,0,10,10"/>
+              <md:MdFilterChip Content="Selected filter" IsChecked="True" Margin="0,0,10,10"/>
+              <md:MdInputChip Content="Input" Margin="0,0,10,10"/>
+            </WrapPanel>
+            <md:MdCard Width="520" HorizontalAlignment="Left" Padding="20">
+              <StackPanel Spacing="8"><TextBlock FontSize="20" FontWeight="Medium" Text="Live component surface"/><TextBlock Classes="body" TextWrapping="Wrap" Text="Color roles, corner scale, typography and motion update without replacing control templates."/><md:MdLinearProgressIndicator Value="68"/></StackPanel>
+            </md:MdCard>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Theme JSON"/>
+        <md:MdTextBox x:Name="JsonBox" MinHeight="220" AcceptsReturn="True" TextWrapping="Wrap"
+                      Label="Portable configuration" Variant="Outlined"
+                      OutlineLabelBackground="{DynamicResource Md.Sys.Color.Surface.Brush}"/>
+        <WrapPanel><md:MdButton Content="Apply JSON" Variant="Outlined" Margin="0,0,10,10" Click="ApplyJson"/><md:MdButton Content="Copy JSON" Variant="Text" Margin="0,0,10,10" Click="CopyJson"/></WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage"/>
+        <gallery:CodeExample XamlCode="&lt;Application.Styles&gt;&#10;  &lt;md:MaterialTheme /&gt;&#10;&lt;/Application.Styles&gt;" CSharpCode="var options = MdThemeJson.Deserialize(json);&#10;MdThemeManager.Apply(Application.Current!, options, dark: false);"/>
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

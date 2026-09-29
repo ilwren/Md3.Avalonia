@@ -1,0 +1,28 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdToolbar}" TargetType="md:MdToolbar">
+    <Setter Property="MinHeight" Value="64" />
+    <Setter Property="Padding" Value="8" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="4" /></ItemsPanelTemplate></Setter>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdToolbar">
+        <Border x:Name="PART_Container" MinHeight="{TemplateBinding MinHeight}" MinWidth="{TemplateBinding MinWidth}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" CornerRadius="32" BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}">
+          <StackPanel x:Name="PART_Layout" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Spacing="4">
+            <ContentPresenter x:Name="PART_Leading" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding LeadingContent}" Foreground="{TemplateBinding Foreground}" />
+            <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
+            <ContentPresenter x:Name="PART_Trailing" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding TrailingContent}" Foreground="{TemplateBinding Foreground}" />
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:not(:has-leading) /template/ ContentPresenter#PART_Leading"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:not(:has-trailing) /template/ ContentPresenter#PART_Trailing"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:vibrant"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" /></Style>
+    <Style Selector="^:docked /template/ Border#PART_Container"><Setter Property="CornerRadius" Value="0" /><Setter Property="BoxShadow" Value="0 0 0 0 #00000000" /></Style>
+    <Style Selector="^:vertical"><Setter Property="MinWidth" Value="64" /><Setter Property="MinHeight" Value="0" /><Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Vertical" Spacing="4" /></ItemsPanelTemplate></Setter></Style>
+    <Style Selector="^:vertical /template/ StackPanel#PART_Layout"><Setter Property="Orientation" Value="Vertical" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

@@ -1,0 +1,29 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdNavigationDrawer}" TargetType="md:MdNavigationDrawer">
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdNavigationDrawer">
+        <Grid ClipToBounds="True">
+          <ContentPresenter x:Name="PART_MainContent" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+          <Border x:Name="PART_Scrim" Background="{DynamicResource Md.Sys.Color.Scrim.Brush}" Opacity="0" IsVisible="False" />
+          <Border x:Name="PART_Drawer" Width="{TemplateBinding DrawerWidth}" Padding="12" HorizontalAlignment="Left"
+                  Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" BoxShadow="{DynamicResource Md.Sys.Elevation.Level1}"
+                  CornerRadius="0,16,16,0" IsVisible="False" Opacity="0">
+            <ContentPresenter Content="{TemplateBinding DrawerContent}" />
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:present /template/ Border#PART_Drawer"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:open /template/ Border#PART_Drawer"><Setter Property="Opacity" Value="1" /></Style>
+    <Style Selector="^:modal:present /template/ Border#PART_Scrim"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:modal:open /template/ Border#PART_Scrim"><Setter Property="Opacity" Value="0.32" /></Style>
+    <Style Selector="^:modal /template/ Border#PART_Drawer"><Setter Property="BoxShadow" Value="{DynamicResource Md.Sys.Elevation.Level2}" /></Style>
+    <Style Selector="^:right /template/ Border#PART_Drawer"><Setter Property="HorizontalAlignment" Value="Right" /><Setter Property="CornerRadius" Value="16,0,0,16" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

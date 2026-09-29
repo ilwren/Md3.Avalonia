@@ -1,0 +1,100 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdRadioButton}" TargetType="md:MdRadioButton">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="MinHeight" Value="{DynamicResource Md.Comp.RadioButton.Target.Size}" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdRadioButton">
+        <Grid MinHeight="{DynamicResource Md.Comp.RadioButton.Target.Size}"
+              ColumnDefinitions="Auto,*">
+          <Grid x:Name="PART_InteractiveArea"
+                Width="{DynamicResource Md.Comp.RadioButton.Target.Size}"
+                Height="{DynamicResource Md.Comp.RadioButton.Target.Size}"
+                Background="Transparent">
+            <Border x:Name="PART_StateLayer"
+                    Width="{DynamicResource Md.Comp.RadioButton.StateLayer.Size}"
+                    Height="{DynamicResource Md.Comp.RadioButton.StateLayer.Size}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{TemplateBinding StateLayerBrush}"
+                    CornerRadius="20"
+                    IsHitTestVisible="False"
+                    Opacity="0" />
+            <md:MdRipplePresenter Width="{DynamicResource Md.Comp.RadioButton.StateLayer.Size}"
+                                  Height="{DynamicResource Md.Comp.RadioButton.StateLayer.Size}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  IsCentered="True"
+                                  RippleBrush="{TemplateBinding StateLayerBrush}" />
+            <Border x:Name="PART_OuterCircle"
+                    Width="{DynamicResource Md.Comp.RadioButton.Icon.Size}"
+                    Height="{DynamicResource Md.Comp.RadioButton.Icon.Size}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="2"
+                    CornerRadius="10">
+              <Border x:Name="PART_Dot"
+                      Width="{DynamicResource Md.Comp.RadioButton.Dot.Size}"
+                      Height="{DynamicResource Md.Comp.RadioButton.Dot.Size}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                      CornerRadius="5"
+                      Opacity="0"
+                      RenderTransform="scale(0.25)"
+                      RenderTransformOrigin="50%,50%" />
+            </Border>
+          </Grid>
+          <ContentPresenter Grid.Column="1"
+                            Margin="{DynamicResource Md.Comp.RadioButton.Label.Margin}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Foreground="{TemplateBinding Foreground}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:checked">
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+      <Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:checked /template/ Border#PART_Dot">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="scale(1)" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Focus.Opacity}" />
+    </Style>
+    <Style Selector="^:md-error">
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+    </Style>
+    <Style Selector="^:md-error /template/ Border#PART_Dot">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="StateLayerBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="^:disabled /template/ Border#PART_Dot">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

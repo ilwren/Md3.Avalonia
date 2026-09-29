@@ -1,0 +1,489 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="MdTextContextMenuTheme" TargetType="ContextMenu">
+    <Setter Property="MinWidth" Value="220" />
+    <Setter Property="Padding" Value="0,8" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
+    <Setter Property="Template"><ControlTemplate TargetType="ContextMenu"><Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}" CornerRadius="4" ClipToBounds="True"><ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"><ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" /></ScrollViewer></Border></ControlTemplate></Setter>
+  </ControlTheme>
+  <ControlTheme x:Key="MdTextContextMenuItemTheme" TargetType="MenuItem">
+    <Setter Property="MinHeight" Value="48" /><Setter Property="Padding" Value="16,0" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" /><Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="MenuItem">
+        <Border x:Name="PART_Row" MinHeight="{TemplateBinding MinHeight}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
+            <ContentPresenter VerticalAlignment="Center" Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" Foreground="{TemplateBinding Foreground}" />
+            <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="12"
+                       Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                       Text="{TemplateBinding InputGesture}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /></Style>
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
+  </ControlTheme>
+  <ControlTheme x:Key="MdTextContextMenuSeparatorTheme" TargetType="Separator">
+    <Setter Property="Margin" Value="0,4" /><Setter Property="Height" Value="1" /><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Setter Property="Template"><ControlTemplate TargetType="Separator"><Border Height="1" Margin="{TemplateBinding Margin}" Background="{TemplateBinding Background}" /></ControlTemplate></Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdTextBox}"
+                TargetType="md:MdTextBox">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="PlaceholderForeground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="LabelBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="SupportingTextBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="LeadingIconBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="TrailingIconBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="OutlineLabelBackground" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Md.Comp.TextField.Filled.Container.Shape}" />
+    <Setter Property="CaretBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="SelectionBrush" Value="{DynamicResource Md.Sys.Color.PrimarySelection.Brush}" />
+    <Setter Property="SelectionForegroundBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Padding" Value="{DynamicResource Md.Comp.TextField.Content.Padding}" />
+    <Setter Property="MinHeight" Value="{DynamicResource Md.Comp.TextField.Container.MinHeight}" />
+    <Setter Property="MinWidth" Value="120" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Comp.TextField.Input.FontSize}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Cursor" Value="IBeam" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="ScrollViewer.IsScrollChainingEnabled" Value="True" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdTextBox">
+        <DataValidationErrors>
+          <StackPanel>
+            <Border x:Name="PART_Container"
+                    MinWidth="{TemplateBinding MinWidth}"
+                    MinHeight="{TemplateBinding MinHeight}"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{TemplateBinding CornerRadius}">
+              <Grid>
+                <Border x:Name="PART_FocusOutline"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{DynamicResource Md.Comp.TextField.Outline.FocusWidth}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        IsHitTestVisible="False"
+                        IsVisible="False" />
+
+                <Grid x:Name="PART_ContentGrid"
+                      Margin="{TemplateBinding Padding}"
+                      ColumnDefinitions="Auto,*,Auto">
+                  <Viewbox x:Name="PART_LeadingIcon"
+                           Grid.Column="0"
+                           Width="{DynamicResource Md.Comp.TextField.Icon.Size}"
+                           Height="{DynamicResource Md.Comp.TextField.Icon.Size}"
+                           Margin="{DynamicResource Md.Comp.TextField.LeadingIcon.Margin}"
+                           VerticalAlignment="Center"
+                           IsHitTestVisible="False"
+                           IsVisible="False"
+                           Stretch="Uniform">
+                    <ContentPresenter Content="{TemplateBinding LeadingIcon}"
+                                      Foreground="{TemplateBinding LeadingIconBrush}" />
+                  </Viewbox>
+
+                  <Grid x:Name="PART_FieldHost"
+                        Grid.Column="1"
+                        MinHeight="{DynamicResource Md.Comp.TextField.Container.MinHeight}">
+                    <ContentPresenter x:Name="PART_Label"
+                                      HorizontalAlignment="Left"
+                                      VerticalAlignment="Center"
+                                      Content="{TemplateBinding Label}"
+                                      FontSize="{DynamicResource Md.Comp.TextField.Input.FontSize}"
+                                      Foreground="{TemplateBinding LabelBrush}"
+                                      IsHitTestVisible="False"
+                                      IsVisible="False"
+                                      RenderTransform="scale(1) translate(0px, 0px)"
+                                      RenderTransformOrigin="0%,50%" />
+
+                    <Grid x:Name="PART_InputRow"
+                          ColumnDefinitions="Auto,*,Auto"
+                          VerticalAlignment="Center"
+                          RenderTransform="translate(0px, 0px)">
+                      <TextBlock x:Name="PART_Prefix"
+                                 Grid.Column="0"
+                                 Margin="0,0,4,0"
+                                 VerticalAlignment="Center"
+                                 FontSize="{TemplateBinding FontSize}"
+                                 Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                                 IsVisible="False"
+                                 Text="{TemplateBinding PrefixText}" />
+
+                      <ScrollViewer x:Name="PART_ScrollViewer"
+                                    Grid.Column="1"
+                                    HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                                    VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
+                                    IsScrollChainingEnabled="{TemplateBinding (ScrollViewer.IsScrollChainingEnabled)}"
+                                    AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}"
+                                    BringIntoViewOnFocusChange="{TemplateBinding (ScrollViewer.BringIntoViewOnFocusChange)}">
+                        <Panel>
+                          <TextBlock x:Name="PART_Placeholder"
+                                     HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                     FontFamily="{TemplateBinding FontFamily}"
+                                     FontSize="{TemplateBinding FontSize}"
+                                     FontStyle="{TemplateBinding FontStyle}"
+                                     FontWeight="{TemplateBinding FontWeight}"
+                                     Foreground="{TemplateBinding PlaceholderForeground}"
+                                     IsHitTestVisible="False"
+                                     Opacity="0"
+                                     Text="{TemplateBinding PlaceholderText}"
+                                     TextAlignment="{TemplateBinding TextAlignment}"
+                                     TextWrapping="{TemplateBinding TextWrapping}">
+                            <!-- IME composition is rendered by PART_TextPresenter; never paint the placeholder over preedit text. -->
+                            <TextBlock.IsVisible>
+                              <Binding ElementName="PART_TextPresenter"
+                                       Path="PreeditText"
+                                       Converter="{x:Static StringConverters.IsNullOrEmpty}" />
+                            </TextBlock.IsVisible>
+                          </TextBlock>
+
+                          <TextPresenter x:Name="PART_TextPresenter"
+                                         HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                         CaretBlinkInterval="{TemplateBinding CaretBlinkInterval}"
+                                         CaretBrush="{TemplateBinding CaretBrush}"
+                                         CaretIndex="{TemplateBinding CaretIndex}"
+                                         LineHeight="{TemplateBinding LineHeight}"
+                                         LetterSpacing="{TemplateBinding LetterSpacing}"
+                                         PasswordChar="{TemplateBinding PasswordChar}"
+                                         RevealPassword="{TemplateBinding RevealPassword}"
+                                         SelectionBrush="{TemplateBinding SelectionBrush}"
+                                         SelectionEnd="{TemplateBinding SelectionEnd}"
+                                         SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                                         SelectionStart="{TemplateBinding SelectionStart}"
+                                         Text="{TemplateBinding Text, Mode=TwoWay}"
+                                         TextAlignment="{TemplateBinding TextAlignment}"
+                                         TextWrapping="{TemplateBinding TextWrapping}" />
+                        </Panel>
+                        <ScrollViewer.Styles>
+                          <Style Selector="ScrollContentPresenter#PART_ContentPresenter">
+                            <Setter Property="Cursor" Value="IBeam" />
+                          </Style>
+                        </ScrollViewer.Styles>
+                      </ScrollViewer>
+
+                      <TextBlock x:Name="PART_Suffix"
+                                 Grid.Column="2"
+                                 Margin="4,0,0,0"
+                                 VerticalAlignment="Center"
+                                 FontSize="{TemplateBinding FontSize}"
+                                 Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                                 IsVisible="False"
+                                 Text="{TemplateBinding SuffixText}" />
+                    </Grid>
+                  </Grid>
+
+                  <StackPanel x:Name="PART_EndActions"
+                              Grid.Column="2"
+                              Margin="{DynamicResource Md.Comp.TextField.TrailingIcon.Margin}"
+                              Orientation="Horizontal"
+                              VerticalAlignment="Center">
+                    <Viewbox x:Name="PART_TrailingIcon"
+                             Width="{DynamicResource Md.Comp.TextField.Icon.Size}"
+                             Height="{DynamicResource Md.Comp.TextField.Icon.Size}"
+                             VerticalAlignment="Center"
+                             IsHitTestVisible="False"
+                             IsVisible="False"
+                             Stretch="Uniform">
+                      <ContentPresenter Content="{TemplateBinding TrailingIcon}"
+                                        Foreground="{TemplateBinding TrailingIconBrush}" />
+                    </Viewbox>
+                    <md:MdIconButton x:Name="PART_ClearButton"
+                                     AutomationProperties.Name="Clear text"
+                                     Icon="{DynamicResource Md.Icon.Close}"
+                                     Size="ExtraSmall"
+                                     Variant="Standard"
+                                     IsVisible="False" />
+                    <md:MdToggleIconButton x:Name="PART_PasswordButton"
+                                           AutomationProperties.Name="Show or hide password"
+                                           Icon="{DynamicResource Md.Icon.Visibility}"
+                                           SelectedIcon="{DynamicResource Md.Icon.VisibilityOff}"
+                                           Size="ExtraSmall"
+                                           Variant="Standard"
+                                           IsChecked="{TemplateBinding RevealPassword, Mode=TwoWay}"
+                                           IsVisible="False" />
+                  </StackPanel>
+                </Grid>
+
+                <Border x:Name="PART_ActiveIndicator"
+                        Height="{DynamicResource Md.Comp.TextField.Indicator.Width}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Bottom"
+                        Background="{TemplateBinding ActiveIndicatorBrush}"
+                        IsHitTestVisible="False" />
+              </Grid>
+            </Border>
+
+            <Grid x:Name="PART_SupportingRow"
+                  Margin="{DynamicResource Md.Comp.TextField.Supporting.Row.Margin}"
+                  ColumnDefinitions="*,Auto"
+                  ColumnSpacing="{DynamicResource Md.Comp.TextField.Supporting.BetweenSpace}"
+                  IsVisible="False">
+              <ContentPresenter x:Name="PART_SupportingText"
+                                Grid.Column="0"
+                                HorizontalAlignment="Left"
+                                Content="{TemplateBinding SupportingText}"
+                                FontSize="{DynamicResource Md.Comp.TextField.Supporting.FontSize}"
+                                Foreground="{TemplateBinding SupportingTextBrush}"
+                                IsVisible="False" />
+              <ContentPresenter x:Name="PART_ErrorText"
+                                Grid.Column="0"
+                                HorizontalAlignment="Left"
+                                Content="{TemplateBinding ErrorText}"
+                                FontSize="{DynamicResource Md.Comp.TextField.Supporting.FontSize}"
+                                Foreground="{DynamicResource Md.Sys.Color.Error.Brush}"
+                                IsVisible="False" />
+              <TextBlock x:Name="PART_CharacterCounter"
+                         Grid.Column="1"
+                         HorizontalAlignment="Right"
+                         FontSize="{DynamicResource Md.Comp.TextField.Supporting.FontSize}"
+                         Foreground="{TemplateBinding SupportingTextBrush}"
+                         IsVisible="False"
+                         Text="{TemplateBinding CharacterCounterText}" />
+            </Grid>
+          </StackPanel>
+        </DataValidationErrors>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Variants -->
+    <Style Selector="^:filled">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="CornerRadius" Value="{DynamicResource Md.Comp.TextField.Filled.Container.Shape}" />
+      <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    </Style>
+    <Style Selector="^:outlined">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Outline.Brush}" />
+      <Setter Property="BorderThickness" Value="{DynamicResource Md.Comp.TextField.Outline.Width}" />
+      <Setter Property="CornerRadius" Value="{DynamicResource Md.Comp.TextField.Outlined.Container.Shape}" />
+    </Style>
+    <Style Selector="^:outlined /template/ Border#PART_ActiveIndicator">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:outlined:has-label /template/ Border#PART_Container">
+      <!-- Reserve space for the notched floating label so Android/Skia clips neither glyphs nor focus outline. -->
+      <Setter Property="Margin" Value="0,8,0,0" />
+    </Style>
+
+    <!-- Icon slots and M3 padding. -->
+    <Style Selector="^:has-leading-icon">
+      <Setter Property="Padding" Value="{DynamicResource Md.Comp.TextField.Content.Padding.LeadingIcon}" />
+    </Style>
+    <Style Selector="^:has-trailing-icon">
+      <Setter Property="Padding" Value="{DynamicResource Md.Comp.TextField.Content.Padding.TrailingIcon}" />
+    </Style>
+    <Style Selector="^:has-end-action">
+      <Setter Property="Padding" Value="{DynamicResource Md.Comp.TextField.Content.Padding.TrailingIcon}" />
+    </Style>
+    <Style Selector="^:has-leading-icon:has-trailing-icon">
+      <Setter Property="Padding" Value="{DynamicResource Md.Comp.TextField.Content.Padding.BothIcons}" />
+    </Style>
+    <Style Selector="^:has-leading-icon:has-end-action">
+      <Setter Property="Padding" Value="{DynamicResource Md.Comp.TextField.Content.Padding.BothIcons}" />
+    </Style>
+    <Style Selector="^:has-leading-icon /template/ Viewbox#PART_LeadingIcon">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-trailing-icon /template/ Viewbox#PART_TrailingIcon">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:show-clear-button:not(:empty) /template/ md|MdIconButton#PART_ClearButton">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:password /template/ md|MdToggleIconButton#PART_PasswordButton">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- Resting and floating label behavior. -->
+    <Style Selector="^:has-label /template/ ContentPresenter#PART_Label">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-label:focus /template/ ContentPresenter#PART_Label">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:filled:has-label:not(:empty) /template/ ContentPresenter#PART_Label">
+      <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -14px)" />
+    </Style>
+    <Style Selector="^:filled:has-label:focus /template/ ContentPresenter#PART_Label">
+      <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -14px)" />
+    </Style>
+    <Style Selector="^:outlined:has-label /template/ ContentPresenter#PART_Label">
+      <!-- Padding is always reserved, so opening the notch never causes a re-measure. -->
+      <Setter Property="Margin" Value="-4,0,0,0" />
+      <Setter Property="Padding" Value="{DynamicResource Md.Comp.TextField.Label.NotchedPadding}" />
+    </Style>
+    <Style Selector="^:outlined:has-label:not(:empty) /template/ ContentPresenter#PART_Label">
+      <Setter Property="Background" Value="{TemplateBinding OutlineLabelBackground}" />
+      <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -28px)" />
+    </Style>
+    <Style Selector="^:outlined:has-label:focus /template/ ContentPresenter#PART_Label">
+      <Setter Property="Background" Value="{TemplateBinding OutlineLabelBackground}" />
+      <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -28px)" />
+    </Style>
+    <!-- Multiline fields keep the label in a fixed top slot. A vertically centered resting label
+         would otherwise cover the first lines of JSON/notes before focus. -->
+    <Style Selector="^:multiline:has-label /template/ ContentPresenter#PART_Label">
+      <Setter Property="VerticalAlignment" Value="Top" />
+      <Setter Property="Margin" Value="0,8,0,0" />
+      <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, 0px)" />
+    </Style>
+    <Style Selector="^:outlined:multiline:has-label /template/ ContentPresenter#PART_Label">
+      <Setter Property="Margin" Value="-4,-8,0,0" />
+      <Setter Property="Background" Value="{TemplateBinding OutlineLabelBackground}" />
+    </Style>
+    <Style Selector="^:multiline:has-label /template/ Grid#PART_InputRow">
+      <Setter Property="VerticalAlignment" Value="Top" />
+      <Setter Property="Margin" Value="0,28,0,0" />
+    </Style>
+    <Style Selector="^:filled:has-label:not(:empty) /template/ Grid#PART_InputRow">
+      <Setter Property="RenderTransform" Value="translate(0px, 8px)" />
+    </Style>
+    <Style Selector="^:filled:has-label:focus /template/ Grid#PART_InputRow">
+      <Setter Property="RenderTransform" Value="translate(0px, 8px)" />
+    </Style>
+
+    <!-- Placeholder, prefix and suffix. -->
+    <Style Selector="^:no-label:empty /template/ TextBlock#PART_Placeholder">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:has-label:focus:empty /template/ TextBlock#PART_Placeholder">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:has-prefix:no-label /template/ TextBlock#PART_Prefix">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-prefix:not(:empty) /template/ TextBlock#PART_Prefix">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-prefix:focus /template/ TextBlock#PART_Prefix">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-suffix:no-label /template/ TextBlock#PART_Suffix">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-suffix:not(:empty) /template/ TextBlock#PART_Suffix">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-suffix:focus /template/ TextBlock#PART_Suffix">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- Supporting text, error text and counter. -->
+    <Style Selector="^:has-supporting-text /template/ Grid#PART_SupportingRow">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-supporting-text /template/ ContentPresenter#PART_SupportingText">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:show-counter /template/ Grid#PART_SupportingRow">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:show-counter /template/ TextBlock#PART_CharacterCounter">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:md-error:has-error-text /template/ Grid#PART_SupportingRow">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:md-error:has-error-text /template/ ContentPresenter#PART_ErrorText">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:error:has-error-text /template/ Grid#PART_SupportingRow">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:error:has-error-text /template/ ContentPresenter#PART_ErrorText">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:md-error:has-error-text /template/ ContentPresenter#PART_SupportingText">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:error:has-error-text /template/ ContentPresenter#PART_SupportingText">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+    <!-- Hover and focus. Touch input simply never enters the hover state. -->
+    <Style Selector="^:filled:pointerover">
+      <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    </Style>
+    <Style Selector="^:outlined:pointerover">
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    </Style>
+    <Style Selector="^:filled:focus">
+      <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:filled:focus /template/ Border#PART_ActiveIndicator">
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.TextField.Indicator.FocusWidth}" />
+    </Style>
+    <Style Selector="^:outlined:focus">
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:outlined:focus /template/ Border#PART_FocusOutline">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- Manual and Avalonia validation error states. -->
+    <Style Selector="^:md-error">
+      <Setter Property="LabelBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="SupportingTextBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="TrailingIconBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="CaretBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+    </Style>
+    <Style Selector="^:error">
+      <Setter Property="LabelBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="SupportingTextBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="TrailingIconBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="CaretBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+    </Style>
+    <Style Selector="^:filled:md-error:focus /template/ Border#PART_ActiveIndicator">
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.TextField.Indicator.FocusWidth}" />
+    </Style>
+    <Style Selector="^:md-error /template/ TextBlock#PART_CharacterCounter">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+    </Style>
+    <Style Selector="^:error /template/ TextBlock#PART_CharacterCounter">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+    </Style>
+
+    <!-- Disabled. -->
+    <Style Selector="^:disabled">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="PlaceholderForeground" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="LabelBrush" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="SupportingTextBrush" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="LeadingIconBrush" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="TrailingIconBrush" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="CaretBrush" Value="Transparent" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+    <Style Selector="^:filled:disabled">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.DisabledFilledField.Brush}" />
+      <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.DisabledIndicator.Brush}" />
+    </Style>
+    <Style Selector="^:disabled /template/ TextBlock#PART_Prefix">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+    </Style>
+    <Style Selector="^:disabled /template/ TextBlock#PART_Suffix">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+    </Style>
+    <Style Selector="^:outlined:disabled">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.DisabledOutline.Brush}" />
+      <Setter Property="BorderThickness" Value="{DynamicResource Md.Comp.TextField.Outline.Width}" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

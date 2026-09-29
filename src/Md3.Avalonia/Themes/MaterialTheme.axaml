@@ -1,0 +1,62 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Md3.Avalonia.Themes.MaterialTheme">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/ColorTokens.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/ExtendedColorTokens.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/SystemTokens.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/FoundationTokens.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/ButtonTokens.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/TextFieldTokens.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/CheckBoxTokens.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/ComboBoxTokens.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/ActionButtonTokens.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdFoundation.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdDesktopAdapters.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdButton.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdToggleButton.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdIconButton.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdSplitButton.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdButtonGroup.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdFab.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdTextBox.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdCheckBox.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdRadioButton.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdComboBox.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdBadge.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdAppBar.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdCarousel.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdCard.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdChip.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdDatePicker.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdTimePicker.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdDialog.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdDivider.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdList.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdProgress.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdMenu.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdNavigationBar.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdNavigationDrawer.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdSearch.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdSheet.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdSlider.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdSnackbar.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdSwitch.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdTabs.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdToolbar.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdTooltip.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdNavigationRail.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdSegmentedButton.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdRangeSlider.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdDateRangePicker.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdTabView.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdMenuAnchor.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdScaffold.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdFlutterParity.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdFlutterAdvanced.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+</Styles>

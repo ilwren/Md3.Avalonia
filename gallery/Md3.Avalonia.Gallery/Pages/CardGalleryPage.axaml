@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.CardGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+    <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Cards"/><TextBlock Classes="body" Text="Elevated, filled, and outlined cards group related content and actions with a 12-DIP shape."/></StackPanel>
+    <StackPanel Spacing="12">
+      <TextBlock Classes="h2" Text="Variants" />
+      <WrapPanel Orientation="Horizontal">
+        <md:MdCard Width="260" Height="190" Margin="0,0,8,8" Variant="Elevated">
+          <StackPanel Spacing="12"><Border Height="72" CornerRadius="8" Background="#8C6FA9"/><TextBlock FontSize="20" Text="Elevated card"/><TextBlock Classes="body" TextWrapping="Wrap" Text="Subtle shadow separates this card from its background."/></StackPanel>
+        </md:MdCard>
+        <md:MdCard Width="260" Height="190" Margin="0,0,8,8" Variant="Filled">
+          <StackPanel Spacing="12"><Border Height="72" CornerRadius="8" Background="#527A70"/><TextBlock FontSize="20" Text="Filled card"/><TextBlock Classes="body" TextWrapping="Wrap" Text="A filled container creates quiet visual grouping."/></StackPanel>
+        </md:MdCard>
+        <md:MdCard Width="260" Height="190" Margin="0,0,8,8" Variant="Outlined">
+          <StackPanel Spacing="12"><Border Height="72" CornerRadius="8" Background="#A36556"/><TextBlock FontSize="20" Text="Outlined card"/><TextBlock Classes="body" TextWrapping="Wrap" Text="An outline defines the boundary without elevation."/></StackPanel>
+        </md:MdCard>
+      </WrapPanel>
+    </StackPanel>
+    <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+      <TextBlock Classes="body" TextWrapping="Wrap" Text="Interactive cards expose Click and Command. Set IsInteractive=False for a presentation-only card that is skipped by keyboard focus." />
+    </Border>
+    <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdCard Variant=&quot;Outlined&quot;&#10;           Command=&quot;{Binding OpenDetailsCommand}&quot;&gt;&#10;  &lt;StackPanel&gt;...&lt;/StackPanel&gt;&#10;&lt;/md:MdCard&gt;" CSharpCode="var card = new MdCard { Variant = MdCardVariant.Outlined, Content = details };&#10;card.Command = viewModel.OpenDetailsCommand;" /></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

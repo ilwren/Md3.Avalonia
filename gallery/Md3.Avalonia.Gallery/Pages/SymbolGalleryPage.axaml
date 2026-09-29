@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.SymbolGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Material Symbols" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="The complete Google Material Symbols Rounded codepoint catalog. Click a tile to copy the official snake_case symbol name." />
+      </StackPanel>
+
+      <Border x:Name="UnavailablePanel" Padding="20" CornerRadius="20"
+              Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+        <StackPanel Spacing="8">
+          <TextBlock FontSize="18" FontWeight="Medium" Text="Material Symbols font is invalid" />
+          <TextBlock Classes="body" TextWrapping="Wrap"
+                     Text="Rebuild Md3.Avalonia.Icons with the official MaterialSymbolsRounded.ttf in its reserved font slot, or pass MaterialSymbolsRoundedFontFile to the build. Glyphs are hidden instead of using a look-alike fallback." />
+        </StackPanel>
+      </Border>
+
+      <StackPanel x:Name="CatalogPanel" Spacing="16" IsVisible="False">
+        <TextBlock x:Name="FontStatus" Classes="body" TextWrapping="Wrap" />
+        <md:MdSearchBar x:Name="SymbolSearch" Width="420" HorizontalAlignment="Left"
+                        PlaceholderText="Search all symbols" TextChanged="FilterSymbols" />
+        <TextBlock x:Name="ResultCount" Classes="body" />
+        <!-- The complete catalog is a deliberately bounded virtualized region. Keeping only its
+             visible six-item rows alive avoids creating 4k+ cards or infinitely measuring the
+             Gallery shell's document scroller. -->
+        <md:MdScrollViewer x:Name="CatalogScroller" Height="560"
+                           VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                           ScrollChanged="CatalogScrolled" SizeChanged="CatalogSizeChanged">
+          <Canvas x:Name="SymbolCanvas" ClipToBounds="True" />
+        </md:MdScrollViewer>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdIcon Glyph=&quot;{x:Static md:MdSymbols.Settings}&quot; Size=&quot;24&quot; /&gt;"
+                             CSharpCode="// Referencing Md3.Avalonia.Icons is sufficient; its embedded font registers automatically.&#10;var icon = new MdIcon { Glyph = MdSymbols.Settings, Size = 24 };" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

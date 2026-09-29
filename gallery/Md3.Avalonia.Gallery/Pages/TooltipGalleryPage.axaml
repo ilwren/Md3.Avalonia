@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.TooltipGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Tooltips" />
+        <TextBlock Classes="body" Text="Plain tooltips label controls; rich tooltips provide persistent contextual details and actions." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Surfaces" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdTooltip Margin="0,0,24,0" Content="Add to favorites" IsOpen="True" />
+          <md:MdTooltip Width="312" Variant="Rich" Title="Keyboard shortcuts" Content="Use Command K to open search from anywhere in the application." IsOpen="True">
+            <md:MdTooltip.ActionContent><md:MdButton Content="View shortcuts" Variant="Text" /></md:MdTooltip.ActionContent>
+          </md:MdTooltip>
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Hover, focus, or long-press" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdTooltipHost Margin="0,0,16,0" Placement="Bottom" ShowDelay="0:0:0.35">
+            <md:MdTooltipHost.Tooltip><md:MdTooltip Content="Share this item" /></md:MdTooltipHost.Tooltip>
+            <md:MdIconButton Icon="{x:Static md:MdSymbols.Share}" Variant="Tonal" />
+          </md:MdTooltipHost>
+          <md:MdTooltipHost Placement="Bottom" OpenOnClick="True">
+            <md:MdTooltipHost.Tooltip>
+              <md:MdTooltip Variant="Rich" Title="About visibility" Content="Anyone with the link can view this item.">
+                <md:MdTooltip.ActionContent><md:MdButton Content="Manage access" Variant="Text" /></md:MdTooltip.ActionContent>
+              </md:MdTooltip>
+            </md:MdTooltipHost.Tooltip>
+            <md:MdButton Content="Rich tooltip" Variant="Outlined" />
+          </md:MdTooltipHost>
+        </WrapPanel>
+        <TextBlock Classes="body" Text="The rich example also opens on click and dismisses with Escape or an outside press." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdTooltipHost Placement=&quot;Bottom&quot;&gt;&#10;  &lt;md:MdTooltipHost.Tooltip&gt;&#10;    &lt;md:MdTooltip Content=&quot;Share this item&quot; /&gt;&#10;  &lt;/md:MdTooltipHost.Tooltip&gt;&#10;  &lt;md:MdIconButton Icon=&quot;...&quot; /&gt;&#10;&lt;/md:MdTooltipHost&gt;" CSharpCode="var host = new MdTooltipHost&#10;{&#10;    Content = shareButton,&#10;    Tooltip = new MdTooltip { Content = &quot;Share this item&quot; }&#10;};&#10;host.Show();&#10;host.Dismiss();" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

@@ -1,0 +1,130 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdTopAppBar}" TargetType="md:MdTopAppBar">
+    <Setter Property="Height" Value="{DynamicResource Md.Comp.AppBar.Small.Height}" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="20" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdTopAppBar">
+        <Border Height="{TemplateBinding Height}"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                ClipToBounds="True">
+          <Grid x:Name="PART_Layout"
+                RowDefinitions="64,*"
+                ColumnDefinitions="64,*,Auto"
+                Margin="{DynamicResource Md.Comp.AppBar.HorizontalPadding}">
+            <ContentPresenter x:Name="PART_Leading"
+                              Grid.Row="0"
+                              Grid.Column="0"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding LeadingContent}" />
+            <StackPanel x:Name="PART_TitleHost"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Spacing="2">
+              <ContentPresenter x:Name="PART_Title"
+                                Content="{TemplateBinding Title}"
+                                FontSize="22"
+                                Foreground="{TemplateBinding Foreground}" />
+              <ContentPresenter x:Name="PART_Subtitle"
+                                Content="{TemplateBinding Subtitle}"
+                                FontSize="12"
+                                Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+            </StackPanel>
+            <ContentPresenter x:Name="PART_Trailing"
+                              Grid.Row="0"
+                              Grid.Column="2"
+                              Margin="4,0,0,0"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding TrailingContent}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:centered /template/ StackPanel#PART_TitleHost">
+      <Setter Property="Grid.Column" Value="0" />
+      <Setter Property="Grid.ColumnSpan" Value="3" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="IsHitTestVisible" Value="False" />
+    </Style>
+    <Style Selector="^:medium-flexible">
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.AppBar.MediumFlexible.Height}" />
+    </Style>
+    <Style Selector="^:medium-flexible:has-subtitle">
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.AppBar.MediumFlexible.LargeHeight}" />
+    </Style>
+    <Style Selector="^:medium-flexible /template/ StackPanel#PART_TitleHost">
+      <Setter Property="Grid.Row" Value="1" />
+      <Setter Property="Grid.Column" Value="0" />
+      <Setter Property="Grid.ColumnSpan" Value="3" />
+      <Setter Property="Margin" Value="{DynamicResource Md.Comp.AppBar.Flexible.TitleMargin}" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+      <Setter Property="VerticalAlignment" Value="Bottom" />
+    </Style>
+    <Style Selector="^:medium-flexible /template/ ContentPresenter#PART_Title">
+      <Setter Property="FontSize" Value="28" />
+    </Style>
+    <Style Selector="^:large-flexible">
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.AppBar.LargeFlexible.Height}" />
+    </Style>
+    <Style Selector="^:large-flexible:has-subtitle">
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.AppBar.LargeFlexible.LargeHeight}" />
+    </Style>
+    <Style Selector="^:large-flexible /template/ StackPanel#PART_TitleHost">
+      <Setter Property="Grid.Row" Value="1" />
+      <Setter Property="Grid.Column" Value="0" />
+      <Setter Property="Grid.ColumnSpan" Value="3" />
+      <Setter Property="Margin" Value="{DynamicResource Md.Comp.AppBar.Flexible.TitleMargin}" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+      <Setter Property="VerticalAlignment" Value="Bottom" />
+    </Style>
+    <Style Selector="^:large-flexible /template/ ContentPresenter#PART_Title">
+      <Setter Property="FontSize" Value="32" />
+    </Style>
+    <Style Selector="^:scrolled">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdBottomAppBar}" TargetType="md:MdBottomAppBar">
+    <Setter Property="Height" Value="{DynamicResource Md.Comp.BottomAppBar.Height}" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="20" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdBottomAppBar">
+        <Border Height="{TemplateBinding Height}"
+                Padding="12,0,16,0"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                ClipToBounds="True">
+          <Grid ColumnDefinitions="*,Auto">
+            <ContentPresenter Grid.Column="0"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding Actions}" />
+            <ContentPresenter Grid.Column="1"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding FloatingAction}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

@@ -1,0 +1,533 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <StreamGeometry x:Key="Md.Comp.ComboBox.SelectedGlyph.Data">M5.5 10.586 1.707 6.793A1 1 0 0 0 .293 8.207l4.5 4.5a1 1 0 0 0 1.414 0l11-11A1 1 0 0 0 15.793.293L5.5 10.586Z</StreamGeometry>
+
+  <!-- Internal hit surface: explicit theme avoids depending on any global ToggleButton theme. -->
+  <ControlTheme x:Key="MdComboBoxToggleTheme" TargetType="ToggleButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ToggleButton">
+        <Border Background="{TemplateBinding Background}" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- Editable exposed-dropdown text editor; preserves TextPresenter/IME without a native TextBox theme. -->
+  <ControlTheme x:Key="MdComboBoxEditableTextBoxTheme" TargetType="TextBox">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="TextBox">
+        <ScrollViewer x:Name="PART_ScrollViewer"
+                      HorizontalScrollBarVisibility="Hidden"
+                      VerticalScrollBarVisibility="Hidden"
+                      IsScrollChainingEnabled="True">
+          <Panel>
+            <TextBlock x:Name="PART_Placeholder"
+                       VerticalAlignment="Center"
+                       FontSize="{TemplateBinding FontSize}"
+                       Foreground="{TemplateBinding PlaceholderForeground}"
+                       IsHitTestVisible="False"
+                       Opacity="0"
+                       Text="{TemplateBinding PlaceholderText}" />
+            <TextPresenter x:Name="PART_TextPresenter"
+                           VerticalAlignment="Center"
+                           CaretBlinkInterval="{TemplateBinding CaretBlinkInterval}"
+                           CaretBrush="{TemplateBinding CaretBrush}"
+                           CaretIndex="{TemplateBinding CaretIndex}"
+                           LineHeight="{TemplateBinding LineHeight}"
+                           LetterSpacing="{TemplateBinding LetterSpacing}"
+                           SelectionBrush="{TemplateBinding SelectionBrush}"
+                           SelectionEnd="{TemplateBinding SelectionEnd}"
+                           SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                           SelectionStart="{TemplateBinding SelectionStart}"
+                           Text="{TemplateBinding Text, Mode=TwoWay}"
+                           TextAlignment="{TemplateBinding TextAlignment}"
+                           TextWrapping="NoWrap" />
+          </Panel>
+        </ScrollViewer>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:empty /template/ TextBlock#PART_Placeholder">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Scoped option-container theme used only inside MdComboBox popups. -->
+  <ControlTheme x:Key="MdComboBoxItemTheme" TargetType="ComboBoxItem">
+    <Setter Property="MinHeight" Value="{DynamicResource Md.Comp.ComboBox.MenuItem.MinHeight}" />
+    <Setter Property="Margin" Value="{DynamicResource Md.Comp.ComboBox.MenuItem.Margin}" />
+    <Setter Property="Padding" Value="{DynamicResource Md.Comp.ComboBox.MenuItem.Padding}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Md.Comp.ComboBox.MenuItem.Shape}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ComboBoxItem">
+        <Grid MinHeight="{TemplateBinding MinHeight}">
+          <Border x:Name="PART_ItemContainer"
+                  Background="{TemplateBinding Background}"
+                  CornerRadius="{DynamicResource Md.Comp.ComboBox.MenuItem.Selected.Shape}" />
+          <Border x:Name="PART_ItemStateLayer"
+                  Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                  IsHitTestVisible="False"
+                  Opacity="0" />
+          <Grid Margin="{TemplateBinding Padding}" ColumnDefinitions="24,12,*">
+            <Viewbox Grid.Column="0"
+                     Width="{DynamicResource Md.Comp.ComboBox.MenuItem.Icon.Size}"
+                     Height="{DynamicResource Md.Comp.ComboBox.MenuItem.Icon.Size}"
+                     IsHitTestVisible="False">
+              <Path x:Name="PART_SelectedGlyph"
+                    Width="17"
+                    Height="14"
+                    Data="{StaticResource Md.Comp.ComboBox.SelectedGlyph.Data}"
+                    Fill="{DynamicResource Md.Sys.Color.OnTertiaryContainer.Brush}"
+                    Opacity="0" />
+            </Viewbox>
+            <ContentPresenter x:Name="PART_ContentPresenter"
+                              Grid.Column="2"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              FontSize="{DynamicResource Md.Comp.ComboBox.MenuItem.FontSize}"
+                              Foreground="{TemplateBinding Foreground}" />
+          </Grid>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover /template/ Border#PART_ItemStateLayer">
+      <Setter Property="Opacity" Value="0.08" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_ItemStateLayer">
+      <Setter Property="Opacity" Value="0.10" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_ItemStateLayer">
+      <Setter Property="Opacity" Value="0.10" />
+    </Style>
+    <Style Selector="^:selected">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" />
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnTertiaryContainer.Brush}" />
+    </Style>
+    <Style Selector="^:selected /template/ Path#PART_SelectedGlyph">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:selected /template/ Border#PART_ItemStateLayer">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnTertiaryContainer.Brush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+    </Style>
+    <Style Selector="^:disabled /template/ Border#PART_ItemStateLayer">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdComboBox}"
+                TargetType="md:MdComboBox">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="PlaceholderForeground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="LabelBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="SupportingTextBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="LeadingIconBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Md.Comp.ComboBox.Filled.Container.Shape}" />
+    <Setter Property="Padding" Value="{DynamicResource Md.Comp.ComboBox.Content.Padding}" />
+    <Setter Property="MinHeight" Value="{DynamicResource Md.Comp.ComboBox.Container.MinHeight}" />
+    <Setter Property="MinWidth" Value="160" />
+    <Setter Property="MaxDropDownHeight" Value="{DynamicResource Md.Comp.ComboBox.Menu.MaxHeight}" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Comp.ComboBox.Input.FontSize}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+    <Setter Property="ItemContainerTheme" Value="{StaticResource MdComboBoxItemTheme}" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdComboBox">
+        <DataValidationErrors>
+          <StackPanel>
+            <Border x:Name="PART_Container"
+                    MinWidth="{TemplateBinding MinWidth}"
+                    MinHeight="{TemplateBinding MinHeight}"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{TemplateBinding CornerRadius}">
+              <Grid>
+                <Border x:Name="PART_FocusOutline"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{DynamicResource Md.Comp.ComboBox.Outline.FocusWidth}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        IsHitTestVisible="False"
+                        IsVisible="False" />
+
+                <Grid x:Name="PART_ContentGrid"
+                      Margin="{TemplateBinding Padding}"
+                      ColumnDefinitions="Auto,*,48">
+                  <Viewbox x:Name="PART_LeadingIcon"
+                           Grid.Column="0"
+                           Width="{DynamicResource Md.Comp.ComboBox.Icon.Size}"
+                           Height="{DynamicResource Md.Comp.ComboBox.Icon.Size}"
+                           Margin="{DynamicResource Md.Comp.ComboBox.LeadingIcon.Margin}"
+                           VerticalAlignment="Center"
+                           IsHitTestVisible="False"
+                           IsVisible="False">
+                    <ContentPresenter Content="{TemplateBinding LeadingIcon}"
+                                      Foreground="{TemplateBinding LeadingIconBrush}" />
+                  </Viewbox>
+
+                  <Grid x:Name="PART_FieldHost"
+                        Grid.Column="1"
+                        Grid.ColumnSpan="2"
+                        MinHeight="{DynamicResource Md.Comp.ComboBox.Container.MinHeight}">
+                    <ContentPresenter x:Name="PART_Label"
+                                      HorizontalAlignment="Left"
+                                      VerticalAlignment="Center"
+                                      Content="{TemplateBinding Label}"
+                                      FontSize="{DynamicResource Md.Comp.ComboBox.Input.FontSize}"
+                                      Foreground="{TemplateBinding LabelBrush}"
+                                      IsHitTestVisible="False"
+                                      IsVisible="False"
+                                      RenderTransform="scale(1) translate(0px, 0px)"
+                                      RenderTransformOrigin="0%,50%" />
+
+                    <Grid x:Name="PART_InputRow"
+                          Margin="0,0,48,0"
+                          VerticalAlignment="Center"
+                          RenderTransform="translate(0px, 0px)">
+                      <TextBlock x:Name="PART_Placeholder"
+                                 VerticalAlignment="Center"
+                                 FontSize="{TemplateBinding FontSize}"
+                                 Foreground="{TemplateBinding PlaceholderForeground}"
+                                 IsHitTestVisible="False"
+                                 Opacity="0"
+                                 Text="{TemplateBinding PlaceholderText}" />
+
+                      <ContentControl x:Name="PART_SelectionBox"
+                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      Content="{TemplateBinding SelectionBoxItem}"
+                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                      Foreground="{TemplateBinding Foreground}"
+                                      IsVisible="{TemplateBinding IsEditable, Converter={x:Static BoolConverters.Not}}" />
+
+                      <TextBox x:Name="PART_EditableTextBox"
+                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                               Background="Transparent"
+                               CaretBrush="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                               FontSize="{TemplateBinding FontSize}"
+                               Foreground="{TemplateBinding Foreground}"
+                               IsVisible="{TemplateBinding IsEditable}"
+                               PlaceholderForeground="{TemplateBinding PlaceholderForeground}"
+                               PlaceholderText="{x:Null}"
+                               SelectionBrush="{DynamicResource Md.Sys.Color.PrimarySelection.Brush}"
+                               Text="{TemplateBinding Text, Mode=TwoWay}"
+                               Theme="{StaticResource MdComboBoxEditableTextBoxTheme}" />
+                    </Grid>
+                  </Grid>
+
+                  <Grid x:Name="PART_DropDownIcon"
+                        Grid.Column="2"
+                        Width="{DynamicResource Md.Comp.ComboBox.DropDownIcon.Size}"
+                        Height="{DynamicResource Md.Comp.ComboBox.DropDownIcon.Size}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        IsHitTestVisible="False"
+                        RenderTransform="rotate(0deg)"
+                        RenderTransformOrigin="50%,50%">
+                    <md:MdIcon Glyph="{DynamicResource Md.Icon.ExpandMore}"
+                               Size="20"
+                               Foreground="{TemplateBinding Foreground}" />
+                  </Grid>
+
+                  <ToggleButton x:Name="PART_DropDownToggle"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="3"
+                                Background="Transparent"
+                                ClickMode="Press"
+                                Focusable="False"
+                                IsChecked="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                                Theme="{StaticResource MdComboBoxToggleTheme}" />
+                </Grid>
+
+                <Border x:Name="PART_ActiveIndicator"
+                        Height="1"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Bottom"
+                        Background="{TemplateBinding ActiveIndicatorBrush}"
+                        IsHitTestVisible="False" />
+              </Grid>
+            </Border>
+
+            <Grid x:Name="PART_SupportingRow"
+                  Margin="{DynamicResource Md.Comp.ComboBox.Supporting.Row.Margin}"
+                  IsVisible="False">
+              <ContentPresenter x:Name="PART_SupportingText"
+                                HorizontalAlignment="Left"
+                                Content="{TemplateBinding SupportingText}"
+                                FontSize="{DynamicResource Md.Comp.ComboBox.Supporting.FontSize}"
+                                Foreground="{TemplateBinding SupportingTextBrush}"
+                                IsVisible="False" />
+              <ContentPresenter x:Name="PART_ErrorText"
+                                HorizontalAlignment="Left"
+                                Content="{TemplateBinding ErrorText}"
+                                FontSize="{DynamicResource Md.Comp.ComboBox.Supporting.FontSize}"
+                                Foreground="{DynamicResource Md.Sys.Color.Error.Brush}"
+                                IsVisible="False" />
+            </Grid>
+
+            <Popup x:Name="PART_Popup"
+                   MinWidth="{Binding Bounds.Width, ElementName=PART_Container}"
+                   MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                   IsLightDismissEnabled="True"
+                   OverlayDismissEventPassThrough="True"
+                   IsOpen="{TemplateBinding IsPopupOpen}"
+                   Placement="BottomEdgeAlignedLeft"
+                   PlacementTarget="{Binding #PART_Container}"
+                   VerticalOffset="0"
+                   InheritsTransform="True"
+                   ShouldUseOverlayLayer="False"
+                   WindowManagerAddShadowHint="False">
+              <Popup.Styles>
+                <Style Selector="PopupRoot">
+                  <Setter Property="Background" Value="Transparent" />
+                  <Setter Property="TransparencyLevelHint" Value="Transparent" />
+                  <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
+                </Style>
+              </Popup.Styles>
+              <Border x:Name="PART_MenuSurface"
+                      HorizontalAlignment="Stretch"
+                      Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                      BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}"
+                      CornerRadius="{DynamicResource Md.Comp.ComboBox.Menu.Shape}"
+                      ClipToBounds="True"
+                      Padding="{DynamicResource Md.Comp.ComboBox.Menu.Padding}"
+                      Opacity="0"
+                      RenderTransform="scale(0.8) translate(0px,-8px)"
+                      RenderTransformOrigin="0%,0%">
+                <ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                              VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
+                              IsDeferredScrollingEnabled="{TemplateBinding (ScrollViewer.IsDeferredScrollingEnabled)}"
+                              IsScrollChainingEnabled="False">
+                  <ItemsPresenter x:Name="PART_ItemsPresenter"
+                                  ItemsPanel="{TemplateBinding ItemsPanel}">
+                    <ItemsPresenter.Styles>
+                      <Style Selector="ComboBoxItem">
+                        <Setter Property="Theme" Value="{StaticResource MdComboBoxItemTheme}" />
+                      </Style>
+                    </ItemsPresenter.Styles>
+                  </ItemsPresenter>
+                </ScrollViewer>
+              </Border>
+            </Popup>
+          </StackPanel>
+        </DataValidationErrors>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^[IsDropDownOpen=true] /template/ Border#PART_MenuSurface">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" />
+    </Style>
+    <Style Selector="^:reduced-motion /template/ Border#PART_MenuSurface">
+      <Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" />
+    </Style>
+
+    <!-- Filled/outlined anchor variants. -->
+    <Style Selector="^:filled">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="CornerRadius" Value="{DynamicResource Md.Comp.ComboBox.Filled.Container.Shape}" />
+      <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    </Style>
+    <Style Selector="^:outlined">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Outline.Brush}" />
+      <Setter Property="BorderThickness" Value="{DynamicResource Md.Comp.ComboBox.Outline.Width}" />
+      <Setter Property="CornerRadius" Value="{DynamicResource Md.Comp.ComboBox.Outlined.Container.Shape}" />
+    </Style>
+    <Style Selector="^:outlined /template/ Border#PART_ActiveIndicator">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^[IsDropDownOpen=true]:outlined">
+      <Setter Property="CornerRadius" Value="4,4,0,0" />
+    </Style>
+    <Style Selector="^:outlined:has-label /template/ Border#PART_Container">
+      <Setter Property="Margin" Value="0,8,0,0" />
+    </Style>
+    <Style Selector="^:has-leading-icon">
+      <Setter Property="Padding" Value="{DynamicResource Md.Comp.ComboBox.Content.Padding.LeadingIcon}" />
+    </Style>
+    <Style Selector="^:has-leading-icon /template/ Viewbox#PART_LeadingIcon">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- Stable render-transform label animation. -->
+    <Style Selector="^:has-label /template/ ContentPresenter#PART_Label">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-label:focus-within /template/ ContentPresenter#PART_Label">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^[IsDropDownOpen=true]:has-label /template/ ContentPresenter#PART_Label">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:filled:has-label:has-value /template/ ContentPresenter#PART_Label">
+      <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -14px)" />
+    </Style>
+    <Style Selector="^:filled:has-label:focus-within /template/ ContentPresenter#PART_Label">
+      <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -14px)" />
+    </Style>
+    <Style Selector="^[IsDropDownOpen=true]:filled:has-label /template/ ContentPresenter#PART_Label">
+      <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -14px)" />
+    </Style>
+    <Style Selector="^:filled:has-label:has-value /template/ Grid#PART_InputRow">
+      <Setter Property="RenderTransform" Value="translate(0px, 8px)" />
+    </Style>
+    <Style Selector="^:filled:has-label:focus-within /template/ Grid#PART_InputRow">
+      <Setter Property="RenderTransform" Value="translate(0px, 8px)" />
+    </Style>
+    <Style Selector="^[IsDropDownOpen=true]:filled:has-label /template/ Grid#PART_InputRow">
+      <Setter Property="RenderTransform" Value="translate(0px, 8px)" />
+    </Style>
+    <Style Selector="^:outlined:has-label /template/ ContentPresenter#PART_Label">
+      <Setter Property="Margin" Value="-4,0,0,0" />
+      <Setter Property="Padding" Value="{DynamicResource Md.Comp.ComboBox.Label.NotchedPadding}" />
+    </Style>
+    <Style Selector="^:outlined:has-label:has-value /template/ ContentPresenter#PART_Label">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+      <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -28px)" />
+    </Style>
+    <Style Selector="^:outlined:has-label:focus-within /template/ ContentPresenter#PART_Label">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+      <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -28px)" />
+    </Style>
+    <Style Selector="^[IsDropDownOpen=true]:outlined:has-label /template/ ContentPresenter#PART_Label">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+      <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -28px)" />
+    </Style>
+    <Style Selector="^:no-label:no-value /template/ TextBlock#PART_Placeholder">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:has-label:no-value:focus-within /template/ TextBlock#PART_Placeholder">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^[IsDropDownOpen=true]:has-label:no-value /template/ TextBlock#PART_Placeholder">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+
+    <!-- Supporting/error rows. -->
+    <Style Selector="^:has-supporting-text /template/ Grid#PART_SupportingRow">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-supporting-text /template/ ContentPresenter#PART_SupportingText">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:md-error:has-error-text /template/ Grid#PART_SupportingRow">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:md-error:has-error-text /template/ ContentPresenter#PART_ErrorText">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:error:has-error-text /template/ Grid#PART_SupportingRow">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:error:has-error-text /template/ ContentPresenter#PART_ErrorText">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:md-error:has-error-text /template/ ContentPresenter#PART_SupportingText">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:error:has-error-text /template/ ContentPresenter#PART_SupportingText">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+    <!-- Interaction states. -->
+    <Style Selector="^:filled:pointerover">
+      <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    </Style>
+    <Style Selector="^:outlined:pointerover">
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    </Style>
+    <Style Selector="^:filled:focus-within">
+      <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^[IsDropDownOpen=true]:filled">
+      <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:filled:focus-within /template/ Border#PART_ActiveIndicator">
+      <Setter Property="Height" Value="2" />
+    </Style>
+    <Style Selector="^[IsDropDownOpen=true]:filled /template/ Border#PART_ActiveIndicator">
+      <Setter Property="Height" Value="2" />
+    </Style>
+    <Style Selector="^:outlined:focus-within">
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^[IsDropDownOpen=true]:outlined">
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:outlined:focus-within /template/ Border#PART_FocusOutline">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^[IsDropDownOpen=true]:outlined /template/ Border#PART_FocusOutline">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^[IsDropDownOpen=true] /template/ Grid#PART_DropDownIcon">
+      <Setter Property="RenderTransform" Value="rotate(180deg)" />
+    </Style>
+
+    <!-- Editable anchors keep the field interactive while the arrow remains a separate menu anchor. -->
+    <Style Selector="^[IsEditable=true]">
+      <Setter Property="IsTabStop" Value="False" />
+      <Setter Property="KeyboardNavigation.TabNavigation" Value="Local" />
+    </Style>
+    <Style Selector="^[IsEditable=true] /template/ ToggleButton#PART_DropDownToggle">
+      <Setter Property="Grid.Column" Value="2" />
+      <Setter Property="Grid.ColumnSpan" Value="1" />
+    </Style>
+
+    <!-- Manual and binding-validation errors. -->
+    <Style Selector="^:md-error">
+      <Setter Property="LabelBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="SupportingTextBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+    </Style>
+    <Style Selector="^:error">
+      <Setter Property="LabelBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="SupportingTextBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+    </Style>
+
+    <!-- Disabled. -->
+    <Style Selector="^:disabled">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="PlaceholderForeground" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="LabelBrush" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="SupportingTextBrush" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="LeadingIconBrush" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+    </Style>
+    <Style Selector="^:filled:disabled">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.DisabledFilledField.Brush}" />
+      <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.DisabledIndicator.Brush}" />
+    </Style>
+    <Style Selector="^:outlined:disabled">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.DisabledOutline.Brush}" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

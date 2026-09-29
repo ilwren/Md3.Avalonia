@@ -1,0 +1,194 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <StreamGeometry x:Key="Md.Flutter.ExpandMore">M5 8L10 13L15 8</StreamGeometry>
+  <StreamGeometry x:Key="Md.Flutter.Check">M3 10L8 15L17 5</StreamGeometry>
+
+  <!-- MaterialBanner -->
+  <ControlTheme x:Key="{x:Type md:MdBanner}" TargetType="md:MdBanner">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="IsVisible" Value="False" />
+    <Setter Property="Opacity" Value="0" />
+    <Setter Property="RenderTransform" Value="translate(0px,-16px)" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdBanner">
+        <Border x:Name="PART_Root" MinHeight="80" Padding="16,12"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,0,1">
+          <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12">
+            <ContentPresenter Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"
+                              Content="{TemplateBinding LeadingContent}" />
+            <ContentPresenter Grid.Row="0" Grid.Column="1" VerticalAlignment="Center"
+                              Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Foreground="{TemplateBinding Foreground}" />
+            <ContentPresenter x:Name="PART_Actions" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center"
+                              Content="{TemplateBinding Actions}" />
+            <md:MdIconButton x:Name="PART_DismissButton" Grid.Row="0" Grid.Column="3"
+                             AutomationProperties.Name="Dismiss banner" Icon="{DynamicResource Md.Icon.Close}"
+                             IsVisible="{TemplateBinding IsDismissible}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:present"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:open"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="translate(0px,0px)" /></Style>
+    <Style Selector="^:reduced-motion"><Setter Property="RenderTransform" Value="translate(0px,0px)" /></Style>
+    <Style Selector="^:actions-below /template/ ContentPresenter#PART_Actions">
+      <Setter Property="Grid.Row" Value="1" /><Setter Property="Grid.Column" Value="1" />
+      <Setter Property="Grid.ColumnSpan" Value="3" /><Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="Margin" Value="0,8,0,0" />
+    </Style>
+  </ControlTheme>
+
+  <!-- ExpansionPanel / ExpansionPanelList -->
+  <ControlTheme x:Key="MdExpansionHeaderButtonTheme" TargetType="Button">
+    <Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" /><Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="Template"><ControlTemplate TargetType="Button"><Grid Background="{TemplateBinding Background}"><ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" Content="{TemplateBinding Content}" /><Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" Opacity="0" /></Grid></ControlTemplate></Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.10" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdExpansionPanel}" TargetType="md:MdExpansionPanel">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdExpansionPanel">
+        <Border Background="{TemplateBinding Background}" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                BorderThickness="1" CornerRadius="16" ClipToBounds="True">
+          <StackPanel>
+            <Button x:Name="PART_HeaderButton" MinHeight="64" Theme="{StaticResource MdExpansionHeaderButtonTheme}">
+              <Grid Margin="16,0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                <ContentPresenter Grid.Column="0" VerticalAlignment="Center" Content="{TemplateBinding LeadingContent}" />
+                <ContentPresenter Grid.Column="1" VerticalAlignment="Center" Content="{TemplateBinding Header}"
+                                  ContentTemplate="{TemplateBinding HeaderTemplate}" Foreground="{TemplateBinding Foreground}" />
+                <Path x:Name="PART_ExpandIcon" Grid.Column="2" Width="20" Height="20" VerticalAlignment="Center"
+                      Data="{StaticResource Md.Flutter.ExpandMore}" Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                      StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round"
+                      RenderTransform="rotate(0deg)" RenderTransformOrigin="50%,50%" />
+              </Grid>
+            </Button>
+            <ContentPresenter x:Name="PART_ExpandedContent" Margin="16,0,16,16" Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}"
+                              IsVisible="False" Opacity="0" RenderTransform="translate(0px, -8px)" />
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:content-present /template/ ContentPresenter#PART_ExpandedContent"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:expanded /template/ ContentPresenter#PART_ExpandedContent"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="translate(0px, 0px)" /></Style>
+    <Style Selector="^:expanded /template/ Path#PART_ExpandIcon"><Setter Property="RenderTransform" Value="rotate(180deg)" /></Style>
+    <Style Selector="^:reduced-motion /template/ ContentPresenter#PART_ExpandedContent"><Setter Property="RenderTransform" Value="translate(0px, 0px)" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdExpansionPanelList}" TargetType="md:MdExpansionPanelList">
+    <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Spacing="8" /></ItemsPanelTemplate></Setter>
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdExpansionPanelList"><ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" /></ControlTemplate></Setter>
+  </ControlTheme>
+
+  <!-- DataTable -->
+  <ControlTheme x:Key="MdDataTableGeneratedRowTheme" TargetType="ListBoxItem">
+    <Setter Property="MinHeight" Value="52" /><Setter Property="Padding" Value="16,0" /><Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template"><ControlTemplate TargetType="ListBoxItem"><Border x:Name="PART_Row" Background="{TemplateBinding Background}" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="True"><Grid><ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="Stretch" VerticalAlignment="Center" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" /><Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsHitTestVisible="False" Opacity="0" /></Grid></Border></ControlTemplate></Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.12" /></Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_State"><Setter Property="Opacity" Value="0.10" /></Style>
+    <Style Selector="^:selected"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" /></Style>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type md:MdDataTableRow}" TargetType="md:MdDataTableRow" BasedOn="{StaticResource MdDataTableGeneratedRowTheme}" />
+
+  <ControlTheme x:Key="{x:Type md:MdDataTable}" TargetType="md:MdDataTable">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" /><Setter Property="BorderThickness" Value="1" />
+    <Setter Property="ItemsPanel"><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></Setter>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdDataTable">
+        <!-- Keep the outline in its own outer layer. Content is clipped by an inset surface, so
+             header/row backgrounds can never paint over the four rounded border corners. -->
+        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="16">
+          <Border Margin="1" Background="{TemplateBinding Background}" CornerRadius="15" ClipToBounds="True">
+            <Grid RowDefinitions="56,*">
+              <Border Grid.Row="0" Padding="16,0" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
+                      BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,0,1">
+                <ContentPresenter VerticalAlignment="Center" Content="{TemplateBinding Header}" />
+              </Border>
+              <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
+              </ScrollViewer>
+            </Grid>
+          </Border>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:striped /template/ ListBoxItem.odd"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" /></Style>
+  </ControlTheme>
+
+  <!-- Stepper -->
+  <ControlTheme x:Key="MdStepHeaderButtonTheme" TargetType="Button" BasedOn="{StaticResource MdExpansionHeaderButtonTheme}" />
+  <ControlTheme x:Key="{x:Type md:MdStep}" TargetType="md:MdStep">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdStep"><Grid ColumnDefinitions="40,*" RowDefinitions="Auto,Auto"><Border x:Name="PART_Connector" Grid.RowSpan="2" Width="2" Margin="0,40,0,-16" HorizontalAlignment="Center" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" /><Button x:Name="PART_HeaderButton" Grid.ColumnSpan="2" MinHeight="56" Theme="{StaticResource MdStepHeaderButtonTheme}"><Grid Margin="4,0" ColumnDefinitions="40,*" ColumnSpacing="12"><Border x:Name="PART_Indicator" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" CornerRadius="16"><Grid><TextBlock x:Name="PART_StepNumber" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{TemplateBinding StepNumber}" /><Path x:Name="PART_CompleteIcon" Width="18" Height="18" Data="{StaticResource Md.Flutter.Check}" Stroke="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round" Opacity="0" /><TextBlock x:Name="PART_ErrorIcon" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Md.Sys.Color.OnError.Brush}" FontWeight="Bold" Text="!" Opacity="0" /></Grid></Border><StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2"><ContentPresenter Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" Foreground="{TemplateBinding Foreground}" /><ContentPresenter Content="{TemplateBinding Subtitle}" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /></StackPanel></Grid></Button><ContentPresenter x:Name="PART_StepContent" Grid.Row="1" Grid.Column="1" Margin="12,0,0,16" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" IsVisible="False" Opacity="0" RenderTransform="translate(0px, -8px)" /></Grid></ControlTemplate></Setter>
+    <Style Selector="^:active /template/ Border#PART_Indicator"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Style Selector="^:active /template/ TextBlock#PART_StepNumber"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" /></Style>
+    <Style Selector="^:content-present /template/ ContentPresenter#PART_StepContent"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:active /template/ ContentPresenter#PART_StepContent"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="translate(0px, 0px)" /></Style>
+    <Style Selector="^:complete /template/ Border#PART_Indicator"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Style Selector="^:complete /template/ TextBlock#PART_StepNumber"><Setter Property="Opacity" Value="0" /></Style>
+    <Style Selector="^:complete /template/ Path#PART_CompleteIcon"><Setter Property="Opacity" Value="1" /></Style>
+    <Style Selector="^:error /template/ Border#PART_Indicator"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" /></Style>
+    <Style Selector="^:error /template/ TextBlock#PART_StepNumber"><Setter Property="Opacity" Value="0" /></Style>
+    <Style Selector="^:error /template/ TextBlock#PART_ErrorIcon"><Setter Property="Opacity" Value="1" /></Style>
+    <Style Selector="^:reduced-motion /template/ ContentPresenter#PART_StepContent"><Setter Property="RenderTransform" Value="translate(0px, 0px)" /></Style>
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdStepper}" TargetType="md:MdStepper">
+    <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel /></ItemsPanelTemplate></Setter>
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdStepper"><StackPanel Spacing="8"><ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" /><StackPanel Margin="52,4,0,0" Orientation="Horizontal" Spacing="8"><md:MdButton x:Name="PART_ContinueButton" Content="{TemplateBinding ContinueContent}" Variant="Filled" /><md:MdButton x:Name="PART_CancelButton" Content="{TemplateBinding CancelContent}" Variant="Text" /></StackPanel></StackPanel></ControlTemplate></Setter>
+    <Style Selector="^:first-step /template/ md|MdButton#PART_CancelButton"><Setter Property="IsEnabled" Value="False" /></Style>
+    <Style Selector="^:horizontal"><Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="16" /></ItemsPanelTemplate></Setter></Style>
+  </ControlTheme>
+
+  <!-- RefreshIndicator -->
+  <ControlTheme x:Key="{x:Type md:MdRefreshIndicator}" TargetType="md:MdRefreshIndicator">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdRefreshIndicator">
+        <Grid ClipToBounds="True">
+          <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+          <Border x:Name="PART_IndicatorHost" Height="{TemplateBinding PullOffset}" MinHeight="0"
+                  VerticalAlignment="Top" ZIndex="2" Background="Transparent" ClipToBounds="False" IsHitTestVisible="False">
+            <Border x:Name="PART_IndicatorSurface" MinWidth="56" Height="44" Padding="8,6"
+                    HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                    Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
+                    BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}" CornerRadius="22"
+                    Opacity="0" RenderTransform="scale(0.8)" RenderTransformOrigin="50%,50%">
+              <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid Width="28" Height="28">
+                  <md:MdCircularProgressIndicator x:Name="PART_PullProgress" Width="28" Height="28"
+                                                  Minimum="0" Maximum="1" Value="{TemplateBinding PullProgress}" />
+                  <md:MdLoadingIndicator x:Name="PART_Refreshing" Size="28"
+                                         IsActive="{TemplateBinding IsRefreshing}" Opacity="0" />
+                </Grid>
+                <TextBlock Grid.Column="1" VerticalAlignment="Center"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                           Text="{TemplateBinding StateText}" />
+              </Grid>
+            </Border>
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pulling /template/ Border#PART_IndicatorSurface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+    <Style Selector="^:armed /template/ Border#PART_IndicatorSurface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+    <Style Selector="^:refreshing /template/ Border#PART_IndicatorSurface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+    <Style Selector="^:refreshing /template/ md|MdCircularProgressIndicator#PART_PullProgress"><Setter Property="Opacity" Value="0" /></Style>
+    <Style Selector="^:refreshing /template/ md|MdLoadingIndicator#PART_Refreshing"><Setter Property="Opacity" Value="1" /></Style>
+    <Style Selector="^:reduced-motion /template/ Border#PART_IndicatorSurface"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

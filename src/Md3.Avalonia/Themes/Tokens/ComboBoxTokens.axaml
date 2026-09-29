@@ -1,0 +1,37 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Exposed dropdown anchor follows the M3 text-field geometry. -->
+  <x:Double x:Key="Md.Comp.ComboBox.Container.MinHeight">56</x:Double>
+  <Thickness x:Key="Md.Comp.ComboBox.Content.Padding">16,0,12,0</Thickness>
+  <Thickness x:Key="Md.Comp.ComboBox.Content.Padding.LeadingIcon">12,0,12,0</Thickness>
+  <x:Double x:Key="Md.Comp.ComboBox.Icon.Size">24</x:Double>
+  <Thickness x:Key="Md.Comp.ComboBox.LeadingIcon.Margin">0,0,16,0</Thickness>
+  <x:Double x:Key="Md.Comp.ComboBox.DropDownIcon.Size">20</x:Double>
+  <x:Double x:Key="Md.Comp.ComboBox.DropDownIcon.TargetSize">48</x:Double>
+
+  <CornerRadius x:Key="Md.Comp.ComboBox.Filled.Container.Shape">4,4,0,0</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.ComboBox.Outlined.Container.Shape">4</CornerRadius>
+  <Thickness x:Key="Md.Comp.ComboBox.Indicator.Width">0,0,0,1</Thickness>
+  <Thickness x:Key="Md.Comp.ComboBox.Indicator.FocusWidth">0,0,0,2</Thickness>
+  <Thickness x:Key="Md.Comp.ComboBox.Outline.Width">1</Thickness>
+  <Thickness x:Key="Md.Comp.ComboBox.Outline.FocusWidth">2</Thickness>
+
+  <x:Double x:Key="Md.Comp.ComboBox.Input.FontSize">16</x:Double>
+  <x:Double x:Key="Md.Comp.ComboBox.Label.FontSize">16</x:Double>
+  <x:Double x:Key="Md.Comp.ComboBox.Supporting.FontSize">12</x:Double>
+  <Thickness x:Key="Md.Comp.ComboBox.Supporting.Row.Margin">16,4,16,0</Thickness>
+  <Thickness x:Key="Md.Comp.ComboBox.Label.NotchedPadding">4,0</Thickness>
+
+  <!-- Exposed options use a clearly roomy 72-DIP row. This remains easy to scan in a dark popup,
+       gives touch users a generous target, and prevents native item templates from collapsing it. -->
+  <CornerRadius x:Key="Md.Comp.ComboBox.Menu.Shape">0,0,4,4</CornerRadius>
+  <Thickness x:Key="Md.Comp.ComboBox.Menu.Padding">4</Thickness>
+  <x:Double x:Key="Md.Comp.ComboBox.Menu.MaxHeight">328</x:Double>
+  <x:Double x:Key="Md.Comp.ComboBox.MenuItem.MinHeight">72</x:Double>
+  <Thickness x:Key="Md.Comp.ComboBox.MenuItem.Margin">0,2</Thickness>
+  <Thickness x:Key="Md.Comp.ComboBox.MenuItem.Padding">16,12</Thickness>
+  <x:Double x:Key="Md.Comp.ComboBox.MenuItem.Icon.Size">24</x:Double>
+  <x:Double x:Key="Md.Comp.ComboBox.MenuItem.FontSize">16</x:Double>
+  <CornerRadius x:Key="Md.Comp.ComboBox.MenuItem.Shape">4</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.ComboBox.MenuItem.Selected.Shape">12</CornerRadius>
+</ResourceDictionary>

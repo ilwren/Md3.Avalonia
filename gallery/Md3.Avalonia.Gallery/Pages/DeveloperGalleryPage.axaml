@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls" xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.DeveloperGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+      <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Develop"/><TextBlock Classes="body" TextWrapping="Wrap" Text="Use the same controls with CommunityToolkit.MVVM bindings or direct event-driven code on desktop and Android."/></StackPanel>
+      <StackPanel Spacing="12"><TextBlock Classes="h2" Text="MVVM first"/><gallery:CodeExample XamlCode="&lt;md:MdSlider Value=&quot;{Binding Volume, Mode=TwoWay}&quot; /&gt;&#10;&lt;md:MdButton Command=&quot;{Binding SaveCommand}&quot; Content=&quot;Save&quot; /&gt;" CSharpCode="[ObservableProperty] private double volume = 50;&#10;[RelayCommand] private Task SaveAsync() =&gt; service.SaveAsync();"/></StackPanel>
+      <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Direct control APIs"/><gallery:CodeExample XamlCode="&lt;md:MdDatePicker x:Name=&quot;Date&quot; /&gt;" CSharpCode="Date.SelectedDate = DateTimeOffset.Now;&#10;Date.IsOpen = true;"/></StackPanel>
+      <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Android host"/><Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"><TextBlock TextWrapping="Wrap" Text="Use AvaloniaAndroidApplication and the shared MaterialTheme. Popup controls remain platform-backed and do not require a desktop OverlayLayer."/></Border></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

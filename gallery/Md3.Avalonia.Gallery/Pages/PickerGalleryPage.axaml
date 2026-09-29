@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.PickerGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+    <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Date &amp; time pickers"/><TextBlock Classes="body" Text="Independent Material pickers with two-way values, keyboard dismissal, and scoped popup surfaces."/></StackPanel>
+    <StackPanel Spacing="12">
+      <TextBlock Classes="h2" Text="Date picker" />
+      <StackPanel Orientation="Horizontal" Spacing="20">
+        <md:MdDatePicker Label="Docked date" SelectedDate="2026-09-22" />
+        <md:MdDatePicker Label="Modal date" Mode="Modal" SelectedDate="2026-10-05" />
+      </StackPanel>
+    </StackPanel>
+    <StackPanel Spacing="12">
+      <TextBlock Classes="h2" Text="Time picker" />
+      <StackPanel Orientation="Horizontal" Spacing="20">
+        <md:MdTimePicker Label="Dial time" SelectedTime="14:30:00" />
+        <md:MdTimePicker Label="Input time" Mode="Input" SelectedTime="09:15:00" />
+        <md:MdTimePicker Label="24-hour time" Mode="Input" Is24Hour="True" SelectedTime="21:45:00" />
+      </StackPanel>
+    </StackPanel>
+    <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+      <TextBlock Classes="body" TextWrapping="Wrap" Text="Press Escape to cancel, Enter to confirm input-mode time, and Tab to move between picker actions. Popup state and selected values support two-way MVVM binding." />
+    </Border>
+    <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdDatePicker SelectedDate=&quot;{Binding DueDate}&quot; Mode=&quot;Modal&quot; /&gt;&#10;&lt;md:MdTimePicker SelectedTime=&quot;{Binding StartTime}&quot;&#10;                 Mode=&quot;Input&quot; Is24Hour=&quot;True&quot; /&gt;" CSharpCode="var date = new MdDatePicker { Mode = MdDatePickerMode.Modal };&#10;var time = new MdTimePicker { Mode = MdTimePickerMode.Input, Is24Hour = true };" /></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

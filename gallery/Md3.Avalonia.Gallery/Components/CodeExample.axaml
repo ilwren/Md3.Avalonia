@@ -1,0 +1,71 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             xmlns:fluent="using:Avalonia.Themes.Fluent"
+             x:Class="Md3.Avalonia.Gallery.Components.CodeExample"
+             x:Name="Root">
+  <UserControl.Styles>
+    <!-- Fluent resources are scoped to AvaloniaEdit's own native template parts only. -->
+    <fluent:FluentTheme />
+    <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+  </UserControl.Styles>
+  <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+          BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+          BorderThickness="1"
+          CornerRadius="16"
+          ClipToBounds="True">
+    <Grid RowDefinitions="52,Auto">
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,*,Auto" Margin="8,0">
+        <Border Grid.Column="0" Grid.ColumnSpan="2"
+                Width="148" Height="34"
+                HorizontalAlignment="Left" VerticalAlignment="Center"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                BorderThickness="1" CornerRadius="17" ClipToBounds="True">
+          <md:MdSegmentedButtonGroup x:Name="LanguageTabs"
+                                     AllowMultiple="False"
+                                     SelectedIndex="0"
+                                     SelectionChanged="LanguageSelectionChanged">
+            <md:MdSegmentedButton x:Name="XamlTab" MinWidth="77" MinHeight="32" Height="32" Padding="10,0" BorderThickness="0" Content="AXAML" Value="AXAML" />
+            <md:MdSegmentedButton x:Name="CSharpTab" MinWidth="69" MinHeight="32" Height="32" Padding="10,0" BorderThickness="0" Content="C#" Value="C#" />
+          </md:MdSegmentedButtonGroup>
+        </Border>
+        <TextBlock Grid.Column="2"
+                   Margin="12,0"
+                   VerticalAlignment="Center"
+                   FontSize="12"
+                   Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                   Text="Selectable preview" />
+        <md:MdButton Grid.Column="3"
+                     Content="Copy"
+                     Size="ExtraSmall"
+                     Variant="Text"
+                     Click="CopyCode" />
+      </Grid>
+      <Grid Grid.Row="1" Height="220">
+        <avaloniaEdit:TextEditor x:Name="XamlEditor"
+                                 Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
+                                 Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                                 FontFamily="monospace"
+                                 FontSize="13"
+                                 HorizontalScrollBarVisibility="Auto"
+                                 VerticalScrollBarVisibility="Auto"
+                                 IsReadOnly="True"
+                                 ShowLineNumbers="True"
+                                 WordWrap="False" />
+        <avaloniaEdit:TextEditor x:Name="CSharpEditor"
+                                 Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
+                                 Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                                 FontFamily="monospace"
+                                 FontSize="13"
+                                 HorizontalScrollBarVisibility="Auto"
+                                 VerticalScrollBarVisibility="Auto"
+                                 IsReadOnly="True"
+                                 IsVisible="False"
+                                 ShowLineNumbers="True"
+                                 WordWrap="False" />
+      </Grid>
+    </Grid>
+  </Border>
+</UserControl>

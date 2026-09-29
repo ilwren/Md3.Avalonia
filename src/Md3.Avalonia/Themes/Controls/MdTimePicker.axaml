@@ -1,0 +1,156 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="MdClockFieldButtonTheme" TargetType="Button">
+    <Setter Property="Width" Value="104" />
+    <Setter Property="Height" Value="80" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Button">
+        <Border Background="{TemplateBinding Background}" CornerRadius="16" ClipToBounds="True">
+          <Grid>
+            <Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" Opacity="0" />
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                              Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"
+                              FontSize="45" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.12" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdTimeDial}" TargetType="md:MdTimeDial">
+    <Setter Property="Width" Value="256" />
+    <Setter Property="Height" Value="256" />
+    <Setter Property="DialBackground" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+    <Setter Property="HandBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="LabelBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="SelectedLabelBrush" Value="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" />
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdTimePicker}" TargetType="md:MdTimePicker">
+    <Setter Property="MinWidth" Value="280" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdTimePicker">
+        <Grid>
+          <Button x:Name="PART_AnchorButton"
+                  AutomationProperties.Name="Open time picker"
+                  MinWidth="{TemplateBinding MinWidth}"
+                  Theme="{StaticResource MdPickerAnchorButtonTheme}">
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Grid.Column="0" HorizontalAlignment="Left" Spacing="1">
+                <ContentPresenter Content="{TemplateBinding Label}"
+                                  FontSize="12"
+                                  Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                <TextBlock FontSize="16"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                           Text="{TemplateBinding DisplayText}" />
+              </StackPanel>
+              <md:MdIcon Grid.Column="1"
+                         Glyph="{DynamicResource Md.Icon.Schedule}"
+                         Size="24"
+                         Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+            </Grid>
+          </Button>
+
+          <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}"
+                 IsLightDismissEnabled="True"
+                 OverlayDismissEventPassThrough="True"
+                 Placement="BottomEdgeAlignedLeft"
+                 PlacementTarget="{Binding #PART_AnchorButton}"
+                 ShouldUseOverlayLayer="False"
+                 WindowManagerAddShadowHint="False">
+            <Popup.Styles>
+              <Style Selector="PopupRoot">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="TransparencyLevelHint" Value="Transparent" />
+                <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
+              </Style>
+            </Popup.Styles>
+            <Border x:Name="PART_Surface" Width="360"
+                    Padding="24"
+                    Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
+                    BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}"
+                    CornerRadius="28"
+                    ClipToBounds="True" Opacity="0"
+                    RenderTransform="scale(0.9) translate(0px,-8px)" RenderTransformOrigin="50%,0%">
+              <StackPanel Spacing="20">
+                <TextBlock FontSize="12" FontWeight="Medium"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                           Text="Select time" />
+
+                <!-- M3 dial mode: the hour/minute fields select which value the actual clock
+                     face edits. Dragging the hand is continuous; minute selection keeps 1-minute precision. -->
+                <StackPanel x:Name="PART_DialPanel" Spacing="16">
+                  <Grid ColumnDefinitions="104,24,104,*" ColumnSpacing="4" HorizontalAlignment="Center">
+                    <Button x:Name="PART_HourDialHost" Grid.Column="0"
+                            AutomationProperties.Name="Edit hour on clock face"
+                            Theme="{StaticResource MdClockFieldButtonTheme}"
+                            Content="{TemplateBinding HourText}" />
+                    <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               FontSize="45" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" Text=":" />
+                    <Button x:Name="PART_MinuteDialHost" Grid.Column="2"
+                            AutomationProperties.Name="Edit minute on clock face"
+                            Theme="{StaticResource MdClockFieldButtonTheme}"
+                            Content="{TemplateBinding MinuteText}" />
+                    <md:MdButton x:Name="PART_PeriodButton" Grid.Column="3" Margin="4,0,0,0"
+                                 VerticalAlignment="Center" AutomationProperties.Name="Toggle AM or PM"
+                                 Content="{TemplateBinding PeriodText}" Size="ExtraSmall" Variant="Outlined" />
+                  </Grid>
+                  <md:MdTimeDial x:Name="PART_ClockFace"
+                                 HorizontalAlignment="Center"
+                                 Hour="{TemplateBinding Hour, Mode=TwoWay}"
+                                 Minute="{TemplateBinding Minute, Mode=TwoWay}"
+                                 ActivePart="{TemplateBinding ActiveDialPart}"
+                                 Is24Hour="{TemplateBinding Is24Hour}"
+                                 AutomationProperties.Name="Interactive clock face" />
+                </StackPanel>
+
+                <Grid x:Name="PART_InputPanel" ColumnDefinitions="104,24,104,Auto" ColumnSpacing="4" IsVisible="False">
+                  <md:MdTextBox x:Name="PART_HourInput" Grid.Column="0" Label="Hour" MaxLength="2"
+                                HorizontalContentAlignment="Center"
+                                OutlineLabelBackground="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
+                                Text="{TemplateBinding HourText}" Variant="Outlined" />
+                  <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="28" Text=":" />
+                  <md:MdTextBox x:Name="PART_MinuteInput" Grid.Column="2" Label="Minute" MaxLength="2"
+                                HorizontalContentAlignment="Center"
+                                OutlineLabelBackground="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
+                                Text="{TemplateBinding MinuteText}" Variant="Outlined" />
+                  <md:MdButton x:Name="PART_InputPeriodButton" Grid.Column="3" Margin="4,8,0,0"
+                               VerticalAlignment="Center" Content="{TemplateBinding PeriodText}"
+                               Size="ExtraSmall" Variant="Outlined" />
+                </Grid>
+
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                  <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                             Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                             Text="Drag the hand, use the wheel, or press arrow keys" TextWrapping="Wrap" />
+                  <md:MdButton x:Name="PART_CancelButton" Grid.Column="1" Content="{TemplateBinding CancelText}" Size="ExtraSmall" Variant="Text" />
+                  <md:MdButton x:Name="PART_ConfirmButton" Grid.Column="2" Content="{TemplateBinding ConfirmText}" Size="ExtraSmall" Variant="Text" />
+                </Grid>
+              </StackPanel>
+            </Border>
+          </Popup>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^[IsOpen=true] /template/ Border#PART_Surface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
+    <Style Selector="^:reduced-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
+    <Style Selector="^:input /template/ StackPanel#PART_DialPanel"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:input /template/ Grid#PART_InputPanel"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:hour-dial /template/ Button#PART_HourDialHost">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" />
+    </Style>
+    <Style Selector="^:minute-dial /template/ Button#PART_MinuteDialHost">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" />
+    </Style>
+    <Style Selector="^:twenty-four-hour /template/ md|MdButton#PART_PeriodButton"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:twenty-four-hour /template/ md|MdButton#PART_InputPeriodButton"><Setter Property="IsVisible" Value="False" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

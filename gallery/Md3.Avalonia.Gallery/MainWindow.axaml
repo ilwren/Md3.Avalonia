@@ -1,0 +1,165 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:md="using:Md3.Avalonia.Controls"
+        x:Class="Md3.Avalonia.Gallery.MainWindow"
+        mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="900"
+        Width="1440" Height="900" MinWidth="360" MinHeight="600"
+        Background="{DynamicResource Md.Sys.Color.Surface.Brush}"
+        Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+        Title="Material 3 for Avalonia — Gallery">
+  <Window.Styles>
+    <Style Selector="TextBlock.h1"><Setter Property="FontSize" Value="48" /><Setter Property="FontWeight" Value="Normal" /><Setter Property="LineHeight" Value="56" /></Style>
+    <Style Selector="TextBlock.h2"><Setter Property="FontSize" Value="28" /><Setter Property="FontWeight" Value="Normal" /><Setter Property="LineHeight" Value="36" /></Style>
+    <Style Selector="TextBlock.body"><Setter Property="FontSize" Value="16" /><Setter Property="LineHeight" Value="24" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /></Style>
+    <Style Selector="Border.gallery-section"><Setter Property="Padding" Value="24" /><Setter Property="CornerRadius" Value="24" /><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" /></Style>
+    <Style Selector="Border.symbol-card"><Setter Property="Width" Value="138" /><Setter Property="Height" Value="96" /><Setter Property="Margin" Value="0,0,10,10" /><Setter Property="Padding" Value="12" /><Setter Property="CornerRadius" Value="18" /><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" /></Style>
+    <Style Selector="Border.symbol-card StackPanel"><Setter Property="HorizontalAlignment" Value="Center" /><Setter Property="VerticalAlignment" Value="Center" /><Setter Property="Spacing" Value="8" /></Style>
+    <Style Selector="Border.symbol-card TextBlock"><Setter Property="HorizontalAlignment" Value="Center" /><Setter Property="FontSize" Value="12" /></Style>
+  </Window.Styles>
+
+  <!-- m3.material.io desktop scaffold: a persistent primary destination rail, a contextual
+       component index, the document pane, and an optional on-this-page pane. -->
+  <Grid x:Name="RootLayout" ColumnDefinitions="104,*">
+    <Border x:Name="PrimaryNavigationRail" Grid.Column="0" Padding="8,12"
+            Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+            BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,1,0">
+      <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
+        <Border Width="56" Height="56" HorizontalAlignment="Center" CornerRadius="18"
+                Background="{DynamicResource Md.Sys.Color.Primary.Brush}">
+          <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" FontWeight="Medium"
+                     Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" Text="M3" />
+        </Border>
+        <md:MdIconButton Grid.Row="1" Icon="{x:Static md:MdSymbols.Search}" Click="FocusGallerySearch"
+                         HorizontalAlignment="Center" ToolTip.Tip="Search" />
+        <StackPanel x:Name="TopNavigation" Grid.Row="2" Spacing="4" VerticalAlignment="Top">
+          <md:MdButton x:Name="GetStartedTopNav" Width="88" Height="64" ContainerHeight="64" ContainerCornerRadius="20" Padding="4" Variant="Text" Click="ShowGetStarted">
+            <StackPanel HorizontalAlignment="Center" Spacing="2"><md:MdIcon Glyph="{x:Static md:MdSymbols.Home}" Size="22"/><TextBlock FontSize="11" Text="Get started"/></StackPanel>
+          </md:MdButton>
+          <md:MdButton x:Name="DevelopTopNav" Width="88" Height="64" ContainerHeight="64" ContainerCornerRadius="20" Padding="4" Variant="Text" Click="ShowDevelop">
+            <StackPanel HorizontalAlignment="Center" Spacing="2"><md:MdIcon Glyph="{x:Static md:MdSymbols.Code}" Size="22"/><TextBlock FontSize="11" Text="Develop"/></StackPanel>
+          </md:MdButton>
+          <md:MdButton x:Name="FoundationsTopNav" Width="88" Height="64" ContainerHeight="64" ContainerCornerRadius="20" Padding="4" Variant="Text" Click="ShowFoundations">
+            <StackPanel HorizontalAlignment="Center" Spacing="2"><md:MdIcon Glyph="{x:Static md:MdSymbols.Bookmark}" Size="22"/><TextBlock FontSize="11" Text="Foundations"/></StackPanel>
+          </md:MdButton>
+          <md:MdButton x:Name="StylesTopNav" Width="88" Height="64" ContainerHeight="64" ContainerCornerRadius="20" Padding="4" Variant="Text" Click="ShowStyles">
+            <StackPanel HorizontalAlignment="Center" Spacing="2"><md:MdIcon Glyph="{x:Static md:MdSymbols.Palette}" Size="22"/><TextBlock FontSize="11" Text="Styles"/></StackPanel>
+          </md:MdButton>
+          <md:MdButton x:Name="ComponentsTopNav" Width="88" Height="64" ContainerHeight="64" ContainerCornerRadius="20" Padding="4" Variant="Tonal" Click="ShowComponents">
+            <StackPanel HorizontalAlignment="Center" Spacing="2"><md:MdIcon Glyph="{x:Static md:MdSymbols.Settings}" Size="22"/><TextBlock FontSize="11" Text="Components"/></StackPanel>
+          </md:MdButton>
+        </StackPanel>
+        <TextBlock Grid.Row="3" HorizontalAlignment="Center" FontSize="10"
+                   Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Avalonia 12" />
+      </Grid>
+    </Border>
+
+    <Grid x:Name="ContentShell" Grid.Column="1" RowDefinitions="72,*">
+      <Border Grid.Row="0" Padding="16,8,20,8" Background="{DynamicResource Md.Sys.Color.Surface.Brush}"
+              BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,0,1">
+        <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12">
+          <md:MdIconButton x:Name="NavigationMenuButton" Grid.Column="0" Icon="{x:Static md:MdSymbols.Menu}"
+                           Click="ToggleNavigation" ToolTip.Tip="Open navigation" />
+          <Border x:Name="CompactBrandMark" Grid.Column="1" Width="44" Height="44" CornerRadius="14"
+                  Background="{DynamicResource Md.Sys.Color.Primary.Brush}">
+            <TextBlock Text="M3" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18"
+                       FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" />
+          </Border>
+          <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="1">
+            <TextBlock x:Name="BrandTitle" FontSize="18" FontWeight="Medium" Text="Material Design 3" />
+            <TextBlock FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Avalonia component gallery" />
+          </StackPanel>
+          <StackPanel x:Name="HeaderActions" Grid.Column="3" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+            <md:MdSearchBar x:Name="GallerySearch" Width="260" PlaceholderText="Search components" TextChanged="GallerySearchTextChanged" SearchSubmitted="GallerySearchSubmitted" />
+            <md:MdComboBox x:Name="LanguageSelector" Width="116" Label="Language" Variant="Outlined" SelectionChanged="LanguageSelectionChanged" />
+            <md:MdComboBox x:Name="ThemeSelector" Width="116" Label="Theme" Variant="Outlined" SelectionChanged="ThemeSelectionChanged" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <Grid x:Name="ShellGrid" Grid.Row="1" ColumnDefinitions="280,*,220">
+      <!-- Official-style contextual component navigation; it becomes a modal drawer below 1200dp. -->
+      <md:MdNavigationDrawer x:Name="NavigationPane" Grid.Column="0" ZIndex="11"
+                             IsOpen="True" IsModal="False" DrawerWidth="280">
+        <md:MdNavigationDrawer.DrawerContent>
+          <Border Padding="20,18" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                  BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,1,0">
+            <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+              <StackPanel Spacing="4">
+            <TextBlock Margin="14,4,14,8" FontSize="22" FontWeight="Medium" Text="Components" />
+            <md:MdButton x:Name="ComponentsOverviewNav" Content="Components overview" Variant="Text" HorizontalContentAlignment="Left" Click="ShowComponents" />
+            <Border Margin="0,12,0,4" Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+            <TextBlock Margin="14,8,14,10" Classes="body" Text="LIBRARY EXTENSIONS" />
+            <md:MdButton x:Name="DesktopAdaptersNav" Content="Desktop adapters" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDesktopAdapters" />
+            <md:MdButton x:Name="ThemeResourcesNav" Content="Theme Lab" Variant="Text" HorizontalContentAlignment="Left" Click="ShowThemeResources" />
+            <md:MdButton x:Name="SymbolsNav" Content="Material Symbols" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSymbols" />
+            <md:MdButton x:Name="MotionNav" Content="Motion" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMotion" />
+            <Border Margin="0,12,0,4" Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+            <TextBlock Margin="14,8,14,10" Classes="body" Text="ALL COMPONENTS" />
+            <md:MdButton x:Name="ButtonNav" Content="Buttons" Variant="Text" HorizontalContentAlignment="Left" Click="ShowButtons" />
+            <md:MdButton x:Name="IconButtonNav" Content="Icon buttons" Variant="Text" HorizontalContentAlignment="Left" Click="ShowIconButtons" />
+            <md:MdButton x:Name="FabNav" Content="FABs" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFabs" />
+            <md:MdButton x:Name="AppBarNav" Content="App bars" Variant="Text" HorizontalContentAlignment="Left" Click="ShowAppBars" />
+            <md:MdButton x:Name="BadgeNav" Content="Badges" Variant="Text" HorizontalContentAlignment="Left" Click="ShowBadges" />
+            <md:MdButton x:Name="TextFieldNav" Content="Text fields" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTextFields" />
+            <md:MdButton x:Name="CheckBoxNav" Content="Checkbox" Variant="Text" HorizontalContentAlignment="Left" Click="ShowCheckBoxes" />
+            <md:MdButton x:Name="RadioButtonNav" Content="Radio buttons" Variant="Text" HorizontalContentAlignment="Left" Click="ShowRadioButtons" />
+            <md:MdButton x:Name="ComboBoxNav" Content="Combo box" Variant="Text" HorizontalContentAlignment="Left" Click="ShowComboBoxes" />
+            <md:MdButton x:Name="CarouselNav" Content="Carousel" Variant="Text" HorizontalContentAlignment="Left" Click="ShowCarousel" />
+            <md:MdButton x:Name="CardNav" Content="Cards" Variant="Text" HorizontalContentAlignment="Left" Click="ShowCards" />
+            <md:MdButton x:Name="ChipNav" Content="Chips" Variant="Text" HorizontalContentAlignment="Left" Click="ShowChips" />
+            <md:MdButton x:Name="PickerNav" Content="Date &amp; time pickers" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPickers" />
+            <md:MdButton x:Name="DialogNav" Content="Dialogs" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDialogs" />
+            <md:MdButton x:Name="DividerNav" Content="Divider" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDivider" />
+            <md:MdButton x:Name="ListNav" Content="Lists" Variant="Text" HorizontalContentAlignment="Left" Click="ShowLists" />
+            <md:MdButton x:Name="LoadingNav" Content="Loading" Variant="Text" HorizontalContentAlignment="Left" Click="ShowLoading" />
+            <md:MdButton x:Name="ProgressNav" Content="Progress" Variant="Text" HorizontalContentAlignment="Left" Click="ShowProgress" />
+            <md:MdButton x:Name="MenuNav" Content="Menus" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMenus" />
+            <md:MdButton x:Name="NavigationBarNav" Content="Navigation bar" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNavigationBar" />
+            <md:MdButton x:Name="NavigationDrawerNav" Content="Navigation drawer" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNavigationDrawer" />
+            <md:MdButton x:Name="AdaptiveNav" Content="Navigation rail &amp; adaptive" Variant="Text" HorizontalContentAlignment="Left" Click="ShowAdaptive" />
+            <md:MdButton x:Name="SearchNav" Content="Search" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSearch" />
+            <md:MdButton x:Name="SheetNav" Content="Sheets" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSheets" />
+            <md:MdButton x:Name="SliderNav" Content="Slider" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSlider" />
+            <md:MdButton x:Name="AdvancedSelectionNav" Content="Segmented &amp; range" Variant="Text" HorizontalContentAlignment="Left" Click="ShowAdvancedSelection" />
+            <md:MdButton x:Name="SnackbarNav" Content="Snackbar" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSnackbar" />
+            <md:MdButton x:Name="SwitchNav" Content="Switch" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSwitch" />
+            <md:MdButton x:Name="TabNav" Content="Tabs" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTabs" />
+            <md:MdButton x:Name="ToolbarNav" Content="Toolbars" Variant="Text" HorizontalContentAlignment="Left" Click="ShowToolbars" />
+            <md:MdButton x:Name="TooltipNav" Content="Tooltips" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTooltips" />
+            <md:MdButton x:Name="FlutterParityNav" Content="Flutter parity" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFlutterParity" />
+            <md:MdButton x:Name="EcosystemNav" Content="Flutter ecosystem" Variant="Text" HorizontalContentAlignment="Left" Click="ShowEcosystem" />
+            <md:MdButton x:Name="BorderlessWindowNav" Content="Borderless windows" Variant="Text" HorizontalContentAlignment="Left" Click="ShowBorderlessWindows" />
+              </StackPanel>
+            </md:MdScrollViewer>
+          </Border>
+        </md:MdNavigationDrawer.DrawerContent>
+      </md:MdNavigationDrawer>
+
+      <!-- One themed shell-level scroller owns the finite viewport. Page-local viewers are
+           unwrapped when navigated, avoiding unbounded nested ScrollViewer measurement. -->
+      <md:MdScrollViewer x:Name="PageScroll" Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <ContentControl x:Name="PageHost" MaxWidth="1100" Margin="48,28,40,40" HorizontalAlignment="Center" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top" />
+      </md:MdScrollViewer>
+
+      <Border x:Name="TableOfContentsPane" Grid.Column="2" Padding="24,32" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1,0,0,0">
+        <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Spacing="12">
+            <TextBlock x:Name="OnThisPageTitle" FontSize="14" FontWeight="Medium" Text="On this page" />
+            <StackPanel x:Name="TableOfContentsItems" Spacing="4" />
+            <Border Margin="0,12,0,0" Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+            <TextBlock TextWrapping="Wrap" Classes="body" Text="Headings are generated from the active page. Activate one to move it into view." />
+          </StackPanel>
+        </md:MdScrollViewer>
+      </Border>
+
+      <Border x:Name="NavigationScrim" Grid.ColumnSpan="3" ZIndex="10" IsVisible="False" Background="#66000000" PointerPressed="DismissNavigation" />
+    </Grid>
+
+    <!-- Shared viewport-level modal host. Documentation pages route task dialogs here so the
+         scrim blocks the shell rather than being measured inside a long scrolling page. -->
+      <md:MdDialogHost x:Name="GlobalDialogHost" Grid.Row="1" ZIndex="100" />
+    </Grid>
+  </Grid>
+</Window>

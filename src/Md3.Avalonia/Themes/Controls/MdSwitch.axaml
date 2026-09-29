@@ -1,0 +1,34 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdSwitch}" TargetType="md:MdSwitch">
+    <Setter Property="MinHeight" Value="48" /><Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" /><Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdSwitch">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+          <ContentPresenter Grid.Column="0" VerticalAlignment="Center" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" />
+          <Grid Grid.Column="1" Width="52" Height="48" VerticalAlignment="Center">
+            <Border x:Name="PART_Track" Width="52" Height="32" VerticalAlignment="Center" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" BorderBrush="{DynamicResource Md.Sys.Color.Outline.Brush}" BorderThickness="2" CornerRadius="16" />
+            <Border x:Name="PART_ThumbState" Width="40" Height="40" Margin="-4,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" CornerRadius="20" Opacity="0" RenderTransform="translate(0px,0px)" />
+            <Border x:Name="PART_Thumb" Width="24" Height="24" Margin="4,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{DynamicResource Md.Sys.Color.Outline.Brush}" CornerRadius="12" RenderTransform="scale(0.667) translate(0px,0px)" RenderTransformOrigin="50%,50%">
+              <Grid>
+                <md:MdIcon x:Name="PART_CheckedIcon" Glyph="{DynamicResource Md.Icon.Check}" Size="16" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" IsVisible="False" />
+                <md:MdIcon x:Name="PART_UncheckedIcon" Glyph="{DynamicResource Md.Icon.Close}" Size="16" Foreground="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" IsVisible="False" />
+              </Grid>
+            </Border>
+          </Grid>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:checked /template/ Border#PART_Track"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Style Selector="^:checked /template/ Border#PART_Thumb"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" /><Setter Property="RenderTransform" Value="translate(20px,0px) scale(1)" /></Style>
+    <Style Selector="^:checked /template/ Border#PART_ThumbState"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="RenderTransform" Value="translate(20px,0px)" /></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_ThumbState"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_ThumbState"><Setter Property="Opacity" Value="0.12" /></Style>
+    <Style Selector="^:show-icons:checked /template/ md|MdIcon#PART_CheckedIcon"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:show-icons:not(:checked) /template/ md|MdIcon#PART_UncheckedIcon"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_Track"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

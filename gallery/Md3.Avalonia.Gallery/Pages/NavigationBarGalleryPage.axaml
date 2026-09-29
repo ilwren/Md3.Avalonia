@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.NavigationBarGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+      <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Navigation bar"/><TextBlock Classes="body" Text="Navigation bars provide three to five top-level destinations on compact and medium layouts."/></StackPanel>
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Flexible · horizontal destinations"/>
+        <Border Width="720" Height="360" HorizontalAlignment="Left" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24" ClipToBounds="True">
+          <Grid RowDefinitions="*,Auto">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"><md:MdIcon x:Name="DestinationIcon" Glyph="{x:Static md:MdSymbols.Home}" Size="48"/><TextBlock x:Name="DestinationTitle" FontSize="22" Text="Home"/><TextBlock x:Name="DestinationDescription" Classes="body" Text="Home destination content is active."/></StackPanel>
+            <md:MdNavigationBar x:Name="DemoNavigationBar" Grid.Row="1" Variant="Flexible" ItemLayout="Horizontal" SelectedIndex="0" SelectionChanged="DestinationChanged">
+              <md:MdNavigationBarItem Label="Home"><md:MdNavigationBarItem.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Home}"/></md:MdNavigationBarItem.Icon></md:MdNavigationBarItem>
+              <md:MdNavigationBarItem Label="Search"><md:MdNavigationBarItem.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Search}"/></md:MdNavigationBarItem.Icon></md:MdNavigationBarItem>
+              <md:MdNavigationBarItem Label="Favorites"><md:MdNavigationBarItem.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Favorite}"/></md:MdNavigationBarItem.Icon><md:MdNavigationBarItem.Badge><md:MdBadge Variant="Label" Content="3"/></md:MdNavigationBarItem.Badge></md:MdNavigationBarItem>
+              <md:MdNavigationBarItem Label="Profile"><md:MdNavigationBarItem.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Person}"/></md:MdNavigationBarItem.Icon></md:MdNavigationBarItem>
+            </md:MdNavigationBar>
+          </Grid>
+        </Border>
+      </StackPanel>
+      <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdNavigationBar SelectedItem=&quot;{Binding Destination}&quot;&gt;&#10;  &lt;md:MdNavigationBarItem Icon=&quot;...&quot; Label=&quot;Home&quot; /&gt;&#10;  &lt;md:MdNavigationBarItem Icon=&quot;...&quot; Label=&quot;Search&quot; /&gt;&#10;&lt;/md:MdNavigationBar&gt;" CSharpCode="var navigation = new MdNavigationBar { SelectedIndex = 0 };&#10;navigation.SelectionChanged += (_, _) =&gt; viewModel.Navigate(navigation.SelectedItem);"/></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

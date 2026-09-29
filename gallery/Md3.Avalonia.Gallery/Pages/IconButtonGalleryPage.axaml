@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.IconButtonGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+    <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Icon buttons"/><TextBlock Classes="body" Text="Material Symbols Rounded with standard, filled, tonal and outlined color styles."/></StackPanel>
+    <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Default icon buttons"/><StackPanel Orientation="Horizontal" Spacing="12"><md:MdIconButton Icon="{x:Static md:MdSymbols.Star}"/><md:MdIconButton Icon="{x:Static md:MdSymbols.Add}" Variant="Filled"/><md:MdIconButton Icon="{x:Static md:MdSymbols.Edit}" Variant="Tonal"/><md:MdIconButton Icon="{x:Static md:MdSymbols.MoreVert}" Variant="Outlined"/></StackPanel></StackPanel>
+    <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Toggle icon buttons"/><StackPanel Orientation="Horizontal" Spacing="12"><md:MdToggleIconButton Icon="{x:Static md:MdSymbols.Favorite}" SelectedIcon="{x:Static md:MdSymbols.Check}"/><md:MdToggleIconButton Icon="{x:Static md:MdSymbols.Notifications}" SelectedIcon="{x:Static md:MdSymbols.Check}" Variant="Filled" IsChecked="True"/><md:MdToggleIconButton Icon="{x:Static md:MdSymbols.Star}" SelectedIcon="{x:Static md:MdSymbols.Check}" Variant="Tonal"/><md:MdToggleIconButton Icon="{x:Static md:MdSymbols.Info}" SelectedIcon="{x:Static md:MdSymbols.Check}" Variant="Outlined" IsChecked="True"/></StackPanel></StackPanel>
+    <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Width and shape"/><StackPanel Orientation="Horizontal" Spacing="12"><md:MdIconButton Icon="{x:Static md:MdSymbols.Remove}" Variant="Filled" WidthMode="Narrow"/><md:MdIconButton Icon="{x:Static md:MdSymbols.Menu}" Variant="Filled"/><md:MdIconButton Icon="{x:Static md:MdSymbols.Add}" Variant="Filled" WidthMode="Wide"/><md:MdIconButton Icon="{x:Static md:MdSymbols.Settings}" Variant="Tonal" Shape="Square"/></StackPanel></StackPanel>
+    <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Expressive sizes"/><StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center"><md:MdIconButton Icon="{x:Static md:MdSymbols.Add}" Variant="Tonal" Size="ExtraSmall"/><md:MdIconButton Icon="{x:Static md:MdSymbols.Add}" Variant="Tonal" Size="Small"/><md:MdIconButton Icon="{x:Static md:MdSymbols.Add}" Variant="Tonal" Size="Medium"/><md:MdIconButton Icon="{x:Static md:MdSymbols.Add}" Variant="Tonal" Size="Large"/></StackPanel></StackPanel>
+    <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdIconButton Icon=&quot;{x:Static md:MdSymbols.Settings}&quot;&#10;                 Variant=&quot;Tonal&quot; /&gt;" CSharpCode="var settings = new MdIconButton&#10;{&#10;    Icon = MdSymbols.Settings,&#10;    Variant = MdIconButtonVariant.Tonal&#10;};" /></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

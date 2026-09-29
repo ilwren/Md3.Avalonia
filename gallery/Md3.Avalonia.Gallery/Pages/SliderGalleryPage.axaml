@@ -1,0 +1,18 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.SliderGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+      <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Slider"/><TextBlock Classes="body" Text="Sliders select a value from a continuous or discrete range while retaining keyboard and pointer input."/></StackPanel>
+      <StackPanel Width="680" HorizontalAlignment="Left" Spacing="20">
+        <StackPanel Spacing="8"><TextBlock Classes="h2" Text="Continuous"/><md:MdSlider Minimum="0" Maximum="100" Value="42"/></StackPanel>
+        <StackPanel Spacing="8"><TextBlock Classes="h2" Text="Value indicator"/><md:MdSlider Minimum="0" Maximum="100" Value="68" ShowValueIndicator="True"/></StackPanel>
+        <StackPanel Spacing="8"><TextBlock Classes="h2" Text="Discrete"/><md:MdSlider Minimum="0" Maximum="10" Value="6" TickFrequency="1" IsSnapToTickEnabled="True" ShowValueIndicator="True" ValueFormat="0"/></StackPanel>
+        <StackPanel Spacing="8"><TextBlock Classes="h2" Text="Disabled"/><md:MdSlider Minimum="0" Maximum="100" Value="30" IsEnabled="False"/></StackPanel>
+      </StackPanel>
+      <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdSlider Minimum=&quot;0&quot; Maximum=&quot;100&quot;&#10;             Value=&quot;{Binding Volume}&quot;&#10;             ShowValueIndicator=&quot;True&quot; /&gt;" CSharpCode="var slider = new MdSlider { Minimum = 0, Maximum = 100, Value = 42 };&#10;slider.PropertyChanged += (_, e) =&gt; { if (e.Property == RangeBase.ValueProperty) Save(slider.Value); };"/></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>
