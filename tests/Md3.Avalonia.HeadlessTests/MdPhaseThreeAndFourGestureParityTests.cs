@@ -173,16 +173,18 @@ public class MdPhaseThreeAndFourGestureParityTests
         };
         card.Click += (_, _) => clicked = true;
 
-        using var host = Show(card, 500, 200);
-        Dispatcher.UIThread.RunJobs();
+        using (var host = Show(card, 500, 200))
+        {
+            Dispatcher.UIThread.RunJobs();
 
-        var point = card.TranslatePoint(new Point(20, 20), host.Window)!.Value;
-        host.Window.MouseMove(point, RawInputModifiers.None);
-        host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
-        host.Window.MouseUp(point, MouseButton.Left, RawInputModifiers.None);
-        Dispatcher.UIThread.RunJobs();
+            var point = card.TranslatePoint(new Point(20, 20), host.Window)!.Value;
+            host.Window.MouseMove(point, RawInputModifiers.None);
+            host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
+            host.Window.MouseUp(point, MouseButton.Left, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
 
-        Assert.True(clicked, "Clicking the settings card should raise the Click event");
+            Assert.True(clicked, "Clicking the settings card should raise the Click event");
+        }
 
         var group = new MdSettingsGroup
         {
@@ -190,8 +192,8 @@ public class MdPhaseThreeAndFourGestureParityTests
             Description = "Wi-Fi, mobile, hotspot",
             Items =
             {
-                card,
-                new MdSettingsCard { Header = "SIMs", Description = "T-Mobile" }
+                new MdSettingsCard { Header = "Wi-Fi", Description = "Connected to Studio_5G", Icon = MdSymbols.Wifi },
+                new MdSettingsCard { Header = "SIMs", Description = "T-Mobile", Icon = MdSymbols.SimCard }
             }
         };
 
