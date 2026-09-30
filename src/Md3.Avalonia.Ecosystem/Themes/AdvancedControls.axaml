@@ -414,70 +414,140 @@
   <ControlTheme x:Key="{x:Type eco:MdChart}" TargetType="eco:MdChart"><Setter Property="MinHeight" Value="220" /><Setter Property="AxisBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /><Setter Property="GridBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" /></ControlTheme>
 
   <ControlTheme x:Key="{x:Type eco:MdRichEditor}" TargetType="eco:MdRichEditor">
-    <Setter Property="Template"><ControlTemplate><Border BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="12" ClipToBounds="True"><Grid RowDefinitions="Auto,*"><ItemsControl Name="PART_Toolbar" Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding ToolbarCommands}" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate><md:MdButton Content="{Binding}" Size="ExtraSmall" Variant="Text" Margin="2" /></DataTemplate></ItemsControl.ItemTemplate></ItemsControl><ContentPresenter Grid.Row="1" Content="{TemplateBinding Content}" Margin="12" /></Grid></Border></ControlTemplate></Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="12" ClipToBounds="True">
+          <Grid RowDefinitions="Auto,*">
+            <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" Padding="6,4" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,0,1">
+              <ItemsControl Name="PART_Toolbar" Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding ToolbarCommands}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Button Width="34" Height="34" Margin="2" Padding="0" CornerRadius="8"
+                            Background="Transparent" BorderThickness="0"
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                            ToolTip.Tip="{Binding Converter={x:Static eco:MdRichEditorCommandConverters.TooltipConverter}}">
+                      <md:MdIcon Glyph="{Binding Converter={x:Static eco:MdRichEditorCommandConverters.GlyphConverter}}" Size="18" />
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Border>
+            <ContentPresenter Grid.Row="1" Content="{TemplateBinding Content}" Margin="12" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type eco:MdChatMessagePresenter}" TargetType="eco:MdChatMessagePresenter">
-    <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="Margin" Value="8,5" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="Margin" Value="8,4" />
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdChatMessagePresenter">
-        <StackPanel x:Name="PART_Layout" MaxWidth="560" HorizontalAlignment="Left" Spacing="3">
-          <TextBlock x:Name="PART_Sender" Margin="6,0" FontSize="11" Opacity=".68"
-                     Text="{Binding Message.Sender, RelativeSource={RelativeSource TemplatedParent}}" />
-          <Border x:Name="PART_Bubble" Padding="12,9" Background="{TemplateBinding Background}"
-                  BorderBrush="Transparent" BorderThickness="2" CornerRadius="16" ClipToBounds="True">
-            <Grid>
-              <StackPanel Spacing="5">
-                <Border x:Name="PART_Reply" Padding="8,5" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" CornerRadius="8" IsVisible="False">
-                  <ContentPresenter Content="{Binding Message.ReplyPreview, RelativeSource={RelativeSource TemplatedParent}}" FontSize="11" Opacity=".78" />
-                </Border>
-                <ContentPresenter Content="{Binding Message.Content, RelativeSource={RelativeSource TemplatedParent}}" Foreground="{TemplateBinding Foreground}" />
-              </StackPanel>
-              <Border x:Name="PART_State" Background="{TemplateBinding Foreground}" CornerRadius="14" IsHitTestVisible="False" Opacity="0" />
-            </Grid>
-          </Border>
-          <Grid ColumnDefinitions="*,Auto" Margin="6,0">
-            <TextBlock x:Name="PART_Time" FontSize="10" Opacity=".56"
-                       Text="{Binding Message.Timestamp, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:t}'}" />
-            <StackPanel x:Name="PART_Failure" Grid.Column="1" Orientation="Horizontal" Spacing="6" IsVisible="False">
-              <TextBlock VerticalAlignment="Center" FontSize="10" Foreground="{DynamicResource Md.Sys.Color.Error.Brush}"
-                         Text="{Binding Message.ErrorText, RelativeSource={RelativeSource TemplatedParent}, FallbackValue='Send failed'}" />
-              <md:MdButton Classes="retry" Content="Retry" Size="ExtraSmall" Variant="Text" />
+        <Grid x:Name="PART_Layout" MaxWidth="580" HorizontalAlignment="Left" Margin="0,2">
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <Border x:Name="PART_AvatarHost" Width="32" Height="32" VerticalAlignment="Top" Margin="0,2,0,0"
+                    CornerRadius="999" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
+                    ClipToBounds="True">
+              <Grid>
+                <md:MdIcon x:Name="PART_AvatarIcon" Glyph="{Binding AvatarGlyph, RelativeSource={RelativeSource TemplatedParent}}"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" Size="18" />
+                <TextBlock x:Name="PART_AvatarInitials" Text="{Binding SenderInitials, RelativeSource={RelativeSource TemplatedParent}}"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" FontSize="12" FontWeight="Bold"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="False" />
+              </Grid>
+            </Border>
+            <StackPanel Grid.Column="1" Spacing="3">
+              <TextBlock x:Name="PART_Sender" Margin="4,0" FontSize="11" FontWeight="Medium" Opacity=".72"
+                         Text="{Binding Message.Sender, RelativeSource={RelativeSource TemplatedParent}}" />
+              <Border x:Name="PART_Bubble" Padding="14,10" Background="{TemplateBinding Background}"
+                      BorderBrush="Transparent" BorderThickness="2" CornerRadius="18,18,18,4" ClipToBounds="True">
+                <Grid>
+                  <StackPanel Spacing="6">
+                    <Border x:Name="PART_Reply" Padding="8,6" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                            CornerRadius="8" IsVisible="False">
+                      <Grid ColumnDefinitions="3,*">
+                        <Border Background="{DynamicResource Md.Sys.Color.Primary.Brush}" CornerRadius="2" />
+                        <StackPanel Grid.Column="1" Margin="8,0,0,0" Spacing="2">
+                          <TextBlock FontSize="10" FontWeight="SemiBold" Opacity=".75" Text="Replying to message" />
+                          <ContentPresenter Content="{Binding Message.ReplyPreview, RelativeSource={RelativeSource TemplatedParent}}" FontSize="11" Opacity=".85" MaxHeight="36" />
+                        </StackPanel>
+                      </Grid>
+                    </Border>
+                    <ContentPresenter Content="{Binding Message.Content, RelativeSource={RelativeSource TemplatedParent}}"
+                                      Foreground="{TemplateBinding Foreground}" />
+                  </StackPanel>
+                  <Border x:Name="PART_State" Background="{TemplateBinding Foreground}" CornerRadius="16" IsHitTestVisible="False" Opacity="0" />
+                </Grid>
+              </Border>
+              <Grid x:Name="PART_Footer" ColumnDefinitions="Auto,Auto" Margin="4,0" HorizontalAlignment="Left">
+                <TextBlock x:Name="PART_Time" FontSize="10" Opacity=".56" VerticalAlignment="Center"
+                           Text="{Binding Message.Timestamp, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:t}'}" />
+                <StackPanel x:Name="PART_DeliveryStatus" Grid.Column="1" Orientation="Horizontal" Margin="6,0,0,0" VerticalAlignment="Center" IsVisible="False">
+                  <md:MdIcon Glyph="&#xe877;" Size="14" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+                </StackPanel>
+                <StackPanel x:Name="PART_Failure" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="6,0,0,0" IsVisible="False">
+                  <md:MdIcon Glyph="&#xe000;" Size="12" Foreground="{DynamicResource Md.Sys.Color.Error.Brush}" VerticalAlignment="Center" />
+                  <TextBlock VerticalAlignment="Center" FontSize="10" Foreground="{DynamicResource Md.Sys.Color.Error.Brush}"
+                             Text="{Binding Message.ErrorText, RelativeSource={RelativeSource TemplatedParent}, FallbackValue='Send failed'}" />
+                  <md:MdButton Classes="retry" Content="Retry" Size="ExtraSmall" Variant="Text" />
+                </StackPanel>
+              </Grid>
             </StackPanel>
           </Grid>
-        </StackPanel>
+        </Grid>
       </ControlTemplate>
     </Setter>
     <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.06" /></Style>
-    <Style Selector="^:selected /template/ Border#PART_Bubble"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="3" /></Style>
+    <Style Selector="^:selected /template/ Border#PART_Bubble"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="2.5" /></Style>
     <Style Selector="^:reply /template/ Border#PART_Reply"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:failed /template/ StackPanel#PART_Failure"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:failed /template/ StackPanel#PART_DeliveryStatus"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:user"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
-    <Style Selector="^:user /template/ StackPanel#PART_Layout"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
-    <Style Selector="^:user /template/ TextBlock#PART_Sender"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
-    <Style Selector="^:user /template/ TextBlock#PART_Time"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
+    <Style Selector="^:user /template/ Grid#PART_Layout"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
+    <Style Selector="^:user /template/ Border#PART_AvatarHost"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:user /template/ TextBlock#PART_Sender"><Setter Property="HorizontalAlignment" Value="Right" /><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:user /template/ Border#PART_Bubble">
+      <Setter Property="CornerRadius" Value="18,18,4,18" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
+    <Style Selector="^:user /template/ Grid#PART_Footer"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
+    <Style Selector="^:user /template/ StackPanel#PART_DeliveryStatus"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:user"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" /></Style>
     <Style Selector="^:system"><Setter Property="HorizontalAlignment" Value="Center" /></Style>
-    <Style Selector="^:system /template/ StackPanel#PART_Layout"><Setter Property="HorizontalAlignment" Value="Center" /></Style>
-    <Style Selector="^:system"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /></Style>
+    <Style Selector="^:system /template/ Grid#PART_Layout"><Setter Property="HorizontalAlignment" Value="Center" /></Style>
+    <Style Selector="^:system /template/ Border#PART_AvatarHost"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:system /template/ TextBlock#PART_Sender"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:system /template/ Border#PART_Bubble">
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Padding" Value="12,6" />
+    </Style>
+    <Style Selector="^:system /template/ Grid#PART_Footer"><Setter Property="HorizontalAlignment" Value="Center" /></Style>
+    <Style Selector="^:system"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" /></Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type eco:MdChatView}" TargetType="eco:MdChatView">
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdChatView">
         <Grid RowDefinitions="Auto,*,Auto,Auto,Auto">
-          <Border x:Name="PART_SelectionToolbar" Padding="8,4" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" CornerRadius="16" IsVisible="False">
-            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="6">
-              <md:MdButton Name="PART_CancelSelectionButton" Content="Cancel" Size="ExtraSmall" Variant="Text" />
-              <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{Binding SelectionCount, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0} selected'}" />
-              <md:MdButton Name="PART_QuoteButton" Grid.Column="2" Content="Quote" Size="ExtraSmall" Variant="Text" />
-              <md:MdButton Name="PART_DeleteButton" Grid.Column="3" Content="Delete" Size="ExtraSmall" Variant="Text" />
+          <Border x:Name="PART_SelectionToolbar" Margin="8,4" Padding="12,6" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" CornerRadius="16" IsVisible="False">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8">
+              <md:MdButton Name="PART_CancelSelectionButton" Content="Cancel" Size="Small" Variant="Text" />
+              <TextBlock Grid.Column="1" VerticalAlignment="Center" FontWeight="Medium"
+                         Text="{Binding SelectionCount, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0} selected'}" />
+              <md:MdButton Name="PART_QuoteButton" Grid.Column="2" Content="Quote" Size="Small" Variant="Tonal" />
+              <md:MdButton Name="PART_DeleteButton" Grid.Column="3" Content="Delete" Size="Small" Variant="Outlined" />
             </Grid>
           </Border>
           <ListBox Name="PART_MessagesHost" Grid.Row="1" Theme="{StaticResource EcoListTheme}" ItemContainerTheme="{StaticResource EcoChatListItemTheme}"
-                   ItemsSource="{TemplateBinding MessagesSource}" SelectionMode="Multiple" Background="Transparent">
+                   ItemsSource="{TemplateBinding MessagesSource}" SelectionMode="Multiple" Background="Transparent" Padding="8,4">
             <ListBox.ItemTemplate>
               <DataTemplate x:DataType="eco:MdChatMessage">
                 <eco:MdChatMessagePresenter Message="{Binding}"
@@ -485,21 +555,48 @@
               </DataTemplate>
             </ListBox.ItemTemplate>
           </ListBox>
-          <ItemsControl Name="PART_SuggestionsHost" Grid.Row="2" Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding SuggestionsSource}">
-            <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl Name="PART_SuggestionsHost" Grid.Row="2" Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding SuggestionsSource}" Margin="8,4">
+            <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate><DataTemplate><md:MdAssistChip Content="{Binding}" Margin="3" /></DataTemplate></ItemsControl.ItemTemplate>
           </ItemsControl>
-          <Border x:Name="PART_QuotePreview" Grid.Row="3" Margin="8,2" Padding="10,6"
-                  Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" CornerRadius="10" IsVisible="False">
-            <Grid ColumnDefinitions="*,Auto">
-              <StackPanel><TextBlock FontSize="11" FontWeight="Medium" Text="Replying to" /><ContentPresenter Content="{Binding QuotedMessage.Content, RelativeSource={RelativeSource TemplatedParent}}" MaxHeight="32" Opacity=".75" /></StackPanel>
-              <md:MdButton Name="PART_CancelQuoteButton" Grid.Column="1" Content="Cancel" Size="ExtraSmall" Variant="Text" />
+          <Border x:Name="PART_QuotePreview" Grid.Row="3" Margin="8,2" Padding="12,8"
+                  Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" CornerRadius="12" IsVisible="False">
+            <Grid ColumnDefinitions="3,*,Auto" ColumnSpacing="8">
+              <Border Background="{DynamicResource Md.Sys.Color.Primary.Brush}" CornerRadius="2" />
+              <StackPanel Grid.Column="1" Spacing="2">
+                <TextBlock FontSize="11" FontWeight="SemiBold" Text="{Binding QuotedMessage.Sender, RelativeSource={RelativeSource TemplatedParent}, StringFormat='Replying to {0}'}" />
+                <ContentPresenter Content="{Binding QuotedMessage.Content, RelativeSource={RelativeSource TemplatedParent}}" MaxHeight="32" Opacity=".75" />
+              </StackPanel>
+              <md:MdButton Name="PART_CancelQuoteButton" Grid.Column="2" Content="Cancel" Size="ExtraSmall" Variant="Text" />
             </Grid>
           </Border>
-          <Grid Grid.Row="4" ColumnDefinitions="*,Auto" Margin="8">
-            <md:MdTextBox Name="PART_Composer" Text="{TemplateBinding ComposerText, Mode=TwoWay}" AcceptsReturn="True" Label="Message" MinHeight="56" Variant="Outlined" />
-            <md:MdButton Name="PART_SendButton" Grid.Column="1" Variant="Filled" Content="Send" Margin="8,0,0,0" />
-          </Grid>
+          <Border Grid.Row="4" Margin="8,6,8,8" Padding="6,4,6,4"
+                  Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
+                  BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1"
+                  CornerRadius="28">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="6" VerticalAlignment="Center">
+              <Button Name="PART_AttachmentButton" Width="36" Height="36" CornerRadius="999"
+                      Background="Transparent" BorderThickness="0" Padding="0"
+                      HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                      ToolTip.Tip="Attach file">
+                <md:MdIcon Glyph="&#xe226;" Size="20" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              </Button>
+              <TextBox Name="PART_Composer" Grid.Column="1"
+                       Text="{TemplateBinding ComposerText, Mode=TwoWay}"
+                       AcceptsReturn="True" MaxHeight="120" MinHeight="36"
+                       VerticalContentAlignment="Center" Padding="8,6"
+                       Background="Transparent" BorderThickness="0"
+                       Watermark="Type a message..." TextWrapping="Wrap" />
+              <Button Name="PART_SendButton" Grid.Column="2" Width="36" Height="36" CornerRadius="999"
+                      Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                      Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}"
+                      BorderThickness="0" Padding="0"
+                      HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                      ToolTip.Tip="Send message">
+                <md:MdIcon Glyph="&#xe163;" Size="18" Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" />
+              </Button>
+            </Grid>
+          </Border>
         </Grid>
       </ControlTemplate>
     </Setter>

@@ -168,6 +168,11 @@ public sealed class MdReportedIssuesTests
         Assert.Equal("**Material** editor", editor.Text);
         Assert.NotEmpty(preview.Children);
         Assert.Equal(MdRichEditorCommand.Bold, adapter.LastCommand);
+
+        editor.SelectionStart = 0;
+        editor.SelectionEnd = editor.Text.Length;
+        adapter.Execute(MdRichEditorCommand.ClearFormatting);
+        Assert.Equal("Material editor", editor.Text);
     }
 
     [AvaloniaFact]

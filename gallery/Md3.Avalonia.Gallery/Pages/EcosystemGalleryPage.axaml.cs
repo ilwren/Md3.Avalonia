@@ -80,6 +80,7 @@ public partial class EcosystemGalleryPage : UserControl
         RichEditor.Adapter = _editorAdapter;
         Chat.MessagesSource = _messages;
         Chat.SuggestionsSource = new[] { L("Show accessibility", "显示无障碍信息"), L("Explain paging", "解释分页"), L("Open docs", "打开文档") };
+        Chat.AttachmentRequested += ChatAttachmentRequested;
 
         var controls = new MdTreeNode("controls", L("Controls", "控件"),
         [
@@ -168,6 +169,11 @@ public partial class EcosystemGalleryPage : UserControl
         var index = _messages.IndexOf(message);
         if (index >= 0) _messages[index] = message with { State = MdAsyncRequestState.Data, ErrorText = null, Timestamp = DateTimeOffset.Now };
         ChatStatus.Text = L($"Retried “{message.Content}”; provider marked it sent.", $"已重试“{message.Content}”；提供方已将其标记为已发送。");
+    }
+    private void ChatAttachmentRequested(object? sender, EventArgs e)
+    {
+        _messages.Add(new MdChatMessage(Guid.NewGuid().ToString("N"), MdChatMessageRole.User, L("📎 Release-notes.md (24 KB)", "📎 发布说明.md (24 KB)"), DateTimeOffset.Now, L("You", "你")));
+        ChatStatus.Text = L("Attachment action invoked; sample attachment file added.", "已调用附件操作；已添加示例附件文件。");
     }
     private void ToggleSkeleton(object? sender, RoutedEventArgs e) => Skeleton.IsLoading = !Skeleton.IsLoading;
     private async void ReplaySequence(object? sender, RoutedEventArgs e) => await Sequence.PlayAsync();

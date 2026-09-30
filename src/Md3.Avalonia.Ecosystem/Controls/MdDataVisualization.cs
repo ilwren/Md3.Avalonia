@@ -5,9 +5,10 @@ using System.Windows.Input;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
-using Avalonia.Controls.Documents;
+using Avalonia.Data.Converters;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -282,7 +283,75 @@ public sealed class MdChart : Control
     private static readonly IBrush[] Palette = [Brushes.MediumPurple, Brushes.Teal, Brushes.OrangeRed, Brushes.RoyalBlue];
 }
 
-public enum MdRichEditorCommand { Bold, Italic, Underline, StrikeThrough, Heading, Quote, Code, Link, BulletedList, NumberedList, Undo, Redo }
+public enum MdRichEditorCommand { Bold, Italic, Underline, StrikeThrough, Heading, Quote, Code, Link, BulletedList, NumberedList, Undo, Redo, HorizontalRule, ClearFormatting }
+
+/// <summary>
+/// Value converters mapping <see cref="MdRichEditorCommand"/> values to Material Symbols glyphs, labels, and tooltips.
+/// </summary>
+public static class MdRichEditorCommandConverters
+{
+    public static readonly IValueConverter GlyphConverter = new FuncValueConverter<MdRichEditorCommand, string>(GetGlyph);
+    public static readonly IValueConverter TooltipConverter = new FuncValueConverter<MdRichEditorCommand, string>(GetTooltip);
+    public static readonly IValueConverter LabelConverter = new FuncValueConverter<MdRichEditorCommand, string>(GetLabel);
+
+    public static string GetGlyph(MdRichEditorCommand cmd) => cmd switch
+    {
+        MdRichEditorCommand.Undo => "\ue166",
+        MdRichEditorCommand.Redo => "\ue15a",
+        MdRichEditorCommand.Bold => "\ue238",
+        MdRichEditorCommand.Italic => "\ue23f",
+        MdRichEditorCommand.Underline => "\ue249",
+        MdRichEditorCommand.StrikeThrough => "\ue246",
+        MdRichEditorCommand.Heading => "\ue264",
+        MdRichEditorCommand.Quote => "\ue244",
+        MdRichEditorCommand.Code => "\ue86f",
+        MdRichEditorCommand.Link => "\ue157",
+        MdRichEditorCommand.BulletedList => "\ue241",
+        MdRichEditorCommand.NumberedList => "\ue242",
+        MdRichEditorCommand.HorizontalRule => "\uf108",
+        MdRichEditorCommand.ClearFormatting => "\ue239",
+        _ => "\ue8b8"
+    };
+
+    public static string GetTooltip(MdRichEditorCommand cmd) => cmd switch
+    {
+        MdRichEditorCommand.Undo => "Undo",
+        MdRichEditorCommand.Redo => "Redo",
+        MdRichEditorCommand.Bold => "Bold (**text**)",
+        MdRichEditorCommand.Italic => "Italic (_text_)",
+        MdRichEditorCommand.Underline => "Underline (<u>text</u>)",
+        MdRichEditorCommand.StrikeThrough => "Strikethrough (~~text~~)",
+        MdRichEditorCommand.Heading => "Heading (## text)",
+        MdRichEditorCommand.Quote => "Quote (> text)",
+        MdRichEditorCommand.Code => "Inline code (`code`)",
+        MdRichEditorCommand.Link => "Insert link ([text](url))",
+        MdRichEditorCommand.BulletedList => "Bulleted list (- item)",
+        MdRichEditorCommand.NumberedList => "Numbered list (1. item)",
+        MdRichEditorCommand.HorizontalRule => "Horizontal rule (---)",
+        MdRichEditorCommand.ClearFormatting => "Clear formatting",
+        _ => cmd.ToString()
+    };
+
+    public static string GetLabel(MdRichEditorCommand cmd) => cmd switch
+    {
+        MdRichEditorCommand.Undo => "Undo",
+        MdRichEditorCommand.Redo => "Redo",
+        MdRichEditorCommand.Bold => "B",
+        MdRichEditorCommand.Italic => "I",
+        MdRichEditorCommand.Underline => "U",
+        MdRichEditorCommand.StrikeThrough => "S",
+        MdRichEditorCommand.Heading => "H",
+        MdRichEditorCommand.Quote => "\"",
+        MdRichEditorCommand.Code => "</>",
+        MdRichEditorCommand.Link => "Link",
+        MdRichEditorCommand.BulletedList => "•",
+        MdRichEditorCommand.NumberedList => "1.",
+        MdRichEditorCommand.HorizontalRule => "---",
+        MdRichEditorCommand.ClearFormatting => "Tx",
+        _ => cmd.ToString()
+    };
+}
+
 public interface IMdRichEditorAdapter
 {
     object? Document { get; set; }
@@ -341,10 +410,55 @@ public sealed class MdTextBoxRichEditorAdapter : IMdRichEditorAdapter
             case MdRichEditorCommand.Quote: PrefixSelectedLines("> "); break;
             case MdRichEditorCommand.BulletedList: PrefixSelectedLines("- "); break;
             case MdRichEditorCommand.NumberedList: PrefixSelectedLines("1. "); break;
+            case MdRichEditorCommand.HorizontalRule: InsertText("\n---\n"); break;
+            case MdRichEditorCommand.ClearFormatting: StripFormattingFromSelection(); break;
         }
         RefreshPreview();
         StateChanged?.Invoke(this, EventArgs.Empty);
         _editor.Focus();
+    }
+
+    private void InsertText(string textToInsert)
+    {
+        var text = _editor.Text ?? string.Empty;
+        var start = Math.Clamp(Math.Min(_editor.SelectionStart, _editor.SelectionEnd), 0, text.Length);
+        var end = Math.Clamp(Math.Max(_editor.SelectionStart, _editor.SelectionEnd), start, text.Length);
+        _editor.Text = text[..start] + textToInsert + text[end..];
+        _editor.SelectionStart = start + textToInsert.Length;
+        _editor.SelectionEnd = start + textToInsert.Length;
+    }
+
+    private void StripFormattingFromSelection()
+    {
+        var text = _editor.Text ?? string.Empty;
+        var start = Math.Clamp(Math.Min(_editor.SelectionStart, _editor.SelectionEnd), 0, text.Length);
+        var end = Math.Clamp(Math.Max(_editor.SelectionStart, _editor.SelectionEnd), start, text.Length);
+        if (end <= start)
+        {
+            start = 0;
+            end = text.Length;
+        }
+        var selected = text[start..end];
+        var cleaned = selected
+            .Replace("**", string.Empty)
+            .Replace("<u>", string.Empty)
+            .Replace("</u>", string.Empty)
+            .Replace("~~", string.Empty)
+            .Replace("`", string.Empty);
+        var lines = cleaned.Replace("\r\n", "\n").Split('\n');
+        for (var i = 0; i < lines.Length; i++)
+        {
+            var l = lines[i];
+            while (l.StartsWith('#')) l = l.TrimStart('#').TrimStart();
+            if (l.StartsWith("> ", StringComparison.Ordinal)) l = l[2..];
+            else if (l.StartsWith("- ", StringComparison.Ordinal) || l.StartsWith("* ", StringComparison.Ordinal)) l = l[2..];
+            else if (char.IsDigit(l.FirstOrDefault()) && l.Length > 2 && l[1] == '.' && l[2] == ' ') l = l[3..];
+            lines[i] = l;
+        }
+        cleaned = string.Join("\n", lines);
+        _editor.Text = text[..start] + cleaned + text[end..];
+        _editor.SelectionStart = start;
+        _editor.SelectionEnd = start + cleaned.Length;
     }
 
     public void RefreshPreview()
@@ -352,27 +466,139 @@ public sealed class MdTextBoxRichEditorAdapter : IMdRichEditorAdapter
         if (_previewHost is null) return;
         _previewHost.Children.Clear();
         var lines = (_editor.Text ?? string.Empty).Replace("\r\n", "\n").Split('\n');
+        var inCodeBlock = false;
+        var codeBlockLines = new List<string>();
+
         foreach (var sourceLine in lines)
         {
             var line = sourceLine;
-            var block = new TextBlock { TextWrapping = TextWrapping.Wrap, MinHeight = 22 };
-            if (line.StartsWith("## ", StringComparison.Ordinal))
+            if (line.StartsWith("```", StringComparison.Ordinal))
             {
-                line = line[3..];
-                block.FontSize = 22;
-                block.FontWeight = FontWeight.SemiBold;
-                block.Margin = new Thickness(0, 8, 0, 2);
+                if (inCodeBlock)
+                {
+                    var codeText = string.Join("\n", codeBlockLines);
+                    var codeBlock = new Border
+                    {
+                        Background = new SolidColorBrush(Color.FromArgb(32, 128, 128, 128)),
+                        CornerRadius = new CornerRadius(8),
+                        Padding = new Thickness(12, 8),
+                        Margin = new Thickness(0, 4, 0, 6),
+                        Child = new TextBlock
+                        {
+                            Text = codeText,
+                            FontFamily = new FontFamily("Cascadia Code,Consolas,Monospace"),
+                            FontSize = 12,
+                            TextWrapping = TextWrapping.Wrap
+                        }
+                    };
+                    _previewHost.Children.Add(codeBlock);
+                    codeBlockLines.Clear();
+                    inCodeBlock = false;
+                }
+                else
+                {
+                    inCodeBlock = true;
+                    codeBlockLines.Clear();
+                }
+                continue;
+            }
+
+            if (inCodeBlock)
+            {
+                codeBlockLines.Add(line);
+                continue;
+            }
+
+            if (line.Trim() == "---" || line.Trim() == "***" || line.Trim() == "___")
+            {
+                var rule = new Border
+                {
+                    Height = 1,
+                    Background = new SolidColorBrush(Color.FromArgb(64, 128, 128, 128)),
+                    Margin = new Thickness(0, 8)
+                };
+                _previewHost.Children.Add(rule);
+                continue;
+            }
+
+            if (line.StartsWith("# ", StringComparison.Ordinal))
+            {
+                var block = new TextBlock
+                {
+                    TextWrapping = TextWrapping.Wrap,
+                    FontSize = 26,
+                    FontWeight = FontWeight.Bold,
+                    Margin = new Thickness(0, 10, 0, 4)
+                };
+                ParseInlineRuns(block, line[2..]);
+                _previewHost.Children.Add(block);
+            }
+            else if (line.StartsWith("## ", StringComparison.Ordinal))
+            {
+                var block = new TextBlock
+                {
+                    TextWrapping = TextWrapping.Wrap,
+                    FontSize = 20,
+                    FontWeight = FontWeight.SemiBold,
+                    Margin = new Thickness(0, 8, 0, 3)
+                };
+                ParseInlineRuns(block, line[3..]);
+                _previewHost.Children.Add(block);
+            }
+            else if (line.StartsWith("### ", StringComparison.Ordinal))
+            {
+                var block = new TextBlock
+                {
+                    TextWrapping = TextWrapping.Wrap,
+                    FontSize = 16,
+                    FontWeight = FontWeight.SemiBold,
+                    Margin = new Thickness(0, 6, 0, 2)
+                };
+                ParseInlineRuns(block, line[4..]);
+                _previewHost.Children.Add(block);
             }
             else if (line.StartsWith("> ", StringComparison.Ordinal))
             {
-                line = "│  " + line[2..];
-                block.FontStyle = FontStyle.Italic;
-                block.Opacity = .82;
-                block.Margin = new Thickness(8, 2);
+                var quoteContent = new TextBlock
+                {
+                    TextWrapping = TextWrapping.Wrap,
+                    FontStyle = FontStyle.Italic,
+                    Opacity = .88
+                };
+                ParseInlineRuns(quoteContent, line[2..]);
+                var quoteBorder = new Border
+                {
+                    BorderThickness = new Thickness(3, 0, 0, 0),
+                    BorderBrush = Brushes.DodgerBlue,
+                    CornerRadius = new CornerRadius(0, 6, 6, 0),
+                    Padding = new Thickness(10, 4),
+                    Margin = new Thickness(0, 4, 0, 4),
+                    Background = new SolidColorBrush(Color.FromArgb(24, 128, 128, 128)),
+                    Child = quoteContent
+                };
+                _previewHost.Children.Add(quoteBorder);
             }
-            else if (line.StartsWith("- ", StringComparison.Ordinal)) line = "•  " + line[2..];
-            ParseInlineRuns(block, line);
-            _previewHost.Children.Add(block);
+            else if (line.StartsWith("- ", StringComparison.Ordinal) || line.StartsWith("* ", StringComparison.Ordinal))
+            {
+                var block = new TextBlock { TextWrapping = TextWrapping.Wrap, MinHeight = 20, Margin = new Thickness(12, 2, 0, 2) };
+                block.Inlines!.Add(new Run("•  ") { FontWeight = FontWeight.Bold });
+                ParseInlineRuns(block, line[2..]);
+                _previewHost.Children.Add(block);
+            }
+            else if (char.IsDigit(line.FirstOrDefault()) && line.Length > 2 && line[1] == '.' && line[2] == ' ')
+            {
+                var prefix = line[..3];
+                var block = new TextBlock { TextWrapping = TextWrapping.Wrap, MinHeight = 20, Margin = new Thickness(12, 2, 0, 2) };
+                block.Inlines!.Add(new Run(prefix));
+                ParseInlineRuns(block, line[3..]);
+                _previewHost.Children.Add(block);
+            }
+            else
+            {
+                var block = new TextBlock { TextWrapping = TextWrapping.Wrap, MinHeight = 20, Margin = new Thickness(0, 2) };
+                ParseInlineRuns(block, line);
+                _previewHost.Children.Add(block);
+            }
         }
     }
 
@@ -444,7 +670,7 @@ public sealed class MdTextBoxRichEditorAdapter : IMdRichEditorAdapter
             ("<u>", "</u>", run => run.TextDecorations = TextDecorations.Underline),
             ("~~", "~~", run => run.TextDecorations = TextDecorations.Strikethrough),
             ("_", "_", run => run.FontStyle = FontStyle.Italic),
-            ("`", "`", run => { run.FontFamily = new FontFamily("monospace"); run.Background = Brushes.Black; run.Foreground = Brushes.White; })
+            ("`", "`", run => { run.FontFamily = new FontFamily("Cascadia Code,Consolas,Monospace"); run.Background = new SolidColorBrush(Color.FromArgb(40, 128, 128, 128)); })
         };
         var found = markers.Select(marker => (Index: text.IndexOf(marker.Open, start, StringComparison.Ordinal), marker.Open, marker.Close, marker.Apply))
             .Where(value => value.Index >= 0)
@@ -479,7 +705,20 @@ public class MdRichEditor : ContentControl
     }
     private void OnToolbarClick(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if (e.Source is Button { DataContext: MdRichEditorCommand command }) { Execute(command); e.Handled = true; }
+        if (e.Source is Visual source)
+        {
+            var btn = source.GetVisualAncestors().Prepend(source).OfType<Button>().FirstOrDefault();
+            if (btn?.DataContext is MdRichEditorCommand command)
+            {
+                Execute(command);
+                e.Handled = true;
+            }
+            else if (btn?.CommandParameter is MdRichEditorCommand cmdParam)
+            {
+                Execute(cmdParam);
+                e.Handled = true;
+            }
+        }
     }
     private void OnAdapterChanged(IMdRichEditorAdapter? newAdapter)
     {
@@ -506,7 +745,10 @@ public sealed record MdChatMessage(
     MdAsyncRequestState State = MdAsyncRequestState.Data,
     string? ReplyToId = null,
     object? ReplyPreview = null,
-    string? ErrorText = null);
+    string? ErrorText = null,
+    string? AvatarGlyph = null,
+    string? StatusGlyph = null,
+    string? Initials = null);
 
 /// <summary>Role-aware message bubble used by <see cref="MdChatView"/>.</summary>
 [PseudoClasses(":user", ":assistant", ":system", ":selected", ":failed", ":reply")]
@@ -516,6 +758,13 @@ public sealed class MdChatMessagePresenter : ContentControl
         AvaloniaProperty.Register<MdChatMessagePresenter, MdChatMessage?>(nameof(Message));
     public static readonly StyledProperty<bool> IsSelectedProperty =
         AvaloniaProperty.Register<MdChatMessagePresenter, bool>(nameof(IsSelected));
+
+    public static readonly DirectProperty<MdChatMessagePresenter, string> FormattedTimeProperty =
+        AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(FormattedTime), control => control.FormattedTime);
+    public static readonly DirectProperty<MdChatMessagePresenter, string> AvatarGlyphProperty =
+        AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(AvatarGlyph), control => control.AvatarGlyph);
+    public static readonly DirectProperty<MdChatMessagePresenter, string> SenderInitialsProperty =
+        AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(SenderInitials), control => control.SenderInitials);
 
     static MdChatMessagePresenter()
     {
@@ -527,6 +776,21 @@ public sealed class MdChatMessagePresenter : ContentControl
     public MdChatMessage? Message { get => GetValue(MessageProperty); set => SetValue(MessageProperty, value); }
     public bool IsSelected { get => GetValue(IsSelectedProperty); set => SetValue(IsSelectedProperty, value); }
 
+    public string FormattedTime => Message?.Timestamp.LocalDateTime.ToString("t", CultureInfo.CurrentCulture) ?? string.Empty;
+    public string AvatarGlyph => Message?.AvatarGlyph ?? (Message?.Role == MdChatMessageRole.Assistant ? "\uf06c" : "\ue7fd");
+    public string SenderInitials
+    {
+        get
+        {
+            if (!string.IsNullOrWhiteSpace(Message?.Initials)) return Message.Initials;
+            var sender = Message?.Sender?.Trim();
+            if (string.IsNullOrEmpty(sender)) return Message?.Role == MdChatMessageRole.Assistant ? "AI" : "U";
+            var parts = sender.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 2) return $"{char.ToUpperInvariant(parts[0][0])}{char.ToUpperInvariant(parts[1][0])}";
+            return sender.Length > 2 ? sender[..2].ToUpperInvariant() : sender.ToUpperInvariant();
+        }
+    }
+
     private void UpdateRole()
     {
         PseudoClasses.Set(":user", Message?.Role == MdChatMessageRole.User);
@@ -535,6 +799,9 @@ public sealed class MdChatMessagePresenter : ContentControl
         PseudoClasses.Set(":selected", IsSelected);
         PseudoClasses.Set(":failed", Message?.State == MdAsyncRequestState.Error);
         PseudoClasses.Set(":reply", Message?.ReplyPreview is not null);
+        RaisePropertyChanged(FormattedTimeProperty, string.Empty, FormattedTime);
+        RaisePropertyChanged(AvatarGlyphProperty, string.Empty, AvatarGlyph);
+        RaisePropertyChanged(SenderInitialsProperty, string.Empty, SenderInitials);
     }
 }
 
@@ -549,6 +816,7 @@ public sealed class MdChatView : TemplatedControl
     public static readonly StyledProperty<string?> ComposerTextProperty = AvaloniaProperty.Register<MdChatView, string?>(nameof(ComposerText), defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
     public static readonly StyledProperty<IEnumerable?> SuggestionsSourceProperty = AvaloniaProperty.Register<MdChatView, IEnumerable?>(nameof(SuggestionsSource));
     public static readonly StyledProperty<ICommand?> SendCommandProperty = AvaloniaProperty.Register<MdChatView, ICommand?>(nameof(SendCommand));
+    public static readonly StyledProperty<ICommand?> AttachmentCommandProperty = AvaloniaProperty.Register<MdChatView, ICommand?>(nameof(AttachmentCommand));
     public static readonly StyledProperty<ICommand?> DeleteMessagesCommandProperty = AvaloniaProperty.Register<MdChatView, ICommand?>(nameof(DeleteMessagesCommand));
     public static readonly StyledProperty<ICommand?> QuoteMessageCommandProperty = AvaloniaProperty.Register<MdChatView, ICommand?>(nameof(QuoteMessageCommand));
     public static readonly StyledProperty<ICommand?> RetryMessageCommandProperty = AvaloniaProperty.Register<MdChatView, ICommand?>(nameof(RetryMessageCommand));
@@ -558,6 +826,7 @@ public sealed class MdChatView : TemplatedControl
     public static readonly DirectProperty<MdChatView, MdChatMessage?> QuotedMessageProperty = AvaloniaProperty.RegisterDirect<MdChatView, MdChatMessage?>(nameof(QuotedMessage), control => control.QuotedMessage);
 
     private Button? _sendButton;
+    private Button? _attachmentButton;
     private Button? _cancelSelectionButton;
     private Button? _deleteButton;
     private Button? _quoteButton;
@@ -575,6 +844,7 @@ public sealed class MdChatView : TemplatedControl
     public string? ComposerText { get => GetValue(ComposerTextProperty); set => SetValue(ComposerTextProperty, value); }
     public IEnumerable? SuggestionsSource { get => GetValue(SuggestionsSourceProperty); set => SetValue(SuggestionsSourceProperty, value); }
     public ICommand? SendCommand { get => GetValue(SendCommandProperty); set => SetValue(SendCommandProperty, value); }
+    public ICommand? AttachmentCommand { get => GetValue(AttachmentCommandProperty); set => SetValue(AttachmentCommandProperty, value); }
     public ICommand? DeleteMessagesCommand { get => GetValue(DeleteMessagesCommandProperty); set => SetValue(DeleteMessagesCommandProperty, value); }
     public ICommand? QuoteMessageCommand { get => GetValue(QuoteMessageCommandProperty); set => SetValue(QuoteMessageCommandProperty, value); }
     public ICommand? RetryMessageCommand { get => GetValue(RetryMessageCommandProperty); set => SetValue(RetryMessageCommandProperty, value); }
@@ -586,6 +856,7 @@ public sealed class MdChatView : TemplatedControl
     public Func<CancellationToken, ValueTask<IReadOnlyList<MdChatMessage>>>? HistoryProvider { get; set; }
 
     public event EventHandler<string>? MessageSubmitted;
+    public event EventHandler? AttachmentRequested;
     public event EventHandler<IReadOnlyList<MdChatMessage>>? HistoryLoaded;
     public event EventHandler<IReadOnlyList<MdChatMessage>>? MessageSelectionChanged;
     public event EventHandler<IReadOnlyList<MdChatMessage>>? DeleteRequested;
@@ -669,6 +940,7 @@ public sealed class MdChatView : TemplatedControl
         DetachTemplateHandlers();
         base.OnApplyTemplate(e);
         _sendButton = e.NameScope.Find<Button>("PART_SendButton");
+        _attachmentButton = e.NameScope.Find<Button>("PART_AttachmentButton");
         _cancelSelectionButton = e.NameScope.Find<Button>("PART_CancelSelectionButton");
         _deleteButton = e.NameScope.Find<Button>("PART_DeleteButton");
         _quoteButton = e.NameScope.Find<Button>("PART_QuoteButton");
@@ -693,6 +965,7 @@ public sealed class MdChatView : TemplatedControl
     private void AttachTemplateHandlers()
     {
         if (_sendButton is not null) _sendButton.Click += OnSend;
+        if (_attachmentButton is not null) _attachmentButton.Click += OnAttachment;
         if (_cancelSelectionButton is not null) _cancelSelectionButton.Click += OnCancelSelection;
         if (_deleteButton is not null) _deleteButton.Click += OnDelete;
         if (_quoteButton is not null) _quoteButton.Click += OnQuote;
@@ -710,6 +983,7 @@ public sealed class MdChatView : TemplatedControl
     private void DetachTemplateHandlers()
     {
         if (_sendButton is not null) _sendButton.Click -= OnSend;
+        if (_attachmentButton is not null) _attachmentButton.Click -= OnAttachment;
         if (_cancelSelectionButton is not null) _cancelSelectionButton.Click -= OnCancelSelection;
         if (_deleteButton is not null) _deleteButton.Click -= OnDelete;
         if (_quoteButton is not null) _quoteButton.Click -= OnQuote;
@@ -770,6 +1044,11 @@ public sealed class MdChatView : TemplatedControl
     }
 
     private void OnSend(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e) => Submit();
+    private void OnAttachment(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (AttachmentCommand?.CanExecute(null) == true) AttachmentCommand.Execute(null);
+        AttachmentRequested?.Invoke(this, EventArgs.Empty);
+    }
     private void OnCancelSelection(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e) => ClearSelection();
     private void OnDelete(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e) => DeleteSelected();
     private void OnQuote(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e) => QuoteSelected();

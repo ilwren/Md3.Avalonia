@@ -98,11 +98,23 @@ public sealed class MdEcosystemWaveAndWindowTests
         var editor = new MdRichEditor { Adapter = adapter };
         Assert.True(editor.Execute(MdRichEditorCommand.Bold));
         Assert.Equal(MdRichEditorCommand.Bold, adapter.LastCommand);
+        Assert.True(editor.Execute(MdRichEditorCommand.HorizontalRule));
+        Assert.Equal(MdRichEditorCommand.HorizontalRule, adapter.LastCommand);
+        Assert.NotEmpty(MdRichEditorCommandConverters.GetGlyph(MdRichEditorCommand.Bold));
+        Assert.NotEmpty(MdRichEditorCommandConverters.GetTooltip(MdRichEditorCommand.Italic));
 
         var submitted = string.Empty;
+        var attachmentInvoked = false;
         var chat = new MdChatView { ComposerText = "Hello" };
         chat.MessageSubmitted += (_, text) => submitted = text;
+        chat.AttachmentRequested += (_, _) => attachmentInvoked = true;
         Assert.True(chat.Submit()); Assert.Equal("Hello", submitted); Assert.Empty(chat.ComposerText!);
+
+        var msg = new MdChatMessage("101", MdChatMessageRole.Assistant, "Hi", DateTimeOffset.Now, "Material Bot");
+        var presenter = new MdChatMessagePresenter { Message = msg };
+        Assert.NotEmpty(presenter.FormattedTime);
+        Assert.Equal("MB", presenter.SenderInitials);
+        Assert.NotEmpty(presenter.AvatarGlyph);
 
         using var host = Show(chart, 440, 280);
         Dispatcher.UIThread.RunJobs();
