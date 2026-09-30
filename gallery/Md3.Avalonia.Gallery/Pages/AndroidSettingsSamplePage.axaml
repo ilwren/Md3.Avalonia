@@ -1,0 +1,112 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             x:Class="Md3.Avalonia.Gallery.Pages.AndroidSettingsSamplePage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel MaxWidth="720" Spacing="20" HorizontalAlignment="Center" Margin="16,24,16,40">
+      
+      <!-- Top Search Settings Bar -->
+      <md:MdSearchBar PlaceholderText="Search settings"
+                      Variant="Outlined"
+                      Height="56"
+                      HorizontalAlignment="Stretch" />
+
+      <!-- Profile Header Card -->
+      <Border Padding="16" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" CornerRadius="24">
+        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16" VerticalAlignment="Center">
+          <Border Width="48" Height="48" CornerRadius="24" Background="{DynamicResource Md.Sys.Color.Primary.Brush}">
+            <TextBlock Text="A" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+            <TextBlock Text="Alex Rivera" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" />
+            <TextBlock Text="alex.rivera@example.com · Google Account" FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" Opacity="0.8" />
+          </StackPanel>
+          <md:MdIconButton Grid.Column="2" Icon="{x:Static md:MdSymbols.ChevronRight}" Variant="Standard" Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" />
+        </Grid>
+      </Border>
+
+      <!-- Network & Connectivity -->
+      <md:MdSettingsGroup Header="NETWORK &amp; CONNECTIVITY">
+        <md:MdSettingsCard Header="Network &amp; internet" Description="Wi-Fi, Mobile data, Hotspot, VPN"
+                           Icon="{x:Static md:MdSymbols.Wifi}"
+                           IconBackground="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
+                           IconForeground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}"
+                           Click="OnSettingClicked" />
+        <Border Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" Margin="72,0,0,0" />
+        <md:MdSettingsCard Header="Connected devices" Description="Bluetooth, Pairing, Cast, NFC"
+                           Icon="{x:Static md:MdSymbols.Bluetooth}"
+                           IconBackground="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
+                           IconForeground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}"
+                           Click="OnSettingClicked" />
+        <Border Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" Margin="72,0,0,0" />
+        <md:MdSettingsCard Header="Airplane mode" Description="Disconnect cellular, Wi-Fi &amp; Bluetooth"
+                           Icon="{x:Static md:MdSymbols.AirplanemodeActive}"
+                           IconBackground="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}"
+                           IconForeground="{DynamicResource Md.Sys.Color.OnTertiaryContainer.Brush}">
+          <md:MdSettingsCard.Trailing>
+            <md:MdSwitch x:Name="AirplaneSwitch" IsChecked="False" Checked="OnSettingToggle" Unchecked="OnSettingToggle" />
+          </md:MdSettingsCard.Trailing>
+        </md:MdSettingsCard>
+      </md:MdSettingsGroup>
+
+      <!-- Display & Sound -->
+      <md:MdSettingsGroup Header="DISPLAY &amp; SOUND">
+        <md:MdSettingsCard Header="Dark theme" Description="Pure dark background for OLED screens"
+                           Icon="{x:Static md:MdSymbols.DarkMode}"
+                           IconBackground="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
+                           IconForeground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}">
+          <md:MdSettingsCard.Trailing>
+            <md:MdSwitch x:Name="DarkThemeSwitch" IsChecked="True" Checked="OnSettingToggle" Unchecked="OnSettingToggle" />
+          </md:MdSettingsCard.Trailing>
+        </md:MdSettingsCard>
+        <Border Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" Margin="72,0,0,0" />
+        <md:MdSettingsCard Header="Display &amp; touch" Description="Brightness, Refresh rate 120Hz, Colors"
+                           Icon="{x:Static md:MdSymbols.BrightnessMedium}"
+                           IconBackground="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
+                           IconForeground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}"
+                           Click="OnSettingClicked" />
+        <Border Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" Margin="72,0,0,0" />
+        <md:MdSettingsCard Header="Sound &amp; vibration" Description="Volume, Haptics, Do Not Disturb"
+                           Icon="{x:Static md:MdSymbols.VolumeUp}"
+                           IconBackground="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}"
+                           IconForeground="{DynamicResource Md.Sys.Color.OnTertiaryContainer.Brush}"
+                           Click="OnSettingClicked" />
+      </md:MdSettingsGroup>
+
+      <!-- Battery & Storage -->
+      <md:MdSettingsGroup Header="BATTERY &amp; STORAGE">
+        <md:MdSettingsCard Header="Battery" Description="84% · About 18 hours remaining"
+                           Icon="{x:Static md:MdSymbols.BatteryFull}"
+                           IconBackground="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
+                           IconForeground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}"
+                           Click="OnSettingClicked" />
+        <Border Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" Margin="72,0,0,0" />
+        <md:MdSettingsCard Header="Storage" Description="68.4 GB used of 128 GB (53%)"
+                           Icon="{x:Static md:MdSymbols.Folder}"
+                           IconBackground="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
+                           IconForeground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}"
+                           Click="OnSettingClicked" />
+      </md:MdSettingsGroup>
+
+      <!-- Privacy & Security -->
+      <md:MdSettingsGroup Header="PRIVACY &amp; SECURITY">
+        <md:MdSettingsCard Header="Security &amp; privacy" Description="Screen lock, Fingerprint, App permissions"
+                           Icon="{x:Static md:MdSymbols.Lock}"
+                           IconBackground="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
+                           IconForeground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}"
+                           Click="OnSettingClicked" />
+        <Border Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" Margin="72,0,0,0" />
+        <md:MdSettingsCard Header="Location" Description="On · 14 apps have access"
+                           Icon="{x:Static md:MdSymbols.LocationOn}"
+                           IconBackground="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
+                           IconForeground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}"
+                           Click="OnSettingClicked" />
+      </md:MdSettingsGroup>
+
+      <TextBlock x:Name="SettingNotification"
+                 Classes="body"
+                 Text="Tap any setting item or toggle a switch to interact."
+                 HorizontalAlignment="Center" />
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

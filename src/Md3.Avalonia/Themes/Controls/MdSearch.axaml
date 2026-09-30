@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:md="using:Md3.Avalonia.Controls">
   <ControlTheme x:Key="MdSearchInternalButtonTheme" TargetType="Button">
-    <Setter Property="Width" Value="40" /><Setter Property="Height" Value="40" /><Setter Property="Background" Value="Transparent" />
+    <Setter Property="Width" Value="40" /><Setter Property="Height" Value="40" /><Setter Property="Background" Value="Transparent" /><Setter Property="Cursor" Value="Hand" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /><Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Template"><ControlTemplate TargetType="Button"><Border x:Name="PART_State" Background="{TemplateBinding Background}" CornerRadius="20"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" /></Border></ControlTemplate></Setter>
     <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" /></Style>

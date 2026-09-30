@@ -41,21 +41,26 @@ public partial class MainWindow : Window
         AutomationProperties.SetName(NavigationMenuButton, "Open component navigation");
         _navigationButtons =
         [
-            ComponentsOverviewNav, ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, TextFieldNav,
+            ComponentsOverviewNav, AndroidSettingsNav, ClockNav, TasksNav,
+            ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, BreadcrumbNav, TextFieldNav,
             CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
-            NavigationDrawerNav, AdaptiveNav, SearchNav, SheetNav, SliderNav, AdvancedSelectionNav,
+            NavigationDrawerNav, AdaptiveNav, SearchNav, SettingsCardNav, SheetNav, SliderNav, AdvancedSelectionNav,
             SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, FlutterParityNav, EcosystemNav, BorderlessWindowNav,
             DesktopAdaptersNav, ThemeResourcesNav, SymbolsNav, MotionNav
         ];
         _topNavigationButtons = [GetStartedTopNav, DevelopTopNav, FoundationsTopNav, StylesTopNav, ComponentsTopNav];
         _galleryIndex =
         [
+            Entry("Android settings", "android settings preference card wifi bluetooth sound display battery", AndroidSettingsNav, () => new AndroidSettingsSamplePage()),
+            Entry("Clock app", "clock alarm timer stopwatch world cities timezone", ClockNav, () => new ClockSamplePage()),
+            Entry("Tasks & todo", "tasks todo slidable list swipe check due date priority", TasksNav, () => new TasksSamplePage()),
             Entry("Buttons", "button toggle split connected group", ButtonNav, () => new ButtonGalleryPage()),
             Entry("Icon buttons", "icon action round square", IconButtonNav, () => new IconButtonGalleryPage()),
             Entry("FABs", "floating action button menu extended", FabNav, () => new FabGalleryPage()),
             Entry("App bars", "top bottom app bar toolbar", AppBarNav, () => new AppBarGalleryPage()),
             Entry("Badges", "badge notification dot", BadgeNav, () => new BadgeGalleryPage()),
+            Entry("Breadcrumbs", "breadcrumb path navigation separator hierarchy", BreadcrumbNav, () => new BreadcrumbGalleryPage()),
             Entry("Text fields", "textbox input password clear context menu", TextFieldNav, () => new TextBoxGalleryPage()),
             Entry("Checkbox", "check selection", CheckBoxNav, () => new CheckBoxGalleryPage()),
             Entry("Radio buttons", "radio selection", RadioButtonNav, () => new RadioButtonGalleryPage()),
@@ -74,6 +79,7 @@ public partial class MainWindow : Window
             Entry("Navigation drawer", "navigation drawer modal standard", NavigationDrawerNav, () => new NavigationDrawerGalleryPage()),
             Entry("Adaptive layout", "navigation rail adaptive responsive breakpoint", AdaptiveNav, () => new AdaptiveGalleryPage()),
             Entry("Search", "search bar view suggestions", SearchNav, () => new SearchGalleryPage()),
+            Entry("Settings cards", "settings card preference group expander android tile", SettingsCardNav, () => new SettingsCardGalleryPage()),
             Entry("Sheets", "bottom side sheet", SheetNav, () => new SheetGalleryPage()),
             Entry("Slider", "slider range value", SliderNav, () => new SliderGalleryPage()),
             Entry("Segmented and range", "segmented button range slider", AdvancedSelectionNav, () => new AdvancedSelectionGalleryPage()),
@@ -122,11 +128,16 @@ public partial class MainWindow : Window
     private void ShowStyles(object? s, RoutedEventArgs e) => Navigate(new StylesGalleryPage(), null, StylesTopNav);
     private void ShowComponents(object? s, RoutedEventArgs e) => Navigate(new ComponentsOverviewGalleryPage(), ComponentsOverviewNav, ComponentsTopNav);
 
+    private void ShowAndroidSettings(object? s, RoutedEventArgs e) => Navigate(new AndroidSettingsSamplePage(), AndroidSettingsNav);
+    private void ShowClock(object? s, RoutedEventArgs e) => Navigate(new ClockSamplePage(), ClockNav);
+    private void ShowTasks(object? s, RoutedEventArgs e) => Navigate(new TasksSamplePage(), TasksNav);
+
     private void ShowButtons(object? s, RoutedEventArgs e) => Navigate(new ButtonGalleryPage(), ButtonNav);
     private void ShowIconButtons(object? s, RoutedEventArgs e) => Navigate(new IconButtonGalleryPage(), IconButtonNav);
     private void ShowFabs(object? s, RoutedEventArgs e) => Navigate(new FabGalleryPage(), FabNav);
     private void ShowAppBars(object? s, RoutedEventArgs e) => Navigate(new AppBarGalleryPage(), AppBarNav);
     private void ShowBadges(object? s, RoutedEventArgs e) => Navigate(new BadgeGalleryPage(), BadgeNav);
+    private void ShowBreadcrumbs(object? s, RoutedEventArgs e) => Navigate(new BreadcrumbGalleryPage(), BreadcrumbNav);
     private void ShowTextFields(object? s, RoutedEventArgs e) => Navigate(new TextBoxGalleryPage(), TextFieldNav);
     private void ShowCheckBoxes(object? s, RoutedEventArgs e) => Navigate(new CheckBoxGalleryPage(), CheckBoxNav);
     private void ShowRadioButtons(object? s, RoutedEventArgs e) => Navigate(new RadioButtonGalleryPage(), RadioButtonNav);
@@ -145,6 +156,7 @@ public partial class MainWindow : Window
     private void ShowNavigationDrawer(object? s, RoutedEventArgs e) => Navigate(new NavigationDrawerGalleryPage(), NavigationDrawerNav);
     private void ShowAdaptive(object? s, RoutedEventArgs e) => Navigate(new AdaptiveGalleryPage(), AdaptiveNav);
     private void ShowSearch(object? s, RoutedEventArgs e) => Navigate(new SearchGalleryPage(), SearchNav);
+    private void ShowSettingsCard(object? s, RoutedEventArgs e) => Navigate(new SettingsCardGalleryPage(), SettingsCardNav);
     private void ShowSheets(object? s, RoutedEventArgs e) => Navigate(new SheetGalleryPage(), SheetNav);
     private void ShowSlider(object? s, RoutedEventArgs e) => Navigate(new SliderGalleryPage(), SliderNav);
     private void ShowAdvancedSelection(object? s, RoutedEventArgs e) => Navigate(new AdvancedSelectionGalleryPage(), AdvancedSelectionNav);

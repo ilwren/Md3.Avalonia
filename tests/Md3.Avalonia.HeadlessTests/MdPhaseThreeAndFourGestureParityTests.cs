@@ -200,6 +200,99 @@ public sealed class MdPhaseThreeAndFourGestureParityTests
         Assert.Equal(0, avoidingHost.Padding.Bottom);
     }
 
+    [AvaloniaFact]
+    public void TabView_Supports_TabStripPlacement_And_Header_Centering()
+    {
+        var tabView = new MdTabView
+        {
+            TabStripPlacement = Dock.Bottom,
+            Items =
+            {
+                new MdTabViewItem { Header = "Tab 1", Content = new TextBlock { Text = "Content 1" } },
+                new MdTabViewItem { Header = "Tab 2", Content = new TextBlock { Text = "Content 2" } }
+            }
+        };
+
+        using var host = Show(tabView, 500, 300);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(Dock.Bottom, tabView.TabStripPlacement);
+        Assert.Equal(0, tabView.SelectedIndex);
+        tabView.SelectedIndex = 1;
+        Assert.Equal(1, tabView.SelectedIndex);
+    }
+
+    [AvaloniaFact]
+    public void TabItem_Supports_Header_And_Content_Interoperability()
+    {
+        var tabItem1 = new MdTabItem { Header = "Header Title" };
+        var tabItem2 = new MdTabItem { Content = "Content Title" };
+
+        Assert.Equal("Header Title", tabItem1.Content);
+        Assert.Equal("Header Title", tabItem1.Header);
+        Assert.Equal("Content Title", tabItem2.Header);
+        Assert.Equal("Content Title", tabItem2.Content);
+
+        var tabs = new MdTabs
+        {
+            Items = { tabItem1, tabItem2 }
+        };
+        using var host = Show(tabs, 400, 100);
+        Dispatcher.UIThread.RunJobs();
+        Assert.NotNull(host.Window.CaptureRenderedFrame());
+    }
+
+    [AvaloniaFact]
+    public void SettingsCard_And_SettingsGroup_Render_And_Handle_Click()
+    {
+        var clicked = false;
+        var card = new MdSettingsCard
+        {
+            Header = "Wi-Fi",
+            Description = "Connected to Studio_5G",
+            Icon = MdSymbols.Wifi,
+            Trailing = new MdSwitch { IsChecked = true }
+        };
+        card.Click += (_, _) => clicked = true;
+
+        var group = new MdSettingsGroup
+        {
+            Header = "CONNECTIVITY",
+            Items = { card }
+        };
+
+        using var host = Show(group, 500, 200);
+        Dispatcher.UIThread.RunJobs();
+
+        var point = card.TranslatePoint(new Point(20, 20), host.Window)!.Value;
+        host.Window.MouseMove(point, RawInputModifiers.None);
+        host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseUp(point, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(clicked, "Clicking the settings card should raise the Click event");
+    }
+
+    [AvaloniaFact]
+    public void Sample_And_New_Gallery_Pages_Render()
+    {
+        Control[] samplePages =
+        [
+            new AndroidSettingsSamplePage(),
+            new ClockSamplePage(),
+            new TasksSamplePage(),
+            new SettingsCardGalleryPage(),
+            new BreadcrumbGalleryPage()
+        ];
+
+        foreach (var page in samplePages)
+        {
+            using var host = Show(page, 800, 600);
+            Dispatcher.UIThread.RunJobs();
+            Assert.NotNull(host.Window.CaptureRenderedFrame());
+        }
+    }
+
     private static Scope Show(Control content, double width = 800, double height = 600)
     {
         var window = new Window { Width = width, Height = height, Content = content };

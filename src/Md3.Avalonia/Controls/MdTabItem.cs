@@ -1,13 +1,18 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
+using Avalonia.Controls.Templates;
 
 namespace Md3.Avalonia.Controls;
 
-/// <summary>A selectable Material tab with optional icon and badge slots.</summary>
+/// <summary>A selectable Material tab with optional icon, badge, and header slots.</summary>
 [PseudoClasses(":primary", ":secondary", ":has-icon", ":has-badge", ":inline", ":shared-indicator")]
 public sealed class MdTabItem : ListBoxItem
 {
+    public static readonly StyledProperty<object?> HeaderProperty =
+        AvaloniaProperty.Register<MdTabItem, object?>(nameof(Header));
+    public static readonly StyledProperty<IDataTemplate?> HeaderTemplateProperty =
+        AvaloniaProperty.Register<MdTabItem, IDataTemplate?>(nameof(HeaderTemplate));
     public static readonly StyledProperty<object?> IconProperty =
         AvaloniaProperty.Register<MdTabItem, object?>(nameof(Icon));
     public static readonly StyledProperty<object?> BadgeProperty =
@@ -19,6 +24,16 @@ public sealed class MdTabItem : ListBoxItem
 
     static MdTabItem()
     {
+        HeaderProperty.Changed.AddClassHandler<MdTabItem>((item, e) =>
+        {
+            if (item.Content is null || Equals(item.Content, e.OldValue))
+                item.SetCurrentValue(ContentProperty, e.NewValue);
+        });
+        ContentProperty.Changed.AddClassHandler<MdTabItem>((item, e) =>
+        {
+            if (item.Header is null || Equals(item.Header, e.OldValue))
+                item.SetCurrentValue(HeaderProperty, e.NewValue);
+        });
         IconProperty.Changed.AddClassHandler<MdTabItem>((item, _) => item.UpdatePseudoClasses());
         BadgeProperty.Changed.AddClassHandler<MdTabItem>((item, _) => item.UpdatePseudoClasses());
         IsIconInlineProperty.Changed.AddClassHandler<MdTabItem>((item, _) => item.UpdatePseudoClasses());
@@ -27,6 +42,18 @@ public sealed class MdTabItem : ListBoxItem
     }
 
     public MdTabItem() => UpdatePseudoClasses();
+
+    public object? Header
+    {
+        get => GetValue(HeaderProperty);
+        set => SetValue(HeaderProperty, value);
+    }
+
+    public IDataTemplate? HeaderTemplate
+    {
+        get => GetValue(HeaderTemplateProperty);
+        set => SetValue(HeaderTemplateProperty, value);
+    }
 
     public object? Icon
     {

@@ -138,6 +138,7 @@
                           IsHitTestVisible="False"
                           IsVisible="{TemplateBinding AreItemsVisible}"
                           ItemsPanel="{TemplateBinding ItemsPanel}"
+                          HorizontalAlignment="Right"
                           Opacity="0"
                           RenderTransform="scale(0.9) translate(0px, 20px)"
                           RenderTransformOrigin="100%,100%">
@@ -148,12 +149,14 @@
                 <Setter Property="IconSize" Value="24" />
                 <Setter Property="IconSpacing" Value="8" />
                 <Setter Property="MinHeight" Value="56" />
+                <Setter Property="HorizontalAlignment" Value="Right" />
               </Style>
             </ItemsPresenter.Styles>
           </ItemsPresenter>
           <md:MdToggleIconButton x:Name="PART_Trigger"
                                  Size="Medium"
                                  Variant="Filled"
+                                 HorizontalAlignment="Right"
                                  Icon="{TemplateBinding OpenIcon}"
                                  SelectedIcon="{TemplateBinding CloseIcon}"
                                  IsChecked="{TemplateBinding IsOpen, Mode=TwoWay}" />

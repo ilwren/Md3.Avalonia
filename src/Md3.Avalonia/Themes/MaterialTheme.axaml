@@ -56,6 +56,7 @@
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdScaffold.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdFlutterParity.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdFlutterAdvanced.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdSettingsCard.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>

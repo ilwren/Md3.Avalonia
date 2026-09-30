@@ -8,19 +8,32 @@
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdTabViewItem">
-        <Border Background="Transparent">
-          <Grid RowDefinitions="*,3">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Spacing="8">
-              <md:MdSymbolPresenter x:Name="PART_Icon" Content="{TemplateBinding Icon}" FontSize="20"
-                                    Foreground="{TemplateBinding Foreground}" IsVisible="False" />
-              <ContentPresenter Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}"
-                                Foreground="{TemplateBinding Foreground}" />
-              <ContentPresenter x:Name="PART_Badge" Content="{TemplateBinding Badge}" IsVisible="False" />
-            </StackPanel>
+        <Border Background="Transparent" MinHeight="{TemplateBinding MinHeight}">
+          <Grid RowDefinitions="*,Auto" VerticalAlignment="Stretch">
+            <Grid Margin="{TemplateBinding Padding}"
+                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+              <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Spacing="8">
+                <md:MdSymbolPresenter x:Name="PART_Icon" Content="{TemplateBinding Icon}" FontSize="20"
+                                      Foreground="{TemplateBinding Foreground}" IsVisible="False"
+                                      VerticalAlignment="Center" />
+                <ContentPresenter x:Name="PART_HeaderPresenter"
+                                  Content="{TemplateBinding Header}"
+                                  ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                  Foreground="{TemplateBinding Foreground}"
+                                  VerticalAlignment="Center"
+                                  HorizontalAlignment="Center"
+                                  RecognizesAccessKey="True" />
+                <ContentPresenter x:Name="PART_Badge" Content="{TemplateBinding Badge}" IsVisible="False"
+                                  VerticalAlignment="Center" />
+              </StackPanel>
+            </Grid>
             <Border x:Name="PART_Indicator" Grid.Row="1" Width="24" Height="3" HorizontalAlignment="Center"
-                    Background="Transparent" CornerRadius="3,3,0,0" />
+                    Background="Transparent" CornerRadius="3,3,0,0" VerticalAlignment="Bottom" />
             <Border x:Name="PART_State" Grid.RowSpan="2" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" Opacity="0" />
           </Grid>
         </Border>
@@ -37,8 +50,11 @@
     <Setter Property="ItemsPanel"><ItemsPanelTemplate><UniformGrid Rows="1" /></ItemsPanelTemplate></Setter>
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdTabView">
-        <Grid RowDefinitions="Auto,*">
-          <Border BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,0,1">
+        <DockPanel>
+          <Border x:Name="PART_TabStripBorder"
+                  DockPanel.Dock="{TemplateBinding TabStripPlacement}"
+                  BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                  BorderThickness="0,0,0,1">
             <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
               <ItemsPresenter x:Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
             </ScrollViewer>
@@ -46,13 +62,30 @@
           <!-- TabControl owns this one and only selected-content presenter. A short opacity
                transition preserves motion without attempting to parent the content twice. -->
           <ContentPresenter x:Name="PART_SelectedContentHost"
-                            Grid.Row="1"
                             ContentTemplate="{TemplateBinding SelectedContentTemplate}"
                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                             VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
-        </Grid>
+        </DockPanel>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^[TabStripPlacement=Top] /template/ Border#PART_TabStripBorder">
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+    </Style>
+    <Style Selector="^[TabStripPlacement=Bottom] /template/ Border#PART_TabStripBorder">
+      <Setter Property="BorderThickness" Value="0,1,0,0" />
+    </Style>
+    <Style Selector="^[TabStripPlacement=Left]">
+      <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Vertical" /></ItemsPanelTemplate></Setter>
+    </Style>
+    <Style Selector="^[TabStripPlacement=Left] /template/ Border#PART_TabStripBorder">
+      <Setter Property="BorderThickness" Value="0,0,1,0" />
+    </Style>
+    <Style Selector="^[TabStripPlacement=Right]">
+      <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Vertical" /></ItemsPanelTemplate></Setter>
+    </Style>
+    <Style Selector="^[TabStripPlacement=Right] /template/ Border#PART_TabStripBorder">
+      <Setter Property="BorderThickness" Value="1,0,0,0" />
+    </Style>
     <Style Selector="^:scrollable"><Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></Setter></Style>
   </ControlTheme>
 </ResourceDictionary>
