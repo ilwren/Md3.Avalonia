@@ -40,20 +40,7 @@ jobs:
         run: dotnet build Md3.Avalonia.sln -c Release --no-restore
 
       - name: Run Headless Tests
-        run: |
-          set -o pipefail
-          dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --no-build --verbosity normal | tee test.log || {
-            python3 -c '
-with open("test.log", "r") as f:
-    text = f.read()
-import re
-failures = re.findall(r"(Failed\s+Md3\..*?)(?=(?:Passed|Failed|Skipped|\Z))", text, re.DOTALL)
-for f in failures[:10]:
-    for line in f.strip().splitlines()[:15]:
-        print(f"::error title=TestFailure::{line}")
-'
-            exit 1
-          }
+        run: dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --no-build --verbosity normal
 
       - name: Verify NuGet Packaging
         run: bash scripts/build-nuget.sh --font src/Md3.Avalonia.Icons/Assets/Fonts/MaterialSymbolsRounded.ttf
