@@ -14,7 +14,7 @@
               <TextBlock Text="My Tasks" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
               <TextBlock Text="Swipe right to complete, swipe left to delete" FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
             </StackPanel>
-            <md:MdFilterChip Grid.Column="1" Label="Today (4)" IsSelected="True" />
+            <md:MdFilterChip Grid.Column="1" Content="Today (4)" IsChecked="True" />
           </Grid>
         </Border>
 
@@ -29,7 +29,7 @@
                 <TextBlock Text="Review Material 3 design tokens" FontSize="15" FontWeight="Medium" />
                 <TextBlock Text="Completed at 09:15 AM · Work" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
               </StackPanel>
-              <md:MdAssistChip Grid.Column="2" Label="High" />
+              <md:MdAssistChip Grid.Column="2" Content="High" />
             </Grid>
           </Border>
         </eco:MdSlidableItem>
@@ -45,7 +45,7 @@
                 <TextBlock Text="Implement TabStripPlacement on MdTabView" FontSize="15" FontWeight="Medium" />
                 <TextBlock Text="Due Today 02:00 PM · Library" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
               </StackPanel>
-              <md:MdAssistChip Grid.Column="2" Label="Feature" />
+              <md:MdAssistChip Grid.Column="2" Content="Feature" />
             </Grid>
           </Border>
         </eco:MdSlidableItem>
@@ -61,7 +61,7 @@
                 <TextBlock Text="Update MdFabMenu alignment and cursor styles" FontSize="15" FontWeight="Medium" />
                 <TextBlock Text="Due Today 04:30 PM · UI" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
               </StackPanel>
-              <md:MdAssistChip Grid.Column="2" Label="Design" />
+              <md:MdAssistChip Grid.Column="2" Content="Design" />
             </Grid>
           </Border>
         </eco:MdSlidableItem>
@@ -77,7 +77,7 @@
                 <TextBlock Text="Prepare release notes and packaging" FontSize="15" FontWeight="Medium" />
                 <TextBlock Text="Due Tomorrow 10:00 AM · Release" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
               </StackPanel>
-              <md:MdAssistChip Grid.Column="2" Label="Docs" />
+              <md:MdAssistChip Grid.Column="2" Content="Docs" />
             </Grid>
           </Border>
         </eco:MdSlidableItem>
