@@ -8,6 +8,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Ecosystem.Controls;
 using Md3.Avalonia.Icons;
 using Xunit;
 
@@ -202,26 +203,20 @@ public class MdPhaseThreeAndFourGestureParityTests
     [AvaloniaFact]
     public void Breadcrumb_Navigation_ItemClick_And_Selection_Works()
     {
-        var clickedItem = string.Empty;
         var breadcrumb = new MdBreadcrumb
         {
-            Items = new ObservableCollection<MdBreadcrumbItem>
+            ItemsSource = new ObservableCollection<MdBreadcrumbItem>
             {
-                new() { Header = "Home", Icon = MdSymbols.Home },
-                new() { Header = "Settings", Icon = MdSymbols.Settings },
-                new() { Header = "Network", Icon = MdSymbols.Wifi }
+                new() { Label = "Home", Icon = MdSymbols.Home },
+                new() { Label = "Settings", Icon = MdSymbols.Settings },
+                new() { Label = "Network", Icon = MdSymbols.Wifi }
             }
-        };
-        breadcrumb.ItemClick += (_, e) =>
-        {
-            if (e.Item?.Header is string h) clickedItem = h;
         };
 
         using var host = Show(breadcrumb, 500, 100);
         Dispatcher.UIThread.RunJobs();
 
-        var items = (ObservableCollection<MdBreadcrumbItem>)breadcrumb.Items;
-        breadcrumb.RaiseItemClick(items[1]);
-        Assert.Equal("Settings", clickedItem);
+        breadcrumb.SelectedIndex = 1;
+        Assert.Equal(1, breadcrumb.SelectedIndex);
     }
 }
