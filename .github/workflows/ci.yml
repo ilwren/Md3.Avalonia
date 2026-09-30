@@ -37,7 +37,7 @@ jobs:
         run: dotnet restore Md3.Avalonia.sln
 
       - name: Build solution (Release)
-        run: dotnet build Md3.Avalonia.sln -c Release --no-restore
+        run: dotnet build Md3.Avalonia.sln -c Release --no-restore -v normal
 
       - name: Run Headless Tests
         run: |
