@@ -235,6 +235,26 @@ public partial class FlutterParityGalleryPage : UserControl
 
     private void SheetExtentChanged(object? sender, double extent) => SheetStatus.Text = L($"Extent {extent:P0}", $"展开比例 {extent:P0}");
 
+    private void ToggleVirtualKeyboard(object? sender, RoutedEventArgs e)
+    {
+        if (DemoKeyboardHost.KeyboardHeight > 0)
+        {
+            DemoKeyboardHost.KeyboardHeight = 0;
+            KeyboardStatus.Text = L("Virtual keyboard inactive (height: 0dp).", "虚拟键盘已关闭 (高度: 0dp)。");
+        }
+        else
+        {
+            DemoKeyboardHost.KeyboardHeight = 150;
+            KeyboardStatus.Text = L("Virtual keyboard active (height: 150dp). Viewport adjusted.", "虚拟键盘已激活 (高度: 150dp)。视口已自动调整。");
+        }
+    }
+
+    private void FocusBottomInput(object? sender, RoutedEventArgs e)
+    {
+        BottomInput.Focus();
+        KeyboardStatus.Text = L("Focused bottom input. Scrolled into view.", "已聚焦底部输入框并滚动至可视区域。");
+    }
+
     private void AdaptiveControlChanged(object? sender, RoutedEventArgs e) =>
         AdaptiveStatus.Text = L($"Platform policy: {(AutomaticAdaptiveSwitch.IsChecked == true ? "automatic" : "manual")}; iOS preview {(CupertinoAdaptiveSwitch.IsChecked == true ? "enabled" : "disabled")}.", $"平台策略：{(AutomaticAdaptiveSwitch.IsChecked == true ? "自动" : "手动")}；iOS 预览已{(CupertinoAdaptiveSwitch.IsChecked == true ? "启用" : "禁用")}。");
 

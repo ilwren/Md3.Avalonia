@@ -53,6 +53,8 @@ public sealed class MdGalleryTests
             new ToolbarGalleryPage(),
             new TooltipGalleryPage(),
             new FlutterParityGalleryPage(),
+            new EcosystemGalleryPage(),
+            new BorderlessWindowGalleryPage(),
             new AdvancedSelectionGalleryPage(),
             new AdaptiveGalleryPage(),
             new DesktopAdaptersGalleryPage(),
