@@ -161,7 +161,7 @@
       <TextBlock x:Name="ReviewerStatus" Classes="body" Text="No reviewer assigned." />
       <TextBlock Classes="body" Text="Click a specific half-star; spacing does not alter the selected step." />
       <eco:MdRating x:Name="Rating" Width="176" HorizontalAlignment="Left" Value="3.5" Precision="0.5" ValueChanged="RatingChanged" /><TextBlock x:Name="RatingStatus" Classes="body" Text="Rating 3.5 of 5" />
-      <eco:MdBreadcrumb x:Name="Breadcrumb" ItemInvoked="BreadcrumbInvoked" SelectedIndex="2">
+      <eco:MdBreadcrumb x:Name="Breadcrumb" ItemInvoked="BreadcrumbInvoked">
         <eco:MdBreadcrumbItem Label="Home" Icon="{x:Static md:MdSymbols.Home}" />
         <eco:MdBreadcrumbItem Label="Components" Icon="{x:Static md:MdSymbols.Settings}" />
         <eco:MdBreadcrumbItem Label="Ecosystem" Icon="{x:Static md:MdSymbols.Code}" IsCurrent="True" />
