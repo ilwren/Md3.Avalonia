@@ -129,16 +129,17 @@ public sealed class MdScrollViewer : ScrollViewer
 
         if (_isDragging)
         {
-            var extentW = Math.Max(Extent.Width, Presenter?.Extent.Width ?? 0);
-            var extentH = Math.Max(Extent.Height, Presenter?.Extent.Height ?? 0);
+            var scrollPresenter = Presenter as ScrollContentPresenter;
+            var extentW = Math.Max(Extent.Width, scrollPresenter?.Extent.Width ?? 0);
+            var extentH = Math.Max(Extent.Height, scrollPresenter?.Extent.Height ?? 0);
             if (extentH == 0 && Content is Control contentControl)
             {
                 extentH = Math.Max(contentControl.DesiredSize.Height, contentControl.Bounds.Height);
                 extentW = Math.Max(contentControl.DesiredSize.Width, contentControl.Bounds.Width);
             }
 
-            var viewportW = Math.Max(Viewport.Width, Presenter?.Viewport.Width ?? Bounds.Width);
-            var viewportH = Math.Max(Viewport.Height, Presenter?.Viewport.Height ?? Bounds.Height);
+            var viewportW = Math.Max(Viewport.Width, scrollPresenter?.Viewport.Width ?? Bounds.Width);
+            var viewportH = Math.Max(Viewport.Height, scrollPresenter?.Viewport.Height ?? Bounds.Height);
 
             var maxOffsetX = Math.Max(0, extentW - viewportW);
             var maxOffsetY = Math.Max(0, extentH - viewportH);
@@ -212,10 +213,11 @@ public sealed class MdScrollViewer : ScrollViewer
         _lastInertiaTickMs = nowMs;
 
         var currentOffset = Offset;
-        var extentW = Math.Max(Extent.Width, Presenter?.Extent.Width ?? 0);
-        var extentH = Math.Max(Extent.Height, Presenter?.Extent.Height ?? 0);
-        var viewportW = Math.Max(Viewport.Width, Presenter?.Viewport.Width ?? Bounds.Width);
-        var viewportH = Math.Max(Viewport.Height, Presenter?.Viewport.Height ?? Bounds.Height);
+        var scrollPresenter = Presenter as ScrollContentPresenter;
+        var extentW = Math.Max(Extent.Width, scrollPresenter?.Extent.Width ?? 0);
+        var extentH = Math.Max(Extent.Height, scrollPresenter?.Extent.Height ?? 0);
+        var viewportW = Math.Max(Viewport.Width, scrollPresenter?.Viewport.Width ?? Bounds.Width);
+        var viewportH = Math.Max(Viewport.Height, scrollPresenter?.Viewport.Height ?? Bounds.Height);
 
         var maxOffsetX = Math.Max(0, extentW - viewportW);
         var maxOffsetY = Math.Max(0, extentH - viewportH);
