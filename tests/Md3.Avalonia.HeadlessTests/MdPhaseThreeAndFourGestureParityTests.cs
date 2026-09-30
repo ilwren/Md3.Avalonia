@@ -9,6 +9,8 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Ecosystem.Controls;
+using Md3.Avalonia.Gallery;
+using Md3.Avalonia.Gallery.Pages;
 using Md3.Avalonia.Icons;
 using Xunit;
 
@@ -121,6 +123,42 @@ public class MdPhaseThreeAndFourGestureParityTests
         Dispatcher.UIThread.RunJobs();
 
         Assert.True(clicked, "Clicking a button inside MdScrollViewer without dragging must trigger the Click event");
+    }
+
+    [AvaloniaFact]
+    public void Gallery_Navigation_Buttons_Switch_Pages_Properly()
+    {
+        var gallery = new MainWindow { Width = 1440, Height = 900 };
+        gallery.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        // Click TextFieldNav button
+        var textFieldBtn = gallery.FindControl<MdButton>("TextFieldNav");
+        Assert.NotNull(textFieldBtn);
+        var pageHost = gallery.FindControl<ContentControl>("PageHost");
+        Assert.NotNull(pageHost);
+
+        var pt = textFieldBtn.TranslatePoint(new Point(40, 20), gallery)!.Value;
+        gallery.MouseMove(pt, RawInputModifiers.None);
+        gallery.MouseDown(pt, MouseButton.Left, RawInputModifiers.None);
+        gallery.MouseUp(pt, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.IsType<TextBoxGalleryPage>(pageHost.Content);
+
+        // Click ButtonNav button
+        var buttonBtn = gallery.FindControl<MdButton>("ButtonNav");
+        Assert.NotNull(buttonBtn);
+
+        var ptBtn = buttonBtn.TranslatePoint(new Point(40, 20), gallery)!.Value;
+        gallery.MouseMove(ptBtn, RawInputModifiers.None);
+        gallery.MouseDown(ptBtn, MouseButton.Left, RawInputModifiers.None);
+        gallery.MouseUp(ptBtn, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.IsType<ButtonGalleryPage>(pageHost.Content);
+
+        gallery.Close();
     }
 
     [AvaloniaFact]
