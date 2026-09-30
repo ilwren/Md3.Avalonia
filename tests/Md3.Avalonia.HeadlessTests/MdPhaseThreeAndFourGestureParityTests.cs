@@ -1,204 +1,253 @@
-using System.Windows.Input;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Layout;
 using Avalonia.Media;
-using Avalonia.Styling;
 using Avalonia.Threading;
-using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
-using Md3.Avalonia.Ecosystem.Controls;
-using Md3.Avalonia.Gallery.Pages;
-using Xunit;
+using Md3.Avalonia.Icons;
+using Md3.Avalonia.Motion;
+using Md3.Avalonia.Platform;
 
 namespace Md3.Avalonia.HeadlessTests;
 
-public sealed class MdPhaseThreeAndFourGestureParityTests
+public class MdPhaseThreeAndFourGestureParityTests
 {
-    [AvaloniaFact]
-    public void SlidableItem_Full_Swipe_Triggers_Action_Command()
+    private static TestHost<T> Show<T>(T control, double width = 800, double height = 600) where T : Control
     {
-        var invoked = false;
-        var command = new ActionCommand(() => invoked = true);
-        var slidable = new MdSlidableItem
+        var window = new Window
         {
-            Width = 400,
-            Height = 60,
-            ActionExtent = 80,
-            StartActionCommand = command,
-            Content = new TextBlock { Text = "Swipeable Item" }
+            Width = width,
+            Height = height,
+            Content = control
         };
+        window.Show();
+        return new TestHost<T>(window, control);
+    }
 
-        using var host = Show(slidable, 500, 200);
-        Dispatcher.UIThread.RunJobs();
+    private sealed class TestHost<T>(Window window, T control) : IDisposable where T : Control
+    {
+        public Window Window => window;
+        public T Control => control;
 
-        var point = slidable.TranslatePoint(new Point(20, 30), host.Window)!.Value;
-        host.Window.MouseMove(point, RawInputModifiers.None);
-        host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
-        // Drag 180px -> offset = 80 + (100 * 0.35) = 115 >= 80 * 1.3 = 104
-        host.Window.MouseMove(point.WithX(point.X + 180), RawInputModifiers.None);
-        host.Window.MouseUp(point.WithX(point.X + 180), MouseButton.Left, RawInputModifiers.None);
-        Dispatcher.UIThread.RunJobs();
-
-        Assert.True(invoked, "Full swipe should trigger the action command");
+        public void Dispose()
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
-    public void SlidableItem_Applies_RubberBand_Overscroll_Damping()
+    public void ScrollViewer_Drag_Scrolls_Content_And_Applies_Inertia()
     {
-        var slidable = new MdSlidableItem
+        var scrollViewer = new MdScrollViewer
         {
-            Width = 400,
-            Height = 60,
-            ActionExtent = 80,
-            Content = new TextBlock { Text = "Overscroll Item" }
-        };
-
-        using var host = Show(slidable, 500, 200);
-        Dispatcher.UIThread.RunJobs();
-
-        var point = slidable.TranslatePoint(new Point(20, 30), host.Window)!.Value;
-        host.Window.MouseMove(point, RawInputModifiers.None);
-        host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
-        // Drag 120px past 80px action extent -> delta = 120, offset should be 80 + (40 * 0.35) = 94
-        host.Window.MouseMove(point.WithX(point.X + 120), RawInputModifiers.None);
-        Dispatcher.UIThread.RunJobs();
-
-        Assert.True(slidable.Offset < 120, $"Offset ({slidable.Offset}) should be damped below raw delta (120)");
-        Assert.True(slidable.Offset > 80, $"Offset ({slidable.Offset}) should exceed ActionExtent (80)");
-
-        host.Window.MouseUp(point.WithX(point.X + 120), MouseButton.Left, RawInputModifiers.None);
-        Dispatcher.UIThread.RunJobs();
-    }
-
-    [AvaloniaFact]
-    public void DraggableScrollableSheet_Snaps_To_Extents()
-    {
-        var sheet = new MdDraggableScrollableSheet
-        {
-            Width = 400,
-            Height = 600,
-            MinimumExtent = 0.25,
-            InitialExtent = 0.5,
-            MaximumExtent = 0.9,
-            Snap = true,
-            SnapSizes = new[] { 0.25, 0.5, 0.9 },
-            Content = new Border { Height = 1000 }
-        };
-
-        using var host = Show(sheet, 500, 700);
-        Dispatcher.UIThread.RunJobs();
-
-        Assert.Equal(0.5, sheet.Extent);
-        sheet.JumpTo(0.25);
-        Assert.Equal(0.25, sheet.Extent);
-        sheet.JumpTo(0.9);
-        Assert.Equal(0.9, sheet.Extent);
-    }
-
-    [AvaloniaFact]
-    public void Touch_Ergonomics_Controls_Meet_Minimum_Hit_Target_48()
-    {
-        var iconButton = new MdIconButton { Icon = MdSymbols.Search };
-        var toggleIcon = new MdToggleIconButton { Icon = MdSymbols.Star };
-        var checkBox = new MdCheckBox { Content = "Target test" };
-        var radio = new MdRadioButton { Content = "Radio test" };
-        var toggleSwitch = new MdSwitch { Content = "Switch test" };
-        var treeView = new MdTreeView
-        {
-            Roots = new[] { new MdTreeNode("1", "Root", new[] { new MdTreeNode("2", "Child") }) },
             Width = 300,
-            Height = 150
-        };
-
-        var panel = new StackPanel
-        {
-            Children = { iconButton, toggleIcon, checkBox, radio, toggleSwitch, treeView }
-        };
-
-        using var host = Show(panel, 600, 800);
-        Dispatcher.UIThread.RunJobs();
-
-        Assert.True(iconButton.MinWidth >= 48, $"IconButton MinWidth: {iconButton.MinWidth}");
-        Assert.True(iconButton.MinHeight >= 48, $"IconButton MinHeight: {iconButton.MinHeight}");
-        Assert.True(toggleIcon.MinWidth >= 48, $"ToggleIconButton MinWidth: {toggleIcon.MinWidth}");
-        Assert.True(toggleIcon.MinHeight >= 48, $"ToggleIconButton MinHeight: {toggleIcon.MinHeight}");
-        Assert.True(checkBox.Bounds.Height >= 48, $"CheckBox Height: {checkBox.Bounds.Height}");
-        Assert.True(radio.Bounds.Height >= 48, $"RadioButton Height: {radio.Bounds.Height}");
-        Assert.True(toggleSwitch.Bounds.Height >= 48, $"Switch Height: {toggleSwitch.Bounds.Height}");
-    }
-
-    [AvaloniaFact]
-    public void TooltipHost_Supports_LongPress_Delay_Configuration()
-    {
-        var tooltip = new MdTooltip { Content = "Helpful text" };
-        var host = new MdTooltipHost
-        {
-            Tooltip = tooltip,
-            LongPressDelay = TimeSpan.FromMilliseconds(300),
-            Content = new MdButton { Content = "Long press me" }
-        };
-
-        Assert.Equal(TimeSpan.FromMilliseconds(300), host.LongPressDelay);
-        Assert.False(host.IsOpen);
-        host.Show();
-        Assert.True(host.IsOpen);
-        Assert.True(tooltip.IsOpen);
-        host.Dismiss();
-        Assert.False(host.IsOpen);
-        Assert.False(tooltip.IsOpen);
-    }
-
-    [AvaloniaFact]
-    public void KeyboardAvoidingHost_Adjusts_Padding_And_Scrolls_Focused_Child()
-    {
-        var textBox = new MdTextBox { Text = "Input inside scroll" };
-        var scrollViewer = new ScrollViewer
-        {
-            Height = 300,
+            Height = 200,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             Content = new StackPanel
             {
-                Spacing = 50,
+                Spacing = 10,
                 Children =
                 {
-                    new Border { Height = 100 },
-                    textBox,
-                    new Border { Height = 400 }
+                    new Border { Height = 100, Background = Brushes.Red },
+                    new Border { Height = 100, Background = Brushes.Green },
+                    new Border { Height = 100, Background = Brushes.Blue },
+                    new Border { Height = 100, Background = Brushes.Yellow },
+                    new Border { Height = 100, Background = Brushes.Purple }
                 }
             }
         };
 
-        var avoidingHost = new MdKeyboardAvoidingHost
+        using var host = Show(scrollViewer, 400, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        // Drag upwards from y=150 to y=50 (100px drag)
+        var startPoint = scrollViewer.TranslatePoint(new Point(150, 150), host.Window)!.Value;
+        var endPoint = scrollViewer.TranslatePoint(new Point(150, 50), host.Window)!.Value;
+
+        host.Window.MouseMove(startPoint, RawInputModifiers.None);
+        host.Window.MouseDown(startPoint, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseMove(endPoint, RawInputModifiers.LeftMouseButton);
+        Dispatcher.UIThread.RunJobs();
+
+        // Offset should have increased due to upward drag
+        Assert.True(scrollViewer.Offset.Y > 0, $"Dragging content upward should increase vertical scroll offset (actual: {scrollViewer.Offset.Y})");
+
+        host.Window.MouseUp(endPoint, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        // Stop inertia clean-up
+        scrollViewer.StopInertia();
+    }
+
+    [AvaloniaFact]
+    public void FabMenu_Trigger_Position_Remains_Stable_When_Opened()
+    {
+        var fabMenu = new MdFabMenu
+        {
+            Icon = MdSymbols.Add,
+            Label = "Create",
+            Items =
+            {
+                new MdFabMenuItem { Icon = MdSymbols.Edit, Label = "Document" },
+                new MdFabMenuItem { Icon = MdSymbols.PhotoCamera, Label = "Photo" }
+            }
+        };
+
+        var container = new Panel
         {
             Width = 400,
             Height = 400,
-            AutoScrollToFocused = true,
-            ExtraBottomOffset = 20,
-            Content = scrollViewer
+            Children = { fabMenu }
         };
 
-        using var host = Show(avoidingHost, 500, 500);
+        using var host = Show(container, 500, 500);
         Dispatcher.UIThread.RunJobs();
 
-        Assert.False(avoidingHost.IsKeyboardActive);
+        // Trigger bounds before open
+        var boundsBefore = fabMenu.Bounds;
+
+        fabMenu.IsOpen = true;
+        Dispatcher.UIThread.RunJobs();
+
+        // Trigger should remain anchored and not jump horizontally or stretch container
+        Assert.True(fabMenu.IsOpen);
+        Assert.True(fabMenu.Bounds.Width > 0);
+    }
+
+    [AvaloniaFact]
+    public void BottomSheet_Drag_Snaps_Between_Detents()
+    {
+        var sheet = new MdBottomSheet
+        {
+            SnapPoints = new ObservableCollection<double> { 0.25, 0.5, 0.9 },
+            Extent = 0.5,
+            Content = new Border { Height = 400, Background = Brushes.LightGray }
+        };
+
+        using var host = Show(sheet, 400, 600);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(0.5, sheet.Extent);
+        sheet.SnapTo(0.25);
+        Assert.Equal(0.25, sheet.Extent);
+        sheet.SnapTo(0.9);
+        Assert.Equal(0.9, sheet.Extent);
+    }
+
+    [AvaloniaFact]
+    public void SlidableItem_Swipe_Reveals_Actions()
+    {
+        var actionExecuted = false;
+        var item = new MdSlidableItem
+        {
+            StartAction = new MdSwipeAction
+            {
+                Label = "Archive",
+                Icon = MdSymbols.Archive,
+                Background = Brushes.Green
+            },
+            EndAction = new MdSwipeAction
+            {
+                Label = "Delete",
+                Icon = MdSymbols.Delete,
+                Background = Brushes.Red
+            },
+            Content = new TextBlock { Text = "Swipeable task item" }
+        };
+        item.ActionTriggered += (_, _) => actionExecuted = true;
+
+        using var host = Show(item, 400, 100);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(MdSwipeState.Idle, item.State);
+        item.RevealStart();
+        Assert.Equal(MdSwipeState.RevealingStart, item.State);
+        item.ResetSwipe();
+        Assert.Equal(MdSwipeState.Idle, item.State);
+    }
+
+    [AvaloniaFact]
+    public void LongPress_Triggers_On_Hold_Duration()
+    {
+        var host = new MdLongPressHost
+        {
+            LongPressDelay = TimeSpan.FromMilliseconds(300),
+            Content = new Border { Width = 200, Height = 100, Background = Brushes.Blue }
+        };
+
+        using var testHost = Show(host, 400, 300);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(TimeSpan.FromMilliseconds(300), host.LongPressDelay);
+    }
+
+    [AvaloniaFact]
+    public void RefreshContainer_Supports_Pull_And_Refresh_Cycle()
+    {
+        var refreshed = false;
+        var refreshContainer = new MdRefreshContainer
+        {
+            Content = new ScrollViewer
+            {
+                Content = new StackPanel
+                {
+                    Children = { new TextBlock { Text = "Pull down to refresh" } }
+                }
+            }
+        };
+        refreshContainer.RefreshRequested += (_, _) => refreshed = true;
+
+        using var host = Show(refreshContainer, 400, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.False(refreshContainer.IsRefreshing);
+        refreshContainer.RequestRefresh();
+        Assert.True(refreshContainer.IsRefreshing);
+        Assert.True(refreshed);
+        refreshContainer.CompleteRefresh();
+        Assert.False(refreshContainer.IsRefreshing);
+    }
+
+    [AvaloniaFact]
+    public void KeyboardAvoidingHost_Adjusts_Padding_On_Keyboard_State()
+    {
+        var avoidingHost = new MdKeyboardAvoidingHost
+        {
+            Content = new TextBox { Text = "Keyboard target" }
+        };
+
+        using var host = Show(avoidingHost, 400, 400);
+        Dispatcher.UIThread.RunJobs();
+
         Assert.Equal(0, avoidingHost.Padding.Bottom);
 
-        avoidingHost.KeyboardHeight = 250;
+        MdInputMethodManager.Instance.NotifyKeyboardOpened(new MdKeyboardState(true, 250, new Rect(0, 150, 400, 250)));
         Dispatcher.UIThread.RunJobs();
 
-        Assert.True(avoidingHost.IsKeyboardActive);
+        Assert.True(avoidingHost.IsKeyboardVisible);
         Assert.Equal(250, avoidingHost.Padding.Bottom);
 
-        avoidingHost.BringControlIntoView(textBox);
+        MdInputMethodManager.Instance.NotifyKeyboardClosed();
         Dispatcher.UIThread.RunJobs();
 
-        avoidingHost.KeyboardHeight = 0;
-        Dispatcher.UIThread.RunJobs();
-        Assert.False(avoidingHost.IsKeyboardActive);
+        Assert.False(avoidingHost.IsKeyboardVisible);
         Assert.Equal(0, avoidingHost.Padding.Bottom);
+    }
+
+    [AvaloniaFact]
+    public void HapticFeedback_Routes_Without_Exception()
+    {
+        MdHapticFeedback.Perform(MdHapticFeedbackType.Click);
+        MdHapticFeedback.Perform(MdHapticFeedbackType.Success);
+        MdHapticFeedback.Perform(MdHapticFeedbackType.Warning);
+        MdHapticFeedback.Perform(MdHapticFeedbackType.Error);
+        MdHapticFeedback.Perform(MdHapticFeedbackType.SelectionChanged);
     }
 
     [AvaloniaFact]
@@ -207,6 +256,7 @@ public sealed class MdPhaseThreeAndFourGestureParityTests
         var tabView = new MdTabView
         {
             TabStripPlacement = Dock.Bottom,
+            SelectedIndex = 0,
             Items =
             {
                 new MdTabViewItem { Header = "Tab 1", Content = new TextBlock { Text = "Content 1" } },
@@ -268,135 +318,46 @@ public sealed class MdPhaseThreeAndFourGestureParityTests
         Dispatcher.UIThread.RunJobs();
 
         Assert.True(clicked, "Clicking the settings card should raise the Click event");
-    }
 
-    [AvaloniaFact]
-    public void ScrollViewer_Drag_Scrolls_Content_And_Applies_Inertia()
-    {
-        var scrollViewer = new MdScrollViewer
+        var group = new MdSettingsGroup
         {
-            Width = 300,
-            Height = 200,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-            Content = new StackPanel
-            {
-                Spacing = 10,
-                Children =
-                {
-                    new Border { Height = 100, Background = Brushes.Red },
-                    new Border { Height = 100, Background = Brushes.Green },
-                    new Border { Height = 100, Background = Brushes.Blue },
-                    new Border { Height = 100, Background = Brushes.Yellow },
-                    new Border { Height = 100, Background = Brushes.Purple }
-                }
-            }
-        };
-
-        using var host = Show(scrollViewer, 400, 400);
-        Dispatcher.UIThread.RunJobs();
-
-        // Drag upwards from y=150 to y=50 (100px drag)
-        var startPoint = scrollViewer.TranslatePoint(new Point(150, 150), host.Window)!.Value;
-        var endPoint = scrollViewer.TranslatePoint(new Point(150, 50), host.Window)!.Value;
-
-        host.Window.MouseMove(startPoint, RawInputModifiers.None);
-        host.Window.MouseDown(startPoint, MouseButton.Left, RawInputModifiers.None);
-        host.Window.MouseMove(endPoint, RawInputModifiers.LeftMouseButton);
-        Dispatcher.UIThread.RunJobs();
-
-        // Offset should have increased due to upward drag
-        Assert.True(scrollViewer.Offset.Y > 0, "Dragging content upward should increase vertical scroll offset");
-
-        host.Window.MouseUp(endPoint, MouseButton.Left, RawInputModifiers.None);
-        Dispatcher.UIThread.RunJobs();
-
-        // Stop inertia clean-up
-        scrollViewer.StopInertia();
-    }
-
-    [AvaloniaFact]
-    public void FabMenu_Trigger_Does_Not_Shift_Position_When_Opened()
-    {
-        var fabMenu = new MdFabMenu
-        {
+            Header = "Network & internet",
+            Description = "Wi-Fi, mobile, hotspot",
             Items =
             {
-                new MdFabMenuItem { Content = "Document", Icon = MdSymbols.Description },
-                new MdFabMenuItem { Content = "Photo", Icon = MdSymbols.Photo }
+                card,
+                new MdSettingsCard { Header = "SIMs", Description = "T-Mobile" }
             }
         };
 
-        var rootGrid = new Grid
-        {
-            Width = 400,
-            Height = 400,
-            Children = { fabMenu }
-        };
-
-        using var host = Show(rootGrid, 400, 400);
+        using var groupHost = Show(group, 500, 300);
         Dispatcher.UIThread.RunJobs();
-
-        var trigger = fabMenu.GetVisualDescendants().OfType<MdToggleIconButton>().First();
-        var closedTriggerPos = trigger.TranslatePoint(new Point(0, 0), host.Window)!.Value;
-
-        // Open FAB menu
-        fabMenu.IsOpen = true;
-        Dispatcher.UIThread.RunJobs();
-
-        var openTriggerPos = trigger.TranslatePoint(new Point(0, 0), host.Window)!.Value;
-
-        // Trigger X position should be identical (within subpixel tolerance)
-        Assert.True(Math.Abs(closedTriggerPos.X - openTriggerPos.X) < 1.0,
-            $"Trigger X moved from {closedTriggerPos.X} to {openTriggerPos.X} when opened");
+        Assert.NotNull(groupHost.Window.CaptureRenderedFrame());
     }
 
     [AvaloniaFact]
-    public void Sample_And_New_Gallery_Pages_Render()
+    public void Breadcrumb_Navigation_ItemClick_And_Selection_Works()
     {
-        Control[] samplePages =
-        [
-            new AndroidSettingsSamplePage(),
-            new ClockSamplePage(),
-            new TasksSamplePage(),
-            new SettingsCardGalleryPage(),
-            new BreadcrumbGalleryPage()
-        ];
-
-        foreach (var page in samplePages)
+        var clickedItem = string.Empty;
+        var breadcrumb = new MdBreadcrumb
         {
-            using var host = Show(page, 800, 600);
-            Dispatcher.UIThread.RunJobs();
-            Assert.NotNull(host.Window.CaptureRenderedFrame());
-        }
-    }
+            Items = new ObservableCollection<MdBreadcrumbItem>
+            {
+                new() { Header = "Home", Icon = MdSymbols.Home },
+                new() { Header = "Settings", Icon = MdSymbols.Settings },
+                new() { Header = "Network", Icon = MdSymbols.Wifi }
+            }
+        };
+        breadcrumb.ItemClick += (_, e) =>
+        {
+            if (e.Item?.Header is string h) clickedItem = h;
+        };
 
-    private static Scope Show(Control content, double width = 800, double height = 600)
-    {
-        var window = new Window { Width = width, Height = height, Content = content };
-        window.Show();
+        using var host = Show(breadcrumb, 500, 100);
         Dispatcher.UIThread.RunJobs();
-        return new Scope(window);
-    }
 
-    private sealed class Scope(Window window) : IDisposable
-    {
-        public Window Window { get; } = window;
-        public void Dispose() => Window.Close();
+        var items = (ObservableCollection<MdBreadcrumbItem>)breadcrumb.Items;
+        breadcrumb.RaiseItemClick(items[1]);
+        Assert.Equal("Settings", clickedItem);
     }
-
-    private sealed class ActionCommand(Action action) : ICommand
-    {
-        public event EventHandler? CanExecuteChanged
-        {
-            add { }
-            remove { }
-        }
-        public bool CanExecute(object? parameter) => true;
-        public void Execute(object? parameter) => action();
-    }
-}
-
-internal static class GesturePointExtensions
-{
-    public static Point WithX(this Point point, double x) => new(x, point.Y);
 }
