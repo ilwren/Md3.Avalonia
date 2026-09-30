@@ -696,7 +696,7 @@ public sealed class MdKeyboardAvoidingHost : ContentControl
         }
     }
 
-    private void OnChildGotFocus(object? sender, GotFocusEventArgs e)
+    private void OnChildGotFocus(object? sender, RoutedEventArgs e)
     {
         if (!AutoScrollToFocused || e.Source is not Control focused) return;
         BringControlIntoView(focused);
