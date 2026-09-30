@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Ecosystem.Controls"
              x:Class="Md3.Avalonia.Gallery.Pages.TasksSamplePage">
   <Grid>
     <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -18,13 +19,9 @@
         </Border>
 
         <!-- Task Item 1 -->
-        <md:MdSlidableItem StartActionBackground="#2E7D32"
-                           EndActionBackground="#C62828"
-                           StartActionIcon="{x:Static md:MdSymbols.Check}"
-                           EndActionIcon="{x:Static md:MdSymbols.Delete}"
-                           StartActionLabel="Done"
-                           EndActionLabel="Delete"
-                           CornerRadius="16">
+        <eco:MdSlidableItem StartActions="Done"
+                            EndActions="Delete"
+                            CornerRadius="16">
           <Border Padding="16,14" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
               <md:MdCheckBox IsChecked="True" />
@@ -35,16 +32,12 @@
               <md:MdAssistChip Grid.Column="2" Label="High" />
             </Grid>
           </Border>
-        </md:MdSlidableItem>
+        </eco:MdSlidableItem>
 
         <!-- Task Item 2 -->
-        <md:MdSlidableItem StartActionBackground="#2E7D32"
-                           EndActionBackground="#C62828"
-                           StartActionIcon="{x:Static md:MdSymbols.Check}"
-                           EndActionIcon="{x:Static md:MdSymbols.Delete}"
-                           StartActionLabel="Done"
-                           EndActionLabel="Delete"
-                           CornerRadius="16">
+        <eco:MdSlidableItem StartActions="Done"
+                            EndActions="Delete"
+                            CornerRadius="16">
           <Border Padding="16,14" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
               <md:MdCheckBox IsChecked="False" />
@@ -55,16 +48,12 @@
               <md:MdAssistChip Grid.Column="2" Label="Feature" />
             </Grid>
           </Border>
-        </md:MdSlidableItem>
+        </eco:MdSlidableItem>
 
         <!-- Task Item 3 -->
-        <md:MdSlidableItem StartActionBackground="#2E7D32"
-                           EndActionBackground="#C62828"
-                           StartActionIcon="{x:Static md:MdSymbols.Check}"
-                           EndActionIcon="{x:Static md:MdSymbols.Delete}"
-                           StartActionLabel="Done"
-                           EndActionLabel="Delete"
-                           CornerRadius="16">
+        <eco:MdSlidableItem StartActions="Done"
+                            EndActions="Delete"
+                            CornerRadius="16">
           <Border Padding="16,14" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
               <md:MdCheckBox />
@@ -75,16 +64,12 @@
               <md:MdAssistChip Grid.Column="2" Label="Design" />
             </Grid>
           </Border>
-        </md:MdSlidableItem>
+        </eco:MdSlidableItem>
 
         <!-- Task Item 4 -->
-        <md:MdSlidableItem StartActionBackground="#2E7D32"
-                           EndActionBackground="#C62828"
-                           StartActionIcon="{x:Static md:MdSymbols.Check}"
-                           EndActionIcon="{x:Static md:MdSymbols.Delete}"
-                           StartActionLabel="Done"
-                           EndActionLabel="Delete"
-                           CornerRadius="16">
+        <eco:MdSlidableItem StartActions="Done"
+                            EndActions="Delete"
+                            CornerRadius="16">
           <Border Padding="16,14" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
               <md:MdCheckBox />
@@ -95,7 +80,7 @@
               <md:MdAssistChip Grid.Column="2" Label="Docs" />
             </Grid>
           </Border>
-        </md:MdSlidableItem>
+        </eco:MdSlidableItem>
 
       </StackPanel>
     </md:MdScrollViewer>

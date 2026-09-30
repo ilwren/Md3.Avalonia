@@ -48,7 +48,7 @@
               </Grid>
             </Border>
 
-            <md:MdButton Variant="FilledTonal" HorizontalAlignment="Center">
+            <md:MdButton Variant="Tonal" HorizontalAlignment="Center">
               <StackPanel Orientation="Horizontal" Spacing="8">
                 <md:MdIcon Glyph="{x:Static md:MdSymbols.Add}" Size="20" />
                 <TextBlock Text="Add new alarm" VerticalAlignment="Center" />
