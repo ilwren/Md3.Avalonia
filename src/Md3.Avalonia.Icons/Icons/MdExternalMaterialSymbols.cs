@@ -172,11 +172,13 @@ public static class MdExternalMaterialSymbols
     public static bool EnsureConfigured()
     {
         var manager = FontManager.Current;
-        if (!IsAvailable &&
-            (_automaticAttemptedManager?.TryGetTarget(out var attempted) != true || !ReferenceEquals(attempted, manager)))
+        if (!IsAvailable || _configuredManager?.TryGetTarget(out var configured) != true || !ReferenceEquals(configured, manager))
         {
-            _automaticAttemptedManager = new WeakReference<FontManager>(manager);
-            Configure(manager);
+            if (_automaticAttemptedManager?.TryGetTarget(out var attempted) != true || !ReferenceEquals(attempted, manager))
+            {
+                _automaticAttemptedManager = new WeakReference<FontManager>(manager);
+                Configure(manager);
+            }
         }
         if (IsAvailable) ApplyToCurrentApplication();
         return IsAvailable;
