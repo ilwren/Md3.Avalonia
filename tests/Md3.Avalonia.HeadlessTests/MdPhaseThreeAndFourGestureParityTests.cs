@@ -132,31 +132,36 @@ public class MdPhaseThreeAndFourGestureParityTests
         gallery.Show();
         Dispatcher.UIThread.RunJobs();
 
-        // Click TextFieldNav button
-        var textFieldBtn = gallery.FindControl<MdButton>("TextFieldNav");
-        Assert.NotNull(textFieldBtn);
         var pageHost = gallery.FindControl<ContentControl>("PageHost");
         Assert.NotNull(pageHost);
 
-        var pt = textFieldBtn.TranslatePoint(new Point(40, 20), gallery)!.Value;
-        gallery.MouseMove(pt, RawInputModifiers.None);
-        gallery.MouseDown(pt, MouseButton.Left, RawInputModifiers.None);
-        gallery.MouseUp(pt, MouseButton.Left, RawInputModifiers.None);
+        // Click AndroidSettingsNav (which is near the top of the navigation)
+        var androidBtn = gallery.FindControl<MdButton>("AndroidSettingsNav");
+        Assert.NotNull(androidBtn);
+        androidBtn.BringIntoView();
         Dispatcher.UIThread.RunJobs();
 
-        Assert.IsType<TextBoxGalleryPage>(pageHost.Content);
-
-        // Click ButtonNav button
-        var buttonBtn = gallery.FindControl<MdButton>("ButtonNav");
-        Assert.NotNull(buttonBtn);
-
-        var ptBtn = buttonBtn.TranslatePoint(new Point(40, 20), gallery)!.Value;
-        gallery.MouseMove(ptBtn, RawInputModifiers.None);
-        gallery.MouseDown(ptBtn, MouseButton.Left, RawInputModifiers.None);
-        gallery.MouseUp(ptBtn, MouseButton.Left, RawInputModifiers.None);
+        var ptAndroid = androidBtn.TranslatePoint(new Point(20, 20), gallery)!.Value;
+        gallery.MouseMove(ptAndroid, RawInputModifiers.None);
+        gallery.MouseDown(ptAndroid, MouseButton.Left, RawInputModifiers.None);
+        gallery.MouseUp(ptAndroid, MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
 
-        Assert.IsType<ButtonGalleryPage>(pageHost.Content);
+        Assert.IsType<AndroidSettingsSamplePage>(pageHost.Content);
+
+        // Click ComponentsOverviewNav
+        var overviewBtn = gallery.FindControl<MdButton>("ComponentsOverviewNav");
+        Assert.NotNull(overviewBtn);
+        overviewBtn.BringIntoView();
+        Dispatcher.UIThread.RunJobs();
+
+        var ptOverview = overviewBtn.TranslatePoint(new Point(20, 20), gallery)!.Value;
+        gallery.MouseMove(ptOverview, RawInputModifiers.None);
+        gallery.MouseDown(ptOverview, MouseButton.Left, RawInputModifiers.None);
+        gallery.MouseUp(ptOverview, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.IsType<ComponentsOverviewGalleryPage>(pageHost.Content);
 
         gallery.Close();
     }
