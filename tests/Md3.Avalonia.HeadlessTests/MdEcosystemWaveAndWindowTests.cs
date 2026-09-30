@@ -109,6 +109,7 @@ public sealed class MdEcosystemWaveAndWindowTests
         chat.MessageSubmitted += (_, text) => submitted = text;
         chat.AttachmentRequested += (_, _) => attachmentInvoked = true;
         Assert.True(chat.Submit()); Assert.Equal("Hello", submitted); Assert.Empty(chat.ComposerText!);
+        Assert.False(attachmentInvoked);
 
         var msg = new MdChatMessage("101", MdChatMessageRole.Assistant, "Hi", DateTimeOffset.Now, "Material Bot");
         var presenter = new MdChatMessagePresenter { Message = msg };
