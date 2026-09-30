@@ -24,6 +24,8 @@
     <Style Selector="^:checked /template/ Border#PART_Track"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
     <Style Selector="^:checked /template/ Border#PART_Thumb"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" /><Setter Property="RenderTransform" Value="translate(20px,0px) scale(1)" /></Style>
     <Style Selector="^:checked /template/ Border#PART_ThumbState"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="RenderTransform" Value="translate(20px,0px)" /></Style>
+    <Style Selector="^:pressed:not(:checked) /template/ Border#PART_Thumb"><Setter Property="RenderTransform" Value="scale(1.12, 0.92) translate(0px,0px)" /></Style>
+    <Style Selector="^:pressed:checked /template/ Border#PART_Thumb"><Setter Property="RenderTransform" Value="translate(20px,0px) scale(1.15, 0.92)" /></Style>
     <Style Selector="^:pointerover /template/ Border#PART_ThumbState"><Setter Property="Opacity" Value="0.08" /></Style>
     <Style Selector="^:pressed /template/ Border#PART_ThumbState"><Setter Property="Opacity" Value="0.12" /></Style>
     <Style Selector="^:show-icons:checked /template/ md|MdIcon#PART_CheckedIcon"><Setter Property="IsVisible" Value="True" /></Style>

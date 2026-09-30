@@ -193,6 +193,8 @@ public sealed class MdSheetHost : ContentControl
 
     private void UpdateVisualState()
     {
+        var speed = IsOpen ? MdMotionSpeed.Default : MdMotionSpeed.Fast;
+        ConfigureTransitions(speed);
         if (IsOpen)
         {
             _presence.Update(true, TimeSpan.Zero);
@@ -203,7 +205,7 @@ public sealed class MdSheetHost : ContentControl
         {
             PseudoClasses.Set(":open", false);
             PseudoClasses.Set(":closed", true);
-            _presence.Update(false, MdMotion.GetExitDuration(this));
+            _presence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
         }
         UpdatePseudoClasses();
         UpdateSurfaceTarget();
@@ -224,12 +226,20 @@ public sealed class MdSheetHost : ContentControl
         var scheme = MdMotion.GetScheme(this);
         PseudoClasses.Set(":reduced-motion", scheme == MdMotionScheme.Reduced);
         PseudoClasses.Set(":no-motion", scheme == MdMotionScheme.None);
+        var speed = IsOpen ? MdMotionSpeed.Default : MdMotionSpeed.Fast;
+        ConfigureTransitions(speed);
 
+        if (!IsOpen) _presence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
+        UpdateSurfaceTarget();
+    }
+
+    private void ConfigureTransitions(MdMotionSpeed speed)
+    {
         var surfaceTransitions = MdMotionTransitions.Collect(
-            MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects));
+            MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects, speed));
         var transformTransitions = MdMotionTransitions.Collect(
-            MdMotionTransitions.CreateDouble(this, TranslateTransform.XProperty, MdMotionKind.Spatial),
-            MdMotionTransitions.CreateDouble(this, TranslateTransform.YProperty, MdMotionKind.Spatial));
+            MdMotionTransitions.CreateDouble(this, TranslateTransform.XProperty, MdMotionKind.Spatial, speed),
+            MdMotionTransitions.CreateDouble(this, TranslateTransform.YProperty, MdMotionKind.Spatial, speed));
 
         if (_dragging)
         {
@@ -244,11 +254,8 @@ public sealed class MdSheetHost : ContentControl
         if (_scrim is not null)
         {
             _scrim.Transitions = MdMotionTransitions.Collect(
-                MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects));
+                MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects, speed));
         }
-
-        if (!IsOpen) _presence.Update(false, MdMotion.GetExitDuration(this));
-        UpdateSurfaceTarget();
     }
 
     private void UpdateSurfaceTarget()

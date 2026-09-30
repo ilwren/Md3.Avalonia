@@ -131,6 +131,7 @@ public sealed class MdDialogHost : ContentControl
     private void UpdateOpenState()
     {
         var version = ++_openStateVersion;
+        ConfigureTransitions(IsOpen ? MdMotionSpeed.Default : MdMotionSpeed.Fast);
         if (IsOpen)
         {
             _presence.Update(true, TimeSpan.Zero);
@@ -156,7 +157,7 @@ public sealed class MdDialogHost : ContentControl
         {
             PseudoClasses.Set(":open", false);
             PseudoClasses.Set(":closed", true);
-            _presence.Update(false, MdMotion.GetExitDuration(this));
+            _presence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
         }
 
         UpdateDialogState();
@@ -174,18 +175,7 @@ public sealed class MdDialogHost : ContentControl
         var scheme = MdMotion.GetScheme(this);
         PseudoClasses.Set(":reduced-motion", scheme == MdMotionScheme.Reduced);
         PseudoClasses.Set(":no-motion", scheme == MdMotionScheme.None);
-
-        if (_overlay is not null)
-        {
-            _overlay.Transitions = MdMotionTransitions.Collect(
-                MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects));
-        }
-        if (_dialogPresenter is not null)
-        {
-            _dialogPresenter.Transitions = MdMotionTransitions.Collect(
-                MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects, MdMotionSpeed.Fast),
-                MdMotionTransitions.CreateTransform(this, RenderTransformProperty));
-        }
+        ConfigureTransitions(IsOpen ? MdMotionSpeed.Default : MdMotionSpeed.Fast);
 
         if (IsOpen && scheme == MdMotionScheme.None)
         {
@@ -195,7 +185,22 @@ public sealed class MdDialogHost : ContentControl
         }
         else if (!IsOpen)
         {
-            _presence.Update(false, MdMotion.GetExitDuration(this));
+            _presence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
+        }
+    }
+
+    private void ConfigureTransitions(MdMotionSpeed speed)
+    {
+        if (_overlay is not null)
+        {
+            _overlay.Transitions = MdMotionTransitions.Collect(
+                MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects, speed));
+        }
+        if (_dialogPresenter is not null)
+        {
+            _dialogPresenter.Transitions = MdMotionTransitions.Collect(
+                MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects, speed),
+                MdMotionTransitions.CreateTransform(this, RenderTransformProperty, speed));
         }
     }
 }

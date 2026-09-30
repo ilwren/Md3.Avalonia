@@ -127,6 +127,15 @@ public sealed class MdFoundationComponentTests
     }
 
     [AvaloniaFact]
+    public void Ripple_Attaches_To_Interactive_Cards_And_List_Items()
+    {
+        var card = new MdCard { Content = "Card with ripple" };
+        using var host = Show(card);
+        var ripple = Assert.Single(card.GetVisualDescendants().OfType<MdRipplePresenter>());
+        Assert.NotNull(ripple);
+    }
+
+    [AvaloniaFact]
     public void Symbols_Dictionary_Contains_All_4284_Glyphs_And_Resolves_Names()
     {
         Assert.Equal(4284, MdSymbols.Count);

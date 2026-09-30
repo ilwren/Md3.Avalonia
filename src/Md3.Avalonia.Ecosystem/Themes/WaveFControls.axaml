@@ -113,7 +113,15 @@
                   HorizontalAlignment="Center" VerticalAlignment="Center"
                   Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round"
                   RenderTransformOrigin="50%,50%">
-              <Path.RenderTransform><RotateTransform Angle="{Binding ExpansionAngle}" /></Path.RenderTransform>
+              <Path.RenderTransform>
+                <RotateTransform Angle="{Binding ExpansionAngle}">
+                  <RotateTransform.Transitions>
+                    <Transitions>
+                      <DoubleTransition Property="Angle" Duration="0:0:0.2" Easing="0.05, 0.7, 0.1, 1.0" />
+                    </Transitions>
+                  </RotateTransform.Transitions>
+                </RotateTransform>
+              </Path.RenderTransform>
             </Path>
           </ToggleButton>
           <StackPanel Grid.Column="1" Margin="8,0,12,0" VerticalAlignment="Center">
