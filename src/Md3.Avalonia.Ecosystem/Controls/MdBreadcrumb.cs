@@ -65,8 +65,8 @@ public sealed class MdBreadcrumb : ListBox
 
     static MdBreadcrumb()
     {
-        SeparatorProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.RefreshContainers());
-        MaxDisplayedItemsProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.RefreshContainers());
+        SeparatorProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.UpdateItemContainers());
+        MaxDisplayedItemsProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.UpdateItemContainers());
     }
 
     public MdBreadcrumb()
@@ -127,7 +127,7 @@ public sealed class MdBreadcrumb : ListBox
         }
     }
 
-    private void RefreshContainers()
+    private void UpdateItemContainers()
     {
         var containers = GetRealizedContainers().ToArray();
         for (var i = 0; i < containers.Length; i++)
