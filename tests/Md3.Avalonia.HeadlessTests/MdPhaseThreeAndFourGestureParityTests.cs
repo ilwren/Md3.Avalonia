@@ -249,6 +249,8 @@ public sealed class MdPhaseThreeAndFourGestureParityTests
         var clicked = false;
         var card = new MdSettingsCard
         {
+            Width = 400,
+            Height = 64,
             Header = "Wi-Fi",
             Description = "Connected to Studio_5G",
             Icon = MdSymbols.Wifi,
@@ -256,13 +258,7 @@ public sealed class MdPhaseThreeAndFourGestureParityTests
         };
         card.Click += (_, _) => clicked = true;
 
-        var group = new MdSettingsGroup
-        {
-            Header = "CONNECTIVITY",
-            Items = { card }
-        };
-
-        using var host = Show(group, 500, 200);
+        using var host = Show(card, 500, 200);
         Dispatcher.UIThread.RunJobs();
 
         var point = card.TranslatePoint(new Point(20, 20), host.Window)!.Value;
