@@ -10,19 +10,10 @@ using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Controls;
 
-public enum MdSettingsCardVariant
-{
-    Filled,
-    Elevated,
-    Outlined,
-    Flat
-}
-
 /// <summary>
-/// An Android Material 3 settings/preference card supporting leading icon badge,
-/// title headline, subtitle description, and interactive trailing action controls (Switch, Radio, Chevron, etc.).
+/// A Material 3 / Android styled preference settings card with icon, header, description, and trailing widget.
 /// </summary>
-[PseudoClasses(":clickable", ":has-icon", ":has-description", ":has-trailing", ":filled", ":elevated", ":outlined", ":flat", ":reduced-motion", ":no-motion")]
+[PseudoClasses(":has-icon", ":has-description", ":has-trailing", ":clickable", ":filled", ":elevated", ":outlined", ":flat", ":reduced-motion", ":no-motion")]
 public class MdSettingsCard : ContentControl
 {
     public static readonly StyledProperty<object?> HeaderProperty =
@@ -96,7 +87,6 @@ public class MdSettingsCard : ContentControl
         base.OnPointerPressed(e);
         if (IsClickable && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {
-            // Focus if focusable
             Focus();
         }
     }
@@ -104,14 +94,10 @@ public class MdSettingsCard : ContentControl
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
-        if (IsClickable && e.InitialPressMouseButton == MouseButton.Left)
+        if (IsClickable)
         {
-            var pos = e.GetPosition(this);
-            if (new Rect(default, Bounds.Size).Contains(pos))
-            {
-                RaiseClick();
-                e.Handled = true;
-            }
+            RaiseClick();
+            e.Handled = true;
         }
     }
 

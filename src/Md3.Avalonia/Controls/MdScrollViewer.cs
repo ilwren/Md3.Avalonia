@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -82,7 +83,8 @@ public sealed class MdScrollViewer : ScrollViewer
         if (!IsDragScrollingEnabled) return;
 
         var currentPoint = e.GetCurrentPoint(this);
-        if (!currentPoint.Properties.IsLeftButtonPressed) return;
+        var props = currentPoint.Properties;
+        if (!props.IsLeftButtonPressed && props.PointerUpdateKind != PointerUpdateKind.LeftButtonPressed) return;
 
         // Stop any active inertia immediately on touch/click (smooth catch)
         StopInertia();
@@ -117,10 +119,7 @@ public sealed class MdScrollViewer : ScrollViewer
 
         if (!_isDragging)
         {
-            var canScrollH = HorizontalScrollBarVisibility != ScrollBarVisibility.Disabled && Extent.Width > Viewport.Width;
-            var canScrollV = VerticalScrollBarVisibility != ScrollBarVisibility.Disabled && Extent.Height > Viewport.Height;
-
-            var dist = Math.Sqrt((canScrollH ? delta.X * delta.X : 0) + (canScrollV ? delta.Y * delta.Y : 0));
+            var dist = Math.Sqrt(delta.X * delta.X + delta.Y * delta.Y);
             if (dist >= DragThreshold)
             {
                 _isDragging = true;
@@ -130,11 +129,22 @@ public sealed class MdScrollViewer : ScrollViewer
 
         if (_isDragging)
         {
-            var maxOffsetX = Math.Max(0, Extent.Width - Viewport.Width);
-            var maxOffsetY = Math.Max(0, Extent.Height - Viewport.Height);
+            var extentW = Math.Max(Extent.Width, Presenter?.Extent.Width ?? 0);
+            var extentH = Math.Max(Extent.Height, Presenter?.Extent.Height ?? 0);
+            if (extentH == 0 && Content is Control contentControl)
+            {
+                extentH = Math.Max(contentControl.DesiredSize.Height, contentControl.Bounds.Height);
+                extentW = Math.Max(contentControl.DesiredSize.Width, contentControl.Bounds.Width);
+            }
 
-            var newX = Math.Clamp(_startOffset.X - delta.X, 0, maxOffsetX);
-            var newY = Math.Clamp(_startOffset.Y - delta.Y, 0, maxOffsetY);
+            var viewportW = Math.Max(Viewport.Width, Presenter?.Viewport.Width ?? Bounds.Width);
+            var viewportH = Math.Max(Viewport.Height, Presenter?.Viewport.Height ?? Bounds.Height);
+
+            var maxOffsetX = Math.Max(0, extentW - viewportW);
+            var maxOffsetY = Math.Max(0, extentH - viewportH);
+
+            var newX = maxOffsetX > 0 ? Math.Clamp(_startOffset.X - delta.X, 0, maxOffsetX) : Math.Max(0, _startOffset.X - delta.X);
+            var newY = maxOffsetY > 0 ? Math.Clamp(_startOffset.Y - delta.Y, 0, maxOffsetY) : Math.Max(0, _startOffset.Y - delta.Y);
 
             Offset = new Vector(newX, newY);
             e.Handled = true;
@@ -202,11 +212,16 @@ public sealed class MdScrollViewer : ScrollViewer
         _lastInertiaTickMs = nowMs;
 
         var currentOffset = Offset;
-        var maxOffsetX = Math.Max(0, Extent.Width - Viewport.Width);
-        var maxOffsetY = Math.Max(0, Extent.Height - Viewport.Height);
+        var extentW = Math.Max(Extent.Width, Presenter?.Extent.Width ?? 0);
+        var extentH = Math.Max(Extent.Height, Presenter?.Extent.Height ?? 0);
+        var viewportW = Math.Max(Viewport.Width, Presenter?.Viewport.Width ?? Bounds.Width);
+        var viewportH = Math.Max(Viewport.Height, Presenter?.Viewport.Height ?? Bounds.Height);
 
-        var newX = Math.Clamp(currentOffset.X + _velocity.X * dt, 0, maxOffsetX);
-        var newY = Math.Clamp(currentOffset.Y + _velocity.Y * dt, 0, maxOffsetY);
+        var maxOffsetX = Math.Max(0, extentW - viewportW);
+        var maxOffsetY = Math.Max(0, extentH - viewportH);
+
+        var newX = maxOffsetX > 0 ? Math.Clamp(currentOffset.X + _velocity.X * dt, 0, maxOffsetX) : Math.Max(0, currentOffset.X + _velocity.X * dt);
+        var newY = maxOffsetY > 0 ? Math.Clamp(currentOffset.Y + _velocity.Y * dt, 0, maxOffsetY) : Math.Max(0, currentOffset.Y + _velocity.Y * dt);
 
         Offset = new Vector(newX, newY);
 
@@ -216,8 +231,8 @@ public sealed class MdScrollViewer : ScrollViewer
 
         // Stop if velocity is low or reached boundary
         if ((Math.Abs(_velocity.X) < 15 && Math.Abs(_velocity.Y) < 15) ||
-            (newX <= 0 && _velocity.X < 0) || (newX >= maxOffsetX && _velocity.X > 0) ||
-            (newY <= 0 && _velocity.Y < 0) || (newY >= maxOffsetY && _velocity.Y > 0))
+            (newX <= 0 && _velocity.X < 0) || (maxOffsetX > 0 && newX >= maxOffsetX && _velocity.X > 0) ||
+            (newY <= 0 && _velocity.Y < 0) || (maxOffsetY > 0 && newY >= maxOffsetY && _velocity.Y > 0))
         {
             StopInertia();
         }
