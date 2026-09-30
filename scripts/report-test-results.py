@@ -34,8 +34,10 @@ def main():
                     msg = msg_el.text.strip()
                 if stack_el is not None and stack_el.text:
                     stack = stack_el.text.strip()
-            print(f"::error title=Failed Test: {test_name}::{msg}\n{stack}")
-            print(f"FAILED: {test_name}\nMessage: {msg}\nStack: {stack}\n")
+            # Escape newlines for github workflow command
+            escaped_msg = msg.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+            print(f"::error title={test_name}::{escaped_msg}")
+            print(f"FAILED TEST: {test_name}\nMESSAGE:\n{msg}\nSTACK:\n{stack}\n" + "="*60)
         elif outcome == 'Passed':
             passed += 1
 
