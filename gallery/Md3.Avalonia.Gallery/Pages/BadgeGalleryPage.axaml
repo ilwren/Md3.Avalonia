@@ -4,30 +4,40 @@
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.BadgeGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Spacing="30">
-    <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Badges"/><TextBlock Classes="body" Text="Badges show notification counts or status on icons and destinations."/></StackPanel>
-    <StackPanel Spacing="16">
-      <TextBlock Classes="h2" Text="Small and large badges" />
-      <StackPanel Orientation="Horizontal" Spacing="52" Margin="12">
-        <md:MdBadgedBox><md:MdIconButton Icon="{x:Static md:MdSymbols.Mail}" Variant="Tonal"/></md:MdBadgedBox>
-        <md:MdBadgedBox Badge="3" BadgeVariant="Label"><md:MdIconButton Icon="{x:Static md:MdSymbols.Mail}" Variant="Tonal"/></md:MdBadgedBox>
-        <md:MdBadgedBox Badge="24" BadgeVariant="Label"><md:MdIconButton Icon="{x:Static md:MdSymbols.Notifications}" Variant="Filled"/></md:MdBadgedBox>
-        <md:MdBadgedBox Badge="999+" BadgeVariant="Label"><md:MdIconButton Icon="{x:Static md:MdSymbols.Notifications}" Variant="Outlined"/></md:MdBadgedBox>
+    <StackPanel Spacing="30" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Badges" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Badges show notification counts or status on icons and destinations." />
       </StackPanel>
-    </StackPanel>
-    <StackPanel Spacing="16">
-      <TextBlock Classes="h2" Text="Standalone anatomy" />
-      <StackPanel Orientation="Horizontal" Spacing="24" VerticalAlignment="Center">
-        <md:MdBadge />
-        <md:MdBadge Variant="Label" Content="1" />
-        <md:MdBadge Variant="Label" Content="12" />
-        <md:MdBadge Variant="Label" Content="999+" />
+
+      <StackPanel Spacing="16">
+        <TextBlock Classes="h2" Text="Small and large badges" />
+        <WrapPanel Orientation="Horizontal" Margin="4">
+          <md:MdBadgedBox Margin="0,0,32,16"><md:MdIconButton Icon="{x:Static md:MdSymbols.Mail}" Variant="Tonal"/></md:MdBadgedBox>
+          <md:MdBadgedBox Badge="3" BadgeVariant="Label" Margin="0,0,32,16"><md:MdIconButton Icon="{x:Static md:MdSymbols.Mail}" Variant="Tonal"/></md:MdBadgedBox>
+          <md:MdBadgedBox Badge="24" BadgeVariant="Label" Margin="0,0,32,16"><md:MdIconButton Icon="{x:Static md:MdSymbols.Notifications}" Variant="Filled"/></md:MdBadgedBox>
+          <md:MdBadgedBox Badge="999+" BadgeVariant="Label" Margin="0,0,32,16"><md:MdIconButton Icon="{x:Static md:MdSymbols.Notifications}" Variant="Outlined"/></md:MdBadgedBox>
+        </WrapPanel>
       </StackPanel>
-    </StackPanel>
-    <Border Padding="22" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
-      <TextBlock Classes="body" TextWrapping="Wrap" Text="Small badges are 6 DIP. Large badges are 16 DIP high, use the Error/OnError roles, and expand horizontally for multiple characters." />
-    </Border>
-    <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdBadgedBox Badge=&quot;3&quot; BadgeVariant=&quot;Label&quot;&gt;&#10;  &lt;md:MdIconButton Icon=&quot;{x:Static md:MdSymbols.Notifications}&quot; /&gt;&#10;&lt;/md:MdBadgedBox&gt;" CSharpCode="var badge = new MdBadgedBox&#10;{&#10;    Badge = &quot;3&quot;,&#10;    BadgeVariant = MdBadgeVariant.Label,&#10;    Content = new MdIconButton { Icon = MdSymbols.Notifications }&#10;};" /></StackPanel>
+
+      <StackPanel Spacing="16">
+        <TextBlock Classes="h2" Text="Standalone anatomy" />
+        <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+          <md:MdBadge Margin="0,0,24,12" />
+          <md:MdBadge Variant="Label" Content="1" Margin="0,0,24,12" />
+          <md:MdBadge Variant="Label" Content="12" Margin="0,0,24,12" />
+          <md:MdBadge Variant="Label" Content="999+" Margin="0,0,24,12" />
+        </WrapPanel>
+      </StackPanel>
+
+      <Border Padding="22" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Small badges are 6 DIP. Large badges are 16 DIP high, use the Error/OnError roles, and expand horizontally for multiple characters." />
+      </Border>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdBadgedBox Badge=&quot;3&quot; BadgeVariant=&quot;Label&quot;&gt;&#10;  &lt;md:MdIconButton Icon=&quot;{x:Static md:MdSymbols.Notifications}&quot; /&gt;&#10;&lt;/md:MdBadgedBox&gt;" CSharpCode="var badge = new MdBadgedBox&#10;{&#10;    Badge = &quot;3&quot;,&#10;    BadgeVariant = MdBadgeVariant.Label,&#10;    Content = new MdIconButton { Icon = MdSymbols.Notifications }&#10;};" />
+      </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>
 </UserControl>

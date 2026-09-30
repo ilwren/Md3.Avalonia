@@ -90,6 +90,41 @@ public sealed class MdEcosystemWaveFTests
     }
 
     [AvaloniaFact]
+    public void Breadcrumb_Supports_Rich_Item_Model_Commands_And_Separators()
+    {
+        var invokedCommandItem = string.Empty;
+        var homeItem = new MdBreadcrumbItem
+        {
+            Label = "Home",
+            Command = new TestCommand(param => invokedCommandItem = "Home")
+        };
+        var componentsItem = new MdBreadcrumbItem
+        {
+            Label = "Components",
+            Command = new TestCommand(param => invokedCommandItem = "Components")
+        };
+        var ecosystemItem = new MdBreadcrumbItem
+        {
+            Label = "Ecosystem",
+            IsCurrent = true
+        };
+
+        var breadcrumb = new MdBreadcrumb
+        {
+            ItemsSource = new ObservableCollection<MdBreadcrumbItem> { homeItem, componentsItem, ecosystemItem },
+            Separator = "/"
+        };
+
+        var invoked = string.Empty;
+        breadcrumb.ItemInvoked += (_, item) => invoked = (item as MdBreadcrumbItem)?.Label?.ToString() ?? string.Empty;
+
+        breadcrumb.Invoke(homeItem);
+        Assert.Equal("Home", invoked);
+        Assert.Equal("Home", invokedCommandItem);
+        Assert.Equal("/", breadcrumb.Separator);
+    }
+
+    [AvaloniaFact]
     public void WaveF_Controls_Render_Together_With_Real_Themes()
     {
         var branch = new MdTreeNode("root", "Root", [new MdTreeNode("child", "Child")]) { IsExpanded = true };

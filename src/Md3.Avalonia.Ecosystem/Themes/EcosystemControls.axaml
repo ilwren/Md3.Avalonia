@@ -18,15 +18,59 @@
     <Setter Property="InactiveBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
   </ControlTheme>
   <ControlTheme x:Key="MdBreadcrumbItemTheme" TargetType="ListBoxItem">
-    <Setter Property="MinHeight" Value="40" /><Setter Property="Padding" Value="12,0" /><Setter Property="FocusAdorner" Value="{x:Null}" />
-    <Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-    <Setter Property="Template"><ControlTemplate TargetType="ListBoxItem"><Border Background="{TemplateBinding Background}" CornerRadius="20"><ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="Center" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" /></Border></ControlTemplate></Setter>
-    <Style Selector="^:pointerover"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" /></Style>
-    <Style Selector="^:selected"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Setter Property="MinHeight" Value="36" />
+    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ListBoxItem">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="4">
+          <Border x:Name="PART_ItemSurface"
+                  Background="{TemplateBinding Background}"
+                  CornerRadius="16"
+                  Padding="{TemplateBinding Padding}">
+            <Grid VerticalAlignment="Center">
+              <Border x:Name="PART_StateLayer"
+                      Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                      CornerRadius="16"
+                      Opacity="0"
+                      IsHitTestVisible="False" />
+              <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                <Viewbox x:Name="PART_IconHost" Width="18" Height="18" VerticalAlignment="Center" IsVisible="False">
+                  <md:MdSymbolPresenter x:Name="PART_IconPresenter" Foreground="{TemplateBinding Foreground}" />
+                </Viewbox>
+                <ContentPresenter x:Name="PART_ContentPresenter"
+                                  Content="{TemplateBinding Content}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  Foreground="{TemplateBinding Foreground}"
+                                  VerticalAlignment="Center" />
+              </StackPanel>
+            </Grid>
+          </Border>
+          <TextBlock x:Name="PART_Separator"
+                     Text="›"
+                     FontSize="16"
+                     Margin="2,0,4,0"
+                     VerticalAlignment="Center"
+                     Opacity="0.6"
+                     Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.12" /></Style>
+    <Style Selector="^:selected"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
+    <Style Selector="^:last /template/ TextBlock#PART_Separator"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:has-icon /template/ Viewbox#PART_IconHost"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
   </ControlTheme>
   <ControlTheme x:Key="{x:Type eco:MdBreadcrumb}" TargetType="eco:MdBreadcrumb">
-    <Setter Property="SelectionMode" Value="Single" /><Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" />
+    <Setter Property="SelectionMode" Value="Single" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
     <Setter Property="ItemContainerTheme" Value="{StaticResource MdBreadcrumbItemTheme}" />
-    <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></Setter>
+    <Setter Property="ItemsPanel"><ItemsPanelTemplate><WrapPanel Orientation="Horizontal" VerticalAlignment="Center" /></ItemsPanelTemplate></Setter>
   </ControlTheme>
 </ResourceDictionary>

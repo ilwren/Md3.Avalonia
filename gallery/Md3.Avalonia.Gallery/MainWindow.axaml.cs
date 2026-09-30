@@ -200,10 +200,10 @@ public partial class MainWindow : Window
         TopNavigation.IsVisible = true;
         DevelopTopNav.IsVisible = true;
         StylesTopNav.IsVisible = true;
-        GallerySearch.IsVisible = width >= 600;
+        GallerySearch.IsVisible = width >= 540;
         LanguageSelector.IsVisible = width >= 1040;
-        ThemeSelector.IsVisible = width >= 520;
-        BrandTitle.IsVisible = width >= 720;
+        ThemeSelector.IsVisible = width >= 420;
+        BrandTitle.IsVisible = width >= 640;
         TableOfContentsPane.IsVisible = width >= 1200;
 
         ShellGrid.ColumnDefinitions = CurrentBreakpoint switch
@@ -214,9 +214,9 @@ public partial class MainWindow : Window
         };
         PageHost.Margin = CurrentBreakpoint switch
         {
-            GalleryBreakpoint.Compact => new Thickness(24, 32, 20, 40),
-            GalleryBreakpoint.Medium => new Thickness(40, 40, 32, 48),
-            GalleryBreakpoint.Expanded => new Thickness(48, 48, 40, 56),
+            GalleryBreakpoint.Compact => new Thickness(16, 20, 16, 32),
+            GalleryBreakpoint.Medium => new Thickness(28, 28, 24, 36),
+            GalleryBreakpoint.Expanded => new Thickness(36, 36, 32, 44),
             _ => new Thickness(64, 56, 56, 72)
         };
         PageHost.MaxWidth = width >= 1200 ? 960 : double.PositiveInfinity;
@@ -226,7 +226,7 @@ public partial class MainWindow : Window
             Grid.SetColumn(NavigationPane, 0);
             Grid.SetColumnSpan(NavigationPane, 3);
             NavigationPane.IsModal = true;
-            NavigationPane.DrawerWidth = Math.Min(320, Math.Max(280, width * 0.88));
+            NavigationPane.DrawerWidth = Math.Min(320, Math.Max(260, width * 0.85));
             NavigationPane.Width = NavigationPane.DrawerWidth;
             NavigationPane.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left;
             NavigationPane.IsOpen = _navigationOpen;
@@ -253,15 +253,15 @@ public partial class MainWindow : Window
     private void ApplyResponsivePageSizing(double shellWidth)
     {
         if (PageHost.Content is not Control page) return;
-        if (CurrentBreakpoint == GalleryBreakpoint.Compact)
+        if (CurrentBreakpoint is GalleryBreakpoint.Compact or GalleryBreakpoint.Medium)
         {
-            var available = Math.Max(280, shellWidth - PageHost.Margin.Left - PageHost.Margin.Right);
+            var available = Math.Max(260, shellWidth - PageHost.Margin.Left - PageHost.Margin.Right);
             foreach (var control in page.GetVisualDescendants().OfType<Control>().Prepend(page))
             {
                 if (double.IsNaN(control.Width) || control.Width <= available || control is Window) continue;
                 if (!_responsiveSizeStates.ContainsKey(control))
                     _responsiveSizeStates[control] = new ResponsiveSizeState(control.Width, control.MaxWidth, control.HorizontalAlignment);
-                control.MaxWidth = control.Width;
+                control.MaxWidth = available;
                 control.Width = double.NaN;
                 control.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Stretch;
             }

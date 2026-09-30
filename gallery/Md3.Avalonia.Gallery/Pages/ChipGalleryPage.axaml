@@ -4,40 +4,55 @@
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.ChipGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Spacing="28">
-    <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Chips"/><TextBlock Classes="body" Text="Compact actions, filters, entered values, and dynamically generated suggestions."/></StackPanel>
-    <StackPanel Spacing="12">
-      <TextBlock Classes="h2" Text="Assist" />
-      <StackPanel Orientation="Horizontal" Spacing="10">
-        <md:MdAssistChip Content="Add to calendar"><md:MdChip.LeadingIcon><md:MdIcon Glyph="{x:Static md:MdSymbols.CalendarMonth}" Size="18"/></md:MdChip.LeadingIcon></md:MdAssistChip>
-        <md:MdChip Content="Get directions" Variant="Assist"><md:MdChip.LeadingIcon><md:MdIcon Glyph="{x:Static md:MdSymbols.ArrowBack}" Size="18"/></md:MdChip.LeadingIcon></md:MdChip>
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Chips" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Compact actions, filters, entered values, and dynamically generated suggestions." />
       </StackPanel>
-    </StackPanel>
-    <StackPanel Spacing="12">
-      <TextBlock Classes="h2" Text="Filter" />
-      <StackPanel Orientation="Horizontal" Spacing="10">
-        <md:MdFilterChip Content="Nearby" IsChecked="True" />
-        <md:MdChip Content="Open now" Variant="Filter" />
-        <md:MdChip Content="Top rated" Variant="Filter" />
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Assist" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdAssistChip Content="Add to calendar" Margin="0,0,10,10">
+            <md:MdChip.LeadingIcon><md:MdIcon Glyph="{x:Static md:MdSymbols.CalendarMonth}" Size="18"/></md:MdChip.LeadingIcon>
+          </md:MdAssistChip>
+          <md:MdChip Content="Get directions" Variant="Assist" Margin="0,0,10,10">
+            <md:MdChip.LeadingIcon><md:MdIcon Glyph="{x:Static md:MdSymbols.ArrowBack}" Size="18"/></md:MdChip.LeadingIcon>
+          </md:MdChip>
+        </WrapPanel>
       </StackPanel>
-    </StackPanel>
-    <StackPanel Spacing="12">
-      <TextBlock Classes="h2" Text="Input" />
-      <StackPanel Orientation="Horizontal" Spacing="10">
-        <md:MdInputChip Content="Alex" />
-        <md:MdChip Content="Design team" Variant="Input" />
-        <md:MdChip Content="September" Variant="Input" />
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Filter" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdFilterChip Content="Nearby" IsChecked="True" Margin="0,0,10,10" />
+          <md:MdChip Content="Open now" Variant="Filter" Margin="0,0,10,10" />
+          <md:MdChip Content="Top rated" Variant="Filter" Margin="0,0,10,10" />
+        </WrapPanel>
       </StackPanel>
-    </StackPanel>
-    <StackPanel Spacing="12">
-      <TextBlock Classes="h2" Text="Suggestion" />
-      <StackPanel Orientation="Horizontal" Spacing="10">
-        <md:MdSuggestionChip Content="Travel ideas" />
-        <md:MdChip Content="Weekend plans" Variant="Suggestion" />
-        <md:MdChip Content="Restaurants" Variant="Suggestion" />
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Input" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdInputChip Content="Alex" Margin="0,0,10,10" />
+          <md:MdChip Content="Design team" Variant="Input" Margin="0,0,10,10" />
+          <md:MdChip Content="September" Variant="Input" Margin="0,0,10,10" />
+        </WrapPanel>
       </StackPanel>
-    </StackPanel>
-    <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdChip Content=&quot;Open now&quot;&#10;           Variant=&quot;Filter&quot;&#10;           IsChecked=&quot;{Binding OpenNow}&quot; /&gt;&#10;&lt;md:MdChip Content=&quot;Alex&quot; Variant=&quot;Input&quot;&#10;           RemoveCommand=&quot;{Binding RemovePersonCommand}&quot; /&gt;" CSharpCode="var filter = new MdChip { Content = &quot;Open now&quot;, Variant = MdChipVariant.Filter };&#10;filter.Bind(ToggleButton.IsCheckedProperty, viewModel.OpenNowBinding);" /></StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Suggestion" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdSuggestionChip Content="Travel ideas" Margin="0,0,10,10" />
+          <md:MdChip Content="Weekend plans" Variant="Suggestion" Margin="0,0,10,10" />
+          <md:MdChip Content="Restaurants" Variant="Suggestion" Margin="0,0,10,10" />
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdChip Content=&quot;Open now&quot;&#10;           Variant=&quot;Filter&quot;&#10;           IsChecked=&quot;{Binding OpenNow}&quot; /&gt;&#10;&lt;md:MdChip Content=&quot;Alex&quot; Variant=&quot;Input&quot;&#10;           RemoveCommand=&quot;{Binding RemovePersonCommand}&quot; /&gt;" CSharpCode="var filter = new MdChip { Content = &quot;Open now&quot;, Variant = MdChipVariant.Filter };&#10;filter.Bind(ToggleButton.IsCheckedProperty, viewModel.OpenNowBinding);" />
+      </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>
 </UserControl>

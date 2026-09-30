@@ -9,7 +9,19 @@
       <StackPanel Spacing="12"><TextBlock Classes="h2" Text="FAB sizes"/><StackPanel Orientation="Horizontal" Spacing="20" VerticalAlignment="Center"><md:MdFloatingActionButton Icon="{x:Static md:MdSymbols.Add}" Size="Small"/><md:MdFloatingActionButton Icon="{x:Static md:MdSymbols.Add}"/><md:MdFloatingActionButton Icon="{x:Static md:MdSymbols.Add}" Size="Medium"/><md:MdFloatingActionButton Icon="{x:Static md:MdSymbols.Add}" Size="Large"/></StackPanel></StackPanel>
       <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Color styles"/><StackPanel Orientation="Horizontal" Spacing="16"><md:MdFloatingActionButton Icon="{x:Static md:MdSymbols.Edit}"/><md:MdFloatingActionButton Icon="{x:Static md:MdSymbols.Edit}" ColorStyle="SecondaryContainer"/><md:MdFloatingActionButton Icon="{x:Static md:MdSymbols.Edit}" ColorStyle="TertiaryContainer"/><md:MdFloatingActionButton Icon="{x:Static md:MdSymbols.Edit}" ColorStyle="Primary"/></StackPanel></StackPanel>
       <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Extended FAB"/><StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center"><md:MdExtendedFloatingActionButton Content="Create" Icon="{x:Static md:MdSymbols.Add}"/><md:MdExtendedFloatingActionButton Content="Compose" Icon="{x:Static md:MdSymbols.Edit}" Size="Medium" ColorStyle="SecondaryContainer"/><md:MdExtendedFloatingActionButton Content="Navigate" Icon="{x:Static md:MdSymbols.ArrowBack}" Size="Large" ColorStyle="TertiaryContainer"/></StackPanel></StackPanel>
-      <Grid ColumnDefinitions="*,Auto"><StackPanel Spacing="8"><TextBlock Classes="h2" Text="FAB menu"/><TextBlock Classes="body" Width="440" TextWrapping="Wrap" Text="Click the round trigger to play the reversible expand/collapse motion. Menu actions use the required 56-DIP full pill shape."/></StackPanel><md:MdFabMenu Grid.Column="1"><md:MdFabMenuItem Content="Photo" Icon="{x:Static md:MdSymbols.Photo}"/><md:MdFabMenuItem Content="Document" Icon="{x:Static md:MdSymbols.Description}"/><md:MdFabMenuItem Content="Link" Icon="{x:Static md:MdSymbols.Link}"/></md:MdFabMenu></Grid>
+      <Border Classes="gallery-section" Padding="24" MinHeight="260">
+        <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Stretch">
+          <StackPanel Spacing="8" VerticalAlignment="Top">
+            <TextBlock Classes="h2" Text="FAB menu"/>
+            <TextBlock Classes="body" TextWrapping="Wrap" MaxWidth="440" Text="Click the round trigger to play the reversible expand/collapse motion. Menu actions use the required 56-DIP full pill shape."/>
+          </StackPanel>
+          <md:MdFabMenu Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <md:MdFabMenuItem Content="Photo" Icon="{x:Static md:MdSymbols.Photo}"/>
+            <md:MdFabMenuItem Content="Document" Icon="{x:Static md:MdSymbols.Description}"/>
+            <md:MdFabMenuItem Content="Link" Icon="{x:Static md:MdSymbols.Link}"/>
+          </md:MdFabMenu>
+        </Grid>
+      </Border>
       <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdFloatingActionButton Icon=&quot;{x:Static md:MdSymbols.Add}&quot; /&gt;&#10;&lt;md:MdExtendedFloatingActionButton Content=&quot;Create&quot; Icon=&quot;{x:Static md:MdSymbols.Add}&quot; /&gt;" CSharpCode="var fab = new MdFloatingActionButton { Icon = MdSymbols.Add };&#10;var extended = new MdExtendedFloatingActionButton { Content = &quot;Create&quot;, Icon = MdSymbols.Add };" /></StackPanel>
     </StackPanel>
   </md:MdScrollViewer>

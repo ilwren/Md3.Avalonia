@@ -55,10 +55,12 @@
     <Setter Property="Width" Value="40" /><Setter Property="Height" Value="40" />
     <Setter Property="Padding" Value="0" /><Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" /><Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate TargetType="ToggleButton">
         <Border x:Name="PART_Surface" Background="{TemplateBinding Background}" CornerRadius="20" ClipToBounds="True">
-          <Grid>
+          <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
             <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
             <Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsHitTestVisible="False" Opacity="0" />
           </Grid>
@@ -103,8 +105,12 @@
           <Border IsVisible="{Binding ShowGuide}" Width="1" Height="48" Margin="-12,0,0,0"
                   HorizontalAlignment="Left" IsHitTestVisible="False"
                   Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
-          <ToggleButton x:Name="PART_Toggle" Theme="{StaticResource EcoTreeToggleTheme}" IsVisible="{Binding HasChildren}" IsChecked="{Binding IsExpanded}" AutomationProperties.Name="Toggle children">
-            <Path Width="18" Height="18" Data="M 6,3 L 15,12 L 6,21" Stretch="Uniform"
+          <ToggleButton x:Name="PART_Toggle" Theme="{StaticResource EcoTreeToggleTheme}"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        IsVisible="{Binding HasChildren}" IsChecked="{Binding IsExpanded}"
+                        AutomationProperties.Name="Toggle children">
+            <Path Width="16" Height="16" Data="M 9,6 L 15,12 L 9,18" Stretch="Uniform"
+                  HorizontalAlignment="Center" VerticalAlignment="Center"
                   Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round"
                   RenderTransformOrigin="50%,50%">
               <Path.RenderTransform><RotateTransform Angle="{Binding ExpansionAngle}" /></Path.RenderTransform>

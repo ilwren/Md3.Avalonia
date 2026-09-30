@@ -127,10 +127,11 @@
     <Setter Property="OpenIcon" Value="{DynamicResource Md.Icon.Add}" />
     <Setter Property="CloseIcon" Value="{DynamicResource Md.Icon.Close}" />
     <Setter Property="HorizontalAlignment" Value="Right" />
+    <Setter Property="VerticalAlignment" Value="Bottom" />
     <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Spacing="{DynamicResource Md.Comp.FabMenu.ItemSpacing}" HorizontalAlignment="Right" /></ItemsPanelTemplate></Setter>
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdFabMenu">
-        <StackPanel Spacing="{DynamicResource Md.Comp.FabMenu.CloseButtonSpacing}" HorizontalAlignment="Right">
+        <StackPanel Spacing="{DynamicResource Md.Comp.FabMenu.CloseButtonSpacing}" HorizontalAlignment="Right" VerticalAlignment="Bottom">
           <ItemsPresenter x:Name="PART_MenuItems"
                           MaxHeight="0"
                           ClipToBounds="True"
