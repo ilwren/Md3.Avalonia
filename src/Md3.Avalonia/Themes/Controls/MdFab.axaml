@@ -2,14 +2,13 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:md="using:Md3.Avalonia.Controls">
   <ControlTheme x:Key="{x:Type md:MdFloatingActionButton}" TargetType="md:MdFloatingActionButton">
-    <Setter Property="MinWidth" Value="48" />
-    <Setter Property="MinHeight" Value="48" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
-    <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Elevation" Value="{DynamicResource Md.Sys.Elevation.Level3}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdFloatingActionButton">
-        <Grid MinWidth="48" MinHeight="48" Background="Transparent">
+        <Grid Background="Transparent">
           <Border x:Name="PART_Container"
                   Width="{TemplateBinding ContainerSize}"
                   Height="{TemplateBinding ContainerSize}"
@@ -27,10 +26,13 @@
                       CornerRadius="{TemplateBinding ContainerCornerRadius}"
                       IsHitTestVisible="False"
                       Opacity="0" />
-              <md:MdRipplePresenter RippleBrush="{TemplateBinding StateLayerBrush}" IsCentered="True" />
-              <Viewbox Width="{TemplateBinding IconSize}" Height="{TemplateBinding IconSize}">
+              <md:MdRipplePresenter RippleBrush="{TemplateBinding StateLayerBrush}" />
+              <Viewbox Width="{TemplateBinding IconSize}"
+                       Height="{TemplateBinding IconSize}"
+                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
                 <md:MdSymbolPresenter Content="{TemplateBinding Icon}"
-                                  Foreground="{TemplateBinding Foreground}" />
+                                      Foreground="{TemplateBinding Foreground}" />
               </Viewbox>
             </Grid>
           </Border>
@@ -41,10 +43,10 @@
     <Style Selector="^:pointerover"><Setter Property="Elevation" Value="{DynamicResource Md.Sys.Elevation.Level4}" /></Style>
     <Style Selector="^:focus-visible /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Focus.Opacity}" /></Style>
     <Style Selector="^:pressed /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" /></Style>
-    <Style Selector="^:small"><Setter Property="ContainerSize" Value="{DynamicResource Md.Comp.Fab.Small.Size}" /><Setter Property="IconSize" Value="{DynamicResource Md.Comp.Fab.Small.IconSize}" /><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Fab.Small.Shape}" /></Style>
-    <Style Selector="^:regular"><Setter Property="ContainerSize" Value="{DynamicResource Md.Comp.Fab.Regular.Size}" /><Setter Property="IconSize" Value="{DynamicResource Md.Comp.Fab.Regular.IconSize}" /><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Fab.Regular.Shape}" /></Style>
-    <Style Selector="^:medium"><Setter Property="ContainerSize" Value="{DynamicResource Md.Comp.Fab.Medium.Size}" /><Setter Property="IconSize" Value="{DynamicResource Md.Comp.Fab.Medium.IconSize}" /><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Fab.Medium.Shape}" /></Style>
-    <Style Selector="^:large"><Setter Property="ContainerSize" Value="{DynamicResource Md.Comp.Fab.Large.Size}" /><Setter Property="IconSize" Value="{DynamicResource Md.Comp.Fab.Large.IconSize}" /><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Fab.Large.Shape}" /></Style>
+    <Style Selector="^:small"><Setter Property="ContainerSize" Value="{DynamicResource Md.Comp.Fab.Small.Height}" /><Setter Property="IconSize" Value="{DynamicResource Md.Comp.Fab.Small.IconSize}" /><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Fab.Small.Shape}" /></Style>
+    <Style Selector="^:regular"><Setter Property="ContainerSize" Value="{DynamicResource Md.Comp.Fab.Regular.Height}" /><Setter Property="IconSize" Value="{DynamicResource Md.Comp.Fab.Regular.IconSize}" /><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Fab.Regular.Shape}" /></Style>
+    <Style Selector="^:medium"><Setter Property="ContainerSize" Value="{DynamicResource Md.Comp.Fab.Medium.Height}" /><Setter Property="IconSize" Value="{DynamicResource Md.Comp.Fab.Medium.IconSize}" /><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Fab.Medium.Shape}" /></Style>
+    <Style Selector="^:large"><Setter Property="ContainerSize" Value="{DynamicResource Md.Comp.Fab.Large.Height}" /><Setter Property="IconSize" Value="{DynamicResource Md.Comp.Fab.Large.IconSize}" /><Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Fab.Large.Shape}" /></Style>
     <Style Selector="^:primary-container"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" /><Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" /></Style>
     <Style Selector="^:secondary-container"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" /><Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" /></Style>
     <Style Selector="^:tertiary-container"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnTertiaryContainer.Brush}" /><Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnTertiaryContainer.Brush}" /></Style>
@@ -128,17 +130,20 @@
     <Setter Property="CloseIcon" Value="{DynamicResource Md.Icon.Close}" />
     <Setter Property="HorizontalAlignment" Value="Right" />
     <Setter Property="VerticalAlignment" Value="Bottom" />
+    <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Spacing="{DynamicResource Md.Comp.FabMenu.ItemSpacing}" HorizontalAlignment="Right" /></ItemsPanelTemplate></Setter>
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdFabMenu">
-        <StackPanel Spacing="{DynamicResource Md.Comp.FabMenu.CloseButtonSpacing}" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+        <Panel ClipToBounds="False">
           <ItemsPresenter x:Name="PART_MenuItems"
+                          Margin="0,0,0,60"
                           MaxHeight="0"
-                          ClipToBounds="True"
+                          ClipToBounds="False"
                           IsHitTestVisible="False"
                           IsVisible="{TemplateBinding AreItemsVisible}"
                           ItemsPanel="{TemplateBinding ItemsPanel}"
                           HorizontalAlignment="Right"
+                          VerticalAlignment="Bottom"
                           Opacity="0"
                           RenderTransform="scale(0.9) translate(0px, 20px)"
                           RenderTransformOrigin="100%,100%">
@@ -150,17 +155,29 @@
                 <Setter Property="IconSpacing" Value="8" />
                 <Setter Property="MinHeight" Value="56" />
                 <Setter Property="HorizontalAlignment" Value="Right" />
+                <Setter Property="Cursor" Value="Hand" />
+              </Style>
+              <Style Selector="md|MdFabMenuItem">
+                <Setter Property="ContainerHeight" Value="56" />
+                <Setter Property="ContainerCornerRadius" Value="28" />
+                <Setter Property="IconSize" Value="24" />
+                <Setter Property="IconSpacing" Value="8" />
+                <Setter Property="MinHeight" Value="56" />
+                <Setter Property="HorizontalAlignment" Value="Right" />
+                <Setter Property="Cursor" Value="Hand" />
               </Style>
             </ItemsPresenter.Styles>
           </ItemsPresenter>
           <md:MdToggleIconButton x:Name="PART_Trigger"
                                  Size="Medium"
                                  Variant="Filled"
+                                 Cursor="Hand"
                                  HorizontalAlignment="Right"
+                                 VerticalAlignment="Bottom"
                                  Icon="{TemplateBinding OpenIcon}"
                                  SelectedIcon="{TemplateBinding CloseIcon}"
                                  IsChecked="{TemplateBinding IsOpen, Mode=TwoWay}" />
-        </StackPanel>
+        </Panel>
       </ControlTemplate>
     </Setter>
     <Style Selector="^:open /template/ ItemsPresenter#PART_MenuItems">

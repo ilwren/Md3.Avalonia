@@ -275,6 +275,87 @@ public sealed class MdPhaseThreeAndFourGestureParityTests
     }
 
     [AvaloniaFact]
+    public void ScrollViewer_Drag_Scrolls_Content_And_Applies_Inertia()
+    {
+        var scrollViewer = new MdScrollViewer
+        {
+            Width = 300,
+            Height = 200,
+            Content = new StackPanel
+            {
+                Spacing = 10,
+                Children =
+                {
+                    new Border { Height = 100, Background = Brushes.Red },
+                    new Border { Height = 100, Background = Brushes.Green },
+                    new Border { Height = 100, Background = Brushes.Blue },
+                    new Border { Height = 100, Background = Brushes.Yellow },
+                    new Border { Height = 100, Background = Brushes.Purple }
+                }
+            }
+        };
+
+        using var host = Show(scrollViewer, 400, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(0, scrollViewer.Offset.Y);
+
+        // Drag upwards from y=150 to y=50 (100px drag)
+        var startPoint = scrollViewer.TranslatePoint(new Point(150, 150), host.Window)!.Value;
+        var endPoint = scrollViewer.TranslatePoint(new Point(150, 50), host.Window)!.Value;
+
+        host.Window.MouseMove(startPoint, RawInputModifiers.None);
+        host.Window.MouseDown(startPoint, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseMove(endPoint, RawInputModifiers.LeftMouseButton);
+        Dispatcher.UIThread.RunJobs();
+
+        // Offset should have increased due to upward drag
+        Assert.True(scrollViewer.Offset.Y > 0, "Dragging content upward should increase vertical scroll offset");
+
+        host.Window.MouseUp(endPoint, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        // Stop inertia clean-up
+        scrollViewer.StopInertia();
+    }
+
+    [AvaloniaFact]
+    public void FabMenu_Trigger_Does_Not_Shift_Position_When_Opened()
+    {
+        var fabMenu = new MdFabMenu
+        {
+            Items =
+            {
+                new MdFabMenuItem { Content = "Document", Icon = MdSymbols.Description },
+                new MdFabMenuItem { Content = "Photo", Icon = MdSymbols.Photo }
+            }
+        };
+
+        var rootGrid = new Grid
+        {
+            Width = 400,
+            Height = 400,
+            Children = { fabMenu }
+        };
+
+        using var host = Show(rootGrid, 400, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        var trigger = fabMenu.GetVisualDescendants().OfType<MdToggleIconButton>().First();
+        var closedTriggerPos = trigger.TranslatePoint(new Point(0, 0), host.Window)!.Value;
+
+        // Open FAB menu
+        fabMenu.IsOpen = true;
+        Dispatcher.UIThread.RunJobs();
+
+        var openTriggerPos = trigger.TranslatePoint(new Point(0, 0), host.Window)!.Value;
+
+        // Trigger X position should be identical (within subpixel tolerance)
+        Assert.True(Math.Abs(closedTriggerPos.X - openTriggerPos.X) < 1.0,
+            $"Trigger X moved from {closedTriggerPos.X} to {openTriggerPos.X} when opened");
+    }
+
+    [AvaloniaFact]
     public void Sample_And_New_Gallery_Pages_Render()
     {
         Control[] samplePages =

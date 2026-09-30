@@ -16,6 +16,8 @@ namespace Md3.Avalonia.Controls;
 public class MdFabMenu : ItemsControl
 {
     private ItemsPresenter? _menuItems;
+    private Control? _trigger;
+
     public static readonly StyledProperty<bool> IsOpenProperty = AvaloniaProperty.Register<MdFabMenu, bool>(
         nameof(IsOpen), defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
     public static readonly StyledProperty<bool> AreItemsVisibleProperty =
@@ -60,7 +62,25 @@ public class MdFabMenu : ItemsControl
     {
         base.OnApplyTemplate(e);
         _menuItems = e.NameScope.Find<ItemsPresenter>("PART_MenuItems");
+        _trigger = e.NameScope.Find<Control>("PART_Trigger");
         UpdateMotion();
+    }
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        _trigger?.Measure(availableSize);
+        _menuItems?.Measure(availableSize);
+
+        var triggerSize = _trigger?.DesiredSize ?? new Size(48, 48);
+        var itemsHeight = _menuItems?.DesiredSize.Height ?? 0;
+
+        // The footprint width is strictly anchored to the trigger's width.
+        // This ensures parent layouts (Grid, StackPanel, Canvas, Scaffold) never shift the trigger horizontally when items expand.
+        var width = triggerSize.Width;
+        var height = triggerSize.Height + (AreItemsVisible || IsOpen ? itemsHeight + 12 : 0);
+
+        base.MeasureOverride(availableSize);
+        return new Size(width, height);
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
