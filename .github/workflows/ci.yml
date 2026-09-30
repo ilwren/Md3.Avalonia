@@ -37,7 +37,8 @@ jobs:
         run: dotnet restore Md3.Avalonia.sln
 
       - name: Build solution (Release)
-        run: dotnet build Md3.Avalonia.sln -c Release --no-restore -v normal
+        run: |
+          dotnet build Md3.Avalonia.sln -c Release --no-restore > build.log 2>&1 || (cat build.log | grep -E "error |Error" | head -n 30 | while read -r line; do echo "::error::$line"; done; cat build.log; exit 1)
 
       - name: Run Headless Tests
         run: |
