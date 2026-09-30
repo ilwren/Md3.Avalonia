@@ -11,6 +11,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Ecosystem.Controls;
+using Md3.Avalonia.Gallery.Pages;
 using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
