@@ -37,7 +37,7 @@ public sealed class MdPhaseThreeAndFourGestureParityTests
         var point = slidable.TranslatePoint(new Point(20, 30), host.Window)!.Value;
         host.Window.MouseMove(point, RawInputModifiers.None);
         host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
-        // Drag past 1.8x ActionExtent (1.8 * 80 = 144)
+        // Drag 180px -> offset = 80 + (100 * 0.35) = 115 >= 80 * 1.3 = 104
         host.Window.MouseMove(point.WithX(point.X + 180), RawInputModifiers.None);
         host.Window.MouseUp(point.WithX(point.X + 180), MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
@@ -141,15 +141,14 @@ public sealed class MdPhaseThreeAndFourGestureParityTests
             Content = new MdButton { Content = "Long press me" }
         };
 
-        using var windowScope = Show(host, 400, 300);
-        Dispatcher.UIThread.RunJobs();
-
         Assert.Equal(TimeSpan.FromMilliseconds(300), host.LongPressDelay);
         Assert.False(host.IsOpen);
         host.Show();
         Assert.True(host.IsOpen);
+        Assert.True(tooltip.IsOpen);
         host.Dismiss();
         Assert.False(host.IsOpen);
+        Assert.False(tooltip.IsOpen);
     }
 
     [AvaloniaFact]

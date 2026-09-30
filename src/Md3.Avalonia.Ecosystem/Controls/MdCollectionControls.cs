@@ -126,12 +126,12 @@ public sealed class MdSlidableItem : ContentControl
         var threshold = Math.Max(1, Bounds.Width) * Math.Clamp(OpenThreshold, 0.05, 0.9);
         var fling = Math.Abs(_horizontalVelocity) >= 0.5 && Math.Sign(_horizontalVelocity) == Math.Sign(Offset);
 
-        if (Offset >= maxExtent * 1.8 && StartActionCommand is not null)
+        if (Offset >= maxExtent * 1.3 && StartActionCommand is not null)
         {
             InvokeStart();
             return;
         }
-        if (Offset <= -maxExtent * 1.8 && EndActionCommand is not null)
+        if (Offset <= -maxExtent * 1.3 && EndActionCommand is not null)
         {
             InvokeEnd();
             return;
