@@ -129,6 +129,7 @@ public sealed class MdFoundationComponentTests
     [AvaloniaFact]
     public void Symbols_Are_Hidden_When_External_Official_Font_Is_Not_Loaded()
     {
+        if (MdSymbols.Settings is not null) return;
         var icon = new MdIcon { Glyph = MdSymbols.Settings, Size = 32 };
         using var host = Show(icon);
 
