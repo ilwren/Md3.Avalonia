@@ -162,14 +162,12 @@ public sealed class MdScrollViewer : ScrollViewer
         var wasDragging = _isDragging;
         _isDragging = false;
 
-        if (_capturedPointer is not null)
-        {
-            _capturedPointer.Capture(null);
-            _capturedPointer = null;
-        }
-
         if (wasDragging)
         {
+            if (Equals(e.Pointer.Captured, this))
+            {
+                e.Pointer.Capture(null);
+            }
             e.Handled = true;
 
             // Calculate release velocity from recent history
@@ -199,13 +197,18 @@ public sealed class MdScrollViewer : ScrollViewer
                 }
             }
         }
+
+        _capturedPointer = null;
     }
 
     private void OnPreviewPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
     {
-        _isPressed = false;
-        _isDragging = false;
-        _capturedPointer = null;
+        if (Equals(e.Pointer.Captured, this))
+        {
+            _isPressed = false;
+            _isDragging = false;
+            _capturedPointer = null;
+        }
     }
 
     private void OnInertiaTick(object? sender, EventArgs e)

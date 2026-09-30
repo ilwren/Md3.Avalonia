@@ -84,6 +84,46 @@ public class MdPhaseThreeAndFourGestureParityTests
     }
 
     [AvaloniaFact]
+    public void ScrollViewer_Child_Button_Click_Fires_Without_Drag()
+    {
+        var clicked = false;
+        var button = new MdButton
+        {
+            Content = "Navigate Page",
+            Width = 160,
+            Height = 48
+        };
+        button.Click += (_, _) => clicked = true;
+
+        var scrollViewer = new MdScrollViewer
+        {
+            Width = 300,
+            Height = 200,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            Content = new StackPanel
+            {
+                Spacing = 10,
+                Children =
+                {
+                    button,
+                    new Border { Height = 200, Background = Brushes.Blue }
+                }
+            }
+        };
+
+        using var host = Show(scrollViewer, 400, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        var point = button.TranslatePoint(new Point(40, 24), host.Window)!.Value;
+        host.Window.MouseMove(point, RawInputModifiers.None);
+        host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseUp(point, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(clicked, "Clicking a button inside MdScrollViewer without dragging must trigger the Click event");
+    }
+
+    [AvaloniaFact]
     public void FabMenu_Trigger_Position_Remains_Stable_When_Opened()
     {
         var fabMenu = new MdFabMenu
@@ -113,6 +153,37 @@ public class MdPhaseThreeAndFourGestureParityTests
         // Trigger should remain anchored and not jump horizontally or stretch container
         Assert.True(fabMenu.IsOpen);
         Assert.True(fabMenu.Bounds.Width > 0);
+    }
+
+    [AvaloniaFact]
+    public void FabMenu_Supports_Left_And_Right_Alignment()
+    {
+        var rightMenu = new MdFabMenu
+        {
+            Alignment = MdFabAlignment.Right,
+            Items = { new MdFabMenuItem { Content = "Right action" } }
+        };
+
+        var leftMenu = new MdFabMenu
+        {
+            Alignment = MdFabAlignment.Left,
+            Items = { new MdFabMenuItem { Content = "Left action" } }
+        };
+
+        var container = new StackPanel
+        {
+            Children = { rightMenu, leftMenu }
+        };
+
+        using var host = Show(container, 400, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(MdFabAlignment.Right, rightMenu.Alignment);
+        Assert.Equal(MdFabAlignment.Left, leftMenu.Alignment);
+
+        // Dynamically toggle alignment
+        rightMenu.Alignment = MdFabAlignment.Left;
+        Assert.Equal(MdFabAlignment.Left, rightMenu.Alignment);
     }
 
     [AvaloniaFact]

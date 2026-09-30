@@ -12,7 +12,7 @@ using Md3.Avalonia.Motion;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>An M3 FAB menu for two to six related actions with reversible expand/collapse motion.</summary>
-[PseudoClasses(":opening", ":open", ":closing", ":closed", ":primary", ":secondary", ":tertiary", ":reduced-motion", ":no-motion")]
+[PseudoClasses(":opening", ":open", ":closing", ":closed", ":primary", ":secondary", ":tertiary", ":left", ":right", ":reduced-motion", ":no-motion")]
 public class MdFabMenu : ItemsControl
 {
     private ItemsPresenter? _menuItems;
@@ -24,6 +24,8 @@ public class MdFabMenu : ItemsControl
         AvaloniaProperty.Register<MdFabMenu, bool>(nameof(AreItemsVisible));
     public static readonly StyledProperty<MdFabColor> ColorStyleProperty =
         AvaloniaProperty.Register<MdFabMenu, MdFabColor>(nameof(ColorStyle), MdFabColor.PrimaryContainer);
+    public static readonly StyledProperty<MdFabAlignment> AlignmentProperty =
+        AvaloniaProperty.Register<MdFabMenu, MdFabAlignment>(nameof(Alignment), MdFabAlignment.Right);
     public static readonly StyledProperty<object?> OpenIconProperty =
         AvaloniaProperty.Register<MdFabMenu, object?>(nameof(OpenIcon));
     public static readonly StyledProperty<object?> CloseIconProperty =
@@ -37,6 +39,7 @@ public class MdFabMenu : ItemsControl
     {
         IsOpenProperty.Changed.AddClassHandler<MdFabMenu>((menu, _) => menu.UpdateOpenState());
         ColorStyleProperty.Changed.AddClassHandler<MdFabMenu>((menu, _) => menu.UpdateColorPseudoClasses());
+        AlignmentProperty.Changed.AddClassHandler<MdFabMenu>((menu, _) => menu.UpdateAlignment());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdFabMenu>((menu, _) => menu.UpdateMotion());
     }
 
@@ -45,6 +48,7 @@ public class MdFabMenu : ItemsControl
         _closeTimer = new DispatcherTimer();
         _closeTimer.Tick += (_, _) => FinishClosing();
         UpdateColorPseudoClasses();
+        UpdateAlignment();
         SetMotionPseudoClass(closed: true);
         LayoutUpdated += (_, _) => UpdateMenuItemGeometry();
     }
@@ -52,6 +56,7 @@ public class MdFabMenu : ItemsControl
     public bool IsOpen { get => GetValue(IsOpenProperty); set => SetValue(IsOpenProperty, value); }
     public bool AreItemsVisible { get => GetValue(AreItemsVisibleProperty); private set => SetCurrentValue(AreItemsVisibleProperty, value); }
     public MdFabColor ColorStyle { get => GetValue(ColorStyleProperty); set => SetValue(ColorStyleProperty, value); }
+    public MdFabAlignment Alignment { get => GetValue(AlignmentProperty); set => SetValue(AlignmentProperty, value); }
     public object? OpenIcon { get => GetValue(OpenIconProperty); set => SetValue(OpenIconProperty, value); }
     public object? CloseIcon { get => GetValue(CloseIconProperty); set => SetValue(CloseIconProperty, value); }
 
@@ -63,6 +68,7 @@ public class MdFabMenu : ItemsControl
         base.OnApplyTemplate(e);
         _menuItems = e.NameScope.Find<ItemsPresenter>("PART_MenuItems");
         _trigger = e.NameScope.Find<Control>("PART_Trigger");
+        UpdateAlignment();
         UpdateMotion();
     }
 
@@ -205,5 +211,11 @@ public class MdFabMenu : ItemsControl
         PseudoClasses.Set(":primary", ColorStyle is MdFabColor.PrimaryContainer or MdFabColor.Primary);
         PseudoClasses.Set(":secondary", ColorStyle is MdFabColor.SecondaryContainer or MdFabColor.Secondary);
         PseudoClasses.Set(":tertiary", ColorStyle is MdFabColor.TertiaryContainer or MdFabColor.Tertiary);
+    }
+
+    private void UpdateAlignment()
+    {
+        PseudoClasses.Set(":left", Alignment == MdFabAlignment.Left);
+        PseudoClasses.Set(":right", Alignment == MdFabAlignment.Right);
     }
 }

@@ -186,6 +186,40 @@
       <Setter Property="Opacity" Value="1" />
       <Setter Property="RenderTransform" Value="scale(1) translate(0px, 0px)" />
     </Style>
+    <Style Selector="^:left">
+      <Setter Property="HorizontalAlignment" Value="Left" />
+      <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Spacing="{DynamicResource Md.Comp.FabMenu.ItemSpacing}" HorizontalAlignment="Left" /></ItemsPanelTemplate></Setter>
+    </Style>
+    <Style Selector="^:left /template/ ItemsPresenter#PART_MenuItems">
+      <Setter Property="HorizontalAlignment" Value="Left" />
+      <Setter Property="RenderTransformOrigin" Value="0%,100%" />
+    </Style>
+    <Style Selector="^:left /template/ md|MdToggleIconButton#PART_Trigger">
+      <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+    <Style Selector="^:left /template/ md|MdExtendedFloatingActionButton">
+      <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+    <Style Selector="^:left /template/ md|MdFabMenuItem">
+      <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+    <Style Selector="^:right">
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Spacing="{DynamicResource Md.Comp.FabMenu.ItemSpacing}" HorizontalAlignment="Right" /></ItemsPanelTemplate></Setter>
+    </Style>
+    <Style Selector="^:right /template/ ItemsPresenter#PART_MenuItems">
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="RenderTransformOrigin" Value="100%,100%" />
+    </Style>
+    <Style Selector="^:right /template/ md|MdToggleIconButton#PART_Trigger">
+      <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
+    <Style Selector="^:right /template/ md|MdExtendedFloatingActionButton">
+      <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
+    <Style Selector="^:right /template/ md|MdFabMenuItem">
+      <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
     <Style Selector="^:primary /template/ md|MdToggleIconButton#PART_Trigger"><Setter Property="Variant" Value="Filled" /></Style>
     <Style Selector="^:secondary /template/ md|MdToggleIconButton#PART_Trigger"><Setter Property="Variant" Value="Tonal" /></Style>
     <Style Selector="^:tertiary /template/ md|MdToggleIconButton#PART_Trigger"><Setter Property="Variant" Value="Outlined" /></Style>
