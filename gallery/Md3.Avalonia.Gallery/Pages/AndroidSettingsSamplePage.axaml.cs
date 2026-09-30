@@ -15,7 +15,7 @@ public partial class AndroidSettingsSamplePage : UserControl
     {
         if (sender is MdSettingsCard card && SettingNotification is not null)
         {
-            SettingNotification.Text = $"Opened setting page: {card.Header}";
+            SettingNotification.Text = $"Selected: {card.Header}";
         }
     }
 
@@ -23,7 +23,7 @@ public partial class AndroidSettingsSamplePage : UserControl
     {
         if (sender is MdSwitch sw && SettingNotification is not null)
         {
-            SettingNotification.Text = $"Option toggled: {(sw.IsChecked == true ? "ON" : "OFF")}";
+            SettingNotification.Text = $"Setting toggled: {(sw.IsChecked == true ? "ON" : "OFF")}";
         }
     }
 }

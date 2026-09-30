@@ -1,105 +1,110 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
-             xmlns:eco="using:Md3.Avalonia.Ecosystem.Controls"
              x:Class="Md3.Avalonia.Gallery.Pages.TasksSamplePage">
-  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <StackPanel MaxWidth="720" Spacing="24" HorizontalAlignment="Center" Margin="16,24,16,40">
+  <Grid>
+    <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel MaxWidth="640" Spacing="16" HorizontalAlignment="Center" Margin="16,24,16,100">
+        
+        <!-- Header -->
+        <Border Padding="16,12" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20">
+          <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+            <StackPanel Spacing="2">
+              <TextBlock Text="My Tasks" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+              <TextBlock Text="Swipe right to complete, swipe left to delete" FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+            </StackPanel>
+            <md:MdFilterChip Grid.Column="1" Label="Today (4)" IsSelected="True" />
+          </Grid>
+        </Border>
 
-      <!-- Header & Progress Card -->
-      <Border Padding="24" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" CornerRadius="28">
-        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
-          <StackPanel Grid.Column="0" Spacing="4">
-            <TextBlock Text="My Tasks" FontSize="28" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
-            <TextBlock Text="3 of 5 tasks completed today" FontSize="14" Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" Opacity="0.8" />
-          </StackPanel>
-          <Border Grid.Column="1" Width="56" Height="56" CornerRadius="28" Background="{DynamicResource Md.Sys.Color.Secondary.Brush}">
-            <TextBlock Text="60%" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.OnSecondary.Brush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        <!-- Task Item 1 -->
+        <md:MdSlidableItem StartActionBackground="#2E7D32"
+                           EndActionBackground="#C62828"
+                           StartActionIcon="{x:Static md:MdSymbols.Check}"
+                           EndActionIcon="{x:Static md:MdSymbols.Delete}"
+                           StartActionLabel="Done"
+                           EndActionLabel="Delete"
+                           CornerRadius="16">
+          <Border Padding="16,14" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
+              <md:MdCheckBox IsChecked="True" />
+              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                <TextBlock Text="Review Material 3 design tokens" FontSize="15" FontWeight="Medium" />
+                <TextBlock Text="Completed at 09:15 AM · Work" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              </StackPanel>
+              <md:MdAssistChip Grid.Column="2" Label="High" />
+            </Grid>
           </Border>
-          <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Margin="0,16,0,0" Value="60" Maximum="100" Height="6" CornerRadius="3" Foreground="{DynamicResource Md.Sys.Color.Secondary.Brush}" />
-        </Grid>
-      </Border>
+        </md:MdSlidableItem>
 
-      <!-- Category Filter Chips -->
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <md:MdChip Content="All (5)" Variant="Filter" IsChecked="True" />
-        <md:MdChip Content="Work (3)" Variant="Filter" />
-        <md:MdChip Content="Personal (2)" Variant="Filter" />
-        <md:MdChip Content="High Priority" Variant="Filter" />
+        <!-- Task Item 2 -->
+        <md:MdSlidableItem StartActionBackground="#2E7D32"
+                           EndActionBackground="#C62828"
+                           StartActionIcon="{x:Static md:MdSymbols.Check}"
+                           EndActionIcon="{x:Static md:MdSymbols.Delete}"
+                           StartActionLabel="Done"
+                           EndActionLabel="Delete"
+                           CornerRadius="16">
+          <Border Padding="16,14" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
+              <md:MdCheckBox IsChecked="False" />
+              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                <TextBlock Text="Implement TabStripPlacement on MdTabView" FontSize="15" FontWeight="Medium" />
+                <TextBlock Text="Due Today 02:00 PM · Library" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              </StackPanel>
+              <md:MdAssistChip Grid.Column="2" Label="Feature" />
+            </Grid>
+          </Border>
+        </md:MdSlidableItem>
+
+        <!-- Task Item 3 -->
+        <md:MdSlidableItem StartActionBackground="#2E7D32"
+                           EndActionBackground="#C62828"
+                           StartActionIcon="{x:Static md:MdSymbols.Check}"
+                           EndActionIcon="{x:Static md:MdSymbols.Delete}"
+                           StartActionLabel="Done"
+                           EndActionLabel="Delete"
+                           CornerRadius="16">
+          <Border Padding="16,14" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
+              <md:MdCheckBox />
+              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                <TextBlock Text="Update MdFabMenu alignment and cursor styles" FontSize="15" FontWeight="Medium" />
+                <TextBlock Text="Due Today 04:30 PM · UI" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              </StackPanel>
+              <md:MdAssistChip Grid.Column="2" Label="Design" />
+            </Grid>
+          </Border>
+        </md:MdSlidableItem>
+
+        <!-- Task Item 4 -->
+        <md:MdSlidableItem StartActionBackground="#2E7D32"
+                           EndActionBackground="#C62828"
+                           StartActionIcon="{x:Static md:MdSymbols.Check}"
+                           EndActionIcon="{x:Static md:MdSymbols.Delete}"
+                           StartActionLabel="Done"
+                           EndActionLabel="Delete"
+                           CornerRadius="16">
+          <Border Padding="16,14" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
+              <md:MdCheckBox />
+              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                <TextBlock Text="Prepare release notes and packaging" FontSize="15" FontWeight="Medium" />
+                <TextBlock Text="Due Tomorrow 10:00 AM · Release" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              </StackPanel>
+              <md:MdAssistChip Grid.Column="2" Label="Docs" />
+            </Grid>
+          </Border>
+        </md:MdSlidableItem>
+
       </StackPanel>
+    </md:MdScrollViewer>
 
-      <!-- Task Items with Slidable Gestures -->
-      <StackPanel Spacing="12">
-        <TextBlock Text="TODAY" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" Margin="8,0,0,0" />
-
-        <!-- Task 1 (Slidable) -->
-        <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20" ClipToBounds="True">
-          <eco:MdSlidableItem StartActions="Complete" EndActions="Delete" ActionExtent="80">
-            <Grid Padding="16,14" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Background="Transparent">
-              <md:MdCheckBox IsChecked="True" VerticalAlignment="Center" />
-              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                <TextBlock Text="Review Material 3 specification update" FontSize="15" FontWeight="Medium" TextDecorations="Strikethrough" Opacity="0.6" />
-                <TextBlock Text="Design system sync with team" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-              </StackPanel>
-              <md:MdBadge Grid.Column="2" Content="High" Variant="Label" VerticalAlignment="Center" />
-            </Grid>
-          </eco:MdSlidableItem>
-        </Border>
-
-        <!-- Task 2 (Slidable) -->
-        <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20" ClipToBounds="True">
-          <eco:MdSlidableItem StartActions="Complete" EndActions="Delete" ActionExtent="80">
-            <Grid Padding="16,14" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Background="Transparent">
-              <md:MdCheckBox IsChecked="True" VerticalAlignment="Center" />
-              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                <TextBlock Text="Implement 48x48 hit targets across small buttons" FontSize="15" FontWeight="Medium" TextDecorations="Strikethrough" Opacity="0.6" />
-                <TextBlock Text="Touch accessibility compliance" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-              </StackPanel>
-              <md:MdBadge Grid.Column="2" Content="Medium" Variant="Label" VerticalAlignment="Center" />
-            </Grid>
-          </eco:MdSlidableItem>
-        </Border>
-
-        <!-- Task 3 (Slidable) -->
-        <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20" ClipToBounds="True">
-          <eco:MdSlidableItem StartActions="Complete" EndActions="Delete" ActionExtent="80">
-            <Grid Padding="16,14" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Background="Transparent">
-              <md:MdCheckBox IsChecked="False" VerticalAlignment="Center" />
-              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                <TextBlock Text="Add Android settings &amp; clock app sample showcase" FontSize="15" FontWeight="Medium" />
-                <TextBlock Text="Due today · 5:00 PM" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" />
-              </StackPanel>
-              <md:MdBadge Grid.Column="2" Content="High" Variant="Label" VerticalAlignment="Center" />
-            </Grid>
-          </eco:MdSlidableItem>
-        </Border>
-
-        <!-- Task 4 (Slidable) -->
-        <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20" ClipToBounds="True">
-          <eco:MdSlidableItem StartActions="Complete" EndActions="Delete" ActionExtent="80">
-            <Grid Padding="16,14" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Background="Transparent">
-              <md:MdCheckBox IsChecked="False" VerticalAlignment="Center" />
-              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                <TextBlock Text="Prepare v12.0 release documentation and changelog" FontSize="15" FontWeight="Medium" />
-                <TextBlock Text="Due tomorrow · 10:00 AM" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-              </StackPanel>
-              <md:MdBadge Grid.Column="2" Content="Normal" Variant="Label" VerticalAlignment="Center" />
-            </Grid>
-          </eco:MdSlidableItem>
-        </Border>
-      </StackPanel>
-
-      <!-- Quick Add Task Bar -->
-      <Border Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="20">
-        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-          <md:MdTextBox x:Name="NewTaskInput" PlaceholderText="Add a new task..." BorderThickness="0" Height="48" />
-          <md:MdButton Grid.Column="1" Content="Add" Variant="Filled" Click="OnAddTaskClick">
-            <md:MdButton.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Add}" /></md:MdButton.Icon>
-          </md:MdButton>
-        </Grid>
-      </Border>
-
-      <TextBlock x:Name="TaskStatus" Classes="body" Text="Swipe tasks left to delete or right to complete." HorizontalAlignment="Center" />
-    </StackPanel>
-  </md:MdScrollViewer>
+    <!-- Floating Action Button at Bottom Right -->
+    <md:MdFab Variant="Primary"
+              Icon="{x:Static md:MdSymbols.Add}"
+              HorizontalAlignment="Right"
+              VerticalAlignment="Bottom"
+              Margin="0,0,32,32" />
+  </Grid>
 </UserControl>

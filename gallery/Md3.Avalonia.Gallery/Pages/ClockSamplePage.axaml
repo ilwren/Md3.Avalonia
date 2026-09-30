@@ -3,142 +3,105 @@
              xmlns:md="using:Md3.Avalonia.Controls"
              x:Class="Md3.Avalonia.Gallery.Pages.ClockSamplePage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <StackPanel MaxWidth="720" Spacing="24" HorizontalAlignment="Center" Margin="16,24,16,40">
+    <StackPanel MaxWidth="640" Spacing="24" HorizontalAlignment="Center" Margin="16,24,16,40">
+      
+      <!-- Big Digital Clock Display -->
+      <Border Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="28">
+        <StackPanel Spacing="8" HorizontalAlignment="Center">
+          <TextBlock x:Name="ClockTimeText"
+                     Text="08:45"
+                     FontSize="56"
+                     FontWeight="Bold"
+                     Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                     HorizontalAlignment="Center" />
+          <TextBlock Text="Thursday, Sep 28 · Next alarm at 06:30 AM"
+                     FontSize="14"
+                     Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                     HorizontalAlignment="Center" />
+        </StackPanel>
+      </Border>
 
-      <!-- App Header & Navigation Tabs -->
-      <StackPanel Spacing="12">
-        <TextBlock Text="Clock" FontSize="28" FontWeight="SemiBold" HorizontalAlignment="Center" />
-        <md:MdTabs x:Name="ClockTabs" SelectedIndex="0" HorizontalAlignment="Center" SelectionChanged="OnTabChanged">
-          <md:MdTabItem Content="Alarm"><md:MdTabItem.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Alarm}" /></md:MdTabItem.Icon></md:MdTabItem>
-          <md:MdTabItem Content="Clock"><md:MdTabItem.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Schedule}" /></md:MdTabItem.Icon></md:MdTabItem>
-          <md:MdTabItem Content="Timer"><md:MdTabItem.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.HourglassBottom}" /></md:MdTabItem.Icon></md:MdTabItem>
-          <md:MdTabItem Content="Stopwatch"><md:MdTabItem.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Timer}" /></md:MdTabItem.Icon></md:MdTabItem>
-        </md:MdTabs>
-      </StackPanel>
+      <!-- Sub Navigation TabView -->
+      <md:MdTabView SelectedIndex="0">
+        <!-- Tab 1: Alarm -->
+        <md:MdTabViewItem Header="Alarm" Icon="{x:Static md:MdSymbols.Alarm}">
+          <StackPanel Spacing="16" Margin="0,16,0,0">
+            <!-- Alarm item 1 -->
+            <Border Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="20">
+              <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="06:30 AM" FontSize="28" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+                  <TextBlock Text="Mon, Tue, Wed, Thu, Fri · Work" FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+                <md:MdSwitch Grid.Column="1" IsChecked="True" />
+              </Grid>
+            </Border>
 
-      <!-- Alarm Section -->
-      <StackPanel x:Name="AlarmSection" Spacing="16">
-        <!-- Alarm 1 -->
-        <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24">
-          <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
-            <StackPanel Grid.Column="0" Spacing="4">
-              <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                <TextBlock Text="07:00" FontSize="36" FontWeight="Normal" />
-                <TextBlock Text="AM" FontSize="18" FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" VerticalAlignment="Center" Margin="0,8,0,0" />
+            <!-- Alarm item 2 -->
+            <Border Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="20">
+              <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="08:00 AM" FontSize="28" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+                  <TextBlock Text="Sat, Sun · Weekend" FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+                <md:MdSwitch Grid.Column="1" IsChecked="False" />
+              </Grid>
+            </Border>
+
+            <md:MdButton Variant="FilledTonal" HorizontalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <md:MdIcon Glyph="{x:Static md:MdSymbols.Add}" Size="20" />
+                <TextBlock Text="Add new alarm" VerticalAlignment="Center" />
               </StackPanel>
-              <TextBlock Text="Workdays · Mon, Tue, Wed, Thu, Fri" FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-            </StackPanel>
-            <md:MdSwitch Grid.Column="1" IsChecked="True" VerticalAlignment="Center" />
-            <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="8" Margin="0,14,0,0">
-              <md:MdChip Content="Ring once" Variant="Filter" />
-              <md:MdChip Content="Vibrate" Variant="Filter" IsChecked="True" />
-              <md:MdChip Content="Radar tone" Variant="Assist" />
-            </StackPanel>
-          </Grid>
-        </Border>
-
-        <!-- Alarm 2 -->
-        <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24">
-          <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
-            <StackPanel Grid.Column="0" Spacing="4">
-              <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                <TextBlock Text="08:30" FontSize="36" FontWeight="Normal" />
-                <TextBlock Text="AM" FontSize="18" FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" VerticalAlignment="Center" Margin="0,8,0,0" />
-              </StackPanel>
-              <TextBlock Text="Weekend · Sat, Sun" FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-            </StackPanel>
-            <md:MdSwitch Grid.Column="1" IsChecked="False" VerticalAlignment="Center" />
-            <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="8" Margin="0,14,0,0">
-              <md:MdChip Content="Gentle wake" Variant="Assist" />
-              <md:MdChip Content="Sunrise alarm" Variant="Filter" IsChecked="True" />
-            </StackPanel>
-          </Grid>
-        </Border>
-
-        <!-- Add Alarm Button -->
-        <md:MdButton HorizontalAlignment="Center" Content="Add new alarm" Variant="Tonal" Click="OnAddAlarmClick">
-          <md:MdButton.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Add}" /></md:MdButton.Icon>
-        </md:MdButton>
-      </StackPanel>
-
-      <!-- World Clock Section -->
-      <StackPanel x:Name="ClockSection" Spacing="16" IsVisible="False">
-        <Border Padding="28" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" CornerRadius="28" HorizontalAlignment="Stretch">
-          <StackPanel HorizontalAlignment="Center" Spacing="6">
-            <TextBlock x:Name="CurrentTimeText" Text="14:32:00" FontSize="48" FontWeight="Normal" Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" HorizontalAlignment="Center" />
-            <TextBlock x:Name="CurrentDateText" Text="Wednesday, September 30 · Local time" FontSize="14" Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" Opacity="0.8" HorizontalAlignment="Center" />
+            </md:MdButton>
           </StackPanel>
-        </Border>
+        </md:MdTabViewItem>
 
-        <TextBlock Text="WORLD CITIES" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" Margin="8,8,0,0" />
-
-        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-          <!-- Tokyo -->
-          <Border Grid.Column="0" Padding="18" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20">
-            <StackPanel Spacing="4">
-              <TextBlock Text="Tokyo, Japan" FontWeight="SemiBold" FontSize="15" />
-              <TextBlock Text="+1 hr ahead" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-              <TextBlock Text="15:32" FontSize="28" FontWeight="Medium" Margin="0,8,0,0" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" />
-            </StackPanel>
-          </Border>
-
-          <!-- London -->
-          <Border Grid.Column="1" Padding="18" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20">
-            <StackPanel Spacing="4">
-              <TextBlock Text="London, UK" FontWeight="SemiBold" FontSize="15" />
-              <TextBlock Text="-8 hrs behind" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-              <TextBlock Text="06:32" FontSize="28" FontWeight="Medium" Margin="0,8,0,0" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" />
-            </StackPanel>
-          </Border>
-        </Grid>
-      </StackPanel>
-
-      <!-- Timer Section -->
-      <StackPanel x:Name="TimerSection" Spacing="20" IsVisible="False">
-        <Border Width="240" Height="240" CornerRadius="120" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" HorizontalAlignment="Center">
-          <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="6">
-            <TextBlock x:Name="TimerDisplay" Text="05:00" FontSize="44" FontWeight="Normal" HorizontalAlignment="Center" />
-            <TextBlock Text="Tea timer" FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" HorizontalAlignment="Center" />
+        <!-- Tab 2: World Clock -->
+        <md:MdTabViewItem Header="World Clock" Icon="{x:Static md:MdSymbols.Public}">
+          <StackPanel Spacing="12" Margin="0,16,0,0">
+            <Border Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="16">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="Tokyo, Japan" FontSize="16" FontWeight="SemiBold" />
+                  <TextBlock Text="Today, +1 hr ahead" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="09:45 PM" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+              </Grid>
+            </Border>
+            <Border Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="16">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="London, UK" FontSize="16" FontWeight="SemiBold" />
+                  <TextBlock Text="Today, -8 hrs behind" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="12:45 PM" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+              </Grid>
+            </Border>
+            <Border Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="16">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="New York, USA" FontSize="16" FontWeight="SemiBold" />
+                  <TextBlock Text="Today, -13 hrs behind" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="07:45 AM" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+              </Grid>
+            </Border>
           </StackPanel>
-        </Border>
+        </md:MdTabViewItem>
 
-        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-          <md:MdChip Content="+1 min" Variant="Assist" Click="OnAddTimerMinute" />
-          <md:MdChip Content="+5 min" Variant="Assist" Click="OnAddTimerMinute" />
-          <md:MdChip Content="+10 min" Variant="Assist" Click="OnAddTimerMinute" />
-        </StackPanel>
-
-        <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Center">
-          <md:MdButton x:Name="TimerResetBtn" Content="Reset" Variant="Outlined" Click="OnTimerReset" />
-          <md:MdButton x:Name="TimerStartBtn" Content="Start" Variant="Filled" Click="OnTimerToggle" />
-        </StackPanel>
-      </StackPanel>
-
-      <!-- Stopwatch Section -->
-      <StackPanel x:Name="StopwatchSection" Spacing="20" IsVisible="False">
-        <Border Padding="32" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="28">
-          <StackPanel HorizontalAlignment="Center" Spacing="8">
-            <TextBlock x:Name="StopwatchDisplay" Text="00:00.00" FontSize="48" FontWeight="Normal" HorizontalAlignment="Center" />
-            <TextBlock Text="Ready" FontSize="14" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" HorizontalAlignment="Center" />
+        <!-- Tab 3: Timer -->
+        <md:MdTabViewItem Header="Timer" Icon="{x:Static md:MdSymbols.Timer}">
+          <StackPanel Spacing="24" Margin="0,24,0,0" HorizontalAlignment="Center">
+            <TextBlock Text="15:00" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" HorizontalAlignment="Center" />
+            <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Center">
+              <md:MdButton Variant="Outlined" Content="Reset" Width="100" />
+              <md:MdButton Variant="Filled" Content="Start" Width="100" />
+            </StackPanel>
           </StackPanel>
-        </Border>
+        </md:MdTabViewItem>
+      </md:MdTabView>
 
-        <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Center">
-          <md:MdButton x:Name="StopwatchLapBtn" Content="Lap" Variant="Outlined" Click="OnStopwatchLap" />
-          <md:MdButton x:Name="StopwatchToggleBtn" Content="Start" Variant="Filled" Click="OnStopwatchToggle" />
-        </StackPanel>
-
-        <StackPanel x:Name="LapsList" Spacing="8" Margin="0,8,0,0">
-          <Border Padding="12,8" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="12">
-            <Grid ColumnDefinitions="Auto,*,Auto">
-              <TextBlock Text="Lap 1" FontWeight="Medium" />
-              <TextBlock Grid.Column="2" Text="00:12.45" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" />
-            </Grid>
-          </Border>
-        </StackPanel>
-      </StackPanel>
-
-      <TextBlock x:Name="ClockStatus" Classes="body" Text="Interactive M3 Clock sample." HorizontalAlignment="Center" />
     </StackPanel>
   </md:MdScrollViewer>
 </UserControl>

@@ -7,7 +7,6 @@
       
       <!-- Top Search Settings Bar -->
       <md:MdSearchBar PlaceholderText="Search settings"
-                      Variant="Outlined"
                       Height="56"
                       HorizontalAlignment="Stretch" />
 
@@ -44,7 +43,7 @@
                            IconBackground="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}"
                            IconForeground="{DynamicResource Md.Sys.Color.OnTertiaryContainer.Brush}">
           <md:MdSettingsCard.Trailing>
-            <md:MdSwitch x:Name="AirplaneSwitch" IsChecked="False" Checked="OnSettingToggle" Unchecked="OnSettingToggle" />
+            <md:MdSwitch x:Name="AirplaneSwitch" IsChecked="False" Click="OnSettingToggle" />
           </md:MdSettingsCard.Trailing>
         </md:MdSettingsCard>
       </md:MdSettingsGroup>
@@ -56,7 +55,7 @@
                            IconBackground="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
                            IconForeground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}">
           <md:MdSettingsCard.Trailing>
-            <md:MdSwitch x:Name="DarkThemeSwitch" IsChecked="True" Checked="OnSettingToggle" Unchecked="OnSettingToggle" />
+            <md:MdSwitch x:Name="DarkThemeSwitch" IsChecked="True" Click="OnSettingToggle" />
           </md:MdSettingsCard.Trailing>
         </md:MdSettingsCard>
         <Border Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" Margin="72,0,0,0" />
