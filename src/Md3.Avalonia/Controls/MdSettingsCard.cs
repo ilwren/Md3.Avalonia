@@ -10,6 +10,14 @@ using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Controls;
 
+public enum MdSettingsCardVariant
+{
+    Flat,
+    Filled,
+    Elevated,
+    Outlined
+}
+
 /// <summary>
 /// A Material 3 / Android styled preference settings card with icon, header, description, and trailing widget.
 /// </summary>
