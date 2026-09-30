@@ -36,6 +36,9 @@ public sealed class MdDraggableScrollableSheet : ContentControl
     private bool _dragging;
     private Point _start;
     private double _startExtent;
+    private double _lastPointerY;
+    private ulong _lastPointerTimestamp;
+    private double _verticalVelocity;
     private double _sheetHeight;
     private bool _isAnimating;
     private CancellationTokenSource? _animationCancellation;
@@ -185,6 +188,9 @@ public sealed class MdDraggableScrollableSheet : ContentControl
         CancelAnimation();
         _dragging = true;
         _start = e.GetPosition(this);
+        _lastPointerY = _start.Y;
+        _lastPointerTimestamp = e.Timestamp;
+        _verticalVelocity = 0;
         _startExtent = Extent;
         e.Pointer.Capture(_dragHandle);
         PseudoClasses.Set(":dragging", true);
@@ -195,8 +201,13 @@ public sealed class MdDraggableScrollableSheet : ContentControl
     private void OnHandleMoved(object? sender, PointerEventArgs e)
     {
         if (!_dragging) return;
+        var currentY = e.GetPosition(this).Y;
+        var elapsed = e.Timestamp > _lastPointerTimestamp ? e.Timestamp - _lastPointerTimestamp : 1;
+        _verticalVelocity = (currentY - _lastPointerY) / (double)elapsed;
+        _lastPointerY = currentY;
+        _lastPointerTimestamp = e.Timestamp;
         var available = Math.Max(1, Bounds.Height);
-        SetExtent(_startExtent + (_start.Y - e.GetPosition(this).Y) / available);
+        SetExtent(_startExtent + (_start.Y - currentY) / available);
         e.Handled = true;
     }
 
@@ -220,8 +231,27 @@ public sealed class MdDraggableScrollableSheet : ContentControl
         UpdateMotion();
         if (Snap && SnapSizes.Count > 0)
         {
-            var nearest = SnapSizes.Select(value => Math.Clamp(value, MinimumExtent, MaximumExtent)).OrderBy(value => Math.Abs(value - Extent)).First();
-            SetExtent(nearest);
+            var clamped = SnapSizes.Select(value => Math.Clamp(value, MinimumExtent, MaximumExtent)).Distinct().OrderBy(v => v).ToList();
+            if (clamped.Count > 0)
+            {
+                // Upward flick (negative velocity): snap to next higher snap size
+                if (_verticalVelocity < -0.35)
+                {
+                    var target = clamped.FirstOrDefault(v => v > Extent + 0.02, clamped.Last());
+                    SetExtent(target);
+                }
+                // Downward flick (positive velocity): snap to next lower snap size
+                else if (_verticalVelocity > 0.35)
+                {
+                    var target = clamped.LastOrDefault(v => v < Extent - 0.02, clamped.First());
+                    SetExtent(target);
+                }
+                else
+                {
+                    var nearest = clamped.OrderBy(value => Math.Abs(value - Extent)).First();
+                    SetExtent(nearest);
+                }
+            }
         }
     }
 
@@ -592,5 +622,109 @@ public sealed class MdShortcutScope : ContentControl
             return;
         }
         base.OnKeyDown(e);
+    }
+}
+
+/// <summary>
+/// A host that monitors soft keyboard insets and automatically adjusts its bottom viewport
+/// padding and scrolls focused text controls into view.
+/// </summary>
+[PseudoClasses(":keyboard-active")]
+public sealed class MdKeyboardAvoidingHost : ContentControl
+{
+    public static readonly StyledProperty<bool> AutoScrollToFocusedProperty =
+        AvaloniaProperty.Register<MdKeyboardAvoidingHost, bool>(nameof(AutoScrollToFocused), true);
+
+    public static readonly StyledProperty<double> KeyboardHeightProperty =
+        AvaloniaProperty.Register<MdKeyboardAvoidingHost, double>(nameof(KeyboardHeight), 0.0);
+
+    public static readonly StyledProperty<double> ExtraBottomOffsetProperty =
+        AvaloniaProperty.Register<MdKeyboardAvoidingHost, double>(nameof(ExtraBottomOffset), 16.0);
+
+    public static readonly DirectProperty<MdKeyboardAvoidingHost, bool> IsKeyboardActiveProperty =
+        AvaloniaProperty.RegisterDirect<MdKeyboardAvoidingHost, bool>(nameof(IsKeyboardActive), host => host.IsKeyboardActive);
+
+    private bool _isKeyboardActive;
+
+    static MdKeyboardAvoidingHost()
+    {
+        KeyboardHeightProperty.Changed.AddClassHandler<MdKeyboardAvoidingHost>((host, _) => host.OnKeyboardHeightChanged());
+    }
+
+    public MdKeyboardAvoidingHost()
+    {
+        AddHandler(GotFocusEvent, OnChildGotFocus, RoutingStrategies.Bubble);
+    }
+
+    public bool AutoScrollToFocused
+    {
+        get => GetValue(AutoScrollToFocusedProperty);
+        set => SetValue(AutoScrollToFocusedProperty, value);
+    }
+
+    public double KeyboardHeight
+    {
+        get => GetValue(KeyboardHeightProperty);
+        set => SetValue(KeyboardHeightProperty, value);
+    }
+
+    public double ExtraBottomOffset
+    {
+        get => GetValue(ExtraBottomOffsetProperty);
+        set => SetValue(ExtraBottomOffsetProperty, value);
+    }
+
+    public bool IsKeyboardActive
+    {
+        get => _isKeyboardActive;
+        private set => SetAndRaise(IsKeyboardActiveProperty, ref _isKeyboardActive, value);
+    }
+
+    private void OnKeyboardHeightChanged()
+    {
+        var active = KeyboardHeight > 0;
+        IsKeyboardActive = active;
+        PseudoClasses.Set(":keyboard-active", active);
+        Padding = new Thickness(0, 0, 0, Math.Max(0, KeyboardHeight));
+        if (active && AutoScrollToFocused)
+        {
+            var topLevel = TopLevel.GetTopLevel(this);
+            if (topLevel?.FocusManager?.GetFocusedElement() is Control focused)
+            {
+                BringControlIntoView(focused);
+            }
+        }
+    }
+
+    private void OnChildGotFocus(object? sender, GotFocusEventArgs e)
+    {
+        if (!AutoScrollToFocused || e.Source is not Control focused) return;
+        BringControlIntoView(focused);
+    }
+
+    public void BringControlIntoView(Control target)
+    {
+        if (!target.IsAttachedToVisualTree()) return;
+        var scrollViewer = target.FindAncestorOfType<ScrollViewer>();
+        if (scrollViewer is null)
+        {
+            target.BringIntoView();
+            return;
+        }
+
+        var origin = target.TranslatePoint(default, scrollViewer);
+        if (origin is null)
+        {
+            target.BringIntoView();
+            return;
+        }
+
+        var visibleHeight = scrollViewer.Viewport.Height - Math.Max(0, KeyboardHeight);
+        var targetBottom = origin.Value.Y + target.Bounds.Height + ExtraBottomOffset;
+        if (targetBottom > visibleHeight)
+        {
+            var delta = targetBottom - visibleHeight;
+            scrollViewer.Offset = new Vector(scrollViewer.Offset.X, scrollViewer.Offset.Y + delta);
+        }
     }
 }

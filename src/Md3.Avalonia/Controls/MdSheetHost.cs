@@ -41,6 +41,9 @@ public sealed class MdSheetHost : ContentControl
     private Transitions? _transformTransitions;
     private double _dragStartY;
     private double _dragOffset;
+    private double _lastDragY;
+    private ulong _lastDragTimestamp;
+    private double _dragVelocityY;
     private bool _dragging;
 
     static MdSheetHost()
@@ -138,6 +141,9 @@ public sealed class MdSheetHost : ContentControl
         _dragging = true;
         _dragOffset = 0;
         _dragStartY = e.GetPosition(this).Y;
+        _lastDragY = _dragStartY;
+        _lastDragTimestamp = e.Timestamp;
+        _dragVelocityY = 0;
         if (_surface is not null)
         {
             // Pointer-driven motion must remain 1:1. Suspend both effects and spatial transitions;
@@ -157,7 +163,12 @@ public sealed class MdSheetHost : ContentControl
     private void OnDragMoved(object? sender, PointerEventArgs e)
     {
         if (!_dragging || _surface is null) return;
-        _dragOffset = Math.Clamp(e.GetPosition(this).Y - _dragStartY, 0, Math.Max(0, SheetExtent));
+        var currentY = e.GetPosition(this).Y;
+        var elapsed = e.Timestamp > _lastDragTimestamp ? e.Timestamp - _lastDragTimestamp : 1;
+        _dragVelocityY = (currentY - _lastDragY) / (double)elapsed;
+        _lastDragY = currentY;
+        _lastDragTimestamp = e.Timestamp;
+        _dragOffset = Math.Clamp(currentY - _dragStartY, 0, Math.Max(0, SheetExtent));
         _motionTransform.Y = _dragOffset;
         e.Handled = true;
     }
@@ -178,7 +189,8 @@ public sealed class MdSheetHost : ContentControl
     private void CompleteDrag()
     {
         _dragging = false;
-        var shouldDismiss = _dragOffset >= Math.Min(112, SheetExtent * 0.3);
+        var flingDown = _dragVelocityY >= 0.5 && _dragOffset > 10;
+        var shouldDismiss = _dragOffset >= Math.Min(112, SheetExtent * 0.3) || flingDown;
         _dragOffset = 0;
         if (_surface is not null)
         {

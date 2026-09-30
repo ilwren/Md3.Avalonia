@@ -92,10 +92,16 @@ public sealed class MdSlidableItem : ContentControl
         if (FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft) { delta = -delta; movement = -movement; }
         if (Math.Abs(delta) < 4) return;
         var elapsed = e.Timestamp > _lastPointerTimestamp ? e.Timestamp - _lastPointerTimestamp : 1;
-        _horizontalVelocity = movement / elapsed;
+        _horizontalVelocity = movement / (double)elapsed;
         _lastPointerX = position.X; _lastPointerTimestamp = e.Timestamp;
         e.Pointer.Capture(this);
-        SetOffset(Math.Clamp(_startOffset + delta, -Math.Max(0, ActionExtent), Math.Max(0, ActionExtent)));
+        var maxExtent = Math.Max(0, ActionExtent);
+        var targetOffset = _startOffset + delta;
+        if (targetOffset > maxExtent)
+            targetOffset = maxExtent + (targetOffset - maxExtent) * 0.35;
+        else if (targetOffset < -maxExtent)
+            targetOffset = -maxExtent + (targetOffset + maxExtent) * 0.35;
+        SetOffset(targetOffset);
         e.Handled = true;
     }
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
@@ -116,10 +122,23 @@ public sealed class MdSlidableItem : ContentControl
         _dragging = false;
         PseudoClasses.Set(":dragging", false);
         UpdateMotion();
+        var maxExtent = Math.Max(0, ActionExtent);
         var threshold = Math.Max(1, Bounds.Width) * Math.Clamp(OpenThreshold, 0.05, 0.9);
-        var fling = Math.Abs(_horizontalVelocity) >= 0.6 && Math.Sign(_horizontalVelocity) == Math.Sign(Offset);
-        if (Offset >= threshold || fling && Offset > 0) OpenStart();
-        else if (Offset <= -threshold || fling && Offset < 0) OpenEnd();
+        var fling = Math.Abs(_horizontalVelocity) >= 0.5 && Math.Sign(_horizontalVelocity) == Math.Sign(Offset);
+
+        if (Offset >= maxExtent * 1.8 && StartActionCommand is not null)
+        {
+            InvokeStart();
+            return;
+        }
+        if (Offset <= -maxExtent * 1.8 && EndActionCommand is not null)
+        {
+            InvokeEnd();
+            return;
+        }
+
+        if (Offset >= threshold || (fling && Offset > 0)) OpenStart();
+        else if (Offset <= -threshold || (fling && Offset < 0)) OpenEnd();
         else Close();
         if (Offset != 0) Opened?.Invoke(this, EventArgs.Empty);
     }
