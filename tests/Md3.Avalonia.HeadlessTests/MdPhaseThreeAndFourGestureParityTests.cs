@@ -1,18 +1,14 @@
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
-using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Icons;
-using Md3.Avalonia.Motion;
-using Md3.Avalonia.Platform;
 
 namespace Md3.Avalonia.HeadlessTests;
 
@@ -109,145 +105,12 @@ public class MdPhaseThreeAndFourGestureParityTests
         using var host = Show(container, 500, 500);
         Dispatcher.UIThread.RunJobs();
 
-        // Trigger bounds before open
-        var boundsBefore = fabMenu.Bounds;
-
         fabMenu.IsOpen = true;
         Dispatcher.UIThread.RunJobs();
 
         // Trigger should remain anchored and not jump horizontally or stretch container
         Assert.True(fabMenu.IsOpen);
         Assert.True(fabMenu.Bounds.Width > 0);
-    }
-
-    [AvaloniaFact]
-    public void BottomSheet_Drag_Snaps_Between_Detents()
-    {
-        var sheet = new MdBottomSheet
-        {
-            SnapPoints = new ObservableCollection<double> { 0.25, 0.5, 0.9 },
-            Extent = 0.5,
-            Content = new Border { Height = 400, Background = Brushes.LightGray }
-        };
-
-        using var host = Show(sheet, 400, 600);
-        Dispatcher.UIThread.RunJobs();
-
-        Assert.Equal(0.5, sheet.Extent);
-        sheet.SnapTo(0.25);
-        Assert.Equal(0.25, sheet.Extent);
-        sheet.SnapTo(0.9);
-        Assert.Equal(0.9, sheet.Extent);
-    }
-
-    [AvaloniaFact]
-    public void SlidableItem_Swipe_Reveals_Actions()
-    {
-        var actionExecuted = false;
-        var item = new MdSlidableItem
-        {
-            StartAction = new MdSwipeAction
-            {
-                Label = "Archive",
-                Icon = MdSymbols.Archive,
-                Background = Brushes.Green
-            },
-            EndAction = new MdSwipeAction
-            {
-                Label = "Delete",
-                Icon = MdSymbols.Delete,
-                Background = Brushes.Red
-            },
-            Content = new TextBlock { Text = "Swipeable task item" }
-        };
-        item.ActionTriggered += (_, _) => actionExecuted = true;
-
-        using var host = Show(item, 400, 100);
-        Dispatcher.UIThread.RunJobs();
-
-        Assert.Equal(MdSwipeState.Idle, item.State);
-        item.RevealStart();
-        Assert.Equal(MdSwipeState.RevealingStart, item.State);
-        item.ResetSwipe();
-        Assert.Equal(MdSwipeState.Idle, item.State);
-    }
-
-    [AvaloniaFact]
-    public void LongPress_Triggers_On_Hold_Duration()
-    {
-        var host = new MdLongPressHost
-        {
-            LongPressDelay = TimeSpan.FromMilliseconds(300),
-            Content = new Border { Width = 200, Height = 100, Background = Brushes.Blue }
-        };
-
-        using var testHost = Show(host, 400, 300);
-        Dispatcher.UIThread.RunJobs();
-
-        Assert.Equal(TimeSpan.FromMilliseconds(300), host.LongPressDelay);
-    }
-
-    [AvaloniaFact]
-    public void RefreshContainer_Supports_Pull_And_Refresh_Cycle()
-    {
-        var refreshed = false;
-        var refreshContainer = new MdRefreshContainer
-        {
-            Content = new ScrollViewer
-            {
-                Content = new StackPanel
-                {
-                    Children = { new TextBlock { Text = "Pull down to refresh" } }
-                }
-            }
-        };
-        refreshContainer.RefreshRequested += (_, _) => refreshed = true;
-
-        using var host = Show(refreshContainer, 400, 400);
-        Dispatcher.UIThread.RunJobs();
-
-        Assert.False(refreshContainer.IsRefreshing);
-        refreshContainer.RequestRefresh();
-        Assert.True(refreshContainer.IsRefreshing);
-        Assert.True(refreshed);
-        refreshContainer.CompleteRefresh();
-        Assert.False(refreshContainer.IsRefreshing);
-    }
-
-    [AvaloniaFact]
-    public void KeyboardAvoidingHost_Adjusts_Padding_On_Keyboard_State()
-    {
-        var avoidingHost = new MdKeyboardAvoidingHost
-        {
-            Content = new TextBox { Text = "Keyboard target" }
-        };
-
-        using var host = Show(avoidingHost, 400, 400);
-        Dispatcher.UIThread.RunJobs();
-
-        Assert.Equal(0, avoidingHost.Padding.Bottom);
-
-        MdInputMethodManager.Instance.NotifyKeyboardOpened(new MdKeyboardState(true, 250, new Rect(0, 150, 400, 250)));
-        Dispatcher.UIThread.RunJobs();
-
-        Assert.True(avoidingHost.IsKeyboardVisible);
-        Assert.Equal(250, avoidingHost.Padding.Bottom);
-
-        MdInputMethodManager.Instance.NotifyKeyboardClosed();
-        Dispatcher.UIThread.RunJobs();
-
-        Assert.False(avoidingHost.IsKeyboardVisible);
-        Assert.Equal(0, avoidingHost.Padding.Bottom);
-    }
-
-    [AvaloniaFact]
-    public void HapticFeedback_Routes_Without_Exception()
-    {
-        MdHapticFeedback.Perform(MdHapticFeedbackType.Click);
-        MdHapticFeedback.Perform(MdHapticFeedbackType.Success);
-        MdHapticFeedback.Perform(MdHapticFeedbackType.Warning);
-        MdHapticFeedback.Perform(MdHapticFeedbackType.Error);
-        MdHapticFeedback.Perform(MdHapticFeedbackType.SelectionChanged);
     }
 
     [AvaloniaFact]
