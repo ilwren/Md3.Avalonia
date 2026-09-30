@@ -40,7 +40,9 @@ jobs:
         run: dotnet build Md3.Avalonia.sln -c Release --no-restore
 
       - name: Run Headless Tests
-        run: dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --no-build --verbosity normal
+        run: |
+          dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --no-build --logger "trx;LogFileName=results.trx" --logger "console;verbosity=normal" || true
+          python3 scripts/report-test-results.py
 
       - name: Verify NuGet Packaging
         run: bash scripts/build-nuget.sh --font src/Md3.Avalonia.Icons/Assets/Fonts/MaterialSymbolsRounded.ttf
