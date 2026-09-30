@@ -40,23 +40,14 @@ jobs:
         run: dotnet build Md3.Avalonia.sln -c Release --no-restore
 
       - name: Run Headless Tests
-        id: test_step
         run: |
-          set +e
-          dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --no-build --logger "console;verbosity=detailed" --logger "trx;LogFileName=test_results.trx" > test_output.log 2>&1
-          TEST_EXIT_CODE=$?
-          echo "## Test Execution Log" >> $GITHUB_STEP_SUMMARY
-          echo "Exit code: $TEST_EXIT_CODE" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          tail -n 120 test_output.log >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          if [ $TEST_EXIT_CODE -ne 0 ]; then
-            echo "### Failures / Errors" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            grep -E -C 3 "(Failed|Error|Exception|Assert)" test_output.log | head -n 120 >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            exit $TEST_EXIT_CODE
-          fi
+          set -o pipefail
+          dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --no-build --logger "console;verbosity=detailed" | tee test.log || {
+            grep -E -C 2 "(Failed|Error|Exception|Assert)" test.log | head -n 40 | while IFS= read -r line; do
+              echo "::error title=TestFailure::$line"
+            done
+            exit 1
+          }
 
       - name: Verify NuGet Packaging
         run: bash scripts/build-nuget.sh --font src/Md3.Avalonia.Icons/Assets/Fonts/MaterialSymbolsRounded.ttf
