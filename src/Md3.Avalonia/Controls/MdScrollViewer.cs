@@ -5,6 +5,7 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Threading;
 
 namespace Md3.Avalonia.Controls;
@@ -59,6 +60,7 @@ public sealed class MdScrollViewer : ScrollViewer
 
     public MdScrollViewer()
     {
+        Background = Brushes.Transparent;
         _inertiaTimer = new DispatcherTimer(DispatcherPriority.Render)
         {
             Interval = TimeSpan.FromMilliseconds(16)

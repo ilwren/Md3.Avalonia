@@ -70,6 +70,7 @@ public class MdSettingsCard : ContentControl
 
     public MdSettingsCard()
     {
+        Background = Brushes.Transparent;
         UpdatePseudoClasses();
     }
 
