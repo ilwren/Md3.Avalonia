@@ -103,7 +103,7 @@
     <Style Selector="^:filled">
       <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
     </Style>
-    <Style Selector="^:elevated">
+    <Style Selector="^:elevated /template/ Border#PART_Root">
       <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
       <Setter Property="BoxShadow" Value="{DynamicResource Md.Sys.Elevation.Level1}" />
     </Style>
@@ -203,19 +203,19 @@
                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16" VerticalAlignment="Center">
                       <Border Width="40" Height="40" CornerRadius="20"
                               Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
-                              IsVisible="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Icon, Converter={x:Static ObjectConverters.IsNotNull}}">
+                              IsVisible="{Binding $parent[md:MdSettingsExpander].Icon, Converter={x:Static ObjectConverters.IsNotNull}}">
                         <Viewbox Width="22" Height="22" HorizontalAlignment="Center" VerticalAlignment="Center">
-                          <md:MdSymbolPresenter Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Icon}"
+                          <md:MdSymbolPresenter Content="{Binding $parent[md:MdSettingsExpander].Icon}"
                                                 Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
                         </Viewbox>
                       </Border>
                       <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                        <ContentPresenter Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Header}"
+                        <ContentPresenter Content="{Binding $parent[md:MdSettingsExpander].Header}"
                                           FontSize="16" FontWeight="Medium"
                                           Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
-                        <ContentPresenter Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Description}"
+                        <ContentPresenter Content="{Binding $parent[md:MdSettingsExpander].Description}"
                                           FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
-                                          IsVisible="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Description, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                          IsVisible="{Binding $parent[md:MdSettingsExpander].Description, Converter={x:Static ObjectConverters.IsNotNull}}"
                                           TextWrapping="Wrap" />
                       </StackPanel>
                       <Path x:Name="PART_ExpanderChevron"
@@ -232,11 +232,6 @@
                         <Path.RenderTransform>
                           <RotateTransform Angle="0" />
                         </Path.RenderTransform>
-                        <Path.Transitions>
-                          <Transitions>
-                            <DoubleTransition Property="RenderTransform.(RotateTransform.Angle)" Duration="0:0:0.2" Easing="0.05, 0.7, 0.1, 1.0" />
-                          </Transitions>
-                        </Path.Transitions>
                       </Path>
                     </Grid>
                   </Grid>
