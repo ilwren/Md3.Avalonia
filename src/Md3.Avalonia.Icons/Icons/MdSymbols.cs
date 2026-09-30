@@ -7637,8 +7637,21 @@ public static class MdSymbols
         return _nameToGlyph.Value.TryGetValue(clean, out var glyph) ? Glyph(glyph) : null;
     }
 
+    /// <summary>Attempts to resolve a glyph string by its official name.</summary>
+    public static bool TryGetByName(string name, out string? glyph)
+    {
+        glyph = GetByName(name);
+        return glyph is not null;
+    }
+
     /// <summary>Total number of icons defined in the official codepoints catalog.</summary>
     public static int TotalCatalogIconCount => 4284;
+
+    /// <summary>Total number of icons in the official catalog.</summary>
+    public static int Count => TotalCatalogIconCount;
+
+    /// <summary>All registered icon name aliases in snake_case and PascalCase.</summary>
+    public static IReadOnlyCollection<string> AllNames => _nameToGlyph.Value.Keys.ToArray();
 
     /// <summary>Official icon: <c>abc</c></summary>
     public static string? Abc => Glyph("\ueb94");
