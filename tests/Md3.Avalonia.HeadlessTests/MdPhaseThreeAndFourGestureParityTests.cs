@@ -9,6 +9,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Icons;
+using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
 
@@ -86,12 +87,12 @@ public class MdPhaseThreeAndFourGestureParityTests
     {
         var fabMenu = new MdFabMenu
         {
-            Icon = MdSymbols.Add,
-            Label = "Create",
+            OpenIcon = MdSymbols.Add,
+            CloseIcon = MdSymbols.Close,
             Items =
             {
-                new MdFabMenuItem { Icon = MdSymbols.Edit, Label = "Document" },
-                new MdFabMenuItem { Icon = MdSymbols.PhotoCamera, Label = "Photo" }
+                new MdFabMenuItem { Icon = MdSymbols.Edit, Content = "Document" },
+                new MdFabMenuItem { Icon = MdSymbols.PhotoCamera, Content = "Photo" }
             }
         };
 
