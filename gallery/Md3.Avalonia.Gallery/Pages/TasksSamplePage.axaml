@@ -86,10 +86,10 @@
     </md:MdScrollViewer>
 
     <!-- Floating Action Button at Bottom Right -->
-    <md:MdFab Variant="Primary"
-              Icon="{x:Static md:MdSymbols.Add}"
-              HorizontalAlignment="Right"
-              VerticalAlignment="Bottom"
-              Margin="0,0,32,32" />
+    <md:MdFloatingActionButton ColorStyle="Primary"
+                               Icon="{x:Static md:MdSymbols.Add}"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Bottom"
+                               Margin="0,0,32,32" />
   </Grid>
 </UserControl>
