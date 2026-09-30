@@ -94,9 +94,11 @@ public class MdSettingsCard : ContentControl
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
-        if (IsClickable && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        if (IsClickable)
         {
+            e.Pointer.Capture(this);
             Focus();
+            e.Handled = true;
         }
     }
 
@@ -105,9 +107,18 @@ public class MdSettingsCard : ContentControl
         base.OnPointerReleased(e);
         if (IsClickable)
         {
+            if (Equals(e.Pointer.Captured, this))
+            {
+                e.Pointer.Capture(null);
+            }
             RaiseClick();
             e.Handled = true;
         }
+    }
+
+    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+    {
+        base.OnPointerCaptureLost(e);
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
