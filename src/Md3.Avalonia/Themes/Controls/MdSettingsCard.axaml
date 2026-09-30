@@ -197,6 +197,13 @@
                           MinHeight="64"
                           HorizontalContentAlignment="Stretch"
                           Cursor="Hand">
+              <ToggleButton.Styles>
+                <Style Selector="ToggleButton:checked /template/ Path#PART_ExpanderChevron">
+                  <Setter Property="RenderTransform">
+                    <RotateTransform Angle="180" />
+                  </Setter>
+                </Style>
+              </ToggleButton.Styles>
               <ToggleButton.Template>
                 <ControlTemplate TargetType="ToggleButton">
                   <Grid Background="Transparent">
@@ -257,11 +264,6 @@
         <StackPanel Spacing="4" />
       </ItemsPanelTemplate>
     </Setter>
-    <Style Selector="^:expanded /template/ ToggleButton#PART_HeaderButton /template/ Path#PART_ExpanderChevron">
-      <Setter Property="RenderTransform">
-        <RotateTransform Angle="180" />
-      </Setter>
-    </Style>
   </ControlTheme>
 
 </ResourceDictionary>
