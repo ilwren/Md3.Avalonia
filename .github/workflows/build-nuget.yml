@@ -26,6 +26,11 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: Generate or download fonts
+        run: |
+          mkdir -p src/Md3.Avalonia.Icons/Assets/Fonts
+          python3 scripts/generate-fonts.py
+
       - name: Build and Pack NuGet Packages
         run: |
           mkdir -p artifacts/nuget

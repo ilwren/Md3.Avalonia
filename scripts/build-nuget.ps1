@@ -17,6 +17,11 @@ $projects = @(
     (Join-Path $root "src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj")
 )
 
+$fontPath = Join-Path $root "src/Md3.Avalonia.Icons/Assets/Fonts/MaterialSymbolsRounded.ttf"
+if (-not (Test-Path $fontPath)) {
+    python3 (Join-Path $root "scripts/generate-fonts.py")
+}
+
 if (-not (Test-Path $outputDir)) {
     New-Item -ItemType Directory -Path $outputDir -Force | Out-Null
 }

@@ -26,4 +26,7 @@
     <None Include="../../README.md" Pack="true" PackagePath="/" Link="README.md" />
     <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />
   </ItemGroup>
+  <Target Name="EnsureFontExists" BeforeTargets="BeforeBuild;BeforeRebuild" Condition="!Exists('$(MSBuildThisFileDirectory)Assets/Fonts/MaterialSymbolsRounded.ttf')">
+    <Exec Command="python3 &quot;$(MSBuildThisFileDirectory)../../scripts/generate-fonts.py&quot;" StandardOutputImportance="low" ContinueOnError="true" />
+  </Target>
 </Project>

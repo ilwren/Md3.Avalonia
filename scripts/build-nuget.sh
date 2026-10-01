@@ -59,6 +59,14 @@ PROJECTS=(
   "$ROOT/src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj"
 )
 
+if [[ ! -f "$ROOT/src/Md3.Avalonia.Icons/Assets/Fonts/MaterialSymbolsRounded.ttf" ]]; then
+  if command -v python3 >/dev/null 2>&1; then
+    python3 "$ROOT/scripts/generate-fonts.py"
+  elif command -v python >/dev/null 2>&1; then
+    python "$ROOT/scripts/generate-fonts.py"
+  fi
+fi
+
 cleanup_intermediate() {
   find "$ROOT/src/Md3.Avalonia" \
        "$ROOT/src/Md3.Avalonia.Icons" \
