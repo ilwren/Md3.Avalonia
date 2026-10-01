@@ -697,22 +697,22 @@
               <Grid ColumnDefinitions="36,*,36" VerticalAlignment="Center">
                 <TextBlock Text="Hue" FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" VerticalAlignment="Center" />
                 <Slider Grid.Column="1" Minimum="0" Maximum="360" Value="{TemplateBinding Hue, Mode=TwoWay}" Margin="6,0" />
-                <TextBlock Grid.Column="2" Text="{TemplateBinding Hue, StringFormat='{}{0:F0}°'}" FontSize="11" TextAlignment="Right" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="{Binding Hue, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}°'}" FontSize="11" TextAlignment="Right" VerticalAlignment="Center" />
               </Grid>
               <Grid ColumnDefinitions="36,*,36" VerticalAlignment="Center">
                 <TextBlock Text="Sat" FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" VerticalAlignment="Center" />
                 <Slider Grid.Column="1" Minimum="0" Maximum="100" Value="{TemplateBinding Saturation, Mode=TwoWay}" Margin="6,0" />
-                <TextBlock Grid.Column="2" Text="{TemplateBinding Saturation, StringFormat='{}{0:F0}%'}" FontSize="11" TextAlignment="Right" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="{Binding Saturation, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}%'}" FontSize="11" TextAlignment="Right" VerticalAlignment="Center" />
               </Grid>
               <Grid ColumnDefinitions="36,*,36" VerticalAlignment="Center">
                 <TextBlock Text="Val" FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" VerticalAlignment="Center" />
                 <Slider Grid.Column="1" Minimum="0" Maximum="100" Value="{TemplateBinding ColorValue, Mode=TwoWay}" Margin="6,0" />
-                <TextBlock Grid.Column="2" Text="{TemplateBinding ColorValue, StringFormat='{}{0:F0}%'}" FontSize="11" TextAlignment="Right" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="{Binding ColorValue, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}%'}" FontSize="11" TextAlignment="Right" VerticalAlignment="Center" />
               </Grid>
               <Grid ColumnDefinitions="36,*,36" VerticalAlignment="Center" IsVisible="{TemplateBinding IsAlphaEnabled}">
                 <TextBlock Text="Alpha" FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" VerticalAlignment="Center" />
                 <Slider Grid.Column="1" Minimum="0" Maximum="100" Value="{TemplateBinding Alpha, Mode=TwoWay}" Margin="6,0" />
-                <TextBlock Grid.Column="2" Text="{TemplateBinding Alpha, StringFormat='{}{0:F0}%'}" FontSize="11" TextAlignment="Right" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" Text="{Binding Alpha, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}%'}" FontSize="11" TextAlignment="Right" VerticalAlignment="Center" />
               </Grid>
             </StackPanel>
 
