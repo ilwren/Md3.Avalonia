@@ -199,10 +199,10 @@
     <Style Selector="^:left /template/ md|MdToggleIconButton#PART_Trigger">
       <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
-    <Style Selector="^:left /template/ md|MdExtendedFloatingActionButton">
+    <Style Selector="^:left md|MdExtendedFloatingActionButton">
       <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
-    <Style Selector="^:left /template/ md|MdFabMenuItem">
+    <Style Selector="^:left md|MdFabMenuItem">
       <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
     <Style Selector="^:right">
@@ -216,10 +216,10 @@
     <Style Selector="^:right /template/ md|MdToggleIconButton#PART_Trigger">
       <Setter Property="HorizontalAlignment" Value="Right" />
     </Style>
-    <Style Selector="^:right /template/ md|MdExtendedFloatingActionButton">
+    <Style Selector="^:right md|MdExtendedFloatingActionButton">
       <Setter Property="HorizontalAlignment" Value="Right" />
     </Style>
-    <Style Selector="^:right /template/ md|MdFabMenuItem">
+    <Style Selector="^:right md|MdFabMenuItem">
       <Setter Property="HorizontalAlignment" Value="Right" />
     </Style>
     <Style Selector="^:primary /template/ md|MdToggleIconButton#PART_Trigger"><Setter Property="Variant" Value="Filled" /></Style>

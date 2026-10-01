@@ -19,6 +19,9 @@ public sealed class MdScrollViewer : ScrollViewer
     public static readonly StyledProperty<bool> IsDragScrollingEnabledProperty =
         AvaloniaProperty.Register<MdScrollViewer, bool>(nameof(IsDragScrollingEnabled), defaultValue: true);
 
+    public static readonly StyledProperty<bool> AllowMouseDragProperty =
+        AvaloniaProperty.Register<MdScrollViewer, bool>(nameof(AllowMouseDrag), defaultValue: false);
+
     public static readonly StyledProperty<double> DragThresholdProperty =
         AvaloniaProperty.Register<MdScrollViewer, double>(nameof(DragThreshold), defaultValue: 4.0);
 
@@ -29,6 +32,12 @@ public sealed class MdScrollViewer : ScrollViewer
     {
         get => GetValue(IsDragScrollingEnabledProperty);
         set => SetValue(IsDragScrollingEnabledProperty, value);
+    }
+
+    public bool AllowMouseDrag
+    {
+        get => GetValue(AllowMouseDragProperty);
+        set => SetValue(AllowMouseDragProperty, value);
     }
 
     public double DragThreshold
@@ -67,7 +76,7 @@ public sealed class MdScrollViewer : ScrollViewer
         };
         _inertiaTimer.Tick += OnInertiaTick;
 
-        // Tunnel events to intercept drag before child controls swallow them
+        // Tunnel events to intercept touch drag before child controls swallow them
         AddHandler(PointerPressedEvent, OnPreviewPointerPressed, RoutingStrategies.Tunnel);
         AddHandler(PointerMovedEvent, OnPreviewPointerMoved, RoutingStrategies.Tunnel);
         AddHandler(PointerReleasedEvent, OnPreviewPointerReleased, RoutingStrategies.Tunnel);
@@ -80,9 +89,22 @@ public sealed class MdScrollViewer : ScrollViewer
         _velocity = default;
     }
 
+    private bool IsInsideScrollBar(Visual? visual)
+    {
+        if (visual is null) return false;
+        if (visual is ScrollBar or Thumb or RepeatButton) return true;
+        return visual.GetVisualAncestors().OfType<ScrollBar>().Any();
+    }
+
     private void OnPreviewPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!IsDragScrollingEnabled) return;
+
+        // Never intercept clicks on scrollbars, thumbs, or buttons - let native scrollbar dragging work
+        if (IsInsideScrollBar(e.Source as Visual)) return;
+
+        // For mouse pointers on desktop, only drag if explicitly enabled (e.g. touch emulation mode)
+        if (e.Pointer.Type == PointerType.Mouse && !AllowMouseDrag) return;
 
         var currentPoint = e.GetCurrentPoint(this);
         var props = currentPoint.Properties;

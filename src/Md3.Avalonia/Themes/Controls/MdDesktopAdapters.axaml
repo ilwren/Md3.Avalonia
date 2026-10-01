@@ -120,22 +120,25 @@
     <Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="VerticalContentAlignment" Value="Stretch" />
     <Setter Property="Template">
       <ControlTemplate>
-        <!-- Spinner actions overlay the field's reserved trailing slot. A separate grid column made
-             the +/- buttons appear outside the outlined container, especially with supporting text. -->
+        <!-- Spinner actions overlay the field's reserved trailing slot, perfectly centered vertically -->
         <Grid>
           <ContentPresenter Name="PART_ContentPresenter"
                             Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
                             HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
           <StackPanel Name="PART_SpinnerPanel" Width="32" Height="42"
-                      Margin="0,8,8,0" VerticalAlignment="Top" HorizontalAlignment="Right"
+                      Margin="0,0,8,0" VerticalAlignment="Center" HorizontalAlignment="Right"
                       Background="Transparent" Spacing="2" ZIndex="2"
                       IsVisible="{TemplateBinding ShowButtonSpinner}">
-            <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}">
+            <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}"
+                          HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
               <Path Width="12" Height="12" Data="{StaticResource Md.Numeric.Plus}" Stretch="Uniform"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
                     Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
             </RepeatButton>
-            <RepeatButton Name="PART_DecreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}">
+            <RepeatButton Name="PART_DecreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}"
+                          HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
               <Path Width="12" Height="12" Data="{StaticResource Md.Numeric.Minus}" Stretch="Uniform"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
                     Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
             </RepeatButton>
           </StackPanel>
@@ -143,7 +146,7 @@
       </ControlTemplate>
     </Setter>
     <Style Selector="^[ButtonSpinnerLocation=Left] /template/ StackPanel#PART_SpinnerPanel">
-      <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="Margin" Value="8,8,0,0" />
+      <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="Margin" Value="8,0,0,0" />
     </Style>
   </ControlTheme>
 
@@ -191,7 +194,7 @@
                  IsOpen="{TemplateBinding IsPopupOpen}"
                  IsLightDismissEnabled="True" OverlayDismissEventPassThrough="True"
                  Placement="BottomEdgeAlignedLeft" PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
-                 InheritsTransform="True" ShouldUseOverlayLayer="False" WindowManagerAddShadowHint="False">
+                 InheritsTransform="True" WindowManagerAddShadowHint="False">
             <Popup.Styles>
               <Style Selector="PopupRoot">
                 <Setter Property="Background" Value="Transparent" />

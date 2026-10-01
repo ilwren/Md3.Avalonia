@@ -197,12 +197,21 @@ public class MdFabMenu : ItemsControl
 
     private void UpdateMenuItemGeometry()
     {
+        var hAlign = Alignment == MdFabAlignment.Left ? global::Avalonia.Layout.HorizontalAlignment.Left : global::Avalonia.Layout.HorizontalAlignment.Right;
         foreach (var item in this.GetVisualDescendants().OfType<MdExtendedFloatingActionButton>())
         {
             item.SetCurrentValue(MdExtendedFloatingActionButton.ContainerHeightProperty, 56);
             item.SetCurrentValue(MdExtendedFloatingActionButton.ContainerCornerRadiusProperty, new CornerRadius(28));
             item.SetCurrentValue(MdExtendedFloatingActionButton.IconSizeProperty, 24);
             item.SetCurrentValue(MdExtendedFloatingActionButton.IconSpacingProperty, 8);
+            item.SetCurrentValue(HorizontalAlignmentProperty, hAlign);
+        }
+        if (Items is { } items)
+        {
+            foreach (var item in items.OfType<Control>())
+            {
+                item.SetCurrentValue(HorizontalAlignmentProperty, hAlign);
+            }
         }
     }
 
@@ -217,5 +226,6 @@ public class MdFabMenu : ItemsControl
     {
         PseudoClasses.Set(":left", Alignment == MdFabAlignment.Left);
         PseudoClasses.Set(":right", Alignment == MdFabAlignment.Right);
+        UpdateMenuItemGeometry();
     }
 }

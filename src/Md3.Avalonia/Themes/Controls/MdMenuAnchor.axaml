@@ -13,7 +13,6 @@
                  OverlayDismissEventPassThrough="True"
                  Placement="{TemplateBinding Placement}"
                  PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
-                 ShouldUseOverlayLayer="False"
                  WindowManagerAddShadowHint="False">
             <Popup.Styles>
               <Style Selector="PopupRoot">
@@ -64,7 +63,6 @@
                  Placement="RightEdgeAlignedTop"
                  PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                  HorizontalOffset="-4"
-                 ShouldUseOverlayLayer="False"
                  WindowManagerAddShadowHint="False">
             <Popup.Styles>
               <Style Selector="PopupRoot">

@@ -11,10 +11,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Avalonia.Android" />
-    <ProjectReference Include="../../src/Md3.Avalonia/Md3.Avalonia.csproj" />
-    <ProjectReference Include="../../src/Md3.Avalonia.Icons/Md3.Avalonia.Icons.csproj" />
-    <ProjectReference Include="../../src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj" />
+    <ProjectReference Include="../Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" />
   </ItemGroup>
 </Project>

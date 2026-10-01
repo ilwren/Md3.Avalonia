@@ -5,41 +5,99 @@
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.ColorPickerGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto">
-    <StackPanel Spacing="24" Margin="0,0,12,24" MaxWidth="720">
+    <StackPanel Spacing="28" Margin="0,0,12,24" MaxWidth="1000">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Color Picker (Flutter Style)" />
-        <TextBlock Classes="body" Text="Material Design 3 and Flutter-inspired color pickers with primary swatches, tonal shades (50-900), HSV sliders, alpha opacity, and live HEX binding." />
+        <TextBlock Classes="body" Text="Material Design 3 and Flutter-inspired color picker with 20 Material swatches, 10-level tonal shades (50-900), HSV 360° gradient sliders, alpha channel, live HEX synchronization, and global dynamic theme integration." />
       </StackPanel>
 
-      <!-- Section: Embedded Color Picker -->
-      <StackPanel Spacing="12">
-        <TextBlock Classes="h2" Text="Material 3 Color Picker" />
-        <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+      <!-- Interactive Playground Studio -->
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="24">
+        <!-- Left: Interactive Color Picker -->
+        <Border Grid.Column="0" Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
                 BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1"
                 CornerRadius="24">
-          <extra:MdColorPicker x:Name="DemoColorPicker"
-                               SelectedColor="#6750A4"
-                               IsAlphaEnabled="True"
-                               HorizontalAlignment="Center" />
+          <StackPanel Spacing="16">
+            <TextBlock Classes="h2" FontSize="20" Text="Pick a Color" />
+            <extra:MdColorPicker x:Name="InteractivePicker"
+                                 SelectedColor="#6750A4"
+                                 IsAlphaEnabled="True"
+                                 ColorChanged="OnColorChanged" />
+          </StackPanel>
         </Border>
-      </StackPanel>
 
-      <!-- Section: Color Swatch Picker Buttons -->
+        <!-- Right: Live Theme & UI Component Preview -->
+        <Border Grid.Column="1" Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1"
+                CornerRadius="24">
+          <StackPanel Spacing="20">
+            <TextBlock Classes="h2" FontSize="20" Text="Live Preview &amp; Theme Studio" />
+
+            <!-- Selected Color Banner -->
+            <Border x:Name="ColorBanner" Height="80" CornerRadius="16" Background="#6750A4" Padding="16">
+              <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+                <StackPanel VerticalAlignment="Center">
+                  <TextBlock Text="SELECTED COLOR" FontSize="11" FontWeight="Bold" Foreground="White" Opacity="0.8" />
+                  <TextBlock x:Name="HexCodeText" Text="#FF6750A4" FontSize="22" FontWeight="Bold" Foreground="White" />
+                </StackPanel>
+                <md:MdButton Grid.Column="1" Content="Copy HEX" Variant="Filled" Click="OnCopyHexClicked" />
+              </Grid>
+            </Border>
+
+            <!-- Actions -->
+            <StackPanel Spacing="8">
+              <md:MdButton x:Name="ApplyThemeButton" Content="Apply as Global App Theme" Variant="Filled" HorizontalAlignment="Stretch" Click="OnApplyThemeClicked" />
+              <TextBlock x:Name="StatusToast" Text="Tip: Pick any color or shade on the left to see live component updates."
+                         FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" TextWrapping="Wrap" />
+            </StackPanel>
+
+            <Border Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+
+            <!-- Live Dynamically Styled Components -->
+            <TextBlock Text="Component Dynamic Preview" FontSize="14" FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+            
+            <WrapPanel>
+              <Border x:Name="SampleFilledBtnBorder" CornerRadius="20" Background="#6750A4" Padding="16,10" Margin="0,0,10,10">
+                <TextBlock x:Name="SampleFilledBtnText" Text="Filled Button" FontWeight="Medium" Foreground="White" />
+              </Border>
+              <Border x:Name="SampleContainerBorder" CornerRadius="20" Background="#EADDFF" Padding="16,10" Margin="0,0,10,10">
+                <TextBlock x:Name="SampleContainerText" Text="Tonal Container" FontWeight="Medium" Foreground="#21005D" />
+              </Border>
+              <Border x:Name="SampleOutlinedBorder" CornerRadius="20" Background="Transparent" BorderBrush="#6750A4" BorderThickness="1.5" Padding="16,10" Margin="0,0,10,10">
+                <TextBlock x:Name="SampleOutlinedText" Text="Outlined Button" FontWeight="Medium" Foreground="#6750A4" />
+              </Border>
+            </WrapPanel>
+
+            <md:MdCard Padding="16">
+              <StackPanel Spacing="8">
+                <TextBlock Text="Dynamic Palette Card" FontSize="16" FontWeight="SemiBold" />
+                <TextBlock Text="Material 3 dynamic color algorithms derive tonal containers, on-colors, and elevation tokens from the picked seed." TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                <md:MdLinearProgressIndicator x:Name="SampleProgress" Value="75" />
+              </StackPanel>
+            </md:MdCard>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <!-- Section: Compact Dropdown Color Swatch Buttons -->
       <StackPanel Spacing="12">
-        <TextBlock Classes="h2" Text="Color Swatch Buttons" />
+        <TextBlock Classes="h2" Text="Compact Swatch Popup Buttons (MdColorPickerButton)" />
+        <TextBlock Classes="body" Text="Click any swatch button below to open a light-dismiss popup picker for quick accent color selection:" />
         <StackPanel Orientation="Horizontal" Spacing="16">
           <extra:MdColorPickerButton SelectedColor="#6750A4" />
           <extra:MdColorPickerButton SelectedColor="#006A6A" />
           <extra:MdColorPickerButton SelectedColor="#984061" />
           <extra:MdColorPickerButton SelectedColor="#2196F3" />
+          <extra:MdColorPickerButton SelectedColor="#4CAF50" />
+          <extra:MdColorPickerButton SelectedColor="#FF9800" />
         </StackPanel>
       </StackPanel>
 
       <!-- Usage Example -->
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
-        <gallery:CodeExample XamlCode="&lt;!-- Flutter-style Color Picker --&gt;&#10;&lt;extra:MdColorPicker SelectedColor=&quot;{Binding PrimaryColor, Mode=TwoWay}&quot;&#10;                     SelectedHex=&quot;{Binding HexString, Mode=TwoWay}&quot;&#10;                     IsAlphaEnabled=&quot;True&quot; /&gt;&#10;&#10;&lt;!-- Compact Color Swatch Button --&gt;&#10;&lt;extra:MdColorPickerButton SelectedColor=&quot;{Binding AccentColor, Mode=TwoWay}&quot; /&gt;"
-                             CSharpCode="var picker = new MdColorPicker { SelectedColor = Color.Parse(&quot;#6750A4&quot;) };&#10;picker.ColorChanged += (sender, color) =&gt; ApplyThemeColor(color);" />
+        <gallery:CodeExample XamlCode="&lt;!-- Full Material 3 / Flutter Color Picker --&gt;&#10;&lt;extra:MdColorPicker SelectedColor=&quot;{Binding CurrentColor, Mode=TwoWay}&quot;&#10;                     SelectedHex=&quot;{Binding HexString, Mode=TwoWay}&quot;&#10;                     IsAlphaEnabled=&quot;True&quot;&#10;                     ColorChanged=&quot;OnColorChanged&quot; /&gt;&#10;&#10;&lt;!-- Compact Pop-up Swatch Button --&gt;&#10;&lt;extra:MdColorPickerButton SelectedColor=&quot;{Binding AccentColor, Mode=TwoWay}&quot; /&gt;"
+                             CSharpCode="private void OnColorChanged(object? sender, Color color)&#10;{&#10;    // Apply live dynamic seed to application theme&#10;    MaterialTheme.ApplyDynamicSeed(Application.Current!, color);&#10;}" />
       </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>

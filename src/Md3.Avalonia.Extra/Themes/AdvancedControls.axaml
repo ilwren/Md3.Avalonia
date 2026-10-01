@@ -65,7 +65,7 @@
       <ControlTemplate>
         <Grid>
           <Button Name="PART_AnchorButton" Theme="{StaticResource EcoAnchorButtonTheme}" Content="{TemplateBinding Anchor}" />
-          <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}" IsLightDismissEnabled="{TemplateBinding DismissOnOutsideClick}" Placement="{TemplateBinding Placement}" PlacementTarget="{Binding #PART_AnchorButton}" ShouldUseOverlayLayer="False" WindowManagerAddShadowHint="False">
+          <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}" IsLightDismissEnabled="{TemplateBinding DismissOnOutsideClick}" Placement="{TemplateBinding Placement}" PlacementTarget="{Binding #PART_AnchorButton}" WindowManagerAddShadowHint="False">
             <Popup.Styles><Style Selector="PopupRoot"><Setter Property="Background" Value="Transparent" /><Setter Property="TransparencyLevelHint" Value="Transparent" /><Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /></Style></Popup.Styles>
             <Border x:Name="PART_Surface" Classes="eco-popover-surface" Margin="0,4,0,0" Padding="16,12" MinWidth="160" MaxWidth="400"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="12"
@@ -187,7 +187,7 @@
       <ControlTemplate>
         <Grid>
           <md:MdTextBox Name="PART_Query" Text="{TemplateBinding Query, Mode=TwoWay}" Label="Search" ShowClearButton="True" Variant="Outlined" />
-          <Popup Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}" Placement="BottomEdgeAlignedLeft" PlacementTarget="{Binding #PART_Query}" IsLightDismissEnabled="True" ShouldUseOverlayLayer="False" WindowManagerAddShadowHint="False">
+          <Popup Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}" Placement="BottomEdgeAlignedLeft" PlacementTarget="{Binding #PART_Query}" IsLightDismissEnabled="True" WindowManagerAddShadowHint="False">
             <Popup.Styles><Style Selector="PopupRoot"><Setter Property="Background" Value="Transparent" /><Setter Property="TransparencyLevelHint" Value="Transparent" /><Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /></Style></Popup.Styles>
             <Border Name="PART_Surface" MinWidth="260" MaxHeight="320" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="0,0,12,12" Padding="4" Opacity="0" RenderTransform="scale(0.96) translate(0px,-8px)" RenderTransformOrigin="50%,0%">
               <Grid>
