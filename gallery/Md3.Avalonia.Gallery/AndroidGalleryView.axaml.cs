@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Gallery.Pages;
 
 namespace Md3.Avalonia.Gallery;
 
@@ -22,8 +23,9 @@ public partial class AndroidGalleryView : UserControl
         if (MobilePageHost is null || MobileNavigation is null) return;
         MobilePageHost.Content = MobileNavigation.SelectedIndex switch
         {
-            1 => BuildThemePage(),
-            2 => BuildAboutPage(),
+            1 => new ColorPickerGalleryPage(),
+            2 => new MotionGalleryPage(),
+            3 => BuildThemePage(),
             _ => _componentsPage
         };
     }
@@ -36,45 +38,30 @@ public partial class AndroidGalleryView : UserControl
         light.Click += (_, _) => ApplyTheme(ThemeVariant.Light);
         dark.Click += (_, _) => ApplyTheme(ThemeVariant.Dark);
         system.Click += (_, _) => ApplyTheme(ThemeVariant.Default);
-        return BuildPage("Theme", new TextBlock
+        return BuildPage("Theme & Info", new TextBlock
         {
-            Text = "Theme resources are shared with desktop. Choose a mode; dynamic color and all control tokens update immediately.",
+            Text = "Material 3 design tokens and theme resources are shared between desktop and mobile. Switch theme mode below:",
             TextWrapping = global::Avalonia.Media.TextWrapping.Wrap
         }, new WrapPanel { Children = { light, dark, system } }, new MdCard
         {
-            Padding = new Thickness(20),
+            Padding = new Thickness(16),
             Content = new StackPanel
             {
                 Spacing = 10,
                 Children =
                 {
-                    new TextBlock { Text = "Live surface", FontSize = 20 },
-                    new MdTextBox { Label = "Theme-aware field", Text = "Material 3" },
-                    new MdLinearProgressIndicator { Value = 68 }
+                    new TextBlock { Text = "Md3.Avalonia v0.2.0", FontSize = 18, FontWeight = global::Avalonia.Media.FontWeight.SemiBold },
+                    new TextBlock { Text = "Comprehensive Material Design 3 and Flutter ecosystem components for Avalonia UI.", TextWrapping = global::Avalonia.Media.TextWrapping.Wrap },
+                    new MdLinearProgressIndicator { Value = 100 }
                 }
             }
         });
     }
 
-    private static Control BuildAboutPage() => BuildPage("About", new MdCard
-    {
-        Padding = new Thickness(20),
-        Content = new StackPanel
-        {
-            Spacing = 8,
-            Children =
-            {
-                new TextBlock { Text = "Md3.Avalonia", FontSize = 24 },
-                new TextBlock { Text = "Avalonia 12 Material controls", TextWrapping = global::Avalonia.Media.TextWrapping.Wrap },
-                new TextBlock { Text = "The Android shell uses the same independent controls, resource dictionaries, localization, and provider-optional icons as desktop.", TextWrapping = global::Avalonia.Media.TextWrapping.Wrap }
-            }
-        }
-    });
-
     private static MdScrollViewer BuildPage(string title, params Control[] controls)
     {
-        var panel = new StackPanel { Margin = new Thickness(20, 18, 20, 32), Spacing = 20 };
-        panel.Children.Add(new TextBlock { Text = title, FontSize = 32 });
+        var panel = new StackPanel { Margin = new Thickness(16, 14, 16, 24), Spacing = 16 };
+        panel.Children.Add(new TextBlock { Text = title, FontSize = 26, FontWeight = global::Avalonia.Media.FontWeight.SemiBold });
         foreach (var control in controls) panel.Children.Add(control);
         return new MdScrollViewer
         {

@@ -1,0 +1,15 @@
+appId: io.arena.md3avalonia.gallery
+tags:
+  - flutter-gestures
+  - slidable
+---
+- launchApp
+- assertVisible: "Material 3 · Avalonia"
+
+# 1. Switch to Theme & Info Tab
+- tapOn: "Theme & Info"
+- assertVisible: "Theme & Info"
+- tapOn: "Dark"
+- takeScreenshot: "m3_dark_theme_android"
+- tapOn: "Light"
+- takeScreenshot: "m3_light_theme_android"

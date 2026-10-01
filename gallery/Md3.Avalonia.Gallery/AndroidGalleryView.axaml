@@ -1,29 +1,58 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:extra="using:Md3.Avalonia.Extra.Controls"
              x:Class="Md3.Avalonia.Gallery.AndroidGalleryView"
              Background="{DynamicResource Md.Sys.Color.Surface.Brush}">
-  <Grid RowDefinitions="72,*,80">
+  <Grid RowDefinitions="64,*,72">
     <md:MdTopAppBar Grid.Row="0" Title="Material 3 · Avalonia" Variant="Small">
-      <md:MdTopAppBar.LeadingContent><Border Width="40" Height="40" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.Primary.Brush}"><TextBlock Text="M3" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}"/></Border></md:MdTopAppBar.LeadingContent>
+      <md:MdTopAppBar.LeadingContent>
+        <Border Width="36" Height="36" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.Primary.Brush}">
+          <TextBlock Text="M3" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}"/>
+        </Border>
+      </md:MdTopAppBar.LeadingContent>
     </md:MdTopAppBar>
+    
     <ContentControl x:Name="MobilePageHost" Grid.Row="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
       <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <StackPanel Margin="20,18,20,32" Spacing="24">
-        <StackPanel Spacing="6"><TextBlock FontSize="32" Text="Android showcase"/><TextBlock TextWrapping="Wrap" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Touch-ready Material controls using the same resources, motion and dynamic theme APIs as desktop."/></StackPanel>
-        <WrapPanel><md:MdButton Content="Filled" Margin="0,0,10,10"/><md:MdButton Content="Tonal" Variant="Tonal" Margin="0,0,10,10"/><md:MdIconButton Icon="{x:Static md:MdSymbols.Favorite}" Margin="0,0,10,10"/></WrapPanel>
-        <md:MdTextBox Label="Outlined text field" Text="Avalonia on Android" ShowClearButton="True"/>
-        <md:MdSearchBar PlaceholderText="Search components"/>
-        <StackPanel Spacing="4"><md:MdSwitch Content="Dynamic color" IsChecked="True"/><md:MdCheckBox Content="Touch target and state layer" IsChecked="True"/></StackPanel>
-        <md:MdCard Padding="20"><StackPanel Spacing="8"><TextBlock FontSize="20" Text="Shared control library"/><TextBlock TextWrapping="Wrap" Text="No desktop-only popup overlay is required. Popup controls retain platform-backed light dismiss behavior."/><md:MdLinearProgressIndicator Value="72"/></StackPanel></md:MdCard>
-        <WrapPanel><md:MdAssistChip Content="Assist" Margin="0,0,8,8"/><md:MdFilterChip Content="Filter" IsChecked="True" Margin="0,0,8,8"/><md:MdInputChip Content="Input" Margin="0,0,8,8"/></WrapPanel>
+        <StackPanel Margin="16,14,16,24" Spacing="20">
+          <StackPanel Spacing="4">
+            <TextBlock FontSize="26" FontWeight="SemiBold" Text="Material 3 Components"/>
+            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Touch-ready Material 3 &amp; Flutter parity controls running natively on Android."/>
+          </StackPanel>
+          <WrapPanel>
+            <md:MdButton Content="Filled" Margin="0,0,8,8"/>
+            <md:MdButton Content="Tonal" Variant="Tonal" Margin="0,0,8,8"/>
+            <md:MdButton Content="Outlined" Variant="Outlined" Margin="0,0,8,8"/>
+            <md:MdIconButton Icon="{x:Static md:MdSymbols.Favorite}" Margin="0,0,8,8"/>
+          </WrapPanel>
+          <md:MdTextBox Label="Outlined text field" Text="Avalonia on Android" ShowClearButton="True"/>
+          <md:MdSearchBar PlaceholderText="Search components"/>
+          <StackPanel Spacing="4">
+            <md:MdSwitch Content="Dynamic color" IsChecked="True"/>
+            <md:MdCheckBox Content="Touch target and state layer" IsChecked="True"/>
+          </StackPanel>
+          <md:MdCard Padding="16">
+            <StackPanel Spacing="8">
+              <TextBlock FontSize="18" FontWeight="Medium" Text="M3 Elevation &amp; Progress"/>
+              <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="High performance cross-platform rendering."/>
+              <md:MdLinearProgressIndicator Value="72"/>
+            </StackPanel>
+          </md:MdCard>
+          <WrapPanel>
+            <md:MdAssistChip Content="Assist" Margin="0,0,8,8"/>
+            <md:MdFilterChip Content="Filter" IsChecked="True" Margin="0,0,8,8"/>
+            <md:MdInputChip Content="Input" Margin="0,0,8,8"/>
+          </WrapPanel>
         </StackPanel>
       </md:MdScrollViewer>
     </ContentControl>
+    
     <md:MdNavigationBar x:Name="MobileNavigation" Grid.Row="2" SelectedIndex="0" SelectionChanged="MobileNavigationChanged">
       <md:MdNavigationBarItem Label="Components" Icon="{x:Static md:MdSymbols.Home}"/>
-      <md:MdNavigationBarItem Label="Theme" Icon="{x:Static md:MdSymbols.Palette}"/>
-      <md:MdNavigationBarItem Label="About" Icon="{x:Static md:MdSymbols.Info}"/>
+      <md:MdNavigationBarItem Label="Color Picker" Icon="{x:Static md:MdSymbols.Palette}"/>
+      <md:MdNavigationBarItem Label="Motion" Icon="{x:Static md:MdSymbols.Settings}"/>
+      <md:MdNavigationBarItem Label="Theme &amp; Info" Icon="{x:Static md:MdSymbols.Info}"/>
     </md:MdNavigationBar>
   </Grid>
 </UserControl>
