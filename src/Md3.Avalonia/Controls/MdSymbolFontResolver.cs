@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
 using Avalonia;
 using Avalonia.Media;
@@ -28,6 +29,8 @@ internal static class MdSymbolFontResolver
 
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicMethods,
         "Md3.Avalonia.Icons.MdExternalMaterialSymbols", "Md3.Avalonia.Icons")]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicMethods,
+        "Md3.Avalonia.Icons.Lite.MdExternalMaterialSymbolsLite", "Md3.Avalonia.Icons.Lite")]
     private static void TryConfigureOptionalProvider()
     {
         try
@@ -36,11 +39,14 @@ internal static class MdSymbolFontResolver
             {
                 _providerLookupAttempted = true;
                 var assembly = AppDomain.CurrentDomain.GetAssemblies()
-                                   .FirstOrDefault(candidate => candidate.GetName().Name == "Md3.Avalonia.Icons")
-                               ?? Assembly.Load(new AssemblyName("Md3.Avalonia.Icons"));
-                _ensureOptionalProvider = assembly
-                    .GetType("Md3.Avalonia.Icons.MdExternalMaterialSymbols")?
-                    .GetMethod("EnsureConfigured", BindingFlags.Public | BindingFlags.Static);
+                                   .FirstOrDefault(candidate => candidate.GetName().Name == "Md3.Avalonia.Icons" || candidate.GetName().Name == "Md3.Avalonia.Icons.Lite")
+                               ?? (TryLoadAssembly("Md3.Avalonia.Icons") ?? TryLoadAssembly("Md3.Avalonia.Icons.Lite"));
+                if (assembly != null)
+                {
+                    _ensureOptionalProvider = (assembly.GetType("Md3.Avalonia.Icons.MdExternalMaterialSymbols")
+                        ?? assembly.GetType("Md3.Avalonia.Icons.Lite.MdExternalMaterialSymbolsLite"))?
+                        .GetMethod("EnsureConfigured", BindingFlags.Public | BindingFlags.Static);
+                }
             }
             _ensureOptionalProvider?.Invoke(null, null);
         }
@@ -49,5 +55,10 @@ internal static class MdSymbolFontResolver
             // The icon package is optional. Core controls remain usable and their zero-width
             // fallback glyphs stay hidden when the provider assembly or font is unavailable.
         }
+    }
+
+    private static Assembly? TryLoadAssembly(string name)
+    {
+        try { return Assembly.Load(new AssemblyName(name)); } catch { return null; }
     }
 }
