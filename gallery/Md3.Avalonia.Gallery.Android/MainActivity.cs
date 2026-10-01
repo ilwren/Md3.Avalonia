@@ -18,7 +18,7 @@ public sealed class MainActivity : AvaloniaMainActivity
 }
 
 [Android.App.Application]
-public class MainAndroidApplication : AvaloniaAndroidApplication<Md3.Avalonia.Gallery.App>
+public class MainAndroidApplication : AvaloniaAndroidApplication<global::Md3.Avalonia.Gallery.App>
 {
     public MainAndroidApplication(IntPtr javaReference, JniHandleOwnership transfer)
         : base(javaReference, transfer)
