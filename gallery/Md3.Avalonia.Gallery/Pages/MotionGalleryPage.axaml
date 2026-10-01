@@ -1,39 +1,110 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:extra="using:Md3.Avalonia.Extra.Controls"
              xmlns:motion="using:Md3.Avalonia.Motion"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.MotionGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Spacing="28">
-    <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Motion"/><TextBlock Classes="body" Text="Material 3 expressive and standard spring schemes, reduced motion, reversible menus, and pointer-origin ripples."/></StackPanel>
-    <StackPanel Spacing="12">
-      <Grid ColumnDefinitions="*,Auto"><TextBlock Classes="h2" Text="Spring comparison"/><md:MdButton Grid.Column="1" Content="Play motion" Variant="Filled" Click="PlayMotion"/></Grid>
-      <Grid Width="520" HorizontalAlignment="Left" ColumnDefinitions="140,*,56" ColumnSpacing="12">
-        <TextBlock VerticalAlignment="Center" Text="Playback speed" />
-        <md:MdSlider x:Name="MotionSpeedSlider" Grid.Column="1" Minimum="0.5" Maximum="2" Value="1"
-                     SmallChange="0.1" TickFrequency="0.25" IsSnapToTickEnabled="True"
-                     ShowValueIndicator="True" ValueFormat="0.00×" PropertyChanged="MotionSpeedChanged" />
-        <TextBlock x:Name="MotionSpeedText" Grid.Column="2" VerticalAlignment="Center" Text="1.00×" />
-      </Grid>
-      <TextBlock Classes="body" Text="This slider changes the playback speed of all three comparison tracks below." />
-      <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
-        <StackPanel Spacing="18">
-          <Grid ColumnDefinitions="100,*"><TextBlock VerticalAlignment="Center" Text="Expressive"/><Border Grid.Column="1" Height="8" CornerRadius="4" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"><Border x:Name="ExpressiveDot" Width="28" Height="28" Margin="0,-10,0,0" HorizontalAlignment="Left" Background="{DynamicResource Md.Sys.Color.Primary.Brush}" CornerRadius="14"/></Border></Grid>
-          <Grid ColumnDefinitions="100,*"><TextBlock VerticalAlignment="Center" Text="Standard"/><Border Grid.Column="1" Height="8" CornerRadius="4" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"><Border x:Name="StandardDot" Width="28" Height="28" Margin="0,-10,0,0" HorizontalAlignment="Left" Background="{DynamicResource Md.Sys.Color.Secondary.Brush}" CornerRadius="14"/></Border></Grid>
-          <Grid ColumnDefinitions="100,*"><TextBlock VerticalAlignment="Center" Text="Reduced"/><Border Grid.Column="1" Height="8" CornerRadius="4" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"><Border x:Name="ReducedDot" Width="28" Height="28" Margin="0,-10,0,0" HorizontalAlignment="Left" Background="{DynamicResource Md.Sys.Color.Tertiary.Brush}" CornerRadius="14"/></Border></Grid>
-        </StackPanel>
-      </Border>
-    </StackPanel>
-    <StackPanel Spacing="12" motion:MdMotion.Scheme="Expressive">
-      <TextBlock Classes="h2" Text="Ripple and component motion" />
-      <StackPanel Orientation="Horizontal" Spacing="12">
-        <md:MdButton Content="Pointer ripple" Variant="Filled" />
-        <md:MdToggleButton Content="Shape morph" Variant="Tonal" />
-        <md:MdSplitButton Content="Animated menu"><md:MdSplitButton.DropDownContent><StackPanel Width="180"><md:MdButton Content="First action" Variant="Text"/><md:MdButton Content="Second action" Variant="Text"/></StackPanel></md:MdSplitButton.DropDownContent></md:MdSplitButton>
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Motion &amp; Animations" />
+        <TextBlock Classes="body" Text="Official Material Design 3 motion system: Container Transform (morph), Shared Axis, Fade Through, Animated Visibility, expressive spring schemes, and pointer ripples." />
       </StackPanel>
-    </StackPanel>
-    <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="motion:MdMotion.Scheme=&quot;Expressive&quot;" CSharpCode="MdMotion.SetScheme(panel, MdMotionScheme.Expressive);&#10;double position = MdMotionTokens.ExpressiveDefaultSpatial.Sample(seconds);" /></StackPanel>
+
+      <!-- Section 1: Spring Comparison -->
+      <StackPanel Spacing="12">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Classes="h2" Text="Spring physics comparison" />
+          <md:MdButton Grid.Column="1" Content="Play motion" Variant="Filled" Click="PlayMotion" />
+        </Grid>
+        <Grid Width="520" HorizontalAlignment="Left" ColumnDefinitions="140,*,56" ColumnSpacing="12">
+          <TextBlock VerticalAlignment="Center" Text="Playback speed" />
+          <md:MdSlider x:Name="MotionSpeedSlider" Grid.Column="1" Minimum="0.5" Maximum="2" Value="1"
+                       SmallChange="0.1" TickFrequency="0.25" IsSnapToTickEnabled="True"
+                       ShowValueIndicator="True" ValueFormat="0.00×" PropertyChanged="MotionSpeedChanged" />
+          <TextBlock x:Name="MotionSpeedText" Grid.Column="2" VerticalAlignment="Center" Text="1.00×" />
+        </Grid>
+        <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+          <StackPanel Spacing="18">
+            <Grid ColumnDefinitions="100,*">
+              <TextBlock VerticalAlignment="Center" Text="Expressive" />
+              <Border Grid.Column="1" Height="8" CornerRadius="4" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}">
+                <Border x:Name="ExpressiveDot" Width="28" Height="28" Margin="0,-10,0,0" HorizontalAlignment="Left" Background="{DynamicResource Md.Sys.Color.Primary.Brush}" CornerRadius="14" />
+              </Border>
+            </Grid>
+            <Grid ColumnDefinitions="100,*">
+              <TextBlock VerticalAlignment="Center" Text="Standard" />
+              <Border Grid.Column="1" Height="8" CornerRadius="4" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}">
+                <Border x:Name="StandardDot" Width="28" Height="28" Margin="0,-10,0,0" HorizontalAlignment="Left" Background="{DynamicResource Md.Sys.Color.Secondary.Brush}" CornerRadius="14" />
+              </Border>
+            </Grid>
+            <Grid ColumnDefinitions="100,*">
+              <TextBlock VerticalAlignment="Center" Text="Reduced" />
+              <Border Grid.Column="1" Height="8" CornerRadius="4" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}">
+                <Border x:Name="ReducedDot" Width="28" Height="28" Margin="0,-10,0,0" HorizontalAlignment="Left" Background="{DynamicResource Md.Sys.Color.Tertiary.Brush}" CornerRadius="14" />
+              </Border>
+            </Grid>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <!-- Section 2: Material 3 Container Transform (Morph) -->
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Container transform (Open Container)" />
+        <TextBlock Classes="body" Text="Click the card below to see the Material 3 Container Transform morphing transition between card trigger and expanded surface." />
+        <extra:MdContainerTransform x:Name="MorphDemo" ClosedCornerRadius="16" OpenCornerRadius="24" MaxWidth="520" HorizontalAlignment="Left">
+          <extra:MdContainerTransform.ClosedContent>
+            <Border Padding="16,14" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" Cursor="Hand" PointerPressed="OnMorphClicked">
+              <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
+                <Border Width="40" Height="40" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}">
+                  <md:MdIcon Glyph="&#xe896;" Size="20" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" />
+                </Border>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                  <TextBlock Text="Material Design 3 Token Guide" FontSize="15" FontWeight="SemiBold" />
+                  <TextBlock Text="Tap to morph into full article view" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+                <md:MdIcon Grid.Column="2" Glyph="&#xe5cc;" Size="20" VerticalAlignment="Center" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              </Grid>
+            </Border>
+          </extra:MdContainerTransform.ClosedContent>
+          <extra:MdContainerTransform.OpenContent>
+            <Border Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+              <StackPanel Spacing="16">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Text="Design Token Architecture" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+                  <md:MdIconButton Grid.Column="1" Icon="{x:Static md:MdSymbols.Close}" Variant="Standard" Click="OnMorphClicked" />
+                </Grid>
+                <TextBlock Text="The container transform pattern transitions smoothly between UI elements that include a container, such as cards, lists, or buttons morphing into full details." TextWrapping="Wrap" />
+                <md:MdButton Content="Collapse" Variant="Tonal" HorizontalAlignment="Right" Click="OnMorphClicked" />
+              </StackPanel>
+            </Border>
+          </extra:MdContainerTransform.OpenContent>
+        </extra:MdContainerTransform>
+      </StackPanel>
+
+      <!-- Section 3: Animated Visibility (Expand / Collapse) -->
+      <StackPanel Spacing="12">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Classes="h2" Text="Animated visibility (Expand / Collapse)" />
+          <md:MdButton Grid.Column="1" Content="Toggle panel" Variant="Tonal" Click="OnTogglePanelClicked" />
+        </Grid>
+        <extra:MdAnimatedVisibility x:Name="AnimatedPanel" IsContentVisible="True" Transition="ExpandVertical" MaxWidth="520" HorizontalAlignment="Left">
+          <Border Padding="16" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" CornerRadius="16">
+            <StackPanel Spacing="6">
+              <TextBlock Text="Collapsible Content Section" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
+              <TextBlock Text="This section animates its height, scale, and opacity using Material Design 3 easing curves." Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+        </extra:MdAnimatedVisibility>
+      </StackPanel>
+
+      <!-- Usage Example -->
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;!-- M3 Container Transform --&gt;&#10;&lt;extra:MdContainerTransform IsExpanded=&quot;{Binding IsDetailOpen}&quot;&gt;&#10;    &lt;extra:MdContainerTransform.ClosedContent&gt;...&lt;/extra:MdContainerTransform.ClosedContent&gt;&#10;    &lt;extra:MdContainerTransform.OpenContent&gt;...&lt;/extra:MdContainerTransform.OpenContent&gt;&#10;&lt;/extra:MdContainerTransform&gt;&#10;&#10;&lt;!-- M3 Shared Axis Navigation --&gt;&#10;&lt;extra:MdSharedAxis Axis=&quot;X&quot; Forward=&quot;True&quot;&gt;&#10;    &lt;ContentControl Content=&quot;{Binding ActivePage}&quot; /&gt;&#10;&lt;/extra:MdSharedAxis&gt;"
+                             CSharpCode="containerTransform.Toggle();&#10;sharedAxis.Axis = MdSharedAxisKind.X;&#10;animatedVis.IsContentVisible = !animatedVis.IsContentVisible;" />
+      </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>
 </UserControl>

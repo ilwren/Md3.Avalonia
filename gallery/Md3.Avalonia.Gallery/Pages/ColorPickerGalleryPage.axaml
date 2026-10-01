@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:extra="using:Md3.Avalonia.Extra.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.ColorPickerGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Spacing="24" Margin="0,0,12,24" MaxWidth="720">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Color Picker (Flutter Style)" />
+        <TextBlock Classes="body" Text="Material Design 3 and Flutter-inspired color pickers with primary swatches, tonal shades (50-900), HSV sliders, alpha opacity, and live HEX binding." />
+      </StackPanel>
+
+      <!-- Section: Embedded Color Picker -->
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Material 3 Color Picker" />
+        <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1"
+                CornerRadius="24">
+          <extra:MdColorPicker x:Name="DemoColorPicker"
+                               SelectedColor="#6750A4"
+                               IsAlphaEnabled="True"
+                               HorizontalAlignment="Center" />
+        </Border>
+      </StackPanel>
+
+      <!-- Section: Color Swatch Picker Buttons -->
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Color Swatch Buttons" />
+        <StackPanel Orientation="Horizontal" Spacing="16">
+          <extra:MdColorPickerButton SelectedColor="#6750A4" />
+          <extra:MdColorPickerButton SelectedColor="#006A6A" />
+          <extra:MdColorPickerButton SelectedColor="#984061" />
+          <extra:MdColorPickerButton SelectedColor="#2196F3" />
+        </StackPanel>
+      </StackPanel>
+
+      <!-- Usage Example -->
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;!-- Flutter-style Color Picker --&gt;&#10;&lt;extra:MdColorPicker SelectedColor=&quot;{Binding PrimaryColor, Mode=TwoWay}&quot;&#10;                     SelectedHex=&quot;{Binding HexString, Mode=TwoWay}&quot;&#10;                     IsAlphaEnabled=&quot;True&quot; /&gt;&#10;&#10;&lt;!-- Compact Color Swatch Button --&gt;&#10;&lt;extra:MdColorPickerButton SelectedColor=&quot;{Binding AccentColor, Mode=TwoWay}&quot; /&gt;"
+                             CSharpCode="var picker = new MdColorPicker { SelectedColor = Color.Parse(&quot;#6750A4&quot;) };&#10;picker.ColorChanged += (sender, color) =&gt; ApplyThemeColor(color);" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>
