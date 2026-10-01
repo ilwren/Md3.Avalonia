@@ -1,0 +1,75 @@
+name: Android Automated UI & Spec Tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'gallery/**'
+      - 'tests/maestro/**'
+      - '.github/workflows/android-test.yml'
+
+jobs:
+  maestro-android-test:
+    name: Run Maestro Android Tests on Emulator
+    runs-on: macos-14 # macOS runners have hardware acceleration for Android Emulator
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup .NET SDK & Workloads
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Generate fonts
+        shell: bash
+        run: |
+          mkdir -p src/Md3.Avalonia.Icons/Assets/Fonts
+          python3 scripts/generate-fonts.py
+
+      - name: Install Android Workload
+        run: dotnet workload install android
+
+      - name: Build Android Gallery APK
+        run: |
+          dotnet publish gallery/Md3.Avalonia.Gallery.Android/Md3.Avalonia.Gallery.Android.csproj \
+            -c Release \
+            -f net10.0-android \
+            -p:AndroidPackageFormat=apk \
+            -o artifacts/android/
+
+      - name: Run Maestro Tests on Android Emulator (API 34)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_6
+          script: |
+            # 1. Install built APK onto Android Emulator
+            adb install artifacts/android/*.apk
+            
+            # 2. Install Maestro CLI
+            curl -Ls "https://get.maestro.mobile.dev" | bash
+            export PATH="$PATH:$HOME/.maestro/bin"
+            
+            # 3. Execute Material Design 3 and Flutter Parity test flows
+            maestro test tests/maestro/01_material_design_specs.yaml
+            maestro test tests/maestro/02_colorpicker_and_motion.yaml
+            maestro test tests/maestro/03_flutter_parity_gestures.yaml
+
+      - name: Upload Test Screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-spec-test-screenshots
+          path: ~/.maestro/tests/screenshots/
+          if-no-files-found: ignore
