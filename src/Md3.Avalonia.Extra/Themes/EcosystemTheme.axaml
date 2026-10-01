@@ -1,6 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        x:Class="Md3.Avalonia.Ecosystem.Themes.EcosystemTheme">
+        x:Class="Md3.Avalonia.Extra.Themes.EcosystemTheme">
   <Styles.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
