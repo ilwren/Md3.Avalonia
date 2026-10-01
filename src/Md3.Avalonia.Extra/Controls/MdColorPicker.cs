@@ -189,10 +189,16 @@ public class MdColorPicker : TemplatedControl
 
     private void OnCopyHexClicked(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if (TopLevel.GetTopLevel(this)?.Clipboard is { } clipboard)
+        try
         {
-            clipboard.SetTextAsync(SelectedHex);
+            if (TopLevel.GetTopLevel(this)?.Clipboard is { } clipboard)
+            {
+                var data = new DataObject();
+                data.Set(DataFormats.Text, SelectedHex);
+                _ = clipboard.SetDataObjectAsync(data);
+            }
         }
+        catch { }
     }
 
     private void OnHexKeyDown(object? sender, KeyEventArgs e)
