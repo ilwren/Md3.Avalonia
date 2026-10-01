@@ -1,6 +1,6 @@
 # Extra Controls API Reference (`Md3.Avalonia.Extra`)
 
-The `Md3.Avalonia.Extra` package provides advanced UI controls inspired by popular open-source Flutter ecosystem widgets (such as `flutter_quill`, `flutter_chat_ui`, `flutter_slidable`, etc.).
+The `Md3.Avalonia.Extra` package provides advanced UI controls inspired by popular open-source Flutter ecosystem widgets (such as `flutter_colorpicker`, `flutter_quill`, `flutter_chat_ui`, `flutter_slidable`, etc.) and official Material Design 3 motion patterns.
 
 To use these controls, add the XML namespace:
 ```xml
@@ -9,7 +9,91 @@ xmlns:extra="using:Md3.Avalonia.Extra.Controls"
 
 ---
 
-## 1. `MdRichEditor` (Rich Text Editor)
+## 1. `MdColorPicker` & `MdColorPickerButton` (Flutter-Style Color Picker)
+Inspired by `flutter_colorpicker`, `MdColorPicker` provides a complete Material Design 3 color selection experience with primary color swatches, tonal shade palettes (50 to 900), HSV gradient sliders, live HEX input/binding, Alpha channel control, and recent colors history.
+
+### Properties:
+| Property | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `SelectedColor` | `Color` | `#6750A4` | Two-way binding for the selected color |
+| `SelectedHex` | `string` | `"#6750A4"` | Two-way binding for HEX color representation |
+| `IsAlphaEnabled` | `bool` | `true` | Enables or disables opacity / alpha slider |
+| `Hue` | `double` | `260` | HSV Hue value (0° to 360°) |
+| `Saturation` | `double` | `50` | HSV Saturation percentage (0% to 100%) |
+| `ColorValue` | `double` | `65` | HSV Brightness / Value percentage (0% to 100%) |
+| `Alpha` | `double` | `100` | Opacity percentage (0% to 100%) |
+| `MaterialPrimaryColors` | `IReadOnlyList<Color>` | Primary swatches | Preset Material 3 primary colors |
+| `MaterialShades` | `IReadOnlyList<Color>` | 10 shades | Tonal shades generated for current color (50–900) |
+| `RecentColors` | `ObservableCollection<Color>` | Recent history | User color selection history |
+
+### Usage Example:
+```xml
+<!-- Embedded Color Picker -->
+<extra:MdColorPicker SelectedColor="{Binding ThemeColor, Mode=TwoWay}"
+                     SelectedHex="{Binding HexString, Mode=TwoWay}"
+                     IsAlphaEnabled="True" />
+
+<!-- Compact Color Swatch Button -->
+<extra:MdColorPickerButton SelectedColor="{Binding AccentColor, Mode=TwoWay}" />
+```
+
+---
+
+## 2. Material 3 Motion Components
+
+### `MdContainerTransform` (Open Container Morph)
+Material Design 3 Container Transform morphs between a collapsed trigger (e.g. Card, Button) and an expanded surface with synchronized corner radius, bounds, and content crossfade.
+
+```xml
+<extra:MdContainerTransform IsExpanded="{Binding IsDetailOpen, Mode=TwoWay}"
+                            ClosedCornerRadius="16" OpenCornerRadius="28">
+    <extra:MdContainerTransform.ClosedContent>
+        <Border Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}">
+            <TextBlock Text="Tap to Expand Details" />
+        </Border>
+    </extra:MdContainerTransform.ClosedContent>
+    <extra:MdContainerTransform.OpenContent>
+        <Border Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+            <TextBlock Text="Full Screen Expanded View" FontSize="20" FontWeight="Bold" />
+        </Border>
+    </extra:MdContainerTransform.OpenContent>
+</extra:MdContainerTransform>
+```
+
+### `MdSharedAxis` (Shared Axis Navigation)
+Implements Material Design 3 Shared Axis transition along X (horizontal slide for forward/back), Y (vertical slide for drill-down), or Z (scale depth for modal/zoomed elements).
+
+```xml
+<extra:MdSharedAxis Axis="X" Forward="{Binding IsNavigatingForward}">
+    <TransitioningContentControl Content="{Binding CurrentPage}" />
+</extra:MdSharedAxis>
+```
+
+### `MdFadeThrough` (Navigation Fade Through)
+Material Design 3 Fade Through pattern for bottom navigation bar and tab switches, smoothly cross-fading outgoing and incoming views.
+
+```xml
+<extra:MdFadeThrough Duration="0:0:0.24">
+    <ContentControl Content="{Binding ActiveTabContent}" />
+</extra:MdFadeThrough>
+```
+
+### `MdAnimatedVisibility` (Expand / Collapse Animation)
+Smoothly animates content entrance and exit when `IsContentVisible` changes, supporting `ExpandVertical`, `ExpandHorizontal`, `Fade`, `Scale`, and `SlideAndFade`.
+
+```xml
+<extra:MdAnimatedVisibility IsContentVisible="{Binding IsPanelOpen}"
+                            Transition="ExpandVertical"
+                            Duration="0:0:0.25">
+    <Border Padding="16" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}">
+        <TextBlock Text="Collapsible Content" />
+    </Border>
+</extra:MdAnimatedVisibility>
+```
+
+---
+
+## 3. `MdRichEditor` (Rich Text Editor)
 Inspired by `flutter_quill`, `MdRichEditor` provides a complete Material Design 3 formatting toolbar and live WYSIWYG Markdown document renderer.
 
 | Property | Type | Description |
@@ -36,14 +120,10 @@ Inspired by `flutter_quill`, `MdRichEditor` provides a complete Material Design 
     </Grid>
 </extra:MdRichEditor>
 ```
-```csharp
-// Wire adapter in C#
-RichEditor.Adapter = new MdTextBoxRichEditorAdapter(EditorText, RichPreview);
-```
 
 ---
 
-## 2. `MdChatView` & `MdChatMessagePresenter` (Chat UI)
+## 4. `MdChatView` & `MdChatMessagePresenter` (Chat UI)
 Inspired by `flutter_chat_ui` and `dash_chat_2`, `MdChatView` provides a provider-neutral chat shell with asymmetric message bubbles, avatars, delivery status, quoted reply card, quick suggestions, and floating pill composer.
 
 ### `MdChatMessage` Record
@@ -75,33 +155,18 @@ public sealed record MdChatMessage(
 | `DeleteRequested`| `event EventHandler<IReadOnlyList<MdChatMessage>>?` | Raised when user deletes selected messages |
 | `RetryRequested` | `event EventHandler<MdChatMessage>?` | Raised when user taps retry on a failed bubble |
 
-### Usage Example:
-```xml
-<extra:MdChatView x:Name="Chat" Height="500"
-                  MessageSubmitted="ChatSubmitted"
-                  AttachmentRequested="ChatAttachmentRequested"
-                  QuoteRequested="ChatQuoteRequested"
-                  DeleteRequested="ChatDeleteRequested"
-                  RetryRequested="ChatRetryRequested" />
-```
-
 ---
 
-## 3. `MdDataGrid` (Enterprise Data Grid)
+## 5. `MdDataGrid` (Enterprise Data Grid)
 High-performance virtualized grid with column sorting, inline cell editing, and clipboard copy.
 
 ```xml
 <extra:MdDataGrid x:Name="DataGrid" Height="300" />
 ```
-```csharp
-DataGrid.Columns.Add(new MdDataGridColumn { Header = "Name", PropertyName = "Name", Width = new GridLength(2, GridUnitType.Star) });
-DataGrid.Columns.Add(new MdDataGridColumn { Header = "Score", PropertyName = "Score", IsEditable = true });
-DataGrid.DataSource = employeesList;
-```
 
 ---
 
-## 4. `MdBreadcrumb` (Path Navigation)
+## 6. `MdBreadcrumb` (Path Navigation)
 Cross-platform breadcrumb supporting icons, custom separators, overflow collapsing, and command binding.
 
 ```xml
@@ -110,7 +175,7 @@ Cross-platform breadcrumb supporting icons, custom separators, overflow collapsi
 
 ---
 
-## 5. `MdPinInput` (Verification & OTP Input)
+## 7. `MdPinInput` (Verification & OTP Input)
 Segmented PIN / SMS verification code input with focus forwarding, automatic paste handling, masking, and keyboard navigation.
 
 ```xml
@@ -119,7 +184,7 @@ Segmented PIN / SMS verification code input with focus forwarding, automatic pas
 
 ---
 
-## 6. `MdTreeView` (Virtual Tree Hierarchy)
+## 8. `MdTreeView` (Virtual Tree Hierarchy)
 Expandable hierarchy view with expansion angle transitions, node invocation, and RTL mirroring.
 
 ```xml
@@ -128,9 +193,18 @@ Expandable hierarchy view with expansion angle transitions, node invocation, and
 
 ---
 
-## 7. `MdTimeline` (Process & Event Timeline)
+## 9. `MdTimeline` (Process & Event Timeline)
 Vertical and horizontal event timeline with neutral, active, completed, and error item states.
 
 ```xml
 <extra:MdTimeline ItemsSource="{Binding TimelineEvents}" Orientation="Vertical" />
+```
+
+---
+
+## 10. `MdSkeleton` (Loading Placeholders)
+Pulsing skeleton shapes (`Rectangle`, `RoundedRectangle`, `Circle`, `Text`) with `MdSkeletonGroup` synchronization.
+
+```xml
+<extra:MdSkeleton IsLoading="{Binding IsLoading}" Shape="RoundedRectangle" Height="72" />
 ```

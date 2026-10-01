@@ -150,6 +150,48 @@ public sealed class MdEcosystemWaveFTests
         finally { window.Close(); }
     }
 
+    [AvaloniaFact]
+    public void ColorPicker_Syncs_Hex_Shades_And_Hsv_Sliders()
+    {
+        var picker = new MdColorPicker { SelectedColor = Color.Parse("#6750A4") };
+        Assert.Equal("#6750A4", picker.SelectedHex);
+        Assert.NotEmpty(picker.MaterialPrimaryColors);
+        Assert.NotEmpty(picker.MaterialShades);
+
+        picker.SelectColor(Color.Parse("#006A6A"));
+        Assert.Equal("#006A6A", picker.SelectedHex);
+        Assert.Contains(Color.Parse("#006A6A"), picker.RecentColors);
+
+        Assert.True(picker.TryApplyHex("#FF5722"));
+        Assert.Equal(Color.Parse("#FF5722"), picker.SelectedColor);
+    }
+
+    [AvaloniaFact]
+    public void Motion_Components_Support_State_Transitions()
+    {
+        var containerTransform = new MdContainerTransform
+        {
+            ClosedContent = new TextBlock { Text = "Card" },
+            OpenContent = new TextBlock { Text = "Detail View" },
+            IsExpanded = false
+        };
+        Assert.False(containerTransform.IsExpanded);
+        containerTransform.Toggle();
+        Assert.True(containerTransform.IsExpanded);
+
+        var sharedAxis = new MdSharedAxis { Axis = MdSharedAxisKind.X, Forward = true };
+        Assert.Equal(MdSharedAxisKind.X, sharedAxis.Axis);
+        Assert.True(sharedAxis.Forward);
+
+        var fadeThrough = new MdFadeThrough { Content = "Page Content" };
+        Assert.Equal(TimeSpan.FromMilliseconds(240), fadeThrough.Duration);
+
+        var animatedVis = new MdAnimatedVisibility { IsContentVisible = true, Transition = MdVisibilityTransition.ExpandVertical };
+        Assert.True(animatedVis.IsContentVisible);
+        animatedVis.IsContentVisible = false;
+        Assert.False(animatedVis.IsContentVisible);
+    }
+
     private sealed class TestCommand(Action<object?> execute) : ICommand
     {
         public event EventHandler? CanExecuteChanged { add { } remove { } }

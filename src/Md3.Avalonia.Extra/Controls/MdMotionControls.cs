@@ -172,3 +172,148 @@ public sealed class MdAnimationSequence : StackPanel
     protected override void OnAttachedToVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e) { base.OnAttachedToVisualTree(e); if (AutoPlay) _ = PlayAsync(); }
     protected override void OnDetachedFromVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e) { Stop(); base.OnDetachedFromVisualTree(e); }
 }
+
+public enum MdSharedAxisKind { X, Y, Z }
+
+/// <summary>
+/// Implements the Material Design 3 Shared Axis transition pattern (X: Horizontal slide, Y: Vertical slide, Z: Scale depth).
+/// </summary>
+[PseudoClasses(":x-axis", ":y-axis", ":z-axis", ":forward", ":backward")]
+public class MdSharedAxis : ContentControl
+{
+    public static readonly StyledProperty<MdSharedAxisKind> AxisProperty =
+        AvaloniaProperty.Register<MdSharedAxis, MdSharedAxisKind>(nameof(Axis), MdSharedAxisKind.X);
+
+    public static readonly StyledProperty<bool> ForwardProperty =
+        AvaloniaProperty.Register<MdSharedAxis, bool>(nameof(Forward), true);
+
+    public static readonly StyledProperty<TimeSpan> DurationProperty =
+        AvaloniaProperty.Register<MdSharedAxis, TimeSpan>(nameof(Duration), TimeSpan.FromMilliseconds(300));
+
+    static MdSharedAxis()
+    {
+        AxisProperty.Changed.AddClassHandler<MdSharedAxis>((control, _) => control.UpdatePseudoClasses());
+        ForwardProperty.Changed.AddClassHandler<MdSharedAxis>((control, _) => control.UpdatePseudoClasses());
+    }
+
+    public MdSharedAxis() => UpdatePseudoClasses();
+
+    public MdSharedAxisKind Axis { get => GetValue(AxisProperty); set => SetValue(AxisProperty, value); }
+    public bool Forward { get => GetValue(ForwardProperty); set => SetValue(ForwardProperty, value); }
+    public TimeSpan Duration { get => GetValue(DurationProperty); set => SetValue(DurationProperty, value); }
+
+    private void UpdatePseudoClasses()
+    {
+        PseudoClasses.Set(":x-axis", Axis == MdSharedAxisKind.X);
+        PseudoClasses.Set(":y-axis", Axis == MdSharedAxisKind.Y);
+        PseudoClasses.Set(":z-axis", Axis == MdSharedAxisKind.Z);
+        PseudoClasses.Set(":forward", Forward);
+        PseudoClasses.Set(":backward", !Forward);
+    }
+}
+
+/// <summary>
+/// Implements the Material Design 3 Fade Through transition pattern for tabs, bottom navigation, and search results.
+/// </summary>
+public class MdFadeThrough : ContentControl
+{
+    public static readonly StyledProperty<TimeSpan> DurationProperty =
+        AvaloniaProperty.Register<MdFadeThrough, TimeSpan>(nameof(Duration), TimeSpan.FromMilliseconds(240));
+
+    public TimeSpan Duration { get => GetValue(DurationProperty); set => SetValue(DurationProperty, value); }
+}
+
+/// <summary>
+/// Material Design 3 Container Transform (Open Container) morphs between a collapsed trigger (e.g. Card, Button)
+/// and an expanded surface with synchronized corner radius, bounds, and content crossfade.
+/// </summary>
+[PseudoClasses(":expanded", ":collapsed")]
+public class MdContainerTransform : TemplatedControl
+{
+    public static readonly StyledProperty<bool> IsExpandedProperty =
+        AvaloniaProperty.Register<MdContainerTransform, bool>(nameof(IsExpanded), false, defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
+
+    public static readonly StyledProperty<object?> ClosedContentProperty =
+        AvaloniaProperty.Register<MdContainerTransform, object?>(nameof(ClosedContent));
+
+    public static readonly StyledProperty<object?> OpenContentProperty =
+        AvaloniaProperty.Register<MdContainerTransform, object?>(nameof(OpenContent));
+
+    public static readonly StyledProperty<CornerRadius> ClosedCornerRadiusProperty =
+        AvaloniaProperty.Register<MdContainerTransform, CornerRadius>(nameof(ClosedCornerRadius), new CornerRadius(16));
+
+    public static readonly StyledProperty<CornerRadius> OpenCornerRadiusProperty =
+        AvaloniaProperty.Register<MdContainerTransform, CornerRadius>(nameof(OpenCornerRadius), new CornerRadius(28));
+
+    public static readonly StyledProperty<IBrush?> ContainerBackgroundProperty =
+        AvaloniaProperty.Register<MdContainerTransform, IBrush?>(nameof(ContainerBackground));
+
+    public static readonly StyledProperty<TimeSpan> DurationProperty =
+        AvaloniaProperty.Register<MdContainerTransform, TimeSpan>(nameof(Duration), TimeSpan.FromMilliseconds(350));
+
+    static MdContainerTransform()
+    {
+        IsExpandedProperty.Changed.AddClassHandler<MdContainerTransform>((ct, _) => ct.UpdateState());
+    }
+
+    public MdContainerTransform() => UpdateState();
+
+    public bool IsExpanded { get => GetValue(IsExpandedProperty); set => SetValue(IsExpandedProperty, value); }
+    public object? ClosedContent { get => GetValue(ClosedContentProperty); set => SetValue(ClosedContentProperty, value); }
+    public object? OpenContent { get => GetValue(OpenContentProperty); set => SetValue(OpenContentProperty, value); }
+    public CornerRadius ClosedCornerRadius { get => GetValue(ClosedCornerRadiusProperty); set => SetValue(ClosedCornerRadiusProperty, value); }
+    public CornerRadius OpenCornerRadius { get => GetValue(OpenCornerRadiusProperty); set => SetValue(OpenCornerRadiusProperty, value); }
+    public IBrush? ContainerBackground { get => GetValue(ContainerBackgroundProperty); set => SetValue(ContainerBackgroundProperty, value); }
+    public TimeSpan Duration { get => GetValue(DurationProperty); set => SetValue(DurationProperty, value); }
+
+    public void Toggle() => IsExpanded = !IsExpanded;
+
+    private void UpdateState()
+    {
+        PseudoClasses.Set(":expanded", IsExpanded);
+        PseudoClasses.Set(":collapsed", !IsExpanded);
+    }
+}
+
+public enum MdVisibilityTransition
+{
+    Fade,
+    ExpandVertical,
+    ExpandHorizontal,
+    Scale,
+    SlideAndFade
+}
+
+/// <summary>
+/// Smoothly animates content entrance and exit when IsContentVisible changes, supporting expand/collapse, scale, and fade.
+/// </summary>
+[PseudoClasses(":visible", ":hidden")]
+public class MdAnimatedVisibility : ContentControl
+{
+    public static readonly StyledProperty<bool> IsContentVisibleProperty =
+        AvaloniaProperty.Register<MdAnimatedVisibility, bool>(nameof(IsContentVisible), true, defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
+
+    public static readonly StyledProperty<MdVisibilityTransition> TransitionProperty =
+        AvaloniaProperty.Register<MdAnimatedVisibility, MdVisibilityTransition>(nameof(Transition), MdVisibilityTransition.ExpandVertical);
+
+    public static readonly StyledProperty<TimeSpan> DurationProperty =
+        AvaloniaProperty.Register<MdAnimatedVisibility, TimeSpan>(nameof(Duration), TimeSpan.FromMilliseconds(250));
+
+    static MdAnimatedVisibility()
+    {
+        IsContentVisibleProperty.Changed.AddClassHandler<MdAnimatedVisibility>((av, _) => av.UpdateState());
+    }
+
+    public MdAnimatedVisibility() => UpdateState();
+
+    public bool IsContentVisible { get => GetValue(IsContentVisibleProperty); set => SetValue(IsContentVisibleProperty, value); }
+    public MdVisibilityTransition Transition { get => GetValue(TransitionProperty); set => SetValue(TransitionProperty, value); }
+    public TimeSpan Duration { get => GetValue(DurationProperty); set => SetValue(DurationProperty, value); }
+
+    private void UpdateState()
+    {
+        PseudoClasses.Set(":visible", IsContentVisible);
+        PseudoClasses.Set(":hidden", !IsContentVisible);
+    }
+}
+
