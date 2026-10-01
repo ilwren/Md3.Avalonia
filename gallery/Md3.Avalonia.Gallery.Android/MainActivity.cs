@@ -4,7 +4,6 @@ using Android.Content.PM;
 using Android.Runtime;
 using Avalonia;
 using Avalonia.Android;
-using Md3.Avalonia.Gallery;
 
 namespace Md3.Avalonia.Gallery.Android;
 
@@ -18,7 +17,7 @@ public sealed class MainActivity : AvaloniaMainActivity
 }
 
 [Android.App.Application]
-public class MainAndroidApplication : AvaloniaAndroidApplication<global::Md3.Avalonia.Gallery.App>
+public class MainAndroidApplication : AvaloniaAndroidApplication<App>
 {
     public MainAndroidApplication(IntPtr javaReference, JniHandleOwnership transfer)
         : base(javaReference, transfer)

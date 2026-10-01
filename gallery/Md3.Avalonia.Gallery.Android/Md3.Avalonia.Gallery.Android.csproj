@@ -13,6 +13,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia.Android" />
-    <ProjectReference Include="../Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia/Md3.Avalonia.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.Icons/Md3.Avalonia.Icons.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj" />
   </ItemGroup>
 </Project>
