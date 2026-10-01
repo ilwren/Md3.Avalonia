@@ -1,0 +1,33 @@
+appId: io.arena.md3avalonia.gallery
+tags:
+  - color-picker
+  - motion
+---
+- launchApp
+- assertVisible: "Material 3 · Avalonia"
+
+# 1. Switch to Color Picker Tab
+- tapOn: "Color Picker"
+- assertVisible: "Flutter-Style Color Picker"
+- assertVisible: "Material Colors"
+
+# 2. Select Swatches & Verify HEX Synchronization
+- tapOn:
+    point: "50%, 35%"
+- assertVisible: "Selected HEX"
+
+# 3. Switch to Motion Tab & Verify M3 Container Transform
+- tapOn: "Motion"
+- assertVisible: "Motion & Animations"
+- assertVisible: "Container transform (Open Container)"
+
+# 4. Trigger Container Transform Morph Animation
+- tapOn: "Material Design 3 Token Guide"
+- assertVisible: "Design Token Architecture"
+- assertVisible: "Collapse"
+- tapOn: "Collapse"
+- assertVisible: "Material Design 3 Token Guide"
+
+# 5. Verify Collapsible Animated Visibility
+- tapOn: "Toggle panel"
+- takeScreenshot: "motion_animated_visibility_android"

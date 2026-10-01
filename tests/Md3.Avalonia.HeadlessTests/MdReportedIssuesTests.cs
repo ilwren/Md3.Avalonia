@@ -10,8 +10,8 @@ using Avalonia.Threading;
 using System.Globalization;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
-using Md3.Avalonia.Ecosystem.Controls;
-using Md3.Avalonia.Ecosystem.Infrastructure;
+using Md3.Avalonia.Extra.Controls;
+using Md3.Avalonia.Extra.Infrastructure;
 using Md3.Avalonia.Gallery;
 using Md3.Avalonia.Gallery.Pages;
 using Xunit;
@@ -168,6 +168,11 @@ public sealed class MdReportedIssuesTests
         Assert.Equal("**Material** editor", editor.Text);
         Assert.NotEmpty(preview.Children);
         Assert.Equal(MdRichEditorCommand.Bold, adapter.LastCommand);
+
+        editor.SelectionStart = 0;
+        editor.SelectionEnd = editor.Text.Length;
+        adapter.Execute(MdRichEditorCommand.ClearFormatting);
+        Assert.Equal("Material editor", editor.Text);
     }
 
     [AvaloniaFact]

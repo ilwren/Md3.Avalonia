@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Md3.Avalonia.Extra</RootNamespace>
+    <AssemblyName>Md3.Avalonia.Extra</AssemblyName>
+    <Description>Extended Material Design 3 components and advanced UX widgets for Avalonia, inspired by popular open-source Flutter ecosystem widgets.</Description>
+    <PackageId>Md3.Avalonia.Extra</PackageId>
+    <Version>0.1.0-preview.1</Version>
+    <Authors>Md3.Avalonia contributors</Authors>
+    <PackageTags>avalonia;flutter;extra;controls;mvvm;android;desktop;material-design-3</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <ProjectReference Include="../Md3.Avalonia/Md3.Avalonia.csproj" />
+    <None Include="../../README.md" Pack="true" PackagePath="/" Link="README.md" />
+    <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />
+  </ItemGroup>
+</Project>

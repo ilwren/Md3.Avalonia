@@ -5,14 +5,95 @@
              x:Class="Md3.Avalonia.Gallery.Pages.ButtonGalleryPage">
   <md:MdScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <StackPanel Spacing="26" Margin="0,0,12,24">
-      <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Buttons"/><TextBlock Classes="body" Text="Default, toggle, split, standard group and connected group configurations."/></StackPanel>
-      <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Default button color styles"/><WrapPanel Orientation="Horizontal" ItemWidth="150" ItemHeight="64"><md:MdButton Content="Filled" Variant="Filled"/><md:MdButton Content="Tonal" Variant="Tonal"/><md:MdButton Content="Outlined" Variant="Outlined"/><md:MdButton Content="Text" Variant="Text"/><md:MdButton Content="Elevated" Variant="Elevated"/></WrapPanel></StackPanel>
-      <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Toggle buttons"/><StackPanel Orientation="Horizontal" Spacing="14"><md:MdToggleButton Content="Filled"/><md:MdToggleButton Content="Selected" IsChecked="True"/><md:MdToggleButton Content="Tonal" Variant="Tonal"/><md:MdToggleButton Content="Outlined" Variant="Outlined"/></StackPanel></StackPanel>
-      <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Split buttons"/><StackPanel Orientation="Horizontal" Spacing="16"><md:MdSplitButton Content="Create"><md:MdSplitButton.LeadingIcon><TextBlock Text="＋"/></md:MdSplitButton.LeadingIcon><md:MdSplitButton.DropDownContent><StackPanel Width="190"><md:MdButton Content="New document" Variant="Text" HorizontalContentAlignment="Left"/><md:MdButton Content="New folder" Variant="Text" HorizontalContentAlignment="Left"/></StackPanel></md:MdSplitButton.DropDownContent></md:MdSplitButton><md:MdSplitButton Content="Export" Variant="Tonal"><md:MdSplitButton.DropDownContent><StackPanel Width="190"><md:MdButton Content="Export PDF" Variant="Text" HorizontalContentAlignment="Left"/><md:MdButton Content="Export image" Variant="Text" HorizontalContentAlignment="Left"/></StackPanel></md:MdSplitButton.DropDownContent></md:MdSplitButton><md:MdSplitButton Content="Share" Variant="Outlined"><md:MdSplitButton.DropDownContent><StackPanel Width="190"><md:MdButton Content="Copy link" Variant="Text" HorizontalContentAlignment="Left"/><md:MdButton Content="Invite people" Variant="Text" HorizontalContentAlignment="Left"/></StackPanel></md:MdSplitButton.DropDownContent></md:MdSplitButton></StackPanel></StackPanel>
-      <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Standard button group"/><md:MdStandardButtonGroup><md:MdButton Content="Day" Variant="Tonal"/><md:MdToggleButton Content="Week" Variant="Tonal" IsChecked="True"/><md:MdToggleButton Content="Month" Variant="Tonal"/></md:MdStandardButtonGroup></StackPanel>
-      <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Connected button group"/><md:MdConnectedButtonGroup><md:MdToggleButton Content="List" Variant="Outlined" IsChecked="True"/><md:MdToggleButton Content="Grid" Variant="Outlined"/><md:MdToggleButton Content="Map" Variant="Outlined"/></md:MdConnectedButtonGroup></StackPanel>
-      <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Expressive sizes"/><StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center"><md:MdButton Content="XS" Size="ExtraSmall"/><md:MdButton Content="Small"/><md:MdButton Content="Medium" Size="Medium"/><md:MdButton Content="Large" Size="Large"/></StackPanel></StackPanel>
-      <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdButton Content=&quot;Save&quot; Variant=&quot;Filled&quot;&#10;             Command=&quot;{Binding SaveCommand}&quot; /&gt;" CSharpCode="var save = new MdButton { Content = &quot;Save&quot;, Variant = MdButtonVariant.Filled };&#10;save.Command = viewModel.SaveCommand;" /></StackPanel>
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Buttons" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Default, toggle, split, standard group and connected group configurations." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Default button color styles" />
+        <WrapPanel Orientation="Horizontal" ItemWidth="150" ItemHeight="64">
+          <md:MdButton Content="Filled" Variant="Filled"/>
+          <md:MdButton Content="Tonal" Variant="Tonal"/>
+          <md:MdButton Content="Outlined" Variant="Outlined"/>
+          <md:MdButton Content="Text" Variant="Text"/>
+          <md:MdButton Content="Elevated" Variant="Elevated"/>
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Toggle buttons" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdToggleButton Content="Filled" Margin="0,0,12,12" />
+          <md:MdToggleButton Content="Selected" IsChecked="True" Margin="0,0,12,12" />
+          <md:MdToggleButton Content="Tonal" Variant="Tonal" Margin="0,0,12,12" />
+          <md:MdToggleButton Content="Outlined" Variant="Outlined" Margin="0,0,12,12" />
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Split buttons" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdSplitButton Content="Create" Margin="0,0,14,12">
+            <md:MdSplitButton.LeadingIcon><TextBlock Text="＋"/></md:MdSplitButton.LeadingIcon>
+            <md:MdSplitButton.DropDownContent>
+              <StackPanel Width="190">
+                <md:MdButton Content="New document" Variant="Text" HorizontalContentAlignment="Left"/>
+                <md:MdButton Content="New folder" Variant="Text" HorizontalContentAlignment="Left"/>
+              </StackPanel>
+            </md:MdSplitButton.DropDownContent>
+          </md:MdSplitButton>
+          <md:MdSplitButton Content="Export" Variant="Tonal" Margin="0,0,14,12">
+            <md:MdSplitButton.DropDownContent>
+              <StackPanel Width="190">
+                <md:MdButton Content="Export PDF" Variant="Text" HorizontalContentAlignment="Left"/>
+                <md:MdButton Content="Export image" Variant="Text" HorizontalContentAlignment="Left"/>
+              </StackPanel>
+            </md:MdSplitButton.DropDownContent>
+          </md:MdSplitButton>
+          <md:MdSplitButton Content="Share" Variant="Outlined" Margin="0,0,14,12">
+            <md:MdSplitButton.DropDownContent>
+              <StackPanel Width="190">
+                <md:MdButton Content="Copy link" Variant="Text" HorizontalContentAlignment="Left"/>
+                <md:MdButton Content="Invite people" Variant="Text" HorizontalContentAlignment="Left"/>
+              </StackPanel>
+            </md:MdSplitButton.DropDownContent>
+          </md:MdSplitButton>
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Standard button group" />
+        <md:MdStandardButtonGroup>
+          <md:MdButton Content="Day" Variant="Tonal"/>
+          <md:MdToggleButton Content="Week" Variant="Tonal" IsChecked="True"/>
+          <md:MdToggleButton Content="Month" Variant="Tonal"/>
+        </md:MdStandardButtonGroup>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Connected button group" />
+        <md:MdConnectedButtonGroup>
+          <md:MdToggleButton Content="List" Variant="Outlined" IsChecked="True"/>
+          <md:MdToggleButton Content="Grid" Variant="Outlined"/>
+          <md:MdToggleButton Content="Map" Variant="Outlined"/>
+        </md:MdConnectedButtonGroup>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Expressive sizes" />
+        <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+          <md:MdButton Content="XS" Size="ExtraSmall" Margin="0,0,10,10" />
+          <md:MdButton Content="Small" Margin="0,0,10,10" />
+          <md:MdButton Content="Medium" Size="Medium" Margin="0,0,10,10" />
+          <md:MdButton Content="Large" Size="Large" Margin="0,0,10,10" />
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdButton Content=&quot;Save&quot; Variant=&quot;Filled&quot;&#10;             Command=&quot;{Binding SaveCommand}&quot; /&gt;" CSharpCode="var save = new MdButton { Content = &quot;Save&quot;, Variant = MdButtonVariant.Filled };&#10;save.Command = viewModel.SaveCommand;" />
+      </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>
 </UserControl>

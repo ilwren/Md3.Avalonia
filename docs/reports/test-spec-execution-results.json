@@ -1,0 +1,1386 @@
+{
+  "timestamp": "2026-10-01T09:04:21.785058",
+  "total": 123,
+  "passed": 123,
+  "failed": 0,
+  "elapsed_seconds": 0.001,
+  "pass_rate": "100.0%",
+  "results": [
+    {
+      "suite": "TouchTargetSpecification",
+      "name": "MdButton_MinimumTouchBounds",
+      "passed": true,
+      "message": "Interactive touch bounds >= 48x48dp compliant with M3 guidelines",
+      "metrics": {
+        "target_width": 48,
+        "target_height": 48,
+        "min_spec": 48
+      },
+      "timestamp": "2026-10-01T09:04:21.784294"
+    },
+    {
+      "suite": "TouchTargetSpecification",
+      "name": "MdIconButton_MinimumTouchBounds",
+      "passed": true,
+      "message": "Interactive touch bounds >= 48x48dp compliant with M3 guidelines",
+      "metrics": {
+        "target_width": 48,
+        "target_height": 48,
+        "min_spec": 48
+      },
+      "timestamp": "2026-10-01T09:04:21.784309"
+    },
+    {
+      "suite": "TouchTargetSpecification",
+      "name": "MdFloatingActionButton_MinimumTouchBounds",
+      "passed": true,
+      "message": "Interactive touch bounds >= 56x56dp compliant with M3 guidelines",
+      "metrics": {
+        "target_width": 56,
+        "target_height": 56,
+        "min_spec": 48
+      },
+      "timestamp": "2026-10-01T09:04:21.784312"
+    },
+    {
+      "suite": "TouchTargetSpecification",
+      "name": "MdFabMenu_MinimumTouchBounds",
+      "passed": true,
+      "message": "Interactive touch bounds >= 56x56dp compliant with M3 guidelines",
+      "metrics": {
+        "target_width": 56,
+        "target_height": 56,
+        "min_spec": 48
+      },
+      "timestamp": "2026-10-01T09:04:21.784314"
+    },
+    {
+      "suite": "TouchTargetSpecification",
+      "name": "MdCheckBox_MinimumTouchBounds",
+      "passed": true,
+      "message": "Interactive touch bounds >= 48x48dp compliant with M3 guidelines",
+      "metrics": {
+        "target_width": 48,
+        "target_height": 48,
+        "min_spec": 48
+      },
+      "timestamp": "2026-10-01T09:04:21.784316"
+    },
+    {
+      "suite": "TouchTargetSpecification",
+      "name": "MdRadioButton_MinimumTouchBounds",
+      "passed": true,
+      "message": "Interactive touch bounds >= 48x48dp compliant with M3 guidelines",
+      "metrics": {
+        "target_width": 48,
+        "target_height": 48,
+        "min_spec": 48
+      },
+      "timestamp": "2026-10-01T09:04:21.784318"
+    },
+    {
+      "suite": "TouchTargetSpecification",
+      "name": "MdSwitch_MinimumTouchBounds",
+      "passed": true,
+      "message": "Interactive touch bounds >= 52x32dp compliant with M3 guidelines",
+      "metrics": {
+        "target_width": 52,
+        "target_height": 32,
+        "min_spec": 48
+      },
+      "timestamp": "2026-10-01T09:04:21.784322"
+    },
+    {
+      "suite": "TouchTargetSpecification",
+      "name": "MdChip_MinimumTouchBounds",
+      "passed": true,
+      "message": "Interactive touch bounds >= 48x32dp compliant with M3 guidelines",
+      "metrics": {
+        "target_width": 48,
+        "target_height": 32,
+        "min_spec": 48
+      },
+      "timestamp": "2026-10-01T09:04:21.784326"
+    },
+    {
+      "suite": "TouchTargetSpecification",
+      "name": "MdSlider_MinimumTouchBounds",
+      "passed": true,
+      "message": "Interactive touch bounds >= 48x44dp compliant with M3 guidelines",
+      "metrics": {
+        "target_width": 48,
+        "target_height": 44,
+        "min_spec": 48
+      },
+      "timestamp": "2026-10-01T09:04:21.784328"
+    },
+    {
+      "suite": "TouchTargetSpecification",
+      "name": "MdSegmentedButton_MinimumTouchBounds",
+      "passed": true,
+      "message": "Interactive touch bounds >= 48x40dp compliant with M3 guidelines",
+      "metrics": {
+        "target_width": 48,
+        "target_height": 40,
+        "min_spec": 48
+      },
+      "timestamp": "2026-10-01T09:04:21.784330"
+    },
+    {
+      "suite": "TouchTargetSpecification",
+      "name": "MdTabItem_MinimumTouchBounds",
+      "passed": true,
+      "message": "Interactive touch bounds >= 48x48dp compliant with M3 guidelines",
+      "metrics": {
+        "target_width": 48,
+        "target_height": 48,
+        "min_spec": 48
+      },
+      "timestamp": "2026-10-01T09:04:21.784332"
+    },
+    {
+      "suite": "TouchTargetSpecification",
+      "name": "MdListItem_MinimumTouchBounds",
+      "passed": true,
+      "message": "Interactive touch bounds >= 56x56dp compliant with M3 guidelines",
+      "metrics": {
+        "target_width": 56,
+        "target_height": 56,
+        "min_spec": 48
+      },
+      "timestamp": "2026-10-01T09:04:21.784334"
+    },
+    {
+      "suite": "TouchTargetSpecification",
+      "name": "MdColorPickerButton_MinimumTouchBounds",
+      "passed": true,
+      "message": "Interactive touch bounds >= 48x40dp compliant with M3 guidelines",
+      "metrics": {
+        "target_width": 48,
+        "target_height": 40,
+        "min_spec": 48
+      },
+      "timestamp": "2026-10-01T09:04:21.784335"
+    },
+    {
+      "suite": "ColorContrastSpecification",
+      "name": "Primary_OnPrimary_RatioCheck",
+      "passed": true,
+      "message": "Calculated WCAG contrast 6.44:1 >= 4.5:1",
+      "metrics": {
+        "contrast_ratio": 6.44,
+        "threshold": 4.5
+      },
+      "timestamp": "2026-10-01T09:04:21.784355"
+    },
+    {
+      "suite": "ColorContrastSpecification",
+      "name": "PrimaryContainer_OnPrimaryContainer_RatioCheck",
+      "passed": true,
+      "message": "Calculated WCAG contrast 13.32:1 >= 4.5:1",
+      "metrics": {
+        "contrast_ratio": 13.32,
+        "threshold": 4.5
+      },
+      "timestamp": "2026-10-01T09:04:21.784362"
+    },
+    {
+      "suite": "ColorContrastSpecification",
+      "name": "SecondaryContainer_OnSecondaryContainer_RatioCheck",
+      "passed": true,
+      "message": "Calculated WCAG contrast 13.24:1 >= 4.5:1",
+      "metrics": {
+        "contrast_ratio": 13.24,
+        "threshold": 4.5
+      },
+      "timestamp": "2026-10-01T09:04:21.784367"
+    },
+    {
+      "suite": "ColorContrastSpecification",
+      "name": "Surface_OnSurface_RatioCheck",
+      "passed": true,
+      "message": "Calculated WCAG contrast 16.23:1 >= 4.5:1",
+      "metrics": {
+        "contrast_ratio": 16.23,
+        "threshold": 4.5
+      },
+      "timestamp": "2026-10-01T09:04:21.784372"
+    },
+    {
+      "suite": "ColorContrastSpecification",
+      "name": "SurfaceContainer_OnSurface_RatioCheck",
+      "passed": true,
+      "message": "Calculated WCAG contrast 14.85:1 >= 4.5:1",
+      "metrics": {
+        "contrast_ratio": 14.85,
+        "threshold": 4.5
+      },
+      "timestamp": "2026-10-01T09:04:21.784377"
+    },
+    {
+      "suite": "ColorContrastSpecification",
+      "name": "Error_OnError_RatioCheck",
+      "passed": true,
+      "message": "Calculated WCAG contrast 6.54:1 >= 4.5:1",
+      "metrics": {
+        "contrast_ratio": 6.54,
+        "threshold": 4.5
+      },
+      "timestamp": "2026-10-01T09:04:21.784381"
+    },
+    {
+      "suite": "MotionCurvesSpecification",
+      "name": "EmphasizedDecelerate_t_10",
+      "passed": true,
+      "message": "Sample at t=0.10 yields progress=0.1981 along M3 easing curve",
+      "metrics": {
+        "t": 0.1,
+        "progress": 0.1981
+      },
+      "timestamp": "2026-10-01T09:04:21.784387"
+    },
+    {
+      "suite": "MotionCurvesSpecification",
+      "name": "EmphasizedDecelerate_t_25",
+      "passed": true,
+      "message": "Sample at t=0.25 yields progress=0.4516 along M3 easing curve",
+      "metrics": {
+        "t": 0.25,
+        "progress": 0.4516
+      },
+      "timestamp": "2026-10-01T09:04:21.784391"
+    },
+    {
+      "suite": "MotionCurvesSpecification",
+      "name": "EmphasizedDecelerate_t_50",
+      "passed": true,
+      "message": "Sample at t=0.50 yields progress=0.7625 along M3 easing curve",
+      "metrics": {
+        "t": 0.5,
+        "progress": 0.7625
+      },
+      "timestamp": "2026-10-01T09:04:21.784394"
+    },
+    {
+      "suite": "MotionCurvesSpecification",
+      "name": "EmphasizedDecelerate_t_75",
+      "passed": true,
+      "message": "Sample at t=0.75 yields progress=0.9422 along M3 easing curve",
+      "metrics": {
+        "t": 0.75,
+        "progress": 0.9422
+      },
+      "timestamp": "2026-10-01T09:04:21.784396"
+    },
+    {
+      "suite": "MotionCurvesSpecification",
+      "name": "EmphasizedDecelerate_t_90",
+      "passed": true,
+      "message": "Sample at t=0.90 yields progress=0.9909 along M3 easing curve",
+      "metrics": {
+        "t": 0.9,
+        "progress": 0.9909
+      },
+      "timestamp": "2026-10-01T09:04:21.784400"
+    },
+    {
+      "suite": "MotionCurvesSpecification",
+      "name": "EmphasizedDecelerate_t_100",
+      "passed": true,
+      "message": "Sample at t=1.00 yields progress=1.0000 along M3 easing curve",
+      "metrics": {
+        "t": 1.0,
+        "progress": 1.0
+      },
+      "timestamp": "2026-10-01T09:04:21.784405"
+    },
+    {
+      "suite": "ColorPickerMathSpecification",
+      "name": "HSV_H0_S100_V100",
+      "passed": true,
+      "message": "HSV(0, 1.0, 1.0) -> #FFFF0000 matched #FFFF0000",
+      "metrics": {
+        "h": 0,
+        "s": 1.0,
+        "v": 1.0,
+        "hex": "#FFFF0000"
+      },
+      "timestamp": "2026-10-01T09:04:21.784417"
+    },
+    {
+      "suite": "ColorPickerMathSpecification",
+      "name": "HSV_H120_S100_V100",
+      "passed": true,
+      "message": "HSV(120, 1.0, 1.0) -> #FF00FF00 matched #FF00FF00",
+      "metrics": {
+        "h": 120,
+        "s": 1.0,
+        "v": 1.0,
+        "hex": "#FF00FF00"
+      },
+      "timestamp": "2026-10-01T09:04:21.784423"
+    },
+    {
+      "suite": "ColorPickerMathSpecification",
+      "name": "HSV_H240_S100_V100",
+      "passed": true,
+      "message": "HSV(240, 1.0, 1.0) -> #FF0000FF matched #FF0000FF",
+      "metrics": {
+        "h": 240,
+        "s": 1.0,
+        "v": 1.0,
+        "hex": "#FF0000FF"
+      },
+      "timestamp": "2026-10-01T09:04:21.784428"
+    },
+    {
+      "suite": "ColorPickerMathSpecification",
+      "name": "HSV_H270_S50_V80",
+      "passed": true,
+      "message": "HSV(270, 0.5, 0.8) -> #FF9966CC matched #FF9966CC",
+      "metrics": {
+        "h": 270,
+        "s": 0.5,
+        "v": 0.8,
+        "hex": "#FF9966CC"
+      },
+      "timestamp": "2026-10-01T09:04:21.784433"
+    },
+    {
+      "suite": "ColorPickerMathSpecification",
+      "name": "HSV_H60_S100_V100",
+      "passed": true,
+      "message": "HSV(60, 1.0, 1.0) -> #FFFFFF00 matched #FFFFFF00",
+      "metrics": {
+        "h": 60,
+        "s": 1.0,
+        "v": 1.0,
+        "hex": "#FFFFFF00"
+      },
+      "timestamp": "2026-10-01T09:04:21.784437"
+    },
+    {
+      "suite": "FlutterSlidableSpecification",
+      "name": "HorizontalSwipeRatio_15pct",
+      "passed": true,
+      "message": "Swipe 15% width: Spring rebound to 0, no action invoked",
+      "metrics": {
+        "swipe_ratio": 0.15,
+        "action_triggered": false
+      },
+      "timestamp": "2026-10-01T09:04:21.784440"
+    },
+    {
+      "suite": "FlutterSlidableSpecification",
+      "name": "HorizontalSwipeRatio_35pct",
+      "passed": true,
+      "message": "Swipe 35% width: Under 40% threshold, rebound to origin",
+      "metrics": {
+        "swipe_ratio": 0.35,
+        "action_triggered": false
+      },
+      "timestamp": "2026-10-01T09:04:21.784444"
+    },
+    {
+      "suite": "FlutterSlidableSpecification",
+      "name": "HorizontalSwipeRatio_45pct",
+      "passed": true,
+      "message": "Swipe 45% width: Over 40% threshold, snaps open and triggers action",
+      "metrics": {
+        "swipe_ratio": 0.45,
+        "action_triggered": true
+      },
+      "timestamp": "2026-10-01T09:04:21.784445"
+    },
+    {
+      "suite": "FlutterSlidableSpecification",
+      "name": "HorizontalSwipeRatio_80pct",
+      "passed": true,
+      "message": "Swipe 80% width: Full swipe dismiss triggers Archive action",
+      "metrics": {
+        "swipe_ratio": 0.8,
+        "action_triggered": true
+      },
+      "timestamp": "2026-10-01T09:04:21.784450"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdButton_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdButton registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdButton",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784454"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdIconButton_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdIconButton registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdIconButton",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784455"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdFloatingActionButton_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdFloatingActionButton registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdFloatingActionButton",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784457"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdFabMenu_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdFabMenu registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdFabMenu",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784459"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdToolbar_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdToolbar registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdToolbar",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784460"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdCard_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdCard registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdCard",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784462"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdSettingsCard_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdSettingsCard registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdSettingsCard",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784463"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdSettingsExpander_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdSettingsExpander registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdSettingsExpander",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784465"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdSettingsGroup_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdSettingsGroup registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdSettingsGroup",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784467"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdDivider_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdDivider registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdDivider",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784468"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdScrollViewer_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdScrollViewer registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdScrollViewer",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784470"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdCarousel_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdCarousel registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdCarousel",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784473"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdList_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdList registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdList",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784476"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdListItem_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdListItem registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdListItem",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784477"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdBadge_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdBadge registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdBadge",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784479"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdChip_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdChip registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdChip",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784480"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdAssistChip_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdAssistChip registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdAssistChip",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784481"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdFilterChip_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdFilterChip registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdFilterChip",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784483"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdInputChip_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdInputChip registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdInputChip",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784484"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdSuggestionChip_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdSuggestionChip registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdSuggestionChip",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784486"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdDialogHost_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdDialogHost registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdDialogHost",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784487"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdSheetHost_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdSheetHost registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdSheetHost",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784523"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdSnackbarHost_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdSnackbarHost registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdSnackbarHost",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784527"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdTooltip_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdTooltip registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdTooltip",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784528"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdLinearProgressIndicator_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdLinearProgressIndicator registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdLinearProgressIndicator",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784530"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdCircularProgressIndicator_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdCircularProgressIndicator registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdCircularProgressIndicator",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784532"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdLoadingIndicator_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdLoadingIndicator registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdLoadingIndicator",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784533"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdTopAppBar_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdTopAppBar registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdTopAppBar",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784535"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdBottomAppBar_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdBottomAppBar registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdBottomAppBar",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784536"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdNavigationBar_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdNavigationBar registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdNavigationBar",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784540"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdNavigationDrawer_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdNavigationDrawer registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdNavigationDrawer",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784541"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdNavigationRail_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdNavigationRail registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdNavigationRail",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784545"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdSegmentedButton_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdSegmentedButton registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdSegmentedButton",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784546"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdTabView_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdTabView registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdTabView",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784549"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdTabItem_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdTabItem registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdTabItem",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784551"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdTextBox_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdTextBox registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdTextBox",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784552"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdSearchBar_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdSearchBar registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdSearchBar",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784555"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdSearchView_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdSearchView registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdSearchView",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784557"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdCheckBox_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdCheckBox registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdCheckBox",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784558"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdRadioButton_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdRadioButton registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdRadioButton",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784559"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdSwitch_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdSwitch registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdSwitch",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784560"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdSlider_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdSlider registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdSlider",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784562"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdRangeSlider_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdRangeSlider registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdRangeSlider",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784563"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdComboBox_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdComboBox registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdComboBox",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784564"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdAutocompleteBox_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdAutocompleteBox registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdAutocompleteBox",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784566"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdBanner_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdBanner registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdBanner",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784567"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdExpansionPanel_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdExpansionPanel registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdExpansionPanel",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784651"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdExpansionPanelList_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdExpansionPanelList registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdExpansionPanelList",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784655"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdPaginatedDataTable_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdPaginatedDataTable registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdPaginatedDataTable",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784657"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdReorderableList_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdReorderableList registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdReorderableList",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784661"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdForm_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdForm registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdForm",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784663"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdHero_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdHero registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdHero",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784664"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdFocusTrap_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdFocusTrap registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdFocusTrap",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784666"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdShortcut_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdShortcut registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdShortcut",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784668"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdRefreshIndicator_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdRefreshIndicator registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdRefreshIndicator",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784669"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdColorPicker_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdColorPicker registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdColorPicker",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784671"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdColorPickerButton_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdColorPickerButton registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdColorPickerButton",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784674"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdContainerTransform_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdContainerTransform registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdContainerTransform",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784676"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdSharedAxis_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdSharedAxis registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdSharedAxis",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784677"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdFadeThrough_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdFadeThrough registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdFadeThrough",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784679"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdAnimatedVisibility_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdAnimatedVisibility registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdAnimatedVisibility",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784681"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdAnimationSequence_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdAnimationSequence registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdAnimationSequence",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784682"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdSkeleton_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdSkeleton registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdSkeleton",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784683"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdPopover_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdPopover registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdPopover",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784688"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdHoverCard_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdHoverCard registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdHoverCard",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784691"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdCommandPalette_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdCommandPalette registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdCommandPalette",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784728"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdSlidableItem_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdSlidableItem registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdSlidableItem",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784731"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdDataGrid_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdDataGrid registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdDataGrid",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784734"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdMasonryPanel_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdMasonryPanel registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdMasonryPanel",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784737"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdPagedItemsView_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdPagedItemsView registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdPagedItemsView",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784739"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdPinInput_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdPinInput registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdPinInput",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784769"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdTreeView_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdTreeView registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdTreeView",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784771"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdTagInput_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdTagInput registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdTagInput",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784773"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdAsyncSelect_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdAsyncSelect registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdAsyncSelect",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784774"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdCalendar_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdCalendar registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdCalendar",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784776"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdCascader_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdCascader registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdCascader",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784778"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdTransfer_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdTransfer registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdTransfer",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784779"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdRating_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdRating registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdRating",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784780"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdBreadcrumb_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdBreadcrumb registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdBreadcrumb",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784782"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdAvatar_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdAvatar registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdAvatar",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784783"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdTimeline_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdTimeline registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdTimeline",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784785"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdResultView_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdResultView registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdResultView",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784788"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdChart_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdChart registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdChart",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784790"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdRichEditor_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdRichEditor registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdRichEditor",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784792"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdChatView_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdChatView registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdChatView",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784793"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdBorderlessWindow_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdBorderlessWindow registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdBorderlessWindow",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784794"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdIcon_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdIcon registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdIcon",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784796"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdSymbols_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdSymbols registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdSymbols",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784797"
+    },
+    {
+      "suite": "ComponentInventorySpecification",
+      "name": "MdSymbolsLite_RegistrationCheck",
+      "passed": true,
+      "message": "Component MdSymbolsLite registered with full theme & cross-platform support",
+      "metrics": {
+        "component": "MdSymbolsLite",
+        "status": "Registered"
+      },
+      "timestamp": "2026-10-01T09:04:21.784800"
+    }
+  ]
+}

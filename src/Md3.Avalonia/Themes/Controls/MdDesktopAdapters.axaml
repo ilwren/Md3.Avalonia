@@ -20,17 +20,17 @@
   <ControlTheme x:Key="{x:Type md:MdScrollBar}" TargetType="md:MdScrollBar">
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="AllowAutoHide" Value="True" />
-    <Setter Property="MinWidth" Value="8" />
-    <Setter Property="MinHeight" Value="8" />
+    <Setter Property="MinWidth" Value="10" />
+    <Setter Property="MinHeight" Value="10" />
     <Style Selector="^:vertical">
-      <Setter Property="Width" Value="8" />
+      <Setter Property="Width" Value="12" />
       <Setter Property="Template">
         <ControlTemplate>
           <Track Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
                  Value="{TemplateBinding Value, Mode=TwoWay}" ViewportSize="{TemplateBinding ViewportSize}"
                  Orientation="Vertical" IsDirectionReversed="True">
             <Track.DecreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.DecreaseButton>
-            <Track.Thumb><Thumb Width="6" MinHeight="24" Margin="1" Theme="{StaticResource MdScrollThumbTheme}" /></Track.Thumb>
+            <Track.Thumb><Thumb Width="8" MinHeight="32" Margin="2" Theme="{StaticResource MdScrollThumbTheme}" /></Track.Thumb>
             <Track.IncreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.IncreaseButton>
           </Track>
         </ControlTemplate>
@@ -39,18 +39,22 @@
     <Style Selector="^:thumb-hidden /template/ Thumb"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:track-visible"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" /></Style>
     <Style Selector="^:horizontal">
-      <Setter Property="Height" Value="8" />
+      <Setter Property="Height" Value="12" />
       <Setter Property="Template">
         <ControlTemplate>
           <Track Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
                  Value="{TemplateBinding Value, Mode=TwoWay}" ViewportSize="{TemplateBinding ViewportSize}"
                  Orientation="Horizontal">
             <Track.DecreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.DecreaseButton>
-            <Track.Thumb><Thumb Height="6" MinWidth="24" Margin="1" Theme="{StaticResource MdScrollThumbTheme}" /></Track.Thumb>
+            <Track.Thumb><Thumb Height="8" MinWidth="32" Margin="2" Theme="{StaticResource MdScrollThumbTheme}" /></Track.Thumb>
             <Track.IncreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.IncreaseButton>
           </Track>
         </ControlTemplate>
       </Setter>
+    </Style>
+    <Style Selector="^:pointerover /template/ Thumb">
+      <Setter Property="Width" Value="10" />
+      <Setter Property="Height" Value="10" />
     </Style>
   </ControlTheme>
 
@@ -120,22 +124,25 @@
     <Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="VerticalContentAlignment" Value="Stretch" />
     <Setter Property="Template">
       <ControlTemplate>
-        <!-- Spinner actions overlay the field's reserved trailing slot. A separate grid column made
-             the +/- buttons appear outside the outlined container, especially with supporting text. -->
+        <!-- Spinner actions overlay the field's reserved trailing slot, perfectly centered vertically -->
         <Grid>
           <ContentPresenter Name="PART_ContentPresenter"
                             Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
                             HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
           <StackPanel Name="PART_SpinnerPanel" Width="32" Height="42"
-                      Margin="0,8,8,0" VerticalAlignment="Top" HorizontalAlignment="Right"
+                      Margin="0,0,8,0" VerticalAlignment="Center" HorizontalAlignment="Right"
                       Background="Transparent" Spacing="2" ZIndex="2"
                       IsVisible="{TemplateBinding ShowButtonSpinner}">
-            <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}">
+            <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}"
+                          HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
               <Path Width="12" Height="12" Data="{StaticResource Md.Numeric.Plus}" Stretch="Uniform"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
                     Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
             </RepeatButton>
-            <RepeatButton Name="PART_DecreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}">
+            <RepeatButton Name="PART_DecreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}"
+                          HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
               <Path Width="12" Height="12" Data="{StaticResource Md.Numeric.Minus}" Stretch="Uniform"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
                     Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
             </RepeatButton>
           </StackPanel>
@@ -143,7 +150,7 @@
       </ControlTemplate>
     </Setter>
     <Style Selector="^[ButtonSpinnerLocation=Left] /template/ StackPanel#PART_SpinnerPanel">
-      <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="Margin" Value="8,8,0,0" />
+      <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="Margin" Value="8,0,0,0" />
     </Style>
   </ControlTheme>
 
@@ -191,7 +198,7 @@
                  IsOpen="{TemplateBinding IsPopupOpen}"
                  IsLightDismissEnabled="True" OverlayDismissEventPassThrough="True"
                  Placement="BottomEdgeAlignedLeft" PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
-                 InheritsTransform="True" ShouldUseOverlayLayer="False" WindowManagerAddShadowHint="False">
+                 InheritsTransform="True" WindowManagerAddShadowHint="False">
             <Popup.Styles>
               <Style Selector="PopupRoot">
                 <Setter Property="Background" Value="Transparent" />

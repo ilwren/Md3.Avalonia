@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.SettingsCardGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Settings cards" />
+        <TextBlock Classes="body" Text="Android Material 3 preference cards for building system-like settings, account preferences, and configuration dashboards with leading badge icons and trailing switches/actions." />
+      </StackPanel>
+
+      <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
+        <TextBlock Classes="h2" Text="Settings group with interactive cards" />
+        <md:MdSettingsGroup Header="NETWORK &amp; INTERNET">
+          <md:MdSettingsCard Header="Wi-Fi" Description="Connected to Studio_5GHz"
+                             Icon="{x:Static md:MdSymbols.Wifi}"
+                             IconBackground="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
+                             IconForeground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}"
+                             Click="CardClicked" />
+          <Border Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" Margin="72,0,0,0" />
+          <md:MdSettingsCard Header="Airplane mode" Description="Disable all wireless connections"
+                             Icon="{x:Static md:MdSymbols.AirplanemodeActive}"
+                             IconBackground="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
+                             IconForeground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}">
+            <md:MdSettingsCard.Trailing>
+              <md:MdSwitch x:Name="AirplaneSwitch" IsChecked="False" />
+            </md:MdSettingsCard.Trailing>
+          </md:MdSettingsCard>
+          <Border Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" Margin="72,0,0,0" />
+          <md:MdSettingsCard Header="SIMs" Description="T-Mobile · Default for mobile data"
+                             Icon="{x:Static md:MdSymbols.SimCard}"
+                             IconBackground="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}"
+                             IconForeground="{DynamicResource Md.Sys.Color.OnTertiaryContainer.Brush}"
+                             Click="CardClicked" />
+        </md:MdSettingsGroup>
+
+        <md:MdSettingsGroup Header="DISPLAY &amp; APPEARANCE">
+          <md:MdSettingsCard Header="Dark theme" Description="Save battery and reduce eye strain"
+                             Icon="{x:Static md:MdSymbols.DarkMode}"
+                             IconBackground="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
+                             IconForeground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}">
+            <md:MdSettingsCard.Trailing>
+              <md:MdSwitch IsChecked="True" />
+            </md:MdSettingsCard.Trailing>
+          </md:MdSettingsCard>
+          <Border Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" Margin="72,0,0,0" />
+          <md:MdSettingsCard Header="Screen timeout" Description="After 2 minutes of inactivity"
+                             Icon="{x:Static md:MdSymbols.Schedule}"
+                             IconBackground="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
+                             IconForeground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}"
+                             Click="CardClicked" />
+        </md:MdSettingsGroup>
+        <TextBlock x:Name="CardStatus" Classes="body" Text="Click a settings card to trigger its preference action." />
+      </StackPanel>
+
+      <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
+        <TextBlock Classes="h2" Text="Expandable settings card" />
+        <md:MdSettingsExpander Header="Advanced network settings"
+                               Description="Private DNS, proxy and VPN configuration"
+                               Icon="{x:Static md:MdSymbols.Tune}">
+          <md:MdSettingsCard Header="Private DNS" Description="Automatic (dns.google)" Variant="Flat" Click="CardClicked" />
+          <md:MdSettingsCard Header="VPN" Description="None configured" Variant="Flat" Click="CardClicked" />
+        </md:MdSettingsExpander>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdSettingsGroup Header=&quot;NETWORK&quot;&gt;&#10;  &lt;md:MdSettingsCard Header=&quot;Wi-Fi&quot;&#10;                     Description=&quot;Connected to Studio_5GHz&quot;&#10;                     Icon=&quot;{x:Static md:MdSymbols.Wifi}&quot;&#10;                     Click=&quot;OnWifiClicked&quot; /&gt;&#10;  &lt;md:MdSettingsCard Header=&quot;Airplane mode&quot;&#10;                     Icon=&quot;{x:Static md:MdSymbols.AirplanemodeActive}&quot;&gt;&#10;    &lt;md:MdSettingsCard.Trailing&gt;&#10;      &lt;md:MdSwitch IsChecked=&quot;{Binding IsAirplaneMode}&quot; /&gt;&#10;    &lt;/md:MdSettingsCard.Trailing&gt;&#10;  &lt;/md:MdSettingsCard&gt;&#10;&lt;/md:MdSettingsGroup&gt;"
+                             CSharpCode="var card = new MdSettingsCard&#10;{&#10;    Header = &quot;Dark theme&quot;,&#10;    Description = &quot;Save battery and reduce eye strain&quot;,&#10;    Icon = MdSymbols.DarkMode,&#10;    Trailing = new MdSwitch { IsChecked = true }&#10;};" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

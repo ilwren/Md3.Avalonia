@@ -4,8 +4,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
 using Avalonia.Threading;
-using Md3.Avalonia.Ecosystem.Controls;
+using Md3.Avalonia.Extra.Controls;
 using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
@@ -90,6 +91,41 @@ public sealed class MdEcosystemWaveFTests
     }
 
     [AvaloniaFact]
+    public void Breadcrumb_Supports_Rich_Item_Model_Commands_And_Separators()
+    {
+        var invokedCommandItem = string.Empty;
+        var homeItem = new MdBreadcrumbItem
+        {
+            Label = "Home",
+            Command = new TestCommand(param => invokedCommandItem = "Home")
+        };
+        var componentsItem = new MdBreadcrumbItem
+        {
+            Label = "Components",
+            Command = new TestCommand(param => invokedCommandItem = "Components")
+        };
+        var ecosystemItem = new MdBreadcrumbItem
+        {
+            Label = "Ecosystem",
+            IsCurrent = true
+        };
+
+        var breadcrumb = new MdBreadcrumb
+        {
+            ItemsSource = new ObservableCollection<MdBreadcrumbItem> { homeItem, componentsItem, ecosystemItem },
+            Separator = "/"
+        };
+
+        var invoked = string.Empty;
+        breadcrumb.ItemInvoked += (_, item) => invoked = (item as MdBreadcrumbItem)?.Label?.ToString() ?? string.Empty;
+
+        breadcrumb.Invoke(homeItem);
+        Assert.Equal("Home", invoked);
+        Assert.Equal("Home", invokedCommandItem);
+        Assert.Equal("/", breadcrumb.Separator);
+    }
+
+    [AvaloniaFact]
     public void WaveF_Controls_Render_Together_With_Real_Themes()
     {
         var branch = new MdTreeNode("root", "Root", [new MdTreeNode("child", "Child")]) { IsExpanded = true };
@@ -113,6 +149,48 @@ public sealed class MdEcosystemWaveFTests
             Assert.True(root.Children.All(control => control.Bounds.Height > 0));
         }
         finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void ColorPicker_Syncs_Hex_Shades_And_Hsv_Sliders()
+    {
+        var picker = new MdColorPicker { SelectedColor = Color.Parse("#6750A4") };
+        Assert.Equal("#6750A4", picker.SelectedHex);
+        Assert.NotEmpty(picker.MaterialPrimaryColors);
+        Assert.NotEmpty(picker.MaterialShades);
+
+        picker.SelectColor(Color.Parse("#006A6A"));
+        Assert.Equal("#006A6A", picker.SelectedHex);
+        Assert.Contains(Color.Parse("#006A6A"), picker.RecentColors);
+
+        Assert.True(picker.TryApplyHex("#FF5722"));
+        Assert.Equal(Color.Parse("#FF5722"), picker.SelectedColor);
+    }
+
+    [AvaloniaFact]
+    public void Motion_Components_Support_State_Transitions()
+    {
+        var containerTransform = new MdContainerTransform
+        {
+            ClosedContent = new TextBlock { Text = "Card" },
+            OpenContent = new TextBlock { Text = "Detail View" },
+            IsExpanded = false
+        };
+        Assert.False(containerTransform.IsExpanded);
+        containerTransform.Toggle();
+        Assert.True(containerTransform.IsExpanded);
+
+        var sharedAxis = new MdSharedAxis { Axis = MdSharedAxisKind.X, Forward = true };
+        Assert.Equal(MdSharedAxisKind.X, sharedAxis.Axis);
+        Assert.True(sharedAxis.Forward);
+
+        var fadeThrough = new MdFadeThrough { Content = "Page Content" };
+        Assert.Equal(TimeSpan.FromMilliseconds(240), fadeThrough.Duration);
+
+        var animatedVis = new MdAnimatedVisibility { IsContentVisible = true, Transition = MdVisibilityTransition.ExpandVertical };
+        Assert.True(animatedVis.IsContentVisible);
+        animatedVis.IsContentVisible = false;
+        Assert.False(animatedVis.IsContentVisible);
     }
 
     private sealed class TestCommand(Action<object?> execute) : ICommand

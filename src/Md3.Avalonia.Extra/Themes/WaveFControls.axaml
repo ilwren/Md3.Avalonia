@@ -1,0 +1,187 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+
+  <!-- PIN/OTP: one real editor behind animated, Material-token-driven segmented cells. -->
+  <ControlTheme x:Key="{x:Type eco:MdPinInput}" TargetType="eco:MdPinInput">
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdPinInput">
+        <Grid MinHeight="48">
+          <md:MdScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+            <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding Cells}" HorizontalAlignment="Left">
+              <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="eco:MdPinCell">
+                  <eco:MdPinCellPresenter Cell="{Binding}" Width="{Binding Size}" Height="{Binding Size}" Margin="{Binding Margin}" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </md:MdScrollViewer>
+          <md:MdTextBox x:Name="PART_Input" MaxLength="{TemplateBinding Length}"
+                        IsEnabled="{TemplateBinding IsEnabled}" IsPassword="{TemplateBinding IsObscured}" Opacity="0" Background="Transparent"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Variant="Outlined" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type eco:MdPinCellPresenter}" TargetType="eco:MdPinCellPresenter">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdPinCellPresenter">
+        <Border x:Name="PART_Cell" Background="{DynamicResource Md.Sys.Color.Surface.Brush}"
+                BorderBrush="{DynamicResource Md.Sys.Color.Outline.Brush}" BorderThickness="1" CornerRadius="8">
+          <Grid>
+            <TextBlock Text="{Binding Cell.DisplayText, RelativeSource={RelativeSource TemplatedParent}}"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" FontWeight="SemiBold" />
+            <Border x:Name="PART_Caret" Width="2" Height="25" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Background="{DynamicResource Md.Sys.Color.Primary.Brush}" CornerRadius="1" IsVisible="False" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:filled /template/ Border#PART_Cell"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /></Style>
+    <Style Selector="^:active /template/ Border#PART_Cell"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="2" /></Style>
+    <Style Selector="^:active /template/ Border#PART_Caret"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:active:filled /template/ Border#PART_Caret"><Setter Property="HorizontalAlignment" Value="Right" /><Setter Property="Margin" Value="0,0,7,0" /></Style>
+    <Style Selector="^:md-error /template/ Border#PART_Cell"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" /><Setter Property="BorderThickness" Value="2" /></Style>
+  </ControlTheme>
+
+  <!-- Tree: a private item theme preserves full-row state layers and ListBox semantics. -->
+  <ControlTheme x:Key="EcoTreeToggleTheme" TargetType="ToggleButton">
+    <Setter Property="Width" Value="40" /><Setter Property="Height" Value="40" />
+    <Setter Property="Padding" Value="0" /><Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" /><Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ToggleButton">
+        <Border x:Name="PART_Surface" Background="{TemplateBinding Background}" CornerRadius="20" ClipToBounds="True">
+          <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsHitTestVisible="False" Opacity="0" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.12" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="EcoTreeItemTheme" TargetType="ListBoxItem">
+    <Setter Property="MinHeight" Value="48" /><Setter Property="Padding" Value="4,0" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" /><Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ListBoxItem">
+        <Border x:Name="PART_Row" Background="{TemplateBinding Background}" CornerRadius="12" ClipToBounds="True">
+          <Grid>
+            <ContentPresenter Margin="{TemplateBinding Padding}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" />
+            <Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" CornerRadius="12" IsHitTestVisible="False" Opacity="0" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.12" /></Style>
+    <Style Selector="^:selected"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" /></Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_Row"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Secondary.Brush}" /><Setter Property="BorderThickness" Value="2" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type eco:MdTreeView}" TargetType="eco:MdTreeView">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Setter Property="BorderThickness" Value="1" /><Setter Property="CornerRadius" Value="16" />
+    <Setter Property="ItemContainerTheme" Value="{StaticResource EcoTreeItemTheme}" />
+    <Setter Property="ItemsPanel"><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></Setter>
+    <Setter Property="ItemTemplate">
+      <DataTemplate x:DataType="eco:MdTreeRow">
+        <Grid Margin="{Binding Indentation}" ColumnDefinitions="40,*" MinHeight="48">
+          <!-- The guide marks the parent indentation lane; it must never run through the current toggle glyph. -->
+          <Border IsVisible="{Binding ShowGuide}" Width="1" Height="48" Margin="-12,0,0,0"
+                  HorizontalAlignment="Left" IsHitTestVisible="False"
+                  Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+          <ToggleButton x:Name="PART_Toggle" Theme="{StaticResource EcoTreeToggleTheme}"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        IsVisible="{Binding HasChildren}" IsChecked="{Binding IsExpanded}"
+                        AutomationProperties.Name="Toggle children">
+            <Path Width="16" Height="16" Data="M 9,6 L 15,12 L 9,18" Stretch="Uniform"
+                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                  Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round"
+                  RenderTransformOrigin="50%,50%">
+              <Path.RenderTransform>
+                <RotateTransform Angle="{Binding ExpansionAngle}">
+                  <RotateTransform.Transitions>
+                    <Transitions>
+                      <DoubleTransition Property="Angle" Duration="0:0:0.2" Easing="0.05, 0.7, 0.1, 1.0" />
+                    </Transitions>
+                  </RotateTransform.Transitions>
+                </RotateTransform>
+              </Path.RenderTransform>
+            </Path>
+          </ToggleButton>
+          <StackPanel Grid.Column="1" Margin="8,0,12,0" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Node.Label}" FontSize="14" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+            <ContentPresenter Content="{Binding Node.Data}" FontSize="11" Opacity="0.68" />
+          </StackPanel>
+        </Grid>
+      </DataTemplate>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdTreeView">
+        <Border Padding="4" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" ClipToBounds="True">
+          <md:MdScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <ItemsPresenter x:Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+          </md:MdScrollViewer>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- Tag input: official Material input chips, wrapping, validation, and live suggestions. -->
+  <ControlTheme x:Key="{x:Type eco:MdTagInput}" TargetType="eco:MdTagInput">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdTagInput">
+        <StackPanel Spacing="4">
+          <Border x:Name="PART_Container" MinHeight="64" Padding="8,4"
+                  Background="{DynamicResource Md.Sys.Color.Surface.Brush}"
+                  BorderBrush="{DynamicResource Md.Sys.Color.Outline.Brush}" BorderThickness="1" CornerRadius="8">
+            <WrapPanel VerticalAlignment="Center">
+              <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding Entries}" VerticalAlignment="Center">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="eco:MdTagEntry">
+                    <md:MdInputChip Content="{Binding Value}" IsRemovable="True" RemoveCommand="{Binding RemoveCommand}"
+                                    RemoveCommandParameter="{Binding Value}" Margin="4" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <md:MdTextBox x:Name="PART_Input" Width="176" MinWidth="120" Margin="4,0" Background="Transparent"
+                            Label="{x:Null}" PlaceholderText="{TemplateBinding PlaceholderText}" Text="{TemplateBinding Text, Mode=TwoWay}"
+                            ErrorText="{TemplateBinding ValidationMessage}" IsError="False" Variant="Filled" />
+            </WrapPanel>
+          </Border>
+          <TextBlock x:Name="PART_Error" IsVisible="False" Margin="12,0" FontSize="12"
+                     Foreground="{DynamicResource Md.Sys.Color.Error.Brush}" Text="{TemplateBinding ValidationMessage}" />
+          <ItemsControl x:Name="PART_Suggestions" Theme="{StaticResource EcoItemsHostTheme}" IsVisible="False"
+                        ItemsSource="{TemplateBinding FilteredSuggestions}" Margin="4,2,4,0">
+            <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:CompileBindings="False"><md:MdSuggestionChip x:Name="PART_Suggestion" Content="{Binding}" Margin="4" /></DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:focus-within /template/ Border#PART_Container"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="2" /></Style>
+    <Style Selector="^:md-error /template/ Border#PART_Container"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" /><Setter Property="BorderThickness" Value="2" /></Style>
+    <Style Selector="^:md-error /template/ TextBlock#PART_Error"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:has-suggestions /template/ ItemsControl#PART_Suggestions"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:limit-reached /template/ md|MdTextBox#PART_Input"><Setter Property="IsEnabled" Value="False" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

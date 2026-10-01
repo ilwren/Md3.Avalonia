@@ -62,7 +62,6 @@
                  OverlayDismissEventPassThrough="True"
                  Placement="BottomEdgeAlignedLeft"
                  PlacementTarget="{Binding #PART_AnchorButton}"
-                 ShouldUseOverlayLayer="False"
                  WindowManagerAddShadowHint="False">
             <Popup.Styles>
               <Style Selector="PopupRoot">

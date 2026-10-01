@@ -4,8 +4,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using CommunityToolkit.Mvvm.Input;
-using Md3.Avalonia.Ecosystem.Controls;
-using Md3.Avalonia.Ecosystem.Infrastructure;
+using Md3.Avalonia.Extra.Controls;
+using Md3.Avalonia.Extra.Infrastructure;
 
 namespace Md3.Avalonia.Gallery.Pages;
 
@@ -80,6 +80,7 @@ public partial class EcosystemGalleryPage : UserControl
         RichEditor.Adapter = _editorAdapter;
         Chat.MessagesSource = _messages;
         Chat.SuggestionsSource = new[] { L("Show accessibility", "显示无障碍信息"), L("Explain paging", "解释分页"), L("Open docs", "打开文档") };
+        Chat.AttachmentRequested += ChatAttachmentRequested;
 
         var controls = new MdTreeNode("controls", L("Controls", "控件"),
         [
@@ -169,6 +170,11 @@ public partial class EcosystemGalleryPage : UserControl
         if (index >= 0) _messages[index] = message with { State = MdAsyncRequestState.Data, ErrorText = null, Timestamp = DateTimeOffset.Now };
         ChatStatus.Text = L($"Retried “{message.Content}”; provider marked it sent.", $"已重试“{message.Content}”；提供方已将其标记为已发送。");
     }
+    private void ChatAttachmentRequested(object? sender, EventArgs e)
+    {
+        _messages.Add(new MdChatMessage(Guid.NewGuid().ToString("N"), MdChatMessageRole.User, L("📎 Release-notes.md (24 KB)", "📎 发布说明.md (24 KB)"), DateTimeOffset.Now, L("You", "你")));
+        ChatStatus.Text = L("Attachment action invoked; sample attachment file added.", "已调用附件操作；已添加示例附件文件。");
+    }
     private void ToggleSkeleton(object? sender, RoutedEventArgs e) => Skeleton.IsLoading = !Skeleton.IsLoading;
     private async void ReplaySequence(object? sender, RoutedEventArgs e) => await Sequence.PlayAsync();
 
@@ -199,7 +205,11 @@ public partial class EcosystemGalleryPage : UserControl
     private void AssignReviewer(object? sender, RoutedEventArgs e) =>
         ReviewerStatus.Text = L($"Review assigned to {(sender as Control)?.Tag}.", $"评审已分配给 {(sender as Control)?.Tag}。");
     private void RatingChanged(object? sender, RangeBaseValueChangedEventArgs e) => RatingStatus.Text = L($"Rating {e.NewValue:0.#} of 5", $"评分 {e.NewValue:0.#} / 5");
-    private void BreadcrumbInvoked(object? sender, object? item) => BreadcrumbStatus.Text = L($"Selected {(item as ContentControl)?.Content ?? item}.", $"已选择 {(item as ContentControl)?.Content ?? item}。");
+    private void BreadcrumbInvoked(object? sender, object? item)
+    {
+        if (BreadcrumbStatus is not null)
+            BreadcrumbStatus.Text = L($"Selected {(item as MdBreadcrumbItem)?.Label ?? (item as TextBlock)?.Text ?? (item as ContentControl)?.Content ?? item}.", $"已选择 {(item as MdBreadcrumbItem)?.Label ?? (item as TextBlock)?.Text ?? (item as ContentControl)?.Content ?? item}。");
+    }
 
     private sealed class GridRow(string name, string team, int score)
     {

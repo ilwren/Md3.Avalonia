@@ -4,7 +4,7 @@ using Avalonia.Controls;
 using Avalonia.LogicalTree;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
-using Md3.Avalonia.Ecosystem.Controls;
+using Md3.Avalonia.Extra.Controls;
 
 namespace Md3.Avalonia.Gallery;
 
@@ -19,13 +19,14 @@ internal static class GalleryLocalization
         ["Get started"]="开始使用", ["Develop"]="开发", ["Foundations"]="基础", ["Styles"]="样式", ["Components"]="组件",
         ["Avalonia component gallery"]="Avalonia 组件库", ["Headings are generated from the active page. Activate one to move it into view."]="目录根据当前页面的标题生成；激活一项即可将对应内容滚动到视图中。",
         ["Search components"]="搜索组件", ["Language"]="语言", ["Theme"]="主题", ["Light"]="浅色", ["Dark"]="深色", ["System"]="跟随系统",
-        ["COMPONENTS"]="组件", ["FOUNDATIONS"]="基础", ["Components overview"]="组件概览", ["LIBRARY EXTENSIONS"]="库扩展", ["ALL COMPONENTS"]="全部组件", ["On this page"]="本页内容", ["Overview"]="概览", ["Examples"]="示例", ["Usage"]="用法", ["API"]="API",
+        ["COMPONENTS"]="组件", ["FOUNDATIONS"]="基础", ["Components overview"]="组件概览", ["SAMPLES & APPS"]="示例应用", ["LIBRARY EXTENSIONS"]="库扩展", ["ALL COMPONENTS"]="全部组件", ["On this page"]="本页内容", ["Overview"]="概览", ["Examples"]="示例", ["Usage"]="用法", ["API"]="API",
+        ["Android settings"]="Android 设置", ["Clock app"]="时钟应用", ["Tasks & todo"]="任务待办", ["Settings cards"]="设置卡片", ["Breadcrumbs"]="面包屑导航",
         ["Components are interactive building blocks for creating a user interface. They can be organized into categories based on their purpose: Action, containment, communication, navigation, selection, and text input."]="组件是构建用户界面的交互式基础单元。它们可以按用途组织为操作、容器、沟通、导航、选择和文本输入等类别。",
         ["Action"]="操作", ["Containment"]="容器", ["Communication"]="沟通", ["Navigation"]="导航", ["Selection"]="选择", ["Text input"]="文本输入",
         ["Controls that start or expose an action."]="用于启动或呈现操作的控件。", ["Surfaces that group information and related actions."]="对信息及其相关操作进行分组的表面。", ["Status, progress, prompts, and transient messages."]="用于状态、进度、提示和临时消息。", ["Components for moving through destinations and views."]="用于在目的地和视图之间移动的组件。", ["Controls for choosing values, dates, and options."]="用于选择值、日期和选项的控件。", ["Fields and temporary surfaces for entering or choosing data."]="用于输入或选择数据的字段与临时表面。",
         ["Buttons"]="按钮", ["Icon buttons"]="图标按钮", ["FABs"]="浮动操作按钮", ["App bars"]="应用栏", ["Badges"]="徽标", ["Text fields"]="文本字段",
         ["Checkbox"]="复选框", ["Radio buttons"]="单选按钮", ["Combo box"]="组合框", ["Carousel"]="轮播", ["Cards"]="卡片", ["Chips"]="标签块",
-        ["Date & time pickers"]="日期和时间选择器", ["Dialogs"]="对话框", ["Divider"]="分隔线", ["Lists"]="列表", ["Loading"]="加载", ["Progress"]="进度",
+        ["Date & time pickers"]="日期和时间选择器", ["Date and time pickers"]="日期和时间选择器", ["Color picker"]="颜色选择器", ["Dialogs"]="对话框", ["Divider"]="分隔线", ["Lists"]="列表", ["Loading"]="加载", ["Progress"]="进度",
         ["Menus"]="菜单", ["Navigation bar"]="导航栏", ["Navigation drawer"]="导航抽屉", ["Navigation rail & adaptive"]="导航轨道与自适应", ["Search"]="搜索",
         ["Sheets"]="面板", ["Slider"]="滑块", ["Segmented & range"]="分段按钮与范围", ["Snackbar"]="消息条", ["Switch"]="开关", ["Tabs"]="标签页",
         ["Toolbars"]="工具栏", ["Tooltips"]="工具提示", ["Flutter parity"]="Flutter 组件补全", ["Desktop adapters"]="桌面适配控件", ["Theme resources"]="主题资源", ["Theme Lab"]="主题实验室", ["Material Symbols"]="Material 图标", ["Motion"]="动效",

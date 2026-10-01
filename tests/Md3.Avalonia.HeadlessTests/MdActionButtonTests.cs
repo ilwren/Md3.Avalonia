@@ -200,6 +200,45 @@ public sealed class MdActionButtonTests
         }
     }
 
+    [AvaloniaFact]
+    public void Fab_Menu_Supports_Left_And_Right_Alignment()
+    {
+        var leftMenu = new MdFabMenu
+        {
+            Alignment = MdFabAlignment.Left,
+            ItemsSource = new[]
+            {
+                new MdFabMenuItem { Content = "Scanner", Icon = MdSymbols.QrCodeScanner },
+                new MdFabMenuItem { Content = "Attachment", Icon = MdSymbols.AttachFile }
+            }
+        };
+        var rightMenu = new MdFabMenu
+        {
+            Alignment = MdFabAlignment.Right,
+            ItemsSource = new[]
+            {
+                new MdFabMenuItem { Content = "Photo", Icon = MdSymbols.Photo }
+            }
+        };
+        var fabLeft = new MdFloatingActionButton { Alignment = MdFabAlignment.Left };
+        var fabRight = new MdFloatingActionButton { Alignment = MdFabAlignment.Right };
+
+        var panel = new StackPanel { Children = { leftMenu, rightMenu, fabLeft, fabRight } };
+        using var host = Show(panel);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(MdFabAlignment.Left, leftMenu.Alignment);
+        Assert.Equal(MdFabAlignment.Right, rightMenu.Alignment);
+        Assert.Equal(MdFabAlignment.Left, fabLeft.Alignment);
+        Assert.Equal(MdFabAlignment.Right, fabRight.Alignment);
+
+        leftMenu.Show();
+        Assert.True(leftMenu.IsOpen);
+        Assert.True(leftMenu.AreItemsVisible);
+        leftMenu.Dismiss();
+        Assert.False(leftMenu.IsOpen);
+    }
+
     private static IDisposable Show(Control content)
     {
         var window = new Window { Width = 900, Height = 320, Content = content };

@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
-using Md3.Avalonia.Ecosystem.Themes;
+using Md3.Avalonia.Extra.Themes;
 using Md3.Avalonia.Themes;
 
 [assembly: AvaloniaTestApplication(typeof(Md3.Avalonia.HeadlessTests.TestAppBuilder))]

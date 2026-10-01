@@ -298,7 +298,6 @@
                    PlacementTarget="{Binding #PART_Container}"
                    VerticalOffset="0"
                    InheritsTransform="True"
-                   ShouldUseOverlayLayer="False"
                    WindowManagerAddShadowHint="False">
               <Popup.Styles>
                 <Style Selector="PopupRoot">

@@ -4,32 +4,150 @@
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.CarouselGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Spacing="28">
-    <StackPanel Spacing="8">
-      <TextBlock Classes="h1" Text="Carousel" />
-      <TextBlock Classes="body" Text="Horizontal collections reveal images, video, or labeled destinations while preserving native selection and keyboard navigation." />
-    </StackPanel>
-    <StackPanel Spacing="12">
-      <TextBlock Classes="h2" Text="Multi-browse" />
-      <md:MdCarousel Height="230" ItemHeight="210" ItemWidth="250">
-        <Grid Background="#FF6F61"><StackPanel Margin="20" VerticalAlignment="Bottom"><TextBlock FontSize="24" Foreground="White" Text="Coastal route"/><TextBlock Foreground="White" Text="12 places"/></StackPanel></Grid>
-        <Grid Background="#FF8A3D"><StackPanel Margin="20" VerticalAlignment="Bottom"><TextBlock FontSize="24" Foreground="White" Text="Desert light"/><TextBlock Foreground="White" Text="8 places"/></StackPanel></Grid>
-        <Grid Background="#477A64"><StackPanel Margin="20" VerticalAlignment="Bottom"><TextBlock FontSize="24" Foreground="White" Text="Forest stays"/><TextBlock Foreground="White" Text="16 places"/></StackPanel></Grid>
-        <Grid Background="#5367B5"><StackPanel Margin="20" VerticalAlignment="Bottom"><TextBlock FontSize="24" Foreground="White" Text="City nights"/><TextBlock Foreground="White" Text="20 places"/></StackPanel></Grid>
-      </md:MdCarousel>
-    </StackPanel>
-    <StackPanel Spacing="12">
-      <TextBlock Classes="h2" Text="Hero" />
-      <md:MdCarousel Height="270" Variant="Hero">
-        <Grid Background="#78536A"><TextBlock Margin="24" VerticalAlignment="Bottom" FontSize="28" Foreground="White" Text="Featured story"/></Grid>
-        <Grid Background="#44606D"><TextBlock Margin="24" VerticalAlignment="Bottom" FontSize="28" Foreground="White" Text="A slower weekend"/></Grid>
-        <Grid Background="#766446"><TextBlock Margin="24" VerticalAlignment="Bottom" FontSize="28" Foreground="White" Text="Local favorites"/></Grid>
-      </md:MdCarousel>
-    </StackPanel>
-    <StackPanel Spacing="10">
-      <TextBlock Classes="h2" Text="Usage" />
-      <gallery:CodeExample XamlCode="&lt;md:MdCarousel ItemsSource=&quot;{Binding Destinations}&quot;&#10;               SelectedItem=&quot;{Binding SelectedDestination}&quot;&gt;&#10;  &lt;md:MdCarousel.ItemTemplate&gt;...&lt;/md:MdCarousel.ItemTemplate&gt;&#10;&lt;/md:MdCarousel&gt;" CSharpCode="var carousel = new MdCarousel&#10;{&#10;    ItemsSource = viewModel.Destinations,&#10;    SelectedItem = viewModel.SelectedDestination&#10;};" />
-    </StackPanel>
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Carousel" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="Horizontal collections reveal images, video, or labeled destinations while preserving native selection, gesture snapping, and keyboard navigation." />
+      </StackPanel>
+
+      <!-- Multi-browse -->
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Multi-browse" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Displays a focal large item with smaller trailing cards that adapt smoothly on selection." />
+        <md:MdCarousel Height="240" ItemHeight="220" ItemWidth="280" SelectedIndex="0">
+          <Border Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" CornerRadius="28" ClipToBounds="True" Padding="16">
+            <Grid RowDefinitions="*,Auto">
+              <StackPanel Spacing="4">
+                <Border HorizontalAlignment="Left" Padding="10,4" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.Primary.Brush}">
+                  <TextBlock FontSize="11" FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" Text="Featured" />
+                </Border>
+              </StackPanel>
+              <StackPanel Grid.Row="1" Spacing="2">
+                <TextBlock FontSize="20" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" Text="Coastal route" TextTrimming="CharacterEllipsis" />
+                <TextBlock FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" Opacity="0.8" Text="12 places · Scenic drive" TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+            </Grid>
+          </Border>
+          <Border Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" CornerRadius="28" ClipToBounds="True" Padding="16">
+            <Grid RowDefinitions="*,Auto">
+              <StackPanel Spacing="4">
+                <Border HorizontalAlignment="Left" Padding="10,4" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.Secondary.Brush}">
+                  <TextBlock FontSize="11" FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.OnSecondary.Brush}" Text="Popular" />
+                </Border>
+              </StackPanel>
+              <StackPanel Grid.Row="1" Spacing="2">
+                <TextBlock FontSize="20" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" Text="Desert light" TextTrimming="CharacterEllipsis" />
+                <TextBlock FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" Opacity="0.8" Text="8 places · Sunset tour" TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+            </Grid>
+          </Border>
+          <Border Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" CornerRadius="28" ClipToBounds="True" Padding="16">
+            <Grid RowDefinitions="*,Auto">
+              <StackPanel Spacing="4">
+                <Border HorizontalAlignment="Left" Padding="10,4" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.Tertiary.Brush}">
+                  <TextBlock FontSize="11" FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.OnTertiary.Brush}" Text="Nature" />
+                </Border>
+              </StackPanel>
+              <StackPanel Grid.Row="1" Spacing="2">
+                <TextBlock FontSize="20" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.OnTertiaryContainer.Brush}" Text="Forest stays" TextTrimming="CharacterEllipsis" />
+                <TextBlock FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnTertiaryContainer.Brush}" Opacity="0.8" Text="16 places · Cabins &amp; trails" TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+            </Grid>
+          </Border>
+          <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" CornerRadius="28" ClipToBounds="True" Padding="16">
+            <Grid RowDefinitions="*,Auto">
+              <StackPanel Spacing="4">
+                <Border HorizontalAlignment="Left" Padding="10,4" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.Outline.Brush}">
+                  <TextBlock FontSize="11" FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.Surface.Brush}" Text="Urban" />
+                </Border>
+              </StackPanel>
+              <StackPanel Grid.Row="1" Spacing="2">
+                <TextBlock FontSize="20" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" Text="City nights" TextTrimming="CharacterEllipsis" />
+                <TextBlock FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="20 places · Dining &amp; arts" TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+            </Grid>
+          </Border>
+        </md:MdCarousel>
+      </StackPanel>
+
+      <!-- Hero -->
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Hero" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Hero variant allocates maximum container focus to one dominant item." />
+        <md:MdCarousel Height="260" ItemHeight="240" ItemWidth="360" Variant="Hero" SelectedIndex="0">
+          <Border Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" CornerRadius="28" ClipToBounds="True" Padding="20">
+            <Grid RowDefinitions="*,Auto">
+              <StackPanel Spacing="6">
+                <TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" Text="EDITORIAL PICK" />
+              </StackPanel>
+              <StackPanel Grid.Row="1" Spacing="4">
+                <TextBlock FontSize="24" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" Text="Featured story" TextTrimming="CharacterEllipsis" />
+                <TextBlock FontSize="14" Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" Opacity="0.85" Text="Discover the most inspiring architectures of the year." TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+            </Grid>
+          </Border>
+          <Border Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" CornerRadius="28" ClipToBounds="True" Padding="20">
+            <Grid RowDefinitions="*,Auto">
+              <StackPanel Spacing="6">
+                <TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.Secondary.Brush}" Text="WEEKEND GUIDE" />
+              </StackPanel>
+              <StackPanel Grid.Row="1" Spacing="4">
+                <TextBlock FontSize="24" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" Text="A slower weekend" TextTrimming="CharacterEllipsis" />
+                <TextBlock FontSize="14" Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" Opacity="0.85" Text="Quiet retreats and scenic countryside escapes." TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+            </Grid>
+          </Border>
+          <Border Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" CornerRadius="28" ClipToBounds="True" Padding="20">
+            <Grid RowDefinitions="*,Auto">
+              <StackPanel Spacing="6">
+                <TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.Tertiary.Brush}" Text="COMMUNITY" />
+              </StackPanel>
+              <StackPanel Grid.Row="1" Spacing="4">
+                <TextBlock FontSize="24" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.OnTertiaryContainer.Brush}" Text="Local favorites" TextTrimming="CharacterEllipsis" />
+                <TextBlock FontSize="14" Foreground="{DynamicResource Md.Sys.Color.OnTertiaryContainer.Brush}" Opacity="0.85" Text="Top rated spots shared by community travelers." TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+            </Grid>
+          </Border>
+        </md:MdCarousel>
+      </StackPanel>
+
+      <!-- Uncontained -->
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Uncontained" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Uniform item sizing scrolling freely without focal shape transitions." />
+        <md:MdCarousel Height="200" ItemHeight="180" ItemWidth="220" Variant="Uncontained">
+          <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="16" ClipToBounds="True" Padding="16">
+            <StackPanel VerticalAlignment="Bottom" Spacing="4">
+              <TextBlock FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" Text="Item 1" />
+              <TextBlock FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Standard card" />
+            </StackPanel>
+          </Border>
+          <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="16" ClipToBounds="True" Padding="16">
+            <StackPanel VerticalAlignment="Bottom" Spacing="4">
+              <TextBlock FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" Text="Item 2" />
+              <TextBlock FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Standard card" />
+            </StackPanel>
+          </Border>
+          <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="16" ClipToBounds="True" Padding="16">
+            <StackPanel VerticalAlignment="Bottom" Spacing="4">
+              <TextBlock FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" Text="Item 3" />
+              <TextBlock FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Standard card" />
+            </StackPanel>
+          </Border>
+          <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="16" ClipToBounds="True" Padding="16">
+            <StackPanel VerticalAlignment="Bottom" Spacing="4">
+              <TextBlock FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" Text="Item 4" />
+              <TextBlock FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Standard card" />
+            </StackPanel>
+          </Border>
+        </md:MdCarousel>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdCarousel ItemsSource=&quot;{Binding Destinations}&quot;&#10;               SelectedItem=&quot;{Binding SelectedDestination}&quot;&#10;               Variant=&quot;MultiBrowse&quot;&gt;&#10;  &lt;md:MdCarousel.ItemTemplate&gt;...&lt;/md:MdCarousel.ItemTemplate&gt;&#10;&lt;/md:MdCarousel&gt;" CSharpCode="var carousel = new MdCarousel&#10;{&#10;    ItemsSource = viewModel.Destinations,&#10;    SelectedItem = viewModel.SelectedDestination,&#10;    Variant = MdCarouselVariant.MultiBrowse&#10;};" />
+      </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>
 </UserControl>

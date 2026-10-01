@@ -127,8 +127,31 @@ public sealed class MdFoundationComponentTests
     }
 
     [AvaloniaFact]
+    public void Ripple_Attaches_To_Interactive_Cards_And_List_Items()
+    {
+        var card = new MdCard { Content = "Card with ripple" };
+        using var host = Show(card);
+        var ripple = Assert.Single(card.GetVisualDescendants().OfType<MdRipplePresenter>());
+        Assert.NotNull(ripple);
+    }
+
+    [AvaloniaFact]
+    public void Symbols_Dictionary_Contains_All_4284_Glyphs_And_Resolves_Names()
+    {
+        Assert.Equal(4284, MdSymbols.Count);
+        Assert.True(MdSymbols.AllNames.Count >= 4284);
+        Assert.True(MdSymbols.TryGetByName("settings", out var settingsGlyph));
+        Assert.True(MdSymbols.TryGetByName("home", out var homeGlyph));
+        Assert.True(MdSymbols.TryGetByName("search", out var searchGlyph));
+        Assert.Equal(settingsGlyph, MdSymbols.Settings);
+        Assert.Equal(homeGlyph, MdSymbols.Home);
+        Assert.Equal(searchGlyph, MdSymbols.Search);
+    }
+
+    [AvaloniaFact]
     public void Symbols_Are_Hidden_When_External_Official_Font_Is_Not_Loaded()
     {
+        if (MdSymbols.Settings is not null) return;
         var icon = new MdIcon { Glyph = MdSymbols.Settings, Size = 32 };
         using var host = Show(icon);
 

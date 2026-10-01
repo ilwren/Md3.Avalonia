@@ -1,0 +1,269 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+
+  <!-- MdSettingsCard Theme -->
+  <ControlTheme x:Key="{x:Type md:MdSettingsCard}" TargetType="md:MdSettingsCard">
+    <Setter Property="MinHeight" Value="64" />
+    <Setter Property="Padding" Value="16,12" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="16" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdSettingsCard">
+        <Border x:Name="PART_Root"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                ClipToBounds="True">
+          <Grid>
+            <!-- State layer & Ripple -->
+            <Border x:Name="PART_StateLayer"
+                    Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                    IsHitTestVisible="False"
+                    Opacity="0" />
+            <md:MdRipplePresenter RippleBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+
+            <!-- Card Content Grid -->
+            <Grid Margin="{TemplateBinding Padding}"
+                  ColumnDefinitions="Auto,*,Auto"
+                  ColumnSpacing="16"
+                  VerticalAlignment="Center">
+
+              <!-- Leading Icon Container -->
+              <Border x:Name="PART_IconContainer"
+                      Grid.Column="0"
+                      Width="40"
+                      Height="40"
+                      VerticalAlignment="Center"
+                      Background="{TemplateBinding IconBackground}"
+                      CornerRadius="20"
+                      IsVisible="False">
+                <Viewbox Width="22" Height="22" HorizontalAlignment="Center" VerticalAlignment="Center">
+                  <md:MdSymbolPresenter x:Name="PART_IconPresenter"
+                                        Content="{TemplateBinding Icon}"
+                                        Foreground="{TemplateBinding IconForeground}" />
+                </Viewbox>
+              </Border>
+
+              <!-- Title & Description Text Block -->
+              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                <ContentPresenter x:Name="PART_HeaderPresenter"
+                                  Content="{TemplateBinding Header}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  FontSize="16"
+                                  FontWeight="Medium"
+                                  Foreground="{TemplateBinding Foreground}" />
+                <ContentPresenter x:Name="PART_DescriptionPresenter"
+                                  Content="{TemplateBinding Description}"
+                                  FontSize="13"
+                                  Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                                  IsVisible="False"
+                                  TextWrapping="Wrap" />
+              </StackPanel>
+
+              <!-- Trailing Action Widget or Default Chevron -->
+              <Grid Grid.Column="2" VerticalAlignment="Center">
+                <ContentPresenter x:Name="PART_TrailingPresenter"
+                                  Content="{TemplateBinding Trailing}"
+                                  IsVisible="False"
+                                  VerticalAlignment="Center" />
+                <md:MdIcon x:Name="PART_DefaultChevron"
+                           Glyph="{DynamicResource Md.Icon.ChevronRight}"
+                           Size="24"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                           IsVisible="False"
+                           VerticalAlignment="Center" />
+              </Grid>
+            </Grid>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Condition Styles -->
+    <Style Selector="^:has-icon /template/ Border#PART_IconContainer">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-description /template/ ContentPresenter#PART_DescriptionPresenter">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-trailing /template/ ContentPresenter#PART_TrailingPresenter">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:not(:has-trailing):clickable /template/ md|MdIcon#PART_DefaultChevron">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- Variants -->
+    <Style Selector="^:filled">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
+    </Style>
+    <Style Selector="^:elevated /template/ Border#PART_Root">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
+      <Setter Property="BoxShadow" Value="{DynamicResource Md.Sys.Elevation.Level1}" />
+    </Style>
+    <Style Selector="^:outlined">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <!-- Interaction State Layers -->
+    <Style Selector="^:clickable:pointerover /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" />
+    </Style>
+    <Style Selector="^:clickable:pressed /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_Root">
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.38" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+    <Style Selector="^:not(:clickable)">
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+  </ControlTheme>
+
+  <!-- MdSettingsGroup Theme -->
+  <ControlTheme x:Key="{x:Type md:MdSettingsGroup}" TargetType="md:MdSettingsGroup">
+    <Setter Property="Margin" Value="0,0,0,16" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdSettingsGroup">
+        <StackPanel Spacing="8">
+          <!-- Group Header -->
+          <ContentPresenter x:Name="PART_HeaderPresenter"
+                            Margin="16,8,16,0"
+                            Content="{TemplateBinding Header}"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                            IsVisible="False" />
+
+          <!-- Group Card Container -->
+          <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                  CornerRadius="20"
+                  ClipToBounds="True">
+            <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
+          </Border>
+
+          <!-- Group Description / Footer Note -->
+          <ContentPresenter x:Name="PART_DescriptionPresenter"
+                            Margin="16,0,16,0"
+                            Content="{TemplateBinding Description}"
+                            FontSize="12"
+                            Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                            IsVisible="False"
+                            TextWrapping="Wrap" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+    <Setter Property="ItemsPanel">
+      <ItemsPanelTemplate>
+        <StackPanel Spacing="0" />
+      </ItemsPanelTemplate>
+    </Setter>
+    <Style Selector="^:has-header /template/ ContentPresenter#PART_HeaderPresenter">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-description /template/ ContentPresenter#PART_DescriptionPresenter">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+
+  <!-- MdSettingsExpander Theme -->
+  <ControlTheme x:Key="{x:Type md:MdSettingsExpander}" TargetType="md:MdSettingsExpander">
+    <Setter Property="Margin" Value="0,0,0,12" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdSettingsExpander">
+        <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                CornerRadius="20"
+                ClipToBounds="True">
+          <StackPanel>
+            <!-- Header Toggle Bar -->
+            <ToggleButton x:Name="PART_HeaderButton"
+                          IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"
+                          Background="Transparent"
+                          BorderThickness="0"
+                          Padding="16,14"
+                          MinHeight="64"
+                          HorizontalContentAlignment="Stretch"
+                          Cursor="Hand">
+              <ToggleButton.Styles>
+                <Style Selector="ToggleButton:checked /template/ Path#PART_ExpanderChevron">
+                  <Setter Property="RenderTransform">
+                    <RotateTransform Angle="180" />
+                  </Setter>
+                </Style>
+              </ToggleButton.Styles>
+              <ToggleButton.Template>
+                <ControlTemplate TargetType="ToggleButton">
+                  <Grid Background="Transparent">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16" VerticalAlignment="Center">
+                      <Border Width="40" Height="40" CornerRadius="20"
+                              Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
+                              IsVisible="{Binding $parent[md:MdSettingsExpander].Icon, Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <Viewbox Width="22" Height="22" HorizontalAlignment="Center" VerticalAlignment="Center">
+                          <md:MdSymbolPresenter Content="{Binding $parent[md:MdSettingsExpander].Icon}"
+                                                Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
+                        </Viewbox>
+                      </Border>
+                      <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                        <ContentPresenter Content="{Binding $parent[md:MdSettingsExpander].Header}"
+                                          FontSize="16" FontWeight="Medium"
+                                          Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+                        <ContentPresenter Content="{Binding $parent[md:MdSettingsExpander].Description}"
+                                          FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                                          IsVisible="{Binding $parent[md:MdSettingsExpander].Description, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                          TextWrapping="Wrap" />
+                      </StackPanel>
+                      <Path x:Name="PART_ExpanderChevron"
+                            Grid.Column="2"
+                            Width="12" Height="8"
+                            Data="M 0,0 L 6,6 L 12,0"
+                            Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                            StrokeThickness="2"
+                            StrokeLineCap="Round"
+                            StrokeJoin="Round"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            RenderTransformOrigin="50%,50%">
+                        <Path.RenderTransform>
+                          <RotateTransform Angle="0" />
+                        </Path.RenderTransform>
+                      </Path>
+                    </Grid>
+                  </Grid>
+                </ControlTemplate>
+              </ToggleButton.Template>
+            </ToggleButton>
+
+            <!-- Expanded Content Area -->
+            <Border x:Name="PART_ContentArea"
+                    IsVisible="{TemplateBinding IsExpanded}"
+                    Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
+                    BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="16,8">
+              <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
+            </Border>
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Setter Property="ItemsPanel">
+      <ItemsPanelTemplate>
+        <StackPanel Spacing="4" />
+      </ItemsPanelTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>

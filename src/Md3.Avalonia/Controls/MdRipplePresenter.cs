@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -12,8 +13,8 @@ using Md3.Avalonia.Motion;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>
-/// Pointer-origin Material ripple. The presenter observes the nearest button without
-/// participating in hit testing, so native command, keyboard and automation behavior remains intact.
+/// Pointer-origin Material ripple with realistic press-and-release dynamics.
+/// Observes the nearest interactive ancestor without participating in hit testing.
 /// </summary>
 public sealed class MdRipplePresenter : Control
 {
@@ -32,9 +33,11 @@ public sealed class MdRipplePresenter : Control
     private readonly DispatcherTimer _timer;
     private InputElement? _inputOwner;
     private long _startedAt;
+    private long _releasedAt;
     private Point _origin;
     private double _maximumRadius;
     private bool _isAnimating;
+    private bool _isPointerDown;
 
     static MdRipplePresenter() =>
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdRipplePresenter>((presenter, _) => presenter.OnMotionSchemeChanged());
@@ -77,9 +80,16 @@ public sealed class MdRipplePresenter : Control
         base.OnAttachedToVisualTree(e);
         _inputOwner = this.GetVisualAncestors()
             .OfType<InputElement>()
-            .FirstOrDefault(owner => owner is Button or ListBoxItem);
-        _inputOwner?.AddHandler(PointerPressedEvent, OnOwnerPointerPressed,
-            RoutingStrategies.Tunnel | RoutingStrategies.Bubble, handledEventsToo: true);
+            .FirstOrDefault(IsInteractiveElement);
+        if (_inputOwner is not null)
+        {
+            _inputOwner.AddHandler(PointerPressedEvent, OnOwnerPointerPressed,
+                RoutingStrategies.Tunnel | RoutingStrategies.Bubble, handledEventsToo: true);
+            _inputOwner.AddHandler(PointerReleasedEvent, OnOwnerPointerReleased,
+                RoutingStrategies.Tunnel | RoutingStrategies.Bubble, handledEventsToo: true);
+            _inputOwner.AddHandler(PointerCaptureLostEvent, OnOwnerPointerReleased,
+                RoutingStrategies.Tunnel | RoutingStrategies.Bubble, handledEventsToo: true);
+        }
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -87,26 +97,43 @@ public sealed class MdRipplePresenter : Control
         if (_inputOwner is not null)
         {
             _inputOwner.RemoveHandler(PointerPressedEvent, OnOwnerPointerPressed);
+            _inputOwner.RemoveHandler(PointerReleasedEvent, OnOwnerPointerReleased);
+            _inputOwner.RemoveHandler(PointerCaptureLostEvent, OnOwnerPointerReleased);
             _inputOwner = null;
         }
 
         _timer.Stop();
         _isAnimating = false;
+        _isPointerDown = false;
         base.OnDetachedFromVisualTree(e);
+    }
+
+    private static bool IsInteractiveElement(InputElement element)
+    {
+        return element is Button
+            or ListBoxItem
+            or MenuItem
+            or TreeViewItem
+            or ToggleButton
+            or RadioButton
+            or CheckBox
+            or MdCard
+            or MdChip
+            or MdListItem
+            or MdTabItem
+            or MdNavigationRailItem
+            or MdNavigationBarItem
+            or MdSegmentedButton
+            or MdSwitch
+            || element.Focusable;
     }
 
     private void OnOwnerPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (_inputOwner is not null && !_inputOwner.IsEffectivelyEnabled)
-        {
-            return;
-        }
+        if (_inputOwner is not null && !_inputOwner.IsEffectivelyEnabled) return;
+        if (MdMotion.GetScheme(this) == MdMotionScheme.None) return;
 
-        if (MdMotion.GetScheme(this) == MdMotionScheme.None)
-        {
-            return;
-        }
-
+        _isPointerDown = true;
         _origin = IsCentered
             ? new Point(Bounds.Width / 2, Bounds.Height / 2)
             : e.GetPosition(this);
@@ -118,24 +145,35 @@ public sealed class MdRipplePresenter : Control
                     Distance(_origin, new Point(0, Bounds.Height)),
                     Distance(_origin, new Point(Bounds.Width, Bounds.Height)))));
         _startedAt = Stopwatch.GetTimestamp();
+        _releasedAt = 0;
         _isAnimating = true;
         _timer.Start();
         InvalidateVisual();
     }
 
+    private void OnOwnerPointerReleased(object? sender, RoutedEventArgs e)
+    {
+        if (!_isPointerDown) return;
+        _isPointerDown = false;
+        _releasedAt = Stopwatch.GetTimestamp();
+        InvalidateVisual();
+    }
+
     private void OnAnimationTick(object? sender, EventArgs e)
     {
-        if (!_isAnimating)
-        {
-            return;
-        }
+        if (!_isAnimating) return;
 
         var elapsed = Stopwatch.GetElapsedTime(_startedAt);
         var effectiveDuration = GetEffectiveDuration();
-        if (elapsed >= effectiveDuration)
+
+        if (!_isPointerDown)
         {
-            _isAnimating = false;
-            _timer.Stop();
+            var releaseElapsed = _releasedAt > 0 ? Stopwatch.GetElapsedTime(_releasedAt) : TimeSpan.Zero;
+            if (elapsed >= effectiveDuration && releaseElapsed >= TimeSpan.FromMilliseconds(200))
+            {
+                _isAnimating = false;
+                _timer.Stop();
+            }
         }
 
         InvalidateVisual();
@@ -144,13 +182,11 @@ public sealed class MdRipplePresenter : Control
     public override void Render(DrawingContext context)
     {
         base.Render(context);
-        if (!_isAnimating || RippleBrush is null || Bounds.Width <= 0 || Bounds.Height <= 0)
-        {
-            return;
-        }
+        if (!_isAnimating || RippleBrush is null || Bounds.Width <= 0 || Bounds.Height <= 0) return;
 
         var scheme = MdMotion.GetScheme(this);
         if (scheme == MdMotionScheme.None) return;
+
         var duration = Math.Max(1, GetEffectiveDuration().TotalMilliseconds);
         var progress = Math.Clamp(Stopwatch.GetElapsedTime(_startedAt).TotalMilliseconds / duration, 0, 1);
         var spatial = scheme switch
@@ -159,10 +195,26 @@ public sealed class MdRipplePresenter : Control
             MdMotionScheme.Reduced => 1,
             _ => Math.Clamp(MdMotionTokens.ExpressiveFastSpatial.Sample(progress * 0.42), 0, 1.08)
         };
-        var fade = scheme == MdMotionScheme.Reduced
-            ? 1 - progress
-            : progress < 0.55 ? 1 : 1 - (progress - 0.55) / 0.45;
+
+        double fade;
+        if (scheme == MdMotionScheme.Reduced)
+        {
+            fade = 1 - progress;
+        }
+        else if (_isPointerDown)
+        {
+            fade = 1.0;
+        }
+        else
+        {
+            var releaseMs = _releasedAt > 0 ? Stopwatch.GetElapsedTime(_releasedAt).TotalMilliseconds : 0;
+            var releaseFade = Math.Clamp(1.0 - (releaseMs / 200.0), 0, 1.0);
+            var naturalFade = progress < 0.5 ? 1.0 : 1.0 - (progress - 0.5) / 0.5;
+            fade = Math.Min(releaseFade, naturalFade);
+        }
+
         var opacity = Math.Clamp(MaxOpacity * fade, 0, 1);
+        if (opacity <= 0.001) return;
 
         using (context.PushClip(new Rect(Bounds.Size)))
         using (context.PushOpacity(opacity))

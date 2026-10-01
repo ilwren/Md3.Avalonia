@@ -41,21 +41,26 @@ public partial class MainWindow : Window
         AutomationProperties.SetName(NavigationMenuButton, "Open component navigation");
         _navigationButtons =
         [
-            ComponentsOverviewNav, ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, TextFieldNav,
-            CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav,
+            ComponentsOverviewNav, AndroidSettingsNav, ClockNav, TasksNav,
+            ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, BreadcrumbNav, TextFieldNav,
+            CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, ColorPickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
-            NavigationDrawerNav, AdaptiveNav, SearchNav, SheetNav, SliderNav, AdvancedSelectionNav,
+            NavigationDrawerNav, AdaptiveNav, SearchNav, SettingsCardNav, SheetNav, SliderNav, AdvancedSelectionNav,
             SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, FlutterParityNav, EcosystemNav, BorderlessWindowNav,
             DesktopAdaptersNav, ThemeResourcesNav, SymbolsNav, MotionNav
         ];
         _topNavigationButtons = [GetStartedTopNav, DevelopTopNav, FoundationsTopNav, StylesTopNav, ComponentsTopNav];
         _galleryIndex =
         [
+            Entry("Android settings", "android settings preference card wifi bluetooth sound display battery", AndroidSettingsNav, () => new AndroidSettingsSamplePage()),
+            Entry("Clock app", "clock alarm timer stopwatch world cities timezone", ClockNav, () => new ClockSamplePage()),
+            Entry("Tasks & todo", "tasks todo slidable list swipe check due date priority", TasksNav, () => new TasksSamplePage()),
             Entry("Buttons", "button toggle split connected group", ButtonNav, () => new ButtonGalleryPage()),
             Entry("Icon buttons", "icon action round square", IconButtonNav, () => new IconButtonGalleryPage()),
             Entry("FABs", "floating action button menu extended", FabNav, () => new FabGalleryPage()),
             Entry("App bars", "top bottom app bar toolbar", AppBarNav, () => new AppBarGalleryPage()),
             Entry("Badges", "badge notification dot", BadgeNav, () => new BadgeGalleryPage()),
+            Entry("Breadcrumbs", "breadcrumb path navigation separator hierarchy", BreadcrumbNav, () => new BreadcrumbGalleryPage()),
             Entry("Text fields", "textbox input password clear context menu", TextFieldNav, () => new TextBoxGalleryPage()),
             Entry("Checkbox", "check selection", CheckBoxNav, () => new CheckBoxGalleryPage()),
             Entry("Radio buttons", "radio selection", RadioButtonNav, () => new RadioButtonGalleryPage()),
@@ -64,6 +69,7 @@ public partial class MainWindow : Window
             Entry("Cards", "card elevated filled outlined", CardNav, () => new CardGalleryPage()),
             Entry("Chips", "chip assist filter input suggestion", ChipNav, () => new ChipGalleryPage()),
             Entry("Date and time pickers", "calendar clock picker localized minute", PickerNav, () => new PickerGalleryPage()),
+            Entry("Color picker", "color picker palette hsv hex rgb alpha flutter swatch", ColorPickerNav, () => new ColorPickerGalleryPage()),
             Entry("Dialogs", "dialog modal alert", DialogNav, () => new DialogGalleryPage()),
             Entry("Divider", "separator inset", DividerNav, () => new DividerGalleryPage()),
             Entry("Lists", "list item virtualized", ListNav, () => new ListGalleryPage()),
@@ -74,6 +80,7 @@ public partial class MainWindow : Window
             Entry("Navigation drawer", "navigation drawer modal standard", NavigationDrawerNav, () => new NavigationDrawerGalleryPage()),
             Entry("Adaptive layout", "navigation rail adaptive responsive breakpoint", AdaptiveNav, () => new AdaptiveGalleryPage()),
             Entry("Search", "search bar view suggestions", SearchNav, () => new SearchGalleryPage()),
+            Entry("Settings cards", "settings card preference group expander android tile", SettingsCardNav, () => new SettingsCardGalleryPage()),
             Entry("Sheets", "bottom side sheet", SheetNav, () => new SheetGalleryPage()),
             Entry("Slider", "slider range value", SliderNav, () => new SliderGalleryPage()),
             Entry("Segmented and range", "segmented button range slider", AdvancedSelectionNav, () => new AdvancedSelectionGalleryPage()),
@@ -122,11 +129,16 @@ public partial class MainWindow : Window
     private void ShowStyles(object? s, RoutedEventArgs e) => Navigate(new StylesGalleryPage(), null, StylesTopNav);
     private void ShowComponents(object? s, RoutedEventArgs e) => Navigate(new ComponentsOverviewGalleryPage(), ComponentsOverviewNav, ComponentsTopNav);
 
+    private void ShowAndroidSettings(object? s, RoutedEventArgs e) => Navigate(new AndroidSettingsSamplePage(), AndroidSettingsNav);
+    private void ShowClock(object? s, RoutedEventArgs e) => Navigate(new ClockSamplePage(), ClockNav);
+    private void ShowTasks(object? s, RoutedEventArgs e) => Navigate(new TasksSamplePage(), TasksNav);
+
     private void ShowButtons(object? s, RoutedEventArgs e) => Navigate(new ButtonGalleryPage(), ButtonNav);
     private void ShowIconButtons(object? s, RoutedEventArgs e) => Navigate(new IconButtonGalleryPage(), IconButtonNav);
     private void ShowFabs(object? s, RoutedEventArgs e) => Navigate(new FabGalleryPage(), FabNav);
     private void ShowAppBars(object? s, RoutedEventArgs e) => Navigate(new AppBarGalleryPage(), AppBarNav);
     private void ShowBadges(object? s, RoutedEventArgs e) => Navigate(new BadgeGalleryPage(), BadgeNav);
+    private void ShowBreadcrumbs(object? s, RoutedEventArgs e) => Navigate(new BreadcrumbGalleryPage(), BreadcrumbNav);
     private void ShowTextFields(object? s, RoutedEventArgs e) => Navigate(new TextBoxGalleryPage(), TextFieldNav);
     private void ShowCheckBoxes(object? s, RoutedEventArgs e) => Navigate(new CheckBoxGalleryPage(), CheckBoxNav);
     private void ShowRadioButtons(object? s, RoutedEventArgs e) => Navigate(new RadioButtonGalleryPage(), RadioButtonNav);
@@ -135,6 +147,7 @@ public partial class MainWindow : Window
     private void ShowCards(object? s, RoutedEventArgs e) => Navigate(new CardGalleryPage(), CardNav);
     private void ShowChips(object? s, RoutedEventArgs e) => Navigate(new ChipGalleryPage(), ChipNav);
     private void ShowPickers(object? s, RoutedEventArgs e) => Navigate(new PickerGalleryPage(), PickerNav);
+    private void ShowColorPicker(object? s, RoutedEventArgs e) => Navigate(new ColorPickerGalleryPage(), ColorPickerNav);
     private void ShowDialogs(object? s, RoutedEventArgs e) => Navigate(new DialogGalleryPage(), DialogNav);
     private void ShowDivider(object? s, RoutedEventArgs e) => Navigate(new DividerGalleryPage(), DividerNav);
     private void ShowLists(object? s, RoutedEventArgs e) => Navigate(new ListGalleryPage(), ListNav);
@@ -145,6 +158,7 @@ public partial class MainWindow : Window
     private void ShowNavigationDrawer(object? s, RoutedEventArgs e) => Navigate(new NavigationDrawerGalleryPage(), NavigationDrawerNav);
     private void ShowAdaptive(object? s, RoutedEventArgs e) => Navigate(new AdaptiveGalleryPage(), AdaptiveNav);
     private void ShowSearch(object? s, RoutedEventArgs e) => Navigate(new SearchGalleryPage(), SearchNav);
+    private void ShowSettingsCard(object? s, RoutedEventArgs e) => Navigate(new SettingsCardGalleryPage(), SettingsCardNav);
     private void ShowSheets(object? s, RoutedEventArgs e) => Navigate(new SheetGalleryPage(), SheetNav);
     private void ShowSlider(object? s, RoutedEventArgs e) => Navigate(new SliderGalleryPage(), SliderNav);
     private void ShowAdvancedSelection(object? s, RoutedEventArgs e) => Navigate(new AdvancedSelectionGalleryPage(), AdvancedSelectionNav);
@@ -200,10 +214,10 @@ public partial class MainWindow : Window
         TopNavigation.IsVisible = true;
         DevelopTopNav.IsVisible = true;
         StylesTopNav.IsVisible = true;
-        GallerySearch.IsVisible = width >= 600;
+        GallerySearch.IsVisible = width >= 540;
         LanguageSelector.IsVisible = width >= 1040;
-        ThemeSelector.IsVisible = width >= 520;
-        BrandTitle.IsVisible = width >= 720;
+        ThemeSelector.IsVisible = width >= 420;
+        BrandTitle.IsVisible = width >= 640;
         TableOfContentsPane.IsVisible = width >= 1200;
 
         ShellGrid.ColumnDefinitions = CurrentBreakpoint switch
@@ -214,9 +228,9 @@ public partial class MainWindow : Window
         };
         PageHost.Margin = CurrentBreakpoint switch
         {
-            GalleryBreakpoint.Compact => new Thickness(24, 32, 20, 40),
-            GalleryBreakpoint.Medium => new Thickness(40, 40, 32, 48),
-            GalleryBreakpoint.Expanded => new Thickness(48, 48, 40, 56),
+            GalleryBreakpoint.Compact => new Thickness(16, 20, 16, 32),
+            GalleryBreakpoint.Medium => new Thickness(28, 28, 24, 36),
+            GalleryBreakpoint.Expanded => new Thickness(36, 36, 32, 44),
             _ => new Thickness(64, 56, 56, 72)
         };
         PageHost.MaxWidth = width >= 1200 ? 960 : double.PositiveInfinity;
@@ -226,7 +240,7 @@ public partial class MainWindow : Window
             Grid.SetColumn(NavigationPane, 0);
             Grid.SetColumnSpan(NavigationPane, 3);
             NavigationPane.IsModal = true;
-            NavigationPane.DrawerWidth = Math.Min(320, Math.Max(280, width * 0.88));
+            NavigationPane.DrawerWidth = Math.Min(320, Math.Max(260, width * 0.85));
             NavigationPane.Width = NavigationPane.DrawerWidth;
             NavigationPane.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left;
             NavigationPane.IsOpen = _navigationOpen;
@@ -253,15 +267,15 @@ public partial class MainWindow : Window
     private void ApplyResponsivePageSizing(double shellWidth)
     {
         if (PageHost.Content is not Control page) return;
-        if (CurrentBreakpoint == GalleryBreakpoint.Compact)
+        if (CurrentBreakpoint is GalleryBreakpoint.Compact or GalleryBreakpoint.Medium)
         {
-            var available = Math.Max(280, shellWidth - PageHost.Margin.Left - PageHost.Margin.Right);
+            var available = Math.Max(260, shellWidth - PageHost.Margin.Left - PageHost.Margin.Right);
             foreach (var control in page.GetVisualDescendants().OfType<Control>().Prepend(page))
             {
                 if (double.IsNaN(control.Width) || control.Width <= available || control is Window) continue;
                 if (!_responsiveSizeStates.ContainsKey(control))
                     _responsiveSizeStates[control] = new ResponsiveSizeState(control.Width, control.MaxWidth, control.HorizontalAlignment);
-                control.MaxWidth = control.Width;
+                control.MaxWidth = available;
                 control.Width = double.NaN;
                 control.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Stretch;
             }

@@ -17,6 +17,7 @@
                               VerticalAlignment="Center" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
                               Foreground="{TemplateBinding Foreground}" />
             <Border x:Name="PART_StateLayer" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsHitTestVisible="False" Opacity="0" />
+            <md:MdRipplePresenter RippleBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
           </Grid>
         </Border>
       </ControlTemplate>

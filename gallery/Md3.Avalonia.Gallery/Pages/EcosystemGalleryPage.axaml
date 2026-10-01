@@ -1,35 +1,50 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:eco="using:Md3.Avalonia.Ecosystem.Controls"
-             xmlns:infra="using:Md3.Avalonia.Ecosystem.Infrastructure"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
              xmlns:md="using:Md3.Avalonia.Controls"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.EcosystemGalleryPage">
-  <StackPanel MinHeight="4400" Spacing="32">
-    <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Flutter ecosystem" /><TextBlock Classes="body" TextWrapping="Wrap" Text="Clean-room, Material-themed controls informed by frozen public behavior baselines. The package depends on Md3.Avalonia, never on the optional icon/font package. Every affordance below is interactive." /></StackPanel>
+  <StackPanel MinHeight="4400" Spacing="32" Margin="0,0,12,24">
+    <StackPanel Spacing="8">
+      <TextBlock Classes="h1" Text="Flutter ecosystem" />
+      <TextBlock Classes="body" TextWrapping="Wrap" Text="Clean-room, Material-themed controls informed by frozen public behavior baselines. The package depends on Md3.Avalonia, never on the optional icon/font package. Every affordance below is interactive." />
+    </StackPanel>
 
     <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="Wave A · Overlay, commands and density" />
       <WrapPanel ItemHeight="64">
-        <eco:MdPopover Anchor="Toggle popover" PopoverContent="This transient action closes on page scroll, outside click, Escape, or another popup." Opened="OverlayOpened" Closed="OverlayClosed" />
-        <eco:MdHoverCard Margin="12,0" Anchor="Hover or focus" PopoverContent="Hover cards open after a deliberate delay and never remain over later sections." Opened="HoverCardOpened" Closed="OverlayClosed" />
-        <md:MdButton Content="Open command palette" Variant="Filled" Click="OpenCommandPalette" />
+        <eco:MdPopover Anchor="Toggle popover" PopoverContent="This transient action closes on page scroll, outside click, Escape, or another popup." Opened="OverlayOpened" Closed="OverlayClosed" Margin="0,0,12,8" />
+        <eco:MdHoverCard Anchor="Hover or focus" PopoverContent="Hover cards open after a deliberate delay and never remain over later sections." Opened="HoverCardOpened" Closed="OverlayClosed" Margin="0,0,12,8" />
+        <md:MdButton Content="Open command palette" Variant="Filled" Click="OpenCommandPalette" Margin="0,0,12,8" />
       </WrapPanel>
-      <TextBlock x:Name="OverlayStatus" Classes="body" Text="Open one transient surface, then scroll to verify it dismisses." />
-      <Border Padding="12" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" infra:MdDensity.Mode="Compact"><TextBlock Text="Compact density is scoped to this information row only." /></Border>
+      <TextBlock x:Name="OverlayStatus" Classes="body" TextWrapping="Wrap" Text="Open one transient surface, then scroll to verify it dismisses." />
+      <Border Padding="12" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" infra:MdDensity.Mode="Compact">
+        <TextBlock Text="Compact density is scoped to this information row only." TextWrapping="Wrap" />
+      </Border>
       <eco:MdCommandPalette x:Name="CommandPalette" CommandInvoked="CommandPaletteInvoked" />
     </StackPanel>
 
     <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="Wave B · Collections and adaptive data" />
       <eco:MdSlidableItem x:Name="Slidable" StartActions="Archive" EndActions="Delete">
-        <Grid ColumnDefinitions="*,Auto" MinHeight="64" Margin="16,0"><StackPanel VerticalAlignment="Center"><TextBlock Text="Swipe this row horizontally" FontWeight="SemiBold" /><TextBlock Text="Ctrl+Left, Ctrl+Right and Escape also work" Opacity=".7" /></StackPanel><md:MdButton Grid.Column="1" Content="Close" Variant="Text" Click="CloseSlidable" /></Grid>
+        <Grid ColumnDefinitions="*,Auto" MinHeight="64" Margin="16,0">
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="Swipe this row horizontally" FontWeight="SemiBold" />
+            <TextBlock Text="Ctrl+Left, Ctrl+Right and Escape also work" Opacity=".7" />
+          </StackPanel>
+          <md:MdButton Grid.Column="1" Content="Close" Variant="Text" Click="CloseSlidable" />
+        </Grid>
       </eco:MdSlidableItem>
-      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12"><md:MdTextBox Label="Filter people by name or team" ShowClearButton="True" Variant="Outlined" TextChanged="GridFilterChanged" /><StackPanel Grid.Column="1" Orientation="Horizontal"><md:MdButton Content="Sort name" Variant="Outlined" Click="SortGrid" /><md:MdButton Content="Preview copied rows" Variant="Text" Click="PreviewGridClipboard" /></StackPanel></Grid>
+      <WrapPanel Orientation="Horizontal">
+        <md:MdTextBox Width="300" MaxWidth="360" Label="Filter people by name or team" ShowClearButton="True" Variant="Outlined" TextChanged="GridFilterChanged" Margin="0,0,12,8" />
+        <md:MdButton Content="Sort name" Variant="Outlined" Click="SortGrid" Margin="0,0,8,8" />
+        <md:MdButton Content="Preview copied rows" Variant="Text" Click="PreviewGridClipboard" Margin="0,0,8,8" />
+      </WrapPanel>
       <eco:MdDataGrid x:Name="EnterpriseGrid" Height="240" />
       <TextBlock x:Name="GridStatus" Classes="body" Text="Virtualized rows, sortable columns, editable score cells." TextWrapping="Wrap" />
       <TextBlock Classes="h3" Text="Project board · responsive masonry cards" />
-      <TextBlock Classes="body" Text="Each uneven card is a real task target. Activate one to open its project context; the panel demonstrates dense dashboard reflow rather than decorative blocks." />
+      <TextBlock Classes="body" TextWrapping="Wrap" Text="Each uneven card is a real task target. Activate one to open its project context; the panel demonstrates dense dashboard reflow rather than decorative blocks." />
       <eco:MdMasonryPanel ColumnCount="3" Strategy="Quilted" ColumnSpacing="12" RowSpacing="12">
         <md:MdCard Height="120" Padding="16" Variant="Filled" Tag="Design review" Click="MasonryCardInvoked"><StackPanel><TextBlock FontWeight="Medium" Text="Design review" /><TextBlock Classes="body" Text="12 comments · open discussion" /></StackPanel></md:MdCard>
         <md:MdCard Height="72" Padding="16" Variant="Filled" Tag="Android build" Click="MasonryCardInvoked"><TextBlock Text="Android · ready" /></md:MdCard>
@@ -38,34 +53,41 @@
         <md:MdCard Height="112" Padding="16" Variant="Outlined" Tag="Release candidate" Click="MasonryCardInvoked"><TextBlock TextWrapping="Wrap" Text="Release candidate · package audit pending" /></md:MdCard>
       </eco:MdMasonryPanel>
       <TextBlock x:Name="MasonryStatus" Classes="body" Text="No project card opened." />
-      <StackPanel Orientation="Horizontal" Spacing="8"><md:MdButton Content="Load next page" Variant="Tonal" Click="LoadNextPage" /><md:MdButton Content="Refresh pages" Variant="Text" Click="RefreshPages" /></StackPanel>
+      <WrapPanel Orientation="Horizontal">
+        <md:MdButton Content="Load next page" Variant="Tonal" Click="LoadNextPage" Margin="0,0,8,8" />
+        <md:MdButton Content="Refresh pages" Variant="Text" Click="RefreshPages" Margin="0,0,8,8" />
+      </WrapPanel>
       <eco:MdPagedItemsView x:Name="PagedItems" AutoLoad="False" PageSize="4" EmptyContent="No records" Refreshed="PagesRefreshed" />
       <TextBlock x:Name="PagingStatus" Classes="body" Text="No page loaded. Load next page to append four records." />
     </StackPanel>
 
     <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="Wave C · Selection, calendar and feedback" />
-      <StackPanel Width="520" HorizontalAlignment="Left" Spacing="8">
-        <eco:MdAsyncSelect x:Name="AsyncSelect" Width="360" HorizontalAlignment="Left" SelectionCommitted="AsyncSelectionCommitted" />
+      <StackPanel MaxWidth="520" HorizontalAlignment="Stretch" Spacing="8">
+        <eco:MdAsyncSelect x:Name="AsyncSelect" MaxWidth="360" HorizontalAlignment="Stretch" SelectionCommitted="AsyncSelectionCommitted" />
         <TextBlock x:Name="AsyncSelectStatus" Classes="body" Text="Type a state name, then choose a visible result." />
       </StackPanel>
-      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="20">
-        <eco:MdCalendar x:Name="Calendar" Width="340" DateInvoked="CalendarDateInvoked" />
-        <eco:MdTimeline x:Name="Timeline" Grid.Column="1" />
-      </Grid>
+      <WrapPanel Orientation="Horizontal">
+        <eco:MdCalendar x:Name="Calendar" Width="320" DateInvoked="CalendarDateInvoked" Margin="0,0,16,16" />
+        <eco:MdTimeline x:Name="Timeline" MinWidth="260" Margin="0,0,16,16" />
+      </WrapPanel>
       <TextBlock x:Name="CalendarStatus" Text="Select a calendar date." />
-      <eco:MdCascader x:Name="Cascader" Width="520" HorizontalAlignment="Left" SelectionChanged="CascaderSelectionChanged" />
+      <eco:MdCascader x:Name="Cascader" MaxWidth="520" HorizontalAlignment="Stretch" SelectionChanged="CascaderSelectionChanged" />
       <TextBlock x:Name="CascaderStatus" Classes="body" Text="Open the hierarchy and choose a leaf destination." />
       <eco:MdTransfer x:Name="Transfer" SelectionChanged="TransferSelectionChanged" />
-      <TextBlock x:Name="TransferStatus" Classes="body" Text="2 capabilities selected. Drag one or several rows across, or use the arrow actions." />
+      <TextBlock x:Name="TransferStatus" Classes="body" Text="2 capabilities selected. Drag one or several rows across, or use the arrow actions." TextWrapping="Wrap" />
       <eco:MdResultView x:Name="ResultView" Kind="Empty" Title="Nothing here yet" Content="Create a record to see it in this result surface." ActionContent="Create record" />
     </StackPanel>
 
     <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="Wave D · Charts, rich editor contracts and chat" />
-      <StackPanel Orientation="Horizontal" Spacing="8"><md:MdButton Content="Line" Variant="Outlined" Tag="Line" Click="ChangeChartKind" /><md:MdButton Content="Bar" Variant="Outlined" Tag="Bar" Click="ChangeChartKind" /><TextBlock x:Name="ChartStatus" VerticalAlignment="Center" Text="Move the pointer across the chart." /></StackPanel>
+      <WrapPanel Orientation="Horizontal">
+        <md:MdButton Content="Line" Variant="Outlined" Tag="Line" Click="ChangeChartKind" Margin="0,0,8,8" />
+        <md:MdButton Content="Bar" Variant="Outlined" Tag="Bar" Click="ChangeChartKind" Margin="0,0,8,8" />
+        <TextBlock x:Name="ChartStatus" VerticalAlignment="Center" Text="Move the pointer across the chart." Margin="8,0,0,8" />
+      </WrapPanel>
       <eco:MdChart x:Name="Chart" Height="280" XAxisTitle="Month" YAxisTitle="Adoption (%)" AccessibleTitle="Monthly adoption and quality" HoveredPointChanged="ChartPointChanged" />
-      <TextBlock Classes="body" Text="Axes show localized numeric ticks and month labels; grouped bar bands stay completely inside the plot." />
+      <TextBlock Classes="body" Text="Axes show localized numeric ticks and month labels; grouped bar bands stay completely inside the plot." TextWrapping="Wrap" />
       <eco:MdRichEditor x:Name="RichEditor" MinHeight="220" EditorStateChanged="EditorStateChanged">
         <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
           <md:MdTextBox x:Name="EditorText" MinHeight="150" AcceptsReturn="True" TextWrapping="Wrap"
@@ -77,16 +99,19 @@
           </Border>
         </Grid>
       </eco:MdRichEditor>
-      <TextBlock x:Name="EditorStatus" Classes="body" Text="Select source text and choose a command; the rendered preview updates immediately." />
+      <TextBlock x:Name="EditorStatus" Classes="body" Text="Select source text and choose a command; the rendered preview updates immediately." TextWrapping="Wrap" />
       <eco:MdChatView x:Name="Chat" Height="440" MessageSubmitted="ChatSubmitted"
                       MessageSelectionChanged="ChatSelectionChanged" DeleteRequested="ChatDeleteRequested"
                       QuoteRequested="ChatQuoteRequested" RetryRequested="ChatRetryRequested" />
-      <TextBlock x:Name="ChatStatus" Classes="body" Text="Select one or more bubbles to quote, cancel, or delete. Failed bubbles expose Retry; suggestions fill the composer." />
+      <TextBlock x:Name="ChatStatus" Classes="body" Text="Select one or more bubbles to quote, cancel, or delete. Failed bubbles expose Retry; suggestions fill the composer." TextWrapping="Wrap" />
     </StackPanel>
 
     <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="Wave E · Skeleton and sequence" />
-      <StackPanel Orientation="Horizontal" Spacing="8"><md:MdButton Content="Toggle loading" Variant="Tonal" Click="ToggleSkeleton" /><md:MdButton Content="Replay sequence" Variant="Text" Click="ReplaySequence" /></StackPanel>
+      <WrapPanel Orientation="Horizontal">
+        <md:MdButton Content="Toggle loading" Variant="Tonal" Click="ToggleSkeleton" Margin="0,0,8,8" />
+        <md:MdButton Content="Replay sequence" Variant="Text" Click="ReplaySequence" Margin="0,0,8,8" />
+      </WrapPanel>
       <eco:MdSkeleton x:Name="Skeleton" Height="72" IsLoading="True"><Border Padding="16" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"><TextBlock Text="Loaded content" /></Border></eco:MdSkeleton>
       <eco:MdAnimationSequence x:Name="Sequence" AutoPlay="True" ItemDelay="0:0:0.08" Orientation="Horizontal" Spacing="8"><Border Width="88" Height="64" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" /><Border Width="88" Height="64" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /><Border Width="88" Height="64" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" /></eco:MdAnimationSequence>
     </StackPanel>
@@ -96,47 +121,52 @@
       <TextBlock Classes="h3" Text="PIN / OTP input" />
       <TextBlock Classes="body" TextWrapping="Wrap" Text="Click the segmented field, type or paste six digits, then use direct APIs to exercise masking, errors and completion." />
       <eco:MdPinInput x:Name="PinInput" Length="6" Completed="PinCompleted" HorizontalAlignment="Left" />
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <md:MdButton Content="Set demo code" Variant="Tonal" Click="SetPinDemo" />
-        <md:MdButton Content="Clear" Variant="Text" Click="ClearPin" />
-        <md:MdButton Content="Toggle mask" Variant="Outlined" Click="TogglePinMask" />
-        <md:MdButton Content="Toggle error" Variant="Text" Click="TogglePinError" />
-      </StackPanel>
+      <WrapPanel Orientation="Horizontal">
+        <md:MdButton Content="Set demo code" Variant="Tonal" Click="SetPinDemo" Margin="0,0,8,8" />
+        <md:MdButton Content="Clear" Variant="Text" Click="ClearPin" Margin="0,0,8,8" />
+        <md:MdButton Content="Toggle mask" Variant="Outlined" Click="TogglePinMask" Margin="0,0,8,8" />
+        <md:MdButton Content="Toggle error" Variant="Text" Click="TogglePinError" Margin="0,0,8,8" />
+      </WrapPanel>
       <TextBlock x:Name="PinStatus" Classes="body" Text="Awaiting a six-digit verification code." />
 
       <TextBlock Classes="h3" Margin="0,12,0,0" Text="Tree view" />
       <TextBlock Classes="body" TextWrapping="Wrap" Text="Expand folders, select rows, use Left/Right/Enter, or switch to RTL to verify mirrored hierarchy navigation." />
       <eco:MdTreeView x:Name="Tree" Height="280" NodeInvoked="TreeNodeInvoked" ExpansionChanged="TreeExpansionChanged" />
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <md:MdButton Content="Expand all" Variant="Tonal" Click="ExpandTree" />
-        <md:MdButton Content="Collapse all" Variant="Text" Click="CollapseTree" />
-        <md:MdButton Content="Select Android" Variant="Outlined" Click="SelectAndroidNode" />
-        <md:MdButton Content="Toggle RTL" Variant="Text" Click="ToggleTreeRtl" />
-      </StackPanel>
+      <WrapPanel Orientation="Horizontal">
+        <md:MdButton Content="Expand all" Variant="Tonal" Click="ExpandTree" Margin="0,0,8,8" />
+        <md:MdButton Content="Collapse all" Variant="Text" Click="CollapseTree" Margin="0,0,8,8" />
+        <md:MdButton Content="Select Android" Variant="Outlined" Click="SelectAndroidNode" Margin="0,0,8,8" />
+        <md:MdButton Content="Toggle RTL" Variant="Text" Click="ToggleTreeRtl" Margin="0,0,8,8" />
+      </WrapPanel>
       <TextBlock x:Name="TreeStatus" Classes="body" Text="Choose a node; Enter invokes the selected task." />
 
       <TextBlock Classes="h3" Margin="0,12,0,0" Text="Tag input" />
       <TextBlock Classes="body" TextWrapping="Wrap" Text="Type to filter suggestions, press Enter or comma to add, click a suggestion, and use each chip’s remove action. Backspace removes the last chip when the editor is empty." />
       <eco:MdTagInput x:Name="TagInput" MaximumTags="6" PlaceholderText="Add release capability" TagAdded="TagAdded" TagRemoved="TagRemoved" />
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <md:MdButton Content="Add Localization" Variant="Tonal" Click="AddLocalizationTag" />
-        <md:MdButton Content="Clear tags" Variant="Text" Click="ClearTags" />
-      </StackPanel>
+      <WrapPanel Orientation="Horizontal">
+        <md:MdButton Content="Add Localization" Variant="Tonal" Click="AddLocalizationTag" Margin="0,0,8,8" />
+        <md:MdButton Content="Clear tags" Variant="Text" Click="ClearTags" Margin="0,0,8,8" />
+      </WrapPanel>
       <TextBlock x:Name="TagStatus" Classes="body" Text="2 capabilities selected; add up to 6." />
     </StackPanel>
 
     <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="Existing clean-room controls" />
       <TextBlock Classes="body" Text="Assign the review to a teammate; the avatar is the actionable identity, not decoration." />
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <md:MdButton Tag="Avery Lee" Height="64" ContainerHeight="64" Padding="12,0" Variant="Text" Click="AssignReviewer"><StackPanel Orientation="Horizontal" Spacing="8"><eco:MdAvatar Initials="AL" /><TextBlock VerticalAlignment="Center" Text="Avery" /></StackPanel></md:MdButton>
-        <md:MdButton Tag="Morgan Three" Height="64" ContainerHeight="64" Padding="12,0" Variant="Text" Click="AssignReviewer"><StackPanel Orientation="Horizontal" Spacing="8"><eco:MdAvatar Initials="M3" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" /><TextBlock VerticalAlignment="Center" Text="Morgan" /></StackPanel></md:MdButton>
-        <md:MdButton Tag="Uma Ito" Height="64" ContainerHeight="64" Padding="12,0" Variant="Text" Click="AssignReviewer"><StackPanel Orientation="Horizontal" Spacing="8"><eco:MdAvatar Initials="UI" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" Foreground="{DynamicResource Md.Sys.Color.OnTertiaryContainer.Brush}" /><TextBlock VerticalAlignment="Center" Text="Uma" /></StackPanel></md:MdButton>
-      </StackPanel>
+      <WrapPanel Orientation="Horizontal">
+        <md:MdButton Tag="Avery Lee" Height="64" ContainerHeight="64" Padding="12,0" Variant="Text" Click="AssignReviewer" Margin="0,0,8,8"><StackPanel Orientation="Horizontal" Spacing="8"><eco:MdAvatar Initials="AL" /><TextBlock VerticalAlignment="Center" Text="Avery" /></StackPanel></md:MdButton>
+        <md:MdButton Tag="Morgan Three" Height="64" ContainerHeight="64" Padding="12,0" Variant="Text" Click="AssignReviewer" Margin="0,0,8,8"><StackPanel Orientation="Horizontal" Spacing="8"><eco:MdAvatar Initials="M3" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" /><TextBlock VerticalAlignment="Center" Text="Morgan" /></StackPanel></md:MdButton>
+        <md:MdButton Tag="Uma Ito" Height="64" ContainerHeight="64" Padding="12,0" Variant="Text" Click="AssignReviewer" Margin="0,0,8,8"><StackPanel Orientation="Horizontal" Spacing="8"><eco:MdAvatar Initials="UI" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" Foreground="{DynamicResource Md.Sys.Color.OnTertiaryContainer.Brush}" /><TextBlock VerticalAlignment="Center" Text="Uma" /></StackPanel></md:MdButton>
+      </WrapPanel>
       <TextBlock x:Name="ReviewerStatus" Classes="body" Text="No reviewer assigned." />
       <TextBlock Classes="body" Text="Click a specific half-star; spacing does not alter the selected step." />
       <eco:MdRating x:Name="Rating" Width="176" HorizontalAlignment="Left" Value="3.5" Precision="0.5" ValueChanged="RatingChanged" /><TextBlock x:Name="RatingStatus" Classes="body" Text="Rating 3.5 of 5" />
-      <eco:MdBreadcrumb x:Name="Breadcrumb" ItemInvoked="BreadcrumbInvoked"><TextBlock Text="Home" /><TextBlock Text="Components" /><TextBlock Text="Ecosystem" /></eco:MdBreadcrumb><TextBlock x:Name="BreadcrumbStatus" Classes="body" Text="Choose a path segment." />
+      <eco:MdBreadcrumb x:Name="Breadcrumb" ItemInvoked="BreadcrumbInvoked">
+        <eco:MdBreadcrumbItem Label="Home" Icon="{x:Static md:MdSymbols.Home}" />
+        <eco:MdBreadcrumbItem Label="Components" Icon="{x:Static md:MdSymbols.Settings}" />
+        <eco:MdBreadcrumbItem Label="Ecosystem" Icon="{x:Static md:MdSymbols.Code}" IsCurrent="True" />
+      </eco:MdBreadcrumb>
+      <TextBlock x:Name="BreadcrumbStatus" Classes="body" Text="Choose a path segment." />
     </StackPanel>
 
     <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage" /><gallery:CodeExample XamlCode="&lt;eco:MdAsyncSelect Query=&quot;{Binding Query}&quot; SelectedItem=&quot;{Binding Choice}&quot; /&gt;&#10;&lt;eco:MdDataGrid DataSource=&quot;{Binding Rows}&quot; /&gt;&#10;&lt;eco:MdChart Series=&quot;{Binding Series}&quot; /&gt;&#10;&lt;eco:MdChatView MessagesSource=&quot;{Binding Messages}&quot; SendCommand=&quot;{Binding SendCommand}&quot; /&gt;&#10;&lt;eco:MdPinInput Code=&quot;{Binding VerificationCode}&quot; CompletedCommand=&quot;{Binding VerifyCommand}&quot; /&gt;&#10;&lt;eco:MdTreeView Roots=&quot;{Binding ProjectNodes}&quot; SelectedNode=&quot;{Binding SelectedNode}&quot; /&gt;&#10;&lt;eco:MdTagInput TagsSource=&quot;{Binding Tags}&quot; SuggestionsSource=&quot;{Binding Suggestions}&quot; TagAddedCommand=&quot;{Binding TagAddedCommand}&quot; /&gt;" CSharpCode="var pages = new MdPagedItemsView();&#10;pages.PageProvider = request =&gt; service.LoadPageAsync(request);&#10;&#10;var editor = new MdRichEditor { Adapter = myEditorAdapter };&#10;&#10;pin.SetCode(&quot;273841&quot;);&#10;tree.ExpandAll();&#10;tree.SelectById(&quot;android&quot;);&#10;tags.AddTag(&quot;Localization&quot;);&#10;tags.RemoveTag(&quot;Draft&quot;);&#10;&#10;var window = new MdBorderlessWindow { PlatformAdapter = customAdapter };" /></StackPanel>

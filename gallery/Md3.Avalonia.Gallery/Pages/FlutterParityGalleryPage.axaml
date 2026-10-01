@@ -191,6 +191,29 @@
       </StackPanel>
 
       <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
+        <TextBlock Classes="h2" Text="Phase 4 · Soft keyboard avoidance host" />
+        <TextBlock Classes="body" Text="Simulate a virtual keyboard inset to verify that the host automatically adjusts viewport bottom padding and scrolls focused text controls into view." />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <md:MdButton Content="Toggle virtual keyboard" Variant="Outlined" Click="ToggleVirtualKeyboard" />
+          <md:MdButton Content="Focus bottom input" Variant="Text" Click="FocusBottomInput" />
+        </StackPanel>
+        <Border Height="260" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="16" ClipToBounds="True">
+          <md:MdKeyboardAvoidingHost x:Name="DemoKeyboardHost" AutoScrollToFocused="True" ExtraBottomOffset="16">
+            <md:MdScrollViewer VerticalScrollBarVisibility="Auto">
+              <StackPanel Margin="16" Spacing="12">
+                <TextBlock FontWeight="Medium" Text="Scrollable form area" />
+                <md:MdTextBox Label="Top input" Text="First item" />
+                <Border Height="80" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" CornerRadius="12" />
+                <md:MdTextBox x:Name="BottomInput" Label="Bottom input" Text="Second item" />
+                <Border Height="120" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" CornerRadius="12" />
+              </StackPanel>
+            </md:MdScrollViewer>
+          </md:MdKeyboardAvoidingHost>
+        </Border>
+        <TextBlock x:Name="KeyboardStatus" Classes="body" Text="Virtual keyboard inactive (height: 0dp)." />
+      </StackPanel>
+
+      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
         <TextBlock Classes="h2" Text="Adaptive controls · cross-platform sync settings" />
         <TextBlock Classes="body" Text="The switches choose the platform policy. Run the same upload to compare Material and Cupertino progress metrics." />
         <WrapPanel>

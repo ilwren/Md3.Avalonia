@@ -30,7 +30,7 @@
       <ControlTemplate TargetType="md:MdTooltipHost">
         <Grid>
           <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
-          <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}" IsLightDismissEnabled="True" OverlayDismissEventPassThrough="True" Placement="{TemplateBinding Placement}" PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}" HorizontalOffset="{TemplateBinding HorizontalOffset}" VerticalOffset="{TemplateBinding VerticalOffset}" InheritsTransform="True" ShouldUseOverlayLayer="False" WindowManagerAddShadowHint="False">
+          <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}" IsLightDismissEnabled="True" OverlayDismissEventPassThrough="True" Placement="{TemplateBinding Placement}" PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}" HorizontalOffset="{TemplateBinding HorizontalOffset}" VerticalOffset="{TemplateBinding VerticalOffset}" InheritsTransform="True" WindowManagerAddShadowHint="False">
             <Popup.Styles>
               <Style Selector="PopupRoot">
                 <Setter Property="Background" Value="Transparent" />

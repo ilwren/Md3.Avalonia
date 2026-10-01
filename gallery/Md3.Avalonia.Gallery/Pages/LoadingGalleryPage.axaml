@@ -5,21 +5,32 @@
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.LoadingGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Spacing="28">
-      <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Loading indicator"/><TextBlock Classes="body" Text="An expressive morphing shape communicates an indeterminate wait without showing exact progress."/></StackPanel>
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Loading indicator" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="An expressive morphing shape communicates an indeterminate wait without showing exact progress." />
+      </StackPanel>
+
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Sizes and motion schemes" />
-        <StackPanel Orientation="Horizontal" Spacing="36" VerticalAlignment="Center">
-          <StackPanel Spacing="8"><md:MdLoadingIndicator Size="32"/><TextBlock HorizontalAlignment="Center" Text="32"/></StackPanel>
-          <StackPanel Spacing="8"><md:MdLoadingIndicator Size="48"/><TextBlock HorizontalAlignment="Center" Text="48"/></StackPanel>
-          <StackPanel Spacing="8"><md:MdLoadingIndicator Size="64"/><TextBlock HorizontalAlignment="Center" Text="64"/></StackPanel>
-          <StackPanel Spacing="8"><md:MdLoadingIndicator Size="56" IsContained="True"/><TextBlock HorizontalAlignment="Center" Text="Contained"/></StackPanel>
-          <StackPanel Spacing="8" motion:MdMotion.Scheme="Reduced"><md:MdLoadingIndicator Size="48"/><TextBlock HorizontalAlignment="Center" Text="Reduced"/></StackPanel>
-          <StackPanel Spacing="8" motion:MdMotion.Scheme="None"><md:MdLoadingIndicator Size="48"/><TextBlock HorizontalAlignment="Center" Text="None"/></StackPanel>
-        </StackPanel>
+        <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+          <StackPanel Spacing="8" Margin="0,0,28,16"><md:MdLoadingIndicator Size="32"/><TextBlock HorizontalAlignment="Center" Text="32"/></StackPanel>
+          <StackPanel Spacing="8" Margin="0,0,28,16"><md:MdLoadingIndicator Size="48"/><TextBlock HorizontalAlignment="Center" Text="48"/></StackPanel>
+          <StackPanel Spacing="8" Margin="0,0,28,16"><md:MdLoadingIndicator Size="64"/><TextBlock HorizontalAlignment="Center" Text="64"/></StackPanel>
+          <StackPanel Spacing="8" Margin="0,0,28,16"><md:MdLoadingIndicator Size="56" IsContained="True"/><TextBlock HorizontalAlignment="Center" Text="Contained"/></StackPanel>
+          <StackPanel Spacing="8" Margin="0,0,28,16" motion:MdMotion.Scheme="Reduced"><md:MdLoadingIndicator Size="48"/><TextBlock HorizontalAlignment="Center" Text="Reduced"/></StackPanel>
+          <StackPanel Spacing="8" Margin="0,0,28,16" motion:MdMotion.Scheme="None"><md:MdLoadingIndicator Size="48"/><TextBlock HorizontalAlignment="Center" Text="None"/></StackPanel>
+        </WrapPanel>
       </StackPanel>
-      <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"><TextBlock Classes="body" TextWrapping="Wrap" Text="IsActive pauses rendering work. The inherited MdMotion scheme reduces or disables decorative movement."/></Border>
-      <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdLoadingIndicator Size=&quot;48&quot; IsActive=&quot;{Binding IsLoading}&quot; /&gt;" CSharpCode="var loading = new MdLoadingIndicator { Size = 48, IsActive = true };&#10;loading.IsActive = viewModel.IsLoading;" /></StackPanel>
+
+      <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="IsActive pauses rendering work. The inherited MdMotion scheme reduces or disables decorative movement."/>
+      </Border>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdLoadingIndicator Size=&quot;48&quot; IsActive=&quot;{Binding IsLoading}&quot; /&gt;" CSharpCode="var loading = new MdLoadingIndicator { Size = 48, IsActive = true };&#10;loading.IsActive = viewModel.IsLoading;" />
+      </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>
 </UserControl>

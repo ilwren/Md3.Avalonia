@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'arena/**'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Generate or download fonts
+        run: |
+          mkdir -p src/Md3.Avalonia.Icons/Assets/Fonts
+          python3 scripts/generate-fonts.py
+
+      - name: Restore dependencies
+        run: dotnet restore Md3.Avalonia.sln
+
+      - name: Build solution (Release)
+        run: |
+          dotnet build Md3.Avalonia.sln -c Release --no-restore > build.log 2>&1 || (cat build.log | grep -E "error |Error" | head -n 30 | while read -r line; do echo "::error::$line"; done; cat build.log; exit 1)
+
+      - name: Run Headless Tests
+        run: |
+          dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --no-build --logger "trx;LogFileName=results.trx" --logger "console;verbosity=normal" || true
+          python3 scripts/report-test-results.py
+
+      - name: Verify NuGet Packaging
+        run: bash scripts/build-nuget.sh

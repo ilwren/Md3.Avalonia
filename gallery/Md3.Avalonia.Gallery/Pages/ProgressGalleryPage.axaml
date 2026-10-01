@@ -4,24 +4,36 @@
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.ProgressGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Spacing="28">
-      <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Progress indicators"/><TextBlock Classes="body" Text="Linear and circular indicators report determinate progress or an indeterminate ongoing process."/></StackPanel>
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Progress indicators" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Linear and circular indicators report determinate progress or an indeterminate ongoing process." />
+      </StackPanel>
+
       <StackPanel Spacing="14">
         <TextBlock Classes="h2" Text="Linear" />
-        <md:MdLinearProgressIndicator Width="620" Value="64" />
-        <md:MdLinearProgressIndicator Width="620" Value="42" Shape="Wavy" TrackThickness="4" WaveAmplitude="3" />
-        <md:MdLinearProgressIndicator Width="620" IsIndeterminate="True" />
+        <md:MdLinearProgressIndicator MaxWidth="620" Value="64" HorizontalAlignment="Stretch" />
+        <md:MdLinearProgressIndicator MaxWidth="620" Value="42" Shape="Wavy" TrackThickness="4" WaveAmplitude="3" HorizontalAlignment="Stretch" />
+        <md:MdLinearProgressIndicator MaxWidth="620" IsIndeterminate="True" HorizontalAlignment="Stretch" />
       </StackPanel>
+
       <StackPanel Spacing="14">
         <TextBlock Classes="h2" Text="Circular" />
-        <StackPanel Orientation="Horizontal" Spacing="28">
-          <md:MdCircularProgressIndicator Value="72" />
-          <md:MdCircularProgressIndicator Value="35" Size="64" StrokeThickness="6" />
-          <md:MdCircularProgressIndicator IsIndeterminate="True" />
-        </StackPanel>
+        <WrapPanel Orientation="Horizontal">
+          <md:MdCircularProgressIndicator Value="72" Margin="0,0,28,16" />
+          <md:MdCircularProgressIndicator Value="35" Size="64" StrokeThickness="6" Margin="0,0,28,16" />
+          <md:MdCircularProgressIndicator IsIndeterminate="True" Margin="0,0,28,16" />
+        </WrapPanel>
       </StackPanel>
-      <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"><TextBlock Classes="body" Text="Active and stop indicators use Primary; the track uses SecondaryContainer. Value, Minimum, Maximum, and IsIndeterminate retain native ProgressBar semantics." TextWrapping="Wrap"/></Border>
-      <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdLinearProgressIndicator Value=&quot;{Binding Progress}&quot; Shape=&quot;Wavy&quot; /&gt;&#10;&lt;md:MdCircularProgressIndicator IsIndeterminate=&quot;True&quot; /&gt;" CSharpCode="var linear = new MdLinearProgressIndicator { Value = 64, Shape = MdProgressShape.Wavy };&#10;var circular = new MdCircularProgressIndicator { IsIndeterminate = true };" /></StackPanel>
+
+      <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+        <TextBlock Classes="body" Text="Active and stop indicators use Primary; the track uses SecondaryContainer. Value, Minimum, Maximum, and IsIndeterminate retain native ProgressBar semantics." TextWrapping="Wrap"/>
+      </Border>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdLinearProgressIndicator Value=&quot;{Binding Progress}&quot; Shape=&quot;Wavy&quot; /&gt;&#10;&lt;md:MdCircularProgressIndicator IsIndeterminate=&quot;True&quot; /&gt;" CSharpCode="var linear = new MdLinearProgressIndicator { Value = 64, Shape = MdProgressShape.Wavy };&#10;var circular = new MdCircularProgressIndicator { IsIndeterminate = true };" />
+      </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>
 </UserControl>

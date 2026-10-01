@@ -1,0 +1,107 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             x:Class="Md3.Avalonia.Gallery.Pages.ClockSamplePage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel MaxWidth="640" Spacing="24" HorizontalAlignment="Center" Margin="16,24,16,40">
+      
+      <!-- Big Digital Clock Display -->
+      <Border Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="28">
+        <StackPanel Spacing="8" HorizontalAlignment="Center">
+          <TextBlock x:Name="ClockTimeText"
+                     Text="08:45"
+                     FontSize="56"
+                     FontWeight="Bold"
+                     Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                     HorizontalAlignment="Center" />
+          <TextBlock Text="Thursday, Sep 28 · Next alarm at 06:30 AM"
+                     FontSize="14"
+                     Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                     HorizontalAlignment="Center" />
+        </StackPanel>
+      </Border>
+
+      <!-- Sub Navigation TabView -->
+      <md:MdTabView SelectedIndex="0">
+        <!-- Tab 1: Alarm -->
+        <md:MdTabViewItem Header="Alarm" Icon="{x:Static md:MdSymbols.Alarm}">
+          <StackPanel Spacing="16" Margin="0,16,0,0">
+            <!-- Alarm item 1 -->
+            <Border Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="20">
+              <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="06:30 AM" FontSize="28" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+                  <TextBlock Text="Mon, Tue, Wed, Thu, Fri · Work" FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+                <md:MdSwitch Grid.Column="1" IsChecked="True" />
+              </Grid>
+            </Border>
+
+            <!-- Alarm item 2 -->
+            <Border Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="20">
+              <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+                <StackPanel Spacing="4">
+                  <TextBlock Text="08:00 AM" FontSize="28" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+                  <TextBlock Text="Sat, Sun · Weekend" FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+                <md:MdSwitch Grid.Column="1" IsChecked="False" />
+              </Grid>
+            </Border>
+
+            <md:MdButton Variant="Tonal" HorizontalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <md:MdIcon Glyph="{x:Static md:MdSymbols.Add}" Size="20" />
+                <TextBlock Text="Add new alarm" VerticalAlignment="Center" />
+              </StackPanel>
+            </md:MdButton>
+          </StackPanel>
+        </md:MdTabViewItem>
+
+        <!-- Tab 2: World Clock -->
+        <md:MdTabViewItem Header="World Clock" Icon="{x:Static md:MdSymbols.Public}">
+          <StackPanel Spacing="12" Margin="0,16,0,0">
+            <Border Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="16">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="Tokyo, Japan" FontSize="16" FontWeight="SemiBold" />
+                  <TextBlock Text="Today, +1 hr ahead" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="09:45 PM" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+              </Grid>
+            </Border>
+            <Border Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="16">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="London, UK" FontSize="16" FontWeight="SemiBold" />
+                  <TextBlock Text="Today, -8 hrs behind" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="12:45 PM" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+              </Grid>
+            </Border>
+            <Border Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="16">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="New York, USA" FontSize="16" FontWeight="SemiBold" />
+                  <TextBlock Text="Today, -13 hrs behind" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="07:45 AM" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+              </Grid>
+            </Border>
+          </StackPanel>
+        </md:MdTabViewItem>
+
+        <!-- Tab 3: Timer -->
+        <md:MdTabViewItem Header="Timer" Icon="{x:Static md:MdSymbols.Timer}">
+          <StackPanel Spacing="24" Margin="0,24,0,0" HorizontalAlignment="Center">
+            <TextBlock Text="15:00" FontSize="48" FontWeight="Bold" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" HorizontalAlignment="Center" />
+            <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Center">
+              <md:MdButton Variant="Outlined" Content="Reset" Width="100" />
+              <md:MdButton Variant="Filled" Content="Start" Width="100" />
+            </StackPanel>
+          </StackPanel>
+        </md:MdTabViewItem>
+      </md:MdTabView>
+
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

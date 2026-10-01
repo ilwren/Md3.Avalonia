@@ -90,6 +90,11 @@
             <TextBlock Margin="14,4,14,8" FontSize="22" FontWeight="Medium" Text="Components" />
             <md:MdButton x:Name="ComponentsOverviewNav" Content="Components overview" Variant="Text" HorizontalContentAlignment="Left" Click="ShowComponents" />
             <Border Margin="0,12,0,4" Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+            <TextBlock Margin="14,8,14,10" Classes="body" Text="SAMPLES &amp; APPS" />
+            <md:MdButton x:Name="AndroidSettingsNav" Content="Android settings" Variant="Text" HorizontalContentAlignment="Left" Click="ShowAndroidSettings" />
+            <md:MdButton x:Name="ClockNav" Content="Clock app" Variant="Text" HorizontalContentAlignment="Left" Click="ShowClock" />
+            <md:MdButton x:Name="TasksNav" Content="Tasks &amp; todo" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTasks" />
+            <Border Margin="0,12,0,4" Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
             <TextBlock Margin="14,8,14,10" Classes="body" Text="LIBRARY EXTENSIONS" />
             <md:MdButton x:Name="DesktopAdaptersNav" Content="Desktop adapters" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDesktopAdapters" />
             <md:MdButton x:Name="ThemeResourcesNav" Content="Theme Lab" Variant="Text" HorizontalContentAlignment="Left" Click="ShowThemeResources" />
@@ -102,6 +107,7 @@
             <md:MdButton x:Name="FabNav" Content="FABs" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFabs" />
             <md:MdButton x:Name="AppBarNav" Content="App bars" Variant="Text" HorizontalContentAlignment="Left" Click="ShowAppBars" />
             <md:MdButton x:Name="BadgeNav" Content="Badges" Variant="Text" HorizontalContentAlignment="Left" Click="ShowBadges" />
+            <md:MdButton x:Name="BreadcrumbNav" Content="Breadcrumbs" Variant="Text" HorizontalContentAlignment="Left" Click="ShowBreadcrumbs" />
             <md:MdButton x:Name="TextFieldNav" Content="Text fields" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTextFields" />
             <md:MdButton x:Name="CheckBoxNav" Content="Checkbox" Variant="Text" HorizontalContentAlignment="Left" Click="ShowCheckBoxes" />
             <md:MdButton x:Name="RadioButtonNav" Content="Radio buttons" Variant="Text" HorizontalContentAlignment="Left" Click="ShowRadioButtons" />
@@ -110,6 +116,7 @@
             <md:MdButton x:Name="CardNav" Content="Cards" Variant="Text" HorizontalContentAlignment="Left" Click="ShowCards" />
             <md:MdButton x:Name="ChipNav" Content="Chips" Variant="Text" HorizontalContentAlignment="Left" Click="ShowChips" />
             <md:MdButton x:Name="PickerNav" Content="Date &amp; time pickers" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPickers" />
+            <md:MdButton x:Name="ColorPickerNav" Content="Color picker" Variant="Text" HorizontalContentAlignment="Left" Click="ShowColorPicker" />
             <md:MdButton x:Name="DialogNav" Content="Dialogs" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDialogs" />
             <md:MdButton x:Name="DividerNav" Content="Divider" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDivider" />
             <md:MdButton x:Name="ListNav" Content="Lists" Variant="Text" HorizontalContentAlignment="Left" Click="ShowLists" />
@@ -120,6 +127,7 @@
             <md:MdButton x:Name="NavigationDrawerNav" Content="Navigation drawer" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNavigationDrawer" />
             <md:MdButton x:Name="AdaptiveNav" Content="Navigation rail &amp; adaptive" Variant="Text" HorizontalContentAlignment="Left" Click="ShowAdaptive" />
             <md:MdButton x:Name="SearchNav" Content="Search" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSearch" />
+            <md:MdButton x:Name="SettingsCardNav" Content="Settings cards" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSettingsCard" />
             <md:MdButton x:Name="SheetNav" Content="Sheets" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSheets" />
             <md:MdButton x:Name="SliderNav" Content="Slider" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSlider" />
             <md:MdButton x:Name="AdvancedSelectionNav" Content="Segmented &amp; range" Variant="Text" HorizontalContentAlignment="Left" Click="ShowAdvancedSelection" />

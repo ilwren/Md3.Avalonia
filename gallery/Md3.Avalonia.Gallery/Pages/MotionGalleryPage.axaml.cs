@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -33,6 +34,24 @@ public partial class MotionGalleryPage : UserControl
         _atEnd = !_atEnd;
         _startedAt = Stopwatch.GetTimestamp();
         _timer.Start();
+    }
+
+    private void OnMorphClicked(object? sender, RoutedEventArgs e)
+    {
+        if (MorphDemo is not null)
+            MorphDemo.Toggle();
+    }
+
+    private void OnMorphClicked(object? sender, PointerPressedEventArgs e)
+    {
+        if (MorphDemo is not null)
+            MorphDemo.Toggle();
+    }
+
+    private void OnTogglePanelClicked(object? sender, RoutedEventArgs e)
+    {
+        if (AnimatedPanel is not null)
+            AnimatedPanel.IsContentVisible = !AnimatedPanel.IsContentVisible;
     }
 
     private void Animate(object? sender, EventArgs e)

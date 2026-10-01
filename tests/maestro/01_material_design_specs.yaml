@@ -1,0 +1,27 @@
+appId: io.arena.md3avalonia.gallery
+tags:
+  - m3-compliance
+  - visual-validation
+---
+# 1. Launch App & Assert Material 3 Scaffold
+- launchApp
+- assertVisible: "Material 3 · Avalonia"
+- assertVisible: "Material 3 Components"
+
+# 2. Verify M3 Touch Target (Minimum 48dp) and Buttons
+- tapOn: "Filled"
+- tapOn: "Tonal"
+- tapOn: "Outlined"
+
+# 3. Verify Text Field Focus & State Layers
+- tapOn: "Avalonia on Android"
+- eraseText: 5
+- inputText: "Test"
+- assertVisible: "Avalonia on Test"
+
+# 4. Verify M3 Switches & Checkboxes
+- tapOn: "Dynamic color"
+- tapOn: "Touch target and state layer"
+
+# 5. Capture Snapshot for Visual Regression Testing
+- takeScreenshot: "m3_components_android_baseline"
