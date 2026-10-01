@@ -357,7 +357,14 @@ public sealed class MdCalendar : TemplatedControl
     static MdCalendar()
     {
         DisplayMonthProperty.Changed.AddClassHandler<MdCalendar>((control, _) => control.Rebuild());
-        SelectedDateProperty.Changed.AddClassHandler<MdCalendar>((control, _) => control.Rebuild());
+        SelectedDateProperty.Changed.AddClassHandler<MdCalendar>((control, change) =>
+        {
+            if (change.NewValue is DateTimeOffset date && (control.DisplayMonth.Year != date.Year || control.DisplayMonth.Month != date.Month))
+            {
+                control.DisplayMonth = new DateTimeOffset(date.Year, date.Month, 1, 0, 0, 0, date.Offset);
+            }
+            control.Rebuild();
+        });
         RangeEndProperty.Changed.AddClassHandler<MdCalendar>((control, _) => control.Rebuild());
         SelectionModeProperty.Changed.AddClassHandler<MdCalendar>((control, _) => control.Rebuild());
         MdLocalization.CultureProperty.Changed.AddClassHandler<MdCalendar>((control, _) => control.Rebuild());
@@ -380,6 +387,7 @@ public sealed class MdCalendar : TemplatedControl
     public bool BeginRangeSelection(DateTimeOffset date)
     {
         if (SelectionMode != MdCalendarSelectionMode.Range || IsDateEnabled?.Invoke(date) == false) return false;
+        DisplayMonth = new DateTimeOffset(date.Year, date.Month, 1, 0, 0, 0, date.Offset);
         _dragAnchor = date.Date;
         _dragRangeActive = true;
         _dragRangeMoved = false;
@@ -421,6 +429,7 @@ public sealed class MdCalendar : TemplatedControl
     {
         if (IsDateEnabled?.Invoke(date) == false) return;
         date = date.Date;
+        DisplayMonth = new DateTimeOffset(date.Year, date.Month, 1, 0, 0, 0, date.Offset);
         if (SelectionMode == MdCalendarSelectionMode.Multiple)
         {
             if (!_multipleDates.Add(date.Date)) _multipleDates.Remove(date.Date);
