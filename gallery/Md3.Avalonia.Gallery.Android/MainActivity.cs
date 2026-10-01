@@ -11,6 +11,7 @@ namespace Md3.Avalonia.Gallery.Android;
 [Activity(
     Label = "Material 3 Gallery",
     Theme = "@style/MyTheme.NoActionBar",
+    Icon = "@drawable/icon",
     MainLauncher = true,
     ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
 public sealed class MainActivity : AvaloniaMainActivity

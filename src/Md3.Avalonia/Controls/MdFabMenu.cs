@@ -224,8 +224,25 @@ public class MdFabMenu : ItemsControl
 
     private void UpdateAlignment()
     {
-        PseudoClasses.Set(":left", Alignment == MdFabAlignment.Left);
-        PseudoClasses.Set(":right", Alignment == MdFabAlignment.Right);
+        var isLeft = Alignment == MdFabAlignment.Left;
+        PseudoClasses.Set(":left", isLeft);
+        PseudoClasses.Set(":right", !isLeft);
+        var hAlign = isLeft ? global::Avalonia.Layout.HorizontalAlignment.Left : global::Avalonia.Layout.HorizontalAlignment.Right;
+        if (_menuItems is not null)
+        {
+            _menuItems.HorizontalAlignment = hAlign;
+            _menuItems.RenderTransformOrigin = isLeft
+                ? new RelativePoint(0, 1, RelativeUnit.Relative)
+                : new RelativePoint(1, 1, RelativeUnit.Relative);
+            if (_menuItems.Panel is Control panel)
+            {
+                panel.HorizontalAlignment = hAlign;
+            }
+        }
+        if (_trigger is not null)
+        {
+            _trigger.HorizontalAlignment = hAlign;
+        }
         UpdateMenuItemGeometry();
     }
 }
