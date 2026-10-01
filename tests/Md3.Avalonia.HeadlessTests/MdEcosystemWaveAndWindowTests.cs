@@ -7,8 +7,8 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Md3.Avalonia.Controls;
-using Md3.Avalonia.Ecosystem.Controls;
-using Md3.Avalonia.Ecosystem.Infrastructure;
+using Md3.Avalonia.Extra.Controls;
+using Md3.Avalonia.Extra.Infrastructure;
 using Md3.Avalonia.Gallery.Pages;
 using Xunit;
 

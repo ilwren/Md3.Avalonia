@@ -8,7 +8,7 @@ using Avalonia.Platform;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
-using Md3.Avalonia.Ecosystem.Controls;
+using Md3.Avalonia.Extra.Controls;
 using Md3.Avalonia.Gallery;
 using Md3.Avalonia.Gallery.Components;
 using Md3.Avalonia.Localization;

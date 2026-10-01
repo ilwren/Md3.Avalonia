@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Md3.Avalonia.Icons.Lite</RootNamespace>
+    <AssemblyName>Md3.Avalonia.Icons.Lite</AssemblyName>
+    <Description>Lite Material Symbols font and glyph catalog with embedded subset font for Md3.Avalonia.</Description>
+    <PackageId>Md3.Avalonia.Icons.Lite</PackageId>
+    <Version>0.1.0-preview.1</Version>
+    <Authors>Md3.Avalonia contributors</Authors>
+    <PackageTags>avalonia;icons;fonts;material-symbols;lite;subset</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <ProjectReference Include="../Md3.Avalonia/Md3.Avalonia.csproj" />
+    <AvaloniaResource Include="Assets/Fonts/MaterialSymbolsRounded-Lite.ttf" />
+    <None Include="../../README.md" Pack="true" PackagePath="/" Link="README.md" />
+    <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />
+  </ItemGroup>
+</Project>

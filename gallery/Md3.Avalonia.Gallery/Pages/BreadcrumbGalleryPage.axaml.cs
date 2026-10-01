@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 using Md3.Avalonia.Controls;
-using Md3.Avalonia.Ecosystem.Controls;
+using Md3.Avalonia.Extra.Controls;
 
 namespace Md3.Avalonia.Gallery.Pages;
 

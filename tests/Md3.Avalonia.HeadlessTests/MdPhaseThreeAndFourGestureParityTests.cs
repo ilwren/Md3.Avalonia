@@ -8,7 +8,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Md3.Avalonia.Controls;
-using Md3.Avalonia.Ecosystem.Controls;
+using Md3.Avalonia.Extra.Controls;
 using Md3.Avalonia.Gallery;
 using Md3.Avalonia.Gallery.Pages;
 using Md3.Avalonia.Icons;

@@ -1,0 +1,39 @@
+name: Build NuGet Packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main
+      - 'arena/**'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  pack:
+    name: Build & Pack NuGet
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build and Pack NuGet Packages
+        run: |
+          mkdir -p artifacts/nuget
+          bash scripts/build-nuget.sh --output artifacts/nuget
+
+      - name: Upload NuGet Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: artifacts/nuget/*.nupkg
+          if-no-files-found: error

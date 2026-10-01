@@ -22,6 +22,7 @@ jobs:
       - name: Setup .NET SDKs
         uses: actions/setup-dotnet@v4
         with:
+<<<<<<< HEAD
           dotnet-version: |
             8.0.x
             10.0.x
@@ -32,6 +33,9 @@ jobs:
           FONT_URL="https://github.com/google/material-design-icons/raw/master/variablefont/MaterialSymbolsRounded%5BFILL%2CGRAD%2Copsz%2Cwght%5D.ttf"
           curl -sSL "$FONT_URL" -o src/Md3.Avalonia.Icons/Assets/Fonts/MaterialSymbolsRounded.ttf
           ls -lh src/Md3.Avalonia.Icons/Assets/Fonts/MaterialSymbolsRounded.ttf
+=======
+          dotnet-version: 10.0.x
+>>>>>>> 2a9bf2c (feat: multi-platform gallery, rename to Extra, add Icons.Lite, embedded TTFs, Wiki docs and workflows)
 
       - name: Restore dependencies
         run: dotnet restore Md3.Avalonia.sln
@@ -46,4 +50,8 @@ jobs:
           python3 scripts/report-test-results.py
 
       - name: Verify NuGet Packaging
+<<<<<<< HEAD
         run: bash scripts/build-nuget.sh --font src/Md3.Avalonia.Icons/Assets/Fonts/MaterialSymbolsRounded.ttf
+=======
+        run: bash scripts/build-nuget.sh
+>>>>>>> 2a9bf2c (feat: multi-platform gallery, rename to Extra, add Icons.Lite, embedded TTFs, Wiki docs and workflows)

@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:eco="using:Md3.Avalonia.Ecosystem.Controls"
-             xmlns:infra="using:Md3.Avalonia.Ecosystem.Infrastructure"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
              xmlns:md="using:Md3.Avalonia.Controls"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.EcosystemGalleryPage">

@@ -4,8 +4,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using CommunityToolkit.Mvvm.Input;
-using Md3.Avalonia.Ecosystem.Controls;
-using Md3.Avalonia.Ecosystem.Infrastructure;
+using Md3.Avalonia.Extra.Controls;
+using Md3.Avalonia.Extra.Infrastructure;
 
 namespace Md3.Avalonia.Gallery.Pages;
 

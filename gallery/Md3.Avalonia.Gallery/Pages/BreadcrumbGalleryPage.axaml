@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
-             xmlns:eco="using:Md3.Avalonia.Ecosystem.Controls"
+             xmlns:extra="using:Md3.Avalonia.Extra.Controls"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.BreadcrumbGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -14,7 +14,7 @@
       <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
         <TextBlock Classes="h2" Text="Interactive breadcrumb" />
         <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
-          <eco:MdBreadcrumb x:Name="DemoBreadcrumb" Separator="›" ItemInvoked="OnBreadcrumbItemInvoked" />
+          <extra:MdBreadcrumb x:Name="DemoBreadcrumb" Separator="›" ItemInvoked="OnBreadcrumbItemInvoked" />
         </Border>
         <TextBlock x:Name="BreadcrumbStatus" Classes="body" Text="Click any breadcrumb segment to navigate." />
       </StackPanel>
@@ -22,20 +22,20 @@
       <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
         <TextBlock Classes="h2" Text="Breadcrumb with icons and slash separator" />
         <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
-          <eco:MdBreadcrumb x:Name="IconBreadcrumb" Separator="/" ItemInvoked="OnIconBreadcrumbInvoked" />
+          <extra:MdBreadcrumb x:Name="IconBreadcrumb" Separator="/" ItemInvoked="OnIconBreadcrumbInvoked" />
         </Border>
       </StackPanel>
 
       <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
         <TextBlock Classes="h2" Text="Deep path with custom separator glyph" />
         <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
-          <eco:MdBreadcrumb x:Name="DeepBreadcrumb" Separator="•" ItemInvoked="OnDeepBreadcrumbInvoked" />
+          <extra:MdBreadcrumb x:Name="DeepBreadcrumb" Separator="•" ItemInvoked="OnDeepBreadcrumbInvoked" />
         </Border>
       </StackPanel>
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
-        <gallery:CodeExample XamlCode="&lt;eco:MdBreadcrumb ItemsSource=&quot;{Binding PathSegments}&quot;&#10;                 Separator=&quot;›&quot;&#10;                 ItemInvoked=&quot;OnBreadcrumbInvoked&quot; /&gt;"
+        <gallery:CodeExample XamlCode="&lt;extra:MdBreadcrumb ItemsSource=&quot;{Binding PathSegments}&quot;&#10;                 Separator=&quot;›&quot;&#10;                 ItemInvoked=&quot;OnBreadcrumbInvoked&quot; /&gt;"
                              CSharpCode="var breadcrumb = new MdBreadcrumb&#10;{&#10;    ItemsSource = new[] { &quot;Home&quot;, &quot;Documents&quot;, &quot;Projects&quot;, &quot;Material 3&quot; },&#10;    Separator = &quot;›&quot;&#10;};&#10;breadcrumb.ItemInvoked += (_, item) =&gt; NavigateTo(item);" />
       </StackPanel>
     </StackPanel>

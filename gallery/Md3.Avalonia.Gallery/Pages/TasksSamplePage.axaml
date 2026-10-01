@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
-             xmlns:eco="using:Md3.Avalonia.Ecosystem.Controls"
+             xmlns:extra="using:Md3.Avalonia.Extra.Controls"
              x:Class="Md3.Avalonia.Gallery.Pages.TasksSamplePage">
   <Grid>
     <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">

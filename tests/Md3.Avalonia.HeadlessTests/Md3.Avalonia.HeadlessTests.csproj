@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
@@ -16,7 +16,8 @@
     </PackageReference>
     <ProjectReference Include="../../src/Md3.Avalonia/Md3.Avalonia.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Icons/Md3.Avalonia.Icons.csproj" />
-    <ProjectReference Include="../../src/Md3.Avalonia.Ecosystem/Md3.Avalonia.Ecosystem.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.Icons.Lite/Md3.Avalonia.Icons.Lite.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj" />
     <ProjectReference Include="../../gallery/Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" />
   </ItemGroup>
 </Project>
