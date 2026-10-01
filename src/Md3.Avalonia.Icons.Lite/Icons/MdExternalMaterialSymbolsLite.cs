@@ -105,6 +105,10 @@ public static class MdExternalMaterialSymbolsLite
     {
         dictionary[resourceKey] = value;
         foreach (var merged in dictionary.MergedDictionaries)
-            ApplyToDictionary(merged, resourceKey, value);
+            if (merged is IResourceDictionary mergedDictionary)
+                ApplyToDictionary(mergedDictionary, resourceKey, value);
+        foreach (var themed in dictionary.ThemeDictionaries.Values)
+            if (themed is IResourceDictionary themedDictionary)
+                ApplyToDictionary(themedDictionary, resourceKey, value);
     }
 }
