@@ -6,12 +6,13 @@ using Avalonia.Media;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A Material 3 floating action button for the screen's primary action.</summary>
-[PseudoClasses(":small", ":regular", ":medium", ":large", ":primary-container", ":secondary-container", ":tertiary-container", ":primary", ":secondary", ":tertiary")]
+[PseudoClasses(":small", ":regular", ":medium", ":large", ":primary-container", ":secondary-container", ":tertiary-container", ":primary", ":secondary", ":tertiary", ":left", ":right")]
 public class MdFloatingActionButton : Button
 {
     public static readonly StyledProperty<object?> IconProperty = AvaloniaProperty.Register<MdFloatingActionButton, object?>(nameof(Icon));
     public static readonly StyledProperty<MdFabSize> SizeProperty = AvaloniaProperty.Register<MdFloatingActionButton, MdFabSize>(nameof(Size), MdFabSize.Regular);
     public static readonly StyledProperty<MdFabColor> ColorStyleProperty = AvaloniaProperty.Register<MdFloatingActionButton, MdFabColor>(nameof(ColorStyle), MdFabColor.PrimaryContainer);
+    public static readonly StyledProperty<MdFabAlignment> AlignmentProperty = AvaloniaProperty.Register<MdFloatingActionButton, MdFabAlignment>(nameof(Alignment), MdFabAlignment.Right);
     public static readonly StyledProperty<double> ContainerSizeProperty = AvaloniaProperty.Register<MdFloatingActionButton, double>(nameof(ContainerSize), 56);
     public static readonly StyledProperty<double> IconSizeProperty = AvaloniaProperty.Register<MdFloatingActionButton, double>(nameof(IconSize), 24);
     public static readonly StyledProperty<CornerRadius> ContainerCornerRadiusProperty = AvaloniaProperty.Register<MdFloatingActionButton, CornerRadius>(nameof(ContainerCornerRadius), new CornerRadius(16));
@@ -22,12 +23,14 @@ public class MdFloatingActionButton : Button
     {
         SizeProperty.Changed.AddClassHandler<MdFloatingActionButton>((x, _) => x.UpdatePseudoClasses());
         ColorStyleProperty.Changed.AddClassHandler<MdFloatingActionButton>((x, _) => x.UpdatePseudoClasses());
+        AlignmentProperty.Changed.AddClassHandler<MdFloatingActionButton>((x, _) => x.UpdatePseudoClasses());
     }
     public MdFloatingActionButton() => UpdatePseudoClasses();
 
     public object? Icon { get => GetValue(IconProperty); set => SetValue(IconProperty, value); }
     public MdFabSize Size { get => GetValue(SizeProperty); set => SetValue(SizeProperty, value); }
     public MdFabColor ColorStyle { get => GetValue(ColorStyleProperty); set => SetValue(ColorStyleProperty, value); }
+    public MdFabAlignment Alignment { get => GetValue(AlignmentProperty); set => SetValue(AlignmentProperty, value); }
     public double ContainerSize { get => GetValue(ContainerSizeProperty); set => SetValue(ContainerSizeProperty, value); }
     public double IconSize { get => GetValue(IconSizeProperty); set => SetValue(IconSizeProperty, value); }
     public CornerRadius ContainerCornerRadius { get => GetValue(ContainerCornerRadiusProperty); set => SetValue(ContainerCornerRadiusProperty, value); }
@@ -46,5 +49,7 @@ public class MdFloatingActionButton : Button
         PseudoClasses.Set(":primary", ColorStyle == MdFabColor.Primary);
         PseudoClasses.Set(":secondary", ColorStyle == MdFabColor.Secondary);
         PseudoClasses.Set(":tertiary", ColorStyle == MdFabColor.Tertiary);
+        PseudoClasses.Set(":left", Alignment == MdFabAlignment.Left);
+        PseudoClasses.Set(":right", Alignment == MdFabAlignment.Right);
     }
 }

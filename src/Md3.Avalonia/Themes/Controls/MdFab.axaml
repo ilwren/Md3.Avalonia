@@ -53,6 +53,8 @@
     <Style Selector="^:primary"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryAction.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimaryAction.Brush}" /></Style>
     <Style Selector="^:secondary"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Secondary.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondary.Brush}" /></Style>
     <Style Selector="^:tertiary"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Tertiary.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnTertiary.Brush}" /></Style>
+    <Style Selector="^:left"><Setter Property="HorizontalAlignment" Value="Left" /></Style>
+    <Style Selector="^:right"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
     <Style Selector="^:disabled"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.DisabledContainer.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" /><Setter Property="Elevation" Value="{DynamicResource Md.Sys.Elevation.Level0}" /></Style>
   </ControlTheme>
 
