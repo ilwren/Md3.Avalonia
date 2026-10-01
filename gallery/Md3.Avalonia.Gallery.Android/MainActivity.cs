@@ -1,6 +1,8 @@
 using Android.App;
 using Android.Content.PM;
+using Avalonia;
 using Avalonia.Android;
+using Md3.Avalonia.Gallery;
 
 namespace Md3.Avalonia.Gallery.Android;
 
@@ -9,6 +11,11 @@ namespace Md3.Avalonia.Gallery.Android;
     Theme = "@style/MyTheme.NoActionBar",
     MainLauncher = true,
     ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
-public sealed class MainActivity : AvaloniaMainActivity<AndroidApp>
+public sealed class MainActivity : AvaloniaMainActivity<App>
 {
+    protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
+    {
+        return base.CustomizeAppBuilder(builder)
+            .WithInterFont();
+    }
 }

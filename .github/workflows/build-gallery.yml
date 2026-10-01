@@ -41,6 +41,7 @@ jobs:
           python3 scripts/generate-fonts.py || python scripts/generate-fonts.py
 
       - name: Publish Desktop Gallery (${{ matrix.rid }})
+        shell: bash
         run: |
           dotnet publish gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj \
             -c Release \
@@ -74,6 +75,7 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Generate or download fonts
+        shell: bash
         run: |
           mkdir -p src/Md3.Avalonia.Icons/Assets/Fonts
           python3 scripts/generate-fonts.py
