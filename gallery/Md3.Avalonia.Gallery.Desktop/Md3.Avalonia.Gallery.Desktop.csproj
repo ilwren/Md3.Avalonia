@@ -4,11 +4,14 @@
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>Md3.Avalonia.Gallery.Desktop</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <ProjectReference Include="../Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" />
   </ItemGroup>
