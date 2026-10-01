@@ -43,7 +43,7 @@ public partial class MainWindow : Window
         [
             ComponentsOverviewNav, AndroidSettingsNav, ClockNav, TasksNav,
             ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, BreadcrumbNav, TextFieldNav,
-            CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav,
+            CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, ColorPickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
             NavigationDrawerNav, AdaptiveNav, SearchNav, SettingsCardNav, SheetNav, SliderNav, AdvancedSelectionNav,
             SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, FlutterParityNav, EcosystemNav, BorderlessWindowNav,
@@ -69,6 +69,7 @@ public partial class MainWindow : Window
             Entry("Cards", "card elevated filled outlined", CardNav, () => new CardGalleryPage()),
             Entry("Chips", "chip assist filter input suggestion", ChipNav, () => new ChipGalleryPage()),
             Entry("Date and time pickers", "calendar clock picker localized minute", PickerNav, () => new PickerGalleryPage()),
+            Entry("Color picker", "color picker palette hsv hex rgb alpha flutter swatch", ColorPickerNav, () => new ColorPickerGalleryPage()),
             Entry("Dialogs", "dialog modal alert", DialogNav, () => new DialogGalleryPage()),
             Entry("Divider", "separator inset", DividerNav, () => new DividerGalleryPage()),
             Entry("Lists", "list item virtualized", ListNav, () => new ListGalleryPage()),
@@ -146,6 +147,7 @@ public partial class MainWindow : Window
     private void ShowCards(object? s, RoutedEventArgs e) => Navigate(new CardGalleryPage(), CardNav);
     private void ShowChips(object? s, RoutedEventArgs e) => Navigate(new ChipGalleryPage(), ChipNav);
     private void ShowPickers(object? s, RoutedEventArgs e) => Navigate(new PickerGalleryPage(), PickerNav);
+    private void ShowColorPicker(object? s, RoutedEventArgs e) => Navigate(new ColorPickerGalleryPage(), ColorPickerNav);
     private void ShowDialogs(object? s, RoutedEventArgs e) => Navigate(new DialogGalleryPage(), DialogNav);
     private void ShowDivider(object? s, RoutedEventArgs e) => Navigate(new DividerGalleryPage(), DividerNav);
     private void ShowLists(object? s, RoutedEventArgs e) => Navigate(new ListGalleryPage(), ListNav);

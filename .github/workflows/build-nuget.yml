@@ -10,12 +10,16 @@ on:
   pull_request:
     branches:
       - main
+  release:
+    types: [published, created]
   workflow_dispatch:
 
 jobs:
   pack:
     name: Build & Pack NuGet
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -42,3 +46,13 @@ jobs:
           name: nuget-packages
           path: artifacts/nuget/*.nupkg
           if-no-files-found: error
+
+      - name: Publish NuGet to GitHub Release
+        if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="${{ github.ref_name }}"
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            gh release upload "$TAG_NAME" artifacts/nuget/*.nupkg --clobber || true
+          fi

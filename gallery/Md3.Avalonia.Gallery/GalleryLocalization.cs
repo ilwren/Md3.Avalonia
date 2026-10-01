@@ -26,7 +26,7 @@ internal static class GalleryLocalization
         ["Controls that start or expose an action."]="用于启动或呈现操作的控件。", ["Surfaces that group information and related actions."]="对信息及其相关操作进行分组的表面。", ["Status, progress, prompts, and transient messages."]="用于状态、进度、提示和临时消息。", ["Components for moving through destinations and views."]="用于在目的地和视图之间移动的组件。", ["Controls for choosing values, dates, and options."]="用于选择值、日期和选项的控件。", ["Fields and temporary surfaces for entering or choosing data."]="用于输入或选择数据的字段与临时表面。",
         ["Buttons"]="按钮", ["Icon buttons"]="图标按钮", ["FABs"]="浮动操作按钮", ["App bars"]="应用栏", ["Badges"]="徽标", ["Text fields"]="文本字段",
         ["Checkbox"]="复选框", ["Radio buttons"]="单选按钮", ["Combo box"]="组合框", ["Carousel"]="轮播", ["Cards"]="卡片", ["Chips"]="标签块",
-        ["Date & time pickers"]="日期和时间选择器", ["Dialogs"]="对话框", ["Divider"]="分隔线", ["Lists"]="列表", ["Loading"]="加载", ["Progress"]="进度",
+        ["Date & time pickers"]="日期和时间选择器", ["Date and time pickers"]="日期和时间选择器", ["Color picker"]="颜色选择器", ["Dialogs"]="对话框", ["Divider"]="分隔线", ["Lists"]="列表", ["Loading"]="加载", ["Progress"]="进度",
         ["Menus"]="菜单", ["Navigation bar"]="导航栏", ["Navigation drawer"]="导航抽屉", ["Navigation rail & adaptive"]="导航轨道与自适应", ["Search"]="搜索",
         ["Sheets"]="面板", ["Slider"]="滑块", ["Segmented & range"]="分段按钮与范围", ["Snackbar"]="消息条", ["Switch"]="开关", ["Tabs"]="标签页",
         ["Toolbars"]="工具栏", ["Tooltips"]="工具提示", ["Flutter parity"]="Flutter 组件补全", ["Desktop adapters"]="桌面适配控件", ["Theme resources"]="主题资源", ["Theme Lab"]="主题实验室", ["Material Symbols"]="Material 图标", ["Motion"]="动效",

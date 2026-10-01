@@ -2,12 +2,16 @@ name: Build Multi-Platform Gallery
 
 on:
   push:
+    tags:
+      - 'v*'
     branches:
       - main
       - 'arena/**'
   pull_request:
     branches:
       - main
+  release:
+    types: [published, created]
   workflow_dispatch:
 
 jobs:
@@ -86,9 +90,11 @@ jobs:
 
       - name: Build Android Gallery APK
         run: |
-          dotnet build gallery/Md3.Avalonia.Gallery.Android/Md3.Avalonia.Gallery.Android.csproj \
+          dotnet publish gallery/Md3.Avalonia.Gallery.Android/Md3.Avalonia.Gallery.Android.csproj \
             -c Release \
-            -o artifacts/android/ || true
+            -f net10.0-android \
+            -p:AndroidPackageFormat=apk \
+            -o artifacts/android/ || dotnet build gallery/Md3.Avalonia.Gallery.Android/Md3.Avalonia.Gallery.Android.csproj -c Release -o artifacts/android/ || true
 
       - name: Upload Android Artifacts
         uses: actions/upload-artifact@v4
@@ -96,3 +102,37 @@ jobs:
           name: gallery-android
           path: artifacts/android/
           if-no-files-found: warn
+
+  publish-release-assets:
+    name: Publish Gallery to GitHub Release
+    needs: [build-desktop, build-android]
+    if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+
+      - name: Package and Upload Release Assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="${{ github.ref_name }}"
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            mkdir -p release-bundle
+            for dir in release-artifacts/gallery-desktop-*; do
+              if [ -d "$dir" ]; then
+                target_name=$(basename "$dir")
+                (cd "$dir" && zip -r "../../release-bundle/${target_name}.zip" .)
+              fi
+            done
+            find release-artifacts/gallery-android -name "*.apk" -exec cp {} release-bundle/ \; || true
+            gh release upload "$TAG_NAME" release-bundle/* --clobber || true
+          fi
