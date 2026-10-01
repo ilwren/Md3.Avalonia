@@ -20,17 +20,17 @@
   <ControlTheme x:Key="{x:Type md:MdScrollBar}" TargetType="md:MdScrollBar">
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="AllowAutoHide" Value="True" />
-    <Setter Property="MinWidth" Value="8" />
-    <Setter Property="MinHeight" Value="8" />
+    <Setter Property="MinWidth" Value="10" />
+    <Setter Property="MinHeight" Value="10" />
     <Style Selector="^:vertical">
-      <Setter Property="Width" Value="8" />
+      <Setter Property="Width" Value="12" />
       <Setter Property="Template">
         <ControlTemplate>
           <Track Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
                  Value="{TemplateBinding Value, Mode=TwoWay}" ViewportSize="{TemplateBinding ViewportSize}"
                  Orientation="Vertical" IsDirectionReversed="True">
             <Track.DecreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.DecreaseButton>
-            <Track.Thumb><Thumb Width="6" MinHeight="24" Margin="1" Theme="{StaticResource MdScrollThumbTheme}" /></Track.Thumb>
+            <Track.Thumb><Thumb Width="8" MinHeight="32" Margin="2" Theme="{StaticResource MdScrollThumbTheme}" /></Track.Thumb>
             <Track.IncreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.IncreaseButton>
           </Track>
         </ControlTemplate>
@@ -39,19 +39,24 @@
     <Style Selector="^:thumb-hidden /template/ Thumb"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:track-visible"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" /></Style>
     <Style Selector="^:horizontal">
-      <Setter Property="Height" Value="8" />
+      <Setter Property="Height" Value="12" />
       <Setter Property="Template">
         <ControlTemplate>
           <Track Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
                  Value="{TemplateBinding Value, Mode=TwoWay}" ViewportSize="{TemplateBinding ViewportSize}"
                  Orientation="Horizontal">
             <Track.DecreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.DecreaseButton>
-            <Track.Thumb><Thumb Height="6" MinWidth="24" Margin="1" Theme="{StaticResource MdScrollThumbTheme}" /></Track.Thumb>
+            <Track.Thumb><Thumb Height="8" MinWidth="32" Margin="2" Theme="{StaticResource MdScrollThumbTheme}" /></Track.Thumb>
             <Track.IncreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.IncreaseButton>
           </Track>
         </ControlTemplate>
       </Setter>
     </Style>
+    <Style Selector="^:pointerover /template/ Thumb">
+      <Setter Property="Width" Value="10" />
+      <Setter Property="Height" Value="10" />
+    </Style>
+  </ControlTheme>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdScrollViewer}" TargetType="md:MdScrollViewer">
