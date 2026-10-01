@@ -8,6 +8,7 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Media;
 using Md3.Avalonia.Controls;
 
@@ -191,11 +192,10 @@ public class MdColorPicker : TemplatedControl
     {
         try
         {
-            if (TopLevel.GetTopLevel(this)?.Clipboard is { } clipboard)
+            var topLevel = TopLevel.GetTopLevel(this);
+            if (topLevel?.Clipboard is { } clipboard)
             {
-                var data = new DataObject();
-                data.Set(DataFormats.Text, SelectedHex);
-                _ = clipboard.SetDataObjectAsync(data);
+                _ = clipboard.SetTextAsync(SelectedHex);
             }
         }
         catch { }
