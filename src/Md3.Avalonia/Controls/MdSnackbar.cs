@@ -160,7 +160,8 @@ public sealed class MdSnackbar : ContentControl
     private void RestartTimer()
     {
         _timer.Stop();
-        if (!IsOpen || Duration <= TimeSpan.Zero) return;
+        // Material snackbars with an action remain until the user acts or dismisses them.
+        if (!IsOpen || ActionContent is not null || Duration <= TimeSpan.Zero) return;
         _timer.Interval = Duration;
         _timer.Start();
     }

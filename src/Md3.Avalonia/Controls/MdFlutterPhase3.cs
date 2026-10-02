@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.VisualTree;
@@ -195,8 +196,10 @@ public sealed class MdSimpleDialog : TemplatedControl
     public static readonly StyledProperty<object?> CancelTextProperty = AvaloniaProperty.Register<MdSimpleDialog, object?>(nameof(CancelText), "Cancel");
     private SelectingItemsControl? _itemsHost;
     private Button? _cancelButton;
+    private Border? _scrim;
     private Border? _surface;
     private readonly MdPresenceController _presence;
+    private readonly MdModalFocusController _modalFocus;
 
     static MdSimpleDialog()
     {
@@ -206,6 +209,7 @@ public sealed class MdSimpleDialog : TemplatedControl
 
     public MdSimpleDialog()
     {
+        _modalFocus = new MdModalFocusController(this);
         _presence = new MdPresenceController(present => PseudoClasses.Set(":present", present));
         _presence.Initialize(IsOpen);
         PseudoClasses.Set(":open", IsOpen);
@@ -232,21 +236,43 @@ public sealed class MdSimpleDialog : TemplatedControl
     {
         if (_itemsHost is not null) _itemsHost.SelectionChanged -= OnSelectionChanged;
         if (_cancelButton is not null) _cancelButton.Click -= OnCancel;
+        if (_scrim is not null) _scrim.PointerPressed -= OnScrimPressed;
         base.OnApplyTemplate(e);
         _itemsHost = e.NameScope.Find<SelectingItemsControl>("PART_ItemsHost");
         _cancelButton = e.NameScope.Find<Button>("PART_CancelButton");
+        _scrim = e.NameScope.Find<Border>("PART_Scrim");
         _surface = e.NameScope.Find<Border>("PART_Surface");
         if (_itemsHost is not null) _itemsHost.SelectionChanged += OnSelectionChanged;
         if (_cancelButton is not null) _cancelButton.Click += OnCancel;
+        if (_scrim is not null) _scrim.PointerPressed += OnScrimPressed;
         _presence.Initialize(IsOpen);
         UpdateMotion();
         UpdateHitTesting();
+        UpdateModalFocus();
+    }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        UpdateModalFocus();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         _presence.Stop();
+        _modalFocus.Deactivate();
         base.OnDetachedFromVisualTree(e);
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        if (IsOpen && e.Key == Key.Escape)
+        {
+            Dismiss();
+            e.Handled = true;
+            return;
+        }
+        base.OnKeyDown(e);
     }
 
     private void UpdateOpenState()
@@ -262,6 +288,21 @@ public sealed class MdSimpleDialog : TemplatedControl
             _presence.Update(false, MdMotion.GetExitDuration(this));
         }
         UpdateHitTesting();
+        UpdateModalFocus();
+    }
+
+    private void UpdateModalFocus()
+    {
+        _modalFocus.Update(IsOpen, _surface, initialFocus: _itemsHost as Control ?? _cancelButton);
+    }
+
+    private void OnScrimPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (IsOpen && ReferenceEquals(e.Source, _scrim))
+        {
+            Dismiss();
+            e.Handled = true;
+        }
     }
 
     private void UpdateMotion()

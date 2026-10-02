@@ -229,8 +229,14 @@ public class MdComboBox : ComboBox, IMdPopupOwner, IMdPopupPresenceOwner
         }
         else
         {
-            _popupPresence.Update(false,
-                MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
+            // Android uses Avalonia's in-window OverlayPopupHost. Keeping that host alive after
+            // ComboBox has committed IsDropDownOpen=false can race touch light-dismiss/focus
+            // teardown on the same native frame. Close it synchronously there; desktop keeps the
+            // Material exit-presence interval.
+            var exitDuration = OperatingSystem.IsAndroid()
+                ? TimeSpan.Zero
+                : MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast);
+            _popupPresence.Update(false, exitDuration);
             MdPopupCoordinator.NotifyStateChanged(this);
         }
     }
@@ -264,8 +270,9 @@ public class MdComboBox : ComboBox, IMdPopupOwner, IMdPopupPresenceOwner
                 MdMotionTransitions.CreateTransform(this, RenderTransformProperty, MdMotionSpeed.Fast));
         ConfigurePopupTransitions(IsDropDownOpen ? MdMotionSpeed.Slow : MdMotionSpeed.Fast);
         if (!IsDropDownOpen)
-            _popupPresence.Update(false,
-                MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
+            _popupPresence.Update(false, OperatingSystem.IsAndroid()
+                ? TimeSpan.Zero
+                : MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
     }
 
     private void ConfigurePopupTransitions(MdMotionSpeed speed)

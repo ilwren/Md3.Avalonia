@@ -616,12 +616,84 @@
     <Style Selector="^:text /template/ Border.eco-highlight"><Setter Property="CornerRadius" Value="4" /></Style>
   </ControlTheme>
 
+  <ControlTheme x:Key="EcoColorSwatchButtonTheme" TargetType="Button">
+    <!-- A 36-DIP color tile inside the Material minimum 48-DIP interaction target. Selection is
+         communicated by both a high-contrast ring and a checkmark, never by color alone. -->
+    <Setter Property="Width" Value="48" />
+    <Setter Property="Height" Value="48" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Button">
+        <Grid Background="Transparent">
+          <Border x:Name="PART_FocusRing"
+                  Width="46" Height="46" CornerRadius="15"
+                  BorderBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                  BorderThickness="2" Opacity="0" />
+          <Border x:Name="PART_SelectionRing"
+                  Width="42" Height="42" CornerRadius="14"
+                  BorderBrush="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                  BorderThickness="3">
+            <Border.IsVisible>
+              <MultiBinding Converter="{x:Static eco:MdColorConverters.ColorsEqual}">
+                <ReflectionBinding />
+                <Binding Path="SelectedColor" RelativeSource="{RelativeSource AncestorType=eco:MdColorPicker}" />
+              </MultiBinding>
+            </Border.IsVisible>
+          </Border>
+          <Border Width="34" Height="34" CornerRadius="11"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{DynamicResource Md.Sys.Color.Outline.Brush}"
+                  BorderThickness="1" ClipToBounds="True">
+            <Grid>
+              <Border x:Name="PART_StateLayer" Background="{TemplateBinding Foreground}"
+                      Opacity="0" IsHitTestVisible="False" />
+              <ContentPresenter x:Name="PART_SelectedMark"
+                                Content="{TemplateBinding Content}"
+                                Foreground="{TemplateBinding Foreground}"
+                                FontSize="17" FontWeight="Bold"
+                                HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ContentPresenter.IsVisible>
+                  <MultiBinding Converter="{x:Static eco:MdColorConverters.ColorsEqual}">
+                    <ReflectionBinding />
+                    <Binding Path="SelectedColor" RelativeSource="{RelativeSource AncestorType=eco:MdColorPicker}" />
+                  </MultiBinding>
+                </ContentPresenter.IsVisible>
+              </ContentPresenter>
+            </Grid>
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusRing"><Setter Property="Opacity" Value="1" /></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" /></Style>
+  </ControlTheme>
+
+  <LinearGradientBrush x:Key="EcoColorPickerHueBrush" StartPoint="0%,50%" EndPoint="100%,50%">
+    <GradientStop Offset="0" Color="#FFFF0000" />
+    <GradientStop Offset="0.1667" Color="#FFFFFF00" />
+    <GradientStop Offset="0.3333" Color="#FF00FF00" />
+    <GradientStop Offset="0.5" Color="#FF00FFFF" />
+    <GradientStop Offset="0.6667" Color="#FF0000FF" />
+    <GradientStop Offset="0.8333" Color="#FFFF00FF" />
+    <GradientStop Offset="1" Color="#FFFF0000" />
+  </LinearGradientBrush>
+
   <ControlTheme x:Key="{x:Type eco:MdColorPicker}" TargetType="eco:MdColorPicker">
+    <!-- Material has no first-party ColorPicker component. This custom control composes current M3
+         surface, text-field, connected-button, slider, state-layer and target-size guidance. -->
+    <Setter Property="MinWidth" Value="336" />
+    <Setter Property="MaxWidth" Value="420" />
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="20" />
-    <Setter Property="Padding" Value="16" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="28" />
+    <Setter Property="Padding" Value="24" />
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdColorPicker">
         <Border Background="{TemplateBinding Background}"
@@ -629,108 +701,153 @@
                 BorderThickness="{TemplateBinding BorderThickness}"
                 CornerRadius="{TemplateBinding CornerRadius}"
                 Padding="{TemplateBinding Padding}"
-                MaxWidth="380">
-          <StackPanel Spacing="14">
-            <!-- Header: Preview Swatch + Hex Input + Copy Button -->
-            <Grid ColumnDefinitions="48,*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
-              <Border Width="48" Height="48" CornerRadius="12"
-                      Background="{TemplateBinding SelectedColor, Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
-                      BoxShadow="{DynamicResource Md.Sys.Elevation.Level1}"
-                      BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
-                      BorderThickness="1" />
-              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                <TextBlock Text="Color Hex" FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-                <TextBox Name="PART_HexTextBox" Text="{TemplateBinding SelectedHex}" Height="34" CornerRadius="8" FontSize="13" FontWeight="SemiBold" VerticalContentAlignment="Center" Padding="8,4" />
+                ClipToBounds="True">
+          <StackPanel Spacing="20">
+            <!-- Selected source color, including a checkerboard behind translucent colors. -->
+            <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                    CornerRadius="20" Padding="12">
+              <Grid ColumnDefinitions="64,*,48" ColumnSpacing="12" VerticalAlignment="Center">
+                <Border Width="64" Height="64" CornerRadius="18"
+                        BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                        BorderThickness="1" ClipToBounds="True">
+                  <Grid RowDefinitions="*,*" ColumnDefinitions="*,*">
+                    <Border Background="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+                    <Border Grid.Column="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+                    <Border Grid.Row="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+                    <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+                    <Border Grid.RowSpan="2" Grid.ColumnSpan="2"
+                            Background="{TemplateBinding SelectedColor, Converter={x:Static eco:MdColorConverters.ColorToBrush}}" />
+                  </Grid>
+                </Border>
+                <md:MdTextBox Name="PART_HexTextBox" Grid.Column="1"
+                              Text="{TemplateBinding SelectedHex}"
+                              Label="HEX value" Variant="Outlined"
+                              PlaceholderText="#RRGGBB" />
+                <md:MdIconButton Name="PART_CopyHexButton" Grid.Column="2"
+                                 Icon="&#xe14d;"
+                                 Variant="Standard" Size="Small"
+                                 ToolTip.Tip="Copy HEX value"
+                                 AutomationProperties.Name="Copy HEX value" />
+              </Grid>
+            </Border>
+
+            <!-- M3 Expressive recommends connected button groups instead of legacy segmented buttons. -->
+            <md:MdConnectedButtonGroup Size="Small" HorizontalAlignment="Center">
+              <md:MdButton x:Name="PART_PaletteModeButton" Content="Palette" Size="Small" Variant="Text"
+                           Command="{Binding $parent[eco:MdColorPicker].SetPickerModeCommand}"
+                           CommandParameter="MaterialPalette" />
+              <md:MdButton x:Name="PART_SpectrumModeButton" Content="Adjust" Size="Small" Variant="Text"
+                           Command="{Binding $parent[eco:MdColorPicker].SetPickerModeCommand}"
+                           CommandParameter="SpectrumSliders" />
+              <md:MdButton x:Name="PART_PresetsModeButton" Content="Recent" Size="Small" Variant="Text"
+                           Command="{Binding $parent[eco:MdColorPicker].SetPickerModeCommand}"
+                           CommandParameter="Presets" />
+            </md:MdConnectedButtonGroup>
+
+            <StackPanel x:Name="PART_PaletteSection" Spacing="18">
+              <StackPanel Spacing="8">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="Source colors" FontSize="16" FontWeight="Medium" />
+                  <TextBlock Text="Choose a source color for the generated scheme."
+                             FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+                <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding MaterialPrimaryColors}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel Orientation="Horizontal" ItemWidth="48" ItemHeight="48" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="Color">
+                      <Button Theme="{StaticResource EcoColorSwatchButtonTheme}" Content="✓"
+                              Background="{Binding Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
+                              Foreground="{Binding Converter={x:Static eco:MdColorConverters.ContrastBrush}}"
+                              Command="{Binding $parent[eco:MdColorPicker].SelectColorCommand}"
+                              CommandParameter="{Binding}"
+                              ToolTip.Tip="{Binding Converter={x:Static eco:MdColorConverters.ColorToHex}}"
+                              AutomationProperties.Name="{Binding Converter={x:Static eco:MdColorConverters.ColorToHex}}" />
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
               </StackPanel>
-              <Button Name="PART_CopyHexButton" Grid.Column="2" Width="36" Height="36" CornerRadius="18"
-                      Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
-                      Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
-                      BorderThickness="0" Padding="0"
-                      HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                      ToolTip.Tip="Copy Hex Code">
-                <md:MdIcon Glyph="&#xe14d;" Size="18" />
-              </Button>
-            </Grid>
 
-            <!-- Material Primary Colors Grid -->
-            <StackPanel Spacing="6">
-              <TextBlock Text="Material Colors" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-              <ItemsControl ItemsSource="{TemplateBinding MaterialPrimaryColors}">
-                <ItemsControl.ItemsPanel>
-                  <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal" ItemWidth="32" ItemHeight="32" />
-                  </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="Color">
-                    <Button Width="26" Height="26" CornerRadius="13" Margin="2" Padding="0" BorderThickness="0"
-                            Background="{Binding Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
-                            Command="{Binding $parent[eco:MdColorPicker].SelectColor}"
-                            CommandParameter="{Binding}" />
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
+              <StackPanel Spacing="8">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="Tonal palette" FontSize="16" FontWeight="Medium" />
+                  <TextBlock Text="HCT tones generated by Material Color Utilities."
+                             FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+                <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding MaterialShades}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel Orientation="Horizontal" ItemWidth="48" ItemHeight="48" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="Color">
+                      <Button Theme="{StaticResource EcoColorSwatchButtonTheme}" Content="✓"
+                              Background="{Binding Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
+                              Foreground="{Binding Converter={x:Static eco:MdColorConverters.ContrastBrush}}"
+                              Command="{Binding $parent[eco:MdColorPicker].SelectColorCommand}"
+                              CommandParameter="{Binding}"
+                              ToolTip.Tip="{Binding Converter={x:Static eco:MdColorConverters.ColorToHex}}"
+                              AutomationProperties.Name="{Binding Converter={x:Static eco:MdColorConverters.ColorToHex}}" />
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
             </StackPanel>
 
-            <!-- Shades of Selected Color -->
-            <StackPanel Spacing="6">
-              <TextBlock Text="Tonal Palette (50 - 900)" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-              <ItemsControl ItemsSource="{TemplateBinding MaterialShades}">
-                <ItemsControl.ItemsPanel>
-                  <ItemsPanelTemplate>
-                    <UniformGrid Rows="1" />
-                  </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="Color">
-                    <Button Height="24" CornerRadius="4" Margin="1" Padding="0" BorderThickness="0"
-                            Background="{Binding Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
-                            Command="{Binding $parent[eco:MdColorPicker].SelectColor}"
-                            CommandParameter="{Binding}" />
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
+            <StackPanel x:Name="PART_SpectrumSection" Spacing="10">
+              <StackPanel Spacing="2">
+                <TextBlock Text="Adjust color" FontSize="16" FontWeight="Medium" />
+                <TextBlock Text="Fine-tune HSV values and optional transparency."
+                           FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              </StackPanel>
+              <StackPanel Spacing="0">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Text="Hue" FontSize="14" FontWeight="Medium" />
+                  <TextBlock Grid.Column="1" Text="{Binding Hue, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}°'}"
+                             FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </Grid>
+                <Border Height="10" Margin="0,8,0,0" CornerRadius="5" Background="{StaticResource EcoColorPickerHueBrush}" />
+                <md:MdSlider Minimum="0" Maximum="360" Value="{TemplateBinding Hue, Mode=TwoWay}" ShowValueIndicator="True" />
+              </StackPanel>
+              <StackPanel Spacing="0">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Text="Saturation" FontSize="14" FontWeight="Medium" />
+                  <TextBlock Grid.Column="1" Text="{Binding Saturation, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}%'}"
+                             FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </Grid>
+                <md:MdSlider Minimum="0" Maximum="100" Value="{TemplateBinding Saturation, Mode=TwoWay}" ShowValueIndicator="True" />
+              </StackPanel>
+              <StackPanel Spacing="0">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Text="Value" FontSize="14" FontWeight="Medium" />
+                  <TextBlock Grid.Column="1" Text="{Binding ColorValue, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}%'}"
+                             FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </Grid>
+                <md:MdSlider Minimum="0" Maximum="100" Value="{TemplateBinding ColorValue, Mode=TwoWay}" ShowValueIndicator="True" />
+              </StackPanel>
+              <StackPanel x:Name="PART_AlphaSection" Spacing="0" IsVisible="{TemplateBinding IsAlphaEnabled}">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Text="Opacity" FontSize="14" FontWeight="Medium" />
+                  <TextBlock Grid.Column="1" Text="{Binding Alpha, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}%'}"
+                             FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </Grid>
+                <md:MdSlider Minimum="0" Maximum="100" Value="{TemplateBinding Alpha, Mode=TwoWay}" ShowValueIndicator="True" />
+              </StackPanel>
             </StackPanel>
 
-            <!-- Sliders: Hue, Saturation, Value, Alpha -->
-            <StackPanel Spacing="8">
-              <Grid ColumnDefinitions="36,*,36" VerticalAlignment="Center">
-                <TextBlock Text="Hue" FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" VerticalAlignment="Center" />
-                <Slider Grid.Column="1" Minimum="0" Maximum="360" Value="{TemplateBinding Hue, Mode=TwoWay}" Margin="6,0" />
-                <TextBlock Grid.Column="2" Text="{Binding Hue, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}°'}" FontSize="11" TextAlignment="Right" VerticalAlignment="Center" />
-              </Grid>
-              <Grid ColumnDefinitions="36,*,36" VerticalAlignment="Center">
-                <TextBlock Text="Sat" FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" VerticalAlignment="Center" />
-                <Slider Grid.Column="1" Minimum="0" Maximum="100" Value="{TemplateBinding Saturation, Mode=TwoWay}" Margin="6,0" />
-                <TextBlock Grid.Column="2" Text="{Binding Saturation, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}%'}" FontSize="11" TextAlignment="Right" VerticalAlignment="Center" />
-              </Grid>
-              <Grid ColumnDefinitions="36,*,36" VerticalAlignment="Center">
-                <TextBlock Text="Val" FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" VerticalAlignment="Center" />
-                <Slider Grid.Column="1" Minimum="0" Maximum="100" Value="{TemplateBinding ColorValue, Mode=TwoWay}" Margin="6,0" />
-                <TextBlock Grid.Column="2" Text="{Binding ColorValue, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}%'}" FontSize="11" TextAlignment="Right" VerticalAlignment="Center" />
-              </Grid>
-              <Grid ColumnDefinitions="36,*,36" VerticalAlignment="Center" IsVisible="{TemplateBinding IsAlphaEnabled}">
-                <TextBlock Text="Alpha" FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" VerticalAlignment="Center" />
-                <Slider Grid.Column="1" Minimum="0" Maximum="100" Value="{TemplateBinding Alpha, Mode=TwoWay}" Margin="6,0" />
-                <TextBlock Grid.Column="2" Text="{Binding Alpha, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}%'}" FontSize="11" TextAlignment="Right" VerticalAlignment="Center" />
-              </Grid>
-            </StackPanel>
-
-            <!-- Recent Colors -->
-            <StackPanel Spacing="6">
-              <TextBlock Text="Recent Colors" FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-              <ItemsControl ItemsSource="{Binding RecentColors, RelativeSource={RelativeSource TemplatedParent}}">
-                <ItemsControl.ItemsPanel>
-                  <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="6" />
-                  </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+            <StackPanel x:Name="PART_PresetsSection" Spacing="8">
+              <StackPanel Spacing="2">
+                <TextBlock Text="Recent colors" FontSize="16" FontWeight="Medium" />
+                <TextBlock Text="Colors selected during this session."
+                           FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              </StackPanel>
+              <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{Binding RecentColors, RelativeSource={RelativeSource TemplatedParent}}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel Orientation="Horizontal" ItemWidth="48" ItemHeight="48" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="Color">
-                    <Button Width="22" Height="22" CornerRadius="11" Padding="0" BorderThickness="0"
+                    <Button Theme="{StaticResource EcoColorSwatchButtonTheme}" Content="✓"
                             Background="{Binding Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
-                            Command="{Binding $parent[eco:MdColorPicker].SelectColor}"
-                            CommandParameter="{Binding}" />
+                            Foreground="{Binding Converter={x:Static eco:MdColorConverters.ContrastBrush}}"
+                            Command="{Binding $parent[eco:MdColorPicker].SelectColorCommand}"
+                            CommandParameter="{Binding}"
+                            ToolTip.Tip="{Binding Converter={x:Static eco:MdColorConverters.ColorToHex}}"
+                              AutomationProperties.Name="{Binding Converter={x:Static eco:MdColorConverters.ColorToHex}}" />
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
@@ -739,6 +856,82 @@
         </Border>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^ /template/ StackPanel#PART_PaletteSection"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^ /template/ StackPanel#PART_SpectrumSection"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^ /template/ StackPanel#PART_PresetsSection"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:palette /template/ StackPanel#PART_PaletteSection"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:spectrum /template/ StackPanel#PART_SpectrumSection"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:presets /template/ StackPanel#PART_PresetsSection"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:palette /template/ md|MdButton#PART_PaletteModeButton"><Setter Property="Variant" Value="Tonal" /></Style>
+    <Style Selector="^:spectrum /template/ md|MdButton#PART_SpectrumModeButton"><Setter Property="Variant" Value="Tonal" /></Style>
+    <Style Selector="^:presets /template/ md|MdButton#PART_PresetsModeButton"><Setter Property="Variant" Value="Tonal" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type eco:MdColorPickerButton}" TargetType="eco:MdColorPickerButton">
+    <Setter Property="Width" Value="48" />
+    <Setter Property="Height" Value="48" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdColorPickerButton">
+        <Grid>
+          <Button x:Name="PART_DropDownButton"
+                  Theme="{StaticResource EcoColorSwatchButtonTheme}"
+                  Background="{TemplateBinding SelectedColor, Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
+                  Foreground="{TemplateBinding SelectedColor, Converter={x:Static eco:MdColorConverters.ContrastBrush}}"
+                  ToolTip.Tip="{TemplateBinding SelectedHex}"
+                  AutomationProperties.Name="Choose color" />
+          <Popup x:Name="PART_Popup"
+                 PlacementTarget="{Binding #PART_DropDownButton}"
+                 Placement="BottomEdgeAlignedLeft"
+                 IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                 IsLightDismissEnabled="True"
+                 WindowManagerAddShadowHint="False">
+            <Popup.Styles>
+              <Style Selector="PopupRoot">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="TransparencyLevelHint" Value="Transparent" />
+                <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
+              </Style>
+            </Popup.Styles>
+            <Border Margin="0,8,0,0" CornerRadius="28"
+                    BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}"
+                    ClipToBounds="True">
+              <eco:MdColorPicker x:Name="PART_Picker"
+                                 Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
+                                 SelectedColor="{TemplateBinding SelectedColor, Mode=TwoWay}"
+                                 SelectedHex="{TemplateBinding SelectedHex, Mode=TwoWay}" />
+            </Border>
+          </Popup>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- Experimental motion shells: these themes guarantee content rendering only. They are not
+       counted as completed Material transitions until outgoing-content lifecycle and interruption
+       behavior are implemented. -->
+  <ControlTheme x:Key="{x:Type eco:MdSharedAxis}" TargetType="eco:MdSharedAxis">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdSharedAxis">
+        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type eco:MdFadeThrough}" TargetType="eco:MdFadeThrough">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdFadeThrough">
+        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type eco:MdAnimatedVisibility}" TargetType="eco:MdAnimatedVisibility">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdAnimatedVisibility">
+        <ContentPresenter x:Name="PART_Content" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:hidden /template/ ContentPresenter#PART_Content"><Setter Property="IsVisible" Value="False" /></Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type eco:MdContainerTransform}" TargetType="eco:MdContainerTransform">

@@ -14,13 +14,6 @@
                  Placement="{TemplateBinding Placement}"
                  PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                  WindowManagerAddShadowHint="False">
-            <Popup.Styles>
-              <Style Selector="PopupRoot">
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="TransparencyLevelHint" Value="Transparent" />
-                <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
-              </Style>
-            </Popup.Styles>
             <Border x:Name="PART_MenuSurface"
                     Padding="0"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
@@ -48,13 +41,18 @@
       <ControlTemplate TargetType="md:MdSubMenuItem">
         <Grid>
           <Border x:Name="PART_Row" MinHeight="48" Padding="12,0"
-                  Background="{TemplateBinding Background}" CornerRadius="4">
-            <Grid ColumnDefinitions="Auto,*,Auto">
-              <ContentPresenter Content="{TemplateBinding LeadingContent}" />
-              <ContentPresenter Grid.Column="1" Margin="12,0" VerticalAlignment="Center"
-                                Content="{TemplateBinding Content}" />
-              <ContentPresenter Grid.Column="2" VerticalAlignment="Center"
-                                Content="{TemplateBinding TrailingContent}" />
+                  Background="{TemplateBinding Background}" CornerRadius="4" ClipToBounds="True">
+            <Grid>
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <ContentPresenter x:Name="PART_Leading" Content="{TemplateBinding LeadingContent}" />
+                <ContentPresenter Grid.Column="1" Margin="12,0" VerticalAlignment="Center"
+                                  Content="{TemplateBinding Content}" />
+                <ContentPresenter x:Name="PART_Trailing" Grid.Column="2" VerticalAlignment="Center"
+                                  Content="{TemplateBinding TrailingContent}" />
+              </Grid>
+              <Border x:Name="PART_StateLayer" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                      IsHitTestVisible="False" Opacity="0" />
+              <md:MdRipplePresenter RippleBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
             </Grid>
           </Border>
           <Popup x:Name="PART_SubmenuPopup"
@@ -64,17 +62,11 @@
                  PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                  HorizontalOffset="-4"
                  WindowManagerAddShadowHint="False">
-            <Popup.Styles>
-              <Style Selector="PopupRoot">
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="TransparencyLevelHint" Value="Transparent" />
-                <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
-              </Style>
-            </Popup.Styles>
             <ContentPresenter Content="{TemplateBinding Submenu}" />
           </Popup>
         </Grid>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:rtl"><Setter Property="TrailingContent" Value="‹" /></Style>
   </ControlTheme>
 </ResourceDictionary>

@@ -176,9 +176,9 @@ public sealed class MdAnimationSequence : StackPanel
 
 public enum MdSharedAxisKind { X, Y, Z }
 
-/// <summary>
-/// Implements the Material Design 3 Shared Axis transition pattern (X: Horizontal slide, Y: Vertical slide, Z: Scale depth).
-/// </summary>
+/// <summary>Preview shell for a future shared-axis content transition.</summary>
+/// <remarks>The current preview exposes direction state and renders content, but does not yet retain outgoing content or provide the full Material shared-axis choreography.</remarks>
+[MdExperimental("Shared-axis outgoing-content lifecycle and choreography are not implemented yet.")]
 [PseudoClasses(":x-axis", ":y-axis", ":z-axis", ":forward", ":backward")]
 public class MdSharedAxis : ContentControl
 {
@@ -213,9 +213,9 @@ public class MdSharedAxis : ContentControl
     }
 }
 
-/// <summary>
-/// Implements the Material Design 3 Fade Through transition pattern for tabs, bottom navigation, and search results.
-/// </summary>
+/// <summary>Preview shell for a future fade-through content transition.</summary>
+/// <remarks>The current preview renders its current content only; it does not retain and phase outgoing content.</remarks>
+[MdExperimental("Fade-through outgoing-content lifecycle and phased opacity are not implemented yet.")]
 public class MdFadeThrough : ContentControl
 {
     public static readonly StyledProperty<TimeSpan> DurationProperty =
@@ -224,10 +224,9 @@ public class MdFadeThrough : ContentControl
     public TimeSpan Duration { get => GetValue(DurationProperty); set => SetValue(DurationProperty, value); }
 }
 
-/// <summary>
-/// Material Design 3 Container Transform (Open Container) morphs between a collapsed trigger (e.g. Card, Button)
-/// and an expanded surface with synchronized corner radius, bounds, and content crossfade.
-/// </summary>
+/// <summary>Preview shell for an open-container transition surface.</summary>
+/// <remarks>The current preview switches content and shape state; synchronized source/destination bounds, elevation and interruption velocity are not implemented.</remarks>
+[MdExperimental("Full container bounds/elevation morph and interruption handling are not implemented yet.")]
 [PseudoClasses(":expanded", ":collapsed")]
 public class MdContainerTransform : TemplatedControl
 {
@@ -285,9 +284,9 @@ public enum MdVisibilityTransition
     SlideAndFade
 }
 
-/// <summary>
-/// Smoothly animates content entrance and exit when IsContentVisible changes, supporting expand/collapse, scale, and fade.
-/// </summary>
+/// <summary>Preview state host for future enter/exit visibility transitions.</summary>
+/// <remarks>The current preview exposes visible/hidden state but does not guarantee retained exit content.</remarks>
+[MdExperimental("Retained exit lifecycle and transition-specific choreography are not implemented yet.")]
 [PseudoClasses(":visible", ":hidden")]
 public class MdAnimatedVisibility : ContentControl
 {

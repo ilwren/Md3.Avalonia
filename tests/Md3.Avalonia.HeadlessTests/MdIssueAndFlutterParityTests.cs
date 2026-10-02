@@ -102,7 +102,7 @@ public sealed class MdIssueAndFlutterParityTests
         try
         {
             Dispatcher.UIThread.RunJobs();
-            var handle = sheet.GetVisualDescendants().OfType<Border>().Single(border => border.Name == "PART_DragHandle");
+            var handle = sheet.GetVisualDescendants().OfType<Button>().Single(button => button.Name == "PART_DragHandle");
             var surface = sheet.GetVisualDescendants().OfType<Border>().Single(border => border.Name == "PART_Surface");
             var point = handle.TranslatePoint(new Point(handle.Bounds.Width / 2, handle.Bounds.Height / 2), window)!.Value;
             window.MouseMove(point, RawInputModifiers.None);

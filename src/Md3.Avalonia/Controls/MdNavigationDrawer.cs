@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Presenters;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.VisualTree;
@@ -30,9 +31,11 @@ public sealed class MdNavigationDrawer : ContentControl
         AvaloniaProperty.Register<MdNavigationDrawer, double>(nameof(DrawerWidth), 360);
 
     private readonly MdPresenceController _presence;
+    private readonly MdModalFocusController _modalFocus;
     private readonly TranslateTransform _motionTransform = new();
     private Border? _scrim;
     private Border? _drawer;
+    private ContentPresenter? _mainContent;
 
     static MdNavigationDrawer()
     {
@@ -45,6 +48,7 @@ public sealed class MdNavigationDrawer : ContentControl
 
     public MdNavigationDrawer()
     {
+        _modalFocus = new MdModalFocusController(this);
         _presence = new MdPresenceController(value => PseudoClasses.Set(":present", value));
         _presence.Initialize(IsOpen);
         UpdateVisualState();
@@ -66,10 +70,12 @@ public sealed class MdNavigationDrawer : ContentControl
         base.OnApplyTemplate(e);
         _scrim = e.NameScope.Find<Border>("PART_Scrim");
         _drawer = e.NameScope.Find<Border>("PART_Drawer");
+        _mainContent = e.NameScope.Find<ContentPresenter>("PART_MainContent");
         if (_scrim is not null) _scrim.PointerPressed += OnScrimPressed;
         if (_drawer is not null) _drawer.RenderTransform = _motionTransform;
         UpdateMotion();
         UpdateTransformTarget();
+        UpdateModalFocus();
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -81,6 +87,7 @@ public sealed class MdNavigationDrawer : ContentControl
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         _presence.Stop();
+        _modalFocus.Deactivate();
         base.OnDetachedFromVisualTree(e);
     }
 
@@ -123,6 +130,12 @@ public sealed class MdNavigationDrawer : ContentControl
         PseudoClasses.Set(":left", Placement == MdNavigationDrawerPlacement.Left);
         PseudoClasses.Set(":right", Placement == MdNavigationDrawerPlacement.Right);
         UpdateTransformTarget();
+        UpdateModalFocus();
+    }
+
+    private void UpdateModalFocus()
+    {
+        _modalFocus.Update(IsOpen && IsModal, _drawer, _mainContent);
     }
 
     private void UpdateMotion()

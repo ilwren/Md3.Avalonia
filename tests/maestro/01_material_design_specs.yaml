@@ -1,14 +1,14 @@
 appId: io.arena.md3avalonia.gallery
 tags:
-  - m3-compliance
-  - visual-validation
+  - m3-ui-regression
+  - visual-smoke
 ---
 # 1. Launch App & Assert Material 3 Scaffold
 - launchApp
 - assertVisible: "Material 3 · Avalonia"
 - assertVisible: "Material 3 Components"
 
-# 2. Verify M3 Touch Target (Minimum 48dp) and Buttons
+# 2. Exercise representative button actions (this flow does not measure touch bounds)
 - tapOn: "Filled"
 - tapOn: "Tonal"
 - tapOn: "Outlined"
@@ -23,5 +23,5 @@ tags:
 - tapOn: "Dynamic color"
 - tapOn: "Touch target and state layer"
 
-# 5. Capture Snapshot for Visual Regression Testing
+# 5. Capture a diagnostic screenshot (no pixel-diff baseline is asserted here)
 - takeScreenshot: "m3_components_android_baseline"

@@ -26,7 +26,7 @@
 - `MdConnectedButtonGroup`：2 DIP 间距，自动计算首、中、尾按钮的外圆内方轮廓；
 - `MdFloatingActionButton`：Small、Regular、Medium、Large，Primary/Secondary/Tertiary 配色与 Level 3/4 elevation；
 - `MdExtendedFloatingActionButton`：当前 Expressive Small、Medium、Large；
-- `MdFabMenu` + `MdFabMenuItem`：可展开 2–6 个相关动作，56 DIP full-pill item、双向 `IsOpen`、`Show`/`Dismiss`、Escape 和可逆展开/收缩 motion。
+- `MdFabMenu` + `MdFabMenuItem`：可展开 2–6 个相关动作，56 DIP full-pill item、独立 `ExpansionDirection="Up|Down"`（默认向上）、双向 `IsOpen`、`Show`/`Dismiss`、Escape 和可逆展开/收缩 motion。
 
 所有按钮、Icon Button 和 FAB 模板都接入 `MdRipplePresenter`：按下位置产生涟漪，裁切到完整 container shape，并支持 Expressive、Standard、Reduced、None motion scheme。
 
@@ -68,7 +68,7 @@
 
 ### 桌面适配与响应式基础
 
-- `MdScrollViewer` + `MdScrollBar`：独立 Material 滚动模板，保留 wheel、touch、chaining、extent、viewport 与双向 offset，不覆盖原生 ScrollViewer；
+- `MdScrollViewer` + `MdScrollBar`：独立 Material 滚动模板，保留 wheel、touch、chaining、extent、viewport 与双向 offset，不覆盖原生 ScrollViewer；桌面鼠标拖页默认关闭并可用 `AllowMouseDrag` 显式启用，子控件直接操作和 `SuppressMouseDragScrolling` 子树优先；
 - `MdAutoCompleteBox : AutoCompleteBox`：原生同步/异步过滤、text completion、selection 与键盘 API，采用 Material exposed-field 与弱引用 popup coordinator；
 - `MdNumericBox : NumericUpDown`：原生 Value/Minimum/Maximum/Increment、解析、键盘、滚轮和 validation，复用 Material text-field 外观；
 - `MdAdaptiveLayout`：按可配置 600/840/1200/1600 DIP breakpoint 选择 Compact/Medium/Expanded/Large/ExtraLarge 内容，并公开 portrait/landscape 与 Touch/Pointer/Keyboard input mode；
@@ -86,7 +86,7 @@
 
 ### Dialog、Divider、Lists 与进度反馈
 
-- `MdDialog` + `MdDialogHost`：Basic/FullScreen、声明式 `IsOpen` 双向绑定，以及返回结果的 `ShowAsync`/`Close(result)` 直接调用；支持 Escape 与可选 scrim dismiss；
+- `MdDialog` + `MdDialogHost`：Basic/FullScreen、声明式 `IsOpen` 双向绑定、按模型类型匹配多个预声明 `DataTemplates`，以及返回结果的 `ShowAsync(model)`/`Close(result)`；支持 Escape 与可选 scrim dismiss；
 - `MdDivider : Control`：水平/垂直、任意 inset/thickness/brush；
 - `MdList : ListBox` + `MdListItem`：Standard/Segmented、单选/多选、leading/headline/supporting/trailing slots，保留 `ItemsSource`、selection、command 与键盘行为；
 - `MdLoadingIndicator`：遵循继承式 motion scheme 的 Expressive morphing indicator，支持官网当前 contained/uncontained 两种形式；
@@ -100,7 +100,7 @@
 - `MdSearchBar` + `MdSearchView`：搜索输入、leading/trailing actions、展开结果 surface，支持绑定与直接操作；
 - `MdSheetHost`：Bottom/Left/Right 的 Standard/Modal sheet、drag handle、scrim dismiss、Escape 与双向 `IsOpen`；
 - `MdSlider : Slider`：continuous/discrete step、16 DIP track、44×4 DIP handle、stop indicator 和随 thumb 移动的 value indicator；
-- `MdSnackbar`：single/two-line、inverse color roles、action/dismiss slots、timeout 与 `Show`/`Dismiss`；
+- `MdSnackbar`：single/two-line、inverse color roles、action/dismiss slots、timeout 与 `Show`/`Dismiss`；`MdSnackbarHost` + `IMdSnackbarService` 为 ViewModel 提供单实例排队显示入口；
 - `MdSwitch : ToggleButton`：selected/unselected、可选状态图标、双向 `IsChecked`、`Command`、键盘与 pointer 行为。
 
 ### Flutter 生态补全与桌面计划
@@ -109,7 +109,7 @@
 - Phase 2：`MdPaginatedDataTable`、`MdReorderableList`、`MdGridTile`/`MdGridTileBar`、`MdDismissible` 与交互式 `MdScrollBar`；
 - Phase 3：`MdForm`/`MdFormField`、`MdDropdownFormField`、`MdSimpleDialog`、`MdAboutDialog`、`MdLicensePage` 与 `MdPickerRestorationStore`；
 - Phase 4：`MdDraggableScrollableSheet`、`MdAdaptiveSwitch`、`MdAdaptiveProgressIndicator`、`MdHero`、`MdFocusTraversalGroup` 与 `MdShortcutScope`；
-- 独立 `Md3.Avalonia.Ecosystem` 包包含 `MdAvatar`/`MdAvatarGroup`、fractional `MdRating` 与 `MdBreadcrumb`，并通过 opt-in `EcosystemTheme` 复用核心 Material tokens；
+- 独立 `Md3.Avalonia.Extra` 包包含 `MdAvatar`/`MdAvatarGroup`、fractional `MdRating` 与 `MdBreadcrumb`，并通过 opt-in `ExtraTheme` 复用核心 Material tokens；
 - Ecosystem Waves A–C：density/overlay/async/shortcut contracts、`MdPopover`、`MdHoverCard`、`MdCommandPalette`、`MdSlidableItem`、`MdPagedItemsView`、`MdMasonryPanel`、`MdDataGrid`、`MdAsyncSelect`、`MdCalendar`、`MdTimeline`、`MdResultView`、`MdCascader` 与 `MdTransfer`；
 - Ecosystem Waves D–E：provider-neutral `MdChart`、`MdRichEditor`、`MdChatView`、`MdSkeleton` 与 `MdAnimationSequence`；不捆绑 chart vendor、editor engine、network/AI provider 或数据库；
 - Ecosystem Wave F：`MdPinInput` 分格输入/粘贴/遮罩/完成状态，`MdTreeView` 无限层级/展开选择/键盘/RTL，以及由正式 Material input chips 构成的 `MdTagInput` 标签输入、建议、验证和换行布局；
@@ -159,7 +159,7 @@ Windows PowerShell 或命令提示符使用：
 .\scripts\build-nuget.cmd -Font "D:\OfflineAssets\MaterialSymbolsRounded.ttf"
 ```
 
-脚本要求 .NET 10 SDK，依次构建 `net8.0;net10.0`，分别打包 Core、Icons、Ecosystem，并在 `artifacts/nuget` 生成三个 `.nupkg` 和三个 `.snupkg`。Bash 使用 `--output`，PowerShell 使用 `-Output` 修改输出目录。
+脚本要求 .NET 10 SDK，依次构建 `net8.0;net10.0`，分别打包 Core、Icons、Icons.Lite 与 Extra，并在 `artifacts/nuget` 生成四个 `.nupkg` 和四个 `.snupkg`。Bash 使用 `--output`，PowerShell 使用 `-Output` 修改输出目录。
 
 同时引用 Core 与 Icons 后不再需要手动调用 `ConfigureFonts`：`MdSymbols` 和核心 `MdSymbolPresenter` 会自动发现 Icons provider、注册程序集内嵌字体，验证 internal family、typeface 和官方 `search` glyph，再注入核心 `Md.Icon.*` resources。`MD3_MATERIAL_SYMBOLS_FONT_DIR` 外部路径仍作为诊断回退保留。验证失败时 symbol glyph 保持隐藏，不使用 Unicode 仿制图标。字体许可证文本已保留，但发布者仍须记录离线资产来源和 checksum。
 
@@ -180,7 +180,7 @@ src/Md3.Avalonia/                 # 官方 Flutter Material 对齐核心包；�
    │  └─ ComboBoxTokens.axaml
    └─ Controls/                    # 每类控件的 scoped ControlTheme
 src/Md3.Avalonia.Icons/           # 可选 Symbols catalog/loader；构建前须离线补充 TTF
-src/Md3.Avalonia.Ecosystem/       # 第三方 Flutter clean-room 控件；依赖核心，不依赖 Icons
+src/Md3.Avalonia.Extra/           # 第三方 Flutter clean-room 控件；依赖核心，不依赖 Icons
 
 gallery/Md3.Avalonia.Gallery/     # 组件、Theme Lab、资源与字体图标页面
 samples/Md3.Avalonia.Gallery.Android/ # net8.0-android single-view host（solution 外）
@@ -194,16 +194,16 @@ spec-snapshot/manifest.json        # 官网、AndroidX commit、token 版本与�
 ```xml
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:themes="using:Md3.Avalonia.Themes"
-             xmlns:ecosystem="using:Md3.Avalonia.Ecosystem.Themes">
+             xmlns:extra="using:Md3.Avalonia.Extra.Themes">
   <Application.Styles>
     <themes:MaterialTheme />
-    <!-- 仅引用 Md3.Avalonia.Ecosystem 时加入： -->
-    <ecosystem:EcosystemTheme />
+    <!-- 引用 Md3.Avalonia.Extra 时加入： -->
+    <extra:ExtraTheme />
   </Application.Styles>
 </Application>
 ```
 
-三个可独立 pack 的 NuGet 预发布包版本均为 `0.1.0-preview.1`：`Md3.Avalonia`（核心）、`Md3.Avalonia.Icons`（可选图标/字体 provider）和 `Md3.Avalonia.Ecosystem`（依赖核心）。核心与生态包都不强制引用 Icons；三个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
+四个可独立 pack 的 NuGet 包版本均为 `0.2.0`：`Md3.Avalonia`（核心）、`Md3.Avalonia.Icons`、`Md3.Avalonia.Icons.Lite`（两种可选图标 provider）和 `Md3.Avalonia.Extra`（依赖核心）。核心与 Extra 都不强制引用 Icons；四个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
 
 任意 seed 主题可在启动时或运行时应用：
 
@@ -220,7 +220,7 @@ MdThemeManager.Apply(Application.Current, options, dark);
 var json = MdThemeJson.Serialize(options);
 ```
 
-完整 API 入口见 [`docs/API.md`](docs/API.md)，兼容策略见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)，本版说明见 [`docs/RELEASE_NOTES_0.1.0-preview.1.md`](docs/RELEASE_NOTES_0.1.0-preview.1.md)。
+完整 API 入口见 [`docs/API.md`](docs/API.md)，兼容策略见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)，本版说明见 [`docs/RELEASE_NOTES_0.2.0.md`](docs/RELEASE_NOTES_0.2.0.md)。
 
 ## XAML 与 MVVM
 
@@ -285,9 +285,16 @@ var comboBox = new MdComboBox
 };
 comboBox.IsDropDownOpen = true;
 
-var dialog = new MdDialog { Headline = "Discard draft?", Content = message };
-var result = await dialogHost.ShowAsync(dialog);
+// DialogHost.DataTemplates can predeclare one MdDialog view for each model type.
+var result = await dialogHost.ShowAsync(new DiscardDraftDialogModel(message));
 dialogHost.Close(result: true);
+
+// Inject the same service instance into the ViewModel and an attached MdSnackbarHost.
+await snackbarService.ShowAsync(new MdSnackbarMessage("Draft archived")
+{
+    ActionContent = "Undo",
+    ActionCommand = undoCommand
+});
 ```
 
 ## Android 约束

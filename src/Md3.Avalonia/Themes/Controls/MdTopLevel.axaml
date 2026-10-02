@@ -1,0 +1,74 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Avalonia requires PART_VisualLayerManager on every TopLevel in order to enable its
+       popup-overlay, adorner, and text-selection layers. This is especially important on
+       Android, where a separate native popup window is not available. -->
+  <ControlTheme x:Key="{x:Type Window}" TargetType="Window">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+    <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource Md.Sys.Typeface.Plain}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Window">
+        <Panel>
+          <Border x:Name="PART_TransparencyFallback" IsHitTestVisible="False" />
+          <Border Background="{TemplateBinding Background}" IsHitTestVisible="False" />
+          <Panel Margin="{TemplateBinding WindowDecorationMargin}" Background="Transparent" />
+          <VisualLayerManager x:Name="PART_VisualLayerManager">
+            <ContentPresenter x:Name="PART_ContentPresenter"
+                              Margin="{TemplateBinding Padding}"
+                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+          </VisualLayerManager>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- MaterialTheme is standalone: consumers do not need FluentTheme just to give native and
+       in-window popup hosts a content template. The native host remains transparent; the popup's
+       Material surface paints its own shape and elevation. -->
+  <ControlTheme x:Key="{x:Type PopupRoot}" TargetType="PopupRoot">
+    <Setter Property="Background" Value="{x:Null}" />
+    <Setter Property="TransparencyLevelHint" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource Md.Sys.Typeface.Plain}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="PopupRoot">
+        <LayoutTransformControl LayoutTransform="{TemplateBinding Transform}">
+          <Panel>
+            <Border x:Name="PART_TransparencyFallback" IsHitTestVisible="False" />
+            <VisualLayerManager x:Name="PART_VisualLayerManager">
+              <ContentPresenter x:Name="PART_ContentPresenter"
+                                Padding="{TemplateBinding Padding}"
+                                Background="{TemplateBinding Background}"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}" />
+            </VisualLayerManager>
+          </Panel>
+        </LayoutTransformControl>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type OverlayPopupHost}" TargetType="OverlayPopupHost">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource Md.Sys.Typeface.Plain}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="OverlayPopupHost">
+        <LayoutTransformControl LayoutTransform="{TemplateBinding Transform}">
+          <VisualLayerManager x:Name="PART_VisualLayerManager">
+            <ContentPresenter x:Name="PART_ContentPresenter"
+                              Padding="{TemplateBinding Padding}"
+                              Background="{TemplateBinding Background}"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+          </VisualLayerManager>
+        </LayoutTransformControl>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

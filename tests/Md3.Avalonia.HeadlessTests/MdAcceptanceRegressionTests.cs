@@ -22,7 +22,7 @@ namespace Md3.Avalonia.HeadlessTests;
 public sealed class MdAcceptanceRegressionTests
 {
     [AvaloniaFact]
-    public void Every_Material_Popup_Template_Provides_A_Scoped_Transparent_Host_Style()
+    public void Every_Material_Popup_Template_Allows_Platform_Host_Selection()
     {
         var controls = new Control[]
         {
@@ -44,7 +44,8 @@ public sealed class MdAcceptanceRegressionTests
             var popup = control.Template!.Build(control)!.NameScope.Find<Popup>("PART_Popup");
             Assert.True(popup is not null, $"{control.GetType().Name} did not expose PART_Popup");
             Assert.False(popup!.ShouldUseOverlayLayer);
-            Assert.NotEmpty(popup.Styles);
+            // MaterialTheme supplies global PopupRoot and OverlayPopupHost templates. Leaving this
+            // false lets desktop use a native host and Android fall back to the popup overlay.
         }
     }
 
