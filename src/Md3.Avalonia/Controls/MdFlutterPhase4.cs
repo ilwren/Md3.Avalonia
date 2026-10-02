@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
+using Avalonia.Controls.Platform;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -573,7 +574,7 @@ public sealed class MdHeroTransitionEventArgs(MdHero source, MdHero destination,
 
 public enum MdFocusTraversalPolicy { VisualOrder, TabIndex, ReadingOrder }
 
-/// <summary>A focus traversal boundary with cycle/contained semantics and host-selectable policy metadata.</summary>
+/// <summary>An Avalonia-native focus traversal boundary with cycle, skip, tab-index, visual-tree, and geometric reading-order policies.</summary>
 [PseudoClasses(":cycle", ":skip-traversal", ":visual-order", ":tab-index", ":reading-order")]
 public sealed class MdFocusTraversalGroup : ContentControl
 {
@@ -586,7 +587,12 @@ public sealed class MdFocusTraversalGroup : ContentControl
         CycleProperty.Changed.AddClassHandler<MdFocusTraversalGroup>((control, _) => control.UpdateTraversalState());
         SkipTraversalProperty.Changed.AddClassHandler<MdFocusTraversalGroup>((control, _) => control.UpdateTraversalState());
     }
-    public MdFocusTraversalGroup() => UpdateTraversalState();
+    public MdFocusTraversalGroup()
+    {
+        AddHandler(InputElement.KeyDownEvent, OnTraversalKeyDown,
+            RoutingStrategies.Tunnel, handledEventsToo: false);
+        UpdateTraversalState();
+    }
     public MdFocusTraversalPolicy Policy { get => GetValue(PolicyProperty); set => SetValue(PolicyProperty, value); }
     public bool Cycle { get => GetValue(CycleProperty); set => SetValue(CycleProperty, value); }
     public bool SkipTraversal { get => GetValue(SkipTraversalProperty); set => SetValue(SkipTraversalProperty, value); }
@@ -597,6 +603,48 @@ public sealed class MdFocusTraversalGroup : ContentControl
         PseudoClasses.Set(":visual-order", Policy == MdFocusTraversalPolicy.VisualOrder);
         PseudoClasses.Set(":tab-index", Policy == MdFocusTraversalPolicy.TabIndex);
         PseudoClasses.Set(":reading-order", Policy == MdFocusTraversalPolicy.ReadingOrder);
+        KeyboardNavigation.SetTabNavigation(this, SkipTraversal
+            ? KeyboardNavigationMode.None
+            : Cycle ? KeyboardNavigationMode.Cycle : KeyboardNavigationMode.Continue);
+    }
+
+    private void OnTraversalKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (SkipTraversal || e.Key != Key.Tab) return;
+        var controls = GetTraversalOrder();
+        if (controls.Count == 0) return;
+        var focused = TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() as Control;
+        var index = focused is null ? -1 : controls.FindIndex(control =>
+            ReferenceEquals(control, focused) || focused.GetVisualAncestors().Contains(control));
+        var backwards = e.KeyModifiers.HasFlag(KeyModifiers.Shift);
+        var targetIndex = index < 0 ? (backwards ? controls.Count - 1 : 0) : index + (backwards ? -1 : 1);
+        if (targetIndex < 0 || targetIndex >= controls.Count)
+        {
+            if (!Cycle) return;
+            targetIndex = targetIndex < 0 ? controls.Count - 1 : 0;
+        }
+        e.Handled = controls[targetIndex].Focus(NavigationMethod.Tab);
+    }
+
+    private List<Control> GetTraversalOrder()
+    {
+        var controls = this.GetVisualDescendants().OfType<Control>()
+            .Where(control => control.Focusable && control.IsVisible && control.IsEffectivelyEnabled &&
+                              KeyboardNavigation.GetIsTabStop(control))
+            .ToList();
+        return Policy switch
+        {
+            MdFocusTraversalPolicy.TabIndex => controls
+                .OrderBy(KeyboardNavigation.GetTabIndex)
+                .ThenBy(control => controls.IndexOf(control))
+                .ToList(),
+            MdFocusTraversalPolicy.ReadingOrder => controls
+                .OrderBy(control => Math.Round((control.TranslatePoint(default, this)?.Y ?? 0) / 4))
+                .ThenBy(control => (FlowDirection == FlowDirection.RightToLeft ? -1 : 1) *
+                                   (control.TranslatePoint(default, this)?.X ?? 0))
+                .ToList(),
+            _ => controls
+        };
     }
 }
 
@@ -641,18 +689,27 @@ public sealed class MdKeyboardAvoidingHost : ContentControl
     public static readonly StyledProperty<double> ExtraBottomOffsetProperty =
         AvaloniaProperty.Register<MdKeyboardAvoidingHost, double>(nameof(ExtraBottomOffset), 16.0);
 
+    public static readonly StyledProperty<bool> AutomaticallyMonitorKeyboardProperty =
+        AvaloniaProperty.Register<MdKeyboardAvoidingHost, bool>(nameof(AutomaticallyMonitorKeyboard), true);
+
     public static readonly DirectProperty<MdKeyboardAvoidingHost, bool> IsKeyboardActiveProperty =
         AvaloniaProperty.RegisterDirect<MdKeyboardAvoidingHost, bool>(nameof(IsKeyboardActive), host => host.IsKeyboardActive);
 
     private bool _isKeyboardActive;
+    private bool _updatingPadding;
+    private Thickness _restingPadding;
+    private IInputPane? _inputPane;
 
     static MdKeyboardAvoidingHost()
     {
         KeyboardHeightProperty.Changed.AddClassHandler<MdKeyboardAvoidingHost>((host, _) => host.OnKeyboardHeightChanged());
+        AutomaticallyMonitorKeyboardProperty.Changed.AddClassHandler<MdKeyboardAvoidingHost>((host, _) => host.SubscribeToInputPane());
+        PaddingProperty.Changed.AddClassHandler<MdKeyboardAvoidingHost>((host, _) => host.OnPaddingChanged());
     }
 
     public MdKeyboardAvoidingHost()
     {
+        _restingPadding = Padding;
         AddHandler(GotFocusEvent, OnChildGotFocus, RoutingStrategies.Bubble);
     }
 
@@ -674,10 +731,58 @@ public sealed class MdKeyboardAvoidingHost : ContentControl
         set => SetValue(ExtraBottomOffsetProperty, value);
     }
 
+    /// <summary>Whether the host subscribes to the current top-level platform input pane.</summary>
+    public bool AutomaticallyMonitorKeyboard
+    {
+        get => GetValue(AutomaticallyMonitorKeyboardProperty);
+        set => SetValue(AutomaticallyMonitorKeyboardProperty, value);
+    }
+
     public bool IsKeyboardActive
     {
         get => _isKeyboardActive;
         private set => SetAndRaise(IsKeyboardActiveProperty, ref _isKeyboardActive, value);
+    }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        if (KeyboardHeight <= 0) _restingPadding = Padding;
+        SubscribeToInputPane();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        UnsubscribeFromInputPane();
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    private void SubscribeToInputPane()
+    {
+        UnsubscribeFromInputPane();
+        if (!AutomaticallyMonitorKeyboard || !this.IsAttachedToVisualTree()) return;
+        _inputPane = TopLevel.GetTopLevel(this)?.InputPane;
+        if (_inputPane is null) return;
+        _inputPane.StateChanged += OnInputPaneStateChanged;
+        SetCurrentValue(KeyboardHeightProperty,
+            _inputPane.State == InputPaneState.Open ? Math.Max(0, _inputPane.OccludedRect.Height) : 0);
+    }
+
+    private void UnsubscribeFromInputPane()
+    {
+        if (_inputPane is not null) _inputPane.StateChanged -= OnInputPaneStateChanged;
+        _inputPane = null;
+    }
+
+    private void OnInputPaneStateChanged(object? sender, InputPaneStateEventArgs e) =>
+        SetCurrentValue(KeyboardHeightProperty,
+            e.NewState == InputPaneState.Open ? Math.Max(0, e.EndRect.Height) : 0);
+
+    private void OnPaddingChanged()
+    {
+        if (_updatingPadding) return;
+        _restingPadding = Padding;
+        if (KeyboardHeight > 0) ApplyKeyboardPadding();
     }
 
     private void OnKeyboardHeightChanged()
@@ -685,7 +790,7 @@ public sealed class MdKeyboardAvoidingHost : ContentControl
         var active = KeyboardHeight > 0;
         IsKeyboardActive = active;
         PseudoClasses.Set(":keyboard-active", active);
-        Padding = new Thickness(0, 0, 0, Math.Max(0, KeyboardHeight));
+        ApplyKeyboardPadding();
         if (active && AutoScrollToFocused)
         {
             var topLevel = TopLevel.GetTopLevel(this);
@@ -696,7 +801,18 @@ public sealed class MdKeyboardAvoidingHost : ContentControl
         }
     }
 
-    private void OnChildGotFocus(object? sender, RoutedEventArgs e)
+    private void ApplyKeyboardPadding()
+    {
+        _updatingPadding = true;
+        SetCurrentValue(PaddingProperty, new Thickness(
+            _restingPadding.Left,
+            _restingPadding.Top,
+            _restingPadding.Right,
+            _restingPadding.Bottom + Math.Max(0, KeyboardHeight)));
+        _updatingPadding = false;
+    }
+
+    private void OnChildGotFocus(object? sender, GotFocusEventArgs e)
     {
         if (!AutoScrollToFocused || e.Source is not Control focused) return;
         BringControlIntoView(focused);
@@ -719,7 +835,9 @@ public sealed class MdKeyboardAvoidingHost : ContentControl
             return;
         }
 
-        var visibleHeight = scrollViewer.Viewport.Height - Math.Max(0, KeyboardHeight);
+        var viewportAlreadyInset = scrollViewer.GetVisualAncestors().Contains(this);
+        var visibleHeight = scrollViewer.Viewport.Height -
+            (viewportAlreadyInset ? 0 : Math.Max(0, KeyboardHeight));
         var targetBottom = origin.Value.Y + target.Bounds.Height + ExtraBottomOffset;
         if (targetBottom > visibleHeight)
         {

@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Input;
@@ -29,6 +30,8 @@ public sealed class MdRangeSlider : Control
     public static readonly StyledProperty<double> VisualUpperValueProperty = AvaloniaProperty.Register<MdRangeSlider, double>(nameof(VisualUpperValue), 75);
     public static readonly StyledProperty<double> IndicatorOpacityProperty = AvaloniaProperty.Register<MdRangeSlider, double>(nameof(IndicatorOpacity));
     public static readonly StyledProperty<double> InteractionOpacityProperty = AvaloniaProperty.Register<MdRangeSlider, double>(nameof(InteractionOpacity));
+    public static readonly StyledProperty<string> LowerThumbNameProperty = AvaloniaProperty.Register<MdRangeSlider, string>(nameof(LowerThumbName), "Lower value");
+    public static readonly StyledProperty<string> UpperThumbNameProperty = AvaloniaProperty.Register<MdRangeSlider, string>(nameof(UpperThumbName), "Upper value");
 
     private bool _dragging;
     private bool _activeLower = true;
@@ -44,6 +47,7 @@ public sealed class MdRangeSlider : Control
         LowerValueProperty.Changed.AddClassHandler<MdRangeSlider>((slider, _) => { slider.CoerceRange(); slider.UpdateVisualValues(); });
         UpperValueProperty.Changed.AddClassHandler<MdRangeSlider>((slider, _) => { slider.CoerceRange(); slider.UpdateVisualValues(); });
         ShowValueIndicatorsProperty.Changed.AddClassHandler<MdRangeSlider>((slider, _) => slider.UpdatePseudoClasses());
+        FlowDirectionProperty.Changed.AddClassHandler<MdRangeSlider>((slider, _) => slider.InvalidateVisual());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdRangeSlider>((slider, _) => slider.UpdateMotion());
     }
 
@@ -73,6 +77,8 @@ public sealed class MdRangeSlider : Control
     public double VisualUpperValue => GetValue(VisualUpperValueProperty);
     public double IndicatorOpacity => GetValue(IndicatorOpacityProperty);
     public double InteractionOpacity => GetValue(InteractionOpacityProperty);
+    public string LowerThumbName { get => GetValue(LowerThumbNameProperty); set => SetValue(LowerThumbNameProperty, value); }
+    public string UpperThumbName { get => GetValue(UpperThumbNameProperty); set => SetValue(UpperThumbNameProperty, value); }
 
     public override void Render(DrawingContext context)
     {
@@ -80,12 +86,14 @@ public sealed class MdRangeSlider : Control
         const double edge = 24;
         var width = Math.Max(1, Bounds.Width - edge * 2);
         var y = ShowValueIndicators ? Bounds.Height - 24 : Bounds.Height / 2;
-        var lowerX = edge + width * Normalize(VisualLowerValue);
-        var upperX = edge + width * Normalize(VisualUpperValue);
+        var lowerX = edge + width * PositionForValue(VisualLowerValue);
+        var upperX = edge + width * PositionForValue(VisualUpperValue);
+        var activeStart = Math.Min(lowerX, upperX);
+        var activeEnd = Math.Max(lowerX, upperX);
 
-        DrawTrackSegment(context, InactiveTrackBrush, edge, lowerX - 2, y, leftRound: true, rightRound: false);
-        DrawTrackSegment(context, ActiveTrackBrush, lowerX + 2, upperX - 2, y, leftRound: false, rightRound: false);
-        DrawTrackSegment(context, InactiveTrackBrush, upperX + 2, edge + width, y, leftRound: false, rightRound: true);
+        DrawTrackSegment(context, InactiveTrackBrush, edge, activeStart - 2, y, leftRound: true, rightRound: false);
+        DrawTrackSegment(context, ActiveTrackBrush, activeStart + 2, activeEnd - 2, y, leftRound: false, rightRound: false);
+        DrawTrackSegment(context, InactiveTrackBrush, activeEnd + 2, edge + width, y, leftRound: false, rightRound: true);
         if (OverlayBrush is not null && InteractionOpacity > 0)
         {
             using (context.PushOpacity(InteractionOpacity))
@@ -93,6 +101,8 @@ public sealed class MdRangeSlider : Control
         }
         context.DrawRectangle(HandleBrush, null, new RoundedRect(new Rect(lowerX - 2, y - 22, 4, 44), 2));
         context.DrawRectangle(HandleBrush, null, new RoundedRect(new Rect(upperX - 2, y - 22, 4, 44), 2));
+        if (IsKeyboardFocusWithin && HandleBrush is not null)
+            context.DrawEllipse(null, new Pen(HandleBrush, 2), new Point(_activeLower ? lowerX : upperX, y), 20, 20);
 
         if (IndicatorOpacity > 0)
         {
@@ -163,16 +173,82 @@ public sealed class MdRangeSlider : Control
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
-        var delta = Math.Max(Step, double.Epsilon) * (e.Key is Key.Left or Key.Down ? -1 : e.Key is Key.Right or Key.Up ? 1 : 0);
+        if (e.Key == Key.Tab)
+        {
+            if (!e.KeyModifiers.HasFlag(KeyModifiers.Shift) && _activeLower)
+            {
+                ActivateThumb(lower: false);
+                e.Handled = true;
+                return;
+            }
+            if (e.KeyModifiers.HasFlag(KeyModifiers.Shift) && !_activeLower)
+            {
+                ActivateThumb(lower: true);
+                e.Handled = true;
+                return;
+            }
+        }
+
+        var step = Math.Max(Step, double.Epsilon);
+        var horizontalDirection = FlowDirection == FlowDirection.RightToLeft ? -1 : 1;
+        var delta = e.Key switch
+        {
+            Key.Left => -step * horizontalDirection,
+            Key.Right => step * horizontalDirection,
+            Key.Down => -step,
+            Key.Up => step,
+            Key.PageDown => -step * 10,
+            Key.PageUp => step * 10,
+            _ => 0
+        };
         if (delta != 0)
         {
             SetNearestValue((_activeLower ? LowerValue : UpperValue) + delta);
             e.Handled = true;
             return;
         }
-        if (e.Key == Key.Tab) _activeLower = !_activeLower;
+        if (e.Key == Key.Home)
+        {
+            SetNearestValue(Minimum);
+            e.Handled = true;
+            return;
+        }
+        if (e.Key == Key.End)
+        {
+            SetNearestValue(Maximum);
+            e.Handled = true;
+            return;
+        }
         base.OnKeyDown(e);
     }
+
+    protected override AutomationPeer OnCreateAutomationPeer() => new MdRangeSliderAutomationPeer(this);
+
+    internal void ActivateThumb(bool lower)
+    {
+        _activeLower = lower;
+        Focus();
+        UpdatePseudoClasses();
+        InvalidateVisual();
+    }
+
+    internal void SetThumbValue(bool lower, double value)
+    {
+        _activeLower = lower;
+        SetNearestValue(value);
+        UpdatePseudoClasses();
+    }
+
+    internal double GetThumbCenterX(bool lower)
+    {
+        const double edge = 24;
+        var width = Math.Max(1, Bounds.Width - edge * 2);
+        return edge + width * PositionForValue(lower ? LowerValue : UpperValue);
+    }
+
+    internal double ThumbCenterY => ShowValueIndicators ? Bounds.Height - 24 : Bounds.Height / 2;
+
+    internal bool IsThumbActive(bool lower) => _activeLower == lower;
 
     private void DrawValueIndicator(DrawingContext context, double centerX, double value)
     {
@@ -214,7 +290,20 @@ public sealed class MdRangeSlider : Control
     }
 
     private double Normalize(double value) => Maximum <= Minimum ? 0 : Math.Clamp((value - Minimum) / (Maximum - Minimum), 0, 1);
-    private double ValueFromX(double x) => Snap(Minimum + Math.Clamp((x - 24) / Math.Max(1, Bounds.Width - 48), 0, 1) * (Maximum - Minimum));
+
+    private double PositionForValue(double value)
+    {
+        var position = Normalize(value);
+        return FlowDirection == FlowDirection.RightToLeft ? 1 - position : position;
+    }
+
+    private double ValueFromX(double x)
+    {
+        var position = Math.Clamp((x - 24) / Math.Max(1, Bounds.Width - 48), 0, 1);
+        if (FlowDirection == FlowDirection.RightToLeft) position = 1 - position;
+        return Snap(Minimum + position * (Maximum - Minimum));
+    }
+
     private double Snap(double value) => Step > 0 ? Math.Round(value / Step) * Step : value;
 
     private void SetNearestValue(double value)

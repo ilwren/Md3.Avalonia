@@ -2,6 +2,15 @@
 
 All notable changes follow Keep a Changelog. The project intends to use Semantic Versioning after the preview cycle.
 
+## [0.2.0] - 2026-10-02
+
+- Fixed Gallery diagnostics restore, Android deployment mappings, scrolling input parity, FAB menu alignment, breadcrumb rendering, and color-picker selection.
+- Updated all NuGet packages to `0.2.0` and added Material 3 HCT tonal-palette generation for color picking.
+- Added independent up/down FAB-menu expansion and refreshed the custom color picker with current Material surfaces, connected mode controls, accessible swatches, and generated role previews.
+- Fixed `MdScrollBar` hover sizing so the track-computed thumb length remains stable and mouse thumb dragging works.
+- Added type-selected `MdDialogHost.DataTemplates` support and an `MdSnackbarHost`/`IMdSnackbarService` queue for ViewModel-driven transient messages.
+- Changed desktop `MdScrollViewer` mouse panning to opt-in and made child direct-manipulation gestures take precedence over page dragging.
+
 ## [0.1.0-preview.1] - 2026-09-24
 
 ### Added

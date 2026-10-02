@@ -161,16 +161,22 @@
                     MinWidth="{TemplateBinding MinWidth}"
                     MinHeight="{TemplateBinding MinHeight}"
                     Background="{TemplateBinding Background}"
-                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderBrush="Transparent"
                     BorderThickness="{TemplateBinding BorderThickness}"
                     CornerRadius="{TemplateBinding CornerRadius}">
               <Grid>
-                <Border x:Name="PART_FocusOutline"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{DynamicResource Md.Comp.ComboBox.Outline.FocusWidth}"
-                        CornerRadius="{TemplateBinding CornerRadius}"
-                        IsHitTestVisible="False"
-                        IsVisible="False" />
+                <md:MdOutlinedFieldBorder x:Name="PART_Outline"
+                                          CornerRadius="{TemplateBinding CornerRadius}"
+                                          IsVisible="False"
+                                          NotchTarget="{Binding #PART_Label}"
+                                          OutlineBrush="{TemplateBinding BorderBrush}"
+                                          OutlineThickness="{TemplateBinding BorderThickness}" />
+                <md:MdOutlinedFieldBorder x:Name="PART_FocusOutline"
+                                          CornerRadius="{TemplateBinding CornerRadius}"
+                                          IsVisible="False"
+                                          NotchTarget="{Binding #PART_Label}"
+                                          OutlineBrush="{TemplateBinding BorderBrush}"
+                                          OutlineThickness="{DynamicResource Md.Comp.ComboBox.Outline.FocusWidth}" />
 
                 <Grid x:Name="PART_ContentGrid"
                       Margin="{TemplateBinding Padding}"
@@ -252,9 +258,12 @@
                                Foreground="{TemplateBinding Foreground}" />
                   </Grid>
 
+                  <!-- Avalonia ComboBox owns full-field pointer routing. Keep the child toggle on
+                       the trailing icon only (as in the native Simple theme) so touch does not
+                       toggle the same drop-down twice on Android. -->
                   <ToggleButton x:Name="PART_DropDownToggle"
-                                Grid.Column="0"
-                                Grid.ColumnSpan="3"
+                                Grid.Column="2"
+                                Grid.ColumnSpan="1"
                                 Background="Transparent"
                                 ClickMode="Press"
                                 Focusable="False"
@@ -298,14 +307,8 @@
                    PlacementTarget="{Binding #PART_Container}"
                    VerticalOffset="0"
                    InheritsTransform="True"
+                   ShouldUseOverlayLayer="True"
                    WindowManagerAddShadowHint="False">
-              <Popup.Styles>
-                <Style Selector="PopupRoot">
-                  <Setter Property="Background" Value="Transparent" />
-                  <Setter Property="TransparencyLevelHint" Value="Transparent" />
-                  <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
-                </Style>
-              </Popup.Styles>
               <Border x:Name="PART_MenuSurface"
                       HorizontalAlignment="Stretch"
                       Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
@@ -360,6 +363,18 @@
     <Style Selector="^:outlined /template/ Border#PART_ActiveIndicator">
       <Setter Property="IsVisible" Value="False" />
     </Style>
+    <Style Selector="^:outlined /template/ md|MdOutlinedFieldBorder#PART_Outline">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:outlined:has-label:has-value /template/ md|MdOutlinedFieldBorder">
+      <Setter Property="IsNotched" Value="True" />
+    </Style>
+    <Style Selector="^:outlined:has-label:focus-within /template/ md|MdOutlinedFieldBorder">
+      <Setter Property="IsNotched" Value="True" />
+    </Style>
+    <Style Selector="^[IsDropDownOpen=true]:outlined:has-label /template/ md|MdOutlinedFieldBorder">
+      <Setter Property="IsNotched" Value="True" />
+    </Style>
     <Style Selector="^[IsDropDownOpen=true]:outlined">
       <Setter Property="CornerRadius" Value="4,4,0,0" />
     </Style>
@@ -406,15 +421,15 @@
       <Setter Property="Padding" Value="{DynamicResource Md.Comp.ComboBox.Label.NotchedPadding}" />
     </Style>
     <Style Selector="^:outlined:has-label:has-value /template/ ContentPresenter#PART_Label">
-      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+      <Setter Property="Background" Value="Transparent" />
       <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -28px)" />
     </Style>
     <Style Selector="^:outlined:has-label:focus-within /template/ ContentPresenter#PART_Label">
-      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+      <Setter Property="Background" Value="Transparent" />
       <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -28px)" />
     </Style>
     <Style Selector="^[IsDropDownOpen=true]:outlined:has-label /template/ ContentPresenter#PART_Label">
-      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+      <Setter Property="Background" Value="Transparent" />
       <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -28px)" />
     </Style>
     <Style Selector="^:no-label:no-value /template/ TextBlock#PART_Placeholder">
@@ -478,10 +493,10 @@
     <Style Selector="^[IsDropDownOpen=true]:outlined">
       <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
     </Style>
-    <Style Selector="^:outlined:focus-within /template/ Border#PART_FocusOutline">
+    <Style Selector="^:outlined:focus-within /template/ md|MdOutlinedFieldBorder#PART_FocusOutline">
       <Setter Property="IsVisible" Value="True" />
     </Style>
-    <Style Selector="^[IsDropDownOpen=true]:outlined /template/ Border#PART_FocusOutline">
+    <Style Selector="^[IsDropDownOpen=true]:outlined /template/ md|MdOutlinedFieldBorder#PART_FocusOutline">
       <Setter Property="IsVisible" Value="True" />
     </Style>
     <Style Selector="^[IsDropDownOpen=true] /template/ Grid#PART_DropDownIcon">

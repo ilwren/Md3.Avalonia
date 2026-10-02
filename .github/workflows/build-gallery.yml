@@ -85,8 +85,7 @@ jobs:
           python3 scripts/generate-fonts.py
 
       - name: Install Android Workload
-        run: |
-          dotnet workload install android || true
+        run: dotnet workload install android
 
       - name: Build Android Gallery APK
         run: |
@@ -94,14 +93,14 @@ jobs:
             -c Release \
             -f net10.0-android \
             -p:AndroidPackageFormat=apk \
-            -o artifacts/android/ || dotnet build gallery/Md3.Avalonia.Gallery.Android/Md3.Avalonia.Gallery.Android.csproj -c Release -o artifacts/android/ || true
+            -o artifacts/android/
 
       - name: Upload Android Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: gallery-android
-          path: artifacts/android/
-          if-no-files-found: warn
+          path: artifacts/android/*.apk
+          if-no-files-found: error
 
   publish-release-assets:
     name: Publish Gallery to GitHub Release

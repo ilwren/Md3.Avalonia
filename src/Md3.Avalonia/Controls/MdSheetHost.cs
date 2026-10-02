@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
@@ -33,7 +34,9 @@ public sealed class MdSheetHost : ContentControl
         AvaloniaProperty.Register<MdSheetHost, bool>(nameof(IsDragDismissEnabled), true);
 
     private readonly MdPresenceController _presence;
+    private readonly MdModalFocusController _modalFocus;
     private readonly TranslateTransform _motionTransform = new();
+    private ContentPresenter? _mainContent;
     private Control? _scrim;
     private Control? _dragHandle;
     private Border? _surface;
@@ -57,6 +60,7 @@ public sealed class MdSheetHost : ContentControl
 
     public MdSheetHost()
     {
+        _modalFocus = new MdModalFocusController(this);
         _presence = new MdPresenceController(value => PseudoClasses.Set(":present", value));
         _presence.Initialize(IsOpen);
         UpdateVisualState();
@@ -77,6 +81,7 @@ public sealed class MdSheetHost : ContentControl
     {
         DetachTemplateHandlers();
         base.OnApplyTemplate(e);
+        _mainContent = e.NameScope.Find<ContentPresenter>("PART_MainContent");
         _scrim = e.NameScope.Find<Control>("PART_Scrim");
         _dragHandle = e.NameScope.Find<Control>("PART_DragHandle");
         _surface = e.NameScope.Find<Border>("PART_Surface");
@@ -87,10 +92,13 @@ public sealed class MdSheetHost : ContentControl
             _dragHandle.PointerMoved += OnDragMoved;
             _dragHandle.PointerReleased += OnDragReleased;
             _dragHandle.PointerCaptureLost += OnDragCaptureLost;
+            _dragHandle.KeyDown += OnDragHandleKeyDown;
+            if (_dragHandle is Button button) button.Click += OnDragHandleClick;
         }
         if (_surface is not null) _surface.RenderTransform = _motionTransform;
         UpdateMotion();
         UpdateSurfaceTarget();
+        UpdateModalFocus();
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -102,6 +110,7 @@ public sealed class MdSheetHost : ContentControl
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         _presence.Stop();
+        _modalFocus.Deactivate();
         base.OnDetachedFromVisualTree(e);
     }
 
@@ -124,6 +133,8 @@ public sealed class MdSheetHost : ContentControl
         _dragHandle.PointerMoved -= OnDragMoved;
         _dragHandle.PointerReleased -= OnDragReleased;
         _dragHandle.PointerCaptureLost -= OnDragCaptureLost;
+        _dragHandle.KeyDown -= OnDragHandleKeyDown;
+        if (_dragHandle is Button button) button.Click -= OnDragHandleClick;
     }
 
     private void OnScrimPressed(object? sender, PointerPressedEventArgs e)
@@ -133,6 +144,22 @@ public sealed class MdSheetHost : ContentControl
             Dismiss();
             e.Handled = true;
         }
+    }
+
+    private void OnDragHandleKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (IsOpen && IsModal && e.Key is Key.Space or Key.Enter)
+        {
+            Dismiss();
+            e.Handled = true;
+        }
+    }
+
+    private void OnDragHandleClick(object? sender, RoutedEventArgs e)
+    {
+        // Pointer releases are completed by the drag handlers; Click remains the Invoke/keyboard
+        // path so assistive technology can activate the dismiss affordance.
+        if (!_dragging && IsOpen && IsModal) Dismiss();
     }
 
     private void OnDragPressed(object? sender, PointerPressedEventArgs e)
@@ -221,6 +248,12 @@ public sealed class MdSheetHost : ContentControl
         }
         UpdatePseudoClasses();
         UpdateSurfaceTarget();
+        UpdateModalFocus();
+    }
+
+    private void UpdateModalFocus()
+    {
+        _modalFocus.Update(IsOpen && IsModal, _surface, _mainContent, _dragHandle);
     }
 
     private void UpdatePseudoClasses()

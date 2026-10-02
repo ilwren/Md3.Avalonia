@@ -136,16 +136,17 @@
     <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Spacing="{DynamicResource Md.Comp.FabMenu.ItemSpacing}" HorizontalAlignment="Right" /></ItemsPanelTemplate></Setter>
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdFabMenu">
-        <Panel ClipToBounds="False">
+        <md:MdFabMenuPanel ClipToBounds="False"
+                           ExpansionDirection="{TemplateBinding ExpansionDirection}"
+                           ItemSpacing="{DynamicResource Md.Comp.FabMenu.CloseButtonSpacing}">
           <ItemsPresenter x:Name="PART_MenuItems"
-                          Margin="0,0,0,60"
                           MaxHeight="0"
                           ClipToBounds="False"
                           IsHitTestVisible="False"
                           IsVisible="{TemplateBinding AreItemsVisible}"
                           ItemsPanel="{TemplateBinding ItemsPanel}"
                           HorizontalAlignment="Right"
-                          VerticalAlignment="Bottom"
+                          VerticalAlignment="Stretch"
                           Opacity="0"
                           RenderTransform="scale(0.9) translate(0px, 20px)"
                           RenderTransformOrigin="100%,100%">
@@ -179,9 +180,15 @@
                                  Icon="{TemplateBinding OpenIcon}"
                                  SelectedIcon="{TemplateBinding CloseIcon}"
                                  IsChecked="{TemplateBinding IsOpen, Mode=TwoWay}" />
-        </Panel>
+        </md:MdFabMenuPanel>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:expand-up /template/ ItemsPresenter#PART_MenuItems">
+      <Setter Property="RenderTransform" Value="scale(0.9) translate(0px, 20px)" />
+    </Style>
+    <Style Selector="^:expand-down /template/ ItemsPresenter#PART_MenuItems">
+      <Setter Property="RenderTransform" Value="scale(0.9) translate(0px, -20px)" />
+    </Style>
     <Style Selector="^:open /template/ ItemsPresenter#PART_MenuItems">
       <Setter Property="MaxHeight" Value="520" />
       <Setter Property="IsHitTestVisible" Value="True" />
@@ -199,12 +206,6 @@
     <Style Selector="^:left /template/ md|MdToggleIconButton#PART_Trigger">
       <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
-    <Style Selector="^:left md|MdExtendedFloatingActionButton">
-      <Setter Property="HorizontalAlignment" Value="Left" />
-    </Style>
-    <Style Selector="^:left md|MdFabMenuItem">
-      <Setter Property="HorizontalAlignment" Value="Left" />
-    </Style>
     <Style Selector="^:right">
       <Setter Property="HorizontalAlignment" Value="Right" />
       <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Spacing="{DynamicResource Md.Comp.FabMenu.ItemSpacing}" HorizontalAlignment="Right" /></ItemsPanelTemplate></Setter>
@@ -214,12 +215,6 @@
       <Setter Property="RenderTransformOrigin" Value="100%,100%" />
     </Style>
     <Style Selector="^:right /template/ md|MdToggleIconButton#PART_Trigger">
-      <Setter Property="HorizontalAlignment" Value="Right" />
-    </Style>
-    <Style Selector="^:right md|MdExtendedFloatingActionButton">
-      <Setter Property="HorizontalAlignment" Value="Right" />
-    </Style>
-    <Style Selector="^:right md|MdFabMenuItem">
       <Setter Property="HorizontalAlignment" Value="Right" />
     </Style>
     <Style Selector="^:primary /template/ md|MdToggleIconButton#PART_Trigger"><Setter Property="Variant" Value="Filled" /></Style>

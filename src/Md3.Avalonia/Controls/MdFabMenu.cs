@@ -12,7 +12,7 @@ using Md3.Avalonia.Motion;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>An M3 FAB menu for two to six related actions with reversible expand/collapse motion.</summary>
-[PseudoClasses(":opening", ":open", ":closing", ":closed", ":primary", ":secondary", ":tertiary", ":left", ":right", ":reduced-motion", ":no-motion")]
+[PseudoClasses(":opening", ":open", ":closing", ":closed", ":primary", ":secondary", ":tertiary", ":left", ":right", ":expand-up", ":expand-down", ":reduced-motion", ":no-motion")]
 public class MdFabMenu : ItemsControl
 {
     private ItemsPresenter? _menuItems;
@@ -26,6 +26,9 @@ public class MdFabMenu : ItemsControl
         AvaloniaProperty.Register<MdFabMenu, MdFabColor>(nameof(ColorStyle), MdFabColor.PrimaryContainer);
     public static readonly StyledProperty<MdFabAlignment> AlignmentProperty =
         AvaloniaProperty.Register<MdFabMenu, MdFabAlignment>(nameof(Alignment), MdFabAlignment.Right);
+    public static readonly StyledProperty<MdFabMenuExpansionDirection> ExpansionDirectionProperty =
+        AvaloniaProperty.Register<MdFabMenu, MdFabMenuExpansionDirection>(
+            nameof(ExpansionDirection), MdFabMenuExpansionDirection.Up);
     public static readonly StyledProperty<object?> OpenIconProperty =
         AvaloniaProperty.Register<MdFabMenu, object?>(nameof(OpenIcon));
     public static readonly StyledProperty<object?> CloseIconProperty =
@@ -40,6 +43,7 @@ public class MdFabMenu : ItemsControl
         IsOpenProperty.Changed.AddClassHandler<MdFabMenu>((menu, _) => menu.UpdateOpenState());
         ColorStyleProperty.Changed.AddClassHandler<MdFabMenu>((menu, _) => menu.UpdateColorPseudoClasses());
         AlignmentProperty.Changed.AddClassHandler<MdFabMenu>((menu, _) => menu.UpdateAlignment());
+        ExpansionDirectionProperty.Changed.AddClassHandler<MdFabMenu>((menu, _) => menu.UpdateExpansionDirection());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdFabMenu>((menu, _) => menu.UpdateMotion());
     }
 
@@ -49,6 +53,7 @@ public class MdFabMenu : ItemsControl
         _closeTimer.Tick += (_, _) => FinishClosing();
         UpdateColorPseudoClasses();
         UpdateAlignment();
+        UpdateExpansionDirection();
         SetMotionPseudoClass(closed: true);
         LayoutUpdated += (_, _) => UpdateMenuItemGeometry();
     }
@@ -57,6 +62,7 @@ public class MdFabMenu : ItemsControl
     public bool AreItemsVisible { get => GetValue(AreItemsVisibleProperty); private set => SetCurrentValue(AreItemsVisibleProperty, value); }
     public MdFabColor ColorStyle { get => GetValue(ColorStyleProperty); set => SetValue(ColorStyleProperty, value); }
     public MdFabAlignment Alignment { get => GetValue(AlignmentProperty); set => SetValue(AlignmentProperty, value); }
+    public MdFabMenuExpansionDirection ExpansionDirection { get => GetValue(ExpansionDirectionProperty); set => SetValue(ExpansionDirectionProperty, value); }
     public object? OpenIcon { get => GetValue(OpenIconProperty); set => SetValue(OpenIconProperty, value); }
     public object? CloseIcon { get => GetValue(CloseIconProperty); set => SetValue(CloseIconProperty, value); }
 
@@ -69,24 +75,8 @@ public class MdFabMenu : ItemsControl
         _menuItems = e.NameScope.Find<ItemsPresenter>("PART_MenuItems");
         _trigger = e.NameScope.Find<Control>("PART_Trigger");
         UpdateAlignment();
+        UpdateExpansionDirection();
         UpdateMotion();
-    }
-
-    protected override Size MeasureOverride(Size availableSize)
-    {
-        _trigger?.Measure(availableSize);
-        _menuItems?.Measure(availableSize);
-
-        var triggerSize = _trigger?.DesiredSize ?? new Size(48, 48);
-        var itemsHeight = _menuItems?.DesiredSize.Height ?? 0;
-
-        // The footprint width is strictly anchored to the trigger's width.
-        // This ensures parent layouts (Grid, StackPanel, Canvas, Scaffold) never shift the trigger horizontally when items expand.
-        var width = triggerSize.Width;
-        var height = triggerSize.Height + (AreItemsVisible || IsOpen ? itemsHeight + 12 : 0);
-
-        base.MeasureOverride(availableSize);
-        return new Size(width, height);
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -231,9 +221,6 @@ public class MdFabMenu : ItemsControl
         if (_menuItems is not null)
         {
             _menuItems.HorizontalAlignment = hAlign;
-            _menuItems.RenderTransformOrigin = isLeft
-                ? new RelativePoint(0, 1, RelativeUnit.Relative)
-                : new RelativePoint(1, 1, RelativeUnit.Relative);
             if (_menuItems.Panel is Control panel)
             {
                 panel.HorizontalAlignment = hAlign;
@@ -243,6 +230,24 @@ public class MdFabMenu : ItemsControl
         {
             _trigger.HorizontalAlignment = hAlign;
         }
+        UpdateTransformOrigin();
         UpdateMenuItemGeometry();
+    }
+
+    private void UpdateExpansionDirection()
+    {
+        var expandsDown = ExpansionDirection == MdFabMenuExpansionDirection.Down;
+        PseudoClasses.Set(":expand-up", !expandsDown);
+        PseudoClasses.Set(":expand-down", expandsDown);
+        UpdateTransformOrigin();
+        InvalidateArrange();
+    }
+
+    private void UpdateTransformOrigin()
+    {
+        if (_menuItems is null) return;
+        var x = Alignment == MdFabAlignment.Left ? 0d : 1d;
+        var y = ExpansionDirection == MdFabMenuExpansionDirection.Down ? 0d : 1d;
+        _menuItems.RenderTransformOrigin = new RelativePoint(x, y, RelativeUnit.Relative);
     }
 }

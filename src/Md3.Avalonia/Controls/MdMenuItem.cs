@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 
@@ -27,6 +28,8 @@ public class MdMenuItem : Button
     public object? LeadingContent { get => GetValue(LeadingContentProperty); set => SetValue(LeadingContentProperty, value); }
     public object? TrailingContent { get => GetValue(TrailingContentProperty); set => SetValue(TrailingContentProperty, value); }
     public bool IsSelected { get => GetValue(IsSelectedProperty); set => SetValue(IsSelectedProperty, value); }
+
+    protected override AutomationPeer OnCreateAutomationPeer() => new MdMenuItemAutomationPeer(this);
 
     private void UpdatePseudoClasses()
     {

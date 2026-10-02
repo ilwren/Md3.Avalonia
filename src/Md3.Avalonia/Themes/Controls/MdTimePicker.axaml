@@ -62,14 +62,8 @@
                  OverlayDismissEventPassThrough="True"
                  Placement="BottomEdgeAlignedLeft"
                  PlacementTarget="{Binding #PART_AnchorButton}"
+                 ShouldUseOverlayLayer="True"
                  WindowManagerAddShadowHint="False">
-            <Popup.Styles>
-              <Style Selector="PopupRoot">
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="TransparencyLevelHint" Value="Transparent" />
-                <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
-              </Style>
-            </Popup.Styles>
             <Border x:Name="PART_Surface" Width="360"
                     Padding="24"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"

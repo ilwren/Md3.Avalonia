@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
@@ -189,6 +190,51 @@ public sealed class MdComboBoxTests
             window.Close();
             Application.Current.RequestedThemeVariant = ThemeVariant.Light;
         }
+    }
+
+    [AvaloniaFact]
+    public void Outlined_Label_Uses_A_Transparent_Notch_On_Arbitrary_Host_Background()
+    {
+        var comboBox = CreateComboBox();
+        comboBox.Label = "Environment";
+        comboBox.SelectedIndex = 0;
+        comboBox.Variant = MdTextBoxVariant.Outlined;
+        var hostSurface = new Border
+        {
+            Background = new SolidColorBrush(Color.Parse("#123456")),
+            Padding = new Thickness(24),
+            Child = comboBox
+        };
+        using var host = Show(hostSurface);
+
+        var label = comboBox.GetVisualDescendants().OfType<ContentPresenter>()
+            .Single(control => control.Name == "PART_Label");
+        var outline = comboBox.GetVisualDescendants().OfType<MdOutlinedFieldBorder>()
+            .Single(control => control.Name == "PART_Outline");
+
+        Assert.True(outline.IsVisible);
+        Assert.True(outline.IsNotched);
+        Assert.Same(label, outline.NotchTarget);
+        Assert.Equal(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(label.Background).Color);
+        Assert.NotEqual(
+            Assert.IsType<SolidColorBrush>(hostSurface.Background).Color,
+            Assert.IsAssignableFrom<ISolidColorBrush>(label.Background).Color);
+    }
+
+    [AvaloniaFact]
+    public void Popup_Uses_Android_Safe_Overlay_And_A_Single_Full_Field_Input_Path()
+    {
+        var comboBox = CreateComboBox();
+        using var host = Show(comboBox);
+
+        var popup = comboBox.GetVisualDescendants().OfType<Popup>()
+            .Single(control => control.Name == "PART_Popup");
+        var toggle = comboBox.GetVisualDescendants().OfType<ToggleButton>()
+            .Single(control => control.Name == "PART_DropDownToggle");
+
+        Assert.True(popup.ShouldUseOverlayLayer);
+        Assert.Equal(2, Grid.GetColumn(toggle));
+        Assert.Equal(1, Grid.GetColumnSpan(toggle));
     }
 
     [AvaloniaFact]

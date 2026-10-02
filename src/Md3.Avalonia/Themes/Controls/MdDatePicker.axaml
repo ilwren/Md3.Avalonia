@@ -12,13 +12,12 @@
     </Setter>
   </ControlTheme>
 
-  <!-- Calendar days use a dedicated 36-DIP visual container inside a 48-DIP grid cell. Reusing
-       MdButton here would retain its larger touch-target geometry and make adjacent filled and
-       outlined days overlap. The ItemsControl remains the 48-DIP hit host. -->
+  <!-- Every day owns a real 48-DIP input/focus target while the visible M3 state container remains
+       36 DIP. The transparent outer button, not the ItemsControl, is the hit host. -->
   <ControlTheme x:Key="MdDateDayButtonTheme" TargetType="Button">
-    <Setter Property="Width" Value="36" /><Setter Property="Height" Value="36" />
-    <Setter Property="MinWidth" Value="0" /><Setter Property="MinHeight" Value="0" />
-    <Setter Property="Padding" Value="0" /><Setter Property="Margin" Value="3" />
+    <Setter Property="Width" Value="48" /><Setter Property="Height" Value="48" />
+    <Setter Property="MinWidth" Value="48" /><Setter Property="MinHeight" Value="48" />
+    <Setter Property="Padding" Value="0" /><Setter Property="Margin" Value="0" />
     <Setter Property="HorizontalAlignment" Value="Center" /><Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="HorizontalContentAlignment" Value="Center" /><Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
@@ -78,17 +77,11 @@
                  OverlayDismissEventPassThrough="True"
                  Placement="BottomEdgeAlignedLeft"
                  PlacementTarget="{Binding #PART_AnchorButton}"
+                 ShouldUseOverlayLayer="True"
                  WindowManagerAddShadowHint="False">
-            <Popup.Styles>
-              <Style Selector="PopupRoot">
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="TransparencyLevelHint" Value="Transparent" />
-                <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
-              </Style>
-            </Popup.Styles>
             <Border x:Name="PART_Surface"
-                    Width="328"
-                    MaxHeight="520"
+                    Width="368"
+                    MaxHeight="568"
                     Padding="16"
                     DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
@@ -130,8 +123,8 @@
                     <DataTemplate x:CompileBindings="False"><TextBlock HorizontalAlignment="Center" Text="{Binding}" /></DataTemplate>
                   </ItemsControl.ItemTemplate>
                 </ItemsControl>
-                <Grid MinHeight="240" ClipToBounds="True">
-                  <ItemsControl x:Name="PART_OutgoingDaysHost"
+                <Grid MinHeight="288" ClipToBounds="True">
+                  <md:MdCalendarGrid x:Name="PART_OutgoingDaysHost"
                                 Theme="{StaticResource MdPickerItemsHostTheme}"
                                 ItemsSource="{Binding OutgoingCalendarDays}"
                                 IsVisible="{Binding IsMonthTransitionActive}"
@@ -147,14 +140,15 @@
                                 Classes.selected="{Binding IsSelected}"
                                 Classes.today="{Binding IsToday}"
                                 Content="{Binding DayText}"
-                                IsEnabled="{Binding IsEnabled}" />
+                                IsEnabled="{Binding IsEnabled}"
+                                KeyboardNavigation.IsTabStop="False" />
                       </DataTemplate>
                     </ItemsControl.ItemTemplate>
                     <ItemsControl.Styles>
                       <Style Selector="Button:not(.current-month)"><Setter Property="Opacity" Value="0.45" /></Style>
                     </ItemsControl.Styles>
-                  </ItemsControl>
-                  <ItemsControl x:Name="PART_DaysHost"
+                  </md:MdCalendarGrid>
+                  <md:MdCalendarGrid x:Name="PART_DaysHost"
                                 Theme="{StaticResource MdPickerItemsHostTheme}"
                                 ItemsSource="{Binding CalendarDays}">
                     <ItemsControl.ItemsPanel>
@@ -168,13 +162,14 @@
                                 Classes.selected="{Binding IsSelected}"
                                 Classes.today="{Binding IsToday}"
                                 Content="{Binding DayText}"
-                                IsEnabled="{Binding IsEnabled}" />
+                                IsEnabled="{Binding IsEnabled}"
+                                KeyboardNavigation.IsTabStop="False" />
                       </DataTemplate>
                     </ItemsControl.ItemTemplate>
                     <ItemsControl.Styles>
                       <Style Selector="Button:not(.current-month)"><Setter Property="Opacity" Value="0.45" /></Style>
                     </ItemsControl.Styles>
-                  </ItemsControl>
+                  </md:MdCalendarGrid>
                 </Grid>
                 <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                   <md:MdButton x:Name="PART_TodayButton"
@@ -205,7 +200,7 @@
       <Setter Property="IsVisible" Value="True" />
     </Style>
     <Style Selector="^:modal /template/ Border#PART_Surface">
-      <Setter Property="Width" Value="360" />
+      <Setter Property="Width" Value="368" />
     </Style>
   </ControlTheme>
 </ResourceDictionary>

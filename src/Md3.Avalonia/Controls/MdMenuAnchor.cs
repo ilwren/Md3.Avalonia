@@ -1,8 +1,11 @@
 using Avalonia;
+using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
 
@@ -28,10 +31,13 @@ public sealed class MdMenuAnchor : ContentControl, IMdPopupOwner, IMdPopupPresen
     private bool _isPopupOpen;
     private Popup? _popup;
     private Border? _surface;
+    private MdMenu? _subscribedMenu;
+    private Control? _focusBeforeOpen;
 
     static MdMenuAnchor()
     {
         IsOpenProperty.Changed.AddClassHandler<MdMenuAnchor>((anchor, _) => anchor.UpdateState());
+        MenuProperty.Changed.AddClassHandler<MdMenuAnchor>((anchor, _) => anchor.SubscribeToMenu());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdMenuAnchor>((anchor, _) => anchor.UpdateMotion());
     }
 
@@ -39,6 +45,7 @@ public sealed class MdMenuAnchor : ContentControl, IMdPopupOwner, IMdPopupPresen
     {
         _presence = new MdPresenceController(SetPopupPresence);
         _presence.Initialize(IsOpen);
+        SubscribeToMenu();
         UpdateState();
     }
 
@@ -69,20 +76,26 @@ public sealed class MdMenuAnchor : ContentControl, IMdPopupOwner, IMdPopupPresen
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        SubscribeToMenu();
         UpdateState();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         _presence.Stop();
+        if (_subscribedMenu is not null) _subscribedMenu.DismissRequested -= OnMenuDismissRequested;
+        _subscribedMenu = null;
+        _focusBeforeOpen = null;
         base.OnDetachedFromVisualTree(e);
     }
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
+        if (e.Source is Visual source && _popup?.IsInsidePopup(source) == true) return;
         if (e.InitialPressMouseButton == MouseButton.Left)
         {
+            Focus(NavigationMethod.Pointer);
             SetCurrentValue(IsOpenProperty, !IsOpen);
             e.Handled = true;
         }
@@ -96,6 +109,17 @@ public sealed class MdMenuAnchor : ContentControl, IMdPopupOwner, IMdPopupPresen
             e.Handled = true;
             return;
         }
+        if (!IsOpen && (e.Key is Key.Down or Key.Up))
+        {
+            SetCurrentValue(IsOpenProperty, true);
+            if (e.Key == Key.Up)
+            {
+                Dispatcher.UIThread.Post(() => (Menu as MdMenu ?? _subscribedMenu)?.FocusLastItem(),
+                    DispatcherPriority.Loaded);
+            }
+            e.Handled = true;
+            return;
+        }
         if (e.Key == Key.Escape && IsOpen)
         {
             Dismiss();
@@ -104,6 +128,8 @@ public sealed class MdMenuAnchor : ContentControl, IMdPopupOwner, IMdPopupPresen
         }
         base.OnKeyDown(e);
     }
+
+    protected override AutomationPeer OnCreateAutomationPeer() => new MdMenuAnchorAutomationPeer(this);
 
     private void OnPopupClosed(object? sender, EventArgs e)
     {
@@ -126,17 +152,42 @@ public sealed class MdMenuAnchor : ContentControl, IMdPopupOwner, IMdPopupPresen
         ConfigureSurfaceTransitions(IsOpen ? MdMotionSpeed.Slow : MdMotionSpeed.Fast);
         if (IsOpen)
         {
+            _focusBeforeOpen ??= TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() as Control;
             _presence.Update(true, TimeSpan.Zero);
             PseudoClasses.Set(":open", true);
             PseudoClasses.Set(":closed", false);
             MdPopupCoordinator.NotifyStateChanged(this);
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (IsOpen) (Menu as MdMenu ?? _subscribedMenu)?.FocusFirstItem();
+            }, DispatcherPriority.Loaded);
         }
         else
         {
             PseudoClasses.Set(":open", false);
             PseudoClasses.Set(":closed", true);
             _presence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
+            RestoreFocus();
         }
+    }
+
+    private void SubscribeToMenu()
+    {
+        var menu = Menu as MdMenu;
+        if (ReferenceEquals(menu, _subscribedMenu)) return;
+        if (_subscribedMenu is not null) _subscribedMenu.DismissRequested -= OnMenuDismissRequested;
+        _subscribedMenu = menu;
+        if (_subscribedMenu is not null) _subscribedMenu.DismissRequested += OnMenuDismissRequested;
+    }
+
+    private void OnMenuDismissRequested(object? sender, EventArgs e) => Dismiss();
+
+    private void RestoreFocus()
+    {
+        var target = _focusBeforeOpen;
+        _focusBeforeOpen = null;
+        if (target is null || !target.IsAttachedToVisualTree() || !target.IsEffectivelyEnabled) return;
+        Dispatcher.UIThread.Post(() => target.Focus(NavigationMethod.Unspecified), DispatcherPriority.Input);
     }
 
     private void UpdateMotion()
@@ -155,5 +206,33 @@ public sealed class MdMenuAnchor : ContentControl, IMdPopupOwner, IMdPopupPresen
         _surface.Transitions = MdMotionTransitions.Collect(
             MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects, speed),
             MdMotionTransitions.CreateTransform(this, RenderTransformProperty, speed));
+    }
+}
+
+internal sealed class MdMenuAnchorAutomationPeer(MdMenuAnchor owner)
+    : ContentControlAutomationPeer(owner), IExpandCollapseProvider
+{
+    private MdMenuAnchor AnchorOwner => (MdMenuAnchor)Owner;
+
+    protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Button;
+    protected override bool IsControlElementCore() => true;
+    protected override bool IsContentElementCore() => true;
+
+    public ExpandCollapseState ExpandCollapseState => AnchorOwner.IsOpen
+        ? ExpandCollapseState.Expanded
+        : ExpandCollapseState.Collapsed;
+
+    public bool ShowsMenu => true;
+
+    public void Expand()
+    {
+        EnsureEnabled();
+        AnchorOwner.Show();
+    }
+
+    public void Collapse()
+    {
+        EnsureEnabled();
+        AnchorOwner.Dismiss();
     }
 }
