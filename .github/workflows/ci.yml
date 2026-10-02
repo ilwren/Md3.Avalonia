@@ -29,19 +29,12 @@ jobs:
           mkdir -p src/Md3.Avalonia.Icons/Assets/Fonts
           python3 scripts/generate-fonts.py
 
-      - name: Restore dependencies
-        run: |
-          dotnet restore gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj
-          dotnet restore tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj
-
-      - name: Build Gallery and tests (Release)
-        run: |
-          dotnet build gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj -c Release --no-restore
-          dotnet build tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --no-restore
+      - name: Build Gallery Desktop
+        run: dotnet build gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj -c Release
 
       - name: Run Headless Tests
         run: |
-          dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --no-build --logger "trx;LogFileName=results.trx" --logger "console;verbosity=normal" || true
+          dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --logger "trx;LogFileName=results.trx" --logger "console;verbosity=normal" || true
           python3 scripts/report-test-results.py
 
       - name: Verify NuGet Packaging
