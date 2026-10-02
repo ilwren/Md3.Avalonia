@@ -76,6 +76,10 @@ public sealed class MdScrollViewer : ScrollViewer
     private bool _isPressed;
     private bool _isDragging;
     private IPointer? _capturedPointer;
+    private InputElement? _contentInputRoot;
+    private bool _contentPressObserved;
+    private bool _contentHandledAtTunnel;
+    private object? _contentCaptureAtTunnel;
 
     // Velocity tracker
     private readonly Stopwatch _stopwatch = new();
@@ -113,6 +117,34 @@ public sealed class MdScrollViewer : ScrollViewer
             RoutingStrategies.Tunnel, handledEventsToo: true);
     }
 
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == ContentProperty)
+            AttachContentPressObserver(Content as InputElement);
+    }
+
+    private void AttachContentPressObserver(InputElement? contentRoot)
+    {
+        if (ReferenceEquals(_contentInputRoot, contentRoot)) return;
+        if (_contentInputRoot is not null)
+        {
+            _contentInputRoot.RemoveHandler(PointerPressedEvent, OnContentPointerPressedTunnel);
+            _contentInputRoot.RemoveHandler(PointerPressedEvent, OnContentPointerPressedBubble);
+        }
+
+        _contentInputRoot = contentRoot;
+        if (_contentInputRoot is not null)
+        {
+            // Observe both sides of the user-content route. Any handled/capture transition between
+            // them belongs to content, while presenter gesture state already exists at tunnel entry.
+            _contentInputRoot.AddHandler(PointerPressedEvent, OnContentPointerPressedTunnel,
+                RoutingStrategies.Tunnel, handledEventsToo: true);
+            _contentInputRoot.AddHandler(PointerPressedEvent, OnContentPointerPressedBubble,
+                RoutingStrategies.Bubble, handledEventsToo: true);
+        }
+    }
+
     public void StopInertia()
     {
         _inertiaTimer.Stop();
@@ -124,17 +156,6 @@ public sealed class MdScrollViewer : ScrollViewer
         if (visual is null) return false;
         if (visual is ScrollBar or Thumb or RepeatButton) return true;
         return visual.GetVisualAncestors().OfType<ScrollBar>().Any();
-    }
-
-    private bool IsInsideUserContent(Visual visual)
-    {
-        for (Visual? current = visual; current is not null; current = current.GetVisualParent())
-        {
-            if (ReferenceEquals(current, Presenter) || ReferenceEquals(current, this)) return false;
-            if (ReferenceEquals(current.GetVisualParent(), Presenter)) return true;
-        }
-
-        return false;
     }
 
     private bool ShouldDeferMouseDrag(PointerPressedEventArgs e)
@@ -158,6 +179,28 @@ public sealed class MdScrollViewer : ScrollViewer
         return false;
     }
 
+    private void OnContentPointerPressedTunnel(object? sender, PointerPressedEventArgs e)
+    {
+        if (!_isPressed || !ReferenceEquals(e.Pointer, _capturedPointer)) return;
+        _contentPressObserved = true;
+        _contentHandledAtTunnel = e.Handled;
+        _contentCaptureAtTunnel = e.Pointer.Captured;
+    }
+
+    private void OnContentPointerPressedBubble(object? sender, PointerPressedEventArgs e)
+    {
+        if (!_isPressed || !_contentPressObserved || !ReferenceEquals(e.Pointer, _capturedPointer)) return;
+
+        // A transition while routing through user content means a descendant accepted the press.
+        // Cancel the outer candidate before its first move can capture the pointer.
+        if ((e.Handled && !_contentHandledAtTunnel) ||
+            !ReferenceEquals(e.Pointer.Captured, _contentCaptureAtTunnel))
+            ResetMouseDragTracking(releaseOwnCapture: false);
+
+        _contentPressObserved = false;
+        _contentCaptureAtTunnel = null;
+    }
+
     private void OnMousePointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!IsDragScrollingEnabled || !AllowMouseDrag || e.Pointer.Type != PointerType.Mouse) return;
@@ -178,6 +221,8 @@ public sealed class MdScrollViewer : ScrollViewer
         _isPressed = true;
         _isDragging = false;
         _capturedPointer = e.Pointer;
+        _contentPressObserved = false;
+        _contentCaptureAtTunnel = null;
 
         _stopwatch.Restart();
         _positionHistory.Clear();
@@ -190,15 +235,6 @@ public sealed class MdScrollViewer : ScrollViewer
         if (!IsDragScrollingEnabled || !AllowMouseDrag || e.Pointer.Type != PointerType.Mouse)
         {
             ResetMouseDragTracking(releaseOwnCapture: true);
-            return;
-        }
-
-        // A non-focusable custom control may claim the pointer after the tunneled press has passed
-        // this viewer. Honor captures made from the user-content subtree, while ignoring the input
-        // root and template presenter captures that can accompany ordinary background presses.
-        if (e.Pointer.Captured is Visual captured && IsInsideUserContent(captured))
-        {
-            ResetMouseDragTracking(releaseOwnCapture: false);
             return;
         }
 
@@ -295,6 +331,8 @@ public sealed class MdScrollViewer : ScrollViewer
         }
 
         _capturedPointer = null;
+        _contentPressObserved = false;
+        _contentCaptureAtTunnel = null;
     }
 
     private void ResetMouseDragTracking(bool releaseOwnCapture)
@@ -303,6 +341,8 @@ public sealed class MdScrollViewer : ScrollViewer
         _isPressed = false;
         _isDragging = false;
         _capturedPointer = null;
+        _contentPressObserved = false;
+        _contentCaptureAtTunnel = null;
         _positionHistory.Clear();
         _stopwatch.Stop();
         if (releaseOwnCapture && ReferenceEquals(pointer?.Captured, this)) pointer.Capture(null);
