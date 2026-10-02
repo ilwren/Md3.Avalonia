@@ -793,7 +793,7 @@ Gallery 顶栏提供播放/暂停及 Reduced Motion 预览。
 
 ### 17.10 Dialog、Divider、Lists、Loading 与 Progress 专项要求
 
-- `MdDialog` 与 `MdDialogHost` 提供 Basic/FullScreen；`IsOpen` 默认双向绑定并支持 XAML 声明，直接操作提供 `ShowAsync(dialog)` 与 `Close(result)`；Escape、可配置 scrim-dismiss 和 awaited result 必须一致。
+- `MdDialog` 与 `MdDialogHost` 提供 Basic/FullScreen；`IsOpen` 默认双向绑定并支持 XAML 声明；Host 的 `DataTemplates` 可按模型类型预声明多个对话框视图，但同一时刻只激活一个；直接操作提供 `ShowAsync(dialogOrModel)` 与 `Close(result)`；Escape、可配置 scrim-dismiss 和 awaited result 必须一致。
 - `MdDivider : Control` 提供 Horizontal/Vertical、leading inset、line thickness 和 brush；默认使用 `OutlineVariant` 1 DIP。
 - `MdList : ListBox` 与 `MdListItem : ListBoxItem` 提供 Standard/Segmented、单选/多选、leading/headline/supporting/trailing slots；保留 `ItemsSource`、`ItemTemplate`、selection、键盘与 automation，不覆盖原生 `ListBoxItem` 全局样式。
 - `MdLoadingIndicator : Control` 使用 Expressive morphing shape，并读取继承的 Expressive/Standard/Reduced/None motion scheme；`IsActive=False` 必须停止计时器。
@@ -809,7 +809,7 @@ Gallery 顶栏提供播放/暂停及 Reduced Motion 预览。
 - `MdSearchBar : TextBox` 与 `MdSearchView : ContentControl` 提供 leading/trailing action、搜索输入、展开结果 surface 与 Escape；可编辑输入必须保留 IME、selection 与 MVVM text binding。
 - `MdSheetHost : ContentControl` 提供 Bottom/Left/Right、Standard/Modal、drag handle、scrim dismiss、Escape、双向 `IsOpen` 及 `Show()`/`Dismiss()`。
 - `MdSlider : Slider` 保留 Avalonia 的 value/range、键盘、pointer、step 行为；默认 track 为 16 DIP、handle 为 44×4 DIP，可显示 stop indicator 与跟随 thumb 的 value indicator。
-- `MdSnackbar : ContentControl` 使用 `InverseSurface`/`InverseOnSurface`/`InversePrimary`；提供 action command、dismiss、timeout、hover pause、双向 `IsOpen` 及 `Show()`/`Dismiss()`。
+- `MdSnackbar : ContentControl` 使用 `InverseSurface`/`InverseOnSurface`/`InversePrimary`；提供 action command、dismiss、timeout、hover pause、双向 `IsOpen` 及 `Show()`/`Dismiss()`。带 action 的消息保持显示直至操作或关闭。ViewModel 通过共享 `IMdSnackbarService` 向视觉树中的 `MdSnackbarHost` 排队发送消息，不直接创建游离控件实例。
 - `MdSwitch : ToggleButton` 使用完整 52×32 DIP track、selected/unselected handle 与可选状态图标；保留双向 `IsChecked`、`Command`、pointer、keyboard 和 automation。
 - 上述 8 个 Gallery 页面必须各自以根级 `ScrollViewer` 支持独立预览，含交互 demo 及 AvaloniaEdit AXAML/C# 双语言示例。实际 Gallery shell 由单一 `MdScrollViewer` 持有有限 viewport，导航时解包页面预览用根 viewer；不得把两个 ScrollViewer 同时保留在视觉树中，以避免无限高度测量或滚动失效。
 - Headless 回归必须验证所有模板均可渲染、直接 API 可操作、popup 模板不强制 OverlayLayer、实际 shell 中无嵌套 ScrollViewer，并以真实 wheel input 验证 extent、viewport 和 offset。

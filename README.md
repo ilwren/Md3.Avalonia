@@ -86,7 +86,7 @@
 
 ### Dialog、Divider、Lists 与进度反馈
 
-- `MdDialog` + `MdDialogHost`：Basic/FullScreen、声明式 `IsOpen` 双向绑定，以及返回结果的 `ShowAsync`/`Close(result)` 直接调用；支持 Escape 与可选 scrim dismiss；
+- `MdDialog` + `MdDialogHost`：Basic/FullScreen、声明式 `IsOpen` 双向绑定、按模型类型匹配多个预声明 `DataTemplates`，以及返回结果的 `ShowAsync(model)`/`Close(result)`；支持 Escape 与可选 scrim dismiss；
 - `MdDivider : Control`：水平/垂直、任意 inset/thickness/brush；
 - `MdList : ListBox` + `MdListItem`：Standard/Segmented、单选/多选、leading/headline/supporting/trailing slots，保留 `ItemsSource`、selection、command 与键盘行为；
 - `MdLoadingIndicator`：遵循继承式 motion scheme 的 Expressive morphing indicator，支持官网当前 contained/uncontained 两种形式；
@@ -100,7 +100,7 @@
 - `MdSearchBar` + `MdSearchView`：搜索输入、leading/trailing actions、展开结果 surface，支持绑定与直接操作；
 - `MdSheetHost`：Bottom/Left/Right 的 Standard/Modal sheet、drag handle、scrim dismiss、Escape 与双向 `IsOpen`；
 - `MdSlider : Slider`：continuous/discrete step、16 DIP track、44×4 DIP handle、stop indicator 和随 thumb 移动的 value indicator；
-- `MdSnackbar`：single/two-line、inverse color roles、action/dismiss slots、timeout 与 `Show`/`Dismiss`；
+- `MdSnackbar`：single/two-line、inverse color roles、action/dismiss slots、timeout 与 `Show`/`Dismiss`；`MdSnackbarHost` + `IMdSnackbarService` 为 ViewModel 提供单实例排队显示入口；
 - `MdSwitch : ToggleButton`：selected/unselected、可选状态图标、双向 `IsChecked`、`Command`、键盘与 pointer 行为。
 
 ### Flutter 生态补全与桌面计划
@@ -285,9 +285,16 @@ var comboBox = new MdComboBox
 };
 comboBox.IsDropDownOpen = true;
 
-var dialog = new MdDialog { Headline = "Discard draft?", Content = message };
-var result = await dialogHost.ShowAsync(dialog);
+// DialogHost.DataTemplates can predeclare one MdDialog view for each model type.
+var result = await dialogHost.ShowAsync(new DiscardDraftDialogModel(message));
 dialogHost.Close(result: true);
+
+// Inject the same service instance into the ViewModel and an attached MdSnackbarHost.
+await snackbarService.ShowAsync(new MdSnackbarMessage("Draft archived")
+{
+    ActionContent = "Undo",
+    ActionCommand = undoCommand
+});
 ```
 
 ## Android 约束

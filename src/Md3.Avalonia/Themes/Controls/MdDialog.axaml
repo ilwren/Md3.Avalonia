@@ -78,6 +78,7 @@
                               HorizontalAlignment="Center"
                               VerticalAlignment="Center"
                               Content="{TemplateBinding Dialog}"
+                              ContentTemplate="{TemplateBinding DialogTemplate}"
                               Opacity="0"
                               RenderTransform="scale(0.9)"
                               RenderTransformOrigin="50%,50%" />

@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -12,8 +13,9 @@ using Md3.Avalonia.Motion;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>
-/// Hosts Material dialogs without a platform-specific window. Use IsOpen/Dialog in AXAML or
-/// await ShowAsync from direct C# code.
+/// Hosts one active Material dialog without a platform-specific window. Declare multiple
+/// type-matched dialog views in the inherited <c>DataTemplates</c> collection, assign a view model to
+/// <see cref="Dialog"/>, and use <see cref="ShowAsync(object, CancellationToken)"/> from direct code.
 /// </summary>
 [TemplatePart("PART_Scrim", typeof(Control))]
 [TemplatePart("PART_Overlay", typeof(Control))]
@@ -21,8 +23,10 @@ namespace Md3.Avalonia.Controls;
 [PseudoClasses(":open", ":closed", ":present", ":full-screen-dialog", ":reduced-motion", ":no-motion")]
 public sealed class MdDialogHost : ContentControl
 {
-    public static readonly StyledProperty<Control?> DialogProperty =
-        AvaloniaProperty.Register<MdDialogHost, Control?>(nameof(Dialog));
+    public static readonly StyledProperty<object?> DialogProperty =
+        AvaloniaProperty.Register<MdDialogHost, object?>(nameof(Dialog));
+    public static readonly StyledProperty<IDataTemplate?> DialogTemplateProperty =
+        AvaloniaProperty.Register<MdDialogHost, IDataTemplate?>(nameof(DialogTemplate));
     public static readonly StyledProperty<bool> IsOpenProperty =
         AvaloniaProperty.Register<MdDialogHost, bool>(nameof(IsOpen),
             defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
@@ -35,13 +39,15 @@ public sealed class MdDialogHost : ContentControl
     private Control? _scrim;
     private Control? _overlay;
     private ContentPresenter? _dialogPresenter;
+    private MdDialog? _displayedDialog;
     private int _openStateVersion;
     private bool _isAttached;
 
     static MdDialogHost()
     {
         IsOpenProperty.Changed.AddClassHandler<MdDialogHost>((host, _) => host.UpdateOpenState());
-        DialogProperty.Changed.AddClassHandler<MdDialogHost>((host, _) => host.UpdateDialogState());
+        DialogProperty.Changed.AddClassHandler<MdDialogHost>((host, _) => host.ScheduleDialogStateUpdate());
+        DialogTemplateProperty.Changed.AddClassHandler<MdDialogHost>((host, _) => host.ScheduleDialogStateUpdate());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdDialogHost>((host, _) => host.UpdateMotion());
     }
 
@@ -52,12 +58,18 @@ public sealed class MdDialogHost : ContentControl
         UpdateOpenState();
     }
 
-    public Control? Dialog { get => GetValue(DialogProperty); set => SetValue(DialogProperty, value); }
+    /// <summary>The active dialog view or view model. Non-controls are rendered through <see cref="DialogTemplate"/> or a matching inherited data template.</summary>
+    public object? Dialog { get => GetValue(DialogProperty); set => SetValue(DialogProperty, value); }
+
+    /// <summary>An optional explicit template for <see cref="Dialog"/>. Leave null to select from <c>DataTemplates</c> by model type.</summary>
+    public IDataTemplate? DialogTemplate { get => GetValue(DialogTemplateProperty); set => SetValue(DialogTemplateProperty, value); }
+
     public bool IsOpen { get => GetValue(IsOpenProperty); set => SetValue(IsOpenProperty, value); }
     public bool DismissOnScrimClick { get => GetValue(DismissOnScrimClickProperty); set => SetValue(DismissOnScrimClickProperty, value); }
 
-    public Task<object?> ShowAsync(Control dialog, CancellationToken cancellationToken = default)
+    public Task<object?> ShowAsync(object dialog, CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(dialog);
         if (_completion is not null) Close();
 
         SetCurrentValue(DialogProperty, dialog);
@@ -88,6 +100,7 @@ public sealed class MdDialogHost : ContentControl
         _dialogPresenter = e.NameScope.Find<ContentPresenter>("PART_DialogPresenter");
         if (_scrim is not null) _scrim.PointerPressed += OnScrimPressed;
         UpdateMotion();
+        ScheduleDialogStateUpdate();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -125,8 +138,33 @@ public sealed class MdDialogHost : ContentControl
         }
     }
 
-    private void UpdateDialogState() =>
-        PseudoClasses.Set(":full-screen-dialog", Dialog is MdDialog { Variant: MdDialogVariant.FullScreen });
+    private void ScheduleDialogStateUpdate()
+    {
+        UpdateDialogState();
+        if (_isAttached)
+            Dispatcher.UIThread.Post(UpdateDialogState, DispatcherPriority.Render);
+    }
+
+    private void UpdateDialogState()
+    {
+        var displayedDialog = Dialog as MdDialog ??
+            _dialogPresenter?.GetVisualDescendants().OfType<MdDialog>().FirstOrDefault();
+        if (!ReferenceEquals(_displayedDialog, displayedDialog))
+        {
+            if (_displayedDialog is not null)
+                _displayedDialog.PropertyChanged -= OnDisplayedDialogPropertyChanged;
+            _displayedDialog = displayedDialog;
+            if (_displayedDialog is not null)
+                _displayedDialog.PropertyChanged += OnDisplayedDialogPropertyChanged;
+        }
+
+        PseudoClasses.Set(":full-screen-dialog", displayedDialog?.Variant == MdDialogVariant.FullScreen);
+    }
+
+    private void OnDisplayedDialogPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property == MdDialog.VariantProperty) UpdateDialogState();
+    }
 
     private void UpdateOpenState()
     {

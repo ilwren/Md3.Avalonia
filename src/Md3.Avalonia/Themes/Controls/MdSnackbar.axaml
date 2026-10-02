@@ -41,4 +41,20 @@
     <Style Selector="^:has-action /template/ md|MdButton#PART_ActionButton"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:dismissible /template/ md|MdIconButton#PART_DismissButton"><Setter Property="IsVisible" Value="True" /></Style>
   </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdSnackbarHost}" TargetType="md:MdSnackbarHost">
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdSnackbarHost">
+        <Grid>
+          <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+          <md:MdSnackbar x:Name="PART_Snackbar" ZIndex="1" Margin="24" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
 </ResourceDictionary>

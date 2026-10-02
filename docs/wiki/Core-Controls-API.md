@@ -130,15 +130,35 @@ Desktop and mobile settings row with icon, title, description, and action conten
 ## 5. Dialogs & Sheets
 
 ### `MdDialogHost` & `MdSheetHost`
-Modal dialogs and bottom/side sheets with backdrop dismiss and keyboard escape support.
+Modal dialogs and bottom/side sheets with backdrop dismiss and keyboard escape support. A dialog host accepts controls directly or selects any number of predeclared `DataTemplate` views by the active model type.
+
+```xml
+<md:MdDialogHost x:Name="DialogHost">
+    <md:MdDialogHost.DataTemplates>
+        <DataTemplate DataType="{x:Type vm:DeleteDialogModel}">
+            <md:MdDialog Headline="Delete item?">...</md:MdDialog>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:RenameDialogModel}">
+            <md:MdDialog Headline="Rename item">...</md:MdDialog>
+        </DataTemplate>
+    </md:MdDialogHost.DataTemplates>
+</md:MdDialogHost>
+```
 
 ```csharp
-// Showing an M3 Alert Dialog
-await MdDialogHost.ShowAsync(new MdAlertDialog
+var result = await DialogHost.ShowAsync(new DeleteDialogModel(item));
+DialogHost.Close(result: true);
+```
+
+### `MdSnackbarHost` & `IMdSnackbarService`
+
+`MdSnackbar.Show()` changes the state of an existing visual control; it does not attach a newly constructed control to a window. For ViewModels, put an `MdSnackbarHost` in the application shell and share one `MdSnackbarService` instance between that host and the ViewModel.
+
+```csharp
+await snackbars.ShowAsync(new MdSnackbarMessage("Draft archived")
 {
-    Title = "Discard unsaved changes?",
-    Content = "Your edits will be lost if you leave this page.",
-    PrimaryButtonText = "Discard",
-    SecondaryButtonText = "Cancel"
+    ActionContent = "Undo",
+    ActionCommand = UndoCommand,
+    IsDismissible = true
 });
 ```
