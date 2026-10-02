@@ -728,7 +728,7 @@
               <StackPanel Spacing="4">
                 <TextBlock Text="Source colors" FontSize="12" FontWeight="Medium"
                            Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-                <ItemsControl ItemsSource="{TemplateBinding MaterialPrimaryColors}">
+                <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding MaterialPrimaryColors}">
                   <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel Orientation="Horizontal" ItemWidth="48" ItemHeight="48" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="Color">
@@ -746,7 +746,7 @@
               <StackPanel Spacing="4">
                 <TextBlock Text="Material 3 HCT tonal palette" FontSize="12" FontWeight="Medium"
                            Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-                <ItemsControl ItemsSource="{TemplateBinding MaterialShades}">
+                <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding MaterialShades}">
                   <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel Orientation="Horizontal" ItemWidth="48" ItemHeight="48" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="Color">
@@ -788,7 +788,7 @@
             <StackPanel x:Name="PART_PresetsSection" Spacing="6">
               <TextBlock Text="Recently selected" FontSize="12" FontWeight="Medium"
                          Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-              <ItemsControl ItemsSource="{Binding RecentColors, RelativeSource={RelativeSource TemplatedParent}}">
+              <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{Binding RecentColors, RelativeSource={RelativeSource TemplatedParent}}">
                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel Orientation="Horizontal" ItemWidth="48" ItemHeight="48" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="Color">
