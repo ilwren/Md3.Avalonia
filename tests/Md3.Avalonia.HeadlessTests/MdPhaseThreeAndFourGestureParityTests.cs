@@ -187,7 +187,8 @@ public class MdPhaseThreeAndFourGestureParityTests
     public void ScrollViewer_OptIn_Mouse_Drag_Yields_When_Custom_Content_Captures_Pointer()
     {
         var pointerMoved = false;
-        var precisionSurface = new Border { Height = 700, Background = Brushes.Orange };
+        var hitSurface = new Border { Height = 700, Background = Brushes.Orange };
+        var precisionSurface = new Border { Height = 700, Child = hitSurface };
         precisionSurface.PointerPressed += (_, e) => e.Pointer.Capture(precisionSurface);
         precisionSurface.AddHandler(InputElement.PointerMovedEvent, (_, _) => pointerMoved = true,
             RoutingStrategies.Bubble, handledEventsToo: true);
