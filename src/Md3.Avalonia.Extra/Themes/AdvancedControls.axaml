@@ -616,7 +616,7 @@
     <Style Selector="^:text /template/ Border.eco-highlight"><Setter Property="CornerRadius" Value="4" /></Style>
   </ControlTheme>
 
-  <ControlTheme x:Key="EcoColorSwatchButtonTheme" TargetType="Button" x:CompileBindings="False">
+  <ControlTheme x:Key="EcoColorSwatchButtonTheme" TargetType="Button">
     <!-- Material visual swatch with a 48-DIP interaction target. -->
     <Setter Property="Width" Value="48" />
     <Setter Property="Height" Value="48" />
@@ -634,8 +634,8 @@
                   BorderThickness="2">
             <Border.IsVisible>
               <MultiBinding Converter="{x:Static eco:MdColorConverters.ColorsEqual}">
-                <Binding />
-                <Binding Path="$parent[eco:MdColorPicker].SelectedColor" />
+                <ReflectionBinding />
+                <ReflectionBinding Path="$parent[eco:MdColorPicker].SelectedColor" />
               </MultiBinding>
             </Border.IsVisible>
           </Border>
@@ -653,8 +653,8 @@
                                 HorizontalAlignment="Center" VerticalAlignment="Center">
                 <ContentPresenter.IsVisible>
                   <MultiBinding Converter="{x:Static eco:MdColorConverters.ColorsEqual}">
-                    <Binding />
-                    <Binding Path="$parent[eco:MdColorPicker].SelectedColor" />
+                    <ReflectionBinding />
+                    <ReflectionBinding Path="$parent[eco:MdColorPicker].SelectedColor" />
                   </MultiBinding>
                 </ContentPresenter.IsVisible>
               </ContentPresenter>
