@@ -328,6 +328,7 @@ public sealed class MdSimpleDialog : TemplatedControl
         // Presence controls lifecycle, not just styling. Set the template part directly so a
         // zero-duration scheme cannot retain a stale :present style value for another layout pass.
         if (_overlay is not null) _overlay.IsVisible = present;
+        if (_surface is not null) _surface.IsVisible = present;
     }
 
     private void UpdateHitTesting()
