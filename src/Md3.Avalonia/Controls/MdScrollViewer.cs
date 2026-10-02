@@ -182,7 +182,9 @@ public sealed class MdScrollViewer : ScrollViewer
 
         // A child may claim the gesture after an initially unhandled press. Never replace that
         // capture with the outer ScrollViewer's capture.
-        if (e.Pointer.Captured is not null && !ReferenceEquals(e.Pointer.Captured, this))
+        if (e.Pointer.Captured is not null &&
+            !ReferenceEquals(e.Pointer.Captured, this) &&
+            !ReferenceEquals(e.Pointer.Captured, Presenter))
         {
             ResetMouseDragTracking(releaseOwnCapture: false);
             return;
