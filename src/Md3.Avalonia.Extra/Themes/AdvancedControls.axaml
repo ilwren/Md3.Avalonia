@@ -724,7 +724,7 @@
                               Label="HEX value" Variant="Outlined"
                               PlaceholderText="#RRGGBB" />
                 <md:MdIconButton Name="PART_CopyHexButton" Grid.Column="2"
-                                 Icon="{x:Static md:MdSymbols.ContentCopy}"
+                                 Icon="&#xe14d;"
                                  Variant="Standard" Size="Small"
                                  ToolTip.Tip="Copy HEX value"
                                  AutomationProperties.Name="Copy HEX value" />
