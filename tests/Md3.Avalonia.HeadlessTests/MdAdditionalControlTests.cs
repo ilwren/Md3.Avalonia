@@ -75,7 +75,7 @@ public sealed class MdAdditionalControlTests
     }
 
     [AvaloniaFact]
-    public void Popup_Templates_Do_Not_Force_An_Overlay_Layer()
+    public void Popup_Templates_Use_Overlay_Only_For_Platform_Safe_Material_Surfaces()
     {
         Control[] owners =
         {
@@ -97,7 +97,8 @@ public sealed class MdAdditionalControlTests
             {
                 var popup = Assert.IsAssignableFrom<TemplatedControl>(owner)
                     .GetTemplateDescendants().OfType<Popup>().Single();
-                Assert.False(popup.ShouldUseOverlayLayer);
+                var expectsOverlay = owner is MdComboBox or MdDatePicker or MdTimePicker or MdMenuAnchor;
+                Assert.Equal(expectsOverlay, popup.ShouldUseOverlayLayer);
             }
         }
         finally

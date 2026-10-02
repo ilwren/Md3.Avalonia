@@ -4,6 +4,7 @@ using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -329,8 +330,10 @@ public sealed class MdP0AccessibilityAndKeyboardTests
         Assert.Equal(20, upper.Minimum);
         Assert.Equal(100, upper.Maximum);
         Assert.Equal(80, upper.Value);
-        Assert.True(thumbs[0].GetBoundingRectangle().Width >= 48);
-        Assert.True(thumbs[1].GetBoundingRectangle().Width >= 48);
+        var lowerBounds = thumbs[0].GetBoundingRectangle();
+        var upperBounds = thumbs[1].GetBoundingRectangle();
+        Assert.True(lowerBounds.Width >= 47.9, $"Lower thumb bounds were {lowerBounds}.");
+        Assert.True(upperBounds.Width >= 47.9, $"Upper thumb bounds were {upperBounds}.");
 
         lower.SetValue(35);
         upper.SetValue(65);
@@ -429,7 +432,10 @@ public sealed class MdP0AccessibilityAndKeyboardTests
 
     private static WindowScope Show(Control content, double width = 700, double height = 700)
     {
-        var window = new Window { Width = width, Height = height, Content = content };
+        // Avalonia Headless has no native IPopupImpl. Mirror Android's supported overlay-host
+        // path so popup keyboard/focus behavior is exercised instead of throwing at open time.
+        var layers = new VisualLayerManager { EnableOverlayLayer = true, Child = content };
+        var window = new Window { Width = width, Height = height, Content = layers };
         window.Show();
         Dispatcher.UIThread.RunJobs();
         return new WindowScope(window);

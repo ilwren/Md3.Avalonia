@@ -268,7 +268,9 @@
       </ControlTemplate>
     </Setter>
     <Style Selector="^:present /template/ Grid#PART_Overlay"><Setter Property="IsVisible" Value="True" /></Style>
-    <Style Selector="^:open /template/ Border#PART_Surface"><Setter Property="IsHitTestVisible" Value="True" /><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+    <!-- Hit testing is owned by MdSimpleDialog.UpdateHitTesting so the still-visible exit
+         surface can never intercept input after IsOpen becomes false. -->
+    <Style Selector="^:open /template/ Border#PART_Surface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
     <Style Selector="^:reduced-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
   </ControlTheme>
 

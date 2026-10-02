@@ -22,7 +22,7 @@ namespace Md3.Avalonia.HeadlessTests;
 public sealed class MdAcceptanceRegressionTests
 {
     [AvaloniaFact]
-    public void Every_Material_Popup_Template_Provides_A_Scoped_Transparent_Host_Style()
+    public void Every_Material_Popup_Template_Uses_A_Supported_Transparent_Or_Overlay_Host()
     {
         var controls = new Control[]
         {
@@ -43,8 +43,8 @@ public sealed class MdAcceptanceRegressionTests
         {
             var popup = control.Template!.Build(control)!.NameScope.Find<Popup>("PART_Popup");
             Assert.True(popup is not null, $"{control.GetType().Name} did not expose PART_Popup");
-            Assert.False(popup!.ShouldUseOverlayLayer);
-            Assert.NotEmpty(popup.Styles);
+            Assert.True(popup!.ShouldUseOverlayLayer || popup.Styles.Count > 0,
+                $"{control.GetType().Name} must use the current-window overlay or a scoped transparent native host.");
         }
     }
 
