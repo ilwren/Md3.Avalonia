@@ -616,7 +616,7 @@
     <Style Selector="^:text /template/ Border.eco-highlight"><Setter Property="CornerRadius" Value="4" /></Style>
   </ControlTheme>
 
-  <ControlTheme x:Key="EcoColorSwatchButtonTheme" TargetType="Button">
+  <ControlTheme x:Key="EcoColorSwatchButtonTheme" TargetType="Button" x:CompileBindings="False">
     <!-- Material visual swatch with a 48-DIP interaction target. -->
     <Setter Property="Width" Value="48" />
     <Setter Property="Height" Value="48" />
@@ -705,7 +705,7 @@
                            Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
                 <md:MdTextBox Name="PART_HexTextBox" Text="{TemplateBinding SelectedHex}"
                               MinHeight="40" FontSize="14" FontWeight="SemiBold"
-                              Watermark="#RRGGBB" />
+                              PlaceholderText="#RRGGBB" />
               </StackPanel>
               <md:MdButton Name="PART_CopyHexButton" Grid.Column="2" Size="Small" Variant="Tonal"
                            Content="Copy" ToolTip.Tip="Copy HEX color" />
