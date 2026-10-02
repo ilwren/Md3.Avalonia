@@ -14,6 +14,7 @@ using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Extra.Controls;
 using Md3.Avalonia.Motion;
+using CoreCalendarDay = Md3.Avalonia.Controls.MdCalendarDay;
 using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
@@ -237,26 +238,26 @@ public sealed class MdP0AccessibilityAndKeyboardTests
         picker.IsOpen = true;
         Dispatcher.UIThread.RunJobs();
         var focused = Assert.IsType<Button>(scope.Window.FocusManager?.GetFocusedElement());
-        var day = Assert.IsType<MdCalendarDay>(focused.DataContext);
+        var day = Assert.IsType<CoreCalendarDay>(focused.DataContext);
         Assert.Equal(selected.Date, day.Date.Date);
         Assert.Contains(Md3.Avalonia.Localization.MdLocalization.GetString("Selected", picker), day.AccessibleText);
-        Assert.Single(scope.Window.GetVisualDescendants().OfType<Button>()
-            .Where(button => button.DataContext is MdCalendarDay && KeyboardNavigation.GetIsTabStop(button)));
+        Assert.Single(scope.Window.GetVisualDescendants().OfType<Button>(),
+            button => button.DataContext is CoreCalendarDay && KeyboardNavigation.GetIsTabStop(button));
 
         Press(scope.Window, Key.Right, PhysicalKey.ArrowRight);
         focused = Assert.IsType<Button>(scope.Window.FocusManager?.GetFocusedElement());
-        day = Assert.IsType<MdCalendarDay>(focused.DataContext);
+        day = Assert.IsType<CoreCalendarDay>(focused.DataContext);
         Assert.Equal(selected.AddDays(1).Date, day.Date.Date);
 
         Press(scope.Window, Key.Down, PhysicalKey.ArrowDown);
         focused = Assert.IsType<Button>(scope.Window.FocusManager?.GetFocusedElement());
-        day = Assert.IsType<MdCalendarDay>(focused.DataContext);
+        day = Assert.IsType<CoreCalendarDay>(focused.DataContext);
         Assert.Equal(selected.AddDays(8).Date, day.Date.Date);
 
         Press(scope.Window, Key.PageDown, PhysicalKey.PageDown);
         Dispatcher.UIThread.RunJobs();
         focused = Assert.IsType<Button>(scope.Window.FocusManager?.GetFocusedElement());
-        day = Assert.IsType<MdCalendarDay>(focused.DataContext);
+        day = Assert.IsType<CoreCalendarDay>(focused.DataContext);
         Assert.Equal(selected.AddDays(8).AddMonths(1).Date, day.Date.Date);
     }
 
@@ -283,7 +284,7 @@ public sealed class MdP0AccessibilityAndKeyboardTests
 
         var values = peer.GetChildren();
         Assert.Equal(12, values.Count);
-        var twelve = Assert.Single(values.Where(child => child.GetAutomationId() == "Hour_12"));
+        var twelve = Assert.Single(values, child => child.GetAutomationId() == "Hour_12");
         Assert.Contains("12 hour", twelve.GetName());
         Assert.Equal(ToggleState.Off,
             Assert.IsAssignableFrom<IToggleProvider>(twelve.GetProvider<IToggleProvider>()).ToggleState);
