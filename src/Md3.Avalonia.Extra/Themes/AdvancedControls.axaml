@@ -635,7 +635,7 @@
             <Border.IsVisible>
               <MultiBinding Converter="{x:Static eco:MdColorConverters.ColorsEqual}">
                 <ReflectionBinding />
-                <ReflectionBinding Path="$parent[eco:MdColorPicker].SelectedColor" />
+                <Binding Path="SelectedColor" RelativeSource="{RelativeSource AncestorType=eco:MdColorPicker}" />
               </MultiBinding>
             </Border.IsVisible>
           </Border>
@@ -654,7 +654,7 @@
                 <ContentPresenter.IsVisible>
                   <MultiBinding Converter="{x:Static eco:MdColorConverters.ColorsEqual}">
                     <ReflectionBinding />
-                    <ReflectionBinding Path="$parent[eco:MdColorPicker].SelectedColor" />
+                    <Binding Path="SelectedColor" RelativeSource="{RelativeSource AncestorType=eco:MdColorPicker}" />
                   </MultiBinding>
                 </ContentPresenter.IsVisible>
               </ContentPresenter>
@@ -724,7 +724,7 @@
                            CommandParameter="Presets" />
             </Grid>
 
-            <StackPanel x:Name="PART_PaletteSection" Spacing="12" IsVisible="False">
+            <StackPanel x:Name="PART_PaletteSection" Spacing="12">
               <StackPanel Spacing="4">
                 <TextBlock Text="Source colors" FontSize="12" FontWeight="Medium"
                            Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
@@ -762,7 +762,7 @@
               </StackPanel>
             </StackPanel>
 
-            <StackPanel x:Name="PART_SpectrumSection" Spacing="8" IsVisible="False">
+            <StackPanel x:Name="PART_SpectrumSection" Spacing="8">
               <StackPanel Spacing="4">
                 <Grid ColumnDefinitions="*,Auto">
                   <TextBlock Text="Hue" FontSize="12" FontWeight="Medium" />
@@ -785,7 +785,7 @@
               </StackPanel>
             </StackPanel>
 
-            <StackPanel x:Name="PART_PresetsSection" Spacing="6" IsVisible="False">
+            <StackPanel x:Name="PART_PresetsSection" Spacing="6">
               <TextBlock Text="Recently selected" FontSize="12" FontWeight="Medium"
                          Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
               <ItemsControl ItemsSource="{Binding RecentColors, RelativeSource={RelativeSource TemplatedParent}}">
@@ -806,6 +806,9 @@
         </Border>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^ /template/ StackPanel#PART_PaletteSection"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^ /template/ StackPanel#PART_SpectrumSection"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^ /template/ StackPanel#PART_PresetsSection"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:palette /template/ StackPanel#PART_PaletteSection"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:spectrum /template/ StackPanel#PART_SpectrumSection"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:presets /template/ StackPanel#PART_PresetsSection"><Setter Property="IsVisible" Value="True" /></Style>
