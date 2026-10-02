@@ -148,6 +148,40 @@ public sealed class MdActionButtonTests
     }
 
     [AvaloniaFact]
+    public void Fab_Menu_Expansion_Direction_Is_Independent_From_Parent_Alignment()
+    {
+        var menu = new MdFabMenu
+        {
+            VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
+            Items =
+            {
+                new MdFabMenuItem { Content = "Photo", Icon = MdSymbols.Photo },
+                new MdFabMenuItem { Content = "Document", Icon = MdSymbols.Description }
+            }
+        };
+        using var host = Show(menu);
+        Dispatcher.UIThread.RunJobs();
+
+        var presenter = menu.GetVisualDescendants().OfType<ItemsPresenter>()
+            .Single(control => control.Name == "PART_MenuItems");
+        Assert.Equal(MdFabMenuExpansionDirection.Up, menu.ExpansionDirection);
+        Assert.Contains(":expand-up", menu.Classes);
+        Assert.Equal(global::Avalonia.Layout.VerticalAlignment.Bottom, presenter.VerticalAlignment);
+        Assert.Equal(new Thickness(0, 0, 0, 64), presenter.Margin);
+        Assert.Equal(global::Avalonia.Layout.VerticalAlignment.Center, menu.VerticalAlignment);
+
+        menu.ExpansionDirection = MdFabMenuExpansionDirection.Down;
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Contains(":expand-down", menu.Classes);
+        Assert.DoesNotContain(":expand-up", menu.Classes);
+        Assert.Equal(global::Avalonia.Layout.VerticalAlignment.Top, presenter.VerticalAlignment);
+        Assert.Equal(new Thickness(0, 64, 0, 0), presenter.Margin);
+        Assert.Equal(0, presenter.RenderTransformOrigin.Point.Y);
+        Assert.Equal(global::Avalonia.Layout.VerticalAlignment.Center, menu.VerticalAlignment);
+    }
+
+    [AvaloniaFact]
     public void Action_Button_Matrix_Can_Render_To_Bitmap()
     {
         Application.Current!.RequestedThemeVariant = ThemeVariant.Light;

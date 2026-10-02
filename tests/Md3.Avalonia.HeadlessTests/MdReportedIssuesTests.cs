@@ -327,6 +327,28 @@ public sealed class MdReportedIssuesTests
     }
 
     [AvaloniaFact]
+    public void ColorPicker_Uses_Material_Surface_And_Connected_Mode_Controls()
+    {
+        var picker = new MdColorPicker { Width = 400 };
+        using var host = Show(picker, 460, 700);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(new CornerRadius(28), picker.CornerRadius);
+        Assert.Equal(new Thickness(0), picker.BorderThickness);
+
+        var group = picker.GetVisualDescendants().OfType<MdConnectedButtonGroup>().Single();
+        var modeButtons = group.GetVisualDescendants().OfType<MdButton>().ToArray();
+        Assert.Equal(3, modeButtons.Length);
+        Assert.Equal(MdButtonVariant.Tonal, modeButtons[0].Variant);
+
+        picker.PickerMode = MdColorPickerMode.SpectrumSliders;
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(MdButtonVariant.Text, modeButtons[0].Variant);
+        Assert.Equal(MdButtonVariant.Tonal, modeButtons[1].Variant);
+    }
+
+    [AvaloniaFact]
     public void ColorPickerButton_Tracks_Popup_And_Hex_State()
     {
         // Keep popup state testing detached because the headless platform intentionally

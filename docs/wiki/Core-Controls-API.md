@@ -41,27 +41,28 @@ Floating action buttons for primary screen actions.
 ---
 
 ### `MdFabMenu` (Expandable FAB with Floating Actions)
-Floating action button speed-dial menu that expands two to six floating action buttons with reversible motion and configurable alignment.
+Material 3 FAB menu that expands two to six labeled actions with reversible motion. Horizontal alignment and vertical expansion direction are independent APIs.
 
 | Property | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `IsOpen` | `bool` | `false` | Two-way binding for expanded/collapsed state |
-| `Alignment` | `MdFabAlignment` | `Right` | `Left` or `Right` alignment of floating buttons and trigger |
+| `Alignment` | `MdFabAlignment` | `Right` | `Left` or `Right` alignment of actions and trigger |
+| `ExpansionDirection` | `MdFabMenuExpansionDirection` | `Up` | Places actions above or below the anchored trigger without changing its parent-layout alignment |
 | `ColorStyle` | `MdFabColor` | `PrimaryContainer` | Color container style for trigger |
 | `OpenIcon` | `object?` | `MdSymbols.Add` | Icon when closed |
 | `CloseIcon` | `object?` | `MdSymbols.Close` | Icon when opened |
 
 ```xml
-<!-- Left-aligned FAB Menu: Floating buttons pop up and align to the Left -->
-<md:MdFabMenu Alignment="Left" VerticalAlignment="Bottom">
-    <md:MdFabMenuItem Content="Scanner" Icon="{x:Static md:MdSymbols.QrCodeScanner}" />
-    <md:MdFabMenuItem Content="Attachment" Icon="{x:Static md:MdSymbols.AttachFile}" />
-</md:MdFabMenu>
-
-<!-- Right-aligned FAB Menu: Floating buttons pop up and align to the Right -->
-<md:MdFabMenu Alignment="Right" VerticalAlignment="Bottom">
+<!-- Material default: actions expand above an anchor near the bottom edge. -->
+<md:MdFabMenu Alignment="Right" ExpansionDirection="Up" VerticalAlignment="Bottom">
     <md:MdFabMenuItem Content="Photo" Icon="{x:Static md:MdSymbols.Photo}" />
     <md:MdFabMenuItem Content="Document" Icon="{x:Static md:MdSymbols.Description}" />
+</md:MdFabMenu>
+
+<!-- Explicit extension: actions expand below an anchor near the top edge. -->
+<md:MdFabMenu Alignment="Left" ExpansionDirection="Down" VerticalAlignment="Top">
+    <md:MdFabMenuItem Content="Scanner" Icon="{x:Static md:MdSymbols.QrCodeScanner}" />
+    <md:MdFabMenuItem Content="Attachment" Icon="{x:Static md:MdSymbols.AttachFile}" />
 </md:MdFabMenu>
 ```
 

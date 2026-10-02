@@ -97,6 +97,8 @@
   <x:Double x:Key="Md.Comp.FabMenu.ItemSpacing">4</x:Double>
   <x:Double x:Key="Md.Comp.FabMenu.CloseButtonSpacing">8</x:Double>
   <x:Double x:Key="Md.Comp.FabMenu.CloseButton.Size">56</x:Double>
+  <Thickness x:Key="Md.Comp.FabMenu.ItemsOffset.Up">0,0,0,64</Thickness>
+  <Thickness x:Key="Md.Comp.FabMenu.ItemsOffset.Down">0,64,0,0</Thickness>
   <CornerRadius x:Key="Md.Comp.FabMenu.CloseButton.Shape">28</CornerRadius>
 
   <BoxShadows x:Key="Md.Sys.Elevation.Level3">0 4 8 1 #3D000000</BoxShadows>

@@ -25,8 +25,9 @@ public enum MdColorPickerMode
 }
 
 /// <summary>
-/// A Flutter / Material Design 3 inspired color picker featuring Material 3 tonal swatches,
-/// HSV sliders, live HEX input/binding, and Alpha channel support.
+/// A custom Material-styled color picker composed from Material 3 surfaces, controls and color roles.
+/// Material and Flutter do not provide a first-party ColorPicker component. This control supplies HCT
+/// tonal swatches, HSV sliders, live HEX input/binding, and alpha-channel support.
 /// </summary>
 [PseudoClasses(":palette", ":spectrum", ":presets")]
 public class MdColorPicker : TemplatedControl
@@ -411,6 +412,11 @@ public static class MdColorConverters
 {
     public static readonly IValueConverter ColorToBrush =
         new FuncValueConverter<Color, IBrush>(color => new SolidColorBrush(color));
+
+    public static readonly IValueConverter ColorToHex =
+        new FuncValueConverter<Color, string>(color => color.A < byte.MaxValue
+            ? $"#{color.A:X2}{color.R:X2}{color.G:X2}{color.B:X2}"
+            : $"#{color.R:X2}{color.G:X2}{color.B:X2}");
 
     public static readonly IValueConverter ContrastBrush =
         new FuncValueConverter<Color, IBrush>(color =>

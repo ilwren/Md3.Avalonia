@@ -762,7 +762,7 @@ Gallery 顶栏提供播放/暂停及 Reduced Motion 预览。
 - FAB resting 使用 Level 3 elevation，hover 使用 Level 4；state layer 必须覆盖整个 visual container 并裁切到当前 shape，不能只覆盖扣除 padding 后的 content box。
 - `MdExtendedFloatingActionButton : Button` 采用当前 Expressive Small/Medium/Large，容器高度 56/80/96 DIP；label 与 icon 必须在 container 内垂直居中；不得把已不推荐的 baseline Extended FAB 当默认配置。
 - `MdFabMenu : ItemsControl` 从任意 FAB trigger 展开 2–6 个相关 labeled actions，不与 Extended FAB trigger 搭配，并取代旧 speed dial 模式。
-- FAB Menu item/close button 高 56 DIP、Full shape；item 间 4 DIP、item 到 close button 8 DIP、Level 3 elevation；`IsOpen` 默认双向绑定，打开/关闭提供可逆 expand/opacity/scale transition、键盘焦点流与 Esc 返回 trigger。
+- FAB Menu item/close button 高 56 DIP、Full shape；item 间 4 DIP、item 到 close button 8 DIP、Level 3 elevation；`IsOpen` 默认双向绑定，打开/关闭提供可逆 expand/opacity/scale transition、键盘焦点流与 Esc 返回 trigger。默认按 Material 模式向上展开；项目扩展可通过独立 `ExpansionDirection=Up|Down` 控制 action 相对 trigger 的方向，不得借用控件在父布局中的 `VerticalAlignment` 代替展开方向。
 
 ### 17.7 Motion、Ripple 与图标字体专项要求
 

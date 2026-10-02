@@ -26,7 +26,7 @@
 - `MdConnectedButtonGroup`：2 DIP 间距，自动计算首、中、尾按钮的外圆内方轮廓；
 - `MdFloatingActionButton`：Small、Regular、Medium、Large，Primary/Secondary/Tertiary 配色与 Level 3/4 elevation；
 - `MdExtendedFloatingActionButton`：当前 Expressive Small、Medium、Large；
-- `MdFabMenu` + `MdFabMenuItem`：可展开 2–6 个相关动作，56 DIP full-pill item、双向 `IsOpen`、`Show`/`Dismiss`、Escape 和可逆展开/收缩 motion。
+- `MdFabMenu` + `MdFabMenuItem`：可展开 2–6 个相关动作，56 DIP full-pill item、独立 `ExpansionDirection="Up|Down"`（默认向上）、双向 `IsOpen`、`Show`/`Dismiss`、Escape 和可逆展开/收缩 motion。
 
 所有按钮、Icon Button 和 FAB 模板都接入 `MdRipplePresenter`：按下位置产生涟漪，裁切到完整 container shape，并支持 Expressive、Standard、Reduced、None motion scheme。
 
