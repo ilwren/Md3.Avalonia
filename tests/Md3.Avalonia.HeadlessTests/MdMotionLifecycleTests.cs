@@ -336,14 +336,16 @@ public sealed class MdMotionLifecycleTests
         dialog.Dismiss();
         Dispatcher.UIThread.RunJobs();
         Assert.True(surface.IsVisible);
-        Assert.False(surface.IsHitTestVisible);
+        Assert.False(surface.IsHitTestVisible,
+            "The exiting dialog surface must remain visible for motion but stop intercepting input immediately.");
         Assert.Equal(2, surface.Transitions!.Count);
 
         MdMotion.SetScheme(dialog, MdMotionScheme.Reduced);
         Assert.Single(surface.Transitions!);
         MdMotion.SetScheme(dialog, MdMotionScheme.None);
         Dispatcher.UIThread.RunJobs();
-        Assert.False(surface.IsVisible);
+        Assert.False(surface.IsVisible,
+            "No-motion must remove the retained dialog surface without waiting for an exit timer.");
         Assert.Null(surface.Transitions);
     }
 

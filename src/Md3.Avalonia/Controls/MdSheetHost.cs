@@ -89,9 +89,13 @@ public sealed class MdSheetHost : ContentControl
         if (_scrim is not null) _scrim.PointerPressed += OnScrimPressed;
         if (_dragHandle is not null)
         {
-            _dragHandle.PointerPressed += OnDragPressed;
+            // Button marks pointer input handled as part of its Click contract. Observe handled
+            // press/release events as well so the accessible drag handle still starts a 1:1 drag.
+            _dragHandle.AddHandler(InputElement.PointerPressedEvent, OnDragPressed,
+                RoutingStrategies.Bubble, handledEventsToo: true);
             _dragHandle.PointerMoved += OnDragMoved;
-            _dragHandle.PointerReleased += OnDragReleased;
+            _dragHandle.AddHandler(InputElement.PointerReleasedEvent, OnDragReleased,
+                RoutingStrategies.Bubble, handledEventsToo: true);
             _dragHandle.PointerCaptureLost += OnDragCaptureLost;
             _dragHandle.KeyDown += OnDragHandleKeyDown;
             if (_dragHandle is Button button) button.Click += OnDragHandleClick;
@@ -130,9 +134,9 @@ public sealed class MdSheetHost : ContentControl
     {
         if (_scrim is not null) _scrim.PointerPressed -= OnScrimPressed;
         if (_dragHandle is null) return;
-        _dragHandle.PointerPressed -= OnDragPressed;
+        _dragHandle.RemoveHandler(InputElement.PointerPressedEvent, OnDragPressed);
         _dragHandle.PointerMoved -= OnDragMoved;
-        _dragHandle.PointerReleased -= OnDragReleased;
+        _dragHandle.RemoveHandler(InputElement.PointerReleasedEvent, OnDragReleased);
         _dragHandle.PointerCaptureLost -= OnDragCaptureLost;
         _dragHandle.KeyDown -= OnDragHandleKeyDown;
         if (_dragHandle is Button button) button.Click -= OnDragHandleClick;
