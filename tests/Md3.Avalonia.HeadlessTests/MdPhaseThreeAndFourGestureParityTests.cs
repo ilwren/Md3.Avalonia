@@ -87,6 +87,88 @@ public class MdPhaseThreeAndFourGestureParityTests
     }
 
     [AvaloniaFact]
+    public void ScrollViewer_Thumb_Hover_Preserves_Axis_Length_And_Mouse_Drag_Scrolls()
+    {
+        var scrollViewer = new MdScrollViewer
+        {
+            Width = 300,
+            Height = 220,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            Content = new Border { Width = 280, Height = 1100, Background = Brushes.Blue }
+        };
+
+        using var host = Show(scrollViewer, 400, 360);
+        Dispatcher.UIThread.RunJobs();
+
+        var scrollBar = scrollViewer.GetVisualDescendants().OfType<MdScrollBar>()
+            .Single(bar => bar.Orientation == global::Avalonia.Layout.Orientation.Vertical);
+        var thumb = scrollBar.GetVisualDescendants().OfType<Thumb>().Single();
+        Assert.True(thumb.Bounds.Height >= 32);
+
+        var axisLengthBeforeHover = thumb.Bounds.Height;
+        var thumbCenter = thumb.TranslatePoint(
+            new Point(thumb.Bounds.Width / 2, thumb.Bounds.Height / 2), host.Window)!.Value;
+
+        host.Window.MouseMove(thumbCenter, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.InRange(Math.Abs(thumb.Bounds.Height - axisLengthBeforeHover), 0, 0.01);
+
+        var offsetBeforeDrag = scrollViewer.Offset.Y;
+        var dragEnd = thumbCenter + new Vector(0, 56);
+        host.Window.MouseDown(thumbCenter, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseMove(dragEnd, RawInputModifiers.LeftMouseButton);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.MouseUp(dragEnd, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(scrollViewer.Offset.Y > offsetBeforeDrag,
+            $"Dragging the vertical scrollbar thumb must increase Offset.Y (actual: {scrollViewer.Offset.Y}).");
+    }
+
+    [AvaloniaFact]
+    public void ScrollViewer_Horizontal_Thumb_Hover_Preserves_Axis_Length_And_Mouse_Drag_Scrolls()
+    {
+        var scrollViewer = new MdScrollViewer
+        {
+            Width = 300,
+            Height = 180,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Visible,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            Content = new Border { Width = 1100, Height = 160, Background = Brushes.Green }
+        };
+
+        using var host = Show(scrollViewer, 420, 300);
+        Dispatcher.UIThread.RunJobs();
+
+        var scrollBar = scrollViewer.GetVisualDescendants().OfType<MdScrollBar>()
+            .Single(bar => bar.Orientation == global::Avalonia.Layout.Orientation.Horizontal);
+        var thumb = scrollBar.GetVisualDescendants().OfType<Thumb>().Single();
+        Assert.True(thumb.Bounds.Width >= 32);
+
+        var axisLengthBeforeHover = thumb.Bounds.Width;
+        var thumbCenter = thumb.TranslatePoint(
+            new Point(thumb.Bounds.Width / 2, thumb.Bounds.Height / 2), host.Window)!.Value;
+
+        host.Window.MouseMove(thumbCenter, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.InRange(Math.Abs(thumb.Bounds.Width - axisLengthBeforeHover), 0, 0.01);
+
+        var offsetBeforeDrag = scrollViewer.Offset.X;
+        var dragEnd = thumbCenter + new Vector(56, 0);
+        host.Window.MouseDown(thumbCenter, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseMove(dragEnd, RawInputModifiers.LeftMouseButton);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.MouseUp(dragEnd, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(scrollViewer.Offset.X > offsetBeforeDrag,
+            $"Dragging the horizontal scrollbar thumb must increase Offset.X (actual: {scrollViewer.Offset.X}).");
+    }
+
+    [AvaloniaFact]
     public void ScrollViewer_Child_Button_Click_Fires_Without_Drag()
     {
         var clicked = false;

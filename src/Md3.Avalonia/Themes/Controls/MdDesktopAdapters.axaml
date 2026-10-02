@@ -3,12 +3,50 @@
                     xmlns:chrome="using:Avalonia.Controls.Chrome"
                     xmlns:md="using:Md3.Avalonia.Controls">
   <!-- Scroll infrastructure is opt-in: native Avalonia controls are never globally restyled. -->
-  <ControlTheme x:Key="MdScrollThumbTheme" TargetType="Thumb">
+  <!-- Keep the draggable Thumb at the full 12-DIP cross-axis hit size. Hover changes only the
+       inner visual thickness, never the track-computed length along the scrolling axis. -->
+  <ControlTheme x:Key="MdVerticalScrollThumbTheme" TargetType="Thumb">
+    <Setter Property="Width" Value="12" />
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
     <Setter Property="CornerRadius" Value="4" />
-    <Setter Property="Template"><ControlTemplate><Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" /></ControlTemplate></Setter>
-    <Style Selector="^:pointerover /template/ Border"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" /></Style>
-    <Style Selector="^:pressed /template/ Border"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid Background="Transparent">
+          <Border x:Name="PART_ThumbVisual" Width="8" HorizontalAlignment="Center"
+                  Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_ThumbVisual">
+      <Setter Property="Width" Value="10" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_ThumbVisual">
+      <Setter Property="Width" Value="10" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="MdHorizontalScrollThumbTheme" TargetType="Thumb">
+    <Setter Property="Height" Value="12" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid Background="Transparent">
+          <Border x:Name="PART_ThumbVisual" Height="8" VerticalAlignment="Center"
+                  Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_ThumbVisual">
+      <Setter Property="Height" Value="10" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_ThumbVisual">
+      <Setter Property="Height" Value="10" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
   </ControlTheme>
 
   <ControlTheme x:Key="MdScrollPageButtonTheme" TargetType="RepeatButton">
@@ -30,7 +68,7 @@
                  Value="{TemplateBinding Value, Mode=TwoWay}" ViewportSize="{TemplateBinding ViewportSize}"
                  Orientation="Vertical" IsDirectionReversed="True">
             <Track.DecreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.DecreaseButton>
-            <Track.Thumb><Thumb Width="8" MinHeight="32" Margin="2" Theme="{StaticResource MdScrollThumbTheme}" /></Track.Thumb>
+            <Track.Thumb><Thumb MinHeight="32" Theme="{StaticResource MdVerticalScrollThumbTheme}" /></Track.Thumb>
             <Track.IncreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.IncreaseButton>
           </Track>
         </ControlTemplate>
@@ -46,16 +84,14 @@
                  Value="{TemplateBinding Value, Mode=TwoWay}" ViewportSize="{TemplateBinding ViewportSize}"
                  Orientation="Horizontal">
             <Track.DecreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.DecreaseButton>
-            <Track.Thumb><Thumb Height="8" MinWidth="32" Margin="2" Theme="{StaticResource MdScrollThumbTheme}" /></Track.Thumb>
+            <Track.Thumb><Thumb MinWidth="32" Theme="{StaticResource MdHorizontalScrollThumbTheme}" /></Track.Thumb>
             <Track.IncreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.IncreaseButton>
           </Track>
         </ControlTemplate>
       </Setter>
     </Style>
-    <Style Selector="^:pointerover /template/ Thumb">
-      <Setter Property="Width" Value="10" />
-      <Setter Property="Height" Value="10" />
-    </Style>
+    <!-- Thumb hover visuals live inside the orientation-specific Thumb themes so the interactive
+         geometry and the track-computed axis length remain stable for the whole drag gesture. -->
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdScrollViewer}" TargetType="md:MdScrollViewer">

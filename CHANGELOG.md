@@ -7,6 +7,7 @@ All notable changes follow Keep a Changelog. The project intends to use Semantic
 - Fixed Gallery diagnostics restore, Android deployment mappings, scrolling input parity, FAB menu alignment, breadcrumb rendering, and color-picker selection.
 - Updated all NuGet packages to `0.2.0` and added Material 3 HCT tonal-palette generation for color picking.
 - Added independent up/down FAB-menu expansion and refreshed the custom color picker with current Material surfaces, connected mode controls, accessible swatches, and generated role previews.
+- Fixed `MdScrollBar` hover sizing so the track-computed thumb length remains stable and mouse thumb dragging works.
 
 ## [0.1.0-preview.1] - 2026-09-24
 
