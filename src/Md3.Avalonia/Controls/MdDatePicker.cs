@@ -319,7 +319,7 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         }
     }
 
-    private void OnCalendarDayGotFocus(object? sender, GotFocusEventArgs e)
+    private void OnCalendarDayGotFocus(object? sender, FocusChangedEventArgs e)
     {
         if (e.Source is Button { DataContext: MdCalendarDay day } button && day.IsEnabled)
         {

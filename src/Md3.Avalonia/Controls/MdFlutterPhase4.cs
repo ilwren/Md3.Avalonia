@@ -812,7 +812,7 @@ public sealed class MdKeyboardAvoidingHost : ContentControl
         _updatingPadding = false;
     }
 
-    private void OnChildGotFocus(object? sender, GotFocusEventArgs e)
+    private void OnChildGotFocus(object? sender, FocusChangedEventArgs e)
     {
         if (!AutoScrollToFocused || e.Source is not Control focused) return;
         BringControlIntoView(focused);

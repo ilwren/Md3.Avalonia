@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -98,7 +99,7 @@ internal sealed class MdModalFocusController
             Dispatcher.UIThread.Post(() => target.Focus(NavigationMethod.Unspecified), DispatcherPriority.Input);
     }
 
-    private void OnTopLevelGotFocus(object? sender, GotFocusEventArgs e)
+    private void OnTopLevelGotFocus(object? sender, FocusChangedEventArgs e)
     {
         if (!_active || _scope is null || e.Source is not Visual source || IsWithin(source, _scope)) return;
         if (_redirectPending) return;
