@@ -68,7 +68,7 @@
 
 ### 桌面适配与响应式基础
 
-- `MdScrollViewer` + `MdScrollBar`：独立 Material 滚动模板，保留 wheel、touch、chaining、extent、viewport 与双向 offset，不覆盖原生 ScrollViewer；
+- `MdScrollViewer` + `MdScrollBar`：独立 Material 滚动模板，保留 wheel、touch、chaining、extent、viewport 与双向 offset，不覆盖原生 ScrollViewer；桌面鼠标拖页默认关闭并可用 `AllowMouseDrag` 显式启用，子控件直接操作和 `SuppressMouseDragScrolling` 子树优先；
 - `MdAutoCompleteBox : AutoCompleteBox`：原生同步/异步过滤、text completion、selection 与键盘 API，采用 Material exposed-field 与弱引用 popup coordinator；
 - `MdNumericBox : NumericUpDown`：原生 Value/Minimum/Maximum/Increment、解析、键盘、滚轮和 validation，复用 Material text-field 外观；
 - `MdAdaptiveLayout`：按可配置 600/840/1200/1600 DIP breakpoint 选择 Compact/Medium/Expanded/Large/ExtraLarge 内容，并公开 portrait/landscape 与 Touch/Pointer/Keyboard input mode；

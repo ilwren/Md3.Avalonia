@@ -49,6 +49,7 @@ public class MdPhaseThreeAndFourGestureParityTests
         {
             Width = 300,
             Height = 200,
+            AllowMouseDrag = true,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             Content = new StackPanel
             {
@@ -84,6 +85,100 @@ public class MdPhaseThreeAndFourGestureParityTests
 
         // Stop inertia clean-up
         scrollViewer.StopInertia();
+    }
+
+    [AvaloniaFact]
+    public void ScrollViewer_Mouse_Drag_Is_OptIn_On_Desktop()
+    {
+        var scrollViewer = new MdScrollViewer
+        {
+            Width = 300,
+            Height = 200,
+            Content = new Border { Height = 900, Background = Brushes.Blue }
+        };
+
+        using var host = Show(scrollViewer, 400, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        var startPoint = scrollViewer.TranslatePoint(new Point(150, 150), host.Window)!.Value;
+        var endPoint = scrollViewer.TranslatePoint(new Point(150, 50), host.Window)!.Value;
+        host.Window.MouseMove(startPoint, RawInputModifiers.None);
+        host.Window.MouseDown(startPoint, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseMove(endPoint, RawInputModifiers.LeftMouseButton);
+        host.Window.MouseUp(endPoint, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(0, scrollViewer.Offset.Y);
+    }
+
+    [AvaloniaFact]
+    public void ScrollViewer_OptIn_Mouse_Drag_Defers_To_Child_Direct_Manipulation()
+    {
+        var rangeSlider = new MdRangeSlider
+        {
+            Width = 280,
+            Height = 80,
+            LowerValue = 25,
+            UpperValue = 75
+        };
+        var scrollViewer = new MdScrollViewer
+        {
+            Width = 300,
+            Height = 200,
+            AllowMouseDrag = true,
+            Content = new StackPanel
+            {
+                Children =
+                {
+                    rangeSlider,
+                    new Border { Height = 700, Background = Brushes.Blue }
+                }
+            }
+        };
+
+        using var host = Show(scrollViewer, 400, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        var valueBeforeDrag = rangeSlider.LowerValue;
+        var startPoint = rangeSlider.TranslatePoint(new Point(82, 40), host.Window)!.Value;
+        var endPoint = startPoint + new Vector(80, -24);
+        host.Window.MouseMove(startPoint, RawInputModifiers.None);
+        host.Window.MouseDown(startPoint, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseMove(endPoint, RawInputModifiers.LeftMouseButton);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.MouseUp(endPoint, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(rangeSlider.LowerValue > valueBeforeDrag,
+            "The inner range slider must retain its pointer drag.");
+        Assert.Equal(0, scrollViewer.Offset.Y);
+    }
+
+    [AvaloniaFact]
+    public void ScrollViewer_OptIn_Mouse_Drag_Honors_Suppressed_Content_Subtree()
+    {
+        var precisionSurface = new Border { Height = 700, Background = Brushes.Green };
+        MdScrollViewer.SetSuppressMouseDragScrolling(precisionSurface, true);
+        var scrollViewer = new MdScrollViewer
+        {
+            Width = 300,
+            Height = 200,
+            AllowMouseDrag = true,
+            Content = precisionSurface
+        };
+
+        using var host = Show(scrollViewer, 400, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        var startPoint = precisionSurface.TranslatePoint(new Point(150, 150), host.Window)!.Value;
+        var endPoint = startPoint + new Vector(0, -100);
+        host.Window.MouseMove(startPoint, RawInputModifiers.None);
+        host.Window.MouseDown(startPoint, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseMove(endPoint, RawInputModifiers.LeftMouseButton);
+        host.Window.MouseUp(endPoint, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(0, scrollViewer.Offset.Y);
     }
 
     [AvaloniaFact]

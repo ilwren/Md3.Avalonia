@@ -692,6 +692,8 @@ Gallery 顶栏提供播放/暂停及 Reduced Motion 预览。
 
 `MdDataGrid`、`MdTreeView`、`MdPropertyGrid` 如后续实现，必须标记为 `Material-inspired desktop extension`，不得标记为官方 M3 组件。
 
+桌面端 `MdScrollViewer` 遵循 Flutter `ScrollBehavior.dragDevices` 的默认语义：鼠标主键拖页默认关闭，滚轮、触控板和滚动条保持可用；显式启用鼠标拖页时，子控件的 handled event、pointer capture、focusable direct manipulation 及 `SuppressMouseDragScrolling` 子树拥有更高优先级。
+
 ---
 
 ## 17. 组件通用视觉与交互要求

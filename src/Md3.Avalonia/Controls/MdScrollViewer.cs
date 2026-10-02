@@ -22,7 +22,11 @@ public sealed class MdScrollViewer : ScrollViewer
         AvaloniaProperty.Register<MdScrollViewer, bool>(nameof(IsDragScrollingEnabled), defaultValue: true);
 
     public static readonly StyledProperty<bool> AllowMouseDragProperty =
-        AvaloniaProperty.Register<MdScrollViewer, bool>(nameof(AllowMouseDrag), defaultValue: true);
+        AvaloniaProperty.Register<MdScrollViewer, bool>(nameof(AllowMouseDrag));
+
+    public static readonly AttachedProperty<bool> SuppressMouseDragScrollingProperty =
+        AvaloniaProperty.RegisterAttached<MdScrollViewer, InputElement, bool>(
+            "SuppressMouseDragScrolling", defaultValue: false, inherits: true);
 
     public static readonly StyledProperty<double> DragThresholdProperty =
         AvaloniaProperty.Register<MdScrollViewer, double>(nameof(DragThreshold), defaultValue: 4.0);
@@ -36,11 +40,24 @@ public sealed class MdScrollViewer : ScrollViewer
         set => SetValue(IsDragScrollingEnabledProperty, value);
     }
 
+    /// <summary>
+    /// Enables canvas-style scrolling with the primary mouse button. Disabled by default on
+    /// desktop so mouse selection and direct manipulation inside the content take precedence.
+    /// Touch, pen, wheel, trackpad, and scrollbar input are unaffected.
+    /// </summary>
     public bool AllowMouseDrag
     {
         get => GetValue(AllowMouseDragProperty);
         set => SetValue(AllowMouseDragProperty, value);
     }
+
+    /// <summary>Gets whether an input subtree is excluded from optional mouse drag scrolling.</summary>
+    public static bool GetSuppressMouseDragScrolling(InputElement element) =>
+        element.GetValue(SuppressMouseDragScrollingProperty);
+
+    /// <summary>Excludes an input subtree from optional mouse drag scrolling.</summary>
+    public static void SetSuppressMouseDragScrolling(InputElement element, bool value) =>
+        element.SetValue(SuppressMouseDragScrollingProperty, value);
 
     public double DragThreshold
     {
@@ -78,13 +95,16 @@ public sealed class MdScrollViewer : ScrollViewer
         };
         _inertiaTimer.Tick += OnInertiaTick;
 
-        // Avalonia's ScrollGestureRecognizer in the template owns touch and pen input. Handling
-        // those pointers here as well makes two independent scrollers fight over Offset, which is
-        // visible as flicker. These handlers are intentionally a mouse-only compatibility path.
-        AddHandler(PointerPressedEvent, OnPreviewPointerPressed, RoutingStrategies.Tunnel);
-        AddHandler(PointerMovedEvent, OnPreviewPointerMoved, RoutingStrategies.Tunnel);
-        AddHandler(PointerReleasedEvent, OnPreviewPointerReleased, RoutingStrategies.Tunnel);
-        AddHandler(PointerCaptureLostEvent, OnPreviewPointerCaptureLost, RoutingStrategies.Tunnel);
+        // Avalonia's ScrollGestureRecognizer in the template owns touch and pen input. Optional
+        // mouse panning is intentionally observed only after child controls have processed the
+        // event. A direct-manipulation child that handles or captures the pointer therefore wins
+        // instead of the outer scroller pre-empting its fine-grained drag.
+        AddHandler(PointerPressedEvent, OnMousePointerPressed, RoutingStrategies.Bubble);
+        AddHandler(PointerMovedEvent, OnMousePointerMoved, RoutingStrategies.Bubble);
+        AddHandler(PointerReleasedEvent, OnMousePointerReleased,
+            RoutingStrategies.Bubble, handledEventsToo: true);
+        AddHandler(PointerCaptureLostEvent, OnMousePointerCaptureLost,
+            RoutingStrategies.Bubble, handledEventsToo: true);
 
         // Wheel scrolling remains native; only cancel residual mouse-drag inertia before the
         // presenter consumes a new wheel gesture.
@@ -105,13 +125,31 @@ public sealed class MdScrollViewer : ScrollViewer
         return visual.GetVisualAncestors().OfType<ScrollBar>().Any();
     }
 
-    private void OnPreviewPointerPressed(object? sender, PointerPressedEventArgs e)
+    private bool ShouldDeferMouseDrag(PointerPressedEventArgs e)
+    {
+        if (IsInsideScrollBar(e.Source as Visual)) return true;
+
+        // Bubble routing lets a child mark the press handled before it reaches this method. Also
+        // honor controls that claim pointer capture without marking the event handled.
+        if (e.Pointer.Captured is not null && !ReferenceEquals(e.Pointer.Captured, this)) return true;
+
+        if (e.Source is not Visual source) return false;
+        foreach (var input in source.GetVisualAncestors().Prepend(source).OfType<InputElement>())
+        {
+            if (ReferenceEquals(input, this)) break;
+            if (GetSuppressMouseDragScrolling(input) || input.Focusable) return true;
+        }
+
+        return false;
+    }
+
+    private void OnMousePointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!IsDragScrollingEnabled || !AllowMouseDrag || e.Pointer.Type != PointerType.Mouse) return;
 
-        // Never intercept clicks on scrollbars or their interactive parts. Child content remains
-        // clickable because the event is not handled or captured until the threshold is crossed.
-        if (IsInsideScrollBar(e.Source as Visual)) return;
+        // Focusable/direct-manipulation content owns primary-button drags. Mouse panning remains
+        // available from non-interactive background surfaces when explicitly enabled.
+        if (ShouldDeferMouseDrag(e)) return;
 
         var currentPoint = e.GetCurrentPoint(this);
         var props = currentPoint.Properties;
@@ -131,11 +169,20 @@ public sealed class MdScrollViewer : ScrollViewer
         _positionHistory.Add((0, _pointerStartPos));
     }
 
-    private void OnPreviewPointerMoved(object? sender, PointerEventArgs e)
+    private void OnMousePointerMoved(object? sender, PointerEventArgs e)
     {
-        if (!_isPressed || !ReferenceEquals(e.Pointer, _capturedPointer) ||
-            !IsDragScrollingEnabled || !AllowMouseDrag || e.Pointer.Type != PointerType.Mouse)
+        if (!_isPressed || !ReferenceEquals(e.Pointer, _capturedPointer)) return;
+        if (!IsDragScrollingEnabled || !AllowMouseDrag || e.Pointer.Type != PointerType.Mouse)
         {
+            ResetMouseDragTracking(releaseOwnCapture: true);
+            return;
+        }
+
+        // A child may claim the gesture after an initially unhandled press. Never replace that
+        // capture with the outer ScrollViewer's capture.
+        if (e.Pointer.Captured is not null && !ReferenceEquals(e.Pointer.Captured, this))
+        {
+            ResetMouseDragTracking(releaseOwnCapture: false);
             return;
         }
 
@@ -187,7 +234,7 @@ public sealed class MdScrollViewer : ScrollViewer
         }
     }
 
-    private void OnPreviewPointerReleased(object? sender, PointerReleasedEventArgs e)
+    private void OnMousePointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         if (!_isPressed || !ReferenceEquals(e.Pointer, _capturedPointer)) return;
 
@@ -234,13 +281,21 @@ public sealed class MdScrollViewer : ScrollViewer
         _capturedPointer = null;
     }
 
-    private void OnPreviewPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
+    private void ResetMouseDragTracking(bool releaseOwnCapture)
     {
-        if (!ReferenceEquals(e.Pointer, _capturedPointer)) return;
-
+        var pointer = _capturedPointer;
         _isPressed = false;
         _isDragging = false;
         _capturedPointer = null;
+        _positionHistory.Clear();
+        _stopwatch.Stop();
+        if (releaseOwnCapture && ReferenceEquals(pointer?.Captured, this)) pointer.Capture(null);
+    }
+
+    private void OnMousePointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
+    {
+        if (ReferenceEquals(e.Pointer, _capturedPointer))
+            ResetMouseDragTracking(releaseOwnCapture: false);
     }
 
     private void OnPreviewPointerWheelChanged(object? sender, PointerWheelEventArgs e)
@@ -284,6 +339,7 @@ public sealed class MdScrollViewer : ScrollViewer
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
+        ResetMouseDragTracking(releaseOwnCapture: true);
         StopInertia();
         base.OnDetachedFromVisualTree(e);
     }
