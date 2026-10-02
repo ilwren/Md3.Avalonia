@@ -94,36 +94,35 @@ public sealed class MdBreadcrumb : ListBox
     protected override void PrepareContainerForItemOverride(Control container, object? item, int index)
     {
         base.PrepareContainerForItemOverride(container, item, index);
-        if (container is ListBoxItem listItem)
+        if (container is not ListBoxItem listItem) return;
+
+        var model = item as MdBreadcrumbItem;
+        var isLast = index == ItemCount - 1;
+
+        // Classes collection entries never include the ':' selector prefix. Using pseudo-class
+        // syntax here meant none of the breadcrumb item styles could match at runtime.
+        listItem.Content = model?.Label ?? item;
+        listItem.Classes.Set("first", index == 0);
+        listItem.Classes.Set("last", isLast);
+        listItem.Classes.Set("has-icon", model?.Icon is not null);
+        listItem.Classes.Set("current", model?.IsCurrent ?? isLast);
+        listItem.IsEnabled = model?.IsEnabled ?? true;
+
+        // The package supplies the complete ListBoxItem theme, so instantiate it before resolving
+        // named parts. This also makes rich breadcrumb content visible on the first layout pass.
+        listItem.ApplyTemplate();
+
+        if (listItem.GetVisualDescendants().OfType<TextBlock>()
+            .FirstOrDefault(text => text.Name == "PART_Separator") is { } separatorText)
         {
-            var isLast = index == ItemCount - 1;
-            var isFirst = index == 0;
-            listItem.Classes.Set(":last", isLast);
-            listItem.Classes.Set(":first", isFirst);
+            separatorText.Text = Separator?.ToString() ?? "›";
+            separatorText.IsVisible = !isLast;
+        }
 
-            if (item is MdBreadcrumbItem model)
-            {
-                listItem.Classes.Set(":has-icon", model.Icon is not null);
-                listItem.Classes.Set(":current", model.IsCurrent);
-                listItem.IsEnabled = model.IsEnabled;
-            }
-            else
-            {
-                listItem.Classes.Set(":has-icon", false);
-                listItem.Classes.Set(":current", isLast);
-            }
-
-            if (listItem.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault(t => t.Name == "PART_Separator") is { } separatorText)
-            {
-                separatorText.Text = Separator?.ToString() ?? "›";
-                separatorText.IsVisible = !isLast;
-            }
-
-            if (item is MdBreadcrumbItem { Icon: { } icon } &&
-                listItem.GetVisualDescendants().OfType<MdSymbolPresenter>().FirstOrDefault(p => p.Name == "PART_IconPresenter") is { } iconPresenter)
-            {
-                iconPresenter.Content = icon;
-            }
+        if (listItem.GetVisualDescendants().OfType<MdSymbolPresenter>()
+            .FirstOrDefault(presenter => presenter.Name == "PART_IconPresenter") is { } iconPresenter)
+        {
+            iconPresenter.Content = model?.Icon;
         }
     }
 

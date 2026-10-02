@@ -2,6 +2,11 @@
 
 All notable changes follow Keep a Changelog. The project intends to use Semantic Versioning after the preview cycle.
 
+## [0.2.0] - 2026-10-02
+
+- Fixed Gallery diagnostics restore, Android deployment mappings, scrolling input parity, FAB menu alignment, breadcrumb rendering, and color-picker selection.
+- Updated all NuGet packages to `0.2.0` and added Material 3 HCT tonal-palette generation for color picking.
+
 ## [0.1.0-preview.1] - 2026-09-24
 
 ### Added

@@ -109,7 +109,7 @@
 - Phase 2：`MdPaginatedDataTable`、`MdReorderableList`、`MdGridTile`/`MdGridTileBar`、`MdDismissible` 与交互式 `MdScrollBar`；
 - Phase 3：`MdForm`/`MdFormField`、`MdDropdownFormField`、`MdSimpleDialog`、`MdAboutDialog`、`MdLicensePage` 与 `MdPickerRestorationStore`；
 - Phase 4：`MdDraggableScrollableSheet`、`MdAdaptiveSwitch`、`MdAdaptiveProgressIndicator`、`MdHero`、`MdFocusTraversalGroup` 与 `MdShortcutScope`；
-- 独立 `Md3.Avalonia.Ecosystem` 包包含 `MdAvatar`/`MdAvatarGroup`、fractional `MdRating` 与 `MdBreadcrumb`，并通过 opt-in `EcosystemTheme` 复用核心 Material tokens；
+- 独立 `Md3.Avalonia.Extra` 包包含 `MdAvatar`/`MdAvatarGroup`、fractional `MdRating` 与 `MdBreadcrumb`，并通过 opt-in `ExtraTheme` 复用核心 Material tokens；
 - Ecosystem Waves A–C：density/overlay/async/shortcut contracts、`MdPopover`、`MdHoverCard`、`MdCommandPalette`、`MdSlidableItem`、`MdPagedItemsView`、`MdMasonryPanel`、`MdDataGrid`、`MdAsyncSelect`、`MdCalendar`、`MdTimeline`、`MdResultView`、`MdCascader` 与 `MdTransfer`；
 - Ecosystem Waves D–E：provider-neutral `MdChart`、`MdRichEditor`、`MdChatView`、`MdSkeleton` 与 `MdAnimationSequence`；不捆绑 chart vendor、editor engine、network/AI provider 或数据库；
 - Ecosystem Wave F：`MdPinInput` 分格输入/粘贴/遮罩/完成状态，`MdTreeView` 无限层级/展开选择/键盘/RTL，以及由正式 Material input chips 构成的 `MdTagInput` 标签输入、建议、验证和换行布局；
@@ -159,7 +159,7 @@ Windows PowerShell 或命令提示符使用：
 .\scripts\build-nuget.cmd -Font "D:\OfflineAssets\MaterialSymbolsRounded.ttf"
 ```
 
-脚本要求 .NET 10 SDK，依次构建 `net8.0;net10.0`，分别打包 Core、Icons、Ecosystem，并在 `artifacts/nuget` 生成三个 `.nupkg` 和三个 `.snupkg`。Bash 使用 `--output`，PowerShell 使用 `-Output` 修改输出目录。
+脚本要求 .NET 10 SDK，依次构建 `net8.0;net10.0`，分别打包 Core、Icons、Icons.Lite 与 Extra，并在 `artifacts/nuget` 生成四个 `.nupkg` 和四个 `.snupkg`。Bash 使用 `--output`，PowerShell 使用 `-Output` 修改输出目录。
 
 同时引用 Core 与 Icons 后不再需要手动调用 `ConfigureFonts`：`MdSymbols` 和核心 `MdSymbolPresenter` 会自动发现 Icons provider、注册程序集内嵌字体，验证 internal family、typeface 和官方 `search` glyph，再注入核心 `Md.Icon.*` resources。`MD3_MATERIAL_SYMBOLS_FONT_DIR` 外部路径仍作为诊断回退保留。验证失败时 symbol glyph 保持隐藏，不使用 Unicode 仿制图标。字体许可证文本已保留，但发布者仍须记录离线资产来源和 checksum。
 
@@ -180,7 +180,7 @@ src/Md3.Avalonia/                 # 官方 Flutter Material 对齐核心包；�
    │  └─ ComboBoxTokens.axaml
    └─ Controls/                    # 每类控件的 scoped ControlTheme
 src/Md3.Avalonia.Icons/           # 可选 Symbols catalog/loader；构建前须离线补充 TTF
-src/Md3.Avalonia.Ecosystem/       # 第三方 Flutter clean-room 控件；依赖核心，不依赖 Icons
+src/Md3.Avalonia.Extra/           # 第三方 Flutter clean-room 控件；依赖核心，不依赖 Icons
 
 gallery/Md3.Avalonia.Gallery/     # 组件、Theme Lab、资源与字体图标页面
 samples/Md3.Avalonia.Gallery.Android/ # net8.0-android single-view host（solution 外）
@@ -194,16 +194,16 @@ spec-snapshot/manifest.json        # 官网、AndroidX commit、token 版本与�
 ```xml
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:themes="using:Md3.Avalonia.Themes"
-             xmlns:ecosystem="using:Md3.Avalonia.Ecosystem.Themes">
+             xmlns:extra="using:Md3.Avalonia.Extra.Themes">
   <Application.Styles>
     <themes:MaterialTheme />
-    <!-- 仅引用 Md3.Avalonia.Ecosystem 时加入： -->
-    <ecosystem:EcosystemTheme />
+    <!-- 引用 Md3.Avalonia.Extra 时加入： -->
+    <extra:ExtraTheme />
   </Application.Styles>
 </Application>
 ```
 
-三个可独立 pack 的 NuGet 预发布包版本均为 `0.1.0-preview.1`：`Md3.Avalonia`（核心）、`Md3.Avalonia.Icons`（可选图标/字体 provider）和 `Md3.Avalonia.Ecosystem`（依赖核心）。核心与生态包都不强制引用 Icons；三个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
+四个可独立 pack 的 NuGet 包版本均为 `0.2.0`：`Md3.Avalonia`（核心）、`Md3.Avalonia.Icons`、`Md3.Avalonia.Icons.Lite`（两种可选图标 provider）和 `Md3.Avalonia.Extra`（依赖核心）。核心与 Extra 都不强制引用 Icons；四个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
 
 任意 seed 主题可在启动时或运行时应用：
 
@@ -220,7 +220,7 @@ MdThemeManager.Apply(Application.Current, options, dark);
 var json = MdThemeJson.Serialize(options);
 ```
 
-完整 API 入口见 [`docs/API.md`](docs/API.md)，兼容策略见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)，本版说明见 [`docs/RELEASE_NOTES_0.1.0-preview.1.md`](docs/RELEASE_NOTES_0.1.0-preview.1.md)。
+完整 API 入口见 [`docs/API.md`](docs/API.md)，兼容策略见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)，本版说明见 [`docs/RELEASE_NOTES_0.2.0.md`](docs/RELEASE_NOTES_0.2.0.md)。
 
 ## XAML 与 MVVM
 

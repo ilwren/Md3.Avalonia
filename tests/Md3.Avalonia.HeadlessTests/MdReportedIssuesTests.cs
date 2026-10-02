@@ -6,6 +6,7 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Threading;
 using System.Globalization;
 using Avalonia.VisualTree;
@@ -272,6 +273,73 @@ public sealed class MdReportedIssuesTests
             CultureInfo.CurrentCulture = previousCulture;
             CultureInfo.CurrentUICulture = previousUiCulture;
         }
+    }
+
+    [AvaloniaFact]
+    public void Breadcrumb_Renders_Rich_Labels_And_Separators_On_The_First_Layout()
+    {
+        var breadcrumb = new MdBreadcrumb
+        {
+            Separator = "/",
+            ItemsSource = new[]
+            {
+                new MdBreadcrumbItem { Label = "Home" },
+                new MdBreadcrumbItem { Label = "Components" },
+                new MdBreadcrumbItem { Label = "Color picker", IsCurrent = true }
+            }
+        };
+
+        using var host = Show(breadcrumb, 520, 100);
+        Dispatcher.UIThread.RunJobs();
+
+        var labels = breadcrumb.GetVisualDescendants().OfType<TextBlock>()
+            .Select(text => text.Text).Where(text => text is not null).ToArray();
+        Assert.Contains("Home", labels);
+        Assert.Contains("Components", labels);
+        Assert.Contains("Color picker", labels);
+        Assert.Equal(2, labels.Count(text => text == "/"));
+
+        var containers = breadcrumb.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
+        Assert.Equal(3, containers.Length);
+        Assert.Contains("current", containers[^1].Classes);
+    }
+
+    [AvaloniaFact]
+    public void ColorPicker_Swatch_Button_Uses_A_Command_And_Shows_Selection()
+    {
+        var picker = new MdColorPicker { Width = 400 };
+        using var host = Show(picker, 460, 620);
+        Dispatcher.UIThread.RunJobs();
+
+        var red = Color.Parse("#F44336");
+        var swatch = picker.GetVisualDescendants().OfType<Button>()
+            .First(button => button.CommandParameter is Color color && color == red);
+        Assert.Same(picker.SelectColorCommand, swatch.Command);
+
+        swatch.Command!.Execute(swatch.CommandParameter);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(red, picker.SelectedColor);
+        Assert.Equal("#F44336", picker.SelectedHex);
+        var selectionRing = swatch.GetVisualDescendants().OfType<Border>()
+            .Single(border => border.Name == "PART_SelectionRing");
+        Assert.True(selectionRing.IsVisible);
+    }
+
+    [AvaloniaFact]
+    public void ColorPickerButton_Opens_A_Functional_Picker()
+    {
+        var button = new MdColorPickerButton { SelectedColor = Color.Parse("#006A6A") };
+        using var host = Show(button, 460, 620);
+        Dispatcher.UIThread.RunJobs();
+
+        var anchor = button.GetVisualDescendants().OfType<Button>()
+            .Single(control => control.Name == "PART_DropDownButton");
+        anchor.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(button.IsDropDownOpen);
+        Assert.Equal("#006A6A", button.SelectedHex);
     }
 
     [AvaloniaFact]

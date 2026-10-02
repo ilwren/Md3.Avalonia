@@ -60,11 +60,12 @@
         </StackPanel>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:pointerover /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.08" /></Style>
-    <Style Selector="^:pressed /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.12" /></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" /></Style>
     <Style Selector="^:selected"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
-    <Style Selector="^:last /template/ TextBlock#PART_Separator"><Setter Property="IsVisible" Value="False" /></Style>
-    <Style Selector="^:has-icon /template/ Viewbox#PART_IconHost"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^.current"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
+    <Style Selector="^.last /template/ TextBlock#PART_Separator"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^.has-icon /template/ Viewbox#PART_IconHost"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
   </ControlTheme>
   <ControlTheme x:Key="{x:Type eco:MdBreadcrumb}" TargetType="eco:MdBreadcrumb">
@@ -73,5 +74,18 @@
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="ItemContainerTheme" Value="{StaticResource MdBreadcrumbItemTheme}" />
     <Setter Property="ItemsPanel"><ItemsPanelTemplate><WrapPanel Orientation="Horizontal" VerticalAlignment="Center" /></ItemsPanelTemplate></Setter>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdBreadcrumb">
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Padding="{TemplateBinding Padding}">
+          <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled">
+            <ItemsPresenter x:Name="PART_ItemsPresenter"
+                            ItemsPanel="{TemplateBinding ItemsPanel}" />
+          </ScrollViewer>
+        </Border>
+      </ControlTemplate>
+    </Setter>
   </ControlTheme>
 </ResourceDictionary>

@@ -86,6 +86,23 @@ public static class MdThemeGenerator
         return roles.ToDictionary(pair => pair.Key, pair => ToColor(pair.Value), StringComparer.Ordinal);
     }
 
+    /// <summary>
+    /// Generates the Material 3 HCT primary tonal palette for a source color. The values are
+    /// ordered from tone 100 (lightest) through tone 0 (darkest).
+    /// </summary>
+    public static IReadOnlyList<Color> GeneratePrimaryTonalPalette(Color sourceColor)
+    {
+        var seed = ((uint)sourceColor.A << 24) |
+                   ((uint)sourceColor.R << 16) |
+                   ((uint)sourceColor.G << 8) |
+                   sourceColor.B;
+        var palette = new CorePalette();
+        palette.Fill(seed, Style.TonalSpot);
+
+        int[] tones = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0];
+        return tones.Select(tone => ToColor(palette.Primary[(uint)tone])).ToArray();
+    }
+
     public static uint ParseSeed(string value)
     {
         var color = Color.Parse(value);

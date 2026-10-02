@@ -1,15 +1,16 @@
 # Md3.Avalonia public API overview
 
-This document is the stable entry point for the `0.1.0-preview.1` API. The NuGet package also emits `Md3.Avalonia.xml` from the source XML comments for IDE IntelliSense and API documentation generation.
+This document is the stable entry point for the `0.2.0` API. The NuGet package also emits `Md3.Avalonia.xml` from the source XML comments for IDE IntelliSense and API documentation generation.
 
 ## Install and register
 
 ```xml
-<PackageReference Include="Md3.Avalonia" Version="0.1.0-preview.1" />
-<!-- Optional official symbol catalog/font loader: -->
-<PackageReference Include="Md3.Avalonia.Icons" Version="0.1.0-preview.1" />
+<PackageReference Include="Md3.Avalonia" Version="0.2.0" />
+<!-- Optional symbol providers (choose one): -->
+<PackageReference Include="Md3.Avalonia.Icons" Version="0.2.0" />
+<PackageReference Include="Md3.Avalonia.Icons.Lite" Version="0.2.0" />
 <!-- Optional clean-room third-party Flutter patterns (depends on core): -->
-<PackageReference Include="Md3.Avalonia.Ecosystem" Version="0.1.0-preview.1" />
+<PackageReference Include="Md3.Avalonia.Extra" Version="0.2.0" />
 ```
 
 ```xml
@@ -30,9 +31,9 @@ All component themes are scoped to `Md*` types. Registering `MaterialTheme` does
 | `Md3.Avalonia.Motion` | Inherited motion scheme and spring definitions |
 | `Md3.Avalonia.Localization` | Inherited UI culture selection |
 | `Md3.Avalonia.Icons` / `Md3.Avalonia.Controls.MdSymbols` | Optional verified Material Symbols loader and strongly typed catalog |
-| `Md3.Avalonia.Ecosystem.Controls` | Optional clean-room ecosystem controls |
-| `Md3.Avalonia.Ecosystem.Infrastructure` | Density, paging, async-state, shortcut, overlay and focus-return contracts |
-| `Md3.Avalonia.Ecosystem.Themes` | Opt-in `EcosystemTheme` resource provider |
+| `Md3.Avalonia.Extra.Controls` | Optional clean-room ecosystem controls |
+| `Md3.Avalonia.Extra.Infrastructure` | Density, paging, async-state, shortcut, overlay and focus-return contracts |
+| `Md3.Avalonia.Extra.Themes` | Opt-in `ExtraTheme` resource provider |
 
 ## Components
 

@@ -78,15 +78,15 @@ public class MdFabMenu : ItemsControl
         _menuItems?.Measure(availableSize);
 
         var triggerSize = _trigger?.DesiredSize ?? new Size(48, 48);
-        var itemsHeight = _menuItems?.DesiredSize.Height ?? 0;
+        var menuSize = _menuItems?.DesiredSize ?? default;
 
-        // The footprint width is strictly anchored to the trigger's width.
-        // This ensures parent layouts (Grid, StackPanel, Canvas, Scaffold) never shift the trigger horizontally when items expand.
-        var width = triggerSize.Width;
-        var height = triggerSize.Height + (AreItemsVisible || IsOpen ? itemsHeight + 12 : 0);
-
-        base.MeasureOverride(availableSize);
-        return new Size(width, height);
+        // Material FAB menus align every action to the trigger's trailing edge. Measure to the
+        // widest child so right/end alignment has a real layout box instead of overflowing the
+        // trigger's narrow width. Keep the trigger height: actions expand upward from the anchored
+        // FAB without moving its resting position when the menu opens.
+        var width = Math.Min(availableSize.Width, Math.Max(triggerSize.Width, menuSize.Width));
+        var height = Math.Min(availableSize.Height, Math.Max(0, triggerSize.Height));
+        return new Size(Math.Max(0, width), height);
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)

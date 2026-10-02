@@ -193,9 +193,20 @@ public class MdPhaseThreeAndFourGestureParityTests
         fabMenu.IsOpen = true;
         Dispatcher.UIThread.RunJobs();
 
-        // Trigger should remain anchored and not jump horizontally or stretch container
+        // Trigger should remain anchored and every expanded action shares its trailing edge.
         Assert.True(fabMenu.IsOpen);
         Assert.True(fabMenu.Bounds.Width > 0);
+
+        var trigger = fabMenu.GetVisualDescendants().OfType<MdToggleIconButton>()
+            .Single(control => control.Name == "PART_Trigger");
+        var triggerRight = trigger.TranslatePoint(new Point(trigger.Bounds.Width, 0), fabMenu)!.Value.X;
+        var actions = fabMenu.GetVisualDescendants().OfType<MdFabMenuItem>().ToArray();
+        Assert.NotEmpty(actions);
+        Assert.All(actions, action =>
+        {
+            var actionRight = action.TranslatePoint(new Point(action.Bounds.Width, 0), fabMenu)!.Value.X;
+            Assert.InRange(Math.Abs(actionRight - triggerRight), 0, 0.5);
+        });
     }
 
     [AvaloniaFact]

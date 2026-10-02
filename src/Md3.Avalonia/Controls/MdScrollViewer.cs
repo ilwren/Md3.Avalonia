@@ -12,8 +12,9 @@ using Avalonia.VisualTree;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>
-/// A scoped Material scrolling surface with smooth gesture drag scrolling, kinetic inertia physics,
-/// touch/mouse tracking, and native extent/offset/chaining support.
+/// A Material scrolling surface that delegates wheel, touch, pen, inertia, snap-point, and
+/// scroll-chaining behavior to Avalonia's native <see cref="ScrollContentPresenter"/>. An optional
+/// mouse-only drag path is layered on top for desktop canvas-style interaction.
 /// </summary>
 public sealed class MdScrollViewer : ScrollViewer
 {
@@ -21,7 +22,7 @@ public sealed class MdScrollViewer : ScrollViewer
         AvaloniaProperty.Register<MdScrollViewer, bool>(nameof(IsDragScrollingEnabled), defaultValue: true);
 
     public static readonly StyledProperty<bool> AllowMouseDragProperty =
-        AvaloniaProperty.Register<MdScrollViewer, bool>(nameof(AllowMouseDrag), defaultValue: false);
+        AvaloniaProperty.Register<MdScrollViewer, bool>(nameof(AllowMouseDrag), defaultValue: true);
 
     public static readonly StyledProperty<double> DragThresholdProperty =
         AvaloniaProperty.Register<MdScrollViewer, double>(nameof(DragThreshold), defaultValue: 4.0);
@@ -77,11 +78,18 @@ public sealed class MdScrollViewer : ScrollViewer
         };
         _inertiaTimer.Tick += OnInertiaTick;
 
-        // Tunnel events to intercept touch drag before child controls swallow them
+        // Avalonia's ScrollGestureRecognizer in the template owns touch and pen input. Handling
+        // those pointers here as well makes two independent scrollers fight over Offset, which is
+        // visible as flicker. These handlers are intentionally a mouse-only compatibility path.
         AddHandler(PointerPressedEvent, OnPreviewPointerPressed, RoutingStrategies.Tunnel);
         AddHandler(PointerMovedEvent, OnPreviewPointerMoved, RoutingStrategies.Tunnel);
         AddHandler(PointerReleasedEvent, OnPreviewPointerReleased, RoutingStrategies.Tunnel);
         AddHandler(PointerCaptureLostEvent, OnPreviewPointerCaptureLost, RoutingStrategies.Tunnel);
+
+        // Wheel scrolling remains native; only cancel residual mouse-drag inertia before the
+        // presenter consumes a new wheel gesture.
+        AddHandler(PointerWheelChangedEvent, OnPreviewPointerWheelChanged,
+            RoutingStrategies.Tunnel, handledEventsToo: true);
     }
 
     public void StopInertia()
@@ -99,19 +107,17 @@ public sealed class MdScrollViewer : ScrollViewer
 
     private void OnPreviewPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (!IsDragScrollingEnabled) return;
+        if (!IsDragScrollingEnabled || !AllowMouseDrag || e.Pointer.Type != PointerType.Mouse) return;
 
-        // Never intercept clicks on scrollbars, thumbs, or buttons - let native scrollbar dragging work
+        // Never intercept clicks on scrollbars or their interactive parts. Child content remains
+        // clickable because the event is not handled or captured until the threshold is crossed.
         if (IsInsideScrollBar(e.Source as Visual)) return;
-
-        // For mouse pointers on desktop, only drag if explicitly enabled (e.g. touch emulation mode)
-        if (e.Pointer.Type == PointerType.Mouse && !AllowMouseDrag) return;
 
         var currentPoint = e.GetCurrentPoint(this);
         var props = currentPoint.Properties;
         if (!props.IsLeftButtonPressed && props.PointerUpdateKind != PointerUpdateKind.LeftButtonPressed) return;
 
-        // Stop any active inertia immediately on touch/click (smooth catch)
+        // Stop any active mouse inertia immediately when a new mouse gesture begins.
         StopInertia();
 
         _pointerStartPos = currentPoint.Position;
@@ -127,7 +133,11 @@ public sealed class MdScrollViewer : ScrollViewer
 
     private void OnPreviewPointerMoved(object? sender, PointerEventArgs e)
     {
-        if (!_isPressed || !IsDragScrollingEnabled) return;
+        if (!_isPressed || !ReferenceEquals(e.Pointer, _capturedPointer) ||
+            !IsDragScrollingEnabled || !AllowMouseDrag || e.Pointer.Type != PointerType.Mouse)
+        {
+            return;
+        }
 
         var currentPoint = e.GetCurrentPoint(this);
         var currentPos = currentPoint.Position;
@@ -179,7 +189,7 @@ public sealed class MdScrollViewer : ScrollViewer
 
     private void OnPreviewPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
-        if (!_isPressed) return;
+        if (!_isPressed || !ReferenceEquals(e.Pointer, _capturedPointer)) return;
 
         _isPressed = false;
         var wasDragging = _isDragging;
@@ -226,12 +236,16 @@ public sealed class MdScrollViewer : ScrollViewer
 
     private void OnPreviewPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
     {
-        if (Equals(e.Pointer.Captured, this))
-        {
-            _isPressed = false;
-            _isDragging = false;
-            _capturedPointer = null;
-        }
+        if (!ReferenceEquals(e.Pointer, _capturedPointer)) return;
+
+        _isPressed = false;
+        _isDragging = false;
+        _capturedPointer = null;
+    }
+
+    private void OnPreviewPointerWheelChanged(object? sender, PointerWheelEventArgs e)
+    {
+        StopInertia();
     }
 
     private void OnInertiaTick(object? sender, EventArgs e)
