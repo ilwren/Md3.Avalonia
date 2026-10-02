@@ -97,7 +97,7 @@ public sealed class MdScrollViewer : ScrollViewer
 
         // Avalonia's ScrollGestureRecognizer in the template owns touch and pen input. Its
         // presenter consumes bubbling mouse events even when mouse panning is explicitly enabled,
-        // so the compatibility path observes the tunnel route. It still rejects focusable or
+        // so the compatibility path observes the tunnel route. It still rejects explicitly
         // suppressed source subtrees and yields if a child claims pointer capture.
         AddHandler(PointerPressedEvent, OnMousePointerPressed, RoutingStrategies.Tunnel);
         AddHandler(PointerMovedEvent, OnMousePointerMoved, RoutingStrategies.Tunnel);
@@ -139,9 +139,7 @@ public sealed class MdScrollViewer : ScrollViewer
             // Template infrastructure can itself be focusable; only classify the user-content
             // side of the presenter as a direct-manipulation subtree.
             if (ReferenceEquals(visual, this) || ReferenceEquals(visual, Presenter)) break;
-            if (visual is InputElement input &&
-                (GetSuppressMouseDragScrolling(input) || input.Focusable))
-                return true;
+            if (visual is InputElement input && GetSuppressMouseDragScrolling(input)) return true;
             if (ReferenceEquals(visual.GetVisualParent(), Presenter)) break;
         }
 
@@ -152,8 +150,9 @@ public sealed class MdScrollViewer : ScrollViewer
     {
         if (!IsDragScrollingEnabled || !AllowMouseDrag || e.Pointer.Type != PointerType.Mouse) return;
 
-        // Focusable/direct-manipulation content owns primary-button drags. Mouse panning remains
-        // available from non-interactive background surfaces when explicitly enabled.
+        // Explicitly suppressed precision content owns primary-button drags. Other child controls
+        // can claim pointer capture before the movement threshold. Mouse panning remains available
+        // from background surfaces when explicitly enabled.
         if (ShouldDeferMouseDrag(e)) return;
 
         var currentPoint = e.GetCurrentPoint(this);
