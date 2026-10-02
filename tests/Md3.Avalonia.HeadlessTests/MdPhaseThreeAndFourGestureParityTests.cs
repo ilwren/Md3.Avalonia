@@ -5,6 +5,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -188,11 +189,8 @@ public class MdPhaseThreeAndFourGestureParityTests
         var pointerMoved = false;
         var precisionSurface = new Border { Height = 700, Background = Brushes.Orange };
         precisionSurface.PointerPressed += (_, e) => e.Pointer.Capture(precisionSurface);
-        precisionSurface.PointerMoved += (_, e) =>
-        {
-            if (e.GetCurrentPoint(precisionSurface).Properties.IsLeftButtonPressed)
-                pointerMoved = true;
-        };
+        precisionSurface.AddHandler(InputElement.PointerMovedEvent, (_, _) => pointerMoved = true,
+            RoutingStrategies.Bubble, handledEventsToo: true);
 
         var scrollViewer = new MdScrollViewer
         {
@@ -209,6 +207,7 @@ public class MdPhaseThreeAndFourGestureParityTests
         var endPoint = startPoint + new Vector(0, -100);
         host.Window.MouseMove(startPoint, RawInputModifiers.None);
         host.Window.MouseDown(startPoint, MouseButton.Left, RawInputModifiers.None);
+        pointerMoved = false;
         host.Window.MouseMove(endPoint, RawInputModifiers.LeftMouseButton);
         host.Window.MouseUp(endPoint, MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
