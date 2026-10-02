@@ -98,7 +98,8 @@ public sealed class MdScrollViewer : ScrollViewer
         // Avalonia's ScrollGestureRecognizer in the template owns touch and pen input. Its
         // presenter consumes bubbling mouse events even when mouse panning is explicitly enabled,
         // so the compatibility path observes the tunnel route. It rejects focusable direct-
-        // manipulation content and explicitly suppressed precision-interaction subtrees.
+        // manipulation content and explicitly suppressed precision-interaction subtrees, then
+        // yields if custom content claims pointer capture.
         AddHandler(PointerPressedEvent, OnMousePointerPressed, RoutingStrategies.Tunnel);
         AddHandler(PointerMovedEvent, OnMousePointerMoved, RoutingStrategies.Tunnel);
         AddHandler(PointerReleasedEvent, OnMousePointerReleased,
@@ -123,6 +124,17 @@ public sealed class MdScrollViewer : ScrollViewer
         if (visual is null) return false;
         if (visual is ScrollBar or Thumb or RepeatButton) return true;
         return visual.GetVisualAncestors().OfType<ScrollBar>().Any();
+    }
+
+    private bool IsInsideUserContent(Visual visual)
+    {
+        for (Visual? current = visual; current is not null; current = current.GetVisualParent())
+        {
+            if (ReferenceEquals(current, Presenter) || ReferenceEquals(current, this)) return false;
+            if (ReferenceEquals(current.GetVisualParent(), Presenter)) return true;
+        }
+
+        return false;
     }
 
     private bool ShouldDeferMouseDrag(PointerPressedEventArgs e)
@@ -178,6 +190,15 @@ public sealed class MdScrollViewer : ScrollViewer
         if (!IsDragScrollingEnabled || !AllowMouseDrag || e.Pointer.Type != PointerType.Mouse)
         {
             ResetMouseDragTracking(releaseOwnCapture: true);
+            return;
+        }
+
+        // A non-focusable custom control may claim the pointer after the tunneled press has passed
+        // this viewer. Honor captures made from the user-content subtree, while ignoring the input
+        // root and template presenter captures that can accompany ordinary background presses.
+        if (e.Pointer.Captured is Visual captured && IsInsideUserContent(captured))
+        {
+            ResetMouseDragTracking(releaseOwnCapture: false);
             return;
         }
 

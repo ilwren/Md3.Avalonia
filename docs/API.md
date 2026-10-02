@@ -91,7 +91,7 @@ Direct APIs include `Show`/`Dismiss` on transient components, `ShowAsync`/`Close
 
 `MdCarousel` supports a bindable `MdCarouselController`, autoplay, pointer-hover pause and finite or wrapping navigation. `MdRefreshIndicator.RequestRefreshAsync` accepts a cancelable provider-neutral handler.
 
-`MdScrollViewer` keeps wheel, trackpad, touch, pen and scrollbar behavior native. Desktop primary-button panning is opt-in through `AllowMouseDrag`; when enabled, focusable controls retain direct manipulation. Set `md:MdScrollViewer.SuppressMouseDragScrolling="True"` on any custom precision-interaction subtree that is not focusable.
+`MdScrollViewer` keeps wheel, trackpad, touch, pen and scrollbar behavior native. Desktop primary-button panning is opt-in through `AllowMouseDrag`; when enabled, focusable controls retain direct manipulation and pointer capture by custom content takes precedence. Set `md:MdScrollViewer.SuppressMouseDragScrolling="True"` on any precision-interaction subtree that is neither focusable nor responsible for capturing its pointer.
 
 `MdBorderlessWindow.PlatformAdapter` is replaceable. `PreserveNativeBorder` defaults to `true`: desktop adapters use `WindowDecorations.BorderOnly` plus an extended client area so platform corners, shadow, resize frame, and compositor behavior are not discarded. View models can use capability/state APIs without importing OS-native types; Android resolves to a safe no-op adapter.
 
