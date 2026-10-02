@@ -130,7 +130,7 @@
                             Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
                             HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
           <StackPanel Name="PART_SpinnerPanel" Width="32" Height="42"
-                      Margin="0,15,8,0" VerticalAlignment="Top" HorizontalAlignment="Right"
+                      Margin="0,15,9,0" VerticalAlignment="Top" HorizontalAlignment="Right"
                       Background="Transparent" Spacing="2" ZIndex="2"
                       IsVisible="{TemplateBinding ShowButtonSpinner}">
             <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}"
