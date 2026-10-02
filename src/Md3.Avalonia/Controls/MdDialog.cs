@@ -55,7 +55,7 @@ internal sealed class MdDialogAutomationPeer(MdDialog owner) : ContentControlAut
 
     protected override string? GetNameCore()
     {
-        var explicitName = Avalonia.Automation.AutomationProperties.GetName(DialogOwner);
+        var explicitName = global::Avalonia.Automation.AutomationProperties.GetName(DialogOwner);
         if (!string.IsNullOrWhiteSpace(explicitName)) return explicitName;
         return DialogOwner.Headline switch
         {
