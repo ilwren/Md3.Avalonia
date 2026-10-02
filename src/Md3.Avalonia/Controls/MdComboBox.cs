@@ -52,6 +52,9 @@ public class MdComboBox : ComboBox, IMdPopupOwner, IMdPopupPresenceOwner
     public static readonly StyledProperty<IBrush?> ActiveIndicatorBrushProperty =
         AvaloniaProperty.Register<MdComboBox, IBrush?>(nameof(ActiveIndicatorBrush));
 
+    public static readonly StyledProperty<IBrush?> OutlineLabelBackgroundProperty =
+        AvaloniaProperty.Register<MdComboBox, IBrush?>(nameof(OutlineLabelBackground));
+
     public static readonly DirectProperty<MdComboBox, bool> IsPopupOpenProperty =
         AvaloniaProperty.RegisterDirect<MdComboBox, bool>(nameof(IsPopupOpen), comboBox => comboBox.IsPopupOpen);
 
@@ -152,6 +155,12 @@ public class MdComboBox : ComboBox, IMdPopupOwner, IMdPopupPresenceOwner
         set => SetValue(ActiveIndicatorBrushProperty, value);
     }
 
+    public IBrush? OutlineLabelBackground
+    {
+        get => GetValue(OutlineLabelBackgroundProperty);
+        set => SetValue(OutlineLabelBackgroundProperty, value);
+    }
+
     /// <summary>The actual popup-host lifetime, which may outlive IsDropDownOpen for exit motion.</summary>
     public bool IsPopupOpen
     {
@@ -202,12 +211,13 @@ public class MdComboBox : ComboBox, IMdPopupOwner, IMdPopupPresenceOwner
     protected override void PrepareContainerForItemOverride(Control container, object? item, int index)
     {
         base.PrepareContainerForItemOverride(container, item, index);
-        // Apply the option theme at the owner/container-generation boundary. Popup-local
-        // descendant styles are too late and too fragile to own the container's first measure.
-        if (container is ComboBoxItem option && option.Theme is null &&
-            ResourceNodeExtensions.FindResource(this, "MdComboBoxItemTheme") is ControlTheme theme)
+        // Apply the option theme safely at the owner/container-generation boundary
+        if (container is ComboBoxItem option && option.Theme is null)
         {
-            option.SetCurrentValue(ThemeProperty, theme);
+            if (this.TryFindResource("MdComboBoxItemTheme", out var themeObj) && themeObj is ControlTheme theme)
+            {
+                option.SetCurrentValue(ThemeProperty, theme);
+            }
         }
     }
 

@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <style name="MyTheme.NoActionBar" parent="android:style/Theme.Material.Light.NoActionBar">
+  <style name="MyTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+    <item name="windowNoTitle">true</item>
+    <item name="windowActionBar">false</item>
+    <item name="windowActionModeOverlay">true</item>
     <item name="android:fontFamily">sans</item>
-    <item name="android:windowActionModeOverlay">true</item>
+    <item name="colorAccent">#6750A4</item>
+    <item name="colorPrimary">#FFFBFE</item>
+    <item name="colorPrimaryDark">#FFFBFE</item>
     <item name="android:colorAccent">#6750A4</item>
     <item name="android:navigationBarColor">#FFFBFE</item>
     <item name="android:statusBarColor">#FFFBFE</item>

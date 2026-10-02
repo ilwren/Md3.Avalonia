@@ -39,7 +39,7 @@
     <Setter Property="LeadingIconBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
     <Setter Property="TrailingIconBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
     <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-    <Setter Property="OutlineLabelBackground" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+    <Setter Property="OutlineLabelBackground" Value="Transparent" />
     <Setter Property="BorderBrush" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="CornerRadius" Value="{DynamicResource Md.Comp.TextField.Filled.Container.Shape}" />
@@ -63,8 +63,8 @@
                     MinWidth="{TemplateBinding MinWidth}"
                     MinHeight="{TemplateBinding MinHeight}"
                     Background="{TemplateBinding Background}"
-                    BorderBrush="{TemplateBinding BorderBrush}"
-                    BorderThickness="{TemplateBinding BorderThickness}"
+                    BorderBrush="Transparent"
+                    BorderThickness="0"
                     CornerRadius="{TemplateBinding CornerRadius}">
               <Grid>
                 <Border x:Name="PART_FocusOutline"
@@ -73,6 +73,33 @@
                         CornerRadius="{TemplateBinding CornerRadius}"
                         IsHitTestVisible="False"
                         IsVisible="False" />
+
+                <Grid x:Name="PART_Outline"
+                      IsHitTestVisible="False"
+                      IsVisible="False">
+                  <Border BorderBrush="{TemplateBinding BorderBrush}"
+                          BorderThickness="{TemplateBinding BorderThickness}"
+                          CornerRadius="{TemplateBinding CornerRadius}" />
+                </Grid>
+
+                <Grid x:Name="PART_NotchedOutline"
+                      IsHitTestVisible="False"
+                      IsVisible="False">
+                  <Border BorderBrush="{TemplateBinding BorderBrush}"
+                          BorderThickness="1,0,1,1"
+                          CornerRadius="{TemplateBinding CornerRadius}" />
+                  <Grid Height="1"
+                        VerticalAlignment="Top"
+                        ColumnDefinitions="12,Auto,*">
+                    <Border Background="{TemplateBinding BorderBrush}" />
+                    <ContentPresenter Grid.Column="1"
+                                      Content="{TemplateBinding Label}"
+                                      FontSize="{DynamicResource Md.Comp.TextField.Input.FontSize}"
+                                      Padding="{DynamicResource Md.Comp.TextField.Label.NotchedPadding}"
+                                      Opacity="0" />
+                    <Border Grid.Column="2" Background="{TemplateBinding BorderBrush}" />
+                  </Grid>
+                </Grid>
 
                 <Grid x:Name="PART_ContentGrid"
                       Margin="{TemplateBinding Padding}"
@@ -272,6 +299,21 @@
     <Style Selector="^:outlined /template/ Border#PART_ActiveIndicator">
       <Setter Property="IsVisible" Value="False" />
     </Style>
+    <Style Selector="^:outlined /template/ Grid#PART_Outline">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:outlined:has-label:not(:empty) /template/ Grid#PART_Outline">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:outlined:has-label:focus /template/ Grid#PART_Outline">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:outlined:has-label:not(:empty) /template/ Grid#PART_NotchedOutline">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:outlined:has-label:focus /template/ Grid#PART_NotchedOutline">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
     <Style Selector="^:outlined:has-label /template/ Border#PART_Container">
       <!-- Reserve space for the notched floating label so Android/Skia clips neither glyphs nor focus outline. -->
       <Setter Property="Margin" Value="0,8,0,0" />
@@ -325,11 +367,11 @@
       <Setter Property="Padding" Value="{DynamicResource Md.Comp.TextField.Label.NotchedPadding}" />
     </Style>
     <Style Selector="^:outlined:has-label:not(:empty) /template/ ContentPresenter#PART_Label">
-      <Setter Property="Background" Value="{TemplateBinding OutlineLabelBackground}" />
+      <Setter Property="Background" Value="Transparent" />
       <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -28px)" />
     </Style>
     <Style Selector="^:outlined:has-label:focus /template/ ContentPresenter#PART_Label">
-      <Setter Property="Background" Value="{TemplateBinding OutlineLabelBackground}" />
+      <Setter Property="Background" Value="Transparent" />
       <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -28px)" />
     </Style>
     <!-- Multiline fields keep the label in a fixed top slot. A vertically centered resting label
@@ -341,7 +383,7 @@
     </Style>
     <Style Selector="^:outlined:multiline:has-label /template/ ContentPresenter#PART_Label">
       <Setter Property="Margin" Value="-4,-8,0,0" />
-      <Setter Property="Background" Value="{TemplateBinding OutlineLabelBackground}" />
+      <Setter Property="Background" Value="Transparent" />
     </Style>
     <Style Selector="^:multiline:has-label /template/ Grid#PART_InputRow">
       <Setter Property="VerticalAlignment" Value="Top" />
@@ -427,9 +469,6 @@
     </Style>
     <Style Selector="^:outlined:focus">
       <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
-    </Style>
-    <Style Selector="^:outlined:focus /template/ Border#PART_FocusOutline">
-      <Setter Property="IsVisible" Value="True" />
     </Style>
 
     <!-- Manual and Avalonia validation error states. -->

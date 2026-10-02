@@ -98,20 +98,24 @@ public sealed class MdBreadcrumb : ListBox
         {
             var isLast = index == ItemCount - 1;
             var isFirst = index == 0;
-            listItem.Classes.Set(":last", isLast);
-            listItem.Classes.Set(":first", isFirst);
+            listItem.Classes.Set("last", isLast);
+            listItem.Classes.Set("first", isFirst);
 
             if (item is MdBreadcrumbItem model)
             {
-                listItem.Classes.Set(":has-icon", model.Icon is not null);
-                listItem.Classes.Set(":current", model.IsCurrent);
+                listItem.Classes.Set("has-icon", model.Icon is not null);
+                listItem.Classes.Set("current", model.IsCurrent);
                 listItem.IsEnabled = model.IsEnabled;
+                listItem.Content = model.Label ?? model;
             }
             else
             {
-                listItem.Classes.Set(":has-icon", false);
-                listItem.Classes.Set(":current", isLast);
+                listItem.Classes.Set("has-icon", false);
+                listItem.Classes.Set("current", isLast);
+                listItem.Content = item;
             }
+
+            listItem.ApplyTemplate();
 
             if (listItem.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault(t => t.Name == "PART_Separator") is { } separatorText)
             {

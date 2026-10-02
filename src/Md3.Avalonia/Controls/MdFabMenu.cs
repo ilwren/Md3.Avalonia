@@ -78,14 +78,11 @@ public class MdFabMenu : ItemsControl
         _menuItems?.Measure(availableSize);
 
         var triggerSize = _trigger?.DesiredSize ?? new Size(48, 48);
-        var itemsHeight = _menuItems?.DesiredSize.Height ?? 0;
+        var itemsSize = _menuItems?.DesiredSize ?? new Size(0, 0);
 
-        // The footprint width is strictly anchored to the trigger's width.
-        // This ensures parent layouts (Grid, StackPanel, Canvas, Scaffold) never shift the trigger horizontally when items expand.
-        var width = triggerSize.Width;
-        var height = triggerSize.Height + (AreItemsVisible || IsOpen ? itemsHeight + 12 : 0);
+        var width = Math.Max(triggerSize.Width, itemsSize.Width);
+        var height = triggerSize.Height;
 
-        base.MeasureOverride(availableSize);
         return new Size(width, height);
     }
 

@@ -63,21 +63,28 @@
       </StackPanel>
 
       <StackPanel Spacing="12">
-        <TextBlock Classes="h2" Text="Standard button group" />
-        <md:MdStandardButtonGroup>
-          <md:MdButton Content="Day" Variant="Tonal"/>
-          <md:MdToggleButton Content="Week" Variant="Tonal" IsChecked="True"/>
-          <md:MdToggleButton Content="Month" Variant="Tonal"/>
-        </md:MdStandardButtonGroup>
-      </StackPanel>
+        <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+          <TextBlock Classes="h2" Text="Standard &amp; Connected button groups (Dynamic FontSize)" VerticalAlignment="Center" />
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+            <TextBlock Text="Group FontSize:" FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" VerticalAlignment="Center" />
+            <Slider x:Name="GroupFontSizeSlider" Minimum="11" Maximum="22" Value="14" Width="120" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding Value, ElementName=GroupFontSizeSlider, StringFormat='{}{0:F0}px'}" FontSize="13" FontWeight="SemiBold" Width="38" VerticalAlignment="Center" />
+          </StackPanel>
+        </Grid>
+        <TextBlock Classes="body" Text="Button groups propagate custom FontSize and typography settings dynamically to all inner buttons:" />
+        <StackPanel Spacing="10">
+          <md:MdStandardButtonGroup FontSize="{Binding Value, ElementName=GroupFontSizeSlider}">
+            <md:MdButton Content="Day" Variant="Tonal"/>
+            <md:MdToggleButton Content="Week" Variant="Tonal" IsChecked="True"/>
+            <md:MdToggleButton Content="Month" Variant="Tonal"/>
+          </md:MdStandardButtonGroup>
 
-      <StackPanel Spacing="12">
-        <TextBlock Classes="h2" Text="Connected button group" />
-        <md:MdConnectedButtonGroup>
-          <md:MdToggleButton Content="List" Variant="Outlined" IsChecked="True"/>
-          <md:MdToggleButton Content="Grid" Variant="Outlined"/>
-          <md:MdToggleButton Content="Map" Variant="Outlined"/>
-        </md:MdConnectedButtonGroup>
+          <md:MdConnectedButtonGroup FontSize="{Binding Value, ElementName=GroupFontSizeSlider}">
+            <md:MdToggleButton Content="List" Variant="Outlined" IsChecked="True"/>
+            <md:MdToggleButton Content="Grid" Variant="Outlined"/>
+            <md:MdToggleButton Content="Map" Variant="Outlined"/>
+          </md:MdConnectedButtonGroup>
+        </StackPanel>
       </StackPanel>
 
       <StackPanel Spacing="12">

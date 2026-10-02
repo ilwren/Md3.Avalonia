@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
@@ -87,6 +88,9 @@ public class MdColorPicker : TemplatedControl
     private TextBox? _hexTextBox;
     private Button? _copyHexButton;
 
+    public ICommand SelectColorCommand { get; }
+    public ICommand SetPickerModeCommand { get; }
+
     public ObservableCollection<Color> RecentColors { get; } = new()
     {
         Color.Parse("#6750A4"),
@@ -111,6 +115,17 @@ public class MdColorPicker : TemplatedControl
 
     public MdColorPicker()
     {
+        SelectColorCommand = new ColorPickerActionCommand(param =>
+        {
+            if (param is Color c) SelectColor(c);
+            else if (param is string s && Color.TryParse(s, out var parsed)) SelectColor(parsed);
+        });
+        SetPickerModeCommand = new ColorPickerActionCommand(param =>
+        {
+            if (param is MdColorPickerMode mode) PickerMode = mode;
+            else if (param is string str && Enum.TryParse<MdColorPickerMode>(str, true, out var parsedMode)) PickerMode = parsedMode;
+        });
+
         UpdateModePseudoClasses();
         UpdateShades(SelectedColor);
         SyncHsvFromColor(SelectedColor);
@@ -316,6 +331,33 @@ public class MdColorPicker : TemplatedControl
     }
 }
 
+internal sealed class ColorPickerActionCommand : System.Windows.Input.ICommand
+{
+    private readonly Action<object?> _action;
+    public ColorPickerActionCommand(Action<object?> action) => _action = action;
+    public event EventHandler? CanExecuteChanged
+    {
+        add { }
+        remove { }
+    }
+    public bool CanExecute(object? parameter) => true;
+    public void Execute(object? parameter) => _action(parameter);
+}
+
+public sealed class ColorEqualsMultiConverter : global::Avalonia.Data.Converters.IMultiValueConverter
+{
+    public static readonly ColorEqualsMultiConverter Instance = new();
+
+    public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (values.Count >= 2 && values[0] is Color c1 && values[1] is Color c2)
+        {
+            return c1.A == c2.A && c1.R == c2.R && c1.G == c2.G && c1.B == c2.B;
+        }
+        return false;
+    }
+}
+
 /// <summary>
 /// A compact Material 3 button that displays the current color swatch and opens a popover color picker.
 /// </summary>
@@ -353,4 +395,30 @@ public static class MdColorConverters
 {
     public static readonly global::Avalonia.Data.Converters.IValueConverter ColorToBrush =
         new global::Avalonia.Data.Converters.FuncValueConverter<Color, IBrush>(c => new SolidColorBrush(c));
+
+    public static readonly global::Avalonia.Data.Converters.IValueConverter ContrastBrush =
+        new global::Avalonia.Data.Converters.FuncValueConverter<Color, IBrush>(c =>
+        {
+            var lum = 0.299 * c.R + 0.587 * c.G + 0.114 * c.B;
+            return lum > 140 ? Brushes.Black : Brushes.White;
+        });
+
+    public static readonly global::Avalonia.Data.Converters.IMultiValueConverter ColorEquals =
+        ColorEqualsMultiConverter.Instance;
+
+    public static readonly IBrush HueTrackBrush = new LinearGradientBrush
+    {
+        StartPoint = new RelativePoint(0, 0.5, RelativeUnit.Relative),
+        EndPoint = new RelativePoint(1, 0.5, RelativeUnit.Relative),
+        GradientStops = new GradientStops
+        {
+            new GradientStop(Color.FromRgb(255, 0, 0), 0.0),
+            new GradientStop(Color.FromRgb(255, 255, 0), 0.17),
+            new GradientStop(Color.FromRgb(0, 255, 0), 0.33),
+            new GradientStop(Color.FromRgb(0, 255, 255), 0.50),
+            new GradientStop(Color.FromRgb(0, 0, 255), 0.67),
+            new GradientStop(Color.FromRgb(255, 0, 255), 0.83),
+            new GradientStop(Color.FromRgb(255, 0, 0), 1.0)
+        }
+    };
 }

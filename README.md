@@ -194,16 +194,16 @@ spec-snapshot/manifest.json        # 官网、AndroidX commit、token 版本与�
 ```xml
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:themes="using:Md3.Avalonia.Themes"
-             xmlns:ecosystem="using:Md3.Avalonia.Ecosystem.Themes">
+             xmlns:extraThemes="using:Md3.Avalonia.Extra.Themes">
   <Application.Styles>
     <themes:MaterialTheme />
-    <!-- 仅引用 Md3.Avalonia.Ecosystem 时加入： -->
-    <ecosystem:EcosystemTheme />
+    <!-- 仅引用 Md3.Avalonia.Extra 时加入： -->
+    <extraThemes:ExtraTheme />
   </Application.Styles>
 </Application>
 ```
 
-三个可独立 pack 的 NuGet 预发布包版本均为 `0.1.0-preview.1`：`Md3.Avalonia`（核心）、`Md3.Avalonia.Icons`（可选图标/字体 provider）和 `Md3.Avalonia.Ecosystem`（依赖核心）。核心与生态包都不强制引用 Icons；三个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
+四个可独立 pack 的 NuGet 包版本均为 `0.2.0`：`Md3.Avalonia`（核心）、`Md3.Avalonia.Icons`（完整图标/字体 provider）、`Md3.Avalonia.Icons.Lite`（轻量图标子集）和 `Md3.Avalonia.Extra`（扩展/生态控件，依赖核心）。核心与扩展包都不强制引用 Icons；四个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
 
 任意 seed 主题可在启动时或运行时应用：
 
@@ -302,11 +302,46 @@ dialogHost.Close(result: true);
 
 ## 构建与测试
 
+### 拉取源码并本地验证 Gallery
+
+```bash
+# 1. 拉取源码
+git clone https://github.com/ilwren/Md3.Avalonia.git
+cd Md3.Avalonia
+
+# 2. 准备 SDK 与字体资源
+# 需要 .NET 10 SDK。仓库已提供字体生成脚本，首次构建前执行一次：
+python3 scripts/generate-fonts.py   # Windows 可使用: python scripts/generate-fonts.py
+
+# 3. 在未安装 Android workload 的桌面环境中，优先直接构建 Desktop Gallery，避免 solution restore 加载 Android TFM
+dotnet build gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj -c Release
+
+# 4. 启动桌面 Gallery 手动验收
+dotnet run --project gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj
+
+# 5. 运行自动化 Headless 验证
+dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release
+```
+
+如需验证 Android Gallery，请先安装 workload，然后单独发布 Android 项目：
+
+```bash
+dotnet workload install android
+dotnet publish gallery/Md3.Avalonia.Gallery.Android/Md3.Avalonia.Gallery.Android.csproj \
+  -c Release \
+  -f net10.0-android \
+  -p:AndroidPackageFormat=apk \
+  -o artifacts/android
+```
+
+完整打包验证仍需提供官方 Material Symbols 字体，或通过脚本参数传入 workspace 外的离线字体路径：
+
 ```bash
 # 先把官方字体放入预留位置，或用 --font 传入离线绝对路径
 scripts/build-nuget.sh --font /offline/path/MaterialSymbolsRounded.ttf
 
-# solution 验证也可通过 MSBuild 属性引用 workspace 外字体
+# solution 验证会包含 Android 项目；未安装 Android workload 时请改用上面的 Desktop Gallery 项目级构建
+# 也可通过 MSBuild 属性引用 workspace 外字体
 dotnet build Md3.Avalonia.sln -c Release \
   -p:MaterialSymbolsRoundedFontFile=/offline/path/MaterialSymbolsRounded.ttf
 

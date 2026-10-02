@@ -645,7 +645,7 @@
               <Button Name="PART_CopyHexButton" Grid.Column="2" Width="36" Height="36" CornerRadius="18"
                       Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
                       Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
-                      BorderThickness="0" Padding="0"
+                      BorderThickness="0" Padding="0" Cursor="Hand"
                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                       ToolTip.Tip="Copy Hex Code">
                 <md:MdIcon Glyph="&#xe14d;" Size="18" />
@@ -658,15 +658,32 @@
               <ItemsControl ItemsSource="{TemplateBinding MaterialPrimaryColors}">
                 <ItemsControl.ItemsPanel>
                   <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal" ItemWidth="32" ItemHeight="32" />
+                    <WrapPanel Orientation="Horizontal" ItemWidth="34" ItemHeight="34" />
                   </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="Color">
-                    <Button Width="26" Height="26" CornerRadius="13" Margin="2" Padding="0" BorderThickness="0"
+                    <Button Width="30" Height="30" CornerRadius="15" Margin="2" Padding="0" BorderThickness="0"
+                            Cursor="Hand"
                             Background="{Binding Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
-                            Command="{Binding $parent[eco:MdColorPicker].SelectColor}"
-                            CommandParameter="{Binding}" />
+                            Command="{Binding $parent[eco:MdColorPicker].SelectColorCommand}"
+                            CommandParameter="{Binding}">
+                      <Path Width="14" Height="14"
+                            Data="M 3 7.5 L 6 10.5 L 12 3.5"
+                            Stroke="{Binding Converter={x:Static eco:MdColorConverters.ContrastBrush}}"
+                            StrokeThickness="2"
+                            StrokeLineCap="Round"
+                            StrokeJoin="Round"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                        <Path.IsVisible>
+                          <MultiBinding Converter="{x:Static eco:MdColorConverters.ColorEquals}">
+                            <Binding />
+                            <Binding Path="SelectedColor" RelativeSource="{RelativeSource AncestorType=eco:MdColorPicker}" />
+                          </MultiBinding>
+                        </Path.IsVisible>
+                      </Path>
+                    </Button>
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
@@ -683,10 +700,27 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="Color">
-                    <Button Height="24" CornerRadius="4" Margin="1" Padding="0" BorderThickness="0"
+                    <Button Height="26" CornerRadius="4" Margin="1" Padding="0" BorderThickness="0"
+                            Cursor="Hand"
                             Background="{Binding Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
-                            Command="{Binding $parent[eco:MdColorPicker].SelectColor}"
-                            CommandParameter="{Binding}" />
+                            Command="{Binding $parent[eco:MdColorPicker].SelectColorCommand}"
+                            CommandParameter="{Binding}">
+                      <Path Width="12" Height="12"
+                            Data="M 2.5 6.5 L 5 9 L 10.5 2.5"
+                            Stroke="{Binding Converter={x:Static eco:MdColorConverters.ContrastBrush}}"
+                            StrokeThickness="1.8"
+                            StrokeLineCap="Round"
+                            StrokeJoin="Round"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                        <Path.IsVisible>
+                          <MultiBinding Converter="{x:Static eco:MdColorConverters.ColorEquals}">
+                            <Binding />
+                            <Binding Path="SelectedColor" RelativeSource="{RelativeSource AncestorType=eco:MdColorPicker}" />
+                          </MultiBinding>
+                        </Path.IsVisible>
+                      </Path>
+                    </Button>
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
@@ -722,21 +756,77 @@
               <ItemsControl ItemsSource="{Binding RecentColors, RelativeSource={RelativeSource TemplatedParent}}">
                 <ItemsControl.ItemsPanel>
                   <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="6" />
+                    <WrapPanel Orientation="Horizontal" ItemWidth="28" ItemHeight="28" />
                   </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="Color">
-                    <Button Width="22" Height="22" CornerRadius="11" Padding="0" BorderThickness="0"
+                    <Button Width="24" Height="24" CornerRadius="12" Margin="2" Padding="0" BorderThickness="0"
+                            Cursor="Hand"
                             Background="{Binding Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
-                            Command="{Binding $parent[eco:MdColorPicker].SelectColor}"
-                            CommandParameter="{Binding}" />
+                            Command="{Binding $parent[eco:MdColorPicker].SelectColorCommand}"
+                            CommandParameter="{Binding}">
+                      <Path Width="10" Height="10"
+                            Data="M 2 5 L 4.5 7.5 L 9 2"
+                            Stroke="{Binding Converter={x:Static eco:MdColorConverters.ContrastBrush}}"
+                            StrokeThickness="1.6"
+                            StrokeLineCap="Round"
+                            StrokeJoin="Round"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                        <Path.IsVisible>
+                          <MultiBinding Converter="{x:Static eco:MdColorConverters.ColorEquals}">
+                            <Binding />
+                            <Binding Path="SelectedColor" RelativeSource="{RelativeSource AncestorType=eco:MdColorPicker}" />
+                          </MultiBinding>
+                        </Path.IsVisible>
+                      </Path>
+                    </Button>
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
             </StackPanel>
           </StackPanel>
         </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type eco:MdColorPickerButton}" TargetType="eco:MdColorPickerButton">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="16" />
+    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdColorPickerButton">
+        <Button Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}"
+                Cursor="Hand">
+          <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+            <Border Width="22" Height="22" CornerRadius="11"
+                    Background="{TemplateBinding SelectedColor, Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
+                    BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                    BorderThickness="1" />
+            <TextBlock Text="{TemplateBinding SelectedHex}"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+            <md:MdIcon Glyph="&#xe5cf;" Size="16" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" VerticalAlignment="Center" />
+          </StackPanel>
+          <Button.Flyout>
+            <Flyout Placement="BottomEdgeAlignedLeft">
+              <eco:MdColorPicker SelectedColor="{Binding SelectedColor, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                 SelectedHex="{Binding SelectedHex, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                 IsAlphaEnabled="True" />
+            </Flyout>
+          </Button.Flyout>
+        </Button>
       </ControlTemplate>
     </Setter>
   </ControlTheme>

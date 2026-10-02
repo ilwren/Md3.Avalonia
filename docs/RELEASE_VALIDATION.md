@@ -1,6 +1,6 @@
 # Release validation record
 
-Version: `0.1.0-preview.1`  
+Version: `0.2.0`
 Automated baseline date: 2026-09-26
 
 ## Automated gates

@@ -4,42 +4,83 @@
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.DialogGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Spacing="28">
-      <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Dialogs"/><TextBlock Classes="body" Text="Dialogs interrupt a flow with an important prompt. MdDialogHost supports declarative AXAML and awaitable direct C# usage."/></StackPanel>
+    <StackPanel Spacing="28" Margin="0,0,12,24" MaxWidth="960">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Dialogs" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="Dialogs interrupt a user's flow with critical prompts, confirmations, or rich interactive choices. MdDialogHost supports declarative AXAML bindings and awaitable C# ShowAsync workflows." />
+      </StackPanel>
+
+      <!-- Interactive Dialog Playground -->
       <StackPanel Spacing="12">
-        <TextBlock Classes="h2" Text="Basic dialog" />
-        <md:MdDialogHost x:Name="BasicDialogHost" Height="330">
-          <Border Padding="24" CornerRadius="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
-              <TextBlock Text="Dialog host content remains in the visual tree." />
-              <StackPanel Orientation="Horizontal" Spacing="8">
-                <md:MdButton Content="Open basic dialog" Variant="Filled" Click="OpenBasicDialog" />
-                <md:MdButton Content="Open full-screen" Variant="Outlined" Click="OpenFullScreenDialog" />
+        <TextBlock Classes="h2" Text="Interactive Dialog Studio" />
+        <md:MdDialogHost x:Name="BasicDialogHost" MinHeight="360" CornerRadius="24">
+          <!-- Background Host Content -->
+          <Border Padding="24" CornerRadius="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                  BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16" MaxWidth="580">
+              <StackPanel Spacing="6" HorizontalAlignment="Center">
+                <TextBlock Text="Dialog Host Stage" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                <TextBlock Text="Trigger different dialog types below to test interactive button actions and awaitable returns."
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" FontSize="13" TextAlignment="Center" TextWrapping="Wrap" />
               </StackPanel>
+
+              <!-- Action Triggers -->
+              <WrapPanel HorizontalAlignment="Center">
+                <md:MdButton Content="Discard Confirmation" Variant="Filled" Margin="4" Click="OpenConfirmationDialog" />
+                <md:MdButton Content="Rename Project (ShowAsync)" Variant="Tonal" Margin="4" Click="OpenAsyncInputDialog" />
+                <md:MdButton Content="Choose Destination" Variant="Outlined" Margin="4" Click="OpenChoiceDialog" />
+                <md:MdButton Content="Full-Screen Review" Variant="Outlined" Margin="4" Click="OpenFullScreenDialog" />
+              </WrapPanel>
+
+              <!-- Live Action Feedback Result Card -->
+              <Border x:Name="FeedbackCard" Padding="16,12" CornerRadius="16"
+                      Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
+                      BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1"
+                      HorizontalAlignment="Stretch">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" VerticalAlignment="Center">
+                  <md:MdIcon x:Name="FeedbackIcon" Glyph="{x:Static md:MdSymbols.Info}" Size="22"
+                             Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" VerticalAlignment="Center" />
+                  <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                    <TextBlock Text="Last Dialog Action Result" FontSize="11" FontWeight="Bold"
+                               Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                    <TextBlock x:Name="FeedbackText" Text="No dialog action triggered yet. Click a button above to test."
+                               FontSize="13" FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" TextWrapping="Wrap" />
+                  </StackPanel>
+                </Grid>
+              </Border>
             </StackPanel>
           </Border>
+
+          <!-- Declarative Default Dialog Slot -->
           <md:MdDialogHost.Dialog>
             <md:MdDialog x:Name="DemoDialog" Headline="Discard draft?">
-              <md:MdDialog.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Warning}" Size="24"/></md:MdDialog.Icon>
-              <TextBlock Width="340" TextWrapping="Wrap" Text="This draft has unsaved changes. Discarding it cannot be undone." />
+              <md:MdDialog.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Warning}" Size="24" Foreground="{DynamicResource Md.Sys.Color.Error.Brush}"/></md:MdDialog.Icon>
+              <TextBlock Width="340" TextWrapping="Wrap" Text="This draft contains unsaved changes. Discarding will permanently erase your recent edits." />
               <md:MdDialog.Actions>
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                  <md:MdButton Content="Cancel" Variant="Text" Click="CloseDialog" />
-                  <md:MdButton Content="Discard" Variant="Text" Click="CloseDialog" />
+                  <md:MdButton Content="Cancel (Keep)" Variant="Text" Click="OnCancelDiscardClicked" />
+                  <md:MdButton Content="Discard Changes" Variant="Filled" Click="OnConfirmDiscardClicked" />
                 </StackPanel>
               </md:MdDialog.Actions>
             </md:MdDialog>
           </md:MdDialogHost.Dialog>
         </md:MdDialogHost>
       </StackPanel>
+
       <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Escape and optional scrim click dismiss the active dialog. IsOpen is two-way bindable; ShowAsync returns the result supplied to Close(result)." />
+        <StackPanel Spacing="6">
+          <TextBlock Text="Dialog Best Practices &amp; Key Gestures" FontWeight="SemiBold" FontSize="14" />
+          <TextBlock Classes="body" TextWrapping="Wrap"
+                     Text="• Escape key and scrim background click automatically dismiss or cancel active dialogs.&#x0a;• dialogHost.ShowAsync(dialog) returns a Task&lt;object?&gt; that resolves when dialogHost.Close(result) is invoked with a typed result.&#x0a;• Supporting both declarative AXAML dialog definitions and dynamic programmatic dialogs." />
+        </StackPanel>
       </Border>
+
       <StackPanel Spacing="10">
-        <TextBlock Classes="h2" Text="AXAML and C#" />
+        <TextBlock Classes="h2" Text="Usage Examples" />
         <gallery:CodeExample
-          XamlCode="&lt;md:MdDialogHost IsOpen=&quot;{Binding IsDeleteDialogOpen}&quot;&gt;&#10;  &lt;md:MdDialogHost.Dialog&gt;&#10;    &lt;md:MdDialog Headline=&quot;Delete item?&quot;&gt;...&lt;/md:MdDialog&gt;&#10;  &lt;/md:MdDialogHost.Dialog&gt;&#10;&lt;/md:MdDialogHost&gt;"
-          CSharpCode="var dialog = new MdDialog { Headline = &quot;Delete item?&quot;, Content = message };&#10;var result = await dialogHost.ShowAsync(dialog);&#10;dialogHost.Close(result: true);" />
+          XamlCode="&lt;!-- Declarative Dialog in AXAML --&gt;&#10;&lt;md:MdDialogHost IsOpen=&quot;{Binding IsDialogOpen}&quot;&gt;&#10;  &lt;md:MdDialogHost.Dialog&gt;&#10;    &lt;md:MdDialog Headline=&quot;Delete File?&quot;&gt;&#10;      &lt;TextBlock Text=&quot;Are you sure you want to delete this file?&quot; /&gt;&#10;      &lt;md:MdDialog.Actions&gt;&#10;        &lt;StackPanel Orientation=&quot;Horizontal&quot; Spacing=&quot;8&quot;&gt;&#10;          &lt;md:MdButton Content=&quot;Cancel&quot; Variant=&quot;Text&quot; Click=&quot;OnCancel&quot; /&gt;&#10;          &lt;md:MdButton Content=&quot;Delete&quot; Variant=&quot;Filled&quot; Click=&quot;OnDelete&quot; /&gt;&#10;        &lt;/StackPanel&gt;&#10;      &lt;/md:MdDialog.Actions&gt;&#10;    &lt;/md:MdDialog&gt;&#10;  &lt;/md:MdDialogHost.Dialog&gt;&#10;&lt;/md:MdDialogHost&gt;"
+          CSharpCode="// Programmatic Async / Awaitable Dialog with Typed Result&#10;var dialog = new MdDialog&#10;{&#10;    Headline = &quot;Rename Project&quot;,&#10;    Content = new TextBox { Text = &quot;New Name&quot; }&#10;};&#10;var result = await dialogHost.ShowAsync(dialog);&#10;if (result is string newName)&#10;{&#10;    // User clicked Save and committed changes&#10;    ApplyRename(newName);&#10;}" />
       </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>

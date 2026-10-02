@@ -124,13 +124,13 @@
     <Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="VerticalContentAlignment" Value="Stretch" />
     <Setter Property="Template">
       <ControlTemplate>
-        <!-- Spinner actions overlay the field's reserved trailing slot, perfectly centered vertically -->
+        <!-- Spinner actions overlay the field's reserved trailing slot, perfectly centered vertically inside container -->
         <Grid>
           <ContentPresenter Name="PART_ContentPresenter"
                             Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
                             HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
           <StackPanel Name="PART_SpinnerPanel" Width="32" Height="42"
-                      Margin="0,0,8,0" VerticalAlignment="Center" HorizontalAlignment="Right"
+                      Margin="0,15,8,0" VerticalAlignment="Top" HorizontalAlignment="Right"
                       Background="Transparent" Spacing="2" ZIndex="2"
                       IsVisible="{TemplateBinding ShowButtonSpinner}">
             <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}"
@@ -150,12 +150,13 @@
       </ControlTemplate>
     </Setter>
     <Style Selector="^[ButtonSpinnerLocation=Left] /template/ StackPanel#PART_SpinnerPanel">
-      <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="Margin" Value="8,0,0,0" />
+      <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="Margin" Value="8,15,0,0" />
     </Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdNumericBox}" TargetType="md:MdNumericBox">
     <Setter Property="MinWidth" Value="160" /><Setter Property="MinHeight" Value="56" />
+    <Setter Property="VerticalAlignment" Value="Top" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
     <Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" />
     <Setter Property="Template">
@@ -376,42 +377,43 @@
                               chrome:WindowDecorationProperties.ElementRole="User" />
             <StackPanel Grid.Column="3" Orientation="Horizontal" IsVisible="{TemplateBinding ShowCaptionButtons}">
               <md:MdCaptionButton Kind="Minimize" IsVisible="{TemplateBinding ShowMinimizeButton}"
-                                  Foreground="{TemplateBinding Foreground}">
-                <Path Width="12" Height="12" Stretch="Uniform"
-                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=md:MdCaptionButton}}" StrokeThickness="1"
-                      Data="M1,6 L11,6" />
-              </md:MdCaptionButton>
+                                  Foreground="{TemplateBinding Foreground}" />
               <md:MdCaptionButton Kind="MaximizeRestore" IsVisible="{TemplateBinding ShowMaximizeButton}"
-                                  Foreground="{TemplateBinding Foreground}">
-                <Grid Width="12" Height="12">
-                  <Path x:Name="PART_MaximizeGlyph" Stretch="Uniform"
-                        Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=md:MdCaptionButton}}" StrokeThickness="1"
-                        Data="M1.5,1.5 L10.5,1.5 L10.5,10.5 L1.5,10.5 Z" />
-                  <Path x:Name="PART_RestoreGlyph" Stretch="Uniform" IsVisible="False"
-                        Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=md:MdCaptionButton}}" StrokeThickness="1"
-                        Data="M3.5,1.5 L10.5,1.5 L10.5,8.5 M1.5,3.5 L8.5,3.5 L8.5,10.5 L1.5,10.5 Z" />
-                </Grid>
-              </md:MdCaptionButton>
+                                  Foreground="{TemplateBinding Foreground}" />
               <md:MdCaptionButton Kind="Close" IsVisible="{TemplateBinding ShowCloseButton}"
-                                  Foreground="{TemplateBinding Foreground}">
-                <Path Width="12" Height="12" Stretch="Uniform"
-                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=md:MdCaptionButton}}" StrokeThickness="1"
-                      Data="M1.5,1.5 L10.5,10.5 M10.5,1.5 L1.5,10.5" />
-              </md:MdCaptionButton>
+                                  Foreground="{TemplateBinding Foreground}" />
             </StackPanel>
           </Grid>
         </Border>
       </ControlTemplate>
     </Setter>
     <Style Selector="^:inactive"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /></Style>
-    <Style Selector="^ /template/ md|MdCaptionButton:restore Path#PART_MaximizeGlyph"><Setter Property="IsVisible" Value="False" /></Style>
-    <Style Selector="^ /template/ md|MdCaptionButton:restore Path#PART_RestoreGlyph"><Setter Property="IsVisible" Value="True" /></Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdCaptionButton}" TargetType="md:MdCaptionButton">
     <Setter Property="Width" Value="46" /><Setter Property="Height" Value="40" /><Setter Property="Padding" Value="0" />
     <Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" /><Setter Property="FocusAdorner" Value="{x:Null}" />
-    <Setter Property="Template"><ControlTemplate><Border Background="{TemplateBinding Background}"><ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" /></Border></ControlTemplate></Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}">
+          <Panel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <ContentPresenter Content="{TemplateBinding Content}" />
+            <Path x:Name="PART_MinimizeGlyph" Width="12" Height="12" Stretch="Uniform" IsVisible="False"
+                  Stroke="{TemplateBinding Foreground}" StrokeThickness="1" Data="M1,6 L11,6" />
+            <Path x:Name="PART_MaximizeGlyph" Width="12" Height="12" Stretch="Uniform" IsVisible="False"
+                  Stroke="{TemplateBinding Foreground}" StrokeThickness="1" Data="M1.5,1.5 L10.5,1.5 L10.5,10.5 L1.5,10.5 Z" />
+            <Path x:Name="PART_RestoreGlyph" Width="12" Height="12" Stretch="Uniform" IsVisible="False"
+                  Stroke="{TemplateBinding Foreground}" StrokeThickness="1" Data="M3.5,1.5 L10.5,1.5 L10.5,8.5 M1.5,3.5 L8.5,3.5 L8.5,10.5 L1.5,10.5 Z" />
+            <Path x:Name="PART_CloseGlyph" Width="12" Height="12" Stretch="Uniform" IsVisible="False"
+                  Stroke="{TemplateBinding Foreground}" StrokeThickness="1" Data="M1.5,1.5 L10.5,10.5 M10.5,1.5 L1.5,10.5" />
+          </Panel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:minimize /template/ Path#PART_MinimizeGlyph"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:maximize /template/ Path#PART_MaximizeGlyph"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:restore /template/ Path#PART_RestoreGlyph"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:close /template/ Path#PART_CloseGlyph"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:pointerover"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" /></Style>
     <Style Selector="^:pressed"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceVariant.Brush}" /></Style>
     <Style Selector="^[Kind=Close]:pointerover"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnError.Brush}" /></Style>

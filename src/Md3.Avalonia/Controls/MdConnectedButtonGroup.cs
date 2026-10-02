@@ -12,12 +12,21 @@ public class MdConnectedButtonGroup : ItemsControl
     public static readonly StyledProperty<MdButtonSize> SizeProperty = AvaloniaProperty.Register<MdConnectedButtonGroup, MdButtonSize>(nameof(Size), MdButtonSize.Small);
     public static readonly StyledProperty<double> ItemSpacingProperty = AvaloniaProperty.Register<MdConnectedButtonGroup, double>(nameof(ItemSpacing), 2);
 
-    static MdConnectedButtonGroup() => SizeProperty.Changed.AddClassHandler<MdConnectedButtonGroup>((x, _) => x.UpdatePseudoClasses());
+    static MdConnectedButtonGroup()
+    {
+        SizeProperty.Changed.AddClassHandler<MdConnectedButtonGroup>((x, _) => x.UpdatePseudoClasses());
+        FontSizeProperty.Changed.AddClassHandler<MdConnectedButtonGroup>((group, _) => group.UpdateChildFontSizes());
+        FontWeightProperty.Changed.AddClassHandler<MdConnectedButtonGroup>((group, _) => group.UpdateChildFontSizes());
+    }
 
     public MdConnectedButtonGroup()
     {
         UpdatePseudoClasses();
-        LayoutUpdated += (_, _) => UpdateConnectedShapes();
+        LayoutUpdated += (_, _) =>
+        {
+            UpdateConnectedShapes();
+            UpdateChildFontSizes();
+        };
     }
 
     public MdButtonSize Size { get => GetValue(SizeProperty); set => SetValue(SizeProperty, value); }
@@ -71,6 +80,21 @@ public class MdConnectedButtonGroup : ItemsControl
             {
                 toggle.SetCurrentValue(MdToggleButton.EnableSelectedShapeMorphProperty, false);
                 toggle.SetCurrentValue(MdToggleButton.ContainerCornerRadiusProperty, radius);
+            }
+        }
+    }
+
+    private void UpdateChildFontSizes()
+    {
+        var fontSize = FontSize;
+        if (double.IsNaN(fontSize) || fontSize <= 0) return;
+        foreach (var btn in this.GetVisualDescendants().OfType<Control>())
+        {
+            if (btn is MdButton or MdToggleButton or Button)
+            {
+                btn.SetCurrentValue(FontSizeProperty, fontSize);
+                if (IsSet(FontWeightProperty))
+                    btn.SetCurrentValue(FontWeightProperty, FontWeight);
             }
         }
     }

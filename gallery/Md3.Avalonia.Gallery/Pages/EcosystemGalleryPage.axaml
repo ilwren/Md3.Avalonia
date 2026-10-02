@@ -5,11 +5,12 @@
              xmlns:md="using:Md3.Avalonia.Controls"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.EcosystemGalleryPage">
-  <StackPanel MinHeight="4400" Spacing="32" Margin="0,0,12,24">
-    <StackPanel Spacing="8">
-      <TextBlock Classes="h1" Text="Flutter ecosystem" />
-      <TextBlock Classes="body" TextWrapping="Wrap" Text="Clean-room, Material-themed controls informed by frozen public behavior baselines. The package depends on Md3.Avalonia, never on the optional icon/font package. Every affordance below is interactive." />
-    </StackPanel>
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel MinHeight="4400" Spacing="32" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Flutter ecosystem" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Clean-room, Material-themed controls informed by frozen public behavior baselines. The package depends on Md3.Avalonia, never on the optional icon/font package. Every affordance below is interactive." />
+      </StackPanel>
 
     <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="Wave A · Overlay, commands and density" />
@@ -169,6 +170,7 @@
       <TextBlock x:Name="BreadcrumbStatus" Classes="body" Text="Choose a path segment." />
     </StackPanel>
 
-    <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage" /><gallery:CodeExample XamlCode="&lt;eco:MdAsyncSelect Query=&quot;{Binding Query}&quot; SelectedItem=&quot;{Binding Choice}&quot; /&gt;&#10;&lt;eco:MdDataGrid DataSource=&quot;{Binding Rows}&quot; /&gt;&#10;&lt;eco:MdChart Series=&quot;{Binding Series}&quot; /&gt;&#10;&lt;eco:MdChatView MessagesSource=&quot;{Binding Messages}&quot; SendCommand=&quot;{Binding SendCommand}&quot; /&gt;&#10;&lt;eco:MdPinInput Code=&quot;{Binding VerificationCode}&quot; CompletedCommand=&quot;{Binding VerifyCommand}&quot; /&gt;&#10;&lt;eco:MdTreeView Roots=&quot;{Binding ProjectNodes}&quot; SelectedNode=&quot;{Binding SelectedNode}&quot; /&gt;&#10;&lt;eco:MdTagInput TagsSource=&quot;{Binding Tags}&quot; SuggestionsSource=&quot;{Binding Suggestions}&quot; TagAddedCommand=&quot;{Binding TagAddedCommand}&quot; /&gt;" CSharpCode="var pages = new MdPagedItemsView();&#10;pages.PageProvider = request =&gt; service.LoadPageAsync(request);&#10;&#10;var editor = new MdRichEditor { Adapter = myEditorAdapter };&#10;&#10;pin.SetCode(&quot;273841&quot;);&#10;tree.ExpandAll();&#10;tree.SelectById(&quot;android&quot;);&#10;tags.AddTag(&quot;Localization&quot;);&#10;tags.RemoveTag(&quot;Draft&quot;);&#10;&#10;var window = new MdBorderlessWindow { PlatformAdapter = customAdapter };" /></StackPanel>
-  </StackPanel>
+      <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage" /><gallery:CodeExample XamlCode="&lt;eco:MdAsyncSelect Query=&quot;{Binding Query}&quot; SelectedItem=&quot;{Binding Choice}&quot; /&gt;&#10;&lt;eco:MdDataGrid DataSource=&quot;{Binding Rows}&quot; /&gt;&#10;&lt;eco:MdChart Series=&quot;{Binding Series}&quot; /&gt;&#10;&lt;eco:MdChatView MessagesSource=&quot;{Binding Messages}&quot; SendCommand=&quot;{Binding SendCommand}&quot; /&gt;&#10;&lt;eco:MdPinInput Code=&quot;{Binding VerificationCode}&quot; CompletedCommand=&quot;{Binding VerifyCommand}&quot; /&gt;&#10;&lt;eco:MdTreeView Roots=&quot;{Binding ProjectNodes}&quot; SelectedNode=&quot;{Binding SelectedNode}&quot; /&gt;&#10;&lt;eco:MdTagInput TagsSource=&quot;{Binding Tags}&quot; SuggestionsSource=&quot;{Binding Suggestions}&quot; TagAddedCommand=&quot;{Binding TagAddedCommand}&quot; /&gt;" CSharpCode="var pages = new MdPagedItemsView();&#10;pages.PageProvider = request =&gt; service.LoadPageAsync(request);&#10;&#10;var editor = new MdRichEditor { Adapter = myEditorAdapter };&#10;&#10;pin.SetCode(&quot;273841&quot;);&#10;tree.ExpandAll();&#10;tree.SelectById(&quot;android&quot;);&#10;tags.AddTag(&quot;Localization&quot;);&#10;tags.RemoveTag(&quot;Draft&quot;);&#10;&#10;var window = new MdBorderlessWindow { PlatformAdapter = customAdapter };" /></StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
 </UserControl>

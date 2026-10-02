@@ -21,10 +21,10 @@ public sealed class MdScrollViewer : ScrollViewer
         AvaloniaProperty.Register<MdScrollViewer, bool>(nameof(IsDragScrollingEnabled), defaultValue: true);
 
     public static readonly StyledProperty<bool> AllowMouseDragProperty =
-        AvaloniaProperty.Register<MdScrollViewer, bool>(nameof(AllowMouseDrag), defaultValue: false);
+        AvaloniaProperty.Register<MdScrollViewer, bool>(nameof(AllowMouseDrag), defaultValue: true);
 
     public static readonly StyledProperty<double> DragThresholdProperty =
-        AvaloniaProperty.Register<MdScrollViewer, double>(nameof(DragThreshold), defaultValue: 4.0);
+        AvaloniaProperty.Register<MdScrollViewer, double>(nameof(DragThreshold), defaultValue: 8.0);
 
     public static readonly StyledProperty<double> FrictionProperty =
         AvaloniaProperty.Register<MdScrollViewer, double>(nameof(Friction), defaultValue: 0.94);
@@ -97,6 +97,25 @@ public sealed class MdScrollViewer : ScrollViewer
         return visual.GetVisualAncestors().OfType<ScrollBar>().Any();
     }
 
+    private static bool IsInteractiveEditableControl(Visual? visual)
+    {
+        if (visual is null) return false;
+        var cur = visual;
+        while (cur is not null and not MdScrollViewer)
+        {
+            if (cur is TextBox or AutoCompleteBox or Slider or ScrollBar or Thumb or RepeatButton)
+                return true;
+            cur = cur.GetVisualParent();
+        }
+        return false;
+    }
+
+    protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
+    {
+        StopInertia();
+        base.OnPointerWheelChanged(e);
+    }
+
     private void OnPreviewPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!IsDragScrollingEnabled) return;
@@ -104,8 +123,12 @@ public sealed class MdScrollViewer : ScrollViewer
         // Never intercept clicks on scrollbars, thumbs, or buttons - let native scrollbar dragging work
         if (IsInsideScrollBar(e.Source as Visual)) return;
 
-        // For mouse pointers on desktop, only drag if explicitly enabled (e.g. touch emulation mode)
-        if (e.Pointer.Type == PointerType.Mouse && !AllowMouseDrag) return;
+        // For mouse pointers on desktop, don't drag if not allowed or if interacting with editable/slider controls
+        if (e.Pointer.Type == PointerType.Mouse)
+        {
+            if (!AllowMouseDrag || IsInteractiveEditableControl(e.Source as Visual))
+                return;
+        }
 
         var currentPoint = e.GetCurrentPoint(this);
         var props = currentPoint.Properties;
@@ -145,7 +168,8 @@ public sealed class MdScrollViewer : ScrollViewer
         if (!_isDragging)
         {
             var dist = Math.Sqrt(delta.X * delta.X + delta.Y * delta.Y);
-            if (dist >= DragThreshold)
+            var threshold = e.Pointer.Type == PointerType.Mouse ? Math.Max(DragThreshold, 10.0) : DragThreshold;
+            if (dist >= threshold)
             {
                 _isDragging = true;
                 _capturedPointer?.Capture(this);

@@ -6,6 +6,7 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Threading;
 using System.Globalization;
 using Avalonia.VisualTree;
@@ -290,6 +291,143 @@ public sealed class MdReportedIssuesTests
             Assert.True(window.TemplateSettings.IsClientAreaExtended);
         }
         finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Breadcrumb_Renders_Items_Containers_And_Handles_Invocation()
+    {
+        var breadcrumb = new MdBreadcrumb
+        {
+            ItemsSource = new[] { "Home", "Settings", "Account" },
+            Separator = "›"
+        };
+        using var host = Show(breadcrumb, 400, 100);
+        Dispatcher.UIThread.RunJobs();
+
+        var containers = breadcrumb.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
+        Assert.Equal(3, containers.Length);
+        Assert.Contains("first", containers[0].Classes);
+        Assert.Contains("last", containers[2].Classes);
+
+        object? invokedItem = null;
+        breadcrumb.ItemInvoked += (_, item) => invokedItem = item;
+        breadcrumb.Invoke("Settings");
+        Assert.Equal("Settings", invokedItem);
+    }
+
+    [AvaloniaFact]
+    public void ColorPicker_Interactive_Selection_Updates_Color_Hex_And_Tonal_Shades()
+    {
+        var picker = new MdColorPicker { SelectedColor = Color.FromRgb(0x21, 0x96, 0xF3) };
+        Assert.Equal("#2196F3", picker.SelectedHex);
+        Assert.Equal(10, picker.MaterialShades.Count);
+
+        // Execute SelectColorCommand
+        var targetColor = Color.FromRgb(0x4C, 0xAF, 0x50);
+        picker.SelectColorCommand.Execute(targetColor);
+
+        Assert.Equal(targetColor, picker.SelectedColor);
+        Assert.Equal("#4CAF50", picker.SelectedHex);
+        Assert.Contains(targetColor, picker.RecentColors);
+    }
+
+    [AvaloniaFact]
+    public void FabMenu_Right_Alignment_Computes_Measured_Bounds()
+    {
+        var menu = new MdFabMenu
+        {
+            Alignment = MdFabAlignment.Right,
+            IsOpen = true,
+            Items =
+            {
+                new MdFabMenuItem { Content = "Scanner Action" },
+                new MdFabMenuItem { Content = "Document Action" }
+            }
+        };
+        using var host = Show(menu, 300, 300);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Contains(":right", menu.Classes);
+        Assert.True(menu.DesiredSize.Width > 0);
+    }
+
+    [AvaloniaFact]
+    public void ScrollViewer_AllowMouseDrag_And_Interactive_Control_Handling()
+    {
+        var scrollViewer = new MdScrollViewer
+        {
+            AllowMouseDrag = true,
+            Content = new StackPanel
+            {
+                Children =
+                {
+                    new TextBox { Text = "Sample Input" },
+                    new Button { Content = "Sample Button" }
+                }
+            }
+        };
+        using var host = Show(scrollViewer, 200, 200);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(scrollViewer.AllowMouseDrag);
+        Assert.True(scrollViewer.IsDragScrollingEnabled);
+    }
+
+    [AvaloniaFact]
+    public void ComboBox_OutlineLabelBackground_And_Container_Generation()
+    {
+        var customBrush = new SolidColorBrush(Color.FromRgb(0x21, 0x1F, 0x26));
+        var comboBox = new MdComboBox
+        {
+            Label = "Test Label",
+            Variant = MdTextBoxVariant.Outlined,
+            OutlineLabelBackground = customBrush,
+            ItemsSource = new[] { "Option A", "Option B" },
+            SelectedIndex = 0
+        };
+        using var host = Show(comboBox, 240, 100);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(customBrush, comboBox.OutlineLabelBackground);
+        Assert.Contains(":has-label", comboBox.Classes);
+        Assert.Contains(":outlined", comboBox.Classes);
+    }
+
+    [AvaloniaFact]
+    public void ButtonGroups_Dynamic_FontSize_Propagation()
+    {
+        var btn1 = new MdButton { Content = "Standard Button" };
+        var btn2 = new MdToggleButton { Content = "Connected Toggle" };
+        var segItem = new MdSegmentedButton { Content = "Segmented Option" };
+
+        var stdGroup = new MdStandardButtonGroup { FontSize = 18, Items = { btn1 } };
+        var connGroup = new MdConnectedButtonGroup { FontSize = 19, Items = { btn2 } };
+        var segGroup = new MdSegmentedButtonGroup { FontSize = 20, Items = { segItem } };
+
+        var panel = new StackPanel { Children = { stdGroup, connGroup, segGroup } };
+        using var host = Show(panel, 300, 300);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(18, btn1.FontSize);
+        Assert.Equal(19, btn2.FontSize);
+        Assert.Equal(20, segItem.FontSize);
+    }
+
+    [AvaloniaFact]
+    public async Task DialogHost_Async_Show_Returns_Typed_Result_From_Close()
+    {
+        var host = new MdDialogHost();
+        using var scope = Show(host, 400, 300);
+        Dispatcher.UIThread.RunJobs();
+
+        var dialog = new MdDialog { Headline = "Question" };
+        var showTask = host.ShowAsync(dialog);
+        Assert.True(host.IsOpen);
+
+        host.Close("accepted");
+        var result = await showTask;
+        Assert.Equal("accepted", result);
+        Assert.False(host.IsOpen);
     }
 
     private static Scope Show(Control content, double width, double height)

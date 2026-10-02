@@ -27,6 +27,8 @@
               <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                 Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                                FontSize="{TemplateBinding FontSize}"
+                                FontWeight="{TemplateBinding FontWeight}"
                                 Foreground="{TemplateBinding Foreground}" />
             </StackPanel>
           </Grid>
@@ -46,6 +48,7 @@
   </ControlTheme>
   <ControlTheme x:Key="{x:Type md:MdSegmentedButtonGroup}" TargetType="md:MdSegmentedButtonGroup">
     <Setter Property="SelectionMode" Value="Single" />
+    <Setter Property="FontSize" Value="14" />
     <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="-1" /></ItemsPanelTemplate></Setter>
     <Setter Property="Template"><ControlTemplate TargetType="md:MdSegmentedButtonGroup"><ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" /></ControlTemplate></Setter>
   </ControlTheme>

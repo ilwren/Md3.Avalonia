@@ -58,7 +58,15 @@ public sealed class MdGalleryTests
             new DesktopAdaptersGalleryPage(),
             new ThemeResourcesGalleryPage(),
             new SymbolGalleryPage(),
-            new MotionGalleryPage()
+            new MotionGalleryPage(),
+            new ColorPickerGalleryPage(),
+            new BreadcrumbGalleryPage(),
+            new AndroidSettingsSamplePage(),
+            new ClockSamplePage(),
+            new TasksSamplePage(),
+            new SettingsCardGalleryPage(),
+            new EcosystemGalleryPage(),
+            new BorderlessWindowGalleryPage()
         ];
 
         foreach (var page in pages)
