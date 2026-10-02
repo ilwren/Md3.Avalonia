@@ -58,7 +58,8 @@ public sealed class MdGalleryTests
             new DesktopAdaptersGalleryPage(),
             new ThemeResourcesGalleryPage(),
             new SymbolGalleryPage(),
-            new MotionGalleryPage()
+            new MotionGalleryPage(),
+            new ColorPickerGalleryPage()
         ];
 
         foreach (var page in pages)

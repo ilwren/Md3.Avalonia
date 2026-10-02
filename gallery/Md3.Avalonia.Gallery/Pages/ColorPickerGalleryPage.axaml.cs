@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Styling;
 using Md3.Avalonia.Themes.Dynamic;
 
 namespace Md3.Avalonia.Gallery.Pages;
@@ -63,7 +64,7 @@ public partial class ColorPickerGalleryPage : UserControl
 
     private async void OnCopyHexClicked(object? sender, RoutedEventArgs e)
     {
-        var hex = HexCodeText.Text;
+        var hex = HexCodeText?.Text;
         if (TopLevel.GetTopLevel(this)?.Clipboard is { } clipboard && !string.IsNullOrEmpty(hex))
         {
             await clipboard.SetTextAsync(hex);
@@ -78,17 +79,18 @@ public partial class ColorPickerGalleryPage : UserControl
     {
         if (Application.Current is { } app)
         {
+            var hex = HexCodeText?.Text ??
+                      $"#{_currentColor.A:X2}{_currentColor.R:X2}{_currentColor.G:X2}{_currentColor.B:X2}";
             var options = MdThemeManager.Current with
             {
-                SeedColor = _currentColor,
-                CustomColorOverride = _currentColor
+                SeedColor = hex
             };
-            var isDark = app.ActualThemeVariant == Avalonia.Styling.ThemeVariant.Dark;
+            var isDark = app.ActualThemeVariant == ThemeVariant.Dark;
             MdThemeManager.Apply(app, options, isDark);
 
             if (StatusToast is not null)
             {
-                StatusToast.Text = $"✓ Global Material 3 theme updated with seed: {HexCodeText.Text}!";
+                StatusToast.Text = $"✓ Global Material 3 theme updated with seed: {hex}!";
             }
         }
     }

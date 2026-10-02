@@ -30,11 +30,14 @@ jobs:
           python3 scripts/generate-fonts.py
 
       - name: Restore dependencies
-        run: dotnet restore Md3.Avalonia.sln
-
-      - name: Build solution (Release)
         run: |
-          dotnet build Md3.Avalonia.sln -c Release --no-restore > build.log 2>&1 || (cat build.log | grep -E "error |Error" | head -n 30 | while read -r line; do echo "::error::$line"; done; cat build.log; exit 1)
+          dotnet restore gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj
+          dotnet restore tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj
+
+      - name: Build Gallery and tests (Release)
+        run: |
+          dotnet build gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj -c Release --no-restore
+          dotnet build tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --no-restore
 
       - name: Run Headless Tests
         run: |
