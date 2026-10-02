@@ -196,6 +196,7 @@ public sealed class MdSimpleDialog : TemplatedControl
     public static readonly StyledProperty<object?> CancelTextProperty = AvaloniaProperty.Register<MdSimpleDialog, object?>(nameof(CancelText), "Cancel");
     private SelectingItemsControl? _itemsHost;
     private Button? _cancelButton;
+    private Grid? _overlay;
     private Border? _scrim;
     private Border? _surface;
     private readonly MdPresenceController _presence;
@@ -210,7 +211,7 @@ public sealed class MdSimpleDialog : TemplatedControl
     public MdSimpleDialog()
     {
         _modalFocus = new MdModalFocusController(this);
-        _presence = new MdPresenceController(present => PseudoClasses.Set(":present", present));
+        _presence = new MdPresenceController(SetPresence);
         _presence.Initialize(IsOpen);
         PseudoClasses.Set(":open", IsOpen);
     }
@@ -238,6 +239,7 @@ public sealed class MdSimpleDialog : TemplatedControl
         if (_cancelButton is not null) _cancelButton.Click -= OnCancel;
         if (_scrim is not null) _scrim.PointerPressed -= OnScrimPressed;
         base.OnApplyTemplate(e);
+        _overlay = e.NameScope.Find<Grid>("PART_Overlay");
         _itemsHost = e.NameScope.Find<SelectingItemsControl>("PART_ItemsHost");
         _cancelButton = e.NameScope.Find<Button>("PART_CancelButton");
         _scrim = e.NameScope.Find<Border>("PART_Scrim");
@@ -246,6 +248,7 @@ public sealed class MdSimpleDialog : TemplatedControl
         if (_cancelButton is not null) _cancelButton.Click += OnCancel;
         if (_scrim is not null) _scrim.PointerPressed += OnScrimPressed;
         _presence.Initialize(IsOpen);
+        SetPresence(_presence.IsPresent);
         UpdateMotion();
         UpdateHitTesting();
         UpdateModalFocus();
@@ -317,6 +320,14 @@ public sealed class MdSimpleDialog : TemplatedControl
                 MdMotionTransitions.CreateTransform(this, RenderTransformProperty));
         }
         if (!IsOpen) _presence.Update(false, MdMotion.GetExitDuration(this));
+    }
+
+    private void SetPresence(bool present)
+    {
+        PseudoClasses.Set(":present", present);
+        // Presence controls lifecycle, not just styling. Set the template part directly so a
+        // zero-duration scheme cannot retain a stale :present style value for another layout pass.
+        if (_overlay is not null) _overlay.IsVisible = present;
     }
 
     private void UpdateHitTesting()
