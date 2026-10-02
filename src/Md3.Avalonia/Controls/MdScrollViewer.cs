@@ -134,12 +134,15 @@ public sealed class MdScrollViewer : ScrollViewer
         if (e.Pointer.Captured is not null && !ReferenceEquals(e.Pointer.Captured, this)) return true;
 
         if (e.Source is not Visual source) return false;
-        foreach (var input in source.GetVisualAncestors().Prepend(source).OfType<InputElement>())
+        foreach (var visual in source.GetVisualAncestors().Prepend(source))
         {
             // Template infrastructure can itself be focusable; only classify the user-content
             // side of the presenter as a direct-manipulation subtree.
-            if (ReferenceEquals(input, this) || ReferenceEquals(input, Presenter)) break;
-            if (GetSuppressMouseDragScrolling(input) || input.Focusable) return true;
+            if (ReferenceEquals(visual, this) || ReferenceEquals(visual, Presenter)) break;
+            if (visual is InputElement input &&
+                (GetSuppressMouseDragScrolling(input) || input.Focusable))
+                return true;
+            if (ReferenceEquals(visual.GetVisualParent(), Presenter)) break;
         }
 
         return false;
