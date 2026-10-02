@@ -155,15 +155,39 @@ public class MdPhaseThreeAndFourGestureParityTests
     }
 
     [AvaloniaFact]
+    public void ScrollViewer_OptIn_Mouse_Drag_Yields_When_Custom_Content_Handles_Press()
+    {
+        var precisionSurface = new Border { Height = 700, Background = Brushes.Orange };
+        precisionSurface.PointerPressed += (_, e) => e.Handled = true;
+
+        var scrollViewer = new MdScrollViewer
+        {
+            Width = 300,
+            Height = 200,
+            AllowMouseDrag = true,
+            Content = precisionSurface
+        };
+
+        using var host = Show(scrollViewer, 400, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        var startPoint = precisionSurface.TranslatePoint(new Point(150, 150), host.Window)!.Value;
+        var endPoint = startPoint + new Vector(0, -100);
+        host.Window.MouseMove(startPoint, RawInputModifiers.None);
+        host.Window.MouseDown(startPoint, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseMove(endPoint, RawInputModifiers.LeftMouseButton);
+        host.Window.MouseUp(endPoint, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(0, scrollViewer.Offset.Y);
+    }
+
+    [AvaloniaFact]
     public void ScrollViewer_OptIn_Mouse_Drag_Yields_When_Custom_Content_Captures_Pointer()
     {
         var pointerMoved = false;
         var precisionSurface = new Border { Height = 700, Background = Brushes.Orange };
-        precisionSurface.PointerPressed += (_, e) =>
-        {
-            e.Pointer.Capture(precisionSurface);
-            e.Handled = true;
-        };
+        precisionSurface.PointerPressed += (_, e) => e.Pointer.Capture(precisionSurface);
         precisionSurface.PointerMoved += (_, e) =>
         {
             if (e.GetCurrentPoint(precisionSurface).Properties.IsLeftButtonPressed)
