@@ -7,6 +7,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
 using Xunit;
@@ -319,7 +320,7 @@ public sealed class MdComboBoxTests
         grid.Children.Add(child);
     }
 
-    private static IDisposable Show(Control content) => new WindowScope(ShowWindow(content));
+    private static WindowScope Show(Control content) => new(ShowWindow(content));
 
     private static Window ShowWindow(Control content)
     {
@@ -330,6 +331,7 @@ public sealed class MdComboBoxTests
 
     private sealed class WindowScope(Window window) : IDisposable
     {
-        public void Dispose() => window.Close();
+        public Window Window { get; } = window;
+        public void Dispose() => Window.Close();
     }
 }
