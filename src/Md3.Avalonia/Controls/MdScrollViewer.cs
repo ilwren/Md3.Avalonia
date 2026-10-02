@@ -97,8 +97,8 @@ public sealed class MdScrollViewer : ScrollViewer
 
         // Avalonia's ScrollGestureRecognizer in the template owns touch and pen input. Its
         // presenter consumes bubbling mouse events even when mouse panning is explicitly enabled,
-        // so the compatibility path observes the tunnel route. It still rejects explicitly
-        // suppressed source subtrees and yields if a child claims pointer capture.
+        // so the compatibility path observes the tunnel route. It rejects focusable direct-
+        // manipulation content and explicitly suppressed precision-interaction subtrees.
         AddHandler(PointerPressedEvent, OnMousePointerPressed, RoutingStrategies.Tunnel);
         AddHandler(PointerMovedEvent, OnMousePointerMoved, RoutingStrategies.Tunnel);
         AddHandler(PointerReleasedEvent, OnMousePointerReleased,
@@ -129,17 +129,17 @@ public sealed class MdScrollViewer : ScrollViewer
     {
         if (IsInsideScrollBar(e.Source as Visual)) return true;
 
-        // Honor an existing capture and classify direct-manipulation source subtrees before the
-        // template presenter can consume the bubbling event.
-        if (e.Pointer.Captured is not null && !ReferenceEquals(e.Pointer.Captured, this)) return true;
-
+        // Classify direct-manipulation source subtrees before the template presenter can consume
+        // the bubbling event.
         if (e.Source is not Visual source) return false;
         foreach (var visual in source.GetVisualAncestors().Prepend(source))
         {
             // Template infrastructure can itself be focusable; only classify the user-content
             // side of the presenter as a direct-manipulation subtree.
             if (ReferenceEquals(visual, this) || ReferenceEquals(visual, Presenter)) break;
-            if (visual is InputElement input && GetSuppressMouseDragScrolling(input)) return true;
+            if (visual is InputElement input &&
+                (GetSuppressMouseDragScrolling(input) || input.Focusable))
+                return true;
             if (ReferenceEquals(visual.GetVisualParent(), Presenter)) break;
         }
 
@@ -150,9 +150,8 @@ public sealed class MdScrollViewer : ScrollViewer
     {
         if (!IsDragScrollingEnabled || !AllowMouseDrag || e.Pointer.Type != PointerType.Mouse) return;
 
-        // Explicitly suppressed precision content owns primary-button drags. Other child controls
-        // can claim pointer capture before the movement threshold. Mouse panning remains available
-        // from background surfaces when explicitly enabled.
+        // Focusable controls and explicitly suppressed precision content own primary-button drags.
+        // Mouse panning remains available from background surfaces when explicitly enabled.
         if (ShouldDeferMouseDrag(e)) return;
 
         var currentPoint = e.GetCurrentPoint(this);
@@ -179,16 +178,6 @@ public sealed class MdScrollViewer : ScrollViewer
         if (!IsDragScrollingEnabled || !AllowMouseDrag || e.Pointer.Type != PointerType.Mouse)
         {
             ResetMouseDragTracking(releaseOwnCapture: true);
-            return;
-        }
-
-        // A child may claim the gesture after an initially unhandled press. Never replace that
-        // capture with the outer ScrollViewer's capture.
-        if (e.Pointer.Captured is not null &&
-            !ReferenceEquals(e.Pointer.Captured, this) &&
-            !ReferenceEquals(e.Pointer.Captured, Presenter))
-        {
-            ResetMouseDragTracking(releaseOwnCapture: false);
             return;
         }
 
