@@ -136,7 +136,9 @@ public sealed class MdScrollViewer : ScrollViewer
         if (e.Source is not Visual source) return false;
         foreach (var input in source.GetVisualAncestors().Prepend(source).OfType<InputElement>())
         {
-            if (ReferenceEquals(input, this)) break;
+            // Template infrastructure can itself be focusable; only classify the user-content
+            // side of the presenter as a direct-manipulation subtree.
+            if (ReferenceEquals(input, this) || ReferenceEquals(input, Presenter)) break;
             if (GetSuppressMouseDragScrolling(input) || input.Focusable) return true;
         }
 
