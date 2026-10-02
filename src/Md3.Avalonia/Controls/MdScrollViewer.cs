@@ -95,12 +95,12 @@ public sealed class MdScrollViewer : ScrollViewer
         };
         _inertiaTimer.Tick += OnInertiaTick;
 
-        // Avalonia's ScrollGestureRecognizer in the template owns touch and pen input. Optional
-        // mouse panning is intentionally observed only after child controls have processed the
-        // event. A direct-manipulation child that handles or captures the pointer therefore wins
-        // instead of the outer scroller pre-empting its fine-grained drag.
-        AddHandler(PointerPressedEvent, OnMousePointerPressed, RoutingStrategies.Bubble);
-        AddHandler(PointerMovedEvent, OnMousePointerMoved, RoutingStrategies.Bubble);
+        // Avalonia's ScrollGestureRecognizer in the template owns touch and pen input. Its
+        // presenter consumes bubbling mouse events even when mouse panning is explicitly enabled,
+        // so the compatibility path observes the tunnel route. It still rejects focusable or
+        // suppressed source subtrees and yields if a child claims pointer capture.
+        AddHandler(PointerPressedEvent, OnMousePointerPressed, RoutingStrategies.Tunnel);
+        AddHandler(PointerMovedEvent, OnMousePointerMoved, RoutingStrategies.Tunnel);
         AddHandler(PointerReleasedEvent, OnMousePointerReleased,
             RoutingStrategies.Bubble, handledEventsToo: true);
         AddHandler(PointerCaptureLostEvent, OnMousePointerCaptureLost,
@@ -129,8 +129,8 @@ public sealed class MdScrollViewer : ScrollViewer
     {
         if (IsInsideScrollBar(e.Source as Visual)) return true;
 
-        // Bubble routing lets a child mark the press handled before it reaches this method. Also
-        // honor controls that claim pointer capture without marking the event handled.
+        // Honor an existing capture and classify direct-manipulation source subtrees before the
+        // template presenter can consume the bubbling event.
         if (e.Pointer.Captured is not null && !ReferenceEquals(e.Pointer.Captured, this)) return true;
 
         if (e.Source is not Visual source) return false;
