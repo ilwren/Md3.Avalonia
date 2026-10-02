@@ -77,8 +77,8 @@ public sealed class MdSubMenuItem : MdMenuItem
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
-        var openKey = FlowDirection == FlowDirection.RightToLeft ? Key.Left : Key.Right;
-        var closeKey = FlowDirection == FlowDirection.RightToLeft ? Key.Right : Key.Left;
+        var openKey = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft ? Key.Left : Key.Right;
+        var closeKey = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft ? Key.Right : Key.Left;
         if (e.Key == openKey && Submenu is not null)
         {
             SetCurrentValue(IsSubmenuOpenProperty, true);
@@ -111,7 +111,7 @@ public sealed class MdSubMenuItem : MdMenuItem
 
     private void UpdateDirection()
     {
-        var rtl = FlowDirection == FlowDirection.RightToLeft;
+        var rtl = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft;
         PseudoClasses.Set(":rtl", rtl);
         if (_submenuPopup is not null)
         {

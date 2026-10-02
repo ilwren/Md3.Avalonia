@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
+using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 
@@ -60,7 +61,7 @@ internal sealed class MdRangeSliderThumbAutomationPeer : ControlAutomationPeer, 
     protected override Rect GetBoundingRectangleCore()
     {
         var local = new Rect(Slider.GetThumbCenterX(_lower) - 24, Slider.ThumbCenterY - 24, 48, 48);
-        if (Slider.GetVisualRoot() is not Visual root) return default;
+        if (TopLevel.GetTopLevel(Slider) is not Visual root) return default;
         var transform = Slider.TransformToVisual(root);
         return transform.HasValue ? local.TransformToAABB(transform.Value) : default;
     }

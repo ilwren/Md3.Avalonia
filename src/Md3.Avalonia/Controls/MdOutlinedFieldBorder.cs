@@ -140,7 +140,7 @@ public sealed class MdOutlinedFieldBorder : Control
             if (notchEnd - notchStart < 1) notchStart = notchEnd = right;
         }
 
-        using var geometry = new StreamGeometry();
+        var geometry = new StreamGeometry();
         using (var path = geometry.Open())
         {
             var start = IsNotched && notchStart < notchEnd

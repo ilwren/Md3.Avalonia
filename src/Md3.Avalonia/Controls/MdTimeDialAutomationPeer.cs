@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
+using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 
@@ -103,7 +104,7 @@ internal sealed class MdTimeDialValueAutomationPeer : ControlAutomationPeer, IIn
     protected override Rect GetBoundingRectangleCore()
     {
         var local = GetLocalBounds();
-        if (Dial.GetVisualRoot() is not Visual root) return default;
+        if (TopLevel.GetTopLevel(Dial) is not Visual root) return default;
         var transform = Dial.TransformToVisual(root);
         return transform.HasValue ? local.TransformToAABB(transform.Value) : default;
     }
