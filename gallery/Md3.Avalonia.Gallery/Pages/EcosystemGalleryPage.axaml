@@ -11,6 +11,7 @@
       <TextBlock Classes="body" TextWrapping="Wrap" Text="Clean-room, Material-themed controls informed by frozen public behavior baselines. The package depends on Md3.Avalonia, never on the optional icon/font package. Every affordance below is interactive." />
     </StackPanel>
 
+    <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
     <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="Wave A · Overlay, commands and density" />
       <WrapPanel ItemHeight="64">
@@ -24,7 +25,9 @@
       </Border>
       <eco:MdCommandPalette x:Name="CommandPalette" CommandInvoked="CommandPaletteInvoked" />
     </StackPanel>
+    </Border>
 
+    <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
     <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="Wave B · Collections and adaptive data" />
       <eco:MdSlidableItem x:Name="Slidable" StartActions="Archive" EndActions="Delete">
@@ -60,7 +63,9 @@
       <eco:MdPagedItemsView x:Name="PagedItems" AutoLoad="False" PageSize="4" EmptyContent="No records" Refreshed="PagesRefreshed" />
       <TextBlock x:Name="PagingStatus" Classes="body" Text="No page loaded. Load next page to append four records." />
     </StackPanel>
+    </Border>
 
+    <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
     <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="Wave C · Selection, calendar and feedback" />
       <StackPanel MaxWidth="520" HorizontalAlignment="Stretch" Spacing="8">
@@ -78,7 +83,9 @@
       <TextBlock x:Name="TransferStatus" Classes="body" Text="2 capabilities selected. Drag one or several rows across, or use the arrow actions." TextWrapping="Wrap" />
       <eco:MdResultView x:Name="ResultView" Kind="Empty" Title="Nothing here yet" Content="Create a record to see it in this result surface." ActionContent="Create record" />
     </StackPanel>
+    </Border>
 
+    <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
     <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="Wave D · Charts, rich editor contracts and chat" />
       <WrapPanel Orientation="Horizontal">
@@ -105,7 +112,9 @@
                       QuoteRequested="ChatQuoteRequested" RetryRequested="ChatRetryRequested" />
       <TextBlock x:Name="ChatStatus" Classes="body" Text="Select one or more bubbles to quote, cancel, or delete. Failed bubbles expose Retry; suggestions fill the composer." TextWrapping="Wrap" />
     </StackPanel>
+    </Border>
 
+    <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
     <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="Visual extras · comparison, animated text and loading recipes" />
       <TextBlock Classes="body" TextWrapping="Wrap" Text="Optional Extra controls inspired by Flutter ecosystem packages. MdChart remains provider-neutral; these controls do not bundle a chart engine." />
@@ -126,7 +135,9 @@
         <Border Width="100" Height="64" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" />
       </eco:MdStaggeredPanel>
     </StackPanel>
+    </Border>
 
+    <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
     <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="Wave E · Skeleton and sequence" />
       <WrapPanel Orientation="Horizontal">
@@ -136,7 +147,9 @@
       <eco:MdSkeleton x:Name="Skeleton" Height="72" IsLoading="True"><Border Padding="16" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"><TextBlock Text="Loaded content" /></Border></eco:MdSkeleton>
       <eco:MdAnimationSequence x:Name="Sequence" AutoPlay="True" ItemDelay="0:0:0.08" Orientation="Horizontal" Spacing="8"><Border Width="88" Height="64" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" /><Border Width="88" Height="64" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /><Border Width="88" Height="64" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" /></eco:MdAnimationSequence>
     </StackPanel>
+    </Border>
 
+    <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
     <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="Wave F · Structured input and hierarchy" />
       <TextBlock Classes="h3" Text="PIN / OTP input" />
@@ -170,7 +183,9 @@
       </WrapPanel>
       <TextBlock x:Name="TagStatus" Classes="body" Text="2 capabilities selected; add up to 6." />
     </StackPanel>
+    </Border>
 
+    <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
     <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="Existing clean-room controls" />
       <TextBlock Classes="body" Text="Assign the review to a teammate; the avatar is the actionable identity, not decoration." />
@@ -189,6 +204,7 @@
       </eco:MdBreadcrumb>
       <TextBlock x:Name="BreadcrumbStatus" Classes="body" Text="Choose a path segment." />
     </StackPanel>
+    </Border>
 
     <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage" /><gallery:CodeExample XamlCode="&lt;eco:MdAsyncSelect Query=&quot;{Binding Query}&quot; SelectedItem=&quot;{Binding Choice}&quot; /&gt;&#10;&lt;eco:MdDataGrid DataSource=&quot;{Binding Rows}&quot; /&gt;&#10;&lt;eco:MdChart Series=&quot;{Binding Series}&quot; /&gt;&#10;&lt;eco:MdChatView MessagesSource=&quot;{Binding Messages}&quot; SendCommand=&quot;{Binding SendCommand}&quot; /&gt;&#10;&lt;eco:MdPinInput Code=&quot;{Binding VerificationCode}&quot; CompletedCommand=&quot;{Binding VerifyCommand}&quot; /&gt;&#10;&lt;eco:MdTreeView Roots=&quot;{Binding ProjectNodes}&quot; SelectedNode=&quot;{Binding SelectedNode}&quot; /&gt;&#10;&lt;eco:MdTagInput TagsSource=&quot;{Binding Tags}&quot; SuggestionsSource=&quot;{Binding Suggestions}&quot; TagAddedCommand=&quot;{Binding TagAddedCommand}&quot; /&gt;" CSharpCode="var pages = new MdPagedItemsView();&#10;pages.PageProvider = request =&gt; service.LoadPageAsync(request);&#10;&#10;var editor = new MdRichEditor { Adapter = myEditorAdapter };&#10;&#10;pin.SetCode(&quot;273841&quot;);&#10;tree.ExpandAll();&#10;tree.SelectById(&quot;android&quot;);&#10;tags.AddTag(&quot;Localization&quot;);&#10;tags.RemoveTag(&quot;Draft&quot;);&#10;&#10;var window = new MdBorderlessWindow { PlatformAdapter = customAdapter };" /></StackPanel>
   </StackPanel>

@@ -15,33 +15,34 @@
           BorderThickness="1"
           CornerRadius="16"
           ClipToBounds="True">
-    <Grid RowDefinitions="52,Auto">
-      <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,*,Auto" Margin="8,0">
-        <Border Grid.Column="0" Grid.ColumnSpan="2"
-                Width="148" Height="34"
+    <Grid RowDefinitions="64,Auto">
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="12,0">
+        <Border Grid.Column="0"
+                Width="156" Height="40"
                 HorizontalAlignment="Left" VerticalAlignment="Center"
                 Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
                 BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
-                BorderThickness="1" CornerRadius="17" ClipToBounds="True">
+                BorderThickness="1" CornerRadius="20" ClipToBounds="True">
           <md:MdSegmentedButtonGroup x:Name="LanguageTabs"
                                      AllowMultiple="False"
                                      SelectedIndex="0"
                                      SelectionChanged="LanguageSelectionChanged">
-            <md:MdSegmentedButton x:Name="XamlTab" MinWidth="77" MinHeight="32" Height="32" Padding="10,0" BorderThickness="0" Content="AXAML" Value="AXAML" />
-            <md:MdSegmentedButton x:Name="CSharpTab" MinWidth="69" MinHeight="32" Height="32" Padding="10,0" BorderThickness="0" Content="C#" Value="C#" />
+            <md:MdSegmentedButton x:Name="XamlTab" MinWidth="82" MinHeight="38" Height="38" Padding="12,0" BorderThickness="0" Content="AXAML" Value="AXAML" />
+            <md:MdSegmentedButton x:Name="CSharpTab" MinWidth="72" MinHeight="38" Height="38" Padding="12,0" BorderThickness="0" Content="C#" Value="C#" />
           </md:MdSegmentedButtonGroup>
         </Border>
-        <TextBlock Grid.Column="2"
-                   Margin="12,0"
+        <TextBlock Grid.Column="1"
+                   Margin="16,0"
                    VerticalAlignment="Center"
                    FontSize="12"
                    Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
-                   Text="Selectable preview" />
-        <md:MdButton Grid.Column="3"
-                     Content="Copy"
-                     Size="ExtraSmall"
-                     Variant="Text"
-                     Click="CopyCode" />
+                   Text="Source example" />
+        <md:MdIconButton Grid.Column="2"
+                         Icon="{x:Static md:MdSymbols.ContentCopy}"
+                         Variant="Standard"
+                         AutomationProperties.Name="Copy source code"
+                         ToolTip.Tip="Copy source code"
+                         Click="CopyCode" />
       </Grid>
       <Grid Grid.Row="1" Height="220">
         <avaloniaEdit:TextEditor x:Name="XamlEditor"
