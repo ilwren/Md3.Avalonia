@@ -145,7 +145,7 @@ public class MdConnectedButtonGroup : ItemsControl
                      (_shapeManagedContainers.Contains(toggle) || !toggle.IsSet(MdToggleButton.ContainerCornerRadiusProperty)))
             {
                 _shapeManagedContainers.Add(toggle);
-                if (!toggle.IsSet(MdToggleButton.EnableSelectedShapeMorphProperty))
+                if (toggle.ReadLocalValue(MdToggleButton.EnableSelectedShapeMorphProperty) == AvaloniaProperty.UnsetValue)
                     toggle.SetCurrentValue(MdToggleButton.EnableSelectedShapeMorphProperty, false);
                 toggle.SetCurrentValue(MdToggleButton.ContainerCornerRadiusProperty, radius);
             }

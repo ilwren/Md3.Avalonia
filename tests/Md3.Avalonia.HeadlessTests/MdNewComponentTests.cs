@@ -94,7 +94,7 @@ public sealed class MdNewComponentTests
     }
 
     [AvaloniaFact]
-    public void Flexible_App_Bar_Expands_For_Subtitle_And_Owns_All_Four_Corners()
+    public void Flexible_App_Bar_Expands_For_Subtitle_And_Remains_An_Edge_To_Edge_Surface()
     {
         var bar = new MdTopAppBar
         {
@@ -105,8 +105,8 @@ public sealed class MdNewComponentTests
         using var host = Show(bar);
 
         Assert.Equal(136, bar.Height);
-        Assert.Equal(new CornerRadius(20), bar.CornerRadius);
-        Assert.Equal(new Thickness(1), bar.BorderThickness);
+        Assert.Equal(new CornerRadius(0), bar.CornerRadius);
+        Assert.Equal(new Thickness(0), bar.BorderThickness);
         var subtitle = bar.GetVisualDescendants().OfType<ContentPresenter>()
             .Single(control => control.Name == "PART_Subtitle");
         Assert.True(subtitle.Bounds.Height > 0);

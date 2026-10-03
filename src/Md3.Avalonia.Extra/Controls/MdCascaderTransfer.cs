@@ -205,9 +205,13 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
             if (lists.Length == 0) return;
             level = Math.Clamp(level, 0, lists.Length - 1);
             var list = lists[level];
-            if (list.SelectedIndex < 0 && list.ItemCount > 0) list.SelectedIndex = 0;
+            // Moving keyboard focus must not commit a hierarchy choice. Selecting index zero here
+            // raised SelectionChanged merely by opening the popup and could expand a branch before
+            // the user invoked it.
+            var focusIndex = list.SelectedIndex >= 0 ? list.SelectedIndex : 0;
             list.Focus(NavigationMethod.Directional);
-            (list.ContainerFromIndex(Math.Max(0, list.SelectedIndex)) as Control)?.Focus(NavigationMethod.Directional);
+            if (list.ItemCount > 0)
+                (list.ContainerFromIndex(focusIndex) as Control)?.Focus(NavigationMethod.Directional);
         }, DispatcherPriority.Input);
     }
 
@@ -275,7 +279,7 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
                         if (version != _openStateVersion || !_isAttached || !IsDropDownOpen) return;
                         PseudoClasses.Set(":closed", false);
                         PseudoClasses.Set(":open", true);
-                    }, DispatcherPriority.Render);
+                    }, DispatcherPriority.Loaded);
             }
         }
         else

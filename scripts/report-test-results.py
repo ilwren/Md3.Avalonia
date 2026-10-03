@@ -35,8 +35,9 @@ def main():
                 if stack_el is not None and stack_el.text:
                     stack = stack_el.text.strip()
             # Escape newlines for github workflow command
-            escaped_msg = msg.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
-            print(f"::error title={test_name}::{escaped_msg}")
+            annotation = f"{test_name}: {msg}" if test_name else msg
+            escaped_msg = annotation.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+            print(f"::error title=Headless test failed::{escaped_msg}")
             print(f"FAILED TEST: {test_name}\nMESSAGE:\n{msg}\nSTACK:\n{stack}\n" + "="*60)
         elif outcome == 'Passed':
             passed += 1

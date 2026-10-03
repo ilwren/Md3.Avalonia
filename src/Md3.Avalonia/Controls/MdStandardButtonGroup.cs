@@ -46,7 +46,7 @@ public class MdStandardButtonGroup : ItemsControl
             _sizeManagedContainers.Add(button);
             button.SetCurrentValue(MdButton.SizeProperty, Size);
         }
-        else if (container is MdToggleButton toggle && (_sizeManagedContainers.Contains(toggle) || !toggle.IsSet(MdToggleButton.SizeProperty)))
+        else if (container is MdToggleButton toggle && (_sizeManagedContainers.Contains(toggle) || toggle.ReadLocalValue(MdToggleButton.SizeProperty) == AvaloniaProperty.UnsetValue))
         {
             _sizeManagedContainers.Add(toggle);
             toggle.SetCurrentValue(MdToggleButton.SizeProperty, Size);
