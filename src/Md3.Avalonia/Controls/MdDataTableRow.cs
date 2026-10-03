@@ -9,7 +9,7 @@ public sealed class MdDataTableRow : ListBoxItem
     protected override AutomationPeer OnCreateAutomationPeer() => new MdDataTableRowAutomationPeer(this);
 }
 
-internal sealed class MdDataTableRowAutomationPeer(MdDataTableRow owner) : ListBoxItemAutomationPeer(owner)
+internal sealed class MdDataTableRowAutomationPeer(MdDataTableRow owner) : ListItemAutomationPeer(owner)
 {
     protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.DataItem;
 }
