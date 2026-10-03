@@ -99,8 +99,9 @@ public partial class AndroidGalleryView : UserControl
         AddSection("Library");
         AddPage("Flutter parity", () => new FlutterParityGalleryPage());
         AddPage("Flutter ecosystem", () => new EcosystemGalleryPage());
-        AddPage("Borderless windows", () => new BorderlessWindowGalleryPage());
-        AddPage("Desktop adapters", () => new DesktopAdaptersGalleryPage());
+        // Borderless window/chrome and desktop adapter samples are intentionally desktop-only.
+        // Do not expose them from the Android single-view navigation: Android has no native
+        // desktop caption, resize frame, or desktop window lifetime to demonstrate.
         AddPage("Theme Lab", () => new ThemeResourcesGalleryPage());
         AddPage("Material Symbols", () => new SymbolGalleryPage());
         AddPage("Motion", () => new MotionGalleryPage());
