@@ -28,7 +28,7 @@
   <ControlTheme x:Key="EcoCalendarListItemTheme" TargetType="ListBoxItem" BasedOn="{StaticResource EcoListItemTheme}">
     <Setter Property="MinWidth" Value="48" /><Setter Property="MinHeight" Value="48" /><Setter Property="Padding" Value="0" />
   </ControlTheme>
-  <ControlTheme x:Key="EcoCommandPaletteItemTheme" TargetType="ListBoxItem" BasedOn="{StaticResource EcoListItemTheme}">
+  <ControlTheme x:Key="EcoCommandPaletteItemTheme" TargetType="ListBoxItem" BasedOn="{StaticResource EcoListItemTheme}" x:CompileBindings="False">
     <Setter Property="MinHeight" Value="60" /><Setter Property="Padding" Value="16,8" />
     <Setter Property="CornerRadius" Value="16" />
     <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
