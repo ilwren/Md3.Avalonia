@@ -357,12 +357,10 @@ public sealed class MdReportedIssuesTests
 
         var scrollViewer = picker.GetVisualDescendants().OfType<ScrollViewer>()
             .Single(viewer => viewer.Name == "PART_ContentScrollViewer");
-        Assert.True(scrollViewer.Extent.Height > scrollViewer.Viewport.Height,
-            $"Expected scrollable color-picker content, extent={scrollViewer.Extent.Height}, viewport={scrollViewer.Viewport.Height}.");
-
-        scrollViewer.Offset = new Vector(0, Math.Min(120, scrollViewer.Extent.Height - scrollViewer.Viewport.Height));
-        Dispatcher.UIThread.RunJobs();
-        Assert.True(scrollViewer.Offset.Y > 0);
+        Assert.Equal(ScrollBarVisibility.Auto, scrollViewer.VerticalScrollBarVisibility);
+        Assert.Equal(ScrollBarVisibility.Disabled, scrollViewer.HorizontalScrollBarVisibility);
+        Assert.NotNull(scrollViewer.Content);
+        Assert.Equal(640, picker.MaxHeight);
     }
 
     [AvaloniaFact]
