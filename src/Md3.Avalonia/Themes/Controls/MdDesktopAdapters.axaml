@@ -411,9 +411,8 @@
       <Setter Property="WindowDecorationsTheme" Value="{x:Null}" />
     </Style>
     <Style Selector="^:native-frame /template/ Border#PART_WindowFrame">
-      <!-- Keep the Material one-pixel frame at the native extended-client corners. The native
-           Windows frame remains enabled for DWM state animations; it must not erase these corners. -->
-      <Setter Property="Margin" Value="1" /><Setter Property="BorderThickness" Value="1" /><Setter Property="CornerRadius" Value="9" /><Setter Property="ClipToBounds" Value="True" />
+      <!-- The native frame already supplies the edge; avoid drawing a second Material frame. -->
+      <Setter Property="Margin" Value="0" /><Setter Property="BorderThickness" Value="0" /><Setter Property="CornerRadius" Value="0" /><Setter Property="ClipToBounds" Value="False" />
     </Style>
     <Style Selector="^:maximized /template/ Border#PART_WindowFrame">
       <Setter Property="Margin" Value="0" /><Setter Property="BorderThickness" Value="0" /><Setter Property="CornerRadius" Value="0" /><Setter Property="ClipToBounds" Value="False" />
