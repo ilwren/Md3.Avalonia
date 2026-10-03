@@ -154,8 +154,6 @@
       <Border x:Name="TableOfContentsPane" Grid.Column="2" Padding="24,32" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1,0,0,0">
         <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
           <StackPanel Spacing="12">
-            <crollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-          <StackPanel Spacing="12">
             <TextBlock x:Name="OnThisPageTitle" FontSize="14" FontWeight="Medium" Text="On this page" />
             <StackPanel x:Name="TableOfContentsItems" Spacing="4" />
             <Border Margin="0,12,0,0" Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
