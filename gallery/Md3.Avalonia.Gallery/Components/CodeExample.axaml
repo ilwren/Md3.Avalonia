@@ -18,7 +18,7 @@
     <Grid RowDefinitions="64,Auto">
       <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="12,0">
         <Border Grid.Column="0"
-                Width="148" Height="40"
+                Width="148" Height="34"
                 HorizontalAlignment="Left" VerticalAlignment="Center"
                 Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
                 BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
