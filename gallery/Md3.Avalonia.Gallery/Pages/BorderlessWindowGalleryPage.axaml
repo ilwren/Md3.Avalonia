@@ -4,7 +4,7 @@
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.BorderlessWindowGalleryPage">
   <StackPanel MinHeight="1200" Spacing="28">
-    <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Borderless windows" /><TextBlock Classes="body" TextWrapping="Wrap" Text="Extended client-area chrome keeps the platform resize frame, shadow and corner treatment while Material owns the caption content. This follows FluentAvalonia's AppWindow separation instead of removing all native decorations." /></StackPanel>
+    <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Borderless windows" /><TextBlock Classes="body" TextWrapping="Wrap" Text="Extended client-area chrome keeps the platform resize frame, shadow and corner treatment while Material owns the caption content. This is a true chromeless client window: Material owns the surface, title bar, caption buttons and resize affordances without a second native title-bar line." /></StackPanel>
     <Border BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="16" ClipToBounds="True">
       <Grid RowDefinitions="Auto,*">
         <md:MdWindowTitleBar Content="Material application" ShowIcon="False" />
