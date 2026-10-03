@@ -107,17 +107,17 @@ public sealed class MdWindowsWindowPlatformAdapter() : MdAvaloniaWindowPlatformA
         var normal = window.WindowState == WindowState.Normal;
         var stateActionsAllowed = !window.IsDialog;
         SetSystemMenuItemEnabled(menu, ScClose,
-            window.Capabilities.HasFlag(MdWindowCapabilities.Close));
+            window.IsCloseButtonEnabled && window.Capabilities.HasFlag(MdWindowCapabilities.Close));
         SetSystemMenuItemEnabled(menu, ScMinimize,
-            stateActionsAllowed && window.CanMinimize && window.Capabilities.HasFlag(MdWindowCapabilities.Minimize));
+            stateActionsAllowed && window.IsMinimizeButtonEnabled && window.CanMinimize && window.Capabilities.HasFlag(MdWindowCapabilities.Minimize));
         SetSystemMenuItemEnabled(menu, ScRestore,
-            stateActionsAllowed && !normal && window.Capabilities.HasFlag(MdWindowCapabilities.Maximize));
+            stateActionsAllowed && !normal && window.IsMaximizeButtonEnabled && window.Capabilities.HasFlag(MdWindowCapabilities.Maximize));
         SetSystemMenuItemEnabled(menu, ScMove,
             stateActionsAllowed && normal && window.Capabilities.HasFlag(MdWindowCapabilities.Move));
         SetSystemMenuItemEnabled(menu, ScSize,
             stateActionsAllowed && normal && window.CanResize && window.Capabilities.HasFlag(MdWindowCapabilities.Resize));
         SetSystemMenuItemEnabled(menu, ScMaximize,
-            stateActionsAllowed && normal && window.CanMaximize && window.Capabilities.HasFlag(MdWindowCapabilities.Maximize));
+            stateActionsAllowed && normal && window.IsMaximizeButtonEnabled && window.CanMaximize && window.Capabilities.HasFlag(MdWindowCapabilities.Maximize));
         SetMenuDefaultItem(menu, uint.MaxValue, false);
 
         var screenPoint = window.PointToScreen(clientPoint);
