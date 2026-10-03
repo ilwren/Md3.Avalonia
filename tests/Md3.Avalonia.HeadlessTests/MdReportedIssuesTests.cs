@@ -351,7 +351,7 @@ public sealed class MdReportedIssuesTests
     [AvaloniaFact]
     public void ColorPicker_Uses_Internal_Viewport_When_Dialog_Sized_Content_Is_Constrained()
     {
-        var picker = new MdColorPicker { Width = 400 };
+        var picker = new MdColorPicker { Width = 400, Height = 320 };
         using var host = Show(picker, 460, 360);
         Dispatcher.UIThread.RunJobs();
 
