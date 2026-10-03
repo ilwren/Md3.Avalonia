@@ -8,7 +8,7 @@
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Material Symbols" />
         <TextBlock Classes="body" TextWrapping="Wrap"
-                   Text="The complete Google Material Symbols Rounded codepoint catalog. Click a tile to copy the official snake_case symbol name." />
+                   Text="The complete Google Material Symbols Rounded catalog. Click a tile to copy a ready-to-paste AXAML MdSymbols reference." />
       </StackPanel>
 
       <Border x:Name="UnavailablePanel" Padding="20" CornerRadius="20"

@@ -46,7 +46,8 @@ All component themes are scoped to `Md*` types. Registering `MaterialTheme` does
 - Feedback: `MdLoadingIndicator`, `MdLinearProgressIndicator`, `MdCircularProgressIndicator`, `MdBadge`, `MdBadgedBox`.
 - Flutter-inspired Avalonia APIs: `MdBanner`, `MdExpansionPanelList`, `MdDataTable`, `MdStepper`, `MdRefreshIndicator`, `MdPaginatedDataTable`, `MdReorderableList`, `MdGridTile`, `MdDismissible`, `MdForm`, `MdFormField`, `MdDropdownFormField`, `MdSimpleDialog`, `MdAboutDialog`, `MdLicensePage`, `MdDraggableScrollableSheet`, `MdAdaptiveSwitch`, `MdAdaptiveProgressIndicator`, `MdHero`, `MdFocusTraversalGroup`, `MdShortcutScope`. These names do not imply complete Flutter parity; see [Flutter parity status](FLUTTER_PARITY_STATUS.md).
 - Foundations and desktop adapters: `MdScrollViewer`, `MdScrollBar`, five-breakpoint/input-aware `MdAdaptiveLayout`, `MdSurface`, `MdText`, `MdStateLayer`, `MdFocusRing`, `MdWindow`, `MdIcon`, `MdSymbolPresenter`.
-- Borderless windows: `MdBorderlessWindow`, `MdWindowTitleBar`, `MdCaptionButton`/`MdWindowCaptionButton`, `MdWindowDragRegion`, `MdWindowResizeGrip`, `IMdWindowPlatformAdapter`, named platform adapters and `MdWindowPlatformAdapterResolver`.
+- Borderless/chromeless windows: `MdBorderlessWindow`, `MdWindowTitleBar`, `MdCaptionButton`/`MdWindowCaptionButton`, `MdWindowDragRegion`, `MdWindowResizeGrip`, `IMdWindowPlatformAdapter`, named platform adapters and `MdWindowPlatformAdapterResolver`. The default caption is icon-free and has no separator line; visibility and enabled state are independently configurable through `ShowMinimizeButton`/`ShowMaximizeButton`/`ShowCloseButton` and `IsMinimizeButtonEnabled`/`IsMaximizeButtonEnabled`/`IsCloseButtonEnabled`.
+
 - Optional Icons package: `MdExternalMaterialSymbols`, `MdSymbols` and the `Md.Icon.*` resource injection contract.
 - Optional Ecosystem foundations: `MdDensity`, `MdAsyncRequestState`, `MdPageRequest`, `MdPageResult<T>`, `IMdPageProvider<T>`, `MdShortcutBinding`, `MdOverlayPlacement`, `MdFocusReturnScope`.
 - Optional Ecosystem Wave A: `MdPopover`, `MdHoverCard`, `MdCommandPalette`, `MdCommandItem`.
@@ -55,7 +56,115 @@ All component themes are scoped to `Md*` types. Registering `MaterialTheme` does
 - Optional Ecosystem Wave D: `MdChart`, `IMdChartDataProvider`, `MdRichEditor`/`MdRichTextEditor`, `IMdRichEditorAdapter`, `MdChatView`.
 - Optional Ecosystem Wave E: `MdSkeleton`, `MdSkeletonGroup`, `MdAnimationSequence`.
 - Optional Ecosystem Wave F: `MdPinInput`, `MdPinCell`, `MdTreeView`, `MdTreeNode`, `MdTreeRow`, `MdTagInput`, `MdTagEntry`, `MdTagChangedEventArgs`.
-- Existing optional Ecosystem controls: `MdAvatar`, `MdAvatarGroup`, `MdRating`, `MdBreadcrumb`.
+- Existing optional Ecosystem controls: `MdAvatar`, `MdAvatarGroup`, `MdRating`, `MdBreadcrumb`, `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, and `MdStaggeredPanel`.
+- `MdBeforeAfter` provides draggable horizontal/vertical content comparison; `MdAnimatedText` provides typewriter/fade/pop-friendly text reveal; `MdSpinKit` contains optional non-Material loading recipes; `MdStaggeredPanel` provides cancelable staggered entrance motion. These are Extra controls; core `MdChart` remains provider-neutral and does not bundle a chart engine.
+
+## Complete component catalog
+
+The following catalog covers the public control surface shipped by the core package. Types ending in `*Item`, `*Part`, `*Presenter`, `*Thumb`, `*Panel`, or `*Grid` are supporting visual types that can also be composed directly when their API is public. For the exact dependency version and XML documentation, use the generated `Md3.Avalonia.xml` file in the NuGet package.
+
+### Core controls (`Md3.Avalonia`)
+
+| Area | Controls and supporting types |
+|---|---|
+| **Buttons and actions** | `MdButton` (`Filled`, `Tonal`, `Outlined`, `Text` variants), `MdIconButton`, `MdToggleButton`, `MdToggleIconButton`, `MdSplitButton`, `MdStandardButtonGroup`, `MdConnectedButtonGroup`, `MdFloatingActionButton`, `MdExtendedFloatingActionButton`, `MdFabMenu`, `MdFabMenuItem`, `MdFabMenuPanel` |
+| **Text and form input** | `MdTextBox`, `MdNumericBox`, `MdAutoCompleteBox`, `MdSearchBar`, `MdSearchView`, `MdCheckBox`, `MdRadioButton`, `MdSwitch`, `MdSlider`, `MdRangeSlider`, `MdComboBox`, `MdForm`, `MdFormField`, `MdDropdownFormField`, `MdOutlinedFieldBorder` |
+| **Chips and selection** | `MdChip`, `MdAssistChip`, `MdFilterChip`, `MdInputChip`, `MdSuggestionChip`, `MdSegmentedButton`, `MdSegmentedButtonGroup` |
+| **Surfaces and content** | `MdSurface`, `MdCard`, `MdList`, `MdListItem`, `MdDivider`, `MdCarousel`, `MdCarouselItem`, `MdGridTile`, `MdGridTileBar`, `MdBanner`, `MdExpansionPanel`, `MdExpansionPanelList`, `MdDataTable`, `MdPaginatedDataTable` |
+| **Menus and dialogs** | `MdMenu`, `MdMenuItem`, `MdSubMenuItem`, `MdMenuAnchor`, `MdDropdownMenu`, `MdDialog`, `MdDialogHost`, `MdSimpleDialog`, `MdAboutDialog`, `MdLicensePage`, `MdSheetHost`, `MdTooltip`, `MdTooltipHost` |
+| **Navigation and layout** | `MdScaffold`, `MdTopAppBar`, `MdBottomAppBar`, `MdToolbar`, `MdNavigationBar`, `MdNavigationBarItem`, `MdNavigationDrawer`, `MdNavigationRail`, `MdNavigationRailItem`, `MdNavigationSuite`, `MdTabs`, `MdTabItem`, `MdTabView`, `MdTabViewItem`, `MdAdaptiveLayout`, `MdAdaptiveSwitch`, `MdKeyboardAvoidingHost`, `MdDraggableScrollableSheet` |
+| **Settings and preference surfaces** | `MdSettingsGroup`, `MdSettingsCard`, `MdSettingsExpander` |
+| **Feedback and status** | `MdLoadingIndicator`, `MdLinearProgressIndicator`, `MdCircularProgressIndicator`, `MdAdaptiveProgressIndicator`, `MdBadge`, `MdBadgedBox`, `MdRefreshIndicator`, `MdSnackbar`, `MdSnackbarHost`, `MdSnackbarService` |
+| **Pickers and calendars** | `MdDatePicker`, `MdDatePickerDialog`, `MdDateRangePicker`, `MdCalendarGrid`, `MdCalendarDay`, `MdTimePicker`, `MdTimePickerDialog`, `MdTimeDial`, `MdTimeDialPart`, `MdPickerRestorationStore` |
+| **Lists and interaction patterns** | `MdReorderableList`, `MdDismissible`, `MdStepper`, `MdStep`, `MdHero`, `MdFocusTraversalGroup`, `MdShortcutScope` |
+| **Foundations and icons** | `MdText`, `MdIcon`, `MdSymbolPresenter`, `MdStateLayer`, `MdRipplePresenter`, `MdFocusRing`, `MdScrollViewer`, `MdScrollBar`, `MdSliderThumb`, `MdWindow` |
+| **Window chrome** | `MdBorderlessWindow`, `MdWindowTitleBar`, `MdCaptionButton`, `MdWindowCaptionButton`, `MdWindowDragRegion`, `MdWindowResizeGrip`, `IMdWindowPlatformAdapter`, `MdWindowPlatformAdapterResolver`, `MdWindowsWindowPlatformAdapter`, `MdMacOsWindowPlatformAdapter`, `MdLinuxWindowPlatformAdapter`, `MdAvaloniaWindowPlatformAdapter`, `MdAndroidWindowPlatformAdapter` |
+
+Most core controls expose styled properties, bindable `Items`/`ItemsSource` where applicable, routed events, commands, and native Avalonia automation peers. The following variant/support enums are part of the public API and should be preferred over string values: `MdButtonVariant`, `MdButtonSize`, `MdButtonShape`, `MdCardVariant`, `MdChipVariant`, `MdDialogVariant`, `MdListVariant`, `MdNavigationBarVariant`, `MdNavigationBarLayout`, `MdNavigationDrawerPlacement`, `MdProgressShape`, `MdTabVariant`, `MdTextBoxVariant`, `MdTimePickerMode`, `MdToolbarDensity`, `MdToolbarMode`, `MdToolbarVariant`, `MdTooltipVariant`, and `MdTopAppBarVariant`.
+
+### Core control quick reference
+
+| Type | Primary use | Important API surface |
+|---|---|---|
+| `MdButton`, `MdIconButton`, `MdToggleButton` | Actions and two-state actions | `Command`, `CommandParameter`, `IsEnabled`, `IsChecked`, content/icon properties, variant and size properties |
+| `MdTextBox`, `MdNumericBox`, `MdAutoCompleteBox` | Text, numeric, and suggestion input | `Text`/`Value`, validation properties, `ItemsSource`/suggestion provider, `Watermark`, `IsReadOnly` |
+| `MdSearchBar`, `MdSearchView` | Search entry and result presentation | `Query`, `SearchCommand`, result templates, `SearchResultCommitted` |
+| `MdCheckBox`, `MdRadioButton`, `MdSwitch` | Boolean and mutually exclusive choices | `IsChecked`, `GroupName`/selection binding, `Command` and native input events |
+| `MdSlider`, `MdRangeSlider` | Single and interval values | `Minimum`, `Maximum`, `Value` or `StartValue`/`EndValue`, `Step`, `Orientation` |
+| `MdCard`, `MdSurface`, `MdList`, `MdListItem` | Material containers and lists | variant/elevation/surface properties, content, `ItemsSource`, item templates, selection/invocation events |
+| `MdDialogHost`, `MdSheetHost` | Modal dialogs and bottom/side sheets | `ShowAsync`, `Close`, `Dialog`, placement, dismissal and result APIs |
+| `MdMenu`, `MdDropdownMenu`, `MdMenuAnchor` | Contextual and anchored actions | items, submenu support, placement, `Show`/`Dismiss`, keyboard navigation |
+| `MdNavigationBar`, `MdNavigationRail`, `MdNavigationDrawer` | Primary application navigation | item collections, selected index/item, placement/layout and `ItemInvoked` |
+| `MdTabs`, `MdTabView` | Peer navigation and document views | tab collections, selected item/index, closable/reorderable view items |
+| `MdDatePicker`, `MdDateRangePicker`, `MdTimePicker` | Date, date range, and time selection | selected value(s), mode, dialogs, validation, restoration and `ShowAsync` |
+| `MdSnackbarHost`, `MdSnackbarService` | Queued transient messages | `Show`, `ShowAsync`, `Dismiss`, action/result, queue and shared service injection |
+| `MdCarousel`, `MdRefreshIndicator`, `MdReorderableList` | Touch-friendly content interaction | controller/provider APIs, navigation, refresh callbacks, reorder callbacks |
+| `MdScaffold`, `MdAdaptiveLayout`, `MdToolbar` | Application shell and responsive layout | slots/regions, breakpoint mode, density, toolbar mode and platform input mode |
+
+### Optional package catalog (`Md3.Avalonia.Extra`)
+
+`ExtraTheme` must be registered in addition to `MaterialTheme`. These controls are maintained as optional ecosystem patterns, not as claims of official Material 3 parity.
+
+| Area | Controls |
+|---|---|
+| **Overlays and commands** | `MdPopover`, `MdHoverCard`, `MdCommandPalette`, `MdCommandItem` |
+| **Collections and layout** | `MdPagedItemsView`, `MdMasonryPanel`, `MdDataGrid`, `MdDataGridColumn`, `MdSlidableItem`, `MdTreeView`, `MdTreeNode`, `MdTreeRow` |
+| **Selection and transfer** | `MdAsyncSelect`, `MdCalendar`, `MdCascader`, `MdCascaderItem`, `MdTransfer`, `MdColorPicker`, `MdColorPickerButton` |
+| **Feedback and identity** | `MdAvatar`, `MdAvatarGroup`, `MdRating`, `MdResultView`, `MdSkeleton`, `MdSkeletonGroup`, `MdPinInput`, `MdPinCell`, `MdTagInput`, `MdTagEntry` |
+| **Data visualization and editing** | `MdChart`, `MdChartSeries`, `MdChartPoint`, `MdRichEditor`, `MdRichTextEditor`, `MdChatView`, `MdChatMessage`, `MdTimeline`, `MdTimelineItem` |
+| **Motion and visual extras** | `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, `MdStaggeredPanel`, `MdAnimationSequence`, `MdAnimatedVisibility`, `MdContainerTransform`, `MdFadeThrough`, `MdSharedAxis` |
+| **Navigation/content** | `MdBreadcrumb`, `MdBreadcrumbItem`, `MdGridTile`-style content helpers |
+
+The Extra support contracts are also public: `IMdPageProvider<T>`, `MdPageRequest`, `MdPageResult<T>`, `MdAsyncRequestState`, `MdDensity`, `MdEcosystemDensity`, `MdOverlayPlacement`, `MdOverlayAlignment`, `MdShortcutBinding`, and `MdFocusReturnScope`. Data and adapter contracts include `IMdChartDataProvider`, `IMdRichEditorAdapter`, and `IMdRichEditorStateAdapter`. Supporting enums and records such as `MdCalendarSelectionMode`, `MdTransferLayoutMode`, `MdMasonryLayoutStrategy`, `MdResultKind`, `MdSkeletonShape`, `MdSpinKitKind`, `MdAnimatedTextEffect`, and `MdTimelineItemState` configure those controls.
+
+### Common usage patterns
+
+**Register both themes when using Extra:**
+
+```xml
+<Application.Styles>
+  <themes:MaterialTheme />
+  <extra:ExtraTheme />
+</Application.Styles>
+```
+
+**Bind an input and a selection control:**
+
+```xml
+<StackPanel Spacing="16">
+  <md:MdTextBox Text="{Binding Name, Mode=TwoWay}" Watermark="Name" />
+  <md:MdSegmentedButtonGroup SelectedItem="{Binding Filter, Mode=TwoWay}">
+    <md:MdSegmentedButton Content="All" Tag="all" />
+    <md:MdSegmentedButton Content="Unread" Tag="unread" />
+  </md:MdSegmentedButtonGroup>
+</StackPanel>
+```
+
+**Compose an application shell:**
+
+```xml
+<md:MdScaffold>
+  <md:MdScaffold.TopBar>
+    <md:MdTopAppBar Title="Inbox" />
+  </md:MdScaffold.TopBar>
+  <md:MdScaffold.Content>
+    <md:MdList ItemsSource="{Binding Messages}" />
+  </md:MdScaffold.Content>
+  <md:MdScaffold.BottomBar>
+    <md:MdNavigationBar ItemsSource="{Binding Destinations}" />
+  </md:MdScaffold.BottomBar>
+</md:MdScaffold>
+```
+
+**Use an Extra provider-backed control:**
+
+```xml
+<extra:MdPagedItemsView ItemsSource="{Binding Items}"
+                        LoadPageAsync="{Binding LoadPageAsync}" />
+<extra:MdResultView Result="{Binding RequestResult}" />
+```
+
+Provider-backed controls are intentionally adapter-neutral. The application owns HTTP, caching, error policy, and cancellation; the control owns loading, empty, error, and retry presentation.
 
 ## Dynamic theme API
 
@@ -95,7 +204,42 @@ Direct APIs include `Show`/`Dismiss` on transient components, `ShowAsync`/`Close
 
 `MdScrollViewer` keeps wheel, trackpad, touch, pen and scrollbar behavior native. Desktop primary-button panning is opt-in through `AllowMouseDrag`; when enabled, focusable controls retain direct manipulation, and custom content takes precedence by handling the press or capturing the pointer. Set `md:MdScrollViewer.SuppressMouseDragScrolling="True"` on any precision-interaction subtree that does neither.
 
-`MdBorderlessWindow.PlatformAdapter` is replaceable. `PreserveNativeBorder` defaults to `true`: Windows uses `WindowDecorations.Full` plus an extended client area so the native `WS_CAPTION`/minimize/maximize styles and DWM state animations remain available, while macOS/Linux retain the portable border-only path. The Material template suppresses its own outer outline whenever a native frame is present, and an empty Avalonia 12 `WindowDrawnDecorations` theme prevents Fluent/Simple title and caption visuals from being layered over the Material title bar. View models use Avalonia `WindowState`; Android resolves to a safe no-op adapter.
+`MdBorderlessWindow.PlatformAdapter` is replaceable. `PreserveNativeBorder` defaults to `true`: Windows uses `WindowDecorations.Full` plus an extended client area so the native `WS_CAPTION`/minimize/maximize styles and DWM state animations remain available, while macOS/Linux retain the portable border-only path. The Material template suppresses its own outer outline whenever a native frame is present, and an empty Avalonia 12 `WindowDrawnDecorations` theme prevents Fluent/Simple title and caption visuals from being layered over the Material title bar. The default caption is icon-free and uses the window surface background without a separator rule. `ShowMinimizeButton`/`ShowMaximizeButton`/`ShowCloseButton` control visibility, while `IsMinimizeButtonEnabled`/`IsMaximizeButtonEnabled`/`IsCloseButtonEnabled` control each action independently. View models use Avalonia `WindowState`; Android resolves to a safe no-op adapter.
+
+## Extra visual controls
+
+The optional `Md3.Avalonia.Extra` package contains visual and ecosystem controls that are intentionally not counted as official Material 3 components:
+
+```xml
+<extra:MdBeforeAfter Before="{Binding Original}" After="{Binding Revised}" Position="0.5" />
+<extra:MdAnimatedText Text="Loading complete" Effect="Typewriter" AutoPlay="True" />
+<extra:MdSpinKit Kind="Wave" Size="40" IsActive="{Binding IsLoading}" />
+<extra:MdStaggeredPanel AutoPlay="True" Stagger="0:0:0.06">
+  <Border /><Border /><Border />
+</extra:MdStaggeredPanel>
+```
+
+`MdBeforeAfter.Position` is a two-way value in the `0..1` range and supports pointer dragging plus keyboard adjustment. `MdAnimatedText` exposes `Start()`, `Stop()`, `IsPlaying`, `DisplayText` and `Completed`. `MdSpinKit` is an optional collection of non-Material loading recipes; use `MdLoadingIndicator` for the Material 3 indicator. `MdStaggeredPanel.PlayAsync()` is cancelable and snaps to the final state under Reduced/None motion.
+
+`MdChart` is deliberately provider-neutral. It exposes `Series`, `Provider`, `BuildAccessibleTable()` and pointer selection, but does not bundle a chart engine. Applications may wrap a third-party chart control with Material surfaces and tokens instead of adopting a second chart data model.
+
+## Borderless/chromeless windows
+
+```xml
+<md:MdBorderlessWindow Title="My app"
+                       ShowMinimizeButton="True"
+                       ShowMaximizeButton="True"
+                       ShowCloseButton="True"
+                       IsMinimizeButtonEnabled="False"
+                       IsMaximizeButtonEnabled="True"
+                       IsCloseButtonEnabled="True">
+  <views:Shell />
+</md:MdBorderlessWindow>
+```
+
+`Show*Button` properties remove a caption button from the visual tree. `Is*ButtonEnabled` keeps the button visible but disables its command and applies the disabled state layer/opacity. Programmatic `Minimize()`, `ToggleMaximizeRestore()` and `RequestClose()` enforce the same state as the visual buttons. `MdWindowTitleBar.ShowIcon` defaults to `false`; set it to `true` and provide `LeadingContent` only when an application wants a leading mark.
+
+The Windows adapter preserves native caption style bits when `PreserveNativeBorder=true`, while the Material template owns the title bar surface. Android uses a safe no-op adapter; desktop-only Gallery pages are not registered in `AndroidGalleryView`.
 
 ## Accessibility
 

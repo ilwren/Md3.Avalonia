@@ -21,6 +21,9 @@ public sealed class MdSlidableItem : ContentControl
     public static readonly StyledProperty<object?> EndActionsProperty = AvaloniaProperty.Register<MdSlidableItem, object?>(nameof(EndActions));
     public static readonly StyledProperty<double> OpenThresholdProperty = AvaloniaProperty.Register<MdSlidableItem, double>(nameof(OpenThreshold), 0.28);
     public static readonly StyledProperty<double> ActionExtentProperty = AvaloniaProperty.Register<MdSlidableItem, double>(nameof(ActionExtent), 144);
+    public static readonly StyledProperty<double> DismissThresholdProperty = AvaloniaProperty.Register<MdSlidableItem, double>(nameof(DismissThreshold), 1.25);
+    public static readonly StyledProperty<bool> CloseOnActionProperty = AvaloniaProperty.Register<MdSlidableItem, bool>(nameof(CloseOnAction), true);
+    public static readonly StyledProperty<bool> IsOpenProperty = AvaloniaProperty.Register<MdSlidableItem, bool>(nameof(IsOpen), false, defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
     public static readonly StyledProperty<ICommand?> StartActionCommandProperty = AvaloniaProperty.Register<MdSlidableItem, ICommand?>(nameof(StartActionCommand));
     public static readonly StyledProperty<ICommand?> EndActionCommandProperty = AvaloniaProperty.Register<MdSlidableItem, ICommand?>(nameof(EndActionCommand));
     public static readonly DirectProperty<MdSlidableItem, double> OffsetProperty = AvaloniaProperty.RegisterDirect<MdSlidableItem, double>(nameof(Offset), item => item.Offset);
@@ -38,14 +41,26 @@ public sealed class MdSlidableItem : ContentControl
     private double _lastPointerX;
     private ulong _lastPointerTimestamp;
     private double _horizontalVelocity;
+    private bool _updatingOpenState;
 
-    static MdSlidableItem() =>
+    static MdSlidableItem()
+    {
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdSlidableItem>((item, _) => item.UpdateMotion());
+        IsOpenProperty.Changed.AddClassHandler<MdSlidableItem>((item, change) =>
+        {
+            if (item._updatingOpenState) return;
+            if (change.NewValue is true && item.Offset == 0) item.OpenStart();
+            else if (change.NewValue is false && item.Offset != 0) item.Close();
+        });
+    }
 
     public object? StartActions { get => GetValue(StartActionsProperty); set => SetValue(StartActionsProperty, value); }
     public object? EndActions { get => GetValue(EndActionsProperty); set => SetValue(EndActionsProperty, value); }
     public double OpenThreshold { get => GetValue(OpenThresholdProperty); set => SetValue(OpenThresholdProperty, value); }
     public double ActionExtent { get => GetValue(ActionExtentProperty); set => SetValue(ActionExtentProperty, value); }
+    public double DismissThreshold { get => GetValue(DismissThresholdProperty); set => SetValue(DismissThresholdProperty, value); }
+    public bool CloseOnAction { get => GetValue(CloseOnActionProperty); set => SetValue(CloseOnActionProperty, value); }
+    public bool IsOpen { get => GetValue(IsOpenProperty); set => SetValue(IsOpenProperty, value); }
     public ICommand? StartActionCommand { get => GetValue(StartActionCommandProperty); set => SetValue(StartActionCommandProperty, value); }
     public ICommand? EndActionCommand { get => GetValue(EndActionCommandProperty); set => SetValue(EndActionCommandProperty, value); }
     public double Offset => _offset;
@@ -55,11 +70,17 @@ public sealed class MdSlidableItem : ContentControl
 
     public event EventHandler? Opened;
     public event EventHandler? Closed;
-    public void OpenStart() { UpdateMotion(); SetOffset(Math.Max(0, ActionExtent)); }
-    public void OpenEnd() { UpdateMotion(); SetOffset(-Math.Max(0, ActionExtent)); }
-    public void Close() { UpdateMotion(); SetOffset(0); Closed?.Invoke(this, EventArgs.Empty); }
-    public void InvokeStart() { if (StartActionCommand?.CanExecute(DataContext) == true) StartActionCommand.Execute(DataContext); Close(); }
-    public void InvokeEnd() { if (EndActionCommand?.CanExecute(DataContext) == true) EndActionCommand.Execute(DataContext); Close(); }
+    public void OpenStart() { UpdateMotion(); SetOffset(Math.Max(0, ActionExtent)); SetOpenState(true); }
+    public void OpenEnd() { UpdateMotion(); SetOffset(-Math.Max(0, ActionExtent)); SetOpenState(true); }
+    public void Close() { UpdateMotion(); SetOffset(0); SetOpenState(false); Closed?.Invoke(this, EventArgs.Empty); }
+    private void SetOpenState(bool value)
+    {
+        _updatingOpenState = true;
+        try { SetCurrentValue(IsOpenProperty, value); }
+        finally { _updatingOpenState = false; }
+    }
+    public void InvokeStart() { if (StartActionCommand?.CanExecute(DataContext) == true) StartActionCommand.Execute(DataContext); if (CloseOnAction) Close(); }
+    public void InvokeEnd() { if (EndActionCommand?.CanExecute(DataContext) == true) EndActionCommand.Execute(DataContext); if (CloseOnAction) Close(); }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
@@ -126,12 +147,12 @@ public sealed class MdSlidableItem : ContentControl
         var threshold = Math.Max(1, Bounds.Width) * Math.Clamp(OpenThreshold, 0.05, 0.9);
         var fling = Math.Abs(_horizontalVelocity) >= 0.5 && Math.Sign(_horizontalVelocity) == Math.Sign(Offset);
 
-        if (Offset >= maxExtent * 1.3 && StartActionCommand is not null)
+        if (Offset >= maxExtent * Math.Max(1, DismissThreshold) && StartActionCommand is not null)
         {
             InvokeStart();
             return;
         }
-        if (Offset <= -maxExtent * 1.3 && EndActionCommand is not null)
+        if (Offset <= -maxExtent * Math.Max(1, DismissThreshold) && EndActionCommand is not null)
         {
             InvokeEnd();
             return;

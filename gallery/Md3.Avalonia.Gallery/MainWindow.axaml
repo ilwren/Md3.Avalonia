@@ -55,7 +55,7 @@
       </Grid>
     </Border>
 
-    <Grid x:Name="ContentShell" Grid.Column="1" RowDefinitions="72,*">
+    <Grid x:Name="ContentShell" Grid.Column="1" RowDefinitions="88,*">
       <Border Grid.Row="0" Padding="16,8,20,8" Background="{DynamicResource Md.Sys.Color.Surface.Brush}"
               BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,0,1">
         <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12">

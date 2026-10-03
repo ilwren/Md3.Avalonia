@@ -6,6 +6,26 @@
 
   <!-- Ecosystem controls are self-contained: these scoped collection templates avoid any
        dependency on Avalonia's global FluentTheme. -->
+  <ControlTheme x:Key="{x:Type eco:MdBeforeAfter}" TargetType="eco:MdBeforeAfter">
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid ClipToBounds="True">
+          <ContentPresenter Content="{TemplateBinding Before}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+          <Border x:Name="PART_AfterClip" ClipToBounds="True" Background="Transparent">
+            <ContentPresenter Content="{TemplateBinding After}" Width="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}" Height="{Binding Bounds.Height, RelativeSource={RelativeSource TemplatedParent}}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+          </Border>
+          <Border x:Name="PART_Divider" Width="2" Background="{DynamicResource Md.Sys.Color.Primary.Brush}" IsHitTestVisible="False" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type eco:MdAnimatedText}" TargetType="eco:MdAnimatedText">
+    <Setter Property="Template"><ControlTemplate><TextBlock x:Name="PART_Text" TextWrapping="Wrap" /></ControlTemplate></Setter>
+  </ControlTheme>
+  <ControlTheme x:Key="{x:Type eco:MdSpinKit}" TargetType="eco:MdSpinKit" />
+  <ControlTheme x:Key="{x:Type eco:MdStaggeredPanel}" TargetType="eco:MdStaggeredPanel" />
   <ControlTheme x:Key="EcoItemsHostTheme" TargetType="ItemsControl">
     <Setter Property="Template"><ControlTemplate TargetType="ItemsControl"><ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" /></ControlTemplate></Setter>
   </ControlTheme>

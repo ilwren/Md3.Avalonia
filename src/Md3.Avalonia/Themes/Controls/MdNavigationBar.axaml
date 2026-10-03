@@ -28,8 +28,8 @@
                         Opacity="0" RenderTransform="scale(0.6)" RenderTransformOrigin="50%,50%" />
                 <Border x:Name="PART_StateLayer" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" CornerRadius="16" IsHitTestVisible="False" Opacity="0" />
                 <md:MdRipplePresenter RippleBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsCentered="True" />
-                <ContentPresenter x:Name="PART_Icon" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Icon}" Foreground="{TemplateBinding Foreground}" />
-                <ContentPresenter x:Name="PART_SelectedIcon" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding SelectedIcon}" Foreground="{TemplateBinding Foreground}" IsVisible="False" Opacity="0" />
+                <md:MdSymbolPresenter x:Name="PART_Icon" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Icon}" Foreground="{TemplateBinding Foreground}" FontSize="24" />
+                <md:MdSymbolPresenter x:Name="PART_SelectedIcon" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding SelectedIcon}" Foreground="{TemplateBinding Foreground}" FontSize="24" IsVisible="False" Opacity="0" />
                 <ContentPresenter x:Name="PART_Badge" Margin="30,-3,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Content="{TemplateBinding Badge}" IsVisible="False" />
               </Grid>
               <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
