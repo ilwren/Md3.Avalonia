@@ -73,12 +73,17 @@ public sealed class MdBreadcrumb : ListBox
     static MdBreadcrumb()
     {
         SeparatorProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.UpdateItemContainers());
-        MaxDisplayedItemsProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.UpdateItemContainers());
+        MaxDisplayedItemsProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.ResetOverflow());
+        ItemsBeforeCollapseProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.ResetOverflow());
+        ItemsAfterCollapseProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.ResetOverflow());
+        OverflowContentProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.UpdateItemContainers());
     }
 
     public MdBreadcrumb()
     {
+        AutomationProperties.SetName(this, "Breadcrumb");
         SelectionChanged += OnSelectionChanged;
+        LayoutUpdated += (_, _) => UpdateOverflowOnly();
     }
 
     public object? Separator { get => GetValue(SeparatorProperty); set => SetValue(SeparatorProperty, value); }
@@ -86,8 +91,28 @@ public sealed class MdBreadcrumb : ListBox
     public int MaxDisplayedItems { get => GetValue(MaxDisplayedItemsProperty); set => SetValue(MaxDisplayedItemsProperty, value); }
     public int ItemsBeforeCollapse { get => GetValue(ItemsBeforeCollapseProperty); set => SetValue(ItemsBeforeCollapseProperty, value); }
     public int ItemsAfterCollapse { get => GetValue(ItemsAfterCollapseProperty); set => SetValue(ItemsAfterCollapseProperty, value); }
+    public object? OverflowContent { get => GetValue(OverflowContentProperty); set => SetValue(OverflowContentProperty, value); }
+    public bool IsOverflowExpanded
+    {
+        get => _isOverflowExpanded;
+        private set => SetAndRaise(IsOverflowExpandedProperty, ref _isOverflowExpanded, value);
+    }
 
     public event EventHandler<object?>? ItemInvoked;
+
+    public void ExpandOverflow()
+    {
+        if (IsOverflowExpanded) return;
+        IsOverflowExpanded = true;
+        UpdateItemContainers();
+    }
+
+    public void CollapseOverflow()
+    {
+        if (!IsOverflowExpanded) return;
+        IsOverflowExpanded = false;
+        UpdateItemContainers();
+    }
 
     public void Invoke(object? item)
     {
@@ -105,15 +130,22 @@ public sealed class MdBreadcrumb : ListBox
 
         var model = item as MdBreadcrumbItem;
         var isLast = index == ItemCount - 1;
+        var isCurrent = model?.IsCurrent ?? isLast;
+        GetOverflowState(index, out var isVisible, out var isOverflow);
 
         // Classes collection entries never include the ':' selector prefix. Using pseudo-class
         // syntax here meant none of the breadcrumb item styles could match at runtime.
-        listItem.Content = model?.Label ?? item;
+        listItem.Content = isOverflow ? OverflowContent : model?.Label ?? item;
         listItem.Classes.Set("first", index == 0);
         listItem.Classes.Set("last", isLast);
-        listItem.Classes.Set("has-icon", model?.Icon is not null);
-        listItem.Classes.Set("current", model?.IsCurrent ?? isLast);
-        listItem.IsEnabled = model?.IsEnabled ?? true;
+        listItem.Classes.Set("has-icon", !isOverflow && model?.Icon is not null);
+        listItem.Classes.Set("current", !isOverflow && isCurrent);
+        listItem.Classes.Set("overflow", isOverflow);
+        listItem.IsVisible = isVisible;
+        listItem.IsEnabled = isOverflow || model?.IsEnabled != false;
+        KeyboardNavigation.SetIsTabStop(listItem, isOverflow || !isCurrent);
+        AutomationProperties.SetName(listItem, isOverflow ? "Show full breadcrumb path" : (model?.Label ?? item)?.ToString());
+        AutomationProperties.SetHelpText(listItem, isCurrent ? "Current page" : $"Item {index + 1} of {ItemCount}");
 
         // The package supplies the complete ListBoxItem theme, so instantiate it before resolving
         // named parts. This also makes rich breadcrumb content visible on the first layout pass.
@@ -129,28 +161,77 @@ public sealed class MdBreadcrumb : ListBox
         if (listItem.GetVisualDescendants().OfType<MdSymbolPresenter>()
             .FirstOrDefault(presenter => presenter.Name == "PART_IconPresenter") is { } iconPresenter)
         {
-            iconPresenter.Content = model?.Icon;
+            iconPresenter.Content = isOverflow ? null : model?.Icon;
         }
+    }
+
+    private void ResetOverflow()
+    {
+        IsOverflowExpanded = false;
+        UpdateItemContainers();
+    }
+
+    private void UpdateOverflowOnly()
+    {
+        if (_updatingOverflow) return;
+        _updatingOverflow = true;
+        try
+        {
+            foreach (var container in GetRealizedContainers().OfType<ListBoxItem>())
+            {
+                var index = IndexFromContainer(container);
+                if (index < 0) continue;
+                GetOverflowState(index, out var isVisible, out var isOverflow);
+                if (container.IsVisible != isVisible || container.Classes.Contains("overflow") != isOverflow)
+                    PrepareContainerForItemOverride(container, ItemFromContainer(container), index);
+            }
+        }
+        finally { _updatingOverflow = false; }
     }
 
     private void UpdateItemContainers()
     {
-        var containers = GetRealizedContainers().ToArray();
-        for (var i = 0; i < containers.Length; i++)
+        if (_updatingOverflow) return;
+        _updatingOverflow = true;
+        try
         {
-            var container = containers[i];
-            var index = IndexFromContainer(container);
-            if (index >= 0)
+            foreach (var container in GetRealizedContainers().ToArray())
             {
-                var item = ItemFromContainer(container);
-                PrepareContainerForItemOverride(container, item, index);
+                var index = IndexFromContainer(container);
+                if (index >= 0) PrepareContainerForItemOverride(container, ItemFromContainer(container), index);
             }
         }
+        finally { _updatingOverflow = false; }
+    }
+
+    private void GetOverflowState(int index, out bool visible, out bool overflow)
+    {
+        visible = true;
+        overflow = false;
+        if (IsOverflowExpanded || MaxDisplayedItems <= 0 || ItemCount <= MaxDisplayedItems) return;
+
+        var maximum = Math.Max(2, MaxDisplayedItems);
+        var before = Math.Clamp(ItemsBeforeCollapse, 0, Math.Max(0, maximum - 2));
+        var after = Math.Clamp(ItemsAfterCollapse, 1, Math.Max(1, maximum - before - 1));
+        if (before + after + 1 > maximum) before = Math.Max(0, maximum - after - 1);
+        var overflowIndex = before;
+        overflow = index == overflowIndex;
+        visible = index < before || overflow || index >= ItemCount - after;
     }
 
     private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (!_invoking && SelectedItem is { } item) RaiseItemInvoked(item);
+        if (_invoking || SelectedIndex < 0 || SelectedItem is not { } item) return;
+        if (ContainerFromIndex(SelectedIndex) is ListBoxItem container && container.Classes.Contains("overflow"))
+        {
+            _invoking = true;
+            try { SelectedIndex = -1; }
+            finally { _invoking = false; }
+            ExpandOverflow();
+            return;
+        }
+        if (item is MdBreadcrumbItem { IsCurrent: true } || SelectedIndex == ItemCount - 1) return;
+        RaiseItemInvoked(item);
     }
 
     private void RaiseItemInvoked(object item)
@@ -159,6 +240,8 @@ public sealed class MdBreadcrumb : ListBox
         {
             if (model.Command?.CanExecute(model.CommandParameter) == true)
                 model.Command.Execute(model.CommandParameter);
+            else if (Uri.TryCreate(model.Href, UriKind.Absolute, out var uri) && TopLevel.GetTopLevel(this)?.Launcher is { } launcher)
+                _ = launcher.LaunchUriAsync(uri);
         }
 
         if (ItemInvokedCommand?.CanExecute(item) == true)

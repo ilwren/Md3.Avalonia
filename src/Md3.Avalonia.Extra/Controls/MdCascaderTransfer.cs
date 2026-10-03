@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
@@ -33,13 +34,16 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
     public static readonly DirectProperty<MdCascader, string> DisplayTextProperty = AvaloniaProperty.RegisterDirect<MdCascader, string>(nameof(DisplayText), control => control.DisplayText);
     public static readonly DirectProperty<MdCascader, IReadOnlyList<MdCascaderItem>> SelectedPathProperty = AvaloniaProperty.RegisterDirect<MdCascader, IReadOnlyList<MdCascaderItem>>(nameof(SelectedPath), control => control.SelectedPath);
     public static readonly DirectProperty<MdCascader, IReadOnlyList<IReadOnlyList<MdCascaderItem>>> ColumnsProperty = AvaloniaProperty.RegisterDirect<MdCascader, IReadOnlyList<IReadOnlyList<MdCascaderItem>>>(nameof(Columns), control => control.Columns);
+    public static readonly DirectProperty<MdCascader, bool> IsPopupOpenProperty = AvaloniaProperty.RegisterDirect<MdCascader, bool>(nameof(IsPopupOpen), control => control.IsPopupOpen);
     private IReadOnlyList<MdCascaderItem> _selectedPath = Array.Empty<MdCascaderItem>();
     private string _displayText = string.Empty;
     private IReadOnlyList<IReadOnlyList<MdCascaderItem>> _columns = Array.Empty<IReadOnlyList<MdCascaderItem>>();
+    private bool _isPopupOpen;
     private readonly MdPresenceController _presence;
     private ItemsControl? _columnsHost;
     private Button? _anchorButton;
     private Border? _surface;
+    private Popup? _popup;
     private Path? _arrow;
     private int _openStateVersion;
     private bool _isAttached;
@@ -53,8 +57,9 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
     }
     public MdCascader()
     {
-        _presence = new MdPresenceController(value => PseudoClasses.Set(":present", value));
+        _presence = new MdPresenceController(SetPopupPresence);
         _presence.Initialize(IsDropDownOpen);
+        AutomationProperties.SetName(this, Label ?? "Hierarchy selector");
         Reset();
         UpdateOpenState();
     }
@@ -69,6 +74,12 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
     public string? PlaceholderText { get => GetValue(PlaceholderTextProperty); set => SetValue(PlaceholderTextProperty, value); }
     public string PathSeparator { get => GetValue(PathSeparatorProperty); set => SetValue(PathSeparatorProperty, value); }
     public string DisplayText => _displayText;
+    /// <summary>The actual popup-host lifetime, including the exit-motion interval.</summary>
+    public bool IsPopupOpen
+    {
+        get => _isPopupOpen;
+        private set => SetAndRaise(IsPopupOpenProperty, ref _isPopupOpen, value);
+    }
     public IReadOnlyList<MdCascaderItem> SelectedPath => _selectedPath;
     public IReadOnlyList<IReadOnlyList<MdCascaderItem>> Columns => _columns;
     public event EventHandler<IReadOnlyList<MdCascaderItem>>? SelectionChanged;
@@ -86,15 +97,23 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
     public void Clear() { SetAndRaise(SelectedPathProperty, ref _selectedPath, Array.Empty<MdCascaderItem>()); UpdateDisplayText(); Reset(); SelectionChanged?.Invoke(this, SelectedPath); }
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
-        if (_columnsHost is not null) _columnsHost.RemoveHandler(ListBox.SelectionChangedEvent, OnColumnSelectionChanged);
+        if (_columnsHost is not null)
+        {
+            _columnsHost.RemoveHandler(ListBox.SelectionChangedEvent, OnColumnSelectionChanged);
+            _columnsHost.RemoveHandler(InputElement.KeyDownEvent, OnPopupKeyDown);
+        }
         if (_anchorButton is not null) _anchorButton.Click -= OnAnchorClick;
+        if (_popup is not null) _popup.Closed -= OnPopupClosed;
         base.OnApplyTemplate(e);
         _columnsHost = e.NameScope.Find<ItemsControl>("PART_Columns");
         _anchorButton = e.NameScope.Find<Button>("PART_Anchor");
         _surface = e.NameScope.Find<Border>("PART_Surface");
+        _popup = e.NameScope.Find<Popup>("PART_Popup");
         _arrow = e.NameScope.Find<Path>("PART_Arrow");
         _columnsHost?.AddHandler(ListBox.SelectionChangedEvent, OnColumnSelectionChanged);
+        _columnsHost?.AddHandler(InputElement.KeyDownEvent, OnPopupKeyDown, RoutingStrategies.Tunnel, true);
         if (_anchorButton is not null) _anchorButton.Click += OnAnchorClick;
+        if (_popup is not null) _popup.Closed += OnPopupClosed;
         UpdateMotion();
     }
 
@@ -117,9 +136,51 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
         SetCurrentValue(IsDropDownOpenProperty, !IsDropDownOpen);
     protected override void OnKeyDown(KeyEventArgs e)
     {
-        if (e.Key == Key.Escape) { IsDropDownOpen = false; e.Handled = true; }
-        else if (e.Key is Key.Enter or Key.Space) { IsDropDownOpen = !IsDropDownOpen; e.Handled = true; }
-        else base.OnKeyDown(e);
+        if (!HandlePopupKey(e)) base.OnKeyDown(e);
+    }
+
+    private void OnPopupKeyDown(object? sender, KeyEventArgs e) => HandlePopupKey(e);
+
+    private bool HandlePopupKey(KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape && IsDropDownOpen)
+        {
+            IsDropDownOpen = false;
+            _anchorButton?.Focus();
+            e.Handled = true;
+            return true;
+        }
+
+        if (!IsDropDownOpen && e.Key is Key.Enter or Key.Space or Key.Down)
+        {
+            IsDropDownOpen = true;
+            FocusColumn(Math.Max(0, SelectedPath.Count - 1));
+            e.Handled = true;
+            return true;
+        }
+
+        if (IsDropDownOpen && e.Source is Visual source)
+        {
+            var lists = GetColumnLists();
+            var current = source as ListBox ?? source.FindAncestorOfType<ListBox>();
+            var level = current is null ? -1 : Array.IndexOf(lists, current);
+            var expandKey = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft ? Key.Left : Key.Right;
+            var collapseKey = expandKey == Key.Right ? Key.Left : Key.Right;
+            if (level >= 0 && e.Key == expandKey && level + 1 < lists.Length)
+            {
+                FocusColumn(level + 1);
+                e.Handled = true;
+                return true;
+            }
+            if (level > 0 && e.Key == collapseKey)
+            {
+                TrimPath(level);
+                FocusColumn(level - 1);
+                e.Handled = true;
+                return true;
+            }
+        }
+        return false;
     }
     private void OnColumnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
@@ -127,8 +188,38 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
         var level = Enumerable.Range(0, Columns.Count).FirstOrDefault(index => ReferenceEquals(Columns[index], list.ItemsSource));
         Select(level, item);
         list.SelectedItem = null;
+        if (item.HasChildren) Dispatcher.UIThread.Post(() => FocusColumn(level + 1), DispatcherPriority.Input);
         e.Handled = true;
     }
+
+    private ListBox[] GetColumnLists() => _columnsHost?.GetVisualDescendants().OfType<ListBox>().ToArray() ?? [];
+
+    private void FocusColumn(int level)
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            var lists = GetColumnLists();
+            if (lists.Length == 0) return;
+            level = Math.Clamp(level, 0, lists.Length - 1);
+            var list = lists[level];
+            if (list.SelectedIndex < 0 && list.ItemCount > 0) list.SelectedIndex = 0;
+            list.Focus(NavigationMethod.Directional);
+            (list.ContainerFromIndex(Math.Max(0, list.SelectedIndex)) as Control)?.Focus(NavigationMethod.Directional);
+        }, DispatcherPriority.Input);
+    }
+
+    private void TrimPath(int level)
+    {
+        if (level <= 0 || SelectedPath.Count < level) return;
+        var path = SelectedPath.Take(level).ToArray();
+        SetAndRaise(SelectedPathProperty, ref _selectedPath, path);
+        var columns = new List<IReadOnlyList<MdCascaderItem>> { (ItemsSource ?? Array.Empty<MdCascaderItem>()).ToArray() };
+        foreach (var selected in path)
+            if (selected.Children is { Count: > 0 }) columns.Add(selected.Children);
+        SetAndRaise(ColumnsProperty, ref _columns, columns);
+        UpdateDisplayText();
+    }
+
     private void Reset()
     {
         IReadOnlyList<IReadOnlyList<MdCascaderItem>> value = [(ItemsSource ?? Array.Empty<MdCascaderItem>()).ToArray()];
@@ -139,10 +230,24 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
     {
         var value = SelectedPath.Count == 0 ? PlaceholderText ?? string.Empty : string.Join(PathSeparator, SelectedPath.Select(item => item.Label));
         SetAndRaise(DisplayTextProperty, ref _displayText, value);
+        AutomationProperties.SetName(this, Label ?? "Hierarchy selector");
+        AutomationProperties.SetHelpText(this, value);
         PseudoClasses.Set(":has-value", SelectedPath.Count > 0);
     }
 
     void IMdPopupPresenceOwner.ClosePopupImmediately() => _presence.Initialize(false);
+
+    private void SetPopupPresence(bool value)
+    {
+        IsPopupOpen = value;
+        PseudoClasses.Set(":present", value);
+    }
+
+    private void OnPopupClosed(object? sender, EventArgs e)
+    {
+        if (IsDropDownOpen) SetCurrentValue(IsDropDownOpenProperty, false);
+        _presence.Initialize(false);
+    }
 
     private void UpdateOpenState()
     {
@@ -151,6 +256,7 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
         if (IsDropDownOpen)
         {
             _presence.Update(true, TimeSpan.Zero);
+            if (_isAttached) FocusColumn(Math.Max(0, SelectedPath.Count - 1));
             if (MdMotion.GetScheme(this) == MdMotionScheme.None)
             {
                 PseudoClasses.Set(":closed", false);
@@ -202,8 +308,15 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
     }
 }
 
+public enum MdTransferLayoutMode
+{
+    Auto,
+    Standard,
+    Compact
+}
+
 /// <summary>Dual-list transfer control with checked moves, select-all, pointer drag/drop, keyboard APIs, and stable source order.</summary>
-[PseudoClasses(":dragging", ":drag-to-source", ":drag-to-target")]
+[PseudoClasses(":dragging", ":drag-to-source", ":drag-to-target", ":compact", ":rtl")]
 public sealed class MdTransfer : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable?> ItemsSourceProperty = AvaloniaProperty.Register<MdTransfer, IEnumerable?>(nameof(ItemsSource));
@@ -211,10 +324,13 @@ public sealed class MdTransfer : TemplatedControl
     public static readonly StyledProperty<string?> SourceFilterProperty = AvaloniaProperty.Register<MdTransfer, string?>(nameof(SourceFilter));
     public static readonly StyledProperty<string?> TargetFilterProperty = AvaloniaProperty.Register<MdTransfer, string?>(nameof(TargetFilter));
     public static readonly StyledProperty<bool> IsDragEnabledProperty = AvaloniaProperty.Register<MdTransfer, bool>(nameof(IsDragEnabled), true);
+    public static readonly StyledProperty<MdTransferLayoutMode> LayoutModeProperty = AvaloniaProperty.Register<MdTransfer, MdTransferLayoutMode>(nameof(LayoutMode));
     public static readonly DirectProperty<MdTransfer, IReadOnlyList<object?>> AvailableItemsProperty = AvaloniaProperty.RegisterDirect<MdTransfer, IReadOnlyList<object?>>(nameof(AvailableItems), control => control.AvailableItems);
     public static readonly DirectProperty<MdTransfer, IReadOnlyList<object?>> TargetItemsProperty = AvaloniaProperty.RegisterDirect<MdTransfer, IReadOnlyList<object?>>(nameof(TargetItems), control => control.TargetItems);
+    public static readonly DirectProperty<MdTransfer, string> StatusTextProperty = AvaloniaProperty.RegisterDirect<MdTransfer, string>(nameof(StatusText), control => control.StatusText);
     private IReadOnlyList<object?> _available = Array.Empty<object?>();
     private IReadOnlyList<object?> _target = Array.Empty<object?>();
+    private string _statusText = string.Empty;
     private ListBox? _availableList;
     private ListBox? _targetList;
     private Button? _moveTarget;
@@ -234,16 +350,27 @@ public sealed class MdTransfer : TemplatedControl
         SelectedItemsProperty.Changed.AddClassHandler<MdTransfer>((control, _) => control.Refresh());
         SourceFilterProperty.Changed.AddClassHandler<MdTransfer>((control, _) => control.Refresh());
         TargetFilterProperty.Changed.AddClassHandler<MdTransfer>((control, _) => control.Refresh());
+        LayoutModeProperty.Changed.AddClassHandler<MdTransfer>((control, _) => control.UpdateLayoutState());
+        BoundsProperty.Changed.AddClassHandler<MdTransfer>((control, _) => control.UpdateLayoutState());
+        FlowDirectionProperty.Changed.AddClassHandler<MdTransfer>((control, _) => control.UpdateLayoutState());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdTransfer>((control, _) => control.CancelTransferMotion());
     }
-    public MdTransfer() => Refresh();
+    public MdTransfer()
+    {
+        AutomationProperties.SetName(this, "Transfer list");
+        AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Polite);
+        Refresh();
+        UpdateLayoutState();
+    }
     public IEnumerable? ItemsSource { get => GetValue(ItemsSourceProperty); set => SetValue(ItemsSourceProperty, value); }
     public IEnumerable? SelectedItems { get => GetValue(SelectedItemsProperty); set => SetValue(SelectedItemsProperty, value); }
     public string? SourceFilter { get => GetValue(SourceFilterProperty); set => SetValue(SourceFilterProperty, value); }
     public string? TargetFilter { get => GetValue(TargetFilterProperty); set => SetValue(TargetFilterProperty, value); }
     public bool IsDragEnabled { get => GetValue(IsDragEnabledProperty); set => SetValue(IsDragEnabledProperty, value); }
+    public MdTransferLayoutMode LayoutMode { get => GetValue(LayoutModeProperty); set => SetValue(LayoutModeProperty, value); }
     public IReadOnlyList<object?> AvailableItems => _available;
     public IReadOnlyList<object?> TargetItems => _target;
+    public string StatusText { get => _statusText; private set => SetAndRaise(StatusTextProperty, ref _statusText, value); }
     public event EventHandler? SelectionChanged;
     public void MoveToTarget(IEnumerable<object?> items)
     {
@@ -253,7 +380,10 @@ public sealed class MdTransfer : TemplatedControl
         var previousLayout = CaptureItemLayout();
         foreach (var item in moved) current.Add(item);
         SelectedItems = current;
+        StatusText = $"Moved {moved.Length} item{(moved.Length == 1 ? string.Empty : "s")} to selected";
+        AutomationProperties.SetHelpText(this, StatusText);
         ScheduleTransferMotion(moved, previousLayout);
+        FocusTransferredItem(moved[0], _targetList);
         SelectionChanged?.Invoke(this, EventArgs.Empty);
     }
     public void MoveToSource(IEnumerable<object?> items)
@@ -264,7 +394,10 @@ public sealed class MdTransfer : TemplatedControl
         if (moved.Length == 0) return;
         var previousLayout = CaptureItemLayout();
         SelectedItems = current.Where(item => !requested.Contains(item)).ToArray();
+        StatusText = $"Moved {moved.Length} item{(moved.Length == 1 ? string.Empty : "s")} to available";
+        AutomationProperties.SetHelpText(this, StatusText);
         ScheduleTransferMotion(moved, previousLayout);
+        FocusTransferredItem(moved[0], _availableList);
         SelectionChanged?.Invoke(this, EventArgs.Empty);
     }
     public void MoveAllToTarget() => MoveToTarget(AvailableItems);
@@ -283,9 +416,33 @@ public sealed class MdTransfer : TemplatedControl
         if (_moveSource is not null) _moveSource.Click += OnMoveSource;
         if (_moveAllTarget is not null) _moveAllTarget.Click += OnMoveAllTarget;
         if (_moveAllSource is not null) _moveAllSource.Click += OnMoveAllSource;
-        _availableList?.AddHandler(InputElement.PointerPressedEvent, OnListPointerPressed, RoutingStrategies.Tunnel, true);
-        _targetList?.AddHandler(InputElement.PointerPressedEvent, OnListPointerPressed, RoutingStrategies.Tunnel, true);
+        if (_availableList is not null)
+        {
+            AutomationProperties.SetName(_availableList, "Available items");
+            _availableList.KeyDown += OnListKeyDown;
+            _availableList.AddHandler(InputElement.PointerPressedEvent, OnListPointerPressed, RoutingStrategies.Tunnel, true);
+        }
+        if (_targetList is not null)
+        {
+            AutomationProperties.SetName(_targetList, "Selected items");
+            _targetList.KeyDown += OnListKeyDown;
+            _targetList.AddHandler(InputElement.PointerPressedEvent, OnListPointerPressed, RoutingStrategies.Tunnel, true);
+        }
+        if (_moveTarget is not null) AutomationProperties.SetName(_moveTarget, "Move selected to target");
+        if (_moveSource is not null) AutomationProperties.SetName(_moveSource, "Move selected to source");
+        if (_moveAllTarget is not null) AutomationProperties.SetName(_moveAllTarget, "Move all to target");
+        if (_moveAllSource is not null) AutomationProperties.SetName(_moveAllSource, "Move all to source");
+        UpdateLayoutState();
     }
+
+    private void UpdateLayoutState()
+    {
+        var compact = LayoutMode == MdTransferLayoutMode.Compact ||
+                      (LayoutMode == MdTransferLayoutMode.Auto && Bounds.Width > 0 && Bounds.Width < 600);
+        PseudoClasses.Set(":compact", compact);
+        PseudoClasses.Set(":rtl", FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft);
+    }
+
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         FinishDragVisual();
@@ -300,13 +457,49 @@ public sealed class MdTransfer : TemplatedControl
 
     private void DetachTemplateHandlers()
     {
-        _availableList?.RemoveHandler(InputElement.PointerPressedEvent, OnListPointerPressed);
-        _targetList?.RemoveHandler(InputElement.PointerPressedEvent, OnListPointerPressed);
+        if (_availableList is not null)
+        {
+            _availableList.RemoveHandler(InputElement.PointerPressedEvent, OnListPointerPressed);
+            _availableList.KeyDown -= OnListKeyDown;
+        }
+        if (_targetList is not null)
+        {
+            _targetList.RemoveHandler(InputElement.PointerPressedEvent, OnListPointerPressed);
+            _targetList.KeyDown -= OnListKeyDown;
+        }
         if (_moveTarget is not null) _moveTarget.Click -= OnMoveTarget;
         if (_moveSource is not null) _moveSource.Click -= OnMoveSource;
         if (_moveAllTarget is not null) _moveAllTarget.Click -= OnMoveAllTarget;
         if (_moveAllSource is not null) _moveAllSource.Click -= OnMoveAllSource;
     }
+    private void OnListKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (sender is not ListBox list || !e.KeyModifiers.HasFlag(KeyModifiers.Control)) return;
+        var moveToTargetKey = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft ? Key.Left : Key.Right;
+        var moveToSourceKey = moveToTargetKey == Key.Right ? Key.Left : Key.Right;
+        if (ReferenceEquals(list, _availableList) && (e.Key == moveToTargetKey || e.Key == Key.Enter))
+        {
+            MoveToTarget((list.SelectedItems ?? Array.Empty<object>()).Cast<object?>());
+            e.Handled = true;
+        }
+        else if (ReferenceEquals(list, _targetList) && (e.Key == moveToSourceKey || e.Key == Key.Back))
+        {
+            MoveToSource((list.SelectedItems ?? Array.Empty<object>()).Cast<object?>());
+            e.Handled = true;
+        }
+    }
+
+    private void FocusTransferredItem(object? item, ListBox? destination)
+    {
+        if (destination is null) return;
+        Dispatcher.UIThread.Post(() =>
+        {
+            destination.SelectedItem = item;
+            destination.ScrollIntoView(item);
+            (destination.ContainerFromItem(item) as Control)?.Focus(NavigationMethod.Directional);
+        }, DispatcherPriority.Input);
+    }
+
     private void OnListPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!IsDragEnabled || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
@@ -514,6 +707,9 @@ public sealed class MdTransfer : TemplatedControl
         var target = all.Where(item => selected.Contains(item) && Matches(item, TargetFilter)).ToArray();
         SetAndRaise(AvailableItemsProperty, ref _available, available);
         SetAndRaise(TargetItemsProperty, ref _target, target);
+        if (string.IsNullOrWhiteSpace(StatusText))
+            StatusText = $"{available.Length} available, {target.Length} selected";
+        AutomationProperties.SetHelpText(this, StatusText);
     }
     private static bool Matches(object? item, string? filter) => string.IsNullOrWhiteSpace(filter) || item?.ToString()?.Contains(filter.Trim(), StringComparison.OrdinalIgnoreCase) == true;
 }

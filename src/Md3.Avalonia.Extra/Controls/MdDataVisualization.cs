@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Windows.Input;
 using Avalonia;
@@ -550,12 +551,30 @@ public interface IMdRichEditorAdapter
     event EventHandler? StateChanged;
 }
 
+/// <summary>Optional formatting-state contract used by toggle-style rich-editor commands.</summary>
+public interface IMdRichEditorStateAdapter
+{
+    bool IsCommandChecked(MdRichEditorCommand command);
+}
+
+public sealed record MdRichEditorCommandDescriptor(
+    MdRichEditorCommand Command,
+    string Name,
+    string Glyph,
+    string? Shortcut,
+    bool IsToggle,
+    bool IsChecked,
+    bool IsEnabled)
+{
+    public string AccessibleDescription => string.IsNullOrEmpty(Shortcut) ? Name : $"{Name}, {Shortcut}";
+}
+
 /// <summary>
 /// Built-in lightweight rich-text adapter for an Avalonia <see cref="TextBox"/>. Commands modify
 /// the selected source using portable rich-text markers and immediately rebuild an optional
 /// WYSIWYG preview panel. Applications can still replace it with a document-engine adapter.
 /// </summary>
-public sealed class MdTextBoxRichEditorAdapter : IMdRichEditorAdapter
+public sealed class MdTextBoxRichEditorAdapter : IMdRichEditorAdapter, IMdRichEditorStateAdapter
 {
     private readonly TextBox _editor;
     private readonly Panel? _previewHost;
@@ -580,6 +599,20 @@ public sealed class MdTextBoxRichEditorAdapter : IMdRichEditorAdapter
         MdRichEditorCommand.Undo => _editor.CanUndo,
         MdRichEditorCommand.Redo => _editor.CanRedo,
         _ => !_editor.IsReadOnly
+    };
+
+    public bool IsCommandChecked(MdRichEditorCommand command) => command switch
+    {
+        MdRichEditorCommand.Bold => HasSelectionWrapper("**", "**"),
+        MdRichEditorCommand.Italic => HasSelectionWrapper("_", "_"),
+        MdRichEditorCommand.Underline => HasSelectionWrapper("<u>", "</u>"),
+        MdRichEditorCommand.StrikeThrough => HasSelectionWrapper("~~", "~~"),
+        MdRichEditorCommand.Code => HasSelectionWrapper("`", "`"),
+        MdRichEditorCommand.Heading => CurrentLineStartsWith("# ", "## ", "### "),
+        MdRichEditorCommand.Quote => CurrentLineStartsWith("> "),
+        MdRichEditorCommand.BulletedList => CurrentLineStartsWith("- ", "* "),
+        MdRichEditorCommand.NumberedList => CurrentLineStartsWith("1. "),
+        _ => false
     };
 
     public void Execute(MdRichEditorCommand command, object? parameter = null)
@@ -798,6 +831,24 @@ public sealed class MdTextBoxRichEditorAdapter : IMdRichEditorAdapter
         StateChanged?.Invoke(this, EventArgs.Empty);
     }
 
+    private bool HasSelectionWrapper(string prefix, string suffix)
+    {
+        var text = _editor.Text ?? string.Empty;
+        var start = Math.Clamp(Math.Min(_editor.SelectionStart, _editor.SelectionEnd), 0, text.Length);
+        var end = Math.Clamp(Math.Max(_editor.SelectionStart, _editor.SelectionEnd), start, text.Length);
+        return start >= prefix.Length && end + suffix.Length <= text.Length &&
+               text.AsSpan(start - prefix.Length, prefix.Length).SequenceEqual(prefix) &&
+               text.AsSpan(end, suffix.Length).SequenceEqual(suffix);
+    }
+
+    private bool CurrentLineStartsWith(params string[] prefixes)
+    {
+        var text = _editor.Text ?? string.Empty;
+        var caret = Math.Clamp(_editor.CaretIndex, 0, text.Length);
+        var lineStart = caret == 0 ? 0 : text.LastIndexOf('\n', caret - 1) + 1;
+        return prefixes.Any(prefix => text.AsSpan(lineStart).StartsWith(prefix, StringComparison.Ordinal));
+    }
+
     private void WrapSelection(string prefix, string suffix, string fallback)
     {
         var text = _editor.Text ?? string.Empty;
@@ -875,13 +926,25 @@ public class MdRichEditor : ContentControl
 {
     public static readonly StyledProperty<IMdRichEditorAdapter?> AdapterProperty = AvaloniaProperty.Register<MdRichEditor, IMdRichEditorAdapter?>(nameof(Adapter));
     public static readonly StyledProperty<IEnumerable<MdRichEditorCommand>?> ToolbarCommandsProperty = AvaloniaProperty.Register<MdRichEditor, IEnumerable<MdRichEditorCommand>?>(nameof(ToolbarCommands));
-    static MdRichEditor() => AdapterProperty.Changed.AddClassHandler<MdRichEditor>((control, _) => control.OnAdapterChanged(control.Adapter));
-    public MdRichEditor() => ToolbarCommands = Enum.GetValues<MdRichEditorCommand>();
+    public static readonly DirectProperty<MdRichEditor, IReadOnlyList<MdRichEditorCommandDescriptor>> ToolbarItemsProperty =
+        AvaloniaProperty.RegisterDirect<MdRichEditor, IReadOnlyList<MdRichEditorCommandDescriptor>>(nameof(ToolbarItems), control => control.ToolbarItems);
+    static MdRichEditor()
+    {
+        AdapterProperty.Changed.AddClassHandler<MdRichEditor>((control, _) => control.OnAdapterChanged(control.Adapter));
+        ToolbarCommandsProperty.Changed.AddClassHandler<MdRichEditor>((control, _) => control.RefreshToolbarItems());
+    }
+    public MdRichEditor()
+    {
+        ToolbarCommands = Enum.GetValues<MdRichEditorCommand>();
+        RefreshToolbarItems();
+    }
     public IMdRichEditorAdapter? Adapter { get => GetValue(AdapterProperty); set => SetValue(AdapterProperty, value); }
     public IEnumerable<MdRichEditorCommand>? ToolbarCommands { get => GetValue(ToolbarCommandsProperty); set => SetValue(ToolbarCommandsProperty, value); }
+    public IReadOnlyList<MdRichEditorCommandDescriptor> ToolbarItems => _toolbarItems;
     public event EventHandler? EditorStateChanged;
     private ItemsControl? _toolbar;
     private IMdRichEditorAdapter? _subscribedAdapter;
+    private IReadOnlyList<MdRichEditorCommandDescriptor> _toolbarItems = Array.Empty<MdRichEditorCommandDescriptor>();
     public bool Execute(MdRichEditorCommand command, object? parameter = null)
     {
         if (Adapter?.CanExecute(command, parameter) != true) return false; Adapter.Execute(command, parameter); return true;
@@ -898,14 +961,22 @@ public class MdRichEditor : ContentControl
         if (e.Source is Visual source)
         {
             var btn = source.GetVisualAncestors().Prepend(source).OfType<Button>().FirstOrDefault();
-            if (btn?.DataContext is MdRichEditorCommand command)
+            if (btn?.DataContext is MdRichEditorCommandDescriptor descriptor)
+            {
+                Execute(descriptor.Command);
+                RefreshToolbarItems();
+                e.Handled = true;
+            }
+            else if (btn?.DataContext is MdRichEditorCommand command)
             {
                 Execute(command);
+                RefreshToolbarItems();
                 e.Handled = true;
             }
             else if (btn?.CommandParameter is MdRichEditorCommand cmdParam)
             {
                 Execute(cmdParam);
+                RefreshToolbarItems();
                 e.Handled = true;
             }
         }
@@ -915,8 +986,45 @@ public class MdRichEditor : ContentControl
         if (_subscribedAdapter is not null) _subscribedAdapter.StateChanged -= OnAdapterStateChanged;
         _subscribedAdapter = newAdapter;
         if (_subscribedAdapter is not null) _subscribedAdapter.StateChanged += OnAdapterStateChanged;
+        RefreshToolbarItems();
     }
-    private void OnAdapterStateChanged(object? sender, EventArgs e) => EditorStateChanged?.Invoke(this, EventArgs.Empty);
+
+    private void OnAdapterStateChanged(object? sender, EventArgs e)
+    {
+        RefreshToolbarItems();
+        EditorStateChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void RefreshToolbarItems()
+    {
+        var stateAdapter = Adapter as IMdRichEditorStateAdapter;
+        var items = (ToolbarCommands ?? Array.Empty<MdRichEditorCommand>()).Select(command =>
+            new MdRichEditorCommandDescriptor(
+                command,
+                MdRichEditorCommandConverters.GetTooltip(command),
+                MdRichEditorCommandConverters.GetGlyph(command),
+                GetShortcut(command),
+                IsToggleCommand(command),
+                stateAdapter?.IsCommandChecked(command) == true,
+                Adapter?.CanExecute(command) == true)).ToArray();
+        SetAndRaise(ToolbarItemsProperty, ref _toolbarItems, items);
+    }
+
+    private static bool IsToggleCommand(MdRichEditorCommand command) => command is
+        MdRichEditorCommand.Bold or MdRichEditorCommand.Italic or MdRichEditorCommand.Underline or
+        MdRichEditorCommand.StrikeThrough or MdRichEditorCommand.Heading or MdRichEditorCommand.Quote or
+        MdRichEditorCommand.Code or MdRichEditorCommand.BulletedList or MdRichEditorCommand.NumberedList;
+
+    private static string? GetShortcut(MdRichEditorCommand command) => command switch
+    {
+        MdRichEditorCommand.Bold => "Ctrl+B",
+        MdRichEditorCommand.Italic => "Ctrl+I",
+        MdRichEditorCommand.Underline => "Ctrl+U",
+        MdRichEditorCommand.Link => "Ctrl+K",
+        MdRichEditorCommand.Undo => "Ctrl+Z",
+        MdRichEditorCommand.Redo => "Ctrl+Y",
+        _ => null
+    };
 }
 
 /// <summary>Long-form compatibility name for MdRichEditor.</summary>
@@ -941,7 +1049,7 @@ public sealed record MdChatMessage(
     string? Initials = null);
 
 /// <summary>Role-aware message bubble used by <see cref="MdChatView"/>.</summary>
-[PseudoClasses(":user", ":assistant", ":system", ":selected", ":failed", ":reply")]
+[PseudoClasses(":user", ":assistant", ":system", ":selected", ":failed", ":reply", ":text-content")]
 public sealed class MdChatMessagePresenter : ContentControl
 {
     public static readonly StyledProperty<MdChatMessage?> MessageProperty =
@@ -955,6 +1063,8 @@ public sealed class MdChatMessagePresenter : ContentControl
         AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(AvatarGlyph), control => control.AvatarGlyph);
     public static readonly DirectProperty<MdChatMessagePresenter, string> SenderInitialsProperty =
         AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(SenderInitials), control => control.SenderInitials);
+    public static readonly DirectProperty<MdChatMessagePresenter, string?> TextContentProperty =
+        AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string?>(nameof(TextContent), control => control.TextContent);
 
     static MdChatMessagePresenter()
     {
@@ -967,6 +1077,7 @@ public sealed class MdChatMessagePresenter : ContentControl
     public bool IsSelected { get => GetValue(IsSelectedProperty); set => SetValue(IsSelectedProperty, value); }
 
     public string FormattedTime => Message?.Timestamp.LocalDateTime.ToString("t", CultureInfo.CurrentCulture) ?? string.Empty;
+    public string? TextContent => Message?.Content as string;
     public string AvatarGlyph => Message?.AvatarGlyph ?? (Message?.Role == MdChatMessageRole.Assistant ? "\uf06c" : "\ue7fd");
     public string SenderInitials
     {
@@ -989,9 +1100,24 @@ public sealed class MdChatMessagePresenter : ContentControl
         PseudoClasses.Set(":selected", IsSelected);
         PseudoClasses.Set(":failed", Message?.State == MdAsyncRequestState.Error);
         PseudoClasses.Set(":reply", Message?.ReplyPreview is not null);
+        PseudoClasses.Set(":text-content", Message?.Content is string);
         RaisePropertyChanged(FormattedTimeProperty, string.Empty, FormattedTime);
         RaisePropertyChanged(AvatarGlyphProperty, string.Empty, AvatarGlyph);
         RaisePropertyChanged(SenderInitialsProperty, string.Empty, SenderInitials);
+        RaisePropertyChanged(TextContentProperty, null, TextContent);
+
+        var sender = Message?.Sender;
+        if (string.IsNullOrWhiteSpace(sender)) sender = Message?.Role switch
+        {
+            MdChatMessageRole.Assistant => "Assistant",
+            MdChatMessageRole.System => "System",
+            _ => "You"
+        };
+        var state = Message?.State == MdAsyncRequestState.Error
+            ? $"Send failed. {Message.ErrorText}".Trim()
+            : Message?.State.ToString();
+        AutomationProperties.SetName(this, $"{sender}, {FormattedTime}. {Message?.Content}. {state}".Trim());
+        AutomationProperties.SetHelpText(this, IsSelected ? "Selected message" : "Message");
     }
 }
 
@@ -1014,6 +1140,7 @@ public sealed class MdChatView : TemplatedControl
     public static readonly StyledProperty<bool> AllowMultipleSelectionProperty = AvaloniaProperty.Register<MdChatView, bool>(nameof(AllowMultipleSelection), true);
     public static readonly DirectProperty<MdChatView, int> SelectionCountProperty = AvaloniaProperty.RegisterDirect<MdChatView, int>(nameof(SelectionCount), control => control.SelectionCount);
     public static readonly DirectProperty<MdChatView, MdChatMessage?> QuotedMessageProperty = AvaloniaProperty.RegisterDirect<MdChatView, MdChatMessage?>(nameof(QuotedMessage), control => control.QuotedMessage);
+    public static readonly DirectProperty<MdChatView, string> StatusTextProperty = AvaloniaProperty.RegisterDirect<MdChatView, string>(nameof(StatusText), control => control.StatusText);
 
     private Button? _sendButton;
     private Button? _attachmentButton;
@@ -1026,9 +1153,15 @@ public sealed class MdChatView : TemplatedControl
     private TextBox? _composer;
     private int _selectionCount;
     private MdChatMessage? _quotedMessage;
+    private string _statusText = string.Empty;
     private bool _synchronizingSelection;
+    private INotifyCollectionChanged? _observedMessages;
 
-    static MdChatView() => MessagesSourceProperty.Changed.AddClassHandler<MdChatView>((control, _) => control.ReconcileSelection());
+    static MdChatView()
+    {
+        MessagesSourceProperty.Changed.AddClassHandler<MdChatView>((control, _) => control.OnMessagesSourceChanged());
+        IsBusyProperty.Changed.AddClassHandler<MdChatView>((control, _) => control.StatusText = control.IsBusy ? "Loading messages" : "Messages ready");
+    }
 
     public IEnumerable? MessagesSource { get => GetValue(MessagesSourceProperty); set => SetValue(MessagesSourceProperty, value); }
     public string? ComposerText { get => GetValue(ComposerTextProperty); set => SetValue(ComposerTextProperty, value); }
@@ -1042,6 +1175,7 @@ public sealed class MdChatView : TemplatedControl
     public bool AllowMultipleSelection { get => GetValue(AllowMultipleSelectionProperty); set => SetValue(AllowMultipleSelectionProperty, value); }
     public int SelectionCount => _selectionCount;
     public MdChatMessage? QuotedMessage => _quotedMessage;
+    public string StatusText { get => _statusText; private set => SetAndRaise(StatusTextProperty, ref _statusText, value); }
     public ObservableCollection<MdChatMessage> SelectedMessages { get; } = [];
     public Func<CancellationToken, ValueTask<IReadOnlyList<MdChatMessage>>>? HistoryProvider { get; set; }
 
@@ -1059,6 +1193,7 @@ public sealed class MdChatView : TemplatedControl
         if (string.IsNullOrEmpty(text) || IsBusy) return false;
         if (SendCommand?.CanExecute(text) == true) SendCommand.Execute(text);
         MessageSubmitted?.Invoke(this, text);
+        StatusText = "Message submitted";
         ComposerText = string.Empty;
         CancelQuote();
         return true;
@@ -1087,6 +1222,7 @@ public sealed class MdChatView : TemplatedControl
         if (DeleteMessagesCommand?.CanExecute(selected) == true) DeleteMessagesCommand.Execute(selected);
         DeleteRequested?.Invoke(this, selected);
         ClearSelection();
+        StatusText = $"Deleted {selected.Length} message{(selected.Length == 1 ? string.Empty : "s")}";
         return true;
     }
 
@@ -1114,6 +1250,7 @@ public sealed class MdChatView : TemplatedControl
         if (message.State != MdAsyncRequestState.Error) return false;
         if (RetryMessageCommand?.CanExecute(message) == true) RetryMessageCommand.Execute(message);
         RetryRequested?.Invoke(this, message);
+        StatusText = $"Retrying message from {message.Sender ?? message.Role.ToString()}";
         return true;
     }
 
@@ -1123,6 +1260,19 @@ public sealed class MdChatView : TemplatedControl
         IsBusy = true;
         try { HistoryLoaded?.Invoke(this, await HistoryProvider(cancellationToken)); }
         finally { IsBusy = false; }
+    }
+
+    protected override void OnAttachedToVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        ObserveMessagesSource();
+    }
+
+    protected override void OnDetachedFromVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        if (_observedMessages is not null) _observedMessages.CollectionChanged -= OnMessagesCollectionChanged;
+        _observedMessages = null;
+        base.OnDetachedFromVisualTree(e);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -1218,6 +1368,37 @@ public sealed class MdChatView : TemplatedControl
         finally { _synchronizingSelection = false; }
     }
 
+    private void OnMessagesSourceChanged()
+    {
+        ObserveMessagesSource();
+        ReconcileSelection();
+    }
+
+    private void ObserveMessagesSource()
+    {
+        var next = this.IsAttachedToVisualTree() ? MessagesSource as INotifyCollectionChanged : null;
+        if (ReferenceEquals(next, _observedMessages)) return;
+        if (_observedMessages is not null) _observedMessages.CollectionChanged -= OnMessagesCollectionChanged;
+        _observedMessages = next;
+        if (_observedMessages is not null) _observedMessages.CollectionChanged += OnMessagesCollectionChanged;
+    }
+
+    private void OnMessagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        ReconcileSelection();
+        var message = e.NewItems?.OfType<MdChatMessage>().LastOrDefault();
+        if (message is null) return;
+        var senderName = message.Sender ?? (message.Role switch
+        {
+            MdChatMessageRole.Assistant => "Assistant",
+            MdChatMessageRole.System => "System",
+            _ => "You"
+        });
+        StatusText = message.State == MdAsyncRequestState.Error
+            ? $"Message from {senderName} failed. {message.ErrorText}".Trim()
+            : $"New message from {senderName}: {message.Content}";
+    }
+
     private void ReconcileSelection()
     {
         var available = (MessagesSource ?? Array.Empty<object>()).OfType<MdChatMessage>().ToHashSet();
@@ -1230,6 +1411,7 @@ public sealed class MdChatView : TemplatedControl
     {
         SetAndRaise(SelectionCountProperty, ref _selectionCount, SelectedMessages.Count);
         PseudoClasses.Set(":selection", SelectionCount > 0);
+        StatusText = SelectionCount == 0 ? "Message selection cleared" : $"{SelectionCount} message{(SelectionCount == 1 ? string.Empty : "s")} selected";
         MessageSelectionChanged?.Invoke(this, SelectedMessages.ToArray());
     }
 

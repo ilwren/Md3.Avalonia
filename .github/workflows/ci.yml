@@ -30,7 +30,21 @@ jobs:
           python3 scripts/generate-fonts.py
 
       - name: Build Gallery Desktop
-        run: dotnet build gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj -c Release
+        shell: bash
+        run: |
+          set +e
+          set -o pipefail
+          dotnet build gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj -c Release 2>&1 | tee gallery-build.log
+          status=${PIPESTATUS[0]}
+          if [ "$status" -ne 0 ]; then
+            grep -E 'error (CS|AVLN|MSB)[0-9]+|: error :' gallery-build.log | head -50 | while IFS= read -r line; do
+              line=${line//'%'/'%25'}
+              line=${line//$'\r'/'%0D'}
+              line=${line//$'\n'/'%0A'}
+              echo "::error title=.NET build failed::$line"
+            done
+          fi
+          exit "$status"
 
       - name: Run Headless Tests
         run: dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --logger "trx;LogFileName=results.trx" --logger "console;verbosity=normal"

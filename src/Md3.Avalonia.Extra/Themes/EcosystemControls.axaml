@@ -19,8 +19,8 @@
     <Setter Property="InactiveBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
   </ControlTheme>
   <ControlTheme x:Key="MdBreadcrumbItemTheme" TargetType="ListBoxItem">
-    <Setter Property="MinHeight" Value="36" />
-    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="MinHeight" Value="48" />
+    <Setter Property="Padding" Value="8,8" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
