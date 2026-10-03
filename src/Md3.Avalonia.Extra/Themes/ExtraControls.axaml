@@ -50,13 +50,14 @@
               </StackPanel>
             </Grid>
           </Border>
-          <TextBlock x:Name="PART_Separator"
-                     Text="{Binding Separator, RelativeSource={RelativeSource AncestorType=eco:MdBreadcrumb}}"
-                     FontSize="16"
-                     Margin="2,0,4,0"
-                     VerticalAlignment="Center"
-                     Opacity="0.6"
-                     Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+          <ContentPresenter x:Name="PART_Separator"
+                            Content="{Binding Separator, RelativeSource={RelativeSource AncestorType=eco:MdBreadcrumb}}"
+                            ContentTemplate="{Binding SeparatorTemplate, RelativeSource={RelativeSource AncestorType=eco:MdBreadcrumb}}"
+                            TextElement.FontSize="16"
+                            Margin="2,0,4,0"
+                            VerticalAlignment="Center"
+                            Opacity="0.6"
+                            Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
         </StackPanel>
       </ControlTemplate>
     </Setter>
@@ -64,7 +65,6 @@
     <Style Selector="^:pressed /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" /></Style>
     <Style Selector="^:selected"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
     <Style Selector="^.current"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
-    <Style Selector="^.last /template/ TextBlock#PART_Separator"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^.has-icon /template/ Viewbox#PART_IconHost"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
   </ControlTheme>
@@ -80,12 +80,24 @@
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
                 Padding="{TemplateBinding Padding}">
-          <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled">
+          <ScrollViewer x:Name="PART_BreadcrumbScrollViewer"
+                        HorizontalScrollBarVisibility="Disabled"
+                        VerticalScrollBarVisibility="Disabled"
+                        IsScrollChainingEnabled="True">
             <ItemsPresenter x:Name="PART_ItemsPresenter"
                             ItemsPanel="{TemplateBinding ItemsPanel}" />
           </ScrollViewer>
         </Border>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:scroll-overflow">
+      <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></Setter>
+    </Style>
+    <Style Selector="^:collapse-overflow">
+      <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></Setter>
+    </Style>
+    <Style Selector="^:scroll-overflow /template/ ScrollViewer#PART_BreadcrumbScrollViewer">
+      <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+    </Style>
   </ControlTheme>
 </ResourceDictionary>

@@ -11,6 +11,9 @@ Usage:
                          [--configuration Release]
                          [--no-restore]
 
+The repository includes the pinned official Material Symbols Rounded fonts.
+Their provenance and checksums are verified before packaging.
+
 A .NET 10 SDK is required.
 EOF
 }
@@ -22,9 +25,6 @@ RESTORE=1
 
 while (($#)); do
   case "$1" in
-    --font)
-      [[ $# -ge 2 ]] || { echo "error: --font requires a path" >&2; exit 2; }
-      shift 2 ;;
     --output)
       [[ $# -ge 2 ]] || { echo "error: --output requires a path" >&2; exit 2; }
       OUTPUT="$2"; shift 2 ;;
@@ -59,12 +59,13 @@ PROJECTS=(
   "$ROOT/src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj"
 )
 
-if [[ ! -f "$ROOT/src/Md3.Avalonia.Icons/Assets/Fonts/MaterialSymbolsRounded.ttf" ]]; then
-  if command -v python3 >/dev/null 2>&1; then
-    python3 "$ROOT/scripts/generate-fonts.py"
-  elif command -v python >/dev/null 2>&1; then
-    python "$ROOT/scripts/generate-fonts.py"
-  fi
+if command -v python3 >/dev/null 2>&1; then
+  python3 "$ROOT/scripts/verify-fonts.py"
+elif command -v python >/dev/null 2>&1; then
+  python "$ROOT/scripts/verify-fonts.py"
+else
+  echo "error: Python is required to verify the embedded official fonts" >&2
+  exit 1
 fi
 
 cleanup_intermediate() {

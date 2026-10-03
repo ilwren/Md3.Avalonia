@@ -36,6 +36,7 @@
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdTimePicker.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdDialog.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdDivider.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdItemsControl.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdList.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdProgress.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdMenu.axaml" />

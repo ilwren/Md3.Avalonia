@@ -111,6 +111,7 @@ public sealed class MdAuditP1P2RegressionTests
     {
         var breadcrumb = new MdBreadcrumb
         {
+            OverflowBehavior = MdBreadcrumbOverflowBehavior.Collapse,
             MaxDisplayedItems = 3,
             ItemsBeforeCollapse = 1,
             ItemsAfterCollapse = 1,

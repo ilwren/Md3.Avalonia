@@ -398,8 +398,8 @@ public sealed class MdMotionLifecycleTests
         var items = carousel.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
         Assert.True(items.Length >= 3);
         Assert.Contains(items, item => Math.Abs(item.Width - 240) < 0.01);
-        Assert.Contains(items, item => Math.Abs(item.Width - 172.8) < 0.01);
-        Assert.Contains(items, item => Math.Abs(item.Width - 115.2) < 0.01);
+        Assert.Contains(items, item => Math.Abs(item.Width - 148) < 0.01);
+        Assert.Contains(items, item => Math.Abs(item.Width - 56) < 0.01);
         Assert.All(items, item => Assert.Null(item.Transitions));
 
         MdMotion.SetScheme(carousel, MdMotionScheme.Standard);

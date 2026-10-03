@@ -15,7 +15,7 @@ dotnet add package Md3.Avalonia.Extra
 # Option A: Full icon font catalog (4,000+ glyphs)
 dotnet add package Md3.Avalonia.Icons
 
-# Option B: Lightweight icon font subset (~25 KB)
+# Option B: Lightweight icon font subset (~98 KB)
 dotnet add package Md3.Avalonia.Icons.Lite
 ```
 

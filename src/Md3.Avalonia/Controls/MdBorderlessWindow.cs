@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Automation;
@@ -46,9 +47,8 @@ public class MdAvaloniaWindowPlatformAdapter(MdWindowPlatform platform) : IMdWin
     public virtual void Apply(MdBorderlessWindow window, MdBorderlessWindowOptions options)
     {
         if (Platform == MdWindowPlatform.Android) return;
-        // Keep the platform-owned resize frame, shadow and corner treatment. This mirrors the
-        // FluentAvalonia AppWindow split: app content owns the caption area while the native
-        // non-client frame remains responsible for window geometry and OS effects.
+        // Portable fallback: retain the platform resize frame while Material owns the client title
+        // content. Windows overrides this because DWM animations require Full caption style bits.
         window.WindowDecorations = options.PreserveNativeBorder ? WindowDecorations.BorderOnly : WindowDecorations.None;
         window.ExtendClientAreaToDecorationsHint = options.ExtendIntoTitleBar;
         window.ExtendClientAreaTitleBarHeightHint = Math.Max(0, options.TitleBarHeight);
@@ -66,7 +66,87 @@ public class MdAvaloniaWindowPlatformAdapter(MdWindowPlatform platform) : IMdWin
     }
     public virtual bool TryShowSystemMenu(MdBorderlessWindow window, Point clientPoint) => false;
 }
-public sealed class MdWindowsWindowPlatformAdapter() : MdAvaloniaWindowPlatformAdapter(MdWindowPlatform.Windows);
+/// <summary>
+/// Windows custom-chrome bridge. Full decorations intentionally preserve WS_CAPTION,
+/// WS_MINIMIZEBOX and WS_MAXIMIZEBOX, allowing Avalonia's native WindowState path and DWM to
+/// provide the Windows 11 minimize/maximize/restore animations. Material renders the client title
+/// bar; no fake Avalonia transition is used.
+/// </summary>
+public sealed class MdWindowsWindowPlatformAdapter() : MdAvaloniaWindowPlatformAdapter(MdWindowPlatform.Windows)
+{
+    private const uint WmSysCommand = 0x0112;
+    private const uint TpmRightButton = 0x0002;
+    private const uint TpmReturnCommand = 0x0100;
+    private const uint MfByCommand = 0x0000;
+    private const uint MfEnabled = 0x0000;
+    private const uint MfGrayed = 0x0001;
+    private const uint ScSize = 0xF000;
+    private const uint ScMove = 0xF010;
+    private const uint ScMinimize = 0xF020;
+    private const uint ScMaximize = 0xF030;
+    private const uint ScClose = 0xF060;
+    private const uint ScRestore = 0xF120;
+
+    public override void Apply(MdBorderlessWindow window, MdBorderlessWindowOptions options)
+    {
+        window.WindowDecorations = options.PreserveNativeBorder ? WindowDecorations.Full : WindowDecorations.None;
+        window.ExtendClientAreaToDecorationsHint = options.ExtendIntoTitleBar;
+        window.ExtendClientAreaTitleBarHeightHint = Math.Max(0, options.TitleBarHeight);
+        window.CanResize = options.CanResize;
+    }
+
+    public override bool TryShowSystemMenu(MdBorderlessWindow window, Point clientPoint)
+    {
+        if (!OperatingSystem.IsWindows() || window.TryGetPlatformHandle() is not { Handle: not 0 } handle)
+            return false;
+        var menu = GetSystemMenu(handle.Handle, false);
+        if (menu == 0) return false;
+
+        // Match FluentAvalonia's native menu bridge: system commands still run through the HWND,
+        // but their enabled state reflects the current native window state and capabilities.
+        var normal = window.WindowState == WindowState.Normal;
+        var stateActionsAllowed = !window.IsDialog;
+        SetSystemMenuItemEnabled(menu, ScClose,
+            window.Capabilities.HasFlag(MdWindowCapabilities.Close));
+        SetSystemMenuItemEnabled(menu, ScMinimize,
+            stateActionsAllowed && window.CanMinimize && window.Capabilities.HasFlag(MdWindowCapabilities.Minimize));
+        SetSystemMenuItemEnabled(menu, ScRestore,
+            stateActionsAllowed && !normal && window.Capabilities.HasFlag(MdWindowCapabilities.Maximize));
+        SetSystemMenuItemEnabled(menu, ScMove,
+            stateActionsAllowed && normal && window.Capabilities.HasFlag(MdWindowCapabilities.Move));
+        SetSystemMenuItemEnabled(menu, ScSize,
+            stateActionsAllowed && normal && window.CanResize && window.Capabilities.HasFlag(MdWindowCapabilities.Resize));
+        SetSystemMenuItemEnabled(menu, ScMaximize,
+            stateActionsAllowed && normal && window.CanMaximize && window.Capabilities.HasFlag(MdWindowCapabilities.Maximize));
+        SetMenuDefaultItem(menu, uint.MaxValue, false);
+
+        var screenPoint = window.PointToScreen(clientPoint);
+        var command = TrackPopupMenu(menu, TpmRightButton | TpmReturnCommand,
+            screenPoint.X, screenPoint.Y, 0, handle.Handle, 0);
+        if (command == 0) return false;
+        return PostMessage(handle.Handle, WmSysCommand, (nint)command, 0);
+    }
+
+    private static void SetSystemMenuItemEnabled(nint menu, uint command, bool enabled) =>
+        EnableMenuItem(menu, command, MfByCommand | (enabled ? MfEnabled : MfGrayed));
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern nint GetSystemMenu(nint window, [MarshalAs(UnmanagedType.Bool)] bool revert);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern uint EnableMenuItem(nint menu, uint item, uint enable);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetMenuDefaultItem(nint menu, uint item, [MarshalAs(UnmanagedType.Bool)] bool byPosition);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern uint TrackPopupMenu(nint menu, uint flags, int x, int y, int reserved, nint window, nint rectangle);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool PostMessage(nint window, uint message, nint wParam, nint lParam);
+}
 public sealed class MdMacOsWindowPlatformAdapter() : MdAvaloniaWindowPlatformAdapter(MdWindowPlatform.MacOS);
 public sealed class MdLinuxWindowPlatformAdapter() : MdAvaloniaWindowPlatformAdapter(MdWindowPlatform.Linux);
 public sealed class MdAndroidWindowPlatformAdapter() : MdAvaloniaWindowPlatformAdapter(MdWindowPlatform.Android);
@@ -81,7 +161,7 @@ public static class MdWindowPlatformAdapterResolver
 }
 
 /// <summary>Material borderless window host with replaceable platform adapter and Android-safe no-op behavior.</summary>
-[PseudoClasses(":active", ":inactive", ":maximized", ":custom-chrome")]
+[PseudoClasses(":active", ":inactive", ":maximized", ":custom-chrome", ":native-frame")]
 public class MdBorderlessWindow : MdWindow
 {
     public static readonly StyledProperty<bool> IsCustomChromeEnabledProperty = AvaloniaProperty.Register<MdBorderlessWindow, bool>(nameof(IsCustomChromeEnabled), true);
@@ -163,6 +243,7 @@ public class MdBorderlessWindow : MdWindow
             WindowState == WindowState.Maximized);
         SetAndRaise(TemplateSettingsProperty, ref _templateSettings, settings);
         PseudoClasses.Set(":custom-chrome", IsCustomChromeEnabled);
+        PseudoClasses.Set(":native-frame", !IsCustomChromeEnabled || PreserveNativeBorder);
         UpdateWindowState();
     }
 

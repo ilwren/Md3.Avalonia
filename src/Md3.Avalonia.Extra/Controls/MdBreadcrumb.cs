@@ -17,6 +17,17 @@ using Md3.Avalonia.Localization;
 
 namespace Md3.Avalonia.Extra.Controls;
 
+/// <summary>Layout strategy for a breadcrumb path when it exceeds the available width.</summary>
+public enum MdBreadcrumbOverflowBehavior
+{
+    /// <summary>Continue the path on a new visual line.</summary>
+    Wrap,
+    /// <summary>Keep one line and expose horizontal touch/mouse scrolling.</summary>
+    Scroll,
+    /// <summary>Keep one line and replace intermediate entries according to MaxDisplayedItems.</summary>
+    Collapse
+}
+
 /// <summary>An individual breadcrumb item model with support for icons, commands, links, and selection state.</summary>
 public class MdBreadcrumbItem : AvaloniaObject
 {
@@ -50,6 +61,7 @@ public class MdBreadcrumbItem : AvaloniaObject
 /// A desktop and touch breadcrumb path supporting rich item models, icons, custom separators,
 /// overflow collapsing, MVVM commands, and direct selection APIs aligned with Flutter ecosystem patterns.
 /// </summary>
+[PseudoClasses(":wrap-overflow", ":scroll-overflow", ":collapse-overflow")]
 public sealed class MdBreadcrumb : ListBox
 {
     private bool _invoking;
@@ -58,6 +70,8 @@ public sealed class MdBreadcrumb : ListBox
 
     public static readonly StyledProperty<object?> SeparatorProperty =
         AvaloniaProperty.Register<MdBreadcrumb, object?>(nameof(Separator), "›");
+    public static readonly StyledProperty<IDataTemplate?> SeparatorTemplateProperty =
+        AvaloniaProperty.Register<MdBreadcrumb, IDataTemplate?>(nameof(SeparatorTemplate));
     public static readonly StyledProperty<ICommand?> ItemInvokedCommandProperty =
         AvaloniaProperty.Register<MdBreadcrumb, ICommand?>(nameof(ItemInvokedCommand));
     public static readonly StyledProperty<int> MaxDisplayedItemsProperty =
@@ -68,16 +82,27 @@ public sealed class MdBreadcrumb : ListBox
         AvaloniaProperty.Register<MdBreadcrumb, int>(nameof(ItemsAfterCollapse), 1);
     public static readonly StyledProperty<object?> OverflowContentProperty =
         AvaloniaProperty.Register<MdBreadcrumb, object?>(nameof(OverflowContent), "…");
+    public static readonly StyledProperty<MdBreadcrumbOverflowBehavior> OverflowBehaviorProperty =
+        AvaloniaProperty.Register<MdBreadcrumb, MdBreadcrumbOverflowBehavior>(nameof(OverflowBehavior));
+    public static readonly StyledProperty<bool> ShowTrailingSeparatorProperty =
+        AvaloniaProperty.Register<MdBreadcrumb, bool>(nameof(ShowTrailingSeparator));
     public static readonly DirectProperty<MdBreadcrumb, bool> IsOverflowExpandedProperty =
         AvaloniaProperty.RegisterDirect<MdBreadcrumb, bool>(nameof(IsOverflowExpanded), control => control.IsOverflowExpanded);
 
     static MdBreadcrumb()
     {
         SeparatorProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.UpdateItemContainers());
+        SeparatorTemplateProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.UpdateItemContainers());
         MaxDisplayedItemsProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.ResetOverflow());
         ItemsBeforeCollapseProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.ResetOverflow());
         ItemsAfterCollapseProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.ResetOverflow());
         OverflowContentProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.UpdateItemContainers());
+        OverflowBehaviorProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) =>
+        {
+            breadcrumb.CollapseOverflow();
+            breadcrumb.UpdateOverflowPseudoClasses();
+        });
+        ShowTrailingSeparatorProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.UpdateItemContainers());
         MdLocalization.CultureProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.UpdateLocalizedText());
     }
 
@@ -86,14 +111,18 @@ public sealed class MdBreadcrumb : ListBox
         AutomationProperties.SetName(this, MdLocalization.GetString("Breadcrumb", this));
         SelectionChanged += OnSelectionChanged;
         LayoutUpdated += (_, _) => UpdateOverflowOnly();
+        UpdateOverflowPseudoClasses();
     }
 
     public object? Separator { get => GetValue(SeparatorProperty); set => SetValue(SeparatorProperty, value); }
+    public IDataTemplate? SeparatorTemplate { get => GetValue(SeparatorTemplateProperty); set => SetValue(SeparatorTemplateProperty, value); }
     public ICommand? ItemInvokedCommand { get => GetValue(ItemInvokedCommandProperty); set => SetValue(ItemInvokedCommandProperty, value); }
     public int MaxDisplayedItems { get => GetValue(MaxDisplayedItemsProperty); set => SetValue(MaxDisplayedItemsProperty, value); }
     public int ItemsBeforeCollapse { get => GetValue(ItemsBeforeCollapseProperty); set => SetValue(ItemsBeforeCollapseProperty, value); }
     public int ItemsAfterCollapse { get => GetValue(ItemsAfterCollapseProperty); set => SetValue(ItemsAfterCollapseProperty, value); }
     public object? OverflowContent { get => GetValue(OverflowContentProperty); set => SetValue(OverflowContentProperty, value); }
+    public MdBreadcrumbOverflowBehavior OverflowBehavior { get => GetValue(OverflowBehaviorProperty); set => SetValue(OverflowBehaviorProperty, value); }
+    public bool ShowTrailingSeparator { get => GetValue(ShowTrailingSeparatorProperty); set => SetValue(ShowTrailingSeparatorProperty, value); }
     public bool IsOverflowExpanded
     {
         get => _isOverflowExpanded;
@@ -119,9 +148,9 @@ public sealed class MdBreadcrumb : ListBox
     public void Invoke(object? item)
     {
         if (item is null) return;
-        _invoking = true;
-        try { SelectedItem = item; }
-        finally { _invoking = false; }
+        var index = ItemsView.IndexOf(item);
+        if (index < 0 || item is MdBreadcrumbItem { IsEnabled: false } ||
+            item is MdBreadcrumbItem { IsCurrent: true } || index == ItemCount - 1) return;
         RaiseItemInvoked(item);
     }
 
@@ -155,11 +184,12 @@ public sealed class MdBreadcrumb : ListBox
         // named parts. This also makes rich breadcrumb content visible on the first layout pass.
         listItem.ApplyTemplate();
 
-        if (listItem.GetVisualDescendants().OfType<TextBlock>()
-            .FirstOrDefault(text => text.Name == "PART_Separator") is { } separatorText)
+        if (listItem.GetVisualDescendants().OfType<ContentPresenter>()
+            .FirstOrDefault(presenter => presenter.Name == "PART_Separator") is { } separatorPresenter)
         {
-            separatorText.Text = Separator?.ToString() ?? "›";
-            separatorText.IsVisible = !isLast;
+            separatorPresenter.Content = Separator;
+            separatorPresenter.ContentTemplate = SeparatorTemplate;
+            separatorPresenter.IsVisible = !isLast || ShowTrailingSeparator;
         }
 
         if (listItem.GetVisualDescendants().OfType<MdSymbolPresenter>()
@@ -218,7 +248,8 @@ public sealed class MdBreadcrumb : ListBox
     {
         visible = true;
         overflow = false;
-        if (IsOverflowExpanded || MaxDisplayedItems <= 0 || ItemCount <= MaxDisplayedItems) return;
+        if (IsOverflowExpanded || OverflowBehavior != MdBreadcrumbOverflowBehavior.Collapse ||
+            MaxDisplayedItems <= 0 || ItemCount <= MaxDisplayedItems) return;
 
         var maximum = Math.Max(2, MaxDisplayedItems);
         var before = Math.Clamp(ItemsBeforeCollapse, 0, Math.Max(0, maximum - 2));
@@ -232,16 +263,29 @@ public sealed class MdBreadcrumb : ListBox
     private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (_invoking || SelectedIndex < 0 || SelectedItem is not { } item) return;
-        if (ContainerFromIndex(SelectedIndex) is ListBoxItem container && container.Classes.Contains("overflow"))
+        var selectedIndex = SelectedIndex;
+        var overflow = ContainerFromIndex(selectedIndex) is ListBoxItem container && container.Classes.Contains("overflow");
+        var current = item is MdBreadcrumbItem { IsCurrent: true } || selectedIndex == ItemCount - 1;
+
+        // Breadcrumbs are navigation links, not a persistent list selection. Clearing selection
+        // prevents a previously invoked parent and the current location from both looking active.
+        _invoking = true;
+        try { SelectedIndex = -1; }
+        finally { _invoking = false; }
+
+        if (overflow)
         {
-            _invoking = true;
-            try { SelectedIndex = -1; }
-            finally { _invoking = false; }
             ExpandOverflow();
             return;
         }
-        if (item is MdBreadcrumbItem { IsCurrent: true } || SelectedIndex == ItemCount - 1) return;
-        RaiseItemInvoked(item);
+        if (!current) RaiseItemInvoked(item);
+    }
+
+    private void UpdateOverflowPseudoClasses()
+    {
+        PseudoClasses.Set(":wrap-overflow", OverflowBehavior == MdBreadcrumbOverflowBehavior.Wrap);
+        PseudoClasses.Set(":scroll-overflow", OverflowBehavior == MdBreadcrumbOverflowBehavior.Scroll);
+        PseudoClasses.Set(":collapse-overflow", OverflowBehavior == MdBreadcrumbOverflowBehavior.Collapse);
     }
 
     private void RaiseItemInvoked(object item)

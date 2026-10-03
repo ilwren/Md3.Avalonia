@@ -7,7 +7,8 @@ Automated baseline date: 2026-10-03
 
 | Gate | Command or evidence | Expected |
 |---|---|---|
-| Restore | `dotnet restore Md3.Avalonia.sln -p:MaterialSymbolsRoundedFontFile=/offline/font.ttf` | Success |
+| Font provenance | `python3 scripts/verify-fonts.py` | Pinned complete Google variable TTF and real Lite subset pass SHA/table/glyph gates |
+| Restore | `dotnet restore Md3.Avalonia.sln` | Success |
 | Release compile | CI `Build Gallery Desktop` plus multi-platform Gallery workflow | 0 warnings, 0 errors for .NET 10 release projects |
 | Tests | `dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release` | 0 failed; no unexplained skipped tests |
 | Package | `bash scripts/build-nuget.sh` for Core, Icons, Icons.Lite and Extra | `.nupkg` and `.snupkg`; `0.3.0-preview.1` metadata/readme/notices/XML docs and one-way dependencies present |
@@ -39,6 +40,6 @@ Do not mark an item complete without recording device/OS, assistive technology v
 - [ ] High-contrast/forced-color platform settings where exposed by the OS.
 - [ ] Localization review for English and Simplified Chinese, including picker culture behavior.
 
-## Offline font gate
+## Embedded official font gate
 
-The Material Symbols Rounded binary is intentionally absent from the repository. `Md3.Avalonia.Icons` must be built with the official font copied to `Assets/Fonts/MaterialSymbolsRounded.ttf` or supplied through `MaterialSymbolsRoundedFontFile`; otherwise compilation fails by design. The resulting Icons assembly embeds that file as an Avalonia resource and still validates its internal family and control glyphs at runtime. The package publisher must verify the Apache-2.0 source and checksum. No look-alike Unicode fallback is used.
+The repository contains the complete Google Material Symbols Rounded variable TTF and a real-outline Lite subset. `scripts/verify-fonts.py` pins upstream commit `737e3324305806514d7909874fa1818ae1808232`, the full-font SHA-256, the deterministic Lite SHA-256, required variable-font tables, and minimum glyph counts. CI and both packaging scripts run this check; missing, placeholder, or substituted fonts fail before compilation. Both icon packages embed the applicable font and Apache-2.0 license. No look-alike Unicode fallback is used.

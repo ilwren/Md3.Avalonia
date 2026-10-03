@@ -6,7 +6,7 @@ This repository and its distributable projects use the following third-party sof
 |---|---|---|---|
 | Avalonia 12 | UI framework and platform hosts | MIT | https://github.com/AvaloniaUI/Avalonia |
 | MaterialColorUtilities 0.3.0 | HCT, tonal palettes and Material scheme mapping | Apache-2.0 | https://github.com/albi005/MaterialColorUtilities |
-| Material Symbols Rounded metadata and publisher-supplied font | Symbol names/codepoints; official TTF is supplied offline at package build time and embedded only in `Md3.Avalonia.Icons` | Apache-2.0 | https://github.com/google/material-design-icons |
+| Material Symbols Rounded | Complete official variable TTF embedded in `Md3.Avalonia.Icons`, plus a real-outline Lite subset generated from the same pinned upstream file | Apache-2.0 | https://github.com/google/material-design-icons (commit `737e3324305806514d7909874fa1818ae1808232`) |
 | Material loading indicator shape geometry | Seven expressive shape paths and animation constants, ported from Material Components Android assets (Copyright Google LLC / Android Open Source Project) | Apache-2.0 | https://github.com/material-components/material-components-android |
 | AvaloniaEdit | Gallery source-code editor | MIT | https://github.com/AvaloniaUI/AvaloniaEdit |
 | CommunityToolkit.Mvvm | Gallery MVVM compatibility examples | MIT | https://github.com/CommunityToolkit/dotnet |

@@ -21,6 +21,7 @@
     <PackageReference Include="Avalonia" />
     <ProjectReference Include="../Md3.Avalonia/Md3.Avalonia.csproj" />
     <AvaloniaResource Include="Assets/Fonts/MaterialSymbolsRounded-Lite.ttf" />
+    <None Include="../Md3.Avalonia.Icons/Assets/Fonts/MaterialSymbolsRounded-LICENSE.txt" Pack="true" PackagePath="licenses/MaterialSymbolsRounded-LICENSE.txt" Link="MaterialSymbolsRounded-LICENSE.txt" />
     <None Include="../../README.md" Pack="true" PackagePath="/" Link="README.md" />
     <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />
   </ItemGroup>

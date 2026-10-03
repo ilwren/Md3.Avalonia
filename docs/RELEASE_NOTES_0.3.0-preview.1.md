@@ -15,6 +15,10 @@ Preview date: 2026-10-03.
 - App bar, toolbar, button-group and split-button tokens were aligned with the audited Material/Flutter baselines.
 - Tabs use a velocity-preserving spatial spring runner; responsive CommandPalette, LicensePage and Transfer layouts avoid previous fixed desktop widths.
 - Core and Extra default visible/automation strings use inherited English/Simplified Chinese localization for the audited component families.
+- The complete official Material Symbols Rounded variable TTF is checked in and embedded; Icons.Lite carries a real-outline subset from the same pinned Google asset. Consumers no longer supply fonts manually.
+- Native `ItemsControl` now has a neutral standalone Material template, so `ItemsSource` plus `ItemTemplate` renders without FluentTheme.
+- Windows custom chrome preserves Full native caption styles for DWM maximize/restore animation and suppresses the duplicate Material outer frame; its title-bar context menu uses Win32 `WM_SYSCOMMAND`.
+- Breadcrumbs now support wrap, scroll, and collapse overflow based on the audited Flutter package source; carousel taps no longer change keyline sizes, and Android Gallery pages reflow at 360/412 DIP.
 
 ## Packages
 

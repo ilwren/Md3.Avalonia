@@ -11,6 +11,8 @@ All notable changes follow Keep a Changelog. The project intends to use Semantic
 - Added `MdFabMenu.IsInitiallyOpen` while preserving two-way `IsOpen` and independent up/down expansion.
 - Added configurable ColorPicker preview, palette, spectrum and recent-color panels plus an internal constrained-height scroll viewport.
 - Added focused P0/P1/P2 accessibility, responsive, localization, motion and token regression tests.
+- Added the complete official Material Symbols Rounded variable TTF and a real-outline Lite subset, both pinned and verified from the Google upstream asset.
+- Added a standalone Material theme for native Avalonia `ItemsControl`, so `ItemsSource` plus `ItemTemplate` renders without requiring FluentTheme.
 
 ### Changed
 
@@ -20,6 +22,9 @@ All notable changes follow Keep a Changelog. The project intends to use Semantic
 - Updated app bars, toolbars, button groups and split buttons to audited Material component tokens and logical RTL geometry.
 - Made Cascader a true popup, Transfer and CommandPalette responsive, and Breadcrumb overflow behavior invokable.
 - Improved failed-test diagnostics so GitHub annotations include the exact headless test name.
+- Aligned breadcrumb overflow with the audited Flutter package model: wrap, horizontal scroll, or explicit collapse, with no trailing divider or persistent parent selection by default.
+- Changed carousel geometry to follow Material keyline/navigation state rather than pointer selection; small items now stay in the official 40–56 DIP range.
+- Reworked Gallery navigation selection so exactly one destination owns the active indicator, and added 360/412 DIP Android page constraint/reflow handling.
 
 ### Fixed
 
@@ -28,6 +33,7 @@ All notable changes follow Keep a Changelog. The project intends to use Semantic
 - Fixed chat selection so only presses inside the visual message bubble select a row.
 - Fixed Cascader open staging and prevented initial keyboard focus from committing a hierarchy selection.
 - Fixed the split-button two-DIP visible gap while preserving the independent 48-DIP trailing touch target.
+- Fixed Windows custom chrome to preserve Full native caption style bits for Windows 11 DWM state animations, use the Win32 system menu, and avoid drawing a second outer border.
 
 ### Validation status
 
@@ -78,5 +84,4 @@ All notable changes follow Keep a Changelog. The project intends to use Semantic
 
 ### Known limitations
 
-- Material Symbols Rounded TTF is intentionally excluded from this preview; unresolved symbol slots remain visually empty until the optional Icons package or a host-provided font/resource mapping is registered.
 - Physical Android ARM64, Narrator, VoiceOver and Orca acceptance require external hardware/OS sign-off; see `docs/RELEASE_VALIDATION.md`.

@@ -16,7 +16,7 @@
         <StackPanel Spacing="8">
           <TextBlock FontSize="18" FontWeight="Medium" Text="Material Symbols font is invalid" />
           <TextBlock Classes="body" TextWrapping="Wrap"
-                     Text="Rebuild Md3.Avalonia.Icons with the official MaterialSymbolsRounded.ttf in its reserved font slot, or pass MaterialSymbolsRoundedFontFile to the build. Glyphs are hidden instead of using a look-alike fallback." />
+                     Text="The Icons package includes the official font. Reinstall the package or run scripts/verify-fonts.py if this diagnostic appears; invalid glyphs remain hidden instead of using a look-alike fallback." />
         </StackPanel>
       </Border>
 

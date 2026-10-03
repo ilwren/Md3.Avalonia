@@ -8,7 +8,7 @@ using Avalonia.Threading;
 namespace Md3.Avalonia.Icons;
 
 /// <summary>
-/// Registers the Material Symbols Rounded font supplied offline when the Icons package is built.
+/// Registers the complete official Material Symbols Rounded font embedded by the Icons package.
 /// An external file/directory override remains available for diagnostics and host customization.
 /// </summary>
 public static class MdExternalMaterialSymbols

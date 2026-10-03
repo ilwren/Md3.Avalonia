@@ -2,10 +2,12 @@ using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using System.Globalization;
@@ -22,6 +24,135 @@ namespace Md3.Avalonia.HeadlessTests;
 /// <summary>Regression coverage for the 23-item dark-theme acceptance report.</summary>
 public sealed class MdReportedIssuesTests
 {
+    [AvaloniaFact]
+    public void Gallery_Navigation_Has_Exactly_One_Active_Destination()
+    {
+        var window = new MainWindow();
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(window.NavigateToIndexedPage("Carousel"));
+            Dispatcher.UIThread.RunJobs();
+            var navigationButtons = window.GetVisualDescendants().OfType<MdButton>()
+                .Where(button => button.Name?.EndsWith("Nav", StringComparison.Ordinal) == true)
+                .ToArray();
+            Assert.Equal("CarouselNav", Assert.Single(navigationButtons.Where(button => button.Variant == MdButtonVariant.Tonal)).Name);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Android_Gallery_Constrains_Wide_Page_Controls_At_360_And_412_Dip()
+    {
+        foreach (var width in new[] { 360d, 412d })
+        {
+            var view = new AndroidGalleryView();
+            using var host = Show(view, width, 760);
+            Assert.True(view.NavigateToPage("Segmented and range"));
+            Dispatcher.UIThread.RunJobs();
+
+            var pageHost = view.GetVisualDescendants().OfType<ContentControl>()
+                .Single(control => control.Name == "MobilePageHost");
+            var page = view.GetVisualDescendants().OfType<AdvancedSelectionGalleryPage>().Single();
+            var groups = page.GetVisualDescendants().OfType<MdSegmentedButtonGroup>().ToArray();
+            Assert.NotEmpty(groups);
+            Assert.All(groups, group =>
+            {
+                Assert.True(double.IsNaN(group.Width));
+                Assert.InRange(group.Bounds.Width, 1, Math.Max(1, pageHost.Bounds.Width - 32));
+            });
+            Assert.Contains(page.GetVisualDescendants().OfType<ScrollViewer>(),
+                viewer => viewer.VerticalScrollBarVisibility == ScrollBarVisibility.Auto);
+
+            host.Window.Width = 900;
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(new[] { 480d, 560d }, groups.Select(group => group.Width).ToArray());
+            Assert.All(groups, group => Assert.Equal(HorizontalAlignment.Left, group.HorizontalAlignment));
+        }
+    }
+
+    [AvaloniaFact]
+    public void Carousel_Tap_Selects_Content_Without_Changing_Keyline_Item_Sizes()
+    {
+        var carousel = new MdCarousel
+        {
+            Width = 620,
+            Height = 220,
+            ItemWidth = 240,
+            ItemHeight = 200,
+            Variant = MdCarouselVariant.MultiBrowse,
+            SelectedIndex = 0,
+            ItemsSource = new[] { "One", "Two", "Three", "Four" }
+        };
+        using var host = Show(carousel, 680, 280);
+        Dispatcher.UIThread.RunJobs();
+        var containers = carousel.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
+        var widthsBeforeTap = containers.Select(item => item.Bounds.Width).ToArray();
+        var second = containers[1];
+        var point = second.TranslatePoint(new Point(second.Bounds.Width / 2, second.Bounds.Height / 2), host.Window)!.Value;
+
+        host.Window.MouseMove(point, RawInputModifiers.None);
+        host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseUp(point, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(1, carousel.SelectedIndex);
+        Assert.Equal(widthsBeforeTap, containers.Select(item => item.Bounds.Width).ToArray());
+        Assert.Contains(containers, item => Math.Abs(item.Bounds.Width - 56) < 0.01);
+    }
+
+    [AvaloniaFact]
+    public void Carousel_MultiBrowse_Keylines_Fit_Compact_Viewport_And_Use_Material_Midpoint()
+    {
+        var carousel = new MdCarousel
+        {
+            Width = 220,
+            Height = 180,
+            ItemWidth = 240,
+            ItemHeight = 160,
+            ItemSpacing = 8,
+            SmallItemWidth = 56,
+            Variant = MdCarouselVariant.MultiBrowse,
+            SelectedIndex = 0,
+            ItemsSource = new[] { "One", "Two", "Three", "Four" }
+        };
+        using var host = Show(carousel, 260, 220);
+        Dispatcher.UIThread.RunJobs();
+
+        var widths = carousel.GetVisualDescendants().OfType<ListBoxItem>()
+            .Select(item => item.Bounds.Width)
+            .ToArray();
+        Assert.True(widths.Length >= 3);
+        Assert.InRange(widths[0] + widths[1] + widths[2] + 16, 219.9, 220.1);
+        Assert.InRange(widths[2], 55.9, 56.1);
+        Assert.InRange(widths[1], (widths[0] + widths[2]) / 2 - 0.1,
+            (widths[0] + widths[2]) / 2 + 0.1);
+    }
+
+    [AvaloniaFact]
+    public void MaterialTheme_Native_ItemsControl_Renders_ItemsSource_And_DataTemplate()
+    {
+        var items = new ItemsControl
+        {
+            Width = 320,
+            ItemsSource = new[] { "Alpha", "Beta", "Gamma" },
+            ItemTemplate = new FuncDataTemplate<string>((value, _) =>
+                new TextBlock { Text = $"Item: {value}" })
+        };
+
+        using var host = Show(items, 360, 220);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.NotNull(items.Template);
+        Assert.Single(items.GetVisualDescendants().OfType<ItemsPresenter>());
+        var labels = items.GetVisualDescendants().OfType<TextBlock>()
+            .Select(text => text.Text)
+            .ToArray();
+        Assert.Equal(new[] { "Item: Alpha", "Item: Beta", "Item: Gamma" }, labels);
+        Assert.True(items.Bounds.Height > 0);
+    }
+
     [AvaloniaFact]
     public void Gallery_Search_CtrlK_And_Query_Filter_Work_In_The_Navigation_Page_Lifecycle()
     {
@@ -277,6 +408,32 @@ public sealed class MdReportedIssuesTests
     }
 
     [AvaloniaFact]
+    public void Breadcrumb_Supports_Flutter_Style_Scroll_Overflow_Without_Persistent_Double_Selection()
+    {
+        var breadcrumb = new MdBreadcrumb
+        {
+            Width = 240,
+            OverflowBehavior = MdBreadcrumbOverflowBehavior.Scroll,
+            ItemsSource = new[] { "Home", "Library", "Components", "Carousel" }
+        };
+        object? invoked = null;
+        breadcrumb.ItemInvoked += (_, item) => invoked = item;
+
+        using var host = Show(breadcrumb, 280, 100);
+        Dispatcher.UIThread.RunJobs();
+        var scroll = breadcrumb.GetVisualDescendants().OfType<ScrollViewer>()
+            .Single(viewer => viewer.Name == "PART_BreadcrumbScrollViewer");
+        Assert.Equal(ScrollBarVisibility.Auto, scroll.HorizontalScrollBarVisibility);
+        Assert.Equal(ScrollBarVisibility.Disabled, scroll.VerticalScrollBarVisibility);
+
+        breadcrumb.SelectedIndex = 1;
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal("Library", invoked);
+        Assert.Equal(-1, breadcrumb.SelectedIndex);
+        Assert.Empty(breadcrumb.GetVisualDescendants().OfType<ListBoxItem>().Where(item => item.IsSelected));
+    }
+
+    [AvaloniaFact]
     public void Breadcrumb_Renders_Rich_Labels_And_Separators_On_The_First_Layout()
     {
         var breadcrumb = new MdBreadcrumb
@@ -298,11 +455,39 @@ public sealed class MdReportedIssuesTests
         Assert.Contains("Home", labels);
         Assert.Contains("Components", labels);
         Assert.Contains("Color picker", labels);
-        Assert.Equal(2, textBlocks.Count(text => text.IsVisible && text.Text == "/"));
+        var separators = breadcrumb.GetVisualDescendants().OfType<ContentPresenter>()
+            .Where(presenter => presenter.Name == "PART_Separator")
+            .ToArray();
+        Assert.Equal(3, separators.Length);
+        Assert.Equal(2, separators.Count(presenter => presenter.IsVisible && Equals(presenter.Content, "/")));
 
         var containers = breadcrumb.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
         Assert.Equal(3, containers.Length);
         Assert.Contains("current", containers[^1].Classes);
+    }
+
+    [AvaloniaFact]
+    public void Breadcrumb_SeparatorTemplate_And_Trailing_Separator_Are_Explicit()
+    {
+        var breadcrumb = new MdBreadcrumb
+        {
+            Separator = "/",
+            ShowTrailingSeparator = true,
+            SeparatorTemplate = new FuncDataTemplate<string>((value, _) =>
+                new TextBlock { Text = $"separator:{value}" }),
+            ItemsSource = new[] { "Home", "Current" }
+        };
+
+        using var host = Show(breadcrumb, 320, 100);
+        Dispatcher.UIThread.RunJobs();
+
+        var separators = breadcrumb.GetVisualDescendants().OfType<ContentPresenter>()
+            .Where(presenter => presenter.Name == "PART_Separator")
+            .ToArray();
+        Assert.Equal(2, separators.Length);
+        Assert.All(separators, presenter => Assert.True(presenter.IsVisible));
+        Assert.Equal(2, breadcrumb.GetVisualDescendants().OfType<TextBlock>()
+            .Count(text => text.Text == "separator:/"));
     }
 
     [AvaloniaFact]

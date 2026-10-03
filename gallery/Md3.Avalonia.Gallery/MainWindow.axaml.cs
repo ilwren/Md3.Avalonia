@@ -206,7 +206,7 @@ public partial class MainWindow : Window
         var usesPrimaryRail = width >= 600;
         _usesModalNavigation = width < 1200;
         RootLayout.ColumnDefinitions = usesPrimaryRail
-            ? new ColumnDefinitions("104,*")
+            ? new ColumnDefinitions("96,*")
             : new ColumnDefinitions("0,*");
         PrimaryNavigationRail.IsVisible = usesPrimaryRail;
         CompactBrandMark.IsVisible = !usesPrimaryRail;
@@ -350,9 +350,12 @@ public partial class MainWindow : Window
                 : ReferenceEquals(selected, DesktopAdaptersNav) ? DevelopTopNav : ComponentsTopNav;
         _currentPageType = page.GetType();
         _currentNavigationButton = selected;
-        _currentTopNavigationButton = selectedTopNavigation;
+        // The M3 site has hierarchical primary and contextual navigation, but only the actual
+        // destination receives an active indicator. A contextual leaf therefore clears the
+        // category-rail highlight instead of leaving two destinations looking selected.
+        _currentTopNavigationButton = selected is null ? selectedTopNavigation : null;
         foreach (var button in _topNavigationButtons)
-            button.Variant = ReferenceEquals(button, selectedTopNavigation) ? MdButtonVariant.Tonal : MdButtonVariant.Text;
+            button.Variant = ReferenceEquals(button, _currentTopNavigationButton) ? MdButtonVariant.Tonal : MdButtonVariant.Text;
         if (_usesModalNavigation) SetNavigationOpen(false);
         Dispatcher.UIThread.Post(() =>
         {

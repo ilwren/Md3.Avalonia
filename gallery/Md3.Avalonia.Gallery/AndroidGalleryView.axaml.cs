@@ -5,7 +5,9 @@ using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.LogicalTree;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Gallery.Pages;
 using Md3.Avalonia.Localization;
@@ -21,6 +23,9 @@ public partial class AndroidGalleryView : UserControl
     private readonly List<MobileGalleryEntry> _galleryIndex = [];
     private object? _overviewPage;
     private string? _currentPageTitle;
+    private Control? _currentPage;
+    private readonly Dictionary<Control, MobileControlSizeState> _mobileSizeStates = [];
+    private readonly Dictionary<StackPanel, Orientation> _mobilePanelOrientations = [];
 
     internal int NavigationPageCount => _galleryIndex.Count;
     internal string? CurrentPageTitle => _currentPageTitle;
@@ -33,6 +38,12 @@ public partial class AndroidGalleryView : UserControl
         AutomationProperties.SetLandmarkType(MobilePageHost, AutomationLandmarkType.Main);
         BuildCompleteNavigation();
         MdLocalization.SetCulture(this, CultureInfo.GetCultureInfo("en-US"));
+    }
+
+    protected override void OnSizeChanged(SizeChangedEventArgs e)
+    {
+        base.OnSizeChanged(e);
+        ApplyMobileResponsiveLayout(e.NewSize.Width);
     }
 
     private void BuildCompleteNavigation()
@@ -120,6 +131,7 @@ public partial class AndroidGalleryView : UserControl
             HorizontalContentAlignment = HorizontalAlignment.Left,
             Tag = entry
         };
+        entry.NavigationButton = button;
         AutomationProperties.SetName(button, title);
         button.Click += NavigateFromDrawer;
         MobileNavigationItems.Children.Add(button);
@@ -141,10 +153,91 @@ public partial class AndroidGalleryView : UserControl
     private void Navigate(MobileGalleryEntry entry)
     {
         if (MobilePageHost is null || MobileDrawer is null) return;
-        MobilePageHost.Content = entry.Factory();
+        RestoreMobileResponsiveState();
+        var content = entry.Factory();
+        _currentPage = content as Control;
+        MobilePageHost.Content = _currentPage is { } page ? CreateMobileViewport(page) : content;
         _currentPageTitle = entry.Title;
         if (MobileAppBar is not null) MobileAppBar.Title = entry.Title;
+        foreach (var candidate in _galleryIndex)
+            if (candidate.NavigationButton is { } button)
+                button.Variant = ReferenceEquals(candidate, entry) ? MdButtonVariant.Tonal : MdButtonVariant.Text;
         MobileDrawer.IsOpen = false;
+        Dispatcher.UIThread.Post(() => ApplyMobileResponsiveLayout(Bounds.Width), DispatcherPriority.Loaded);
+    }
+
+    private Control CreateMobileViewport(Control page)
+    {
+        page.Margin = new Thickness(16, 14, 16, 24);
+        if (page is UserControl userPage &&
+            (userPage.Content is ScrollViewer ||
+             userPage.Content is Grid root && root.Children.OfType<ScrollViewer>().Any()))
+        {
+            return page;
+        }
+
+        return new MdScrollViewer
+        {
+            VerticalScrollBarVisibility = global::Avalonia.Controls.Primitives.ScrollBarVisibility.Auto,
+            HorizontalScrollBarVisibility = global::Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled,
+            Content = page
+        };
+    }
+
+    private void ApplyMobileResponsiveLayout(double shellWidth)
+    {
+        if (_currentPage is not { } page || shellWidth <= 0) return;
+
+        // Re-evaluate from the page's authored values on every breakpoint/rotation change. Without
+        // this reset, a control constrained at 360 DIP would stay constrained after rotating to a
+        // wide viewport, and a row converted to a column could never become a row again.
+        RestoreMobileResponsiveState();
+        var available = Math.Max(240, shellWidth - 32);
+        foreach (var control in page.GetLogicalDescendants().OfType<Control>().Prepend(page))
+        {
+            var explicitWidthOverflows = !double.IsNaN(control.Width) && control.Width > available;
+            var minimumOverflows = control.MinWidth > available;
+            if (!explicitWidthOverflows && !minimumOverflows) continue;
+            if (!_mobileSizeStates.ContainsKey(control))
+                _mobileSizeStates[control] = new MobileControlSizeState(
+                    control.Width, control.MinWidth, control.MaxWidth, control.HorizontalAlignment);
+            control.Width = double.NaN;
+            control.MinWidth = 0;
+            control.MaxWidth = Math.Min(control.MaxWidth, available);
+            control.HorizontalAlignment = HorizontalAlignment.Stretch;
+        }
+
+        foreach (var panel in page.GetLogicalDescendants().OfType<StackPanel>()
+                     .Where(panel => panel.Orientation == Orientation.Horizontal && panel.Children.Count > 1))
+        {
+            var requiredWidth = panel.Children.Sum(child =>
+            {
+                if (child is not Control control) return child.DesiredSize.Width;
+                var authoredWidth = _mobileSizeStates.TryGetValue(control, out var state)
+                    ? state.Width
+                    : control.Width;
+                var width = !double.IsNaN(authoredWidth) ? authoredWidth : child.DesiredSize.Width;
+                return width + control.Margin.Left + control.Margin.Right;
+            }) + panel.Spacing * (panel.Children.Count - 1);
+            if (requiredWidth <= available) continue;
+            _mobilePanelOrientations.TryAdd(panel, panel.Orientation);
+            panel.Orientation = Orientation.Vertical;
+        }
+    }
+
+    private void RestoreMobileResponsiveState()
+    {
+        foreach (var (control, state) in _mobileSizeStates)
+        {
+            control.Width = state.Width;
+            control.MinWidth = state.MinWidth;
+            control.MaxWidth = state.MaxWidth;
+            control.HorizontalAlignment = state.HorizontalAlignment;
+        }
+        foreach (var (panel, orientation) in _mobilePanelOrientations)
+            panel.Orientation = orientation;
+        _mobileSizeStates.Clear();
+        _mobilePanelOrientations.Clear();
     }
 
     private void OpenNavigation(object? sender, RoutedEventArgs e) => MobileDrawer.IsOpen = true;
@@ -209,5 +302,14 @@ public partial class AndroidGalleryView : UserControl
         if (Application.Current is { } application) application.RequestedThemeVariant = variant;
     }
 
-    private sealed record MobileGalleryEntry(string Title, Func<object?> Factory);
+    private sealed record MobileGalleryEntry(string Title, Func<object?> Factory)
+    {
+        public MdButton? NavigationButton { get; set; }
+    }
+
+    private readonly record struct MobileControlSizeState(
+        double Width,
+        double MinWidth,
+        double MaxWidth,
+        HorizontalAlignment HorizontalAlignment);
 }

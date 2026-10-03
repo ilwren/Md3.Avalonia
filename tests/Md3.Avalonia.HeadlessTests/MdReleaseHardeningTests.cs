@@ -113,7 +113,7 @@ public sealed class MdReleaseHardeningTests
         window.Show();
         try
         {
-            var widths = new[] { 480d, 720d, 1000d, 1360d, 1680d };
+            var widths = new[] { 360d, 412d, 480d, 720d, 1000d, 1360d, 1680d };
             foreach (var width in widths)
             foreach (var dark in new[] { false, true })
             foreach (var contrast in Enum.GetValues<MdThemeContrastLevel>())

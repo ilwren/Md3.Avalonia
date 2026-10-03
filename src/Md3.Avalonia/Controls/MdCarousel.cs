@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -12,9 +13,10 @@ using Md3.Avalonia.Motion;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>
-/// A horizontally scrolling Material 3 carousel. Direct manipulation remains 1:1; selection,
-/// keyboard and autoplay changes use a token-driven snap settle and resize the realized large,
-/// medium and small items without replacing their content.
+/// A horizontally scrolling Material 3 carousel. Direct manipulation remains 1:1; keyline
+/// navigation, keyboard and autoplay changes use a token-driven snap settle and resize the
+/// realized large, medium and small items without replacing their content. Tap selection does not
+/// move the keyline or resize cards.
 /// </summary>
 [PseudoClasses(":multi-browse", ":hero", ":center-aligned", ":uncontained", ":reduced-motion", ":no-motion")]
 public sealed class MdCarousel : ListBox
@@ -27,6 +29,8 @@ public sealed class MdCarousel : ListBox
         AvaloniaProperty.Register<MdCarousel, double>(nameof(ItemHeight), 220);
     public static readonly StyledProperty<double> ItemSpacingProperty =
         AvaloniaProperty.Register<MdCarousel, double>(nameof(ItemSpacing), 8);
+    public static readonly StyledProperty<double> SmallItemWidthProperty =
+        AvaloniaProperty.Register<MdCarousel, double>(nameof(SmallItemWidth), 56);
     public static readonly StyledProperty<bool> IsAutoPlayProperty =
         AvaloniaProperty.Register<MdCarousel, bool>(nameof(IsAutoPlay));
     public static readonly StyledProperty<TimeSpan> AutoPlayIntervalProperty =
@@ -45,6 +49,9 @@ public sealed class MdCarousel : ListBox
     private MdCarouselController? _attachedController;
     private ScrollViewer? _scrollViewer;
     private int _settleVersion;
+    private int _layoutAnchorIndex;
+    private bool _isPointerSelection;
+    private bool _updatingSelection;
 
     static MdCarousel()
     {
@@ -60,7 +67,16 @@ public sealed class MdCarousel : ListBox
             carousel.ScheduleSelectedSettle();
         });
         ItemHeightProperty.Changed.AddClassHandler<MdCarousel>((carousel, _) => carousel.UpdateRealizedContainers());
-        ItemSpacingProperty.Changed.AddClassHandler<MdCarousel>((carousel, _) => carousel.UpdateRealizedContainers());
+        ItemSpacingProperty.Changed.AddClassHandler<MdCarousel>((carousel, _) =>
+        {
+            carousel.UpdateRealizedContainers();
+            carousel.ScheduleSelectedSettle();
+        });
+        SmallItemWidthProperty.Changed.AddClassHandler<MdCarousel>((carousel, _) =>
+        {
+            carousel.UpdateRealizedContainers();
+            carousel.ScheduleSelectedSettle();
+        });
         IsAutoPlayProperty.Changed.AddClassHandler<MdCarousel>((carousel, _) => carousel.UpdateAutoPlay());
         AutoPlayIntervalProperty.Changed.AddClassHandler<MdCarousel>((carousel, _) => carousel.UpdateAutoPlay());
         ControllerProperty.Changed.AddClassHandler<MdCarousel>((carousel, _) => carousel.UpdateController());
@@ -85,11 +101,14 @@ public sealed class MdCarousel : ListBox
             _settleCleanupTimer.Stop();
             if (_scrollViewer is not null) _scrollViewer.Transitions = null;
         };
+        AddHandler(PointerPressedEvent, PreviewCarouselPointerPressed, RoutingStrategies.Tunnel);
         SelectionChanged += (_, _) =>
         {
-            UpdateRealizedContainers();
+            // Material carousel taps invoke/select content but do not resize it. Geometry follows
+            // the keyline/scroll anchor, matching Flutter CarouselView.onTap semantics.
+            if (!_isPointerSelection && !_updatingSelection && SelectedIndex >= 0)
+                SetLayoutAnchor(SelectedIndex, settle: true);
             UpdateSelectionAnnouncement();
-            ScheduleSelectedSettle();
         };
         ScrollGesture += (_, _) => CancelSettleForDirectManipulation();
         ScrollGestureEnded += (_, _) => SnapToNearestRealizedItem();
@@ -109,6 +128,8 @@ public sealed class MdCarousel : ListBox
     public double ItemWidth { get => GetValue(ItemWidthProperty); set => SetValue(ItemWidthProperty, value); }
     public double ItemHeight { get => GetValue(ItemHeightProperty); set => SetValue(ItemHeightProperty, value); }
     public double ItemSpacing { get => GetValue(ItemSpacingProperty); set => SetValue(ItemSpacingProperty, value); }
+    /// <summary>Preferred small keyline width, constrained to Material's 40–56 DIP range.</summary>
+    public double SmallItemWidth { get => GetValue(SmallItemWidthProperty); set => SetValue(SmallItemWidthProperty, value); }
     public bool IsAutoPlay { get => GetValue(IsAutoPlayProperty); set => SetValue(IsAutoPlayProperty, value); }
     public TimeSpan AutoPlayInterval { get => GetValue(AutoPlayIntervalProperty); set => SetValue(AutoPlayIntervalProperty, value); }
     public bool IsInfiniteLoop { get => GetValue(IsInfiniteLoopProperty); set => SetValue(IsInfiniteLoopProperty, value); }
@@ -117,6 +138,13 @@ public sealed class MdCarousel : ListBox
 
     public bool MoveNext() => SelectRelative(1);
     public bool MovePrevious() => SelectRelative(-1);
+    /// <summary>Moves the Material keyline layout to an item and settles it through the native scroller.</summary>
+    public bool ScrollTo(int index)
+    {
+        if (index < 0 || index >= ItemCount) return false;
+        SelectAndSettle(index);
+        return true;
+    }
     public void StartAutoPlay() => SetCurrentValue(IsAutoPlayProperty, true);
     public void StopAutoPlay() => SetCurrentValue(IsAutoPlayProperty, false);
 
@@ -124,14 +152,33 @@ public sealed class MdCarousel : ListBox
     {
         base.OnApplyTemplate(e);
         _scrollViewer = e.NameScope.Find<ScrollViewer>("PART_ScrollViewer");
+        _layoutAnchorIndex = Math.Max(0, SelectedIndex);
         UpdateMotion();
+        UpdateRealizedContainers();
         ScheduleSelectedSettle();
+    }
+
+    private void PreviewCarouselPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        _isPointerSelection = e.Source is Visual source && source.GetVisualAncestors()
+            .Prepend(source)
+            .OfType<ListBoxItem>()
+            .Any();
+        Dispatcher.UIThread.Post(() => _isPointerSelection = false, DispatcherPriority.Background);
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         CancelSettleForDirectManipulation();
         base.OnPointerPressed(e);
+    }
+
+    protected override void OnSizeChanged(SizeChangedEventArgs e)
+    {
+        base.OnSizeChanged(e);
+        if (Math.Abs(e.NewSize.Width - e.PreviousSize.Width) < 0.01) return;
+        UpdateRealizedContainers();
+        ScheduleSelectedSettle();
     }
 
     protected override void OnPointerEntered(PointerEventArgs e)
@@ -167,8 +214,8 @@ public sealed class MdCarousel : ListBox
         var rtl = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft;
         if (e.Key == Key.Right && (rtl ? MovePrevious() : MoveNext())) e.Handled = true;
         else if (e.Key == Key.Left && (rtl ? MoveNext() : MovePrevious())) e.Handled = true;
-        else if (e.Key == Key.Home && ItemCount > 0) { SelectedIndex = 0; e.Handled = true; }
-        else if (e.Key == Key.End && ItemCount > 0) { SelectedIndex = ItemCount - 1; e.Handled = true; }
+        else if (e.Key == Key.Home && ScrollTo(0)) e.Handled = true;
+        else if (e.Key == Key.End && ScrollTo(ItemCount - 1)) e.Handled = true;
         else base.OnKeyDown(e);
     }
 
@@ -205,31 +252,93 @@ public sealed class MdCarousel : ListBox
 
     private double GetTargetWidth(int index)
     {
-        if (index < 0 || SelectedIndex < 0 || Variant == MdCarouselVariant.Uncontained) return ItemWidth;
-        var distance = Math.Abs(index - SelectedIndex);
-        if (distance == 0) return ItemWidth;
+        var preferredLarge = Math.Max(0, ItemWidth);
+        if (index < 0 || Variant == MdCarouselVariant.Uncontained) return preferredLarge;
+
+        var preferredSmall = Math.Min(preferredLarge, Math.Clamp(SmallItemWidth, 40, 56));
+        var viewport = GetLayoutViewportWidth();
+        var large = preferredLarge;
+        var small = preferredSmall;
+
+        if (viewport > 0 && ItemCount > 1)
+        {
+            // The Material arrangements fit their visible keylines into the viewport instead of
+            // allowing the authored large extent to push the preview keyline out of sight.
+            switch (Variant)
+            {
+                case MdCarouselVariant.MultiBrowse when ItemCount >= 3:
+                {
+                    // Android's reference strategy targets medium=(large+small)/2. Solving
+                    // large+medium+small+2*spacing <= viewport gives this maximum large extent.
+                    var availableItemsWidth = Math.Max(0, viewport - 2 * Math.Max(0, ItemSpacing));
+                    var maximumLarge = 2 * availableItemsWidth / 3 - small;
+                    large = Math.Min(preferredLarge, Math.Max(small, maximumLarge));
+                    break;
+                }
+                case MdCarouselVariant.CenterAligned when ItemCount >= 3:
+                    large = Math.Min(preferredLarge,
+                        Math.Max(small, viewport - 2 * small - 2 * Math.Max(0, ItemSpacing)));
+                    break;
+                case MdCarouselVariant.MultiBrowse:
+                case MdCarouselVariant.Hero:
+                case MdCarouselVariant.CenterAligned:
+                    large = Math.Min(preferredLarge,
+                        Math.Max(small, viewport - small - Math.Max(0, ItemSpacing)));
+                    break;
+            }
+            small = Math.Min(small, large);
+        }
+
+        var distance = Math.Abs(index - _layoutAnchorIndex);
+        if (distance == 0) return large;
         return Variant switch
         {
-            MdCarouselVariant.MultiBrowse when distance == 1 => Math.Max(96, ItemWidth * 0.72),
-            MdCarouselVariant.MultiBrowse => Math.Max(56, ItemWidth * 0.48),
-            MdCarouselVariant.Hero => Math.Max(56, ItemWidth * 0.30),
-            MdCarouselVariant.CenterAligned => Math.Max(96, ItemWidth * 0.72),
-            _ => ItemWidth
+            // Material Components Android derives the medium keyline from the midpoint between
+            // the current small and large arrangement sizes.
+            MdCarouselVariant.MultiBrowse when distance == 1 => (large + small) / 2,
+            MdCarouselVariant.MultiBrowse => small,
+            MdCarouselVariant.Hero => small,
+            MdCarouselVariant.CenterAligned => small,
+            _ => large
         };
+    }
+
+    private double GetLayoutViewportWidth()
+    {
+        var width = _scrollViewer?.Viewport.Width ?? 0;
+        if (width <= 0 || double.IsNaN(width) || double.IsInfinity(width)) width = Bounds.Width;
+        if (width <= 0 || double.IsNaN(width) || double.IsInfinity(width)) return 0;
+        return Math.Max(0, width - Padding.Left - Padding.Right);
     }
 
     private bool SelectRelative(int delta)
     {
         var count = ItemCount;
         if (count <= 0) return false;
-        var next = SelectedIndex < 0 ? 0 : SelectedIndex + delta;
+        var next = _layoutAnchorIndex + delta;
         if (next < 0 || next >= count)
         {
             if (!IsInfiniteLoop) return false;
             next = (next % count + count) % count;
         }
-        SelectedIndex = next;
+        SelectAndSettle(next);
         return true;
+    }
+
+    private void SelectAndSettle(int index)
+    {
+        _updatingSelection = true;
+        try { SetCurrentValue(SelectedIndexProperty, index); }
+        finally { _updatingSelection = false; }
+        SetLayoutAnchor(index, settle: true);
+    }
+
+    private void SetLayoutAnchor(int index, bool settle)
+    {
+        if (index < 0 || index >= ItemCount) return;
+        _layoutAnchorIndex = index;
+        UpdateRealizedContainers();
+        if (settle) ScheduleSelectedSettle();
     }
 
     private void ScheduleSelectedSettle()
@@ -243,10 +352,10 @@ public sealed class MdCarousel : ListBox
 
     private void SettleSelectedItem()
     {
-        if (_scrollViewer is null || SelectedIndex < 0) return;
-        var selected = ContainerFromIndex(SelectedIndex) as Control;
+        if (_scrollViewer is null || _layoutAnchorIndex < 0 || _layoutAnchorIndex >= ItemCount) return;
+        var selected = ContainerFromIndex(_layoutAnchorIndex) as Control;
         var origin = selected?.TranslatePoint(default, this);
-        var selectedWidth = selected?.Bounds.Width ?? GetTargetWidth(SelectedIndex);
+        var selectedWidth = selected?.Bounds.Width ?? GetTargetWidth(_layoutAnchorIndex);
         var rtl = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft;
         var maxOffset = Math.Max(0, _scrollViewer.Extent.Width - _scrollViewer.Viewport.Width);
         double target;
@@ -260,7 +369,7 @@ public sealed class MdCarousel : ListBox
         else
         {
             target = Padding.Left;
-            for (var index = 0; index < SelectedIndex; index++)
+            for (var index = 0; index < _layoutAnchorIndex; index++)
                 target += GetTargetWidth(index) + ItemSpacing;
             if (Variant == MdCarouselVariant.CenterAligned)
                 target -= Math.Max(0, (Bounds.Width - selectedWidth) / 2);
@@ -311,7 +420,7 @@ public sealed class MdCarousel : ListBox
             .FirstOrDefault();
         if (nearest is null) return;
         var index = IndexFromContainer(nearest.Control);
-        if (index >= 0 && index != SelectedIndex) SelectedIndex = index;
+        if (index >= 0 && index != _layoutAnchorIndex) SelectAndSettle(index);
         else ScheduleSelectedSettle();
     }
 
