@@ -6,7 +6,7 @@ using Avalonia.Layout;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A docked or floating Material toolbar for frequently used page actions.</summary>
-[PseudoClasses(":docked", ":floating", ":standard", ":vibrant", ":horizontal", ":vertical", ":has-leading", ":has-trailing")]
+[PseudoClasses(":docked", ":floating", ":standard", ":vibrant", ":horizontal", ":vertical", ":compact", ":has-leading", ":has-trailing")]
 public sealed class MdToolbar : ItemsControl
 {
     public static readonly StyledProperty<MdToolbarMode> ModeProperty =
@@ -15,6 +15,8 @@ public sealed class MdToolbar : ItemsControl
         AvaloniaProperty.Register<MdToolbar, MdToolbarVariant>(nameof(Variant));
     public static readonly StyledProperty<Orientation> OrientationProperty =
         AvaloniaProperty.Register<MdToolbar, Orientation>(nameof(Orientation));
+    public static readonly StyledProperty<MdToolbarDensity> DensityProperty =
+        AvaloniaProperty.Register<MdToolbar, MdToolbarDensity>(nameof(Density));
     public static readonly StyledProperty<object?> LeadingContentProperty =
         AvaloniaProperty.Register<MdToolbar, object?>(nameof(LeadingContent));
     public static readonly StyledProperty<object?> TrailingContentProperty =
@@ -25,6 +27,7 @@ public sealed class MdToolbar : ItemsControl
         ModeProperty.Changed.AddClassHandler<MdToolbar>((toolbar, _) => toolbar.UpdatePseudoClasses());
         VariantProperty.Changed.AddClassHandler<MdToolbar>((toolbar, _) => toolbar.UpdatePseudoClasses());
         OrientationProperty.Changed.AddClassHandler<MdToolbar>((toolbar, _) => toolbar.UpdatePseudoClasses());
+        DensityProperty.Changed.AddClassHandler<MdToolbar>((toolbar, _) => toolbar.UpdatePseudoClasses());
         LeadingContentProperty.Changed.AddClassHandler<MdToolbar>((toolbar, _) => toolbar.UpdatePseudoClasses());
         TrailingContentProperty.Changed.AddClassHandler<MdToolbar>((toolbar, _) => toolbar.UpdatePseudoClasses());
     }
@@ -49,6 +52,12 @@ public sealed class MdToolbar : ItemsControl
         set => SetValue(OrientationProperty, value);
     }
 
+    public MdToolbarDensity Density
+    {
+        get => GetValue(DensityProperty);
+        set => SetValue(DensityProperty, value);
+    }
+
     public object? LeadingContent
     {
         get => GetValue(LeadingContentProperty);
@@ -69,6 +78,7 @@ public sealed class MdToolbar : ItemsControl
         PseudoClasses.Set(":vibrant", Variant == MdToolbarVariant.Vibrant);
         PseudoClasses.Set(":horizontal", Orientation == Orientation.Horizontal);
         PseudoClasses.Set(":vertical", Orientation == Orientation.Vertical);
+        PseudoClasses.Set(":compact", Density == MdToolbarDensity.Compact);
         PseudoClasses.Set(":has-leading", LeadingContent is not null);
         PseudoClasses.Set(":has-trailing", TrailingContent is not null);
     }

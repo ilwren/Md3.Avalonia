@@ -6,8 +6,8 @@
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="20" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="0" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdTopAppBar">
@@ -102,8 +102,8 @@
     <Setter Property="Height" Value="{DynamicResource Md.Comp.BottomAppBar.Height}" />
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="20" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="0" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdBottomAppBar">
         <Border Height="{TemplateBinding Height}"
@@ -126,9 +126,6 @@
         </Border>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:fab-left /template/ Grid#PART_BottomLayout">
-      <Setter Property="ColumnDefinitions" Value="Auto,*" />
-    </Style>
     <Style Selector="^:fab-left /template/ ContentPresenter#PART_BottomActions">
       <Setter Property="Grid.Column" Value="1" />
       <Setter Property="HorizontalAlignment" Value="Right" />

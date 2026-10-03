@@ -13,6 +13,7 @@ using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Localization;
 
 namespace Md3.Avalonia.Extra.Controls;
 
@@ -77,11 +78,12 @@ public sealed class MdBreadcrumb : ListBox
         ItemsBeforeCollapseProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.ResetOverflow());
         ItemsAfterCollapseProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.ResetOverflow());
         OverflowContentProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.UpdateItemContainers());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.UpdateLocalizedText());
     }
 
     public MdBreadcrumb()
     {
-        AutomationProperties.SetName(this, "Breadcrumb");
+        AutomationProperties.SetName(this, MdLocalization.GetString("Breadcrumb", this));
         SelectionChanged += OnSelectionChanged;
         LayoutUpdated += (_, _) => UpdateOverflowOnly();
     }
@@ -144,8 +146,10 @@ public sealed class MdBreadcrumb : ListBox
         listItem.IsVisible = isVisible;
         listItem.IsEnabled = isOverflow || model?.IsEnabled != false;
         KeyboardNavigation.SetIsTabStop(listItem, isOverflow || !isCurrent);
-        AutomationProperties.SetName(listItem, isOverflow ? "Show full breadcrumb path" : (model?.Label ?? item)?.ToString());
-        AutomationProperties.SetHelpText(listItem, isCurrent ? "Current page" : $"Item {index + 1} of {ItemCount}");
+        AutomationProperties.SetName(listItem, isOverflow ? MdLocalization.GetString("ShowFullBreadcrumbPath", this) : (model?.Label ?? item)?.ToString());
+        AutomationProperties.SetHelpText(listItem, isCurrent
+            ? MdLocalization.GetString("CurrentPage", this)
+            : MdLocalization.Format("ItemOf", this, index + 1, ItemCount));
 
         // The package supplies the complete ListBoxItem theme, so instantiate it before resolving
         // named parts. This also makes rich breadcrumb content visible on the first layout pass.
@@ -163,6 +167,12 @@ public sealed class MdBreadcrumb : ListBox
         {
             iconPresenter.Content = isOverflow ? null : model?.Icon;
         }
+    }
+
+    private void UpdateLocalizedText()
+    {
+        AutomationProperties.SetName(this, MdLocalization.GetString("Breadcrumb", this));
+        UpdateItemContainers();
     }
 
     private void ResetOverflow()

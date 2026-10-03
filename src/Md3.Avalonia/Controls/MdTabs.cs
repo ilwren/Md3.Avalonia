@@ -21,6 +21,8 @@ public sealed class MdTabs : ListBox
         AvaloniaProperty.Register<MdTabs, bool>(nameof(IsScrollable));
 
     private readonly TranslateTransform _indicatorTransform = new();
+    private readonly MdSpatialSpringRunner _indicatorXRunner;
+    private readonly MdSpatialSpringRunner _indicatorWidthRunner;
     private Border? _selectionIndicator;
     private double _lastIndicatorX = double.NaN;
     private double _lastIndicatorWidth = double.NaN;
@@ -43,6 +45,11 @@ public sealed class MdTabs : ListBox
 
     public MdTabs()
     {
+        _indicatorXRunner = new MdSpatialSpringRunner(this, value => _indicatorTransform.X = value);
+        _indicatorWidthRunner = new MdSpatialSpringRunner(this, value =>
+        {
+            if (_selectionIndicator is not null) _selectionIndicator.Width = value;
+        });
         UpdatePseudoClasses();
         SelectionChanged += (_, _) => ScheduleIndicatorUpdate();
         LayoutUpdated += (_, _) => UpdateIndicatorGeometry();
@@ -71,6 +78,13 @@ public sealed class MdTabs : ListBox
             _selectionIndicator.RenderTransform = _indicatorTransform;
         UpdateMotion();
         ScheduleIndicatorUpdate();
+    }
+
+    protected override void OnDetachedFromVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        _indicatorXRunner.Stop();
+        _indicatorWidthRunner.Stop();
+        base.OnDetachedFromVisualTree(e);
     }
 
     protected override void PrepareContainerForItemOverride(Control container, object? item, int index)
@@ -102,12 +116,11 @@ public sealed class MdTabs : ListBox
         PseudoClasses.Set(":no-motion", scheme == MdMotionScheme.None);
         if (_selectionIndicator is not null)
         {
+            // Effects remain duration-based; critical indicator geometry uses the velocity-preserving runners.
             _selectionIndicator.Transitions = MdMotionTransitions.Collect(
-                MdMotionTransitions.CreateDouble(this, WidthProperty, MdMotionKind.Spatial),
                 MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects, MdMotionSpeed.Fast));
         }
-        _indicatorTransform.Transitions = MdMotionTransitions.Collect(
-            MdMotionTransitions.CreateDouble(this, TranslateTransform.XProperty, MdMotionKind.Spatial));
+        _indicatorTransform.Transitions = null;
         ScheduleIndicatorUpdate();
     }
 
@@ -138,27 +151,33 @@ public sealed class MdTabs : ListBox
         if (Math.Abs(x - _lastIndicatorX) < 0.01 && Math.Abs(width - _lastIndicatorWidth) < 0.01)
             return;
 
+        var firstGeometry = double.IsNaN(_lastIndicatorX) || double.IsNaN(_lastIndicatorWidth);
         _lastIndicatorX = x;
         _lastIndicatorWidth = width;
         _selectionIndicator.IsVisible = true;
         _selectionIndicator.Height = Variant == MdTabVariant.Secondary ? 2 : 3;
 
-        if (MdMotion.GetScheme(this) == MdMotionScheme.Reduced)
+        var scheme = MdMotion.GetScheme(this);
+        if (firstGeometry || scheme is MdMotionScheme.Reduced or MdMotionScheme.None)
         {
-            _selectionIndicator.Opacity = 0;
-            _indicatorTransform.X = x;
-            _selectionIndicator.Width = width;
-            var version = ++_indicatorVersion;
-            Dispatcher.UIThread.Post(() =>
+            if (scheme == MdMotionScheme.Reduced) _selectionIndicator.Opacity = 0;
+            _indicatorXRunner.SnapTo(x);
+            _indicatorWidthRunner.SnapTo(width);
+            if (scheme == MdMotionScheme.Reduced)
             {
-                if (version == _indicatorVersion && _selectionIndicator is not null)
-                    _selectionIndicator.Opacity = 1;
-            }, DispatcherPriority.Render);
+                var version = ++_indicatorVersion;
+                Dispatcher.UIThread.Post(() =>
+                {
+                    if (version == _indicatorVersion && _selectionIndicator is not null)
+                        _selectionIndicator.Opacity = 1;
+                }, DispatcherPriority.Render);
+            }
+            else _selectionIndicator.Opacity = 1;
         }
         else
         {
-            _indicatorTransform.X = x;
-            _selectionIndicator.Width = width;
+            _indicatorXRunner.Retarget(x);
+            _indicatorWidthRunner.Retarget(width);
             _selectionIndicator.Opacity = 1;
         }
     }

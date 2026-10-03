@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
-using Avalonia.VisualTree;
 
 namespace Md3.Avalonia.Controls;
 
@@ -9,19 +8,84 @@ namespace Md3.Avalonia.Controls;
 [PseudoClasses(":xsmall", ":small", ":medium", ":large", ":xlarge")]
 public class MdConnectedButtonGroup : ItemsControl
 {
+    private readonly HashSet<Control> _sizeManagedContainers = [];
+    private readonly HashSet<Control> _shapeManagedContainers = [];
+    private bool _shapesScheduled;
+
     public static readonly StyledProperty<MdButtonSize> SizeProperty = AvaloniaProperty.Register<MdConnectedButtonGroup, MdButtonSize>(nameof(Size), MdButtonSize.Small);
     public static readonly StyledProperty<double> ItemSpacingProperty = AvaloniaProperty.Register<MdConnectedButtonGroup, double>(nameof(ItemSpacing), 2);
 
-    static MdConnectedButtonGroup() => SizeProperty.Changed.AddClassHandler<MdConnectedButtonGroup>((x, _) => x.UpdatePseudoClasses());
-
-    public MdConnectedButtonGroup()
+    static MdConnectedButtonGroup()
     {
-        UpdatePseudoClasses();
-        LayoutUpdated += (_, _) => UpdateConnectedShapes();
+        SizeProperty.Changed.AddClassHandler<MdConnectedButtonGroup>((group, _) =>
+        {
+            group.UpdatePseudoClasses();
+            group.UpdateManagedContainerSizes();
+            group.UpdateConnectedShapes();
+        });
+        FlowDirectionProperty.Changed.AddClassHandler<MdConnectedButtonGroup>((group, _) => group.UpdateConnectedShapes());
     }
+
+    public MdConnectedButtonGroup() => UpdatePseudoClasses();
 
     public MdButtonSize Size { get => GetValue(SizeProperty); set => SetValue(SizeProperty, value); }
     public double ItemSpacing { get => GetValue(ItemSpacingProperty); set => SetValue(ItemSpacingProperty, value); }
+
+    protected override void PrepareContainerForItemOverride(Control container, object? item, int index)
+    {
+        base.PrepareContainerForItemOverride(container, item, index);
+        ManageContainerSize(container);
+        if (!_shapesScheduled)
+        {
+            _shapesScheduled = true;
+            LayoutUpdated += UpdateShapesOnce;
+        }
+    }
+
+    protected override void ClearContainerForItemOverride(Control container)
+    {
+        if (_sizeManagedContainers.Remove(container))
+        {
+            if (container is MdButton button) button.ClearValue(MdButton.SizeProperty);
+            else if (container is MdToggleButton toggle) toggle.ClearValue(MdToggleButton.SizeProperty);
+        }
+        if (_shapeManagedContainers.Remove(container))
+        {
+            if (container is MdButton button) button.ClearValue(MdButton.ContainerCornerRadiusProperty);
+            else if (container is MdToggleButton toggle)
+            {
+                toggle.ClearValue(MdToggleButton.ContainerCornerRadiusProperty);
+                toggle.ClearValue(MdToggleButton.EnableSelectedShapeMorphProperty);
+            }
+        }
+        base.ClearContainerForItemOverride(container);
+    }
+
+    private void UpdateShapesOnce(object? sender, EventArgs e)
+    {
+        LayoutUpdated -= UpdateShapesOnce;
+        _shapesScheduled = false;
+        UpdateConnectedShapes();
+    }
+
+    private void ManageContainerSize(Control container)
+    {
+        if (container is MdButton button && (_sizeManagedContainers.Contains(button) || !button.IsSet(MdButton.SizeProperty)))
+        {
+            _sizeManagedContainers.Add(button);
+            button.SetCurrentValue(MdButton.SizeProperty, Size);
+        }
+        else if (container is MdToggleButton toggle && (_sizeManagedContainers.Contains(toggle) || !toggle.IsSet(MdToggleButton.SizeProperty)))
+        {
+            _sizeManagedContainers.Add(toggle);
+            toggle.SetCurrentValue(MdToggleButton.SizeProperty, Size);
+        }
+    }
+
+    private void UpdateManagedContainerSizes()
+    {
+        foreach (var container in _sizeManagedContainers.ToArray()) ManageContainerSize(container);
+    }
 
     private void UpdatePseudoClasses()
     {
@@ -34,7 +98,9 @@ public class MdConnectedButtonGroup : ItemsControl
 
     private void UpdateConnectedShapes()
     {
-        var buttons = this.GetVisualDescendants()
+        // Only direct realized item containers participate. Nested buttons inside an item's
+        // content belong to that item and must never be resized or reshaped by the group.
+        var buttons = GetRealizedContainers()
             .Where(control => control is MdButton or MdToggleButton)
             .ToArray();
         if (buttons.Length == 0)
@@ -55,21 +121,32 @@ public class MdConnectedButtonGroup : ItemsControl
 
         for (var index = 0; index < buttons.Length; index++)
         {
+            var firstRadius = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft
+                ? new CornerRadius(inner, outer, outer, inner)
+                : new CornerRadius(outer, inner, inner, outer);
+            var lastRadius = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft
+                ? new CornerRadius(outer, inner, inner, outer)
+                : new CornerRadius(inner, outer, outer, inner);
             var radius = buttons.Length == 1
                 ? new CornerRadius(outer)
                 : index == 0
-                    ? new CornerRadius(outer, inner, inner, outer)
+                    ? firstRadius
                     : index == buttons.Length - 1
-                        ? new CornerRadius(inner, outer, outer, inner)
+                        ? lastRadius
                         : new CornerRadius(inner);
 
-            if (buttons[index] is MdButton button)
+            if (buttons[index] is MdButton button &&
+                (_shapeManagedContainers.Contains(button) || !button.IsSet(MdButton.ContainerCornerRadiusProperty)))
             {
+                _shapeManagedContainers.Add(button);
                 button.SetCurrentValue(MdButton.ContainerCornerRadiusProperty, radius);
             }
-            else if (buttons[index] is MdToggleButton toggle)
+            else if (buttons[index] is MdToggleButton toggle &&
+                     (_shapeManagedContainers.Contains(toggle) || !toggle.IsSet(MdToggleButton.ContainerCornerRadiusProperty)))
             {
-                toggle.SetCurrentValue(MdToggleButton.EnableSelectedShapeMorphProperty, false);
+                _shapeManagedContainers.Add(toggle);
+                if (!toggle.IsSet(MdToggleButton.EnableSelectedShapeMorphProperty))
+                    toggle.SetCurrentValue(MdToggleButton.EnableSelectedShapeMorphProperty, false);
                 toggle.SetCurrentValue(MdToggleButton.ContainerCornerRadiusProperty, radius);
             }
         }

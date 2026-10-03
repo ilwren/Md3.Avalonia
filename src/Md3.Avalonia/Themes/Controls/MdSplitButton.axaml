@@ -13,7 +13,8 @@
                        Command="{TemplateBinding Command}"
                        CommandParameter="{TemplateBinding CommandParameter}"
                        LeadingIcon="{TemplateBinding LeadingIcon}"
-                       Size="{TemplateBinding Size}" />
+                       Size="{TemplateBinding Size}"
+                       AutomationProperties.Name="{TemplateBinding PrimaryAutomationName}" />
           <md:MdToggleIconButton x:Name="PART_TrailingButton"
                                  Grid.Column="2"
                                  MinWidth="0"
@@ -24,7 +25,8 @@
                                  Size="{TemplateBinding Size}"
                                  Command="{TemplateBinding TrailingCommand}"
                                  CommandParameter="{TemplateBinding TrailingCommandParameter}"
-                                 IsChecked="{TemplateBinding IsDropDownOpen, Mode=TwoWay}" />
+                                 IsChecked="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                                 AutomationProperties.Name="{TemplateBinding TrailingAutomationName}" />
           <md:MdDropdownMenu Grid.ColumnSpan="3"
                              Content="{TemplateBinding DropDownContent}"
                              IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
@@ -44,15 +46,27 @@
     <Style Selector="^:elevated /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="Variant" Value="Filled" /><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
 
     <Style Selector="^:xsmall /template/ md|MdButton#PART_PrimaryButton"><Setter Property="ContainerCornerRadius" Value="16,4,4,16" /></Style>
-    <Style Selector="^:xsmall /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerWidth" Value="48" /><Setter Property="IconSize" Value="22" /><Setter Property="ContainerCornerRadius" Value="4,16,16,4" /></Style>
+    <Style Selector="^:xsmall /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerWidth" Value="{DynamicResource Md.Comp.SplitButton.XSmall.TrailingWidth}" /><Setter Property="IconSize" Value="{DynamicResource Md.Comp.IconButton.XSmall.IconSize}" /><Setter Property="ContainerCornerRadius" Value="4,16,16,4" /></Style>
     <Style Selector="^:small /template/ md|MdButton#PART_PrimaryButton"><Setter Property="ContainerCornerRadius" Value="20,4,4,20" /></Style>
-    <Style Selector="^:small /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerWidth" Value="48" /><Setter Property="IconSize" Value="22" /><Setter Property="ContainerCornerRadius" Value="4,20,20,4" /></Style>
+    <Style Selector="^:small /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerWidth" Value="{DynamicResource Md.Comp.SplitButton.Small.TrailingWidth}" /><Setter Property="IconSize" Value="{DynamicResource Md.Comp.IconButton.Small.IconSize}" /><Setter Property="ContainerCornerRadius" Value="4,20,20,4" /></Style>
     <Style Selector="^:medium /template/ md|MdButton#PART_PrimaryButton"><Setter Property="ContainerCornerRadius" Value="28,4,4,28" /></Style>
-    <Style Selector="^:medium /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerWidth" Value="56" /><Setter Property="IconSize" Value="26" /><Setter Property="ContainerCornerRadius" Value="4,28,28,4" /></Style>
+    <Style Selector="^:medium /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerWidth" Value="{DynamicResource Md.Comp.SplitButton.Medium.TrailingWidth}" /><Setter Property="IconSize" Value="{DynamicResource Md.Comp.IconButton.Medium.IconSize}" /><Setter Property="ContainerCornerRadius" Value="4,28,28,4" /></Style>
     <Style Selector="^:large /template/ md|MdButton#PART_PrimaryButton"><Setter Property="ContainerCornerRadius" Value="48,8,8,48" /></Style>
-    <Style Selector="^:large /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerWidth" Value="96" /><Setter Property="IconSize" Value="38" /><Setter Property="ContainerCornerRadius" Value="8,48,48,8" /></Style>
+    <Style Selector="^:large /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerWidth" Value="{DynamicResource Md.Comp.SplitButton.Large.TrailingWidth}" /><Setter Property="IconSize" Value="{DynamicResource Md.Comp.IconButton.Large.IconSize}" /><Setter Property="ContainerCornerRadius" Value="8,48,48,8" /></Style>
     <Style Selector="^:xlarge /template/ md|MdButton#PART_PrimaryButton"><Setter Property="ContainerCornerRadius" Value="68,12,12,68" /></Style>
-    <Style Selector="^:xlarge /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerWidth" Value="136" /><Setter Property="IconSize" Value="50" /><Setter Property="ContainerCornerRadius" Value="12,68,68,12" /></Style>
+    <Style Selector="^:xlarge /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerWidth" Value="{DynamicResource Md.Comp.SplitButton.XLarge.TrailingWidth}" /><Setter Property="IconSize" Value="{DynamicResource Md.Comp.IconButton.XLarge.IconSize}" /><Setter Property="ContainerCornerRadius" Value="12,68,68,12" /></Style>
+
+    <!-- Start/end shapes mirror while preserving logical primary/trailing actions in RTL. -->
+    <Style Selector="^:rtl:xsmall /template/ md|MdButton#PART_PrimaryButton"><Setter Property="ContainerCornerRadius" Value="4,16,16,4" /></Style>
+    <Style Selector="^:rtl:xsmall /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerCornerRadius" Value="16,4,4,16" /></Style>
+    <Style Selector="^:rtl:small /template/ md|MdButton#PART_PrimaryButton"><Setter Property="ContainerCornerRadius" Value="4,20,20,4" /></Style>
+    <Style Selector="^:rtl:small /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerCornerRadius" Value="20,4,4,20" /></Style>
+    <Style Selector="^:rtl:medium /template/ md|MdButton#PART_PrimaryButton"><Setter Property="ContainerCornerRadius" Value="4,28,28,4" /></Style>
+    <Style Selector="^:rtl:medium /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerCornerRadius" Value="28,4,4,28" /></Style>
+    <Style Selector="^:rtl:large /template/ md|MdButton#PART_PrimaryButton"><Setter Property="ContainerCornerRadius" Value="8,48,48,8" /></Style>
+    <Style Selector="^:rtl:large /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerCornerRadius" Value="48,8,8,48" /></Style>
+    <Style Selector="^:rtl:xlarge /template/ md|MdButton#PART_PrimaryButton"><Setter Property="ContainerCornerRadius" Value="12,68,68,12" /></Style>
+    <Style Selector="^:rtl:xlarge /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="ContainerCornerRadius" Value="68,12,12,68" /></Style>
 
   </ControlTheme>
 </ResourceDictionary>

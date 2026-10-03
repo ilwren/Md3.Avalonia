@@ -6,6 +6,7 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Controls;
@@ -38,6 +39,7 @@ public sealed class MdLoadingIndicator : ProgressBar
         IsActiveProperty.Changed.AddClassHandler<MdLoadingIndicator>((indicator, _) => indicator.UpdateTimer());
         IsContainedProperty.Changed.AddClassHandler<MdLoadingIndicator>((indicator, _) => indicator.UpdateContainedState());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdLoadingIndicator>((indicator, _) => indicator.UpdateTimer());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdLoadingIndicator>((indicator, _) => indicator.UpdateAutomationName());
         AffectsRender<MdLoadingIndicator>(IndicatorBrushProperty, ContainerBrushProperty, IsContainedProperty);
     }
 
@@ -45,7 +47,7 @@ public sealed class MdLoadingIndicator : ProgressBar
     {
         IsIndeterminate = true;
         IsHitTestVisible = false;
-        AutomationProperties.SetName(this, "Loading");
+        UpdateAutomationName();
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
         _timer.Tick += (_, _) => InvalidateVisual();
         ApplySize();
@@ -133,6 +135,8 @@ public sealed class MdLoadingIndicator : ProgressBar
     }
 
     private static int PositiveModulo(int value, int divisor) => (value % divisor + divisor) % divisor;
+
+    private void UpdateAutomationName() => AutomationProperties.SetName(this, MdLocalization.GetString("Loading", this));
 
     private void ApplySize()
     {

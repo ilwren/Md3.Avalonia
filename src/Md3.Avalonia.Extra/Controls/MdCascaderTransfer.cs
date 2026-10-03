@@ -8,10 +8,12 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
 using Path = Avalonia.Controls.Shapes.Path;
 
@@ -54,12 +56,13 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
         PlaceholderTextProperty.Changed.AddClassHandler<MdCascader>((control, _) => control.UpdateDisplayText());
         PathSeparatorProperty.Changed.AddClassHandler<MdCascader>((control, _) => control.UpdateDisplayText());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdCascader>((control, _) => control.UpdateMotion());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdCascader>((control, _) => control.UpdateDisplayText());
     }
     public MdCascader()
     {
         _presence = new MdPresenceController(SetPopupPresence);
         _presence.Initialize(IsDropDownOpen);
-        AutomationProperties.SetName(this, Label ?? "Hierarchy selector");
+        AutomationProperties.SetName(this, Label ?? MdLocalization.GetString("HierarchySelector", this));
         Reset();
         UpdateOpenState();
     }
@@ -230,7 +233,7 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
     {
         var value = SelectedPath.Count == 0 ? PlaceholderText ?? string.Empty : string.Join(PathSeparator, SelectedPath.Select(item => item.Label));
         SetAndRaise(DisplayTextProperty, ref _displayText, value);
-        AutomationProperties.SetName(this, Label ?? "Hierarchy selector");
+        AutomationProperties.SetName(this, Label ?? MdLocalization.GetString("HierarchySelector", this));
         AutomationProperties.SetHelpText(this, value);
         PseudoClasses.Set(":has-value", SelectedPath.Count > 0);
     }
@@ -308,6 +311,81 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
     }
 }
 
+/// <summary>Responsive three-region layout used by <see cref="MdTransfer"/>.</summary>
+public sealed class MdTransferLayoutPanel : Panel
+{
+    public static readonly StyledProperty<bool> IsCompactProperty = AvaloniaProperty.Register<MdTransferLayoutPanel, bool>(nameof(IsCompact));
+    public static readonly StyledProperty<double> SpacingProperty = AvaloniaProperty.Register<MdTransferLayoutPanel, double>(nameof(Spacing), 12);
+
+    static MdTransferLayoutPanel() => AffectsMeasure<MdTransferLayoutPanel>(IsCompactProperty, SpacingProperty);
+
+    public bool IsCompact { get => GetValue(IsCompactProperty); set => SetValue(IsCompactProperty, value); }
+    public double Spacing { get => GetValue(SpacingProperty); set => SetValue(SpacingProperty, value); }
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        if (Children.Count == 0) return default;
+        if (IsCompact)
+        {
+            var height = 0d;
+            var width = 0d;
+            foreach (var child in Children)
+            {
+                child.Measure(new Size(availableSize.Width, double.PositiveInfinity));
+                width = Math.Max(width, child.DesiredSize.Width);
+                height += child.DesiredSize.Height;
+            }
+            height += Math.Max(0, Children.Count - 1) * Spacing;
+            return new Size(width, height);
+        }
+
+        var actions = Children.Count > 1 ? Children[1] : null;
+        actions?.Measure(new Size(double.PositiveInfinity, availableSize.Height));
+        var actionWidth = actions?.DesiredSize.Width ?? 0;
+        var availableColumnWidth = double.IsInfinity(availableSize.Width)
+            ? double.PositiveInfinity
+            : Math.Max(0, (availableSize.Width - actionWidth - Math.Max(0, Children.Count - 1) * Spacing) / Math.Max(1, Children.Count - 1));
+        var width = actionWidth;
+        var height = actions?.DesiredSize.Height ?? 0;
+        for (var index = 0; index < Children.Count; index++)
+        {
+            if (index == 1) continue;
+            Children[index].Measure(new Size(availableColumnWidth, availableSize.Height));
+            width += Children[index].DesiredSize.Width;
+            height = Math.Max(height, Children[index].DesiredSize.Height);
+        }
+        width += Math.Max(0, Children.Count - 1) * Spacing;
+        return new Size(width, height);
+    }
+
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        if (IsCompact)
+        {
+            var y = 0d;
+            foreach (var child in Children)
+            {
+                child.Arrange(new Rect(0, y, finalSize.Width, child.DesiredSize.Height));
+                y += child.DesiredSize.Height + Spacing;
+            }
+            return finalSize;
+        }
+
+        var actionWidth = Children.Count > 1 ? Children[1].DesiredSize.Width : 0;
+        var columnWidth = Math.Max(0, (finalSize.Width - actionWidth - Math.Max(0, Children.Count - 1) * Spacing) / Math.Max(1, Children.Count - 1));
+        var rtl = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft;
+        var x = rtl ? finalSize.Width : 0d;
+        for (var index = 0; index < Children.Count; index++)
+        {
+            var width = index == 1 ? actionWidth : columnWidth;
+            if (rtl) x -= width;
+            Children[index].Arrange(new Rect(x, 0, width, finalSize.Height));
+            x += rtl ? -Spacing : width + Spacing;
+        }
+        return finalSize;
+    }
+}
+
 public enum MdTransferLayoutMode
 {
     Auto,
@@ -328,9 +406,17 @@ public sealed class MdTransfer : TemplatedControl
     public static readonly DirectProperty<MdTransfer, IReadOnlyList<object?>> AvailableItemsProperty = AvaloniaProperty.RegisterDirect<MdTransfer, IReadOnlyList<object?>>(nameof(AvailableItems), control => control.AvailableItems);
     public static readonly DirectProperty<MdTransfer, IReadOnlyList<object?>> TargetItemsProperty = AvaloniaProperty.RegisterDirect<MdTransfer, IReadOnlyList<object?>>(nameof(TargetItems), control => control.TargetItems);
     public static readonly DirectProperty<MdTransfer, string> StatusTextProperty = AvaloniaProperty.RegisterDirect<MdTransfer, string>(nameof(StatusText), control => control.StatusText);
+    public static readonly DirectProperty<MdTransfer, string> AllTextProperty = AvaloniaProperty.RegisterDirect<MdTransfer, string>(nameof(AllText), control => control.AllText);
+    public static readonly DirectProperty<MdTransfer, string> SourceFilterLabelProperty = AvaloniaProperty.RegisterDirect<MdTransfer, string>(nameof(SourceFilterLabel), control => control.SourceFilterLabel);
+    public static readonly DirectProperty<MdTransfer, string> TargetFilterLabelProperty = AvaloniaProperty.RegisterDirect<MdTransfer, string>(nameof(TargetFilterLabel), control => control.TargetFilterLabel);
+    public static readonly DirectProperty<MdTransfer, bool> IsCompactProperty = AvaloniaProperty.RegisterDirect<MdTransfer, bool>(nameof(IsCompact), control => control.IsCompact);
     private IReadOnlyList<object?> _available = Array.Empty<object?>();
     private IReadOnlyList<object?> _target = Array.Empty<object?>();
     private string _statusText = string.Empty;
+    private string _allText = string.Empty;
+    private string _sourceFilterLabel = string.Empty;
+    private string _targetFilterLabel = string.Empty;
+    private bool _isCompact;
     private ListBox? _availableList;
     private ListBox? _targetList;
     private Button? _moveTarget;
@@ -353,13 +439,15 @@ public sealed class MdTransfer : TemplatedControl
         LayoutModeProperty.Changed.AddClassHandler<MdTransfer>((control, _) => control.UpdateLayoutState());
         BoundsProperty.Changed.AddClassHandler<MdTransfer>((control, _) => control.UpdateLayoutState());
         FlowDirectionProperty.Changed.AddClassHandler<MdTransfer>((control, _) => control.UpdateLayoutState());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdTransfer>((control, _) => control.UpdateLocalizedAutomation());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdTransfer>((control, _) => control.CancelTransferMotion());
     }
     public MdTransfer()
     {
-        AutomationProperties.SetName(this, "Transfer list");
+        AutomationProperties.SetName(this, MdLocalization.GetString("TransferList", this));
         AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Polite);
         Refresh();
+        UpdateLocalizedAutomation();
         UpdateLayoutState();
     }
     public IEnumerable? ItemsSource { get => GetValue(ItemsSourceProperty); set => SetValue(ItemsSourceProperty, value); }
@@ -371,6 +459,10 @@ public sealed class MdTransfer : TemplatedControl
     public IReadOnlyList<object?> AvailableItems => _available;
     public IReadOnlyList<object?> TargetItems => _target;
     public string StatusText { get => _statusText; private set => SetAndRaise(StatusTextProperty, ref _statusText, value); }
+    public string AllText => _allText;
+    public string SourceFilterLabel => _sourceFilterLabel;
+    public string TargetFilterLabel => _targetFilterLabel;
+    public bool IsCompact => _isCompact;
     public event EventHandler? SelectionChanged;
     public void MoveToTarget(IEnumerable<object?> items)
     {
@@ -380,7 +472,7 @@ public sealed class MdTransfer : TemplatedControl
         var previousLayout = CaptureItemLayout();
         foreach (var item in moved) current.Add(item);
         SelectedItems = current;
-        StatusText = $"Moved {moved.Length} item{(moved.Length == 1 ? string.Empty : "s")} to selected";
+        StatusText = MdLocalization.Format("MovedItemsToSelected", this, moved.Length);
         AutomationProperties.SetHelpText(this, StatusText);
         ScheduleTransferMotion(moved, previousLayout);
         FocusTransferredItem(moved[0], _targetList);
@@ -394,7 +486,7 @@ public sealed class MdTransfer : TemplatedControl
         if (moved.Length == 0) return;
         var previousLayout = CaptureItemLayout();
         SelectedItems = current.Where(item => !requested.Contains(item)).ToArray();
-        StatusText = $"Moved {moved.Length} item{(moved.Length == 1 ? string.Empty : "s")} to available";
+        StatusText = MdLocalization.Format("MovedItemsToAvailable", this, moved.Length);
         AutomationProperties.SetHelpText(this, StatusText);
         ScheduleTransferMotion(moved, previousLayout);
         FocusTransferredItem(moved[0], _availableList);
@@ -418,27 +510,37 @@ public sealed class MdTransfer : TemplatedControl
         if (_moveAllSource is not null) _moveAllSource.Click += OnMoveAllSource;
         if (_availableList is not null)
         {
-            AutomationProperties.SetName(_availableList, "Available items");
             _availableList.KeyDown += OnListKeyDown;
             _availableList.AddHandler(InputElement.PointerPressedEvent, OnListPointerPressed, RoutingStrategies.Tunnel, true);
         }
         if (_targetList is not null)
         {
-            AutomationProperties.SetName(_targetList, "Selected items");
             _targetList.KeyDown += OnListKeyDown;
             _targetList.AddHandler(InputElement.PointerPressedEvent, OnListPointerPressed, RoutingStrategies.Tunnel, true);
         }
-        if (_moveTarget is not null) AutomationProperties.SetName(_moveTarget, "Move selected to target");
-        if (_moveSource is not null) AutomationProperties.SetName(_moveSource, "Move selected to source");
-        if (_moveAllTarget is not null) AutomationProperties.SetName(_moveAllTarget, "Move all to target");
-        if (_moveAllSource is not null) AutomationProperties.SetName(_moveAllSource, "Move all to source");
+        UpdateLocalizedAutomation();
         UpdateLayoutState();
+    }
+
+    private void UpdateLocalizedAutomation()
+    {
+        SetAndRaise(AllTextProperty, ref _allText, MdLocalization.GetString("All", this));
+        SetAndRaise(SourceFilterLabelProperty, ref _sourceFilterLabel, MdLocalization.GetString("FilterAvailable", this));
+        SetAndRaise(TargetFilterLabelProperty, ref _targetFilterLabel, MdLocalization.GetString("FilterSelected", this));
+        AutomationProperties.SetName(this, MdLocalization.GetString("TransferList", this));
+        if (_availableList is not null) AutomationProperties.SetName(_availableList, MdLocalization.GetString("AvailableItems", this));
+        if (_targetList is not null) AutomationProperties.SetName(_targetList, MdLocalization.GetString("SelectedItems", this));
+        if (_moveTarget is not null) AutomationProperties.SetName(_moveTarget, MdLocalization.GetString("MoveSelectedToTarget", this));
+        if (_moveSource is not null) AutomationProperties.SetName(_moveSource, MdLocalization.GetString("MoveSelectedToSource", this));
+        if (_moveAllTarget is not null) AutomationProperties.SetName(_moveAllTarget, MdLocalization.GetString("MoveAllToTarget", this));
+        if (_moveAllSource is not null) AutomationProperties.SetName(_moveAllSource, MdLocalization.GetString("MoveAllToSource", this));
     }
 
     private void UpdateLayoutState()
     {
         var compact = LayoutMode == MdTransferLayoutMode.Compact ||
                       (LayoutMode == MdTransferLayoutMode.Auto && Bounds.Width > 0 && Bounds.Width < 600);
+        SetAndRaise(IsCompactProperty, ref _isCompact, compact);
         PseudoClasses.Set(":compact", compact);
         PseudoClasses.Set(":rtl", FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft);
     }

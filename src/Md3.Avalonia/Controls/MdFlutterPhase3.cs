@@ -395,6 +395,7 @@ public sealed class MdAboutDialog : ContentControl
 }
 
 /// <summary>A searchable, selectable license list suitable for dialog or routed-page presentation.</summary>
+[PseudoClasses(":compact")]
 public sealed class MdLicensePage : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable<MdLicenseEntry>?> LicensesProperty = AvaloniaProperty.Register<MdLicensePage, IEnumerable<MdLicenseEntry>?>(nameof(Licenses));
@@ -408,13 +409,19 @@ public sealed class MdLicensePage : TemplatedControl
     {
         LicensesProperty.Changed.AddClassHandler<MdLicensePage>((page, _) => page.Refresh());
         FilterProperty.Changed.AddClassHandler<MdLicensePage>((page, _) => page.Refresh());
+        BoundsProperty.Changed.AddClassHandler<MdLicensePage>((page, _) => page.UpdateResponsiveState());
     }
-    public MdLicensePage() => Refresh();
+    public MdLicensePage()
+    {
+        Refresh();
+        UpdateResponsiveState();
+    }
     public IEnumerable<MdLicenseEntry>? Licenses { get => GetValue(LicensesProperty); set => SetValue(LicensesProperty, value); }
     public string? Filter { get => GetValue(FilterProperty); set => SetValue(FilterProperty, value); }
     public string? FilterLabel { get => GetValue(FilterLabelProperty); set => SetValue(FilterLabelProperty, value); }
     public MdLicenseEntry? SelectedLicense { get => GetValue(SelectedLicenseProperty); set => SetValue(SelectedLicenseProperty, value); }
     public IReadOnlyList<MdLicenseEntry> FilteredLicenses => _filteredLicenses;
+    private void UpdateResponsiveState() => PseudoClasses.Set(":compact", Bounds.Width > 0 && Bounds.Width < 640);
     private void Refresh()
     {
         var query = Filter?.Trim();

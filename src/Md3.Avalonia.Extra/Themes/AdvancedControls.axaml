@@ -71,7 +71,7 @@
             <Popup.Styles><Style Selector="PopupRoot"><Setter Property="Background" Value="Transparent" /><Setter Property="TransparencyLevelHint" Value="Transparent" /><Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /></Style></Popup.Styles>
             <Border x:Name="PART_Surface" Classes="eco-popover-surface" Margin="0,4,0,0" Padding="16,12" MinWidth="160" MaxWidth="400"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="12"
-                    BoxShadow="0 4 16 0 #33000000" Opacity="0"
+                    BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}" Opacity="0"
                     RenderTransform="scale(0.8) translate(0px,-8px)" RenderTransformOrigin="0%,0%">
               <ContentPresenter Content="{TemplateBinding PopoverContent}" />
             </Border>
@@ -89,13 +89,13 @@
     <Setter Property="VerticalAlignment" Value="Stretch" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Grid x:Name="PART_Backdrop" IsVisible="False" IsHitTestVisible="False" Opacity="0" Background="#66000000">
-          <Border x:Name="PART_Surface" Width="600" MaxWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}" MaxHeight="480" VerticalAlignment="Top" Margin="24,72,24,24" Padding="8"
-                  KeyboardNavigation.TabNavigation="Cycle" AutomationProperties.Name="Command palette"
-                  Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="28" BoxShadow="0 8 32 0 #55000000"
+        <Grid x:Name="PART_Backdrop" IsVisible="False" IsHitTestVisible="False" Opacity="0" Background="{DynamicResource Md.Sys.Color.Scrim.Standard.Brush}">
+          <Border x:Name="PART_Surface" MinWidth="0" MaxWidth="600" MaxHeight="480" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="24,72,24,24" Padding="8"
+                  KeyboardNavigation.TabNavigation="Cycle" AutomationProperties.Name="{TemplateBinding AccessibleName}"
+                  Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="28" BoxShadow="{DynamicResource Md.Sys.Elevation.Level5}"
                   Opacity="0" RenderTransform="scale(0.96) translate(0px,-16px)" RenderTransformOrigin="50%,0%">
             <Grid RowDefinitions="Auto,*">
-              <md:MdTextBox Name="PART_QueryBox" Margin="8" PlaceholderText="Search commands"
+              <md:MdTextBox Name="PART_QueryBox" Margin="8" PlaceholderText="{TemplateBinding SearchPlaceholder}"
                             ShowClearButton="True" Variant="Outlined" Text="{TemplateBinding Query, Mode=TwoWay}" />
               <ListBox Name="PART_ItemsHost" Grid.Row="1" Theme="{StaticResource EcoListTheme}"
                        ItemContainerTheme="{StaticResource EcoCommandPaletteItemTheme}"
@@ -113,7 +113,7 @@
                   </DataTemplate>
                 </ListBox.ItemTemplate>
               </ListBox>
-              <TextBlock Grid.Row="1" Classes="eco-empty" IsVisible="False" Margin="24" Text="No matching commands" HorizontalAlignment="Center" />
+              <TextBlock Grid.Row="1" Classes="eco-empty" IsVisible="False" Margin="24" Text="{TemplateBinding EmptyText}" HorizontalAlignment="Center" />
             </Grid>
           </Border>
         </Grid>
@@ -314,7 +314,7 @@
             <Border Name="PART_Surface" Padding="4"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
                     BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1"
-                    CornerRadius="12" BoxShadow="0 4 16 0 #33000000" ClipToBounds="True"
+                    CornerRadius="12" BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}" ClipToBounds="True"
                     Opacity="0" RenderTransform="scale(0.96) translate(0px,-8px)" RenderTransformOrigin="50%,0%">
               <ItemsControl Name="PART_Columns" Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding Columns}">
                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
@@ -341,26 +341,26 @@
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdTransfer">
         <Grid RowDefinitions="*,Auto" RowSpacing="8">
-          <Grid Name="PART_TransferLayout" ColumnDefinitions="*,Auto,*" ColumnSpacing="12" RowSpacing="12">
+          <eco:MdTransferLayoutPanel Name="PART_TransferLayout" IsCompact="{TemplateBinding IsCompact}" Spacing="12">
           <Border Name="PART_SourceSurface" Padding="8" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="16">
             <Grid RowDefinitions="Auto,*" RowSpacing="8">
-              <md:MdTextBox Label="Filter available" ShowClearButton="True" Variant="Outlined" Text="{TemplateBinding SourceFilter, Mode=TwoWay}" />
+              <md:MdTextBox Label="{TemplateBinding SourceFilterLabel}" ShowClearButton="True" Variant="Outlined" Text="{TemplateBinding SourceFilter, Mode=TwoWay}" />
               <ListBox Name="PART_Available" Grid.Row="1" Theme="{StaticResource EcoListTheme}" ItemContainerTheme="{StaticResource EcoListItemTheme}" ItemsSource="{TemplateBinding AvailableItems}" SelectionMode="Multiple" MinHeight="180" />
             </Grid>
           </Border>
           <StackPanel Name="PART_TransferActions" Grid.Column="1" VerticalAlignment="Center" Spacing="8">
-            <md:MdIconButton Name="PART_MoveTarget" Icon="{DynamicResource Md.Icon.ChevronRight}" ToolTip.Tip="Move selected to target" />
-            <md:MdButton Name="PART_MoveAllTarget" Content="All" Size="ExtraSmall" Variant="Text" ToolTip.Tip="Move all to target" />
-            <md:MdIconButton Name="PART_MoveSource" Icon="{DynamicResource Md.Icon.ChevronLeft}" ToolTip.Tip="Move selected to available" />
-            <md:MdButton Name="PART_MoveAllSource" Content="All" Size="ExtraSmall" Variant="Text" ToolTip.Tip="Move all to available" />
+            <md:MdIconButton Name="PART_MoveTarget" Icon="{DynamicResource Md.Icon.ChevronRight}" />
+            <md:MdButton Name="PART_MoveAllTarget" Content="{TemplateBinding AllText}" Size="ExtraSmall" Variant="Text" />
+            <md:MdIconButton Name="PART_MoveSource" Icon="{DynamicResource Md.Icon.ChevronLeft}" />
+            <md:MdButton Name="PART_MoveAllSource" Content="{TemplateBinding AllText}" Size="ExtraSmall" Variant="Text" />
           </StackPanel>
           <Border Name="PART_TargetSurface" Grid.Column="2" Padding="8" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="16">
             <Grid RowDefinitions="Auto,*" RowSpacing="8">
-              <md:MdTextBox Label="Filter selected" ShowClearButton="True" Variant="Outlined" Text="{TemplateBinding TargetFilter, Mode=TwoWay}" />
+              <md:MdTextBox Label="{TemplateBinding TargetFilterLabel}" ShowClearButton="True" Variant="Outlined" Text="{TemplateBinding TargetFilter, Mode=TwoWay}" />
               <ListBox Name="PART_Target" Grid.Row="1" Theme="{StaticResource EcoListTheme}" ItemContainerTheme="{StaticResource EcoListItemTheme}" ItemsSource="{TemplateBinding TargetItems}" SelectionMode="Multiple" MinHeight="180" />
             </Grid>
           </Border>
-          </Grid>
+          </eco:MdTransferLayoutPanel>
           <TextBlock Grid.Row="1" Margin="8,0" FontSize="12"
                      Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                      Text="{TemplateBinding StatusText}"
@@ -368,10 +368,7 @@
         </Grid>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:compact /template/ Grid#PART_TransferLayout"><Setter Property="ColumnDefinitions" Value="*" /><Setter Property="RowDefinitions" Value="Auto,Auto,Auto" /></Style>
-    <Style Selector="^:compact /template/ Border#PART_SourceSurface"><Setter Property="Grid.Row" Value="0" /><Setter Property="Grid.Column" Value="0" /></Style>
-    <Style Selector="^:compact /template/ StackPanel#PART_TransferActions"><Setter Property="Grid.Row" Value="1" /><Setter Property="Grid.Column" Value="0" /><Setter Property="Orientation" Value="Horizontal" /><Setter Property="HorizontalAlignment" Value="Center" /></Style>
-    <Style Selector="^:compact /template/ Border#PART_TargetSurface"><Setter Property="Grid.Row" Value="2" /><Setter Property="Grid.Column" Value="0" /></Style>
+    <Style Selector="^:compact /template/ StackPanel#PART_TransferActions"><Setter Property="Orientation" Value="Horizontal" /><Setter Property="HorizontalAlignment" Value="Center" /></Style>
     <Style Selector="^:compact /template/ ListBox#PART_Available"><Setter Property="MinHeight" Value="128" /></Style>
     <Style Selector="^:compact /template/ ListBox#PART_Target"><Setter Property="MinHeight" Value="128" /></Style>
     <Style Selector="^:rtl /template/ md|MdIconButton#PART_MoveTarget"><Setter Property="RenderTransform" Value="scale(-1,1)" /></Style>
@@ -525,7 +522,7 @@
                   <md:MdIcon Glyph="&#xe000;" Size="12" Foreground="{DynamicResource Md.Sys.Color.Error.Brush}" VerticalAlignment="Center" />
                   <TextBlock VerticalAlignment="Center" FontSize="10" Foreground="{DynamicResource Md.Sys.Color.Error.Brush}"
                              Text="{Binding Message.ErrorText, RelativeSource={RelativeSource TemplatedParent}, FallbackValue='Send failed'}" />
-                  <md:MdButton Classes="retry" Content="Retry" Size="ExtraSmall" Variant="Text" />
+                  <md:MdButton Classes="retry" Content="{Binding RetryText, RelativeSource={RelativeSource AncestorType=eco:MdChatView}}" Size="ExtraSmall" Variant="Text" />
                 </StackPanel>
               </Grid>
             </StackPanel>
@@ -569,7 +566,7 @@
         <Grid RowDefinitions="Auto,*,Auto,Auto,Auto,Auto">
           <Border x:Name="PART_SelectionToolbar" Margin="8,4" Padding="12,6" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" CornerRadius="16" IsVisible="False">
             <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8">
-              <md:MdButton Name="PART_CancelSelectionButton" Content="Cancel" Size="Small" Variant="Text" />
+              <md:MdButton Name="PART_CancelSelectionButton" Content="{TemplateBinding CancelText}" Size="Small" Variant="Text" />
               <TextBlock Grid.Column="1" VerticalAlignment="Center" FontWeight="Medium"
                          Text="{Binding SelectionCount, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0} selected'}" />
               <md:MdButton Name="PART_QuoteButton" Grid.Column="2" Content="Quote" Size="Small" Variant="Tonal" />
@@ -578,7 +575,7 @@
           </Border>
           <ListBox Name="PART_MessagesHost" Grid.Row="1" Theme="{StaticResource EcoListTheme}" ItemContainerTheme="{StaticResource EcoChatListItemTheme}"
                    ItemsSource="{TemplateBinding MessagesSource}" SelectionMode="Multiple" Background="Transparent" Padding="8,4"
-                   AutomationProperties.Name="Messages">
+                   AutomationProperties.Name="{TemplateBinding MessagesText}">
             <ListBox.ItemTemplate>
               <DataTemplate x:DataType="eco:MdChatMessage">
                 <eco:MdChatMessagePresenter Message="{Binding}"
@@ -602,7 +599,7 @@
                 <TextBlock FontSize="11" FontWeight="SemiBold" Text="{Binding QuotedMessage.Sender, RelativeSource={RelativeSource TemplatedParent}, StringFormat='Replying to {0}'}" />
                 <ContentPresenter Content="{Binding QuotedMessage.Content, RelativeSource={RelativeSource TemplatedParent}}" MaxHeight="32" Opacity=".75" />
               </StackPanel>
-              <md:MdButton Name="PART_CancelQuoteButton" Grid.Column="2" Content="Cancel" Size="ExtraSmall" Variant="Text" />
+              <md:MdButton Name="PART_CancelQuoteButton" Grid.Column="2" Content="{TemplateBinding CancelText}" Size="ExtraSmall" Variant="Text" />
             </Grid>
           </Border>
           <Border Grid.Row="5" Margin="8,6,8,8" Padding="6,4,6,4"
@@ -613,7 +610,7 @@
               <Button Name="PART_AttachmentButton" Width="48" Height="48" CornerRadius="999"
                       Background="Transparent" BorderThickness="0" Padding="0"
                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                      ToolTip.Tip="Attach file" AutomationProperties.Name="Attach file">
+                      ToolTip.Tip="{TemplateBinding AttachFileText}" AutomationProperties.Name="{TemplateBinding AttachFileText}">
                 <md:MdIcon Glyph="&#xe226;" Size="20" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
               </Button>
               <TextBox Name="PART_Composer" Grid.Column="1"
@@ -623,12 +620,12 @@
                        Background="Transparent" BorderThickness="0"
                        Watermark="Type a message..." TextWrapping="Wrap" />
               <Button Name="PART_SendButton" Grid.Column="2" Width="48" Height="48" CornerRadius="999"
-                      AutomationProperties.Name="Send message"
+                      AutomationProperties.Name="{TemplateBinding SendMessageText}"
                       Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
                       Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}"
                       BorderThickness="0" Padding="0"
                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                      ToolTip.Tip="Send message">
+                      ToolTip.Tip="{TemplateBinding SendMessageText}">
                 <md:MdIcon Glyph="&#xe163;" Size="18" Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" />
               </Button>
             </Grid>

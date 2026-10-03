@@ -10,6 +10,7 @@ using Avalonia.LogicalTree;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Extra.Infrastructure;
+using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Extra.Controls;
@@ -29,6 +30,9 @@ public sealed class MdCommandPalette : TemplatedControl
     public static readonly StyledProperty<KeyGesture?> OpenGestureProperty = AvaloniaProperty.Register<MdCommandPalette, KeyGesture?>(nameof(OpenGesture), new KeyGesture(Key.P, KeyModifiers.Control | KeyModifiers.Shift));
     public static readonly StyledProperty<int> SelectedIndexProperty = AvaloniaProperty.Register<MdCommandPalette, int>(nameof(SelectedIndex));
     public static readonly DirectProperty<MdCommandPalette, IReadOnlyList<MdCommandItem>> FilteredItemsProperty = AvaloniaProperty.RegisterDirect<MdCommandPalette, IReadOnlyList<MdCommandItem>>(nameof(FilteredItems), control => control.FilteredItems);
+    public static readonly DirectProperty<MdCommandPalette, string> AccessibleNameProperty = AvaloniaProperty.RegisterDirect<MdCommandPalette, string>(nameof(AccessibleName), control => control.AccessibleName);
+    public static readonly DirectProperty<MdCommandPalette, string> SearchPlaceholderProperty = AvaloniaProperty.RegisterDirect<MdCommandPalette, string>(nameof(SearchPlaceholder), control => control.SearchPlaceholder);
+    public static readonly DirectProperty<MdCommandPalette, string> EmptyTextProperty = AvaloniaProperty.RegisterDirect<MdCommandPalette, string>(nameof(EmptyText), control => control.EmptyText);
 
     private IReadOnlyList<MdCommandItem> _filteredItems = Array.Empty<MdCommandItem>();
     private TextBox? _queryBox;
@@ -39,6 +43,9 @@ public sealed class MdCommandPalette : TemplatedControl
     private readonly MdPresenceController _presence;
     private readonly MdFocusReturnScope _focusReturn = new();
     private readonly HashSet<ICommand> _observedCommands = [];
+    private string _accessibleName = string.Empty;
+    private string _searchPlaceholder = string.Empty;
+    private string _emptyText = string.Empty;
     private int _resultsVersion;
 
     static MdCommandPalette()
@@ -47,11 +54,13 @@ public sealed class MdCommandPalette : TemplatedControl
         QueryProperty.Changed.AddClassHandler<MdCommandPalette>((control, _) => control.Refresh());
         IsOpenProperty.Changed.AddClassHandler<MdCommandPalette>((control, _) => control.OnOpenChanged());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdCommandPalette>((control, _) => control.UpdateMotion());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdCommandPalette>((control, _) => control.UpdateLocalizedText());
     }
     public MdCommandPalette()
     {
         _presence = new MdPresenceController(present => PseudoClasses.Set(":present", present));
         _presence.Initialize(IsOpen);
+        UpdateLocalizedText();
         Refresh();
     }
 
@@ -61,6 +70,9 @@ public sealed class MdCommandPalette : TemplatedControl
     public KeyGesture? OpenGesture { get => GetValue(OpenGestureProperty); set => SetValue(OpenGestureProperty, value); }
     public int SelectedIndex { get => GetValue(SelectedIndexProperty); set => SetValue(SelectedIndexProperty, value); }
     public IReadOnlyList<MdCommandItem> FilteredItems => _filteredItems;
+    public string AccessibleName => _accessibleName;
+    public string SearchPlaceholder => _searchPlaceholder;
+    public string EmptyText => _emptyText;
 
     public event EventHandler<MdCommandItem>? CommandInvoked;
     public void Show() => SetCurrentValue(IsOpenProperty, true);
@@ -230,6 +242,13 @@ public sealed class MdCommandPalette : TemplatedControl
     private void UpdateHitTesting()
     {
         if (_backdrop is not null) _backdrop.IsHitTestVisible = IsOpen;
+    }
+
+    private void UpdateLocalizedText()
+    {
+        SetAndRaise(AccessibleNameProperty, ref _accessibleName, MdLocalization.GetString("CommandPalette", this));
+        SetAndRaise(SearchPlaceholderProperty, ref _searchPlaceholder, MdLocalization.GetString("SearchCommands", this));
+        SetAndRaise(EmptyTextProperty, ref _emptyText, MdLocalization.GetString("NoResults", this));
     }
 
     private void SynchronizeCommandHandlers()
