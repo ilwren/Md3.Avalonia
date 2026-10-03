@@ -346,7 +346,16 @@ public sealed class MdCarousel : ListBox
         var version = ++_settleVersion;
         Dispatcher.UIThread.Post(() =>
         {
-            if (version == _settleVersion) SettleSelectedItem();
+            if (version != _settleVersion) return;
+
+            // ItemCount and the virtualizing viewport can settle after the first container is
+            // prepared. Recompute the realized keylines now, then let one layout pass commit their
+            // Bounds before calculating the native scroll offset.
+            UpdateRealizedContainers();
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (version == _settleVersion) SettleSelectedItem();
+            }, DispatcherPriority.Render);
         }, DispatcherPriority.Render);
     }
 
