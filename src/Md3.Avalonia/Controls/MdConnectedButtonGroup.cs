@@ -90,8 +90,10 @@ public class MdConnectedButtonGroup : ItemsControl
     {
         // Only direct realized item containers participate. Nested buttons inside an item's
         // content belong to that item and must never be resized or reshaped by the group.
-        var buttons = GetRealizedContainers()
+        var buttons = Enumerable.Range(0, ItemCount)
+            .Select(index => ContainerFromIndex(index) as Control ?? Items[index] as Control)
             .Where(control => control is MdButton or MdToggleButton)
+            .Cast<Control>()
             .ToArray();
         if (buttons.Length == 0)
         {

@@ -18,6 +18,7 @@
           <md:MdToggleIconButton x:Name="PART_TrailingButton"
                                  Grid.Column="2"
                                  MinWidth="0"
+                                 HorizontalContentAlignment="Left"
                                  Icon="{DynamicResource Md.Icon.ExpandMore}"
                                  SelectedIcon="{DynamicResource Md.Icon.ExpandLess}"
                                  Shape="Square"
@@ -39,8 +40,7 @@
     <!-- Keep the visible split surfaces at the frozen two-DIP gap while the XS/S trailing
          action retains its independent 48-DIP transparent touch target. The blank target inset
          stays on the physical outside edge and mirrors in RTL. -->
-    <Style Selector="^ /template/ md|MdToggleIconButton#PART_TrailingButton /template/ Border#PART_Container"><Setter Property="HorizontalAlignment" Value="Left" /></Style>
-    <Style Selector="^:rtl /template/ md|MdToggleIconButton#PART_TrailingButton /template/ Border#PART_Container"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
+    <Style Selector="^:rtl /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="HorizontalContentAlignment" Value="Right" /></Style>
 
     <Style Selector="^:filled /template/ md|MdButton#PART_PrimaryButton"><Setter Property="Variant" Value="Filled" /></Style>
     <Style Selector="^:filled /template/ md|MdToggleIconButton#PART_TrailingButton"><Setter Property="Variant" Value="Filled" /><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryAction.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimaryAction.Brush}" /><Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnPrimaryAction.Brush}" /></Style>

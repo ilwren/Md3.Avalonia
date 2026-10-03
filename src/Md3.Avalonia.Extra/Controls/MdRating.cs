@@ -62,6 +62,10 @@ public sealed class MdRating : RangeBase
     public override void Render(DrawingContext context)
     {
         base.Render(context);
+        // A transparent bounds primitive makes every 48-DIP cell and the spacing between cells
+        // participate in hit testing; the visible star remains compact and does not define the
+        // pointer target by its irregular outline.
+        context.DrawRectangle(Brushes.Transparent, null, new Rect(Bounds.Size));
         var count = Math.Max(1, (int)Math.Ceiling(Maximum - Minimum));
         var size = Math.Max(16, ItemSize);
         var target = Math.Max(48, size);
