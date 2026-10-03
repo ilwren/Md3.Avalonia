@@ -59,6 +59,113 @@ All component themes are scoped to `Md*` types. Registering `MaterialTheme` does
 - Existing optional Ecosystem controls: `MdAvatar`, `MdAvatarGroup`, `MdRating`, `MdBreadcrumb`, `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, and `MdStaggeredPanel`.
 - `MdBeforeAfter` provides draggable horizontal/vertical content comparison; `MdAnimatedText` provides typewriter/fade/pop-friendly text reveal; `MdSpinKit` contains optional non-Material loading recipes; `MdStaggeredPanel` provides cancelable staggered entrance motion. These are Extra controls; core `MdChart` remains provider-neutral and does not bundle a chart engine.
 
+## Complete component catalog
+
+The following catalog covers the public control surface shipped by the core package. Types ending in `*Item`, `*Part`, `*Presenter`, `*Thumb`, `*Panel`, or `*Grid` are supporting visual types that can also be composed directly when their API is public. For the exact dependency version and XML documentation, use the generated `Md3.Avalonia.xml` file in the NuGet package.
+
+### Core controls (`Md3.Avalonia`)
+
+| Area | Controls and supporting types |
+|---|---|
+| **Buttons and actions** | `MdButton` (`Filled`, `Tonal`, `Outlined`, `Text` variants), `MdIconButton`, `MdToggleButton`, `MdToggleIconButton`, `MdSplitButton`, `MdStandardButtonGroup`, `MdConnectedButtonGroup`, `MdFloatingActionButton`, `MdExtendedFloatingActionButton`, `MdFabMenu`, `MdFabMenuItem`, `MdFabMenuPanel` |
+| **Text and form input** | `MdTextBox`, `MdNumericBox`, `MdAutoCompleteBox`, `MdSearchBar`, `MdSearchView`, `MdCheckBox`, `MdRadioButton`, `MdSwitch`, `MdSlider`, `MdRangeSlider`, `MdComboBox`, `MdForm`, `MdFormField`, `MdDropdownFormField`, `MdOutlinedFieldBorder` |
+| **Chips and selection** | `MdChip`, `MdAssistChip`, `MdFilterChip`, `MdInputChip`, `MdSuggestionChip`, `MdSegmentedButton`, `MdSegmentedButtonGroup` |
+| **Surfaces and content** | `MdSurface`, `MdCard`, `MdList`, `MdListItem`, `MdDivider`, `MdCarousel`, `MdCarouselItem`, `MdGridTile`, `MdGridTileBar`, `MdBanner`, `MdExpansionPanel`, `MdExpansionPanelList`, `MdDataTable`, `MdPaginatedDataTable` |
+| **Menus and dialogs** | `MdMenu`, `MdMenuItem`, `MdSubMenuItem`, `MdMenuAnchor`, `MdDropdownMenu`, `MdDialog`, `MdDialogHost`, `MdSimpleDialog`, `MdAboutDialog`, `MdLicensePage`, `MdSheetHost`, `MdTooltip`, `MdTooltipHost` |
+| **Navigation and layout** | `MdScaffold`, `MdTopAppBar`, `MdBottomAppBar`, `MdToolbar`, `MdNavigationBar`, `MdNavigationBarItem`, `MdNavigationDrawer`, `MdNavigationRail`, `MdNavigationRailItem`, `MdNavigationSuite`, `MdTabs`, `MdTabItem`, `MdTabView`, `MdTabViewItem`, `MdAdaptiveLayout`, `MdAdaptiveSwitch`, `MdKeyboardAvoidingHost`, `MdDraggableScrollableSheet` |
+| **Settings and preference surfaces** | `MdSettingsGroup`, `MdSettingsCard`, `MdSettingsExpander` |
+| **Feedback and status** | `MdLoadingIndicator`, `MdLinearProgressIndicator`, `MdCircularProgressIndicator`, `MdAdaptiveProgressIndicator`, `MdBadge`, `MdBadgedBox`, `MdRefreshIndicator`, `MdSnackbar`, `MdSnackbarHost`, `MdSnackbarService` |
+| **Pickers and calendars** | `MdDatePicker`, `MdDatePickerDialog`, `MdDateRangePicker`, `MdCalendarGrid`, `MdCalendarDay`, `MdTimePicker`, `MdTimePickerDialog`, `MdTimeDial`, `MdTimeDialPart`, `MdPickerRestorationStore` |
+| **Lists and interaction patterns** | `MdReorderableList`, `MdDismissible`, `MdStepper`, `MdStep`, `MdHero`, `MdFocusTraversalGroup`, `MdShortcutScope` |
+| **Foundations and icons** | `MdText`, `MdIcon`, `MdSymbolPresenter`, `MdStateLayer`, `MdRipplePresenter`, `MdFocusRing`, `MdScrollViewer`, `MdScrollBar`, `MdSliderThumb`, `MdWindow` |
+| **Window chrome** | `MdBorderlessWindow`, `MdWindowTitleBar`, `MdCaptionButton`, `MdWindowCaptionButton`, `MdWindowDragRegion`, `MdWindowResizeGrip`, `IMdWindowPlatformAdapter`, `MdWindowPlatformAdapterResolver`, `MdWindowsWindowPlatformAdapter`, `MdMacOsWindowPlatformAdapter`, `MdLinuxWindowPlatformAdapter`, `MdAvaloniaWindowPlatformAdapter`, `MdAndroidWindowPlatformAdapter` |
+
+Most core controls expose styled properties, bindable `Items`/`ItemsSource` where applicable, routed events, commands, and native Avalonia automation peers. The following variant/support enums are part of the public API and should be preferred over string values: `MdButtonVariant`, `MdButtonSize`, `MdButtonShape`, `MdCardVariant`, `MdChipVariant`, `MdDialogVariant`, `MdListVariant`, `MdNavigationBarVariant`, `MdNavigationBarLayout`, `MdNavigationDrawerPlacement`, `MdProgressShape`, `MdTabVariant`, `MdTextBoxVariant`, `MdTimePickerMode`, `MdToolbarDensity`, `MdToolbarMode`, `MdToolbarVariant`, `MdTooltipVariant`, and `MdTopAppBarVariant`.
+
+### Core control quick reference
+
+| Type | Primary use | Important API surface |
+|---|---|---|
+| `MdButton`, `MdIconButton`, `MdToggleButton` | Actions and two-state actions | `Command`, `CommandParameter`, `IsEnabled`, `IsChecked`, content/icon properties, variant and size properties |
+| `MdTextBox`, `MdNumericBox`, `MdAutoCompleteBox` | Text, numeric, and suggestion input | `Text`/`Value`, validation properties, `ItemsSource`/suggestion provider, `Watermark`, `IsReadOnly` |
+| `MdSearchBar`, `MdSearchView` | Search entry and result presentation | `Query`, `SearchCommand`, result templates, `SearchResultCommitted` |
+| `MdCheckBox`, `MdRadioButton`, `MdSwitch` | Boolean and mutually exclusive choices | `IsChecked`, `GroupName`/selection binding, `Command` and native input events |
+| `MdSlider`, `MdRangeSlider` | Single and interval values | `Minimum`, `Maximum`, `Value` or `StartValue`/`EndValue`, `Step`, `Orientation` |
+| `MdCard`, `MdSurface`, `MdList`, `MdListItem` | Material containers and lists | variant/elevation/surface properties, content, `ItemsSource`, item templates, selection/invocation events |
+| `MdDialogHost`, `MdSheetHost` | Modal dialogs and bottom/side sheets | `ShowAsync`, `Close`, `Dialog`, placement, dismissal and result APIs |
+| `MdMenu`, `MdDropdownMenu`, `MdMenuAnchor` | Contextual and anchored actions | items, submenu support, placement, `Show`/`Dismiss`, keyboard navigation |
+| `MdNavigationBar`, `MdNavigationRail`, `MdNavigationDrawer` | Primary application navigation | item collections, selected index/item, placement/layout and `ItemInvoked` |
+| `MdTabs`, `MdTabView` | Peer navigation and document views | tab collections, selected item/index, closable/reorderable view items |
+| `MdDatePicker`, `MdDateRangePicker`, `MdTimePicker` | Date, date range, and time selection | selected value(s), mode, dialogs, validation, restoration and `ShowAsync` |
+| `MdSnackbarHost`, `MdSnackbarService` | Queued transient messages | `Show`, `ShowAsync`, `Dismiss`, action/result, queue and shared service injection |
+| `MdCarousel`, `MdRefreshIndicator`, `MdReorderableList` | Touch-friendly content interaction | controller/provider APIs, navigation, refresh callbacks, reorder callbacks |
+| `MdScaffold`, `MdAdaptiveLayout`, `MdToolbar` | Application shell and responsive layout | slots/regions, breakpoint mode, density, toolbar mode and platform input mode |
+
+### Optional package catalog (`Md3.Avalonia.Extra`)
+
+`ExtraTheme` must be registered in addition to `MaterialTheme`. These controls are maintained as optional ecosystem patterns, not as claims of official Material 3 parity.
+
+| Area | Controls |
+|---|---|
+| **Overlays and commands** | `MdPopover`, `MdHoverCard`, `MdCommandPalette`, `MdCommandItem` |
+| **Collections and layout** | `MdPagedItemsView`, `MdMasonryPanel`, `MdDataGrid`, `MdDataGridColumn`, `MdSlidableItem`, `MdTreeView`, `MdTreeNode`, `MdTreeRow` |
+| **Selection and transfer** | `MdAsyncSelect`, `MdCalendar`, `MdCascader`, `MdCascaderItem`, `MdTransfer`, `MdColorPicker`, `MdColorPickerButton` |
+| **Feedback and identity** | `MdAvatar`, `MdAvatarGroup`, `MdRating`, `MdResultView`, `MdSkeleton`, `MdSkeletonGroup`, `MdPinInput`, `MdPinCell`, `MdTagInput`, `MdTagEntry` |
+| **Data visualization and editing** | `MdChart`, `MdChartSeries`, `MdChartPoint`, `MdRichEditor`, `MdRichTextEditor`, `MdChatView`, `MdChatMessage`, `MdTimeline`, `MdTimelineItem` |
+| **Motion and visual extras** | `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, `MdStaggeredPanel`, `MdAnimationSequence`, `MdAnimatedVisibility`, `MdContainerTransform`, `MdFadeThrough`, `MdSharedAxis` |
+| **Navigation/content** | `MdBreadcrumb`, `MdBreadcrumbItem`, `MdGridTile`-style content helpers |
+
+The Extra support contracts are also public: `IMdPageProvider<T>`, `MdPageRequest`, `MdPageResult<T>`, `MdAsyncRequestState`, `MdDensity`, `MdEcosystemDensity`, `MdOverlayPlacement`, `MdOverlayAlignment`, `MdShortcutBinding`, and `MdFocusReturnScope`. Data and adapter contracts include `IMdChartDataProvider`, `IMdRichEditorAdapter`, and `IMdRichEditorStateAdapter`. Supporting enums and records such as `MdCalendarSelectionMode`, `MdTransferLayoutMode`, `MdMasonryLayoutStrategy`, `MdResultKind`, `MdSkeletonShape`, `MdSpinKitKind`, `MdAnimatedTextEffect`, and `MdTimelineItemState` configure those controls.
+
+### Common usage patterns
+
+**Register both themes when using Extra:**
+
+```xml
+<Application.Styles>
+  <themes:MaterialTheme />
+  <extra:ExtraTheme />
+</Application.Styles>
+```
+
+**Bind an input and a selection control:**
+
+```xml
+<StackPanel Spacing="16">
+  <md:MdTextBox Text="{Binding Name, Mode=TwoWay}" Watermark="Name" />
+  <md:MdSegmentedButtonGroup SelectedItem="{Binding Filter, Mode=TwoWay}">
+    <md:MdSegmentedButton Content="All" Tag="all" />
+    <md:MdSegmentedButton Content="Unread" Tag="unread" />
+  </md:MdSegmentedButtonGroup>
+</StackPanel>
+```
+
+**Compose an application shell:**
+
+```xml
+<md:MdScaffold>
+  <md:MdScaffold.TopBar>
+    <md:MdTopAppBar Title="Inbox" />
+  </md:MdScaffold.TopBar>
+  <md:MdScaffold.Content>
+    <md:MdList ItemsSource="{Binding Messages}" />
+  </md:MdScaffold.Content>
+  <md:MdScaffold.BottomBar>
+    <md:MdNavigationBar ItemsSource="{Binding Destinations}" />
+  </md:MdScaffold.BottomBar>
+</md:MdScaffold>
+```
+
+**Use an Extra provider-backed control:**
+
+```xml
+<extra:MdPagedItemsView ItemsSource="{Binding Items}"
+                        LoadPageAsync="{Binding LoadPageAsync}" />
+<extra:MdResultView Result="{Binding RequestResult}" />
+```
+
+Provider-backed controls are intentionally adapter-neutral. The application owns HTTP, caching, error policy, and cancellation; the control owns loading, empty, error, and retry presentation.
+
 ## Dynamic theme API
 
 ```csharp
