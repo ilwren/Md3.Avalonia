@@ -41,15 +41,16 @@ public sealed class MdSlidableItem : ContentControl
     private double _lastPointerX;
     private ulong _lastPointerTimestamp;
     private double _horizontalVelocity;
+    private bool _updatingOpenState;
 
     static MdSlidableItem()
     {
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdSlidableItem>((item, _) => item.UpdateMotion());
         IsOpenProperty.Changed.AddClassHandler<MdSlidableItem>((item, change) =>
         {
-            if (change.NewValue is true && !item.IsOpen) return;
-            if (change.NewValue is true) item.OpenStart();
-            else if (item.Offset != 0) item.Close();
+            if (item._updatingOpenState) return;
+            if (change.NewValue is true && item.Offset == 0) item.OpenStart();
+            else if (change.NewValue is false && item.Offset != 0) item.Close();
         });
     }
 
@@ -69,9 +70,15 @@ public sealed class MdSlidableItem : ContentControl
 
     public event EventHandler? Opened;
     public event EventHandler? Closed;
-    public void OpenStart() { UpdateMotion(); SetOffset(Math.Max(0, ActionExtent)); IsOpen = true; }
-    public void OpenEnd() { UpdateMotion(); SetOffset(-Math.Max(0, ActionExtent)); IsOpen = true; }
-    public void Close() { UpdateMotion(); SetOffset(0); IsOpen = false; Closed?.Invoke(this, EventArgs.Empty); }
+    public void OpenStart() { UpdateMotion(); SetOffset(Math.Max(0, ActionExtent)); SetOpenState(true); }
+    public void OpenEnd() { UpdateMotion(); SetOffset(-Math.Max(0, ActionExtent)); SetOpenState(true); }
+    public void Close() { UpdateMotion(); SetOffset(0); SetOpenState(false); Closed?.Invoke(this, EventArgs.Empty); }
+    private void SetOpenState(bool value)
+    {
+        _updatingOpenState = true;
+        try { SetCurrentValue(IsOpenProperty, value); }
+        finally { _updatingOpenState = false; }
+    }
     public void InvokeStart() { if (StartActionCommand?.CanExecute(DataContext) == true) StartActionCommand.Execute(DataContext); if (CloseOnAction) Close(); }
     public void InvokeEnd() { if (EndActionCommand?.CanExecute(DataContext) == true) EndActionCommand.Execute(DataContext); if (CloseOnAction) Close(); }
 
