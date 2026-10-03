@@ -229,6 +229,15 @@ public sealed class MdBreadcrumb : ListBox
                 {
                     PrepareContainerForItemOverride(container, ItemFromContainer(container), index);
                 }
+
+                // ItemCount can settle after the generator's initial prepare pass. Keep this tiny
+                // part synchronized on every layout so the final separator never flashes or stays
+                // visible merely because its container was prepared before the count updated.
+                if (container.GetVisualDescendants().OfType<ContentPresenter>()
+                    .FirstOrDefault(presenter => presenter.Name == "PART_Separator") is { } separator)
+                {
+                    separator.IsVisible = !isLast || ShowTrailingSeparator;
+                }
             }
         }
         finally { _updatingOverflow = false; }
