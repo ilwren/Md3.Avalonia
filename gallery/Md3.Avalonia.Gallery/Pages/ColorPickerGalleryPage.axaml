@@ -103,7 +103,7 @@
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
-        <gallery:CodeExample XamlCode="&lt;!-- Custom Material-styled source color picker --&gt;&#10;&lt;extra:MdColorPicker SelectedColor=&quot;{Binding CurrentColor, Mode=TwoWay}&quot;&#10;                     SelectedHex=&quot;{Binding HexString, Mode=TwoWay}&quot;&#10;                     IsAlphaEnabled=&quot;True&quot;&#10;                     ColorChanged=&quot;OnColorChanged&quot; /&gt;&#10;&#10;&lt;!-- Compact pop-up color button --&gt;&#10;&lt;extra:MdColorPickerButton SelectedColor=&quot;{Binding AccentColor, Mode=TwoWay}&quot; /&gt;"
+        <gallery:CodeExample XamlCode="&lt;!-- Custom Material-styled source color picker --&gt;&#10;&lt;extra:MdColorPicker SelectedColor=&quot;{Binding CurrentColor, Mode=TwoWay}&quot;&#10;                     SelectedHex=&quot;{Binding HexString, Mode=TwoWay}&quot;&#10;                     IsAlphaEnabled=&quot;True&quot;&#10;                     IsPreviewPanelVisible=&quot;True&quot;&#10;                     IsMaterialPalettePanelVisible=&quot;True&quot;&#10;                     IsSpectrumPanelVisible=&quot;True&quot;&#10;                     IsRecentColorsPanelVisible=&quot;False&quot;&#10;                     ColorChanged=&quot;OnColorChanged&quot; /&gt;&#10;&#10;&lt;!-- Compact pop-up color button --&gt;&#10;&lt;extra:MdColorPickerButton SelectedColor=&quot;{Binding AccentColor, Mode=TwoWay}&quot; /&gt;"
                              CSharpCode="private void OnColorChanged(object? sender, Color color)&#10;{&#10;    var options = MdThemeManager.Current with { SeedColor = color.ToString() };&#10;    MdThemeManager.Apply(Application.Current!, options, isDark: false);&#10;}" />
       </StackPanel>
     </StackPanel>

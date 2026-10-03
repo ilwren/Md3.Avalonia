@@ -31,7 +31,7 @@ public enum MdColorPickerMode
 /// Material and Flutter do not provide a first-party ColorPicker component. This control supplies HCT
 /// tonal swatches, HSV sliders, live HEX input/binding, and alpha-channel support.
 /// </summary>
-[PseudoClasses(":palette", ":spectrum", ":presets")]
+[PseudoClasses(":palette", ":spectrum", ":presets", ":palette-panel-visible", ":spectrum-panel-visible", ":presets-panel-visible", ":mode-selector-visible")]
 public class MdColorPicker : TemplatedControl
 {
     public static readonly StyledProperty<Color> SelectedColorProperty =
@@ -42,6 +42,21 @@ public class MdColorPicker : TemplatedControl
 
     public static readonly StyledProperty<bool> IsAlphaEnabledProperty =
         AvaloniaProperty.Register<MdColorPicker, bool>(nameof(IsAlphaEnabled), true);
+
+    public static readonly StyledProperty<bool> IsPreviewPanelVisibleProperty =
+        AvaloniaProperty.Register<MdColorPicker, bool>(nameof(IsPreviewPanelVisible), true);
+
+    public static readonly StyledProperty<bool> IsModeSelectorVisibleProperty =
+        AvaloniaProperty.Register<MdColorPicker, bool>(nameof(IsModeSelectorVisible), true);
+
+    public static readonly StyledProperty<bool> IsMaterialPalettePanelVisibleProperty =
+        AvaloniaProperty.Register<MdColorPicker, bool>(nameof(IsMaterialPalettePanelVisible), true);
+
+    public static readonly StyledProperty<bool> IsSpectrumPanelVisibleProperty =
+        AvaloniaProperty.Register<MdColorPicker, bool>(nameof(IsSpectrumPanelVisible), true);
+
+    public static readonly StyledProperty<bool> IsRecentColorsPanelVisibleProperty =
+        AvaloniaProperty.Register<MdColorPicker, bool>(nameof(IsRecentColorsPanelVisible), true);
 
     public static readonly StyledProperty<MdColorPickerMode> PickerModeProperty =
         AvaloniaProperty.Register<MdColorPicker, MdColorPickerMode>(nameof(PickerMode), MdColorPickerMode.MaterialPalette);
@@ -122,7 +137,11 @@ public class MdColorPicker : TemplatedControl
         SaturationProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.OnHsvChanged());
         ColorValueProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.OnHsvChanged());
         AlphaProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.OnHsvChanged());
-        PickerModeProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.UpdateModePseudoClasses());
+        PickerModeProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.OnPanelConfigurationChanged());
+        IsModeSelectorVisibleProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.OnPanelConfigurationChanged());
+        IsMaterialPalettePanelVisibleProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.OnPanelConfigurationChanged());
+        IsSpectrumPanelVisibleProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.OnPanelConfigurationChanged());
+        IsRecentColorsPanelVisibleProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.OnPanelConfigurationChanged());
     }
 
     public MdColorPicker()
@@ -160,6 +179,44 @@ public class MdColorPicker : TemplatedControl
     {
         get => GetValue(IsAlphaEnabledProperty);
         set => SetValue(IsAlphaEnabledProperty, value);
+    }
+
+    /// <summary>Shows the selected-color preview, HEX editor, and copy action.</summary>
+    public bool IsPreviewPanelVisible
+    {
+        get => GetValue(IsPreviewPanelVisibleProperty);
+        set => SetValue(IsPreviewPanelVisibleProperty, value);
+    }
+
+    /// <summary>
+    /// Shows the mode selector when at least two picker panels are available. Set this to false
+    /// when the host exposes a single purpose-specific panel.
+    /// </summary>
+    public bool IsModeSelectorVisible
+    {
+        get => GetValue(IsModeSelectorVisibleProperty);
+        set => SetValue(IsModeSelectorVisibleProperty, value);
+    }
+
+    /// <summary>Allows the Material source-color and generated tonal-palette panel to be displayed.</summary>
+    public bool IsMaterialPalettePanelVisible
+    {
+        get => GetValue(IsMaterialPalettePanelVisibleProperty);
+        set => SetValue(IsMaterialPalettePanelVisibleProperty, value);
+    }
+
+    /// <summary>Allows the HSV and optional alpha adjustment panel to be displayed.</summary>
+    public bool IsSpectrumPanelVisible
+    {
+        get => GetValue(IsSpectrumPanelVisibleProperty);
+        set => SetValue(IsSpectrumPanelVisibleProperty, value);
+    }
+
+    /// <summary>Allows the recent-colors panel to be displayed.</summary>
+    public bool IsRecentColorsPanelVisible
+    {
+        get => GetValue(IsRecentColorsPanelVisibleProperty);
+        set => SetValue(IsRecentColorsPanelVisibleProperty, value);
     }
 
     public MdColorPickerMode PickerMode
@@ -415,11 +472,49 @@ public class MdColorPicker : TemplatedControl
         MaterialShades = MdThemeGenerator.GeneratePrimaryTonalPalette(baseColor);
     }
 
+    private void OnPanelConfigurationChanged()
+    {
+        if (!IsPanelVisible(PickerMode))
+        {
+            MdColorPickerMode? fallback = IsMaterialPalettePanelVisible
+                ? MdColorPickerMode.MaterialPalette
+                : IsSpectrumPanelVisible
+                    ? MdColorPickerMode.SpectrumSliders
+                    : IsRecentColorsPanelVisible
+                        ? MdColorPickerMode.Presets
+                        : null;
+
+            if (fallback is { } fallbackMode && fallbackMode != PickerMode)
+            {
+                SetCurrentValue(PickerModeProperty, fallbackMode);
+                return;
+            }
+        }
+
+        UpdateModePseudoClasses();
+    }
+
+    private bool IsPanelVisible(MdColorPickerMode mode) => mode switch
+    {
+        MdColorPickerMode.MaterialPalette => IsMaterialPalettePanelVisible,
+        MdColorPickerMode.SpectrumSliders => IsSpectrumPanelVisible,
+        MdColorPickerMode.Presets => IsRecentColorsPanelVisible,
+        _ => false
+    };
+
     private void UpdateModePseudoClasses()
     {
-        PseudoClasses.Set(":palette", PickerMode == MdColorPickerMode.MaterialPalette);
-        PseudoClasses.Set(":spectrum", PickerMode == MdColorPickerMode.SpectrumSliders);
-        PseudoClasses.Set(":presets", PickerMode == MdColorPickerMode.Presets);
+        var visiblePanelCount = (IsMaterialPalettePanelVisible ? 1 : 0) +
+                                (IsSpectrumPanelVisible ? 1 : 0) +
+                                (IsRecentColorsPanelVisible ? 1 : 0);
+
+        PseudoClasses.Set(":palette-panel-visible", IsMaterialPalettePanelVisible);
+        PseudoClasses.Set(":spectrum-panel-visible", IsSpectrumPanelVisible);
+        PseudoClasses.Set(":presets-panel-visible", IsRecentColorsPanelVisible);
+        PseudoClasses.Set(":mode-selector-visible", IsModeSelectorVisible && visiblePanelCount > 1);
+        PseudoClasses.Set(":palette", PickerMode == MdColorPickerMode.MaterialPalette && IsMaterialPalettePanelVisible);
+        PseudoClasses.Set(":spectrum", PickerMode == MdColorPickerMode.SpectrumSliders && IsSpectrumPanelVisible);
+        PseudoClasses.Set(":presets", PickerMode == MdColorPickerMode.Presets && IsRecentColorsPanelVisible);
     }
 
     private sealed class DelegateCommand(Action<object?> execute) : ICommand

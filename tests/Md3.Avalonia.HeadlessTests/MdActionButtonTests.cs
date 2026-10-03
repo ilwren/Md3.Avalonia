@@ -149,6 +149,49 @@ public sealed class MdActionButtonTests
     }
 
     [AvaloniaFact]
+    public void Fab_Menu_Can_Open_Initially_Without_Overriding_Explicit_Live_State()
+    {
+        var initiallyOpen = new MdFabMenu
+        {
+            IsInitiallyOpen = true,
+            Items =
+            {
+                new MdFabMenuItem { Content = "Photo" },
+                new MdFabMenuItem { Content = "Document" }
+            }
+        };
+        MdMotion.SetScheme(initiallyOpen, MdMotionScheme.None);
+        using (Show(initiallyOpen))
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(initiallyOpen.IsOpen);
+            Assert.True(initiallyOpen.AreItemsVisible);
+
+            initiallyOpen.Dismiss();
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(initiallyOpen.IsOpen);
+            Assert.False(initiallyOpen.AreItemsVisible);
+        }
+
+        var explicitlyClosed = new MdFabMenu
+        {
+            IsInitiallyOpen = true,
+            IsOpen = false,
+            Items =
+            {
+                new MdFabMenuItem { Content = "Photo" },
+                new MdFabMenuItem { Content = "Document" }
+            }
+        };
+        using (Show(explicitlyClosed))
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(explicitlyClosed.IsOpen);
+            Assert.False(explicitlyClosed.AreItemsVisible);
+        }
+    }
+
+    [AvaloniaFact]
     public void Fab_Menu_Expansion_Direction_Controls_Actual_Geometry_Independent_Of_Parent_Alignment()
     {
         var menu = new MdFabMenu

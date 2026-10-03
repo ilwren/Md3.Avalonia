@@ -45,7 +45,8 @@ Material 3 FAB menu that expands two to six labeled actions with reversible moti
 
 | Property | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `IsOpen` | `bool` | `false` | Two-way binding for expanded/collapsed state |
+| `IsOpen` | `bool` | `false` | Two-way binding for the live expanded/collapsed state |
+| `IsInitiallyOpen` | `bool` | `false` | Opens on first visual-tree attachment unless `IsOpen` was explicitly assigned or bound; it does not reopen after the user closes it |
 | `Alignment` | `MdFabAlignment` | `Right` | `Left` or `Right` alignment of actions and trigger |
 | `ExpansionDirection` | `MdFabMenuExpansionDirection` | `Up` | Places actions above or below the anchored trigger without changing its parent-layout alignment |
 | `ColorStyle` | `MdFabColor` | `PrimaryContainer` | Color container style for trigger |
@@ -54,7 +55,8 @@ Material 3 FAB menu that expands two to six labeled actions with reversible moti
 
 ```xml
 <!-- Material default: actions expand above an anchor near the bottom edge. -->
-<md:MdFabMenu Alignment="Right" ExpansionDirection="Up" VerticalAlignment="Bottom">
+<md:MdFabMenu Alignment="Right" ExpansionDirection="Up" VerticalAlignment="Bottom"
+              IsInitiallyOpen="True">
     <md:MdFabMenuItem Content="Photo" Icon="{x:Static md:MdSymbols.Photo}" />
     <md:MdFabMenuItem Content="Document" Icon="{x:Static md:MdSymbols.Description}" />
 </md:MdFabMenu>

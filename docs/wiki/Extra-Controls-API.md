@@ -18,6 +18,12 @@ Material Design 3 and Flutter do not define a first-party ColorPicker component.
 | `SelectedColor` | `Color` | `#6750A4` | Two-way binding for the selected color |
 | `SelectedHex` | `string` | `"#6750A4"` | Two-way binding for HEX color representation |
 | `IsAlphaEnabled` | `bool` | `true` | Enables or disables opacity / alpha slider |
+| `PickerMode` | `MdColorPickerMode` | `MaterialPalette` | Active panel: palette, spectrum sliders, or recent presets |
+| `IsPreviewPanelVisible` | `bool` | `true` | Shows the selected-color preview, HEX editor, and copy action |
+| `IsModeSelectorVisible` | `bool` | `true` | Shows the selector when at least two panels are available |
+| `IsMaterialPalettePanelVisible` | `bool` | `true` | Allows the source-color and HCT tonal-palette panel |
+| `IsSpectrumPanelVisible` | `bool` | `true` | Allows the HSV/alpha adjustment panel |
+| `IsRecentColorsPanelVisible` | `bool` | `true` | Allows the recent-colors panel |
 | `Hue` | `double` | `260` | HSV Hue value (0° to 360°) |
 | `Saturation` | `double` | `50` | HSV Saturation percentage (0% to 100%) |
 | `ColorValue` | `double` | `65` | HSV Brightness / Value percentage (0% to 100%) |
@@ -31,7 +37,10 @@ Material Design 3 and Flutter do not define a first-party ColorPicker component.
 <!-- Embedded Color Picker -->
 <extra:MdColorPicker SelectedColor="{Binding ThemeColor, Mode=TwoWay}"
                      SelectedHex="{Binding HexString, Mode=TwoWay}"
-                     IsAlphaEnabled="True" />
+                     IsAlphaEnabled="True"
+                     IsMaterialPalettePanelVisible="False"
+                     IsSpectrumPanelVisible="True"
+                     IsRecentColorsPanelVisible="False" />
 
 <!-- Compact Color Swatch Button -->
 <extra:MdColorPickerButton SelectedColor="{Binding AccentColor, Mode=TwoWay}" />

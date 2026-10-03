@@ -349,6 +349,61 @@ public sealed class MdReportedIssuesTests
     }
 
     [AvaloniaFact]
+    public void ColorPicker_Uses_Internal_Viewport_When_Dialog_Sized_Content_Is_Constrained()
+    {
+        var picker = new MdColorPicker { Width = 400 };
+        using var host = Show(picker, 460, 360);
+        Dispatcher.UIThread.RunJobs();
+
+        var scrollViewer = picker.GetVisualDescendants().OfType<ScrollViewer>()
+            .Single(viewer => viewer.Name == "PART_ContentScrollViewer");
+        Assert.True(scrollViewer.Extent.Height > scrollViewer.Viewport.Height,
+            $"Expected scrollable color-picker content, extent={scrollViewer.Extent.Height}, viewport={scrollViewer.Viewport.Height}.");
+
+        scrollViewer.Offset = new Vector(0, Math.Min(120, scrollViewer.Extent.Height - scrollViewer.Viewport.Height));
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(scrollViewer.Offset.Y > 0);
+    }
+
+    [AvaloniaFact]
+    public void ColorPicker_Panel_Visibility_Properties_Select_An_Available_Mode()
+    {
+        var picker = new MdColorPicker
+        {
+            Width = 400,
+            IsPreviewPanelVisible = false,
+            IsModeSelectorVisible = false,
+            IsMaterialPalettePanelVisible = false,
+            IsSpectrumPanelVisible = true,
+            IsRecentColorsPanelVisible = true
+        };
+        using var host = Show(picker, 460, 500);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(MdColorPickerMode.SpectrumSliders, picker.PickerMode);
+        Assert.False(picker.GetVisualDescendants().OfType<Border>()
+            .Single(control => control.Name == "PART_PreviewPanel").IsVisible);
+        Assert.False(picker.GetVisualDescendants().OfType<MdConnectedButtonGroup>()
+            .Single(control => control.Name == "PART_ModeSelector").IsVisible);
+        Assert.False(picker.GetVisualDescendants().OfType<StackPanel>()
+            .Single(control => control.Name == "PART_PaletteSection").IsVisible);
+        Assert.True(picker.GetVisualDescendants().OfType<StackPanel>()
+            .Single(control => control.Name == "PART_SpectrumSection").IsVisible);
+        Assert.False(picker.GetVisualDescendants().OfType<StackPanel>()
+            .Single(control => control.Name == "PART_PresetsSection").IsVisible);
+
+        picker.IsModeSelectorVisible = true;
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(picker.GetVisualDescendants().OfType<MdConnectedButtonGroup>()
+            .Single(control => control.Name == "PART_ModeSelector").IsVisible);
+
+        picker.IsRecentColorsPanelVisible = false;
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(picker.GetVisualDescendants().OfType<MdConnectedButtonGroup>()
+            .Single(control => control.Name == "PART_ModeSelector").IsVisible);
+    }
+
+    [AvaloniaFact]
     public void ColorPickerButton_Tracks_Popup_And_Hex_State()
     {
         // Keep popup state testing detached because the headless platform intentionally

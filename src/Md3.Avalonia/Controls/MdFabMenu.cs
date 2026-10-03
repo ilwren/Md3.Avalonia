@@ -25,6 +25,8 @@ public class MdFabMenu : ItemsControl
 
     public static readonly StyledProperty<bool> IsOpenProperty = AvaloniaProperty.Register<MdFabMenu, bool>(
         nameof(IsOpen), defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
+    public static readonly StyledProperty<bool> IsInitiallyOpenProperty = AvaloniaProperty.Register<MdFabMenu, bool>(
+        nameof(IsInitiallyOpen));
     public static readonly StyledProperty<bool> AreItemsVisibleProperty =
         AvaloniaProperty.Register<MdFabMenu, bool>(nameof(AreItemsVisible));
     public static readonly StyledProperty<MdFabColor> ColorStyleProperty =
@@ -42,6 +44,7 @@ public class MdFabMenu : ItemsControl
     private readonly DispatcherTimer _closeTimer;
     private CancellationTokenSource? _openFrameCancellation;
     private bool _isAttached;
+    private bool _initialOpenStateApplied;
 
     static MdFabMenu()
     {
@@ -69,7 +72,16 @@ public class MdFabMenu : ItemsControl
         };
     }
 
+    /// <summary>Gets or sets the current expanded state. This property supports two-way binding.</summary>
     public bool IsOpen { get => GetValue(IsOpenProperty); set => SetValue(IsOpenProperty, value); }
+
+    /// <summary>
+    /// Gets or sets whether the menu opens the first time it is attached to a visual tree.
+    /// An explicitly assigned or bound <see cref="IsOpen"/> value takes precedence. The initial
+    /// value is applied only once, so closing the menu is preserved across detach/reattach cycles.
+    /// </summary>
+    public bool IsInitiallyOpen { get => GetValue(IsInitiallyOpenProperty); set => SetValue(IsInitiallyOpenProperty, value); }
+
     public bool AreItemsVisible { get => GetValue(AreItemsVisibleProperty); private set => SetCurrentValue(AreItemsVisibleProperty, value); }
     public MdFabColor ColorStyle { get => GetValue(ColorStyleProperty); set => SetValue(ColorStyleProperty, value); }
     public MdFabAlignment Alignment { get => GetValue(AlignmentProperty); set => SetValue(AlignmentProperty, value); }
@@ -104,6 +116,7 @@ public class MdFabMenu : ItemsControl
     {
         base.OnAttachedToVisualTree(e);
         _isAttached = true;
+        ApplyInitialOpenState();
         UpdateItemCountDiagnostic();
         UpdateOpenState();
     }
@@ -135,6 +148,17 @@ public class MdFabMenu : ItemsControl
             return;
         }
         base.OnKeyDown(e);
+    }
+
+    private void ApplyInitialOpenState()
+    {
+        if (_initialOpenStateApplied) return;
+        _initialOpenStateApplied = true;
+
+        // IsOpen remains the authoritative live state. The initial-state convenience property only
+        // supplies that state when the caller has not already assigned or bound IsOpen explicitly.
+        if (IsInitiallyOpen && !IsSet(IsOpenProperty))
+            SetCurrentValue(IsOpenProperty, true);
     }
 
     private void UpdateOpenState()

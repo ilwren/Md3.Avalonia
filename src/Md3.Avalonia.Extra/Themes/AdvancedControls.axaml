@@ -722,6 +722,7 @@
          surface, text-field, connected-button, slider, state-layer and target-size guidance. -->
     <Setter Property="MinWidth" Value="336" />
     <Setter Property="MaxWidth" Value="420" />
+    <Setter Property="MaxHeight" Value="640" />
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
     <Setter Property="BorderBrush" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
@@ -735,9 +736,17 @@
                 CornerRadius="{TemplateBinding CornerRadius}"
                 Padding="{TemplateBinding Padding}"
                 ClipToBounds="True">
-          <StackPanel Spacing="20">
+          <!-- The picker owns the vertical viewport so a constrained dialog or popup can scroll its
+               full content instead of clipping the lower panels. In an unconstrained page the
+               ScrollViewer keeps the natural content height. -->
+          <ScrollViewer x:Name="PART_ContentScrollViewer"
+                        HorizontalScrollBarVisibility="Disabled"
+                        VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="20">
             <!-- Selected source color, including a checkerboard behind translucent colors. -->
-            <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+            <Border x:Name="PART_PreviewPanel"
+                    IsVisible="{TemplateBinding IsPreviewPanelVisible}"
+                    Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
                     CornerRadius="20" Padding="12">
               <Grid ColumnDefinitions="64,*,48" RowDefinitions="Auto,Auto" ColumnSpacing="12" VerticalAlignment="Center">
                 <Border Width="64" Height="64" CornerRadius="18"
@@ -771,7 +780,7 @@
             </Border>
 
             <!-- M3 Expressive recommends connected button groups instead of legacy segmented buttons. -->
-            <md:MdConnectedButtonGroup Size="Small" HorizontalAlignment="Center">
+            <md:MdConnectedButtonGroup x:Name="PART_ModeSelector" Size="Small" HorizontalAlignment="Center">
               <md:MdButton x:Name="PART_PaletteModeButton" Content="Palette" Size="Small" Variant="Text"
                            Command="{Binding $parent[eco:MdColorPicker].SetPickerModeCommand}"
                            CommandParameter="MaterialPalette" />
@@ -891,10 +900,19 @@
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
             </StackPanel>
-          </StackPanel>
+            </StackPanel>
+          </ScrollViewer>
         </Border>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^ /template/ md|MdConnectedButtonGroup#PART_ModeSelector"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:mode-selector-visible /template/ md|MdConnectedButtonGroup#PART_ModeSelector"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^ /template/ md|MdButton#PART_PaletteModeButton"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^ /template/ md|MdButton#PART_SpectrumModeButton"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^ /template/ md|MdButton#PART_PresetsModeButton"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:palette-panel-visible /template/ md|MdButton#PART_PaletteModeButton"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:spectrum-panel-visible /template/ md|MdButton#PART_SpectrumModeButton"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:presets-panel-visible /template/ md|MdButton#PART_PresetsModeButton"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^ /template/ StackPanel#PART_PaletteSection"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^ /template/ StackPanel#PART_SpectrumSection"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^ /template/ StackPanel#PART_PresetsSection"><Setter Property="IsVisible" Value="False" /></Style>
