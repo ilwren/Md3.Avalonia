@@ -23,7 +23,7 @@ public sealed class MdSlidableItem : ContentControl
     public static readonly StyledProperty<double> ActionExtentProperty = AvaloniaProperty.Register<MdSlidableItem, double>(nameof(ActionExtent), 144);
     public static readonly StyledProperty<double> DismissThresholdProperty = AvaloniaProperty.Register<MdSlidableItem, double>(nameof(DismissThreshold), 1.25);
     public static readonly StyledProperty<bool> CloseOnActionProperty = AvaloniaProperty.Register<MdSlidableItem, bool>(nameof(CloseOnAction), true);
-    public static readonly StyledProperty<bool> IsOpenProperty = AvaloniaProperty.Register<MdSlidableItem, bool>(nameof(IsOpen), false, defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
+    public static readonly StyledProperty<bool> IsOpenProperty = AvaloniaProperty.Register<MdSlidableItem, bool>(nameof(IsOpen), false, defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
     public static readonly StyledProperty<ICommand?> StartActionCommandProperty = AvaloniaProperty.Register<MdSlidableItem, ICommand?>(nameof(StartActionCommand));
     public static readonly StyledProperty<ICommand?> EndActionCommandProperty = AvaloniaProperty.Register<MdSlidableItem, ICommand?>(nameof(EndActionCommand));
     public static readonly DirectProperty<MdSlidableItem, double> OffsetProperty = AvaloniaProperty.RegisterDirect<MdSlidableItem, double>(nameof(Offset), item => item.Offset);

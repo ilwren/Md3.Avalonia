@@ -19,7 +19,7 @@ public sealed class MdBeforeAfter : TemplatedControl
 {
     public static readonly StyledProperty<object?> BeforeProperty = AvaloniaProperty.Register<MdBeforeAfter, object?>(nameof(Before));
     public static readonly StyledProperty<object?> AfterProperty = AvaloniaProperty.Register<MdBeforeAfter, object?>(nameof(After));
-    public static readonly StyledProperty<double> PositionProperty = AvaloniaProperty.Register<MdBeforeAfter, double>(nameof(Position), .5, defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
+    public static readonly StyledProperty<double> PositionProperty = AvaloniaProperty.Register<MdBeforeAfter, double>(nameof(Position), .5, defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
     public static readonly StyledProperty<MdComparisonOrientation> OrientationProperty = AvaloniaProperty.Register<MdBeforeAfter, MdComparisonOrientation>(nameof(Orientation));
     public static readonly StyledProperty<double> DividerThicknessProperty = AvaloniaProperty.Register<MdBeforeAfter, double>(nameof(DividerThickness), 2);
     public static readonly StyledProperty<IBrush?> DividerBrushProperty = AvaloniaProperty.Register<MdBeforeAfter, IBrush?>(nameof(DividerBrush));
@@ -69,17 +69,17 @@ public sealed class MdBeforeAfter : TemplatedControl
         {
             _afterClip.Width = Bounds.Width * position;
             _afterClip.Height = double.NaN;
-            _afterClip.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left;
-            _afterClip.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch;
-            if (_divider is not null) { _divider.Width = DividerThickness; _divider.Height = double.NaN; _divider.Margin = new Thickness(Bounds.Width * position - DividerThickness / 2, 0, 0, 0); _divider.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left; }
+            _afterClip.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left;
+            _afterClip.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Stretch;
+            if (_divider is not null) { _divider.Width = DividerThickness; _divider.Height = double.NaN; _divider.Margin = new Thickness(Bounds.Width * position - DividerThickness / 2, 0, 0, 0); _divider.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left; }
         }
         else
         {
             _afterClip.Height = Bounds.Height * position;
             _afterClip.Width = double.NaN;
-            _afterClip.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch;
-            _afterClip.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top;
-            if (_divider is not null) { _divider.Height = DividerThickness; _divider.Width = double.NaN; _divider.Margin = new Thickness(0, Bounds.Height * position - DividerThickness / 2, 0, 0); _divider.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top; }
+            _afterClip.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Stretch;
+            _afterClip.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top;
+            if (_divider is not null) { _divider.Height = DividerThickness; _divider.Width = double.NaN; _divider.Margin = new Thickness(0, Bounds.Height * position - DividerThickness / 2, 0, 0); _divider.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top; }
         }
     }
     protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -118,7 +118,7 @@ public enum MdAnimatedTextEffect { Typewriter, Fade, Pop, None }
 public sealed class MdAnimatedText : TemplatedControl
 {
     public static readonly StyledProperty<string?> TextProperty = AvaloniaProperty.Register<MdAnimatedText, string?>(nameof(Text));
-    public static readonly StyledProperty<MdAnimatedTextEffect> EffectProperty = AvaloniaProperty.Register<MdAnimatedText, MdAnimatedTextEffect>(nameof(Effect), MdAnimatedTextEffect.Typewriter);
+    public static readonly new StyledProperty<MdAnimatedTextEffect> EffectProperty = AvaloniaProperty.Register<MdAnimatedText, MdAnimatedTextEffect>(nameof(Effect), MdAnimatedTextEffect.Typewriter);
     public static readonly StyledProperty<TimeSpan> DurationProperty = AvaloniaProperty.Register<MdAnimatedText, TimeSpan>(nameof(Duration), TimeSpan.FromMilliseconds(900));
     public static readonly StyledProperty<TimeSpan> PauseProperty = AvaloniaProperty.Register<MdAnimatedText, TimeSpan>(nameof(Pause), TimeSpan.Zero);
     public static readonly StyledProperty<bool> AutoPlayProperty = AvaloniaProperty.Register<MdAnimatedText, bool>(nameof(AutoPlay), true);
@@ -138,7 +138,7 @@ public sealed class MdAnimatedText : TemplatedControl
     }
     public MdAnimatedText() { Focusable = false; _timer.Tick += (_, _) => Tick(); }
     public string? Text { get => GetValue(TextProperty); set => SetValue(TextProperty, value); }
-    public MdAnimatedTextEffect Effect { get => GetValue(EffectProperty); set => SetValue(EffectProperty, value); }
+    public new MdAnimatedTextEffect Effect { get => GetValue(EffectProperty); set => SetValue(EffectProperty, value); }
     public TimeSpan Duration { get => GetValue(DurationProperty); set => SetValue(DurationProperty, value); }
     public TimeSpan Pause { get => GetValue(PauseProperty); set => SetValue(PauseProperty, value); }
     public bool AutoPlay { get => GetValue(AutoPlayProperty); set => SetValue(AutoPlayProperty, value); }
