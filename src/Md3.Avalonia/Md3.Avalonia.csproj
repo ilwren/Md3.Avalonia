@@ -5,12 +5,12 @@
     <AssemblyName>Md3.Avalonia</AssemblyName>
     <Description>Material Design 3 and Material 3 Expressive controls, dynamic HCT theming, motion, localization and desktop adapters for Avalonia 12.</Description>
     <PackageId>Md3.Avalonia</PackageId>
-    <Version>0.2.0</Version>
+    <Version>0.3.0-preview.1</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;material-design;material-3;controls;android;desktop;hct;mvvm</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>Material 3 control fixes, HCT color-picker palettes, input parity, and Gallery platform updates. Icon-font providers are optional.</PackageReleaseNotes>
+    <PackageReleaseNotes>0.3.0 preview: Android single-view popup hosting and complete Gallery navigation; audited accessibility, RTL, motion, responsive and localization fixes; configurable FAB menus and color-picker panels.</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>

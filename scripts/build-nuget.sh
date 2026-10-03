@@ -92,9 +92,19 @@ for proj in "${PROJECTS[@]}"; do
   dotnet pack "$proj" -c "$CONFIGURATION" --no-build --no-restore --nologo -o "$OUTPUT"
 done
 
+VERSION="$(sed -n 's:.*<Version>\([^<]*\)</Version>.*:\1:p' "${PROJECTS[0]}" | head -1)"
+[[ -n "$VERSION" ]] || { echo "error: package version is missing" >&2; exit 1; }
+PACKAGE_IDS=(Md3.Avalonia Md3.Avalonia.Icons Md3.Avalonia.Icons.Lite Md3.Avalonia.Extra)
+for package_id in "${PACKAGE_IDS[@]}"; do
+  for extension in nupkg snupkg; do
+    package="$OUTPUT/$package_id.$VERSION.$extension"
+    [[ -f "$package" ]] || { echo "error: expected package is missing: $package" >&2; exit 1; }
+  done
+done
+
 PACKAGE_COUNT="$(find "$OUTPUT" -maxdepth 1 -type f \( -name '*.nupkg' -o -name '*.snupkg' \) | wc -l | tr -d '[:space:]')"
-if ((PACKAGE_COUNT < 4)); then
-  echo "error: expected at least 4 package files, found $PACKAGE_COUNT in $OUTPUT" >&2
+if ((PACKAGE_COUNT != 8)); then
+  echo "error: expected exactly 8 package files for version $VERSION, found $PACKAGE_COUNT in $OUTPUT" >&2
   exit 1
 fi
 

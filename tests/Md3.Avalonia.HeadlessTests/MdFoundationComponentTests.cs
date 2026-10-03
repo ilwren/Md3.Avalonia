@@ -60,7 +60,7 @@ public sealed class MdFoundationComponentTests
 
         Assert.InRange(trailingLeft - primaryRight, 1.9, 2.1);
         Assert.Equal(40, trailing.ContainerWidth);
-        Assert.Equal(20, trailing.IconSize);
+        Assert.Equal(24, trailing.IconSize);
         Assert.False(trailing.EnableSelectedShapeMorph);
         Assert.Equal(new CornerRadius(4, 20, 20, 4), trailing.ContainerCornerRadius);
         Assert.Single(split.GetVisualDescendants().OfType<MdDropdownMenu>());

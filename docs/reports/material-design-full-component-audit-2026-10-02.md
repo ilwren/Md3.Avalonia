@@ -544,3 +544,32 @@ Automation 名称同样需要本地化。只本地化可见按钮而保留英文
 **当前状态：功能覆盖广、基础架构有进展，但属于“Material 3 风格组件库 + 部分 Expressive/Flutter parity”，不是已经认证的完整 M3/Flutter 合规实现。**
 
 最优先的工作不是继续增加组件数量，而是让现有公开类型的键盘、Automation、RTL、Reduced Motion、焦点生命周期与测试证据变得可信。
+
+---
+
+## 9. 0.3.0-preview.1 整改记录（2026-10-03）
+
+本节记录审计基线之后的实现状态；第 3–5 节保留为历史问题证据，不再代表当前源码状态。状态“已实现/自动化验证”表示源码、模板及 Headless/构建门禁已覆盖，不等同于未执行的屏幕阅读器或物理设备认证。
+
+| 范围 | 状态 | 主要实现与证据 |
+|---|---|---|
+| P0-01 | 已整改 | 历史“100% 合规”声明已降级为非认证证据；新增 spec baseline/test matrix、真实 Headless/构建结果与分层人工矩阵。CI 失败注释现在包含具体测试名。 |
+| P0-02～P0-03 | 已实现/自动化验证 | Menu/Submenu、Dialog、modal drawer/sheet、Search、SimpleDialog 使用键盘/焦点进入、约束及恢复控制器；modal 背景被隔离。 |
+| P0-04～P0-05 | 已实现/自动化验证 | DatePicker 的 42-day grid/roving focus、TimeDial 虚拟 selector peers、RangeSlider 双 thumb `IRangeValueProvider` children 已加入针对性测试。 |
+| P0-06～P0-07 | 已按审计要求收口 | 未完成完整 parity 的 motion/parity shell 明确标记 experimental/partial，不再计入完成组件；状态详见 `docs/FLUTTER_PARITY_STATUS.md`。 |
+| P1-01～P1-09 | 已实现/自动化验证 | 48-DIP 输入目标、FAB/Search focus、逻辑 RTL、Carousel reduced motion、输入错误语义、Tooltip 描述/延迟及可键盘操作 sheet handle 已覆盖。 |
+| P1-10～P1-15 | 已实现/自动化验证 | DataTable/Tree/Chart/Rating/Calendar Automation 与键盘模型、ColorPicker 双向 HEX/alpha/模式语义已补齐；ColorPicker 在受限 Dialog 内使用内部滚动 viewport。 |
+| P1-16～P1-20 | 已实现/自动化验证 | Breadcrumb overflow/URI、Popup Cascader、responsive Transfer、CommandPalette disabled/modal、Popover/HoverCard 边界和 Chat/RichEditor 语义已补齐。 |
+| P2-01～P2-04 | 已实现/自动化验证 | AppBar edge-to-edge、Toolbar component tokens/density、ButtonGroup 直接容器与本地值优先、SplitButton frozen trailing tokens/RTL/Automation 已覆盖。 |
+| P2-05～P2-06 | 已实现/自动化验证 | Tabs 使用可重定向且保留 velocity 的 spatial spring runner；scrim/elevation 使用 semantic tokens。 |
+| P2-07～P2-08 | 已实现/自动化验证 | CommandPalette/License/Transfer/Picker/ColorPicker 窄宽 reflow 与滚动约束、关键 Core/Extra 默认文案和 Automation 名称 inherited en/zh 本地化已覆盖。 |
+| Android popup | 已实现/构建验证；真机签字待外部执行 | `EmbeddableControlRoot` 模板提供 `PART_VisualLayerManager`；Android APK workflow 编译，Maestro 用例验证 ComboBox open/select/no-crash 并归档 logcat/截图。物理设备结果仍须记录设备与 API。 |
+| Android Gallery 完整导航 | 已实现/构建验证；真机签字待外部执行 | 单视图 shell 提供分组、可滚动 modal drawer 及完整页面 factory；Headless 检查页面数量/可达性，Android workflow 构建 APK。 |
+
+### 0.3 预览版发布门禁
+
+1. Desktop Gallery Release build：0 warnings / 0 errors。
+2. 完整 Headless suite：0 failed / 0 skipped（跳过项如出现必须单独解释）。
+3. 四个 NuGet 包独立 pack、metadata、readme、XML docs、symbol package 与依赖方向验证通过。
+4. Linux/Windows/macOS Desktop Gallery 与 Android APK workflow 通过。
+5. 物理 Android、Narrator、VoiceOver、Orca 仍是外部人工签字项；没有记录时不得改写为“已认证”或“100% 合规”。

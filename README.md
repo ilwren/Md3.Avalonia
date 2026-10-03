@@ -26,7 +26,7 @@
 - `MdConnectedButtonGroup`：2 DIP 间距，自动计算首、中、尾按钮的外圆内方轮廓；
 - `MdFloatingActionButton`：Small、Regular、Medium、Large，Primary/Secondary/Tertiary 配色与 Level 3/4 elevation；
 - `MdExtendedFloatingActionButton`：当前 Expressive Small、Medium、Large；
-- `MdFabMenu` + `MdFabMenuItem`：可展开 2–6 个相关动作，56 DIP full-pill item、独立 `ExpansionDirection="Up|Down"`（默认向上）、双向 `IsOpen`、`Show`/`Dismiss`、Escape 和可逆展开/收缩 motion。
+- `MdFabMenu` + `MdFabMenuItem`：可展开 2–6 个相关动作，56 DIP full-pill item、独立 `ExpansionDirection="Up|Down"`（默认向上）、首次挂载 `IsInitiallyOpen`、双向 `IsOpen`、`Show`/`Dismiss`、Escape 和可逆展开/收缩 motion。
 
 所有按钮、Icon Button 和 FAB 模板都接入 `MdRipplePresenter`：按下位置产生涟漪，裁切到完整 container shape，并支持 Expressive、Standard、Reduced、None motion scheme。
 
@@ -35,7 +35,7 @@
 ### Radio、App bars 与 Badge
 
 - `MdRadioButton : RadioButton`：20 DIP icon、40 DIP state layer、48 DIP target，支持 selected、error、disabled、`GroupName`、键盘和自动化；
-- `MdTopAppBar`：Small、Medium Flexible、Large Flexible、centered title 和 scrolled container；subtitle 自动采用完整双行高度，组件自身负责四角 outline/clip；
+- `MdTopAppBar`：Small、Medium Flexible、Large Flexible、centered title 和 scrolled container；subtitle 自动采用完整双行高度，默认保持 edge-to-edge surface，不绘制 card 式 outline/圆角；
 - `MdBottomAppBar`：仅用于 Baseline 兼容，新设计应优先使用后续 docked toolbar；
 - `MdBadge`：6 DIP dot 与 16 DIP labeled badge；
 - `MdBadgedBox`：将 badge 放置到任意 icon/control 的 top-trailing corner。
@@ -203,7 +203,7 @@ spec-snapshot/manifest.json        # 官网、AndroidX commit、token 版本与�
 </Application>
 ```
 
-四个可独立 pack 的 NuGet 包版本均为 `0.2.0`：`Md3.Avalonia`（核心）、`Md3.Avalonia.Icons`、`Md3.Avalonia.Icons.Lite`（两种可选图标 provider）和 `Md3.Avalonia.Extra`（依赖核心）。核心与 Extra 都不强制引用 Icons；四个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
+四个可独立 pack 的 NuGet 包版本均为 `0.3.0-preview.1`（0.3.0 预览版）：`Md3.Avalonia`（核心）、`Md3.Avalonia.Icons`、`Md3.Avalonia.Icons.Lite`（两种可选图标 provider）和 `Md3.Avalonia.Extra`（依赖核心）。核心与 Extra 都不强制引用 Icons；四个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
 
 任意 seed 主题可在启动时或运行时应用：
 
@@ -220,7 +220,7 @@ MdThemeManager.Apply(Application.Current, options, dark);
 var json = MdThemeJson.Serialize(options);
 ```
 
-完整 API 入口见 [`docs/API.md`](docs/API.md)，兼容策略见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)，本版说明见 [`docs/RELEASE_NOTES_0.2.0.md`](docs/RELEASE_NOTES_0.2.0.md)。
+完整 API 入口见 [`docs/API.md`](docs/API.md)，兼容策略见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)，本版说明见 [`docs/RELEASE_NOTES_0.3.0-preview.1.md`](docs/RELEASE_NOTES_0.3.0-preview.1.md)。
 
 ## XAML 与 MVVM
 

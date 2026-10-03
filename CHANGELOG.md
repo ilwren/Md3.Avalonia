@@ -2,6 +2,38 @@
 
 All notable changes follow Keep a Changelog. The project intends to use Semantic Versioning after the preview cycle.
 
+## [0.3.0-preview.1] - 2026-10-03
+
+### Added
+
+- Added an Android `EmbeddableControlRoot` visual-layer host so ComboBox and other popup controls can use Avalonia's overlay fallback in a single-view lifetime.
+- Added a complete, grouped and scrollable Android Gallery navigation shell covering every registered sample page.
+- Added `MdFabMenu.IsInitiallyOpen` while preserving two-way `IsOpen` and independent up/down expansion.
+- Added configurable ColorPicker preview, palette, spectrum and recent-color panels plus an internal constrained-height scroll viewport.
+- Added focused P0/P1/P2 accessibility, responsive, localization, motion and token regression tests.
+
+### Changed
+
+- Completed the 2026-10-02 audit remediation across menu/modal focus, picker and range semantics, RTL, reduced motion, touch targets, automation peers, overlay behavior, responsive layouts and inherited en/zh localization.
+- Replaced fixed outlined-field label patches with transparent outline notches and kept host backgrounds visible.
+- Retargeted tab indicator spatial motion with a velocity-preserving spring runner; reduced/none schemes snap without spatial animation.
+- Updated app bars, toolbars, button groups and split buttons to audited Material component tokens and logical RTL geometry.
+- Made Cascader a true popup, Transfer and CommandPalette responsive, and Breadcrumb overflow behavior invokable.
+- Improved failed-test diagnostics so GitHub annotations include the exact headless test name.
+
+### Fixed
+
+- Fixed connected/standard button-group defaults so group-managed style-trigger values never overwrite explicit local child values.
+- Fixed compact rating hit testing to retain full 48-DIP input cells around smaller visible stars.
+- Fixed chat selection so only presses inside the visual message bubble select a row.
+- Fixed Cascader open staging and prevented initial keyboard focus from committing a hierarchy selection.
+- Fixed the split-button two-DIP visible gap while preserving the independent 48-DIP trailing touch target.
+
+### Validation status
+
+- Desktop Gallery build, NuGet package verification and the full headless suite are required green release gates.
+- Physical Android, Narrator, VoiceOver and Orca sign-off remain explicit external validation items; this preview does not claim those checks without recorded hardware/OS evidence.
+
 ## [0.2.0] - 2026-10-02
 
 - Fixed Gallery diagnostics restore, Android deployment mappings, scrolling input parity, FAB menu alignment, breadcrumb rendering, and color-picker selection.

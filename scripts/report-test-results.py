@@ -43,6 +43,12 @@ def main():
             passed += 1
 
     print(f"Summary: {passed} passed, {failed} failed.")
+    summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary_path:
+        with open(summary_path, "a", encoding="utf-8") as stream:
+            stream.write("## Headless test results\n\n")
+            stream.write(f"- Passed: **{passed}**\n")
+            stream.write(f"- Failed: **{failed}**\n")
     if failed > 0:
         sys.exit(1)
 
