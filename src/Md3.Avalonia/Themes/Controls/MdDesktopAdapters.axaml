@@ -373,9 +373,14 @@
                                    Height="{Binding TemplateSettings.TitleBarHeight, RelativeSource={RelativeSource TemplatedParent}}"
                                    VerticalAlignment="Top"
                                    Content="{TemplateBinding Title}"
+                                   Background="{TemplateBinding Background}"
+                                   ShowIcon="False"
                                    ShowMinimizeButton="{TemplateBinding ShowMinimizeButton}"
                                    ShowMaximizeButton="{TemplateBinding ShowMaximizeButton}"
                                    ShowCloseButton="{TemplateBinding ShowCloseButton}"
+                                   IsMinimizeButtonEnabled="{TemplateBinding IsMinimizeButtonEnabled}"
+                                   IsMaximizeButtonEnabled="{TemplateBinding IsMaximizeButtonEnabled}"
+                                   IsCloseButtonEnabled="{TemplateBinding IsCloseButtonEnabled}"
                                    chrome:WindowDecorationProperties.ElementRole="TitleBar" />
             </Grid>
           </Border>
@@ -421,10 +426,11 @@
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdWindowTitleBar">
         <Border Background="{TemplateBinding Background}"
-                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,0,1"
+                BorderThickness="0"
                 chrome:WindowDecorationProperties.ElementRole="TitleBar">
           <Grid ColumnDefinitions="Auto,*,Auto,Auto" Height="{TemplateBinding Height}">
             <ContentPresenter Grid.Column="0" Margin="8,0" VerticalAlignment="Center"
+                              IsVisible="{TemplateBinding ShowIcon}"
                               Content="{TemplateBinding LeadingContent}" Foreground="{TemplateBinding Foreground}"
                               chrome:WindowDecorationProperties.ElementRole="User" />
             <StackPanel Grid.Column="1" Margin="12,0" VerticalAlignment="Center">
@@ -437,12 +443,14 @@
                               chrome:WindowDecorationProperties.ElementRole="User" />
             <StackPanel Grid.Column="3" Orientation="Horizontal" IsVisible="{TemplateBinding ShowCaptionButtons}">
               <md:MdCaptionButton Kind="Minimize" IsVisible="{TemplateBinding ShowMinimizeButton}"
+                                  IsEnabled="{TemplateBinding IsMinimizeButtonEnabled}"
                                   Foreground="{TemplateBinding Foreground}">
                 <Path Width="12" Height="12" Stretch="Uniform"
-                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=md:MdCaptionButton}}" StrokeThickness="1"
+                      Stroke="{DynamicResource Md.Sys.Color.OnSurface.Brush}" StrokeThickness="2"
                       Data="M1,6 L11,6" />
               </md:MdCaptionButton>
               <md:MdCaptionButton Kind="MaximizeRestore" IsVisible="{TemplateBinding ShowMaximizeButton}"
+                                  IsEnabled="{TemplateBinding IsMaximizeButtonEnabled}"
                                   Foreground="{TemplateBinding Foreground}">
                 <Grid Width="12" Height="12">
                   <Path x:Name="PART_MaximizeGlyph" Stretch="Uniform"
@@ -454,6 +462,7 @@
                 </Grid>
               </md:MdCaptionButton>
               <md:MdCaptionButton Kind="Close" IsVisible="{TemplateBinding ShowCloseButton}"
+                                  IsEnabled="{TemplateBinding IsCloseButtonEnabled}"
                                   Foreground="{TemplateBinding Foreground}">
                 <Path Width="12" Height="12" Stretch="Uniform"
                       Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=md:MdCaptionButton}}" StrokeThickness="1"
@@ -475,6 +484,7 @@
     <Setter Property="Template"><ControlTemplate><Border Background="{TemplateBinding Background}"><ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" /></Border></ControlTemplate></Setter>
     <Style Selector="^:pointerover"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" /></Style>
     <Style Selector="^:pressed"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceVariant.Brush}" /></Style>
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
     <Style Selector="^[Kind=Close]:pointerover"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnError.Brush}" /></Style>
     <Style Selector="^[Kind=Close]:pressed"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.ErrorContainer.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnErrorContainer.Brush}" /></Style>
   </ControlTheme>

@@ -171,6 +171,9 @@ public class MdBorderlessWindow : MdWindow
     public static readonly StyledProperty<bool> ShowMinimizeButtonProperty = AvaloniaProperty.Register<MdBorderlessWindow, bool>(nameof(ShowMinimizeButton), true);
     public static readonly StyledProperty<bool> ShowMaximizeButtonProperty = AvaloniaProperty.Register<MdBorderlessWindow, bool>(nameof(ShowMaximizeButton), true);
     public static readonly StyledProperty<bool> ShowCloseButtonProperty = AvaloniaProperty.Register<MdBorderlessWindow, bool>(nameof(ShowCloseButton), true);
+    public static readonly StyledProperty<bool> IsMinimizeButtonEnabledProperty = AvaloniaProperty.Register<MdBorderlessWindow, bool>(nameof(IsMinimizeButtonEnabled), true);
+    public static readonly StyledProperty<bool> IsMaximizeButtonEnabledProperty = AvaloniaProperty.Register<MdBorderlessWindow, bool>(nameof(IsMaximizeButtonEnabled), true);
+    public static readonly StyledProperty<bool> IsCloseButtonEnabledProperty = AvaloniaProperty.Register<MdBorderlessWindow, bool>(nameof(IsCloseButtonEnabled), true);
     public static readonly DirectProperty<MdBorderlessWindow, MdWindowTemplateSettings> TemplateSettingsProperty =
         AvaloniaProperty.RegisterDirect<MdBorderlessWindow, MdWindowTemplateSettings>(nameof(TemplateSettings), window => window.TemplateSettings);
     private IMdWindowPlatformAdapter _platformAdapter;
@@ -208,6 +211,9 @@ public class MdBorderlessWindow : MdWindow
     public bool ShowMinimizeButton { get => GetValue(ShowMinimizeButtonProperty); set => SetValue(ShowMinimizeButtonProperty, value); }
     public bool ShowMaximizeButton { get => GetValue(ShowMaximizeButtonProperty); set => SetValue(ShowMaximizeButtonProperty, value); }
     public bool ShowCloseButton { get => GetValue(ShowCloseButtonProperty); set => SetValue(ShowCloseButtonProperty, value); }
+    public bool IsMinimizeButtonEnabled { get => GetValue(IsMinimizeButtonEnabledProperty); set => SetValue(IsMinimizeButtonEnabledProperty, value); }
+    public bool IsMaximizeButtonEnabled { get => GetValue(IsMaximizeButtonEnabledProperty); set => SetValue(IsMaximizeButtonEnabledProperty, value); }
+    public bool IsCloseButtonEnabled { get => GetValue(IsCloseButtonEnabledProperty); set => SetValue(IsCloseButtonEnabledProperty, value); }
     public MdWindowTemplateSettings TemplateSettings => _templateSettings;
     public bool IsWindowActive => _isActive;
     public IMdWindowPlatformAdapter PlatformAdapter { get => _platformAdapter; set { _platformAdapter = value ?? throw new ArgumentNullException(nameof(value)); ApplyChrome(); } }
@@ -219,9 +225,9 @@ public class MdBorderlessWindow : MdWindow
     public event EventHandler? MinimizeRequested;
     public event EventHandler? MaximizeRestoreRequested;
     public event EventHandler? CloseRequested;
-    public void Minimize() { if (!Capabilities.HasFlag(MdWindowCapabilities.Minimize)) return; MinimizeRequested?.Invoke(this, EventArgs.Empty); WindowState = WindowState.Minimized; }
-    public void ToggleMaximizeRestore() { if (!Capabilities.HasFlag(MdWindowCapabilities.Maximize)) return; MaximizeRestoreRequested?.Invoke(this, EventArgs.Empty); WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized; }
-    public void RequestClose() { if (!Capabilities.HasFlag(MdWindowCapabilities.Close)) return; CloseRequested?.Invoke(this, EventArgs.Empty); Close(); }
+    public void Minimize() { if (!IsMinimizeButtonEnabled || !CanMinimize || !Capabilities.HasFlag(MdWindowCapabilities.Minimize)) return; MinimizeRequested?.Invoke(this, EventArgs.Empty); WindowState = WindowState.Minimized; }
+    public void ToggleMaximizeRestore() { if (!IsMaximizeButtonEnabled || !CanMaximize || !Capabilities.HasFlag(MdWindowCapabilities.Maximize)) return; MaximizeRestoreRequested?.Invoke(this, EventArgs.Empty); WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized; }
+    public void RequestClose() { if (!IsCloseButtonEnabled || !Capabilities.HasFlag(MdWindowCapabilities.Close)) return; CloseRequested?.Invoke(this, EventArgs.Empty); Close(); }
     public bool ShowSystemMenu(Point point) { var shown = PlatformAdapter.TryShowSystemMenu(this, point); if (!shown) SystemMenuRequested?.Invoke(this, point); return shown; }
     internal bool TryBeginMove(PointerPressedEventArgs args) => PlatformAdapter.TryBeginMove(this, args);
     internal bool TryBeginResize(WindowEdge edge, PointerPressedEventArgs args) => PlatformAdapter.TryBeginResize(this, edge, args);
@@ -276,18 +282,26 @@ public sealed class MdWindowTitleBar : ContentControl
     public static readonly StyledProperty<object?> LeadingContentProperty = AvaloniaProperty.Register<MdWindowTitleBar, object?>(nameof(LeadingContent));
     public static readonly StyledProperty<object?> TrailingContentProperty = AvaloniaProperty.Register<MdWindowTitleBar, object?>(nameof(TrailingContent));
     public static readonly StyledProperty<object?> SubtitleProperty = AvaloniaProperty.Register<MdWindowTitleBar, object?>(nameof(Subtitle));
+    public static readonly StyledProperty<bool> ShowIconProperty = AvaloniaProperty.Register<MdWindowTitleBar, bool>(nameof(ShowIcon));
     public static readonly StyledProperty<bool> ShowCaptionButtonsProperty = AvaloniaProperty.Register<MdWindowTitleBar, bool>(nameof(ShowCaptionButtons), true);
     public static readonly StyledProperty<bool> ShowMinimizeButtonProperty = AvaloniaProperty.Register<MdWindowTitleBar, bool>(nameof(ShowMinimizeButton), true);
     public static readonly StyledProperty<bool> ShowMaximizeButtonProperty = AvaloniaProperty.Register<MdWindowTitleBar, bool>(nameof(ShowMaximizeButton), true);
     public static readonly StyledProperty<bool> ShowCloseButtonProperty = AvaloniaProperty.Register<MdWindowTitleBar, bool>(nameof(ShowCloseButton), true);
+    public static readonly StyledProperty<bool> IsMinimizeButtonEnabledProperty = AvaloniaProperty.Register<MdWindowTitleBar, bool>(nameof(IsMinimizeButtonEnabled), true);
+    public static readonly StyledProperty<bool> IsMaximizeButtonEnabledProperty = AvaloniaProperty.Register<MdWindowTitleBar, bool>(nameof(IsMaximizeButtonEnabled), true);
+    public static readonly StyledProperty<bool> IsCloseButtonEnabledProperty = AvaloniaProperty.Register<MdWindowTitleBar, bool>(nameof(IsCloseButtonEnabled), true);
     private MdBorderlessWindow? _window;
     public object? LeadingContent { get => GetValue(LeadingContentProperty); set => SetValue(LeadingContentProperty, value); }
     public object? TrailingContent { get => GetValue(TrailingContentProperty); set => SetValue(TrailingContentProperty, value); }
     public object? Subtitle { get => GetValue(SubtitleProperty); set => SetValue(SubtitleProperty, value); }
+    public bool ShowIcon { get => GetValue(ShowIconProperty); set => SetValue(ShowIconProperty, value); }
     public bool ShowCaptionButtons { get => GetValue(ShowCaptionButtonsProperty); set => SetValue(ShowCaptionButtonsProperty, value); }
     public bool ShowMinimizeButton { get => GetValue(ShowMinimizeButtonProperty); set => SetValue(ShowMinimizeButtonProperty, value); }
     public bool ShowMaximizeButton { get => GetValue(ShowMaximizeButtonProperty); set => SetValue(ShowMaximizeButtonProperty, value); }
     public bool ShowCloseButton { get => GetValue(ShowCloseButtonProperty); set => SetValue(ShowCloseButtonProperty, value); }
+    public bool IsMinimizeButtonEnabled { get => GetValue(IsMinimizeButtonEnabledProperty); set => SetValue(IsMinimizeButtonEnabledProperty, value); }
+    public bool IsMaximizeButtonEnabled { get => GetValue(IsMaximizeButtonEnabledProperty); set => SetValue(IsMaximizeButtonEnabledProperty, value); }
+    public bool IsCloseButtonEnabled { get => GetValue(IsCloseButtonEnabledProperty); set => SetValue(IsCloseButtonEnabledProperty, value); }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {

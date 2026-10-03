@@ -66,6 +66,7 @@ public sealed class MdBorderlessWindowTemplateTests
             Assert.Equal(new Thickness(0), frame.BorderThickness);
             Assert.False(frame.ClipToBounds);
             Assert.Equal("Material application", titleBar.Content);
+            Assert.False(titleBar.ShowIcon);
             Assert.Equal(44, titleBar.Height);
             Assert.Equal(44, presenter.Margin.Top);
             Assert.Same(content, presenter.Content);
@@ -140,6 +141,36 @@ public sealed class MdBorderlessWindowTemplateTests
         {
             window.Close();
         }
+    }
+
+    [AvaloniaFact]
+    public void Caption_Button_Visibility_And_Enabled_State_Are_Independently_Controllable()
+    {
+        var window = new MdBorderlessWindow
+        {
+            PlatformAdapter = new TemplateAdapter(),
+            ShowMinimizeButton = true,
+            ShowMaximizeButton = true,
+            ShowCloseButton = true,
+            IsMinimizeButtonEnabled = false,
+            IsMaximizeButtonEnabled = false,
+            IsCloseButtonEnabled = true,
+            Content = new Border()
+        };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var buttons = window.GetVisualDescendants().OfType<MdCaptionButton>().ToArray();
+            Assert.False(buttons.Single(button => button.Kind == MdCaptionButtonKind.Minimize).IsEnabled);
+            Assert.False(buttons.Single(button => button.Kind == MdCaptionButtonKind.MaximizeRestore).IsEnabled);
+            Assert.True(buttons.Single(button => button.Kind == MdCaptionButtonKind.Close).IsEnabled);
+
+            window.ShowMinimizeButton = false;
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(buttons.Single(button => button.Kind == MdCaptionButtonKind.Minimize).IsVisible);
+        }
+        finally { window.Close(); }
     }
 
     private sealed class TemplateAdapter : IMdWindowPlatformAdapter
