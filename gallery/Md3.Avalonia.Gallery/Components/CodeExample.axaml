@@ -27,8 +27,8 @@
                                      AllowMultiple="False"
                                      SelectedIndex="0"
                                      SelectionChanged="LanguageSelectionChanged">
-            <md:MdSegmentedButton x:Name="XamlTab" MinWidth="82" MinHeight="38" Height="38" Padding="12,0" BorderThickness="0" Content="AXAML" Value="AXAML" />
-            <md:MdSegmentedButton x:Name="CSharpTab" MinWidth="72" MinHeight="38" Height="38" Padding="12,0" BorderThickness="0" Content="C#" Value="C#" />
+            <md:MdSegmentedButton x:Name="XamlTab" MinWidth="82" MinHeight="32" Height="32" Padding="12,0" BorderThickness="0" Content="AXAML" Value="AXAML" />
+            <md:MdSegmentedButton x:Name="CSharpTab" MinWidth="72" MinHeight="32" Height="32" Padding="12,0" BorderThickness="0" Content="C#" Value="C#" />
           </md:MdSegmentedButtonGroup>
         </Border>
         <TextBlock Grid.Column="1"
