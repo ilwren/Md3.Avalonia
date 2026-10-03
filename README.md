@@ -1,6 +1,16 @@
 # Md3.Avalonia — Material Design 3 controls for Avalonia 12
 
-依据 Material Design 3 当前规范实现的独立 Avalonia 12 控件库与 Gallery。每个控件都有独立 CLR 类型和 scoped `ControlTheme`，不会全局覆盖 Avalonia 原生控件。
+一个面向 Avalonia 12 的跨平台 Material 3 / M3 Expressive 控件库与组件 Gallery。项目同时提供核心控件、动态 HCT 主题、Material Symbols provider、Flutter-inspired Extra 控件、桌面窗口适配和 Android single-view Gallery。
+
+> 当前版本：`0.3.0-preview.1`。项目适合预览、内部应用和组件验证；物理 Android/TalkBack、Windows Narrator、macOS VoiceOver、Linux Orca 等外部验收仍需单独签署。
+
+设计原则：
+
+- 每个交互控件使用独立的 `Md*` CLR 类型和 scoped `ControlTheme`；不全局覆盖 Avalonia 原生控件；
+- 核心包不依赖 Fluent/Simple theme，尽量复用 Avalonia 原生行为、绑定、键盘和选择模型；
+- Material 颜色、字体、形状、状态层、阴影和 motion 通过 token 与 `DynamicResource` 消费；
+- Core、Icons、Icons.Lite、Extra 四个包可以独立发布；Extra 和图表能力不强制绑定第三方 vendor；
+- RTL、现有 accessibility 和多平台适配代码会持续保留；当前开发优先级暂不把完整 RTL/多语种布局和屏幕阅读器人工验收作为预览版阻塞项。
 
 | Dark components and app bar | Dark outlined fields |
 |---|---|
@@ -124,14 +134,14 @@
 
 ## 共用基础
 
-- Avalonia **12.1.2**；三个发布包同时提供 `net8.0` 与 `net10.0` 资产；
+- Avalonia **12.1.2**；当前仓库和预览包以 `net10.0` / `net10.0-android` 为 CI 验证基线；
 - Light、Dark、System 主题和 `DynamicResource` tokens；
 - `MaterialColorUtilities` HCT 任意 seed color 生成器，TonalSpot/Neutral/Vibrant/Expressive/Monochrome/Fidelity 六种 scheme、Standard/Medium/High contrast、49 个标准/固定/surface-container 色彩角色；
 - `MdThemeManager`、`MdThemeJson` 与对比度诊断，支持 motion、font、shape 和主题 JSON round-trip；System/Component token 分层；
 - 核心包提供通用 `MdIcon`/`MdSymbolPresenter` 与可替换的 `Md.Sys.Typeface.Symbols.Rounded`、`Md.Icon.*` contract；完整 Google codepoint catalog、强类型 `MdSymbols` 和自动嵌入字体 provider 位于可选 `Md3.Avalonia.Icons` 包；字体/包缺失或验证失败时图标视觉为空，不使用 look-alike fallback；
 - M3 motion physics 参数、继承式 motion scheme、pointer-origin ripple、popup/FAB-menu transition；
 - 核心 `Md3.Avalonia` 控件库不依赖 `Avalonia.Themes.Fluent` 或 `Avalonia.Themes.Simple`；Gallery 仅在 `CodeExample` 内局部加载 Fluent resources，作为 AvaloniaEdit 原生内部 template parts 的资源依赖，不会覆盖应用或控件库的原生控件；
-- 核心程序集不引用 Desktop、Win32、X11 或 macOS 专属程序集，可由 `net8.0-android` 宿主引用；
+- 核心程序集不引用 Desktop、Win32、X11 或 macOS 专属程序集，可由 Android 宿主引用；当前 Android Gallery 的 CI target 为 `net10.0-android`；
 - Gallery 使用官网式顶部导航、真实 `MdNavigationDrawer` 左侧组件栏、中央文档与右侧动态目录；按 Compact `<600`、Medium `600–839`、Expanded `840–1199`、Large `1200–1599`、Extra-large `>=1600` 五档切换一至三栏，compact/medium 使用 modal drawer 并自动收缩过宽示例；Android bottom destinations 会切换真实页面；
 - shell 由单一 `MdScrollViewer` 持有有限 viewport，导航时解包页面预览用根 ScrollViewer，避免嵌套无限测量，并已用真实 wheel input 验证 Offset 变化；包含 Desktop adapters、Theme Lab、Material Symbols 和 Motion；
 - 每个组件页使用 AvaloniaEdit 提供具备 Light/Dark 语法高亮、选择、滚动和一键复制能力的 AXAML/C# 示例；示例语言使用单选 Material segmented button group 切换；Symbols 页面虚拟化浏览并点击复制官方 catalog 中的全部图标；
@@ -173,7 +183,7 @@ src/Md3.Avalonia.Icons/           # 可选 Symbols catalog/loader；内嵌完整
 src/Md3.Avalonia.Extra/           # 第三方 Flutter clean-room 控件；依赖核心，不依赖 Icons
 
 gallery/Md3.Avalonia.Gallery/     # 组件、Theme Lab、资源与字体图标页面
-samples/Md3.Avalonia.Gallery.Android/ # net8.0-android single-view host（solution 外）
+gallery/Md3.Avalonia.Gallery.Android/ # net10.0-android single-view host（solution 外）
 tests/Md3.Avalonia.HeadlessTests/ # API、输入、主题、回归及渲染测试
 docs/                              # API、兼容性、发布验证与参考渲染图
 spec-snapshot/manifest.json        # 官网、AndroidX commit、token 版本与决策
@@ -287,15 +297,53 @@ await snackbarService.ShowAsync(new MdSnackbarMessage("Draft archived")
 });
 ```
 
+## Extra 与第三方 Flutter UI 能力
+
+`Md3.Avalonia.Extra` 是可选的 clean-room 扩展包，不声称复刻 Flutter package 的全部 API。当前提供：
+
+- `MdBeforeAfter`：水平/垂直 Before/After 内容对比和可拖动分隔线；
+- `MdAnimatedText`：Typewriter、Fade、Pop-friendly、None 等文字显示模式，支持 `Start`、`Stop`、循环和完成事件；
+- `MdSpinKit`：RotatingPlain、ThreeBounce、Wave、FadingCircle、ChasingDots 等非核心 Material 加载动画；
+- `MdStaggeredPanel` / `MdAnimationSequence`：可取消的 staggered entrance 和序列 motion；
+- `MdSlidableItem`：Start/End action、拖动、键盘操作、RTL 基础、`IsOpen`、dismiss threshold 和 action command；
+- `MdMasonryPanel`：Masonry、Quilted、Woven 三种布局策略；
+- `MdChart`：provider-neutral 基础图表展示，不内置图表数据引擎，也不试图替代第三方 chart library；
+- Avatar、Rating、Breadcrumb、DataGrid、Calendar、TreeView、TagInput、RichEditor、ChatView 等生态控件。
+
+这些控件的成熟度不同。需要严格 Flutter API parity 时，请查看 [`docs/FLUTTER_PARITY_STATUS.md`](docs/FLUTTER_PARITY_STATUS.md)，不要仅根据相似的 `Md*` 类型名推断完全兼容。
+
+## Borderless window / Chromeless window
+
+桌面应用可以使用 `MdBorderlessWindow` 和 `MdWindowTitleBar` 构建 Material 标题栏。默认行为是：
+
+- Windows 保留原生 Full caption style bits，以保留 DWM 的最小化、最大化和还原行为；
+- Material 自己绘制客户区标题栏，不再叠加 Fluent/Simple 的第二套标题栏；
+- 默认不显示图标，标题栏使用窗口主体 surface 颜色且不绘制额外分隔线；
+- `ShowMinimizeButton`、`ShowMaximizeButton`、`ShowCloseButton` 控制按钮是否显示；
+- `IsMinimizeButtonEnabled`、`IsMaximizeButtonEnabled`、`IsCloseButtonEnabled` 控制按钮是否可操作；
+- `PreserveNativeBorder`、`CanResize`、`ExtendIntoTitleBar` 控制 native frame 和客户区扩展；
+- Android adapter 是 safe no-op，Android Gallery 不展示 Borderless windows 和 Desktop adapters 页面。
+
+```xml
+<md:MdBorderlessWindow Title="My app"
+                       IsMinimizeButtonEnabled="False"
+                       IsMaximizeButtonEnabled="True"
+                       ShowCloseButton="True">
+  <views:Shell />
+</md:MdBorderlessWindow>
+```
+
+更换平台行为时注入 `IMdWindowPlatformAdapter`。完整 API 和限制见 [`docs/BORDERLESS_WINDOW_PLAN.md`](docs/BORDERLESS_WINDOW_PLAN.md)。
+
 ## Android 约束
 
-- Android 为 Tier 1；`samples/Md3.Avalonia.Gallery.Android` 提供 `net8.0-android` single-view 宿主（最低 API 21，正式发布验证目标 API 26+）；
+- Android 为 Tier 1；`gallery/Md3.Avalonia.Gallery.Android` 提供 `net10.0-android` single-view 宿主（最低 API 23，正式发布验证目标 API 26+）；
 - Gallery 的 `App` 同时处理 desktop classic lifetime 与 Android `ISingleViewApplicationLifetime`；
 - 核心控件不引用桌面专属 API；
 - TextBox/可编辑 ComboBox 保留原生 IME 和软键盘链路；
 - Popup 继续由 Avalonia 原生 popup/fallback 宿主处理可用空间、light-dismiss 与返回键；模板不强制 OverlayLayer，避免无可用 overlay 的 Android/headless host 卡死或崩溃；
 - 小尺寸按钮仍保留至少 48 DIP 的 interaction target；
-- Android Gallery 源码宿主已加入且独立于 desktop solution；ARM64、旋转、生命周期和真机/模拟器人工矩阵仍须在具备 Android workload/设备的环境按 `docs/RELEASE_VALIDATION.md` 签署。
+- Android Gallery 源码宿主已加入且独立于 desktop solution；Android 导航隐藏不适用移动端的 Borderless windows 和 Desktop adapters 页面；ARM64、旋转、生命周期和真机/模拟器人工矩阵仍须在具备 Android workload/设备的环境按 `docs/RELEASE_VALIDATION.md` 签署。
 
 ## 构建与测试
 
