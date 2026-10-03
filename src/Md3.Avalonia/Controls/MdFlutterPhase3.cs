@@ -228,11 +228,13 @@ public sealed class MdSimpleDialog : TemplatedControl
     private Border? _surface;
     private readonly MdPresenceController _presence;
     private readonly MdModalFocusController _modalFocus;
+    private object? _defaultCancelText = "Cancel";
 
     static MdSimpleDialog()
     {
         IsOpenProperty.Changed.AddClassHandler<MdSimpleDialog>((dialog, _) => dialog.UpdateOpenState());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdSimpleDialog>((dialog, _) => dialog.UpdateMotion());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdSimpleDialog>((dialog, _) => dialog.UpdateLocalizedText());
     }
 
     public MdSimpleDialog()
@@ -241,6 +243,7 @@ public sealed class MdSimpleDialog : TemplatedControl
         _presence = new MdPresenceController(SetPresence);
         _presence.Initialize(IsOpen);
         PseudoClasses.Set(":open", IsOpen);
+        UpdateLocalizedText();
     }
 
     public object? Title { get => GetValue(TitleProperty); set => SetValue(TitleProperty, value); }
@@ -252,6 +255,14 @@ public sealed class MdSimpleDialog : TemplatedControl
     public object? CancelText { get => GetValue(CancelTextProperty); set => SetValue(CancelTextProperty, value); }
     public event EventHandler<object?>? ItemSelected;
     public event EventHandler? Dismissed;
+
+    private void UpdateLocalizedText()
+    {
+        if (!Equals(CancelText, _defaultCancelText)) return;
+        _defaultCancelText = MdLocalization.GetString("Cancel", this);
+        SetCurrentValue(CancelTextProperty, _defaultCancelText);
+    }
+
     public void Show() => SetCurrentValue(IsOpenProperty, true);
     public void Dismiss()
     {

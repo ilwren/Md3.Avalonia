@@ -66,6 +66,8 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         AvaloniaProperty.RegisterDirect<MdTimePicker, string>(nameof(CancelText), picker => picker.CancelText);
     public static readonly DirectProperty<MdTimePicker, string> ConfirmTextProperty =
         AvaloniaProperty.RegisterDirect<MdTimePicker, string>(nameof(ConfirmText), picker => picker.ConfirmText);
+    public static readonly DirectProperty<MdTimePicker, string> HeaderTextProperty =
+        AvaloniaProperty.RegisterDirect<MdTimePicker, string>(nameof(HeaderText), picker => picker.HeaderText);
     public static readonly DirectProperty<MdTimePicker, bool> IsPopupOpenProperty =
         AvaloniaProperty.RegisterDirect<MdTimePicker, bool>(nameof(IsPopupOpen), picker => picker.IsPopupOpen);
 
@@ -76,6 +78,8 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private string _periodText = "PM";
     private string _cancelText = "Cancel";
     private string _confirmText = "OK";
+    private string _headerText = "Choose time";
+    private string _defaultLabelText = "Time";
     private TimeSpan? _valueAtOpen;
     private bool _commitOnClose;
     private Button? _anchorButton;
@@ -209,6 +213,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
 
     public string CancelText => _cancelText;
     public string ConfirmText => _confirmText;
+    public string HeaderText => _headerText;
     public bool IsPopupOpen
     {
         get => _isPopupOpen;
@@ -488,8 +493,14 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private void UpdateLocalizedText()
     {
         var culture = MdLocalization.ResolveCulture(this);
+        if (Equals(Label, _defaultLabelText))
+        {
+            _defaultLabelText = MdLocalization.GetString("Time", culture);
+            SetCurrentValue(LabelProperty, _defaultLabelText);
+        }
         SetAndRaise(CancelTextProperty, ref _cancelText, MdLocalization.GetString("Cancel", culture));
         SetAndRaise(ConfirmTextProperty, ref _confirmText, MdLocalization.GetString("OK", culture));
+        SetAndRaise(HeaderTextProperty, ref _headerText, MdLocalization.GetString("ChooseTime", culture));
     }
 
     private void RefreshTextAndState()

@@ -7,6 +7,7 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
+using Md3.Avalonia.Localization;
 
 namespace Md3.Avalonia.Extra.Controls;
 
@@ -32,6 +33,7 @@ public sealed class MdRating : RangeBase
         });
         ValueProperty.Changed.AddClassHandler<MdRating>((rating, _) => rating.UpdateAutomation());
         FlowDirectionProperty.Changed.AddClassHandler<MdRating>((rating, _) => rating.InvalidateVisual());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdRating>((rating, _) => rating.UpdateAutomation());
     }
 
     public MdRating()
@@ -40,7 +42,6 @@ public sealed class MdRating : RangeBase
         Maximum = 5;
         SmallChange = 0.5;
         Focusable = true;
-        AutomationProperties.SetName(this, "Rating");
         UpdateAutomation();
     }
 
@@ -162,8 +163,13 @@ public sealed class MdRating : RangeBase
         if (!IsReadOnly) SetCurrentValue(ValueProperty, Math.Clamp(value, Minimum, Maximum));
     }
 
-    private void UpdateAutomation() => AutomationProperties.SetHelpText(this,
-        $"{Value:0.##} of {Maximum:0.##}{(IsReadOnly ? ", read only" : string.Empty)}");
+    private void UpdateAutomation()
+    {
+        var culture = MdLocalization.ResolveCulture(this);
+        AutomationProperties.SetName(this, MdLocalization.GetString("Rating", this));
+        var readOnly = IsReadOnly ? $", {MdLocalization.GetString("ReadOnly", this)}" : string.Empty;
+        AutomationProperties.SetHelpText(this, $"{Value.ToString("0.##", culture)} / {Maximum.ToString("0.##", culture)}{readOnly}");
+    }
 
     protected override AutomationPeer OnCreateAutomationPeer() => new MdRatingAutomationPeer(this);
 

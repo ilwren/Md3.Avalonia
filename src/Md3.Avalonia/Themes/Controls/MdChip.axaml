@@ -48,7 +48,6 @@
                                   Foreground="{TemplateBinding Foreground}"
                                   IsVisible="False" />
                 <md:MdIconButton x:Name="PART_RemoveButton"
-                                 AutomationProperties.Name="Remove chip"
                                  Icon="{DynamicResource Md.Icon.Close}"
                                  Size="ExtraSmall"
                                  Variant="Standard"

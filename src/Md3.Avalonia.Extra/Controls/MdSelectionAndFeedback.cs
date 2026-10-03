@@ -33,6 +33,9 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
     public static readonly DirectProperty<MdAsyncSelect, MdAsyncRequestState> StateProperty = AvaloniaProperty.RegisterDirect<MdAsyncSelect, MdAsyncRequestState>(nameof(State), control => control.State);
     public static readonly DirectProperty<MdAsyncSelect, Exception?> ErrorProperty = AvaloniaProperty.RegisterDirect<MdAsyncSelect, Exception?>(nameof(Error), control => control.Error);
     public static readonly DirectProperty<MdAsyncSelect, bool> IsPopupOpenProperty = AvaloniaProperty.RegisterDirect<MdAsyncSelect, bool>(nameof(IsPopupOpen), control => control.IsPopupOpen);
+    public static readonly DirectProperty<MdAsyncSelect, string> SearchTextProperty = AvaloniaProperty.RegisterDirect<MdAsyncSelect, string>(nameof(SearchText), control => control.SearchText);
+    public static readonly DirectProperty<MdAsyncSelect, string> NoResultsTextProperty = AvaloniaProperty.RegisterDirect<MdAsyncSelect, string>(nameof(NoResultsText), control => control.NoResultsText);
+    public static readonly DirectProperty<MdAsyncSelect, string> SearchErrorTextProperty = AvaloniaProperty.RegisterDirect<MdAsyncSelect, string>(nameof(SearchErrorText), control => control.SearchErrorText);
     private readonly DispatcherTimer _timer = new();
     private readonly MdPresenceController _popupPresence;
     private IReadOnlyList<object?> _results = Array.Empty<object?>();
@@ -49,6 +52,9 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
     private bool _isAttached;
     private bool _synchronizingDisplayText;
     private bool _synchronizingSelection;
+    private string _searchText = string.Empty;
+    private string _noResultsText = string.Empty;
+    private string _searchErrorText = string.Empty;
 
     static MdAsyncSelect()
     {
@@ -58,12 +64,14 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
         IsDropDownOpenProperty.Changed.AddClassHandler<MdAsyncSelect>((control, _) => control.UpdateOpenState());
         IsMultiSelectProperty.Changed.AddClassHandler<MdAsyncSelect>((control, _) => control.UpdateSelectionMode());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdAsyncSelect>((control, _) => control.UpdateMotion());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdAsyncSelect>((control, _) => control.UpdateLocalizedText());
     }
     public MdAsyncSelect()
     {
         _popupPresence = new MdPresenceController(control => SetPopupPresence(control));
         _popupPresence.Initialize(IsDropDownOpen);
         _timer.Tick += async (_, _) => { _timer.Stop(); await SearchAsync(); };
+        UpdateLocalizedText();
         UpdateRequestState();
         UpdateOpenState();
     }
@@ -81,6 +89,9 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
     public bool IsMultiSelect { get => GetValue(IsMultiSelectProperty); set => SetValue(IsMultiSelectProperty, value); }
     public ObservableCollection<object?> SelectedItems { get; } = [];
     public IReadOnlyList<object?> Results => _results;
+    public string SearchText => _searchText;
+    public string NoResultsText => _noResultsText;
+    public string SearchErrorText => _searchErrorText;
     public bool IsPopupOpen
     {
         get => _isPopupOpen;
@@ -137,6 +148,13 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
         }
         SelectionCommitted?.Invoke(this, item);
         if (!IsMultiSelect) IsDropDownOpen = false;
+    }
+
+    private void UpdateLocalizedText()
+    {
+        SetAndRaise(SearchTextProperty, ref _searchText, MdLocalization.GetString("Search", this));
+        SetAndRaise(NoResultsTextProperty, ref _noResultsText, MdLocalization.GetString("NoResults", this));
+        SetAndRaise(SearchErrorTextProperty, ref _searchErrorText, MdLocalization.GetString("SearchFailed", this));
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)

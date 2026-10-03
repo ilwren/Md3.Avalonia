@@ -327,16 +327,16 @@ public sealed class MdTransferLayoutPanel : Panel
         if (Children.Count == 0) return default;
         if (IsCompact)
         {
-            var height = 0d;
-            var width = 0d;
+            var compactHeight = 0d;
+            var compactWidth = 0d;
             foreach (var child in Children)
             {
                 child.Measure(new Size(availableSize.Width, double.PositiveInfinity));
-                width = Math.Max(width, child.DesiredSize.Width);
-                height += child.DesiredSize.Height;
+                compactWidth = Math.Max(compactWidth, child.DesiredSize.Width);
+                compactHeight += child.DesiredSize.Height;
             }
-            height += Math.Max(0, Children.Count - 1) * Spacing;
-            return new Size(width, height);
+            compactHeight += Math.Max(0, Children.Count - 1) * Spacing;
+            return new Size(compactWidth, compactHeight);
         }
 
         var actions = Children.Count > 1 ? Children[1] : null;
@@ -593,7 +593,7 @@ public sealed class MdTransfer : TemplatedControl
 
     private void FocusTransferredItem(object? item, ListBox? destination)
     {
-        if (destination is null) return;
+        if (destination is null || item is null) return;
         Dispatcher.UIThread.Post(() =>
         {
             destination.SelectedItem = item;

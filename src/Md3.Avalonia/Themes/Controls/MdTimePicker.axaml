@@ -73,7 +73,7 @@
               <StackPanel Spacing="20">
                 <TextBlock FontSize="12" FontWeight="Medium"
                            Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
-                           Text="Select time" />
+                           Text="{TemplateBinding HeaderText}" />
 
                 <!-- M3 dial mode: the hour/minute fields select which value the actual clock
                      face edits. Dragging the hand is continuous; minute selection keeps 1-minute precision. -->

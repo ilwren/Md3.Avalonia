@@ -133,17 +133,24 @@ public sealed class MdChart : Control
     private string? _pointToolTipText;
     private int _activePointIndex = -1;
     private MdChartAutomationPeer? _automationPeer;
+    private bool _usesDefaultAccessibleTitle = true;
+    private bool _updatingDefaultAccessibleTitle;
     static MdChart()
     {
         AffectsRender<MdChart>(SeriesProperty, KindProperty, ShowGridProperty, AxisBrushProperty, GridBrushProperty, XAxisTitleProperty, YAxisTitleProperty);
         SeriesProperty.Changed.AddClassHandler<MdChart>((chart, _) => chart.OnSeriesChanged());
-        AccessibleTitleProperty.Changed.AddClassHandler<MdChart>((chart, _) => AutomationProperties.SetName(chart, chart.AccessibleTitle));
+        AccessibleTitleProperty.Changed.AddClassHandler<MdChart>((chart, _) =>
+        {
+            if (!chart._updatingDefaultAccessibleTitle) chart._usesDefaultAccessibleTitle = false;
+            AutomationProperties.SetName(chart, chart.AccessibleTitle);
+        });
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdChart>((chart, _) => chart.UpdateLocalizedTitle());
     }
     public MdChart()
     {
         ClipToBounds = true;
         Focusable = true;
-        AutomationProperties.SetName(this, AccessibleTitle);
+        UpdateLocalizedTitle();
         AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Polite);
         GotFocus += (_, _) =>
         {
@@ -151,6 +158,15 @@ public sealed class MdChart : Control
         };
         LostFocus += (_, _) => SetActivePoint(-1, true);
     }
+    private void UpdateLocalizedTitle()
+    {
+        if (!_usesDefaultAccessibleTitle) return;
+        _updatingDefaultAccessibleTitle = true;
+        try { SetCurrentValue(AccessibleTitleProperty, MdLocalization.GetString("Chart", this)); }
+        finally { _updatingDefaultAccessibleTitle = false; }
+        AutomationProperties.SetName(this, AccessibleTitle);
+    }
+
     public IEnumerable<MdChartSeries>? Series { get => GetValue(SeriesProperty); set => SetValue(SeriesProperty, value); }
     public MdChartKind Kind { get => GetValue(KindProperty); set => SetValue(KindProperty, value); }
     public bool ShowGrid { get => GetValue(ShowGridProperty); set => SetValue(ShowGridProperty, value); }
@@ -311,7 +327,7 @@ public sealed class MdChart : Control
         var min = all.Min(entry => entry.Point.X);
         var max = all.Max(entry => entry.Point.X);
         var next = all.MinBy(entry => Math.Abs(entry.Point.X - (min + normalized * (max - min))));
-        SetActivePoint(next.Index, true);
+        if (next is not null) SetActivePoint(next.Index, true);
     }
 
     protected override void OnPointerExited(PointerEventArgs e)
@@ -926,6 +942,7 @@ public class MdRichEditor : ContentControl
     {
         AdapterProperty.Changed.AddClassHandler<MdRichEditor>((control, _) => control.OnAdapterChanged(control.Adapter));
         ToolbarCommandsProperty.Changed.AddClassHandler<MdRichEditor>((control, _) => control.RefreshToolbarItems());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdRichEditor>((control, _) => control.RefreshToolbarItems());
     }
     public MdRichEditor()
     {
@@ -995,7 +1012,7 @@ public class MdRichEditor : ContentControl
         var items = (ToolbarCommands ?? Array.Empty<MdRichEditorCommand>()).Select(command =>
             new MdRichEditorCommandDescriptor(
                 command,
-                MdRichEditorCommandConverters.GetTooltip(command),
+                MdLocalization.GetString($"Rich{command}", this),
                 MdRichEditorCommandConverters.GetGlyph(command),
                 GetShortcut(command),
                 IsToggleCommand(command),

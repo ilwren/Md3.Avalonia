@@ -72,6 +72,8 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         AvaloniaProperty.RegisterDirect<MdDatePicker, string>(nameof(CancelText), picker => picker.CancelText);
     public static readonly DirectProperty<MdDatePicker, string> ConfirmTextProperty =
         AvaloniaProperty.RegisterDirect<MdDatePicker, string>(nameof(ConfirmText), picker => picker.ConfirmText);
+    public static readonly DirectProperty<MdDatePicker, string> HeaderTextProperty =
+        AvaloniaProperty.RegisterDirect<MdDatePicker, string>(nameof(HeaderText), picker => picker.HeaderText);
     public static readonly DirectProperty<MdDatePicker, bool> IsPopupOpenProperty =
         AvaloniaProperty.RegisterDirect<MdDatePicker, bool>(nameof(IsPopupOpen), picker => picker.IsPopupOpen);
 
@@ -83,6 +85,8 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private string _todayText = "Today";
     private string _cancelText = "Cancel";
     private string _confirmText = "OK";
+    private string _headerText = "Choose date";
+    private string _defaultLabelText = "Date";
     private Button? _anchorButton;
     private Button? _previousButton;
     private Button? _nextButton;
@@ -209,6 +213,7 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     public string TodayText => _todayText;
     public string CancelText => _cancelText;
     public string ConfirmText => _confirmText;
+    public string HeaderText => _headerText;
     public bool IsPopupOpen
     {
         get => _isPopupOpen;
@@ -562,9 +567,15 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private void UpdateLocalizedText()
     {
         var culture = MdLocalization.ResolveCulture(this);
+        if (Equals(Label, _defaultLabelText))
+        {
+            _defaultLabelText = MdLocalization.GetString("Date", culture);
+            SetCurrentValue(LabelProperty, _defaultLabelText);
+        }
         SetAndRaise(TodayTextProperty, ref _todayText, MdLocalization.GetString("Today", culture));
         SetAndRaise(CancelTextProperty, ref _cancelText, MdLocalization.GetString("Cancel", culture));
         SetAndRaise(ConfirmTextProperty, ref _confirmText, MdLocalization.GetString("OK", culture));
+        SetAndRaise(HeaderTextProperty, ref _headerText, MdLocalization.GetString("ChooseDate", culture));
     }
 
     private void UpdateDisplayText()

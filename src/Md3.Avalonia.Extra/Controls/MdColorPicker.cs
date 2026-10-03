@@ -257,7 +257,7 @@ public class MdColorPicker : TemplatedControl
         {
             CopyStatusMessage = MdLocalization.GetString("CopyFailed", this);
         }
-        AutomationProperties.SetHelpText(_copyHexButton ?? this, CopyStatusMessage);
+        AutomationProperties.SetHelpText(_copyHexButton is { } copyButton ? copyButton : this, CopyStatusMessage);
     }
 
     private void OnHexKeyDown(object? sender, KeyEventArgs e)
@@ -293,10 +293,10 @@ public class MdColorPicker : TemplatedControl
             }
         }
         HexValidationMessage = MdLocalization.GetString("InvalidHex", this);
-        if (_hexTextBox is MdTextBox materialTextBox)
+        if (_hexTextBox is MdTextBox invalidTextBox)
         {
-            materialTextBox.IsError = true;
-            materialTextBox.ErrorText = HexValidationMessage;
+            invalidTextBox.IsError = true;
+            invalidTextBox.ErrorText = HexValidationMessage;
         }
         return false;
     }

@@ -79,9 +79,9 @@
                  PlacementTarget="{Binding #PART_AnchorButton}"
                  WindowManagerAddShadowHint="False">
             <Border x:Name="PART_Surface"
-                    Width="368"
+                    Width="360"
                     MaxHeight="568"
-                    Padding="16"
+                    Padding="12"
                     DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
                     BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}"
@@ -92,7 +92,7 @@
                 <TextBlock FontSize="12"
                            FontWeight="Medium"
                            Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
-                           Text="Select date" />
+                           Text="{Binding HeaderText}" />
                 <TextBlock FontSize="28"
                            Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
                            Text="{Binding DisplayText}" />

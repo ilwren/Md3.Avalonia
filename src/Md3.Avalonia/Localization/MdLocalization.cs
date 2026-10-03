@@ -28,12 +28,12 @@ public sealed class MdLocalization : AvaloniaObject
                 ["Rating"] = "Rating", ["Carousel"] = "Carousel", ["Calendar"] = "Calendar", ["Loading"] = "Loading",
                 ["ItemOf"] = "Item {0} of {1}", ["SelectedItemOf"] = "Selected item {0} of {1}",
                 ["ItemsCount"] = "{0} items", ["CharactersEntered"] = "{0} of {1} characters entered", ["ReadOnly"] = "read only", ["ErrorPrefix"] = "Error: {0}",
-                ["Search"] = "Search", ["NoResults"] = "No results", ["Dismiss"] = "Dismiss",
+                ["Search"] = "Search", ["NoResults"] = "No results", ["SearchFailed"] = "Search failed. Try again.", ["Dismiss"] = "Dismiss",
                 ["InvalidHex"] = "Enter a valid HEX color", ["CopiedHex"] = "HEX value copied", ["CopyFailed"] = "Could not copy HEX value",
                 ["PreviousMonth"] = "Previous month", ["NextMonth"] = "Next month",
                 ["Expand"] = "Expand", ["Collapse"] = "Collapse", ["Remove"] = "Remove",
                 ["Breadcrumb"] = "Breadcrumb", ["ShowFullBreadcrumbPath"] = "Show full breadcrumb path", ["CurrentPage"] = "Current page",
-                ["HierarchySelector"] = "Hierarchy selector", ["TransferList"] = "Transfer list", ["AvailableItems"] = "Available items", ["SelectedItems"] = "Selected items",
+                ["HierarchySelector"] = "Hierarchy selector", ["Hierarchy"] = "Hierarchy", ["TransferList"] = "Transfer list", ["AvailableItems"] = "Available items", ["SelectedItems"] = "Selected items",
                 ["MoveSelectedToTarget"] = "Move selected to target", ["MoveSelectedToSource"] = "Move selected to source", ["MoveAllToTarget"] = "Move all to target", ["MoveAllToSource"] = "Move all to source",
                 ["MovedItemsToSelected"] = "Moved {0} item(s) to selected", ["MovedItemsToAvailable"] = "Moved {0} item(s) to available",
                 ["Assistant"] = "Assistant", ["System"] = "System", ["You"] = "You", ["Message"] = "Message", ["SelectedMessage"] = "Selected message",
@@ -41,7 +41,8 @@ public sealed class MdLocalization : AvaloniaObject
                 ["MessagesSelected"] = "{0} message(s) selected", ["DeletedMessages"] = "Deleted {0} message(s)", ["RetryingMessageFrom"] = "Retrying message from {0}",
                 ["NewMessageFrom"] = "New message from {0}: {1}", ["MessageFromFailed"] = "Message from {0} failed. {1}",
                 ["CommandPalette"] = "Command palette", ["SearchCommands"] = "Search commands", ["Retry"] = "Retry", ["All"] = "All", ["AttachFile"] = "Attach file", ["SendMessage"] = "Send message",
-                ["FilterAvailable"] = "Filter available", ["FilterSelected"] = "Filter selected"
+                ["FilterAvailable"] = "Filter available", ["FilterSelected"] = "Filter selected",
+                ["RichBold"] = "Bold", ["RichItalic"] = "Italic", ["RichUnderline"] = "Underline", ["RichStrikeThrough"] = "Strikethrough", ["RichHeading"] = "Heading", ["RichQuote"] = "Quote", ["RichCode"] = "Inline code", ["RichLink"] = "Insert link", ["RichBulletedList"] = "Bulleted list", ["RichNumberedList"] = "Numbered list", ["RichUndo"] = "Undo", ["RichRedo"] = "Redo", ["RichHorizontalRule"] = "Horizontal rule", ["RichClearFormatting"] = "Clear formatting"
             },
             ["zh"] = new Dictionary<string, string>(StringComparer.Ordinal)
             {
@@ -58,12 +59,12 @@ public sealed class MdLocalization : AvaloniaObject
                 ["Rating"] = "评分", ["Carousel"] = "轮播", ["Calendar"] = "日历", ["Loading"] = "加载中",
                 ["ItemOf"] = "第 {0} 项，共 {1} 项", ["SelectedItemOf"] = "已选择第 {0} 项，共 {1} 项",
                 ["ItemsCount"] = "共 {0} 项", ["CharactersEntered"] = "已输入 {0}/{1} 个字符", ["ReadOnly"] = "只读", ["ErrorPrefix"] = "错误：{0}",
-                ["Search"] = "搜索", ["NoResults"] = "无结果", ["Dismiss"] = "关闭",
+                ["Search"] = "搜索", ["NoResults"] = "无结果", ["SearchFailed"] = "搜索失败，请重试。", ["Dismiss"] = "关闭",
                 ["InvalidHex"] = "请输入有效的十六进制颜色", ["CopiedHex"] = "已复制十六进制颜色值", ["CopyFailed"] = "无法复制十六进制颜色值",
                 ["PreviousMonth"] = "上个月", ["NextMonth"] = "下个月",
                 ["Expand"] = "展开", ["Collapse"] = "收起", ["Remove"] = "移除",
                 ["Breadcrumb"] = "面包屑导航", ["ShowFullBreadcrumbPath"] = "显示完整导航路径", ["CurrentPage"] = "当前页面",
-                ["HierarchySelector"] = "层级选择器", ["TransferList"] = "穿梭列表", ["AvailableItems"] = "可选项目", ["SelectedItems"] = "已选项目",
+                ["HierarchySelector"] = "层级选择器", ["Hierarchy"] = "层级结构", ["TransferList"] = "穿梭列表", ["AvailableItems"] = "可选项目", ["SelectedItems"] = "已选项目",
                 ["MoveSelectedToTarget"] = "将所选项目移至已选列表", ["MoveSelectedToSource"] = "将所选项目移至可选列表", ["MoveAllToTarget"] = "全部移至已选列表", ["MoveAllToSource"] = "全部移至可选列表",
                 ["MovedItemsToSelected"] = "已将 {0} 项移至已选列表", ["MovedItemsToAvailable"] = "已将 {0} 项移至可选列表",
                 ["Assistant"] = "助手", ["System"] = "系统", ["You"] = "你", ["Message"] = "消息", ["SelectedMessage"] = "已选择的消息",
@@ -71,7 +72,8 @@ public sealed class MdLocalization : AvaloniaObject
                 ["MessagesSelected"] = "已选择 {0} 条消息", ["DeletedMessages"] = "已删除 {0} 条消息", ["RetryingMessageFrom"] = "正在重试来自 {0} 的消息",
                 ["NewMessageFrom"] = "来自 {0} 的新消息：{1}", ["MessageFromFailed"] = "来自 {0} 的消息发送失败。{1}",
                 ["CommandPalette"] = "命令面板", ["SearchCommands"] = "搜索命令", ["Retry"] = "重试", ["All"] = "全部", ["AttachFile"] = "附加文件", ["SendMessage"] = "发送消息",
-                ["FilterAvailable"] = "筛选可选项目", ["FilterSelected"] = "筛选已选项目"
+                ["FilterAvailable"] = "筛选可选项目", ["FilterSelected"] = "筛选已选项目",
+                ["RichBold"] = "粗体", ["RichItalic"] = "斜体", ["RichUnderline"] = "下划线", ["RichStrikeThrough"] = "删除线", ["RichHeading"] = "标题", ["RichQuote"] = "引用", ["RichCode"] = "行内代码", ["RichLink"] = "插入链接", ["RichBulletedList"] = "项目符号列表", ["RichNumberedList"] = "编号列表", ["RichUndo"] = "撤销", ["RichRedo"] = "重做", ["RichHorizontalRule"] = "水平分隔线", ["RichClearFormatting"] = "清除格式"
             }
         };
 

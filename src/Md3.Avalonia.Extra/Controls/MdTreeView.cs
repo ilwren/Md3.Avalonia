@@ -15,6 +15,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Extra.Controls;
@@ -105,11 +106,12 @@ public sealed class MdTreeView : ListBox
         ShowGuidesProperty.Changed.AddClassHandler<MdTreeView>((control, _) => control.Rebuild());
         FlowDirectionProperty.Changed.AddClassHandler<MdTreeView>((control, _) => control.Rebuild());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdTreeView>((control, _) => control.CancelMotion());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdTreeView>((control, _) => control.UpdateAutomationName());
     }
 
     public MdTreeView()
     {
-        AutomationProperties.SetName(this, "Hierarchy");
+        UpdateAutomationName();
         SelectionChanged += OnSelectionChanged;
         AddHandler(Button.ClickEvent, OnButtonClick, RoutingStrategies.Bubble, true);
         DoubleTapped += (_, _) =>
@@ -128,6 +130,8 @@ public sealed class MdTreeView : ListBox
 
     public event EventHandler<MdTreeNode>? NodeInvoked;
     public event EventHandler<MdTreeNode>? ExpansionChanged;
+
+    private void UpdateAutomationName() => AutomationProperties.SetName(this, MdLocalization.GetString("Hierarchy", this));
 
     /// <summary>Expands a node and refreshes the visible flattened rows.</summary>
     public bool Expand(MdTreeNode node) => SetExpanded(node, true);

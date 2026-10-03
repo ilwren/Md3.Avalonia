@@ -189,15 +189,15 @@
     <Setter Property="Focusable" Value="True" /><Setter Property="Template">
       <ControlTemplate>
         <Grid>
-          <md:MdTextBox Name="PART_Query" Text="{TemplateBinding Query, Mode=TwoWay}" Label="Search" ShowClearButton="True" Variant="Outlined" />
+          <md:MdTextBox Name="PART_Query" Text="{TemplateBinding Query, Mode=TwoWay}" Label="{TemplateBinding SearchText}" ShowClearButton="True" Variant="Outlined" />
           <Popup Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}" Placement="BottomEdgeAlignedLeft" PlacementTarget="{Binding #PART_Query}" IsLightDismissEnabled="True" WindowManagerAddShadowHint="False">
             <Popup.Styles><Style Selector="PopupRoot"><Setter Property="Background" Value="Transparent" /><Setter Property="TransparencyLevelHint" Value="Transparent" /><Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /></Style></Popup.Styles>
             <Border Name="PART_Surface" MinWidth="260" MaxHeight="320" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="0,0,12,12" Padding="4" Opacity="0" RenderTransform="scale(0.96) translate(0px,-8px)" RenderTransformOrigin="50%,0%">
               <Grid>
                 <ListBox Name="PART_Results" Theme="{StaticResource EcoListTheme}" ItemContainerTheme="{StaticResource EcoListItemTheme}" ItemsSource="{TemplateBinding Results}" Background="Transparent" />
                 <md:MdLinearProgressIndicator Classes="eco-loading" IsVisible="False" IsIndeterminate="True" VerticalAlignment="Top" />
-                <TextBlock Classes="eco-empty" IsVisible="False" Text="No results" HorizontalAlignment="Center" Margin="16" />
-                <TextBlock Classes="eco-error" IsVisible="False" Text="Search failed. Try again." HorizontalAlignment="Center" Margin="16" />
+                <TextBlock Classes="eco-empty" IsVisible="False" Text="{TemplateBinding NoResultsText}" HorizontalAlignment="Center" Margin="16" />
+                <TextBlock Classes="eco-error" IsVisible="False" Text="{TemplateBinding SearchErrorText}" HorizontalAlignment="Center" Margin="16" />
               </Grid>
             </Border>
           </Popup>
