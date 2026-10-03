@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.IO;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Automation;
@@ -8,6 +9,7 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.VisualTree;
 
@@ -168,6 +170,9 @@ public class MdBorderlessWindow : MdWindow
     public static readonly StyledProperty<bool> ExtendIntoTitleBarProperty = AvaloniaProperty.Register<MdBorderlessWindow, bool>(nameof(ExtendIntoTitleBar), true);
     public static readonly StyledProperty<double> TitleBarHeightProperty = AvaloniaProperty.Register<MdBorderlessWindow, double>(nameof(TitleBarHeight), 40);
     public static readonly StyledProperty<bool> PreserveNativeBorderProperty = AvaloniaProperty.Register<MdBorderlessWindow, bool>(nameof(PreserveNativeBorder), true);
+    public static readonly StyledProperty<bool> ShowIconProperty = AvaloniaProperty.Register<MdBorderlessWindow, bool>(nameof(ShowIcon), true);
+    public static readonly DirectProperty<MdBorderlessWindow, Bitmap?> TitleBarIconProperty =
+        AvaloniaProperty.RegisterDirect<MdBorderlessWindow, Bitmap?>(nameof(TitleBarIcon), window => window._titleBarIcon);
     public static readonly StyledProperty<bool> ShowMinimizeButtonProperty = AvaloniaProperty.Register<MdBorderlessWindow, bool>(nameof(ShowMinimizeButton), true);
     public static readonly StyledProperty<bool> ShowMaximizeButtonProperty = AvaloniaProperty.Register<MdBorderlessWindow, bool>(nameof(ShowMaximizeButton), true);
     public static readonly StyledProperty<bool> ShowCloseButtonProperty = AvaloniaProperty.Register<MdBorderlessWindow, bool>(nameof(ShowCloseButton), true);
@@ -179,6 +184,7 @@ public class MdBorderlessWindow : MdWindow
     private IMdWindowPlatformAdapter _platformAdapter;
     private MdWindowTemplateSettings _templateSettings = new(40, new Thickness(0, 40, 0, 0), 46, true, false);
     private bool _isActive;
+    private Bitmap? _titleBarIcon;
 
     static MdBorderlessWindow()
     {
@@ -188,6 +194,7 @@ public class MdBorderlessWindow : MdWindow
         PreserveNativeBorderProperty.Changed.AddClassHandler<MdBorderlessWindow>((window, _) => window.ApplyChrome());
         CanResizeProperty.Changed.AddClassHandler<MdBorderlessWindow>((window, _) => window.ApplyChrome());
         WindowStateProperty.Changed.AddClassHandler<MdBorderlessWindow>((window, _) => window.UpdateWindowState());
+        IconProperty.Changed.AddClassHandler<MdBorderlessWindow>((window, _) => window.UpdateTitleBarIcon());
     }
     protected override Type StyleKeyOverride => typeof(MdBorderlessWindow);
 
@@ -202,18 +209,36 @@ public class MdBorderlessWindow : MdWindow
         Deactivated += (_, _) => SetActiveState(false);
         Closed += (_, _) => SetActiveState(false);
         SetActiveState(false);
+        UpdateTitleBarIcon();
         UpdateWindowState();
     }
     public bool IsCustomChromeEnabled { get => GetValue(IsCustomChromeEnabledProperty); set => SetValue(IsCustomChromeEnabledProperty, value); }
     public bool ExtendIntoTitleBar { get => GetValue(ExtendIntoTitleBarProperty); set => SetValue(ExtendIntoTitleBarProperty, value); }
     public double TitleBarHeight { get => GetValue(TitleBarHeightProperty); set => SetValue(TitleBarHeightProperty, value); }
     public bool PreserveNativeBorder { get => GetValue(PreserveNativeBorderProperty); set => SetValue(PreserveNativeBorderProperty, value); }
+    public bool ShowIcon { get => GetValue(ShowIconProperty); set => SetValue(ShowIconProperty, value); }
+    public Bitmap? TitleBarIcon => _titleBarIcon;
     public bool ShowMinimizeButton { get => GetValue(ShowMinimizeButtonProperty); set => SetValue(ShowMinimizeButtonProperty, value); }
     public bool ShowMaximizeButton { get => GetValue(ShowMaximizeButtonProperty); set => SetValue(ShowMaximizeButtonProperty, value); }
     public bool ShowCloseButton { get => GetValue(ShowCloseButtonProperty); set => SetValue(ShowCloseButtonProperty, value); }
     public bool IsMinimizeButtonEnabled { get => GetValue(IsMinimizeButtonEnabledProperty); set => SetValue(IsMinimizeButtonEnabledProperty, value); }
     public bool IsMaximizeButtonEnabled { get => GetValue(IsMaximizeButtonEnabledProperty); set => SetValue(IsMaximizeButtonEnabledProperty, value); }
     public bool IsCloseButtonEnabled { get => GetValue(IsCloseButtonEnabledProperty); set => SetValue(IsCloseButtonEnabledProperty, value); }
+    private void UpdateTitleBarIcon()
+    {
+        var oldIcon = _titleBarIcon;
+        Bitmap? newIcon = null;
+        if (Icon is not null)
+        {
+            using var stream = new MemoryStream();
+            Icon.Save(stream);
+            stream.Position = 0;
+            newIcon = new Bitmap(stream);
+        }
+        SetAndRaise(TitleBarIconProperty, ref _titleBarIcon, newIcon);
+        oldIcon?.Dispose();
+    }
+
     public MdWindowTemplateSettings TemplateSettings => _templateSettings;
     public bool IsWindowActive => _isActive;
     public IMdWindowPlatformAdapter PlatformAdapter { get => _platformAdapter; set { _platformAdapter = value ?? throw new ArgumentNullException(nameof(value)); ApplyChrome(); } }
@@ -283,6 +308,7 @@ public sealed class MdWindowTitleBar : ContentControl
     public static readonly StyledProperty<object?> TrailingContentProperty = AvaloniaProperty.Register<MdWindowTitleBar, object?>(nameof(TrailingContent));
     public static readonly StyledProperty<object?> SubtitleProperty = AvaloniaProperty.Register<MdWindowTitleBar, object?>(nameof(Subtitle));
     public static readonly StyledProperty<bool> ShowIconProperty = AvaloniaProperty.Register<MdWindowTitleBar, bool>(nameof(ShowIcon));
+    public static readonly StyledProperty<Bitmap?> IconSourceProperty = AvaloniaProperty.Register<MdWindowTitleBar, Bitmap?>(nameof(IconSource));
     public static readonly StyledProperty<bool> ShowCaptionButtonsProperty = AvaloniaProperty.Register<MdWindowTitleBar, bool>(nameof(ShowCaptionButtons), true);
     public static readonly StyledProperty<bool> ShowMinimizeButtonProperty = AvaloniaProperty.Register<MdWindowTitleBar, bool>(nameof(ShowMinimizeButton), true);
     public static readonly StyledProperty<bool> ShowMaximizeButtonProperty = AvaloniaProperty.Register<MdWindowTitleBar, bool>(nameof(ShowMaximizeButton), true);
@@ -295,6 +321,7 @@ public sealed class MdWindowTitleBar : ContentControl
     public object? TrailingContent { get => GetValue(TrailingContentProperty); set => SetValue(TrailingContentProperty, value); }
     public object? Subtitle { get => GetValue(SubtitleProperty); set => SetValue(SubtitleProperty, value); }
     public bool ShowIcon { get => GetValue(ShowIconProperty); set => SetValue(ShowIconProperty, value); }
+    public Bitmap? IconSource { get => GetValue(IconSourceProperty); set => SetValue(IconSourceProperty, value); }
     public bool ShowCaptionButtons { get => GetValue(ShowCaptionButtonsProperty); set => SetValue(ShowCaptionButtonsProperty, value); }
     public bool ShowMinimizeButton { get => GetValue(ShowMinimizeButtonProperty); set => SetValue(ShowMinimizeButtonProperty, value); }
     public bool ShowMaximizeButton { get => GetValue(ShowMaximizeButtonProperty); set => SetValue(ShowMaximizeButtonProperty, value); }

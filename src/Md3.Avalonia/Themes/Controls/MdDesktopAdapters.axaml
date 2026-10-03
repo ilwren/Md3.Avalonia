@@ -376,7 +376,8 @@
                                    Background="{DynamicResource Md.Sys.Color.Surface.Brush}"
                                    BorderBrush="{x:Null}"
                                    BorderThickness="0"
-                                   ShowIcon="False"
+                                   ShowIcon="{TemplateBinding ShowIcon}"
+                                   IconSource="{TemplateBinding TitleBarIcon}"
                                    ShowMinimizeButton="{TemplateBinding ShowMinimizeButton}"
                                    ShowMaximizeButton="{TemplateBinding ShowMaximizeButton}"
                                    ShowCloseButton="{TemplateBinding ShowCloseButton}"
@@ -435,10 +436,12 @@
                 BorderThickness="0"
                 chrome:WindowDecorationProperties.ElementRole="TitleBar">
           <Grid ColumnDefinitions="Auto,*,Auto,Auto" Height="{TemplateBinding Height}">
-            <ContentPresenter Grid.Column="0" Margin="8,0" VerticalAlignment="Center"
-                              IsVisible="{TemplateBinding ShowIcon}"
-                              Content="{TemplateBinding LeadingContent}" Foreground="{TemplateBinding Foreground}"
-                              chrome:WindowDecorationProperties.ElementRole="User" />
+            <Grid Grid.Column="0" Margin="8,0" VerticalAlignment="Center"
+                  IsVisible="{TemplateBinding ShowIcon}"
+                  chrome:WindowDecorationProperties.ElementRole="User">
+              <Image Source="{TemplateBinding IconSource}" Width="20" Height="20" Stretch="Uniform" />
+              <ContentPresenter Content="{TemplateBinding LeadingContent}" Foreground="{TemplateBinding Foreground}" />
+            </Grid>
             <StackPanel Grid.Column="1" Margin="12,0" VerticalAlignment="Center">
               <ContentPresenter Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" />
               <ContentPresenter Content="{TemplateBinding Subtitle}" FontSize="11"

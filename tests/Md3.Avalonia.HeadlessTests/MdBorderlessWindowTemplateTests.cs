@@ -66,7 +66,7 @@ public sealed class MdBorderlessWindowTemplateTests
             Assert.Equal(new Thickness(1), frame.BorderThickness);
             Assert.True(frame.ClipToBounds);
             Assert.Equal("Material application", titleBar.Content);
-            Assert.False(titleBar.ShowIcon);
+            Assert.True(titleBar.ShowIcon);
             Assert.Equal(44, titleBar.Height);
             Assert.Equal(44, presenter.Margin.Top);
             Assert.Same(content, presenter.Content);
