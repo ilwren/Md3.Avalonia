@@ -63,8 +63,8 @@ public class MdConnectedButtonGroup : ItemsControl
     {
         IDisposable? managedValue = container switch
         {
-            MdButton button => button.SetValue(MdButton.SizeProperty, Size, BindingPriority.Style),
-            MdToggleButton toggle => toggle.SetValue(MdToggleButton.SizeProperty, Size, BindingPriority.Style),
+            MdButton button => button.SetValue(MdButton.SizeProperty, Size, BindingPriority.StyleTrigger),
+            MdToggleButton toggle => toggle.SetValue(MdToggleButton.SizeProperty, Size, BindingPriority.StyleTrigger),
             _ => null
         };
         if (managedValue is null) return;
@@ -130,12 +130,12 @@ public class MdConnectedButtonGroup : ItemsControl
             IDisposable? shapeValue;
             if (buttons[index] is MdButton button)
             {
-                shapeValue = button.SetValue(MdButton.ContainerCornerRadiusProperty, radius, BindingPriority.Style);
+                shapeValue = button.SetValue(MdButton.ContainerCornerRadiusProperty, radius, BindingPriority.StyleTrigger);
             }
             else if (buttons[index] is MdToggleButton toggle)
             {
-                shapeValue = toggle.SetValue(MdToggleButton.ContainerCornerRadiusProperty, radius, BindingPriority.Style);
-                var morphValue = toggle.SetValue(MdToggleButton.EnableSelectedShapeMorphProperty, false, BindingPriority.Style);
+                shapeValue = toggle.SetValue(MdToggleButton.ContainerCornerRadiusProperty, radius, BindingPriority.StyleTrigger);
+                var morphValue = toggle.SetValue(MdToggleButton.EnableSelectedShapeMorphProperty, false, BindingPriority.StyleTrigger);
                 if (_shapeMorphManagedValues.Remove(toggle, out var previousMorph)) previousMorph?.Dispose();
                 _shapeMorphManagedValues[toggle] = morphValue;
             }

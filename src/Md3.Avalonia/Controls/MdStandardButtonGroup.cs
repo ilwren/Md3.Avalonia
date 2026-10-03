@@ -40,8 +40,8 @@ public class MdStandardButtonGroup : ItemsControl
     {
         IDisposable? managedValue = container switch
         {
-            MdButton button => button.SetValue(MdButton.SizeProperty, Size, BindingPriority.Style),
-            MdToggleButton toggle => toggle.SetValue(MdToggleButton.SizeProperty, Size, BindingPriority.Style),
+            MdButton button => button.SetValue(MdButton.SizeProperty, Size, BindingPriority.StyleTrigger),
+            MdToggleButton toggle => toggle.SetValue(MdToggleButton.SizeProperty, Size, BindingPriority.StyleTrigger),
             _ => null
         };
         if (managedValue is null) return;

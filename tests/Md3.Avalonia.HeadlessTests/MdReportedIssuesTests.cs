@@ -241,9 +241,10 @@ public sealed class MdReportedIssuesTests
     public void Rating_Can_Increase_And_Decrease_To_The_Exact_Half_Star()
     {
         var rating = new MdRating { ItemSize = 32, Spacing = 4, Precision = .5, Value = 1 };
-        rating.SetValueFromPosition(3 * 36 + 28);
+        const double targetPitch = 48 + 4;
+        rating.SetValueFromPosition(3 * targetPitch + 48);
         Assert.Equal(4, rating.Value);
-        rating.SetValueFromPosition(36 + 8);
+        rating.SetValueFromPosition(targetPitch + 24);
         Assert.Equal(1.5, rating.Value);
     }
 

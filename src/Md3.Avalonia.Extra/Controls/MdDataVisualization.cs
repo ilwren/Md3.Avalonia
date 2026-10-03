@@ -1477,7 +1477,27 @@ public sealed class MdChatView : TemplatedControl
         if (path.OfType<Button>().Any()) return;
         // Selection belongs to the visual bubble. Transparent space in a full-width virtualized
         // row must remain available for scrolling and must never toggle message selection.
-        if (!path.OfType<Border>().Any(border => border.Name == "PART_Bubble")) e.Handled = true;
+        if (!path.OfType<Border>().Any(border => border.Name == "PART_Bubble"))
+        {
+            e.Handled = true;
+            return;
+        }
+
+        // Select explicitly instead of depending on ListBoxItem's presenter surface. Rich and
+        // selectable text inside the bubble may otherwise consume the press before ListBox sees it.
+        var row = path.OfType<ListBoxItem>().FirstOrDefault();
+        if (row?.DataContext is not MdChatMessage) return;
+        var toggle = AllowMultipleSelection && e.KeyModifiers.HasFlag(KeyModifiers.Control);
+        if (toggle)
+        {
+            row.IsSelected = !row.IsSelected;
+        }
+        else
+        {
+            _messagesHost?.UnselectAll();
+            row.IsSelected = true;
+        }
+        e.Handled = true;
     }
 
     private void OnMessageActionClick(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
