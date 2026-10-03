@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
+using Avalonia.Data;
 
 namespace Md3.Avalonia.Controls;
 
@@ -8,7 +9,7 @@ namespace Md3.Avalonia.Controls;
 [PseudoClasses(":xsmall", ":small", ":medium", ":large", ":xlarge")]
 public class MdStandardButtonGroup : ItemsControl
 {
-    private readonly HashSet<Control> _sizeManagedContainers = [];
+    private readonly Dictionary<Control, IDisposable> _sizeManagedValues = [];
 
     public static readonly StyledProperty<MdButtonSize> SizeProperty = AvaloniaProperty.Register<MdStandardButtonGroup, MdButtonSize>(nameof(Size), MdButtonSize.Small);
     public static readonly StyledProperty<double> ItemSpacingProperty = AvaloniaProperty.Register<MdStandardButtonGroup, double>(nameof(ItemSpacing), 12);
@@ -31,31 +32,26 @@ public class MdStandardButtonGroup : ItemsControl
 
     protected override void ClearContainerForItemOverride(Control container)
     {
-        if (_sizeManagedContainers.Remove(container))
-        {
-            if (container is MdButton button) button.ClearValue(MdButton.SizeProperty);
-            else if (container is MdToggleButton toggle) toggle.ClearValue(MdToggleButton.SizeProperty);
-        }
+        if (_sizeManagedValues.Remove(container, out var managedValue)) managedValue.Dispose();
         base.ClearContainerForItemOverride(container);
     }
 
     private void ManageContainerSize(Control container)
     {
-        if (container is MdButton button && (_sizeManagedContainers.Contains(button) || !button.IsSet(MdButton.SizeProperty)))
+        IDisposable? managedValue = container switch
         {
-            _sizeManagedContainers.Add(button);
-            button.SetCurrentValue(MdButton.SizeProperty, Size);
-        }
-        else if (container is MdToggleButton toggle && (_sizeManagedContainers.Contains(toggle) || toggle.ReadLocalValue(MdToggleButton.SizeProperty) == AvaloniaProperty.UnsetValue))
-        {
-            _sizeManagedContainers.Add(toggle);
-            toggle.SetCurrentValue(MdToggleButton.SizeProperty, Size);
-        }
+            MdButton button => button.SetValue(MdButton.SizeProperty, Size, BindingPriority.Style),
+            MdToggleButton toggle => toggle.SetValue(MdToggleButton.SizeProperty, Size, BindingPriority.Style),
+            _ => null
+        };
+        if (managedValue is null) return;
+        if (_sizeManagedValues.Remove(container, out var previous)) previous.Dispose();
+        _sizeManagedValues[container] = managedValue;
     }
 
     private void UpdateManagedContainerSizes()
     {
-        foreach (var container in _sizeManagedContainers.ToArray()) ManageContainerSize(container);
+        foreach (var container in _sizeManagedValues.Keys.ToArray()) ManageContainerSize(container);
     }
 
     private void UpdatePseudoClasses()
