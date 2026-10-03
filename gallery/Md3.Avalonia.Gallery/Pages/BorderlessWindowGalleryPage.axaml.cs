@@ -27,7 +27,7 @@ public partial class BorderlessWindowGalleryPage : UserControl
             MinWidth = 420,
             MinHeight = 300,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
-            PreserveNativeBorder = false,
+            PreserveNativeBorder = true,
             ExtendIntoTitleBar = true,
             TitleBarHeight = 40
         };
