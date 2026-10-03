@@ -145,6 +145,11 @@ public sealed class MdChart : Control
         Focusable = true;
         AutomationProperties.SetName(this, AccessibleTitle);
         AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Polite);
+        GotFocus += (_, _) =>
+        {
+            if (_activePointIndex < 0 && GetPointEntries().Count > 0) SetActivePoint(0, true);
+        };
+        LostFocus += (_, _) => SetActivePoint(-1, true);
     }
     public IEnumerable<MdChartSeries>? Series { get => GetValue(SeriesProperty); set => SetValue(SeriesProperty, value); }
     public MdChartKind Kind { get => GetValue(KindProperty); set => SetValue(KindProperty, value); }
@@ -313,18 +318,6 @@ public sealed class MdChart : Control
     {
         base.OnPointerExited(e);
         if (!IsKeyboardFocusWithin) SetActivePoint(-1, true);
-    }
-
-    protected override void OnGotFocus(GotFocusEventArgs e)
-    {
-        base.OnGotFocus(e);
-        if (_activePointIndex < 0 && GetPointEntries().Count > 0) SetActivePoint(0, true);
-    }
-
-    protected override void OnLostFocus(RoutedEventArgs e)
-    {
-        base.OnLostFocus(e);
-        SetActivePoint(-1, true);
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
