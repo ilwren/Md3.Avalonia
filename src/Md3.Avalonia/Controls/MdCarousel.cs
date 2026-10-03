@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
@@ -63,6 +64,11 @@ public sealed class MdCarousel : ListBox
         IsAutoPlayProperty.Changed.AddClassHandler<MdCarousel>((carousel, _) => carousel.UpdateAutoPlay());
         AutoPlayIntervalProperty.Changed.AddClassHandler<MdCarousel>((carousel, _) => carousel.UpdateAutoPlay());
         ControllerProperty.Changed.AddClassHandler<MdCarousel>((carousel, _) => carousel.UpdateController());
+        FlowDirectionProperty.Changed.AddClassHandler<MdCarousel>((carousel, _) =>
+        {
+            carousel.UpdateRealizedContainers();
+            carousel.ScheduleSelectedSettle();
+        });
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdCarousel>((carousel, _) => carousel.UpdateMotion());
     }
 
@@ -82,6 +88,7 @@ public sealed class MdCarousel : ListBox
         SelectionChanged += (_, _) =>
         {
             UpdateRealizedContainers();
+            UpdateSelectionAnnouncement();
             ScheduleSelectedSettle();
         };
         ScrollGesture += (_, _) => CancelSettleForDirectManipulation();
@@ -93,6 +100,8 @@ public sealed class MdCarousel : ListBox
             _wheelSnapTimer.Interval = TimeSpan.FromMilliseconds(120);
             _wheelSnapTimer.Start();
         };
+        AutomationProperties.SetName(this, "Carousel");
+        AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Polite);
         UpdatePseudoClasses();
     }
 
@@ -155,8 +164,11 @@ public sealed class MdCarousel : ListBox
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
-        if (e.Key == Key.Right && MoveNext()) e.Handled = true;
-        else if (e.Key == Key.Left && MovePrevious()) e.Handled = true;
+        var rtl = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft;
+        if (e.Key == Key.Right && (rtl ? MovePrevious() : MoveNext())) e.Handled = true;
+        else if (e.Key == Key.Left && (rtl ? MoveNext() : MovePrevious())) e.Handled = true;
+        else if (e.Key == Key.Home && ItemCount > 0) { SelectedIndex = 0; e.Handled = true; }
+        else if (e.Key == Key.End && ItemCount > 0) { SelectedIndex = ItemCount - 1; e.Handled = true; }
         else base.OnKeyDown(e);
     }
 
@@ -178,12 +190,16 @@ public sealed class MdCarousel : ListBox
             MdMotionTransitions.CreateDouble(this, WidthProperty, MdMotionKind.Spatial));
         container.SetCurrentValue(WidthProperty, GetTargetWidth(index));
         container.SetCurrentValue(HeightProperty, ItemHeight);
-        container.SetCurrentValue(MarginProperty, new Thickness(0, 0, ItemSpacing, 0));
-        if (container is ListBoxItem item && ResourceNodeExtensions.FindResource(this, "MdCarouselItemTheme") is ControlTheme theme)
+        container.SetCurrentValue(MarginProperty, FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft
+            ? new Thickness(ItemSpacing, 0, 0, 0)
+            : new Thickness(0, 0, ItemSpacing, 0));
+        if (container is ListBoxItem item)
         {
-            item.SetCurrentValue(ThemeProperty, theme);
+            if (ResourceNodeExtensions.FindResource(this, "MdCarouselItemTheme") is ControlTheme theme)
+                item.SetCurrentValue(ThemeProperty, theme);
             item.SetCurrentValue(ListBoxItem.CornerRadiusProperty,
                 Variant == MdCarouselVariant.Uncontained ? new CornerRadius(12) : new CornerRadius(28));
+            AutomationProperties.SetHelpText(item, $"Item {index + 1} of {ItemCount}");
         }
     }
 
@@ -231,12 +247,14 @@ public sealed class MdCarousel : ListBox
         var selected = ContainerFromIndex(SelectedIndex) as Control;
         var origin = selected?.TranslatePoint(default, this);
         var selectedWidth = selected?.Bounds.Width ?? GetTargetWidth(SelectedIndex);
+        var rtl = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft;
+        var maxOffset = Math.Max(0, _scrollViewer.Extent.Width - _scrollViewer.Viewport.Width);
         double target;
         if (origin is not null)
         {
             var desiredX = Variant == MdCarouselVariant.CenterAligned
                 ? Math.Max(0, (Bounds.Width - selectedWidth) / 2)
-                : Padding.Left;
+                : rtl ? Math.Max(0, Bounds.Width - Padding.Right - selectedWidth) : Padding.Left;
             target = _scrollViewer.Offset.X + origin.Value.X - desiredX;
         }
         else
@@ -246,9 +264,10 @@ public sealed class MdCarousel : ListBox
                 target += GetTargetWidth(index) + ItemSpacing;
             if (Variant == MdCarouselVariant.CenterAligned)
                 target -= Math.Max(0, (Bounds.Width - selectedWidth) / 2);
+            if (rtl) target = maxOffset - target;
         }
 
-        target = Math.Clamp(target, 0, Math.Max(0, _scrollViewer.Extent.Width - _scrollViewer.Viewport.Width));
+        target = Math.Clamp(target, 0, maxOffset);
         var spec = MdMotion.Resolve(this, MdMotionKind.Spatial, MdMotionSpeed.Default);
         _scrollViewer.Transitions = MdMotionTransitions.Collect(
             MdMotionTransitions.CreateVector(this, ScrollViewer.OffsetProperty));
@@ -276,13 +295,16 @@ public sealed class MdCarousel : ListBox
     {
         var containers = GetRealizedContainers().Where(control => control.Bounds.Width > 0).ToArray();
         if (containers.Length == 0) return;
-        var targetX = Variant == MdCarouselVariant.CenterAligned ? Bounds.Width / 2 : Padding.Left;
+        var rtl = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft;
+        var targetX = Variant == MdCarouselVariant.CenterAligned
+            ? Bounds.Width / 2
+            : rtl ? Bounds.Width - Padding.Right : Padding.Left;
         var nearest = containers
             .Select(control => new
             {
                 Control = control,
                 Point = control.TranslatePoint(new Point(
-                    Variant == MdCarouselVariant.CenterAligned ? control.Bounds.Width / 2 : 0, 0), this)
+                    Variant == MdCarouselVariant.CenterAligned ? control.Bounds.Width / 2 : rtl ? control.Bounds.Width : 0, 0), this)
             })
             .Where(value => value.Point is not null)
             .OrderBy(value => Math.Abs(value.Point!.Value.X - targetX))
@@ -291,6 +313,13 @@ public sealed class MdCarousel : ListBox
         var index = IndexFromContainer(nearest.Control);
         if (index >= 0 && index != SelectedIndex) SelectedIndex = index;
         else ScheduleSelectedSettle();
+    }
+
+    private void UpdateSelectionAnnouncement()
+    {
+        AutomationProperties.SetHelpText(this, SelectedIndex >= 0
+            ? $"Selected item {SelectedIndex + 1} of {ItemCount}"
+            : $"{ItemCount} items");
     }
 
     private void UpdateController()

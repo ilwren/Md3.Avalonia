@@ -172,6 +172,38 @@ public sealed class MdTextBoxTests
     }
 
     [AvaloniaFact]
+    public void Outlined_Label_Uses_A_Transparent_Stroke_Notch_On_Arbitrary_Host_Color()
+    {
+        var textBox = new MdTextBox
+        {
+            Width = 320,
+            Label = "HEX value",
+            Text = "#8BC34A",
+            Variant = MdTextBoxVariant.Outlined
+        };
+        var hostSurface = new Border
+        {
+            Background = new SolidColorBrush(Color.Parse("#615D67")),
+            Padding = new Thickness(24),
+            Child = textBox
+        };
+        using var host = Show(hostSurface);
+
+        var label = textBox.GetVisualDescendants().OfType<ContentPresenter>()
+            .Single(control => control.Name == "PART_Label");
+        var outline = textBox.GetVisualDescendants().OfType<MdOutlinedFieldBorder>()
+            .Single(control => control.Name == "PART_Outline");
+
+        Assert.True(outline.IsVisible);
+        Assert.True(outline.IsNotched);
+        Assert.Same(label, outline.NotchTarget);
+        Assert.Equal(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(label.Background).Color);
+        Assert.NotEqual(
+            Assert.IsType<SolidColorBrush>(hostSurface.Background).Color,
+            Assert.IsAssignableFrom<ISolidColorBrush>(label.Background).Color);
+    }
+
+    [AvaloniaFact]
     public void TextBox_Matrix_Can_Render_To_Bitmap()
     {
         Application.Current!.RequestedThemeVariant = ThemeVariant.Light;

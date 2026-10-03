@@ -104,6 +104,7 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private bool _isMonthTransitionActive;
     private int _monthAnimationVersion;
     private int _monthDirection = 1;
+    private DateTimeOffset _activeDate = DateTimeOffset.Now;
 
     static MdDatePicker()
     {
@@ -245,6 +246,10 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         if (_cancelButton is not null) _cancelButton.Click += OnCancel;
         if (_confirmButton is not null) _confirmButton.Click += OnConfirm;
         _daysHost?.AddHandler(Button.ClickEvent, OnDayClick);
+        _daysHost?.AddHandler(InputElement.KeyDownEvent, OnCalendarKeyDown,
+            RoutingStrategies.Tunnel, handledEventsToo: true);
+        _daysHost?.AddHandler(InputElement.GotFocusEvent, OnCalendarDayGotFocus,
+            RoutingStrategies.Bubble, handledEventsToo: true);
         _popupPresence.Initialize(IsOpen);
         UpdateMotion();
     }
@@ -277,6 +282,8 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         if (_cancelButton is not null) _cancelButton.Click -= OnCancel;
         if (_confirmButton is not null) _confirmButton.Click -= OnConfirm;
         _daysHost?.RemoveHandler(Button.ClickEvent, OnDayClick);
+        _daysHost?.RemoveHandler(InputElement.KeyDownEvent, OnCalendarKeyDown);
+        _daysHost?.RemoveHandler(InputElement.GotFocusEvent, OnCalendarDayGotFocus);
     }
 
     private void OnAnchorClick(object? sender, RoutedEventArgs e) =>
@@ -312,8 +319,82 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         }
     }
 
+    private void OnCalendarDayGotFocus(object? sender, FocusChangedEventArgs e)
+    {
+        if (e.Source is Button { DataContext: MdCalendarDay day } button && day.IsEnabled)
+        {
+            _activeDate = day.Date;
+            SetActiveTabStop(button);
+        }
+    }
+
+    private void OnCalendarKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (!IsOpen || e.Source is not Visual source || _daysHost is null ||
+            (!ReferenceEquals(source, _daysHost) && !source.GetVisualAncestors().Contains(_daysHost)))
+            return;
+
+        var culture = MdLocalization.ResolveCulture(this);
+        var firstDayOfWeek = culture.DateTimeFormat.FirstDayOfWeek;
+        var dayOffset = (7 + (int)_activeDate.DayOfWeek - (int)firstDayOfWeek) % 7;
+        var rtl = FlowDirection == FlowDirection.RightToLeft;
+        DateTimeOffset? target = e.Key switch
+        {
+            Key.Left => _activeDate.AddDays(rtl ? 1 : -1),
+            Key.Right => _activeDate.AddDays(rtl ? -1 : 1),
+            Key.Up => _activeDate.AddDays(-7),
+            Key.Down => _activeDate.AddDays(7),
+            Key.Home => _activeDate.AddDays(-dayOffset),
+            Key.End => _activeDate.AddDays(6 - dayOffset),
+            Key.PageUp when e.KeyModifiers.HasFlag(KeyModifiers.Shift) => _activeDate.AddYears(-1),
+            Key.PageDown when e.KeyModifiers.HasFlag(KeyModifiers.Shift) => _activeDate.AddYears(1),
+            Key.PageUp => _activeDate.AddMonths(-1),
+            Key.PageDown => _activeDate.AddMonths(1),
+            _ => null
+        };
+        if (target is null) return;
+        MoveActiveDate(target.Value);
+        e.Handled = true;
+    }
+
+    private void MoveActiveDate(DateTimeOffset target)
+    {
+        _activeDate = ClampToEnabledDate(target);
+        if (_activeDate.Year != DisplayDate.Year || _activeDate.Month != DisplayDate.Month)
+            SetCurrentValue(DisplayDateProperty, _activeDate);
+        FocusActiveDate();
+    }
+
+    private DateTimeOffset ClampToEnabledDate(DateTimeOffset value)
+    {
+        if (MinimumDate is { } minimum && value.Date < minimum.Date) value = minimum;
+        if (MaximumDate is { } maximum && value.Date > maximum.Date) value = maximum;
+        return value;
+    }
+
+    private void FocusActiveDate()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (!IsOpen || _daysHost is null) return;
+            var target = _daysHost.GetVisualDescendants().OfType<Button>()
+                .FirstOrDefault(button => button.DataContext is MdCalendarDay day &&
+                    day.IsEnabled && day.Date.Date == _activeDate.Date);
+            SetActiveTabStop(target);
+            target?.Focus(NavigationMethod.Directional);
+        }, DispatcherPriority.Loaded);
+    }
+
+    private void SetActiveTabStop(Button? active)
+    {
+        if (_daysHost is null) return;
+        foreach (var button in _daysHost.GetVisualDescendants().OfType<Button>())
+            KeyboardNavigation.SetIsTabStop(button, ReferenceEquals(button, active));
+    }
+
     private void SelectDate(DateTimeOffset value)
     {
+        _activeDate = value;
         SetCurrentValue(SelectedDateProperty, value);
         SetCurrentValue(DisplayDateProperty, value);
         if (Mode == MdDatePickerMode.Docked)
@@ -329,7 +410,11 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
             _popupPresence.Update(true, TimeSpan.Zero);
             _valueAtOpen = SelectedDate;
             _commitModalSelection = false;
+            _activeDate = ClampToEnabledDate(SelectedDate ?? DateTimeOffset.Now);
+            if (_activeDate.Year != DisplayDate.Year || _activeDate.Month != DisplayDate.Month)
+                SetCurrentValue(DisplayDateProperty, _activeDate);
             MdPopupCoordinator.NotifyStateChanged(this);
+            FocusActiveDate();
             return;
         }
 
@@ -338,6 +423,7 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         _commitModalSelection = false;
         _popupPresence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
         MdPopupCoordinator.NotifyStateChanged(this);
+        Dispatcher.UIThread.Post(() => _anchorButton?.Focus(), DispatcherPriority.Input);
     }
 
     private void OnDisplayDateChanged(AvaloniaPropertyChangedEventArgs change)
@@ -533,13 +619,19 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
             var value = date.Date;
             var enabled = (!minimum.HasValue || value >= minimum.Value) &&
                           (!maximum.HasValue || value <= maximum.Value);
+            var isSelected = selectedDate == value;
+            var isToday = today == value;
+            var accessibleText = date.ToString("D", culture);
+            if (isSelected) accessibleText += $", {MdLocalization.GetString("Selected", culture)}";
+            if (isToday) accessibleText += $", {MdLocalization.GetString("Today", culture)}";
+            if (!enabled) accessibleText += $", {MdLocalization.GetString("Unavailable", culture)}";
             _calendarDays.Add(new MdCalendarDay(
                 date,
                 date.Day.ToString(culture),
-                date.ToString("D", culture),
+                accessibleText,
                 date.Month == monthStart.Month,
-                selectedDate == value,
-                today == value,
+                isSelected,
+                isToday,
                 enabled));
         }
     }

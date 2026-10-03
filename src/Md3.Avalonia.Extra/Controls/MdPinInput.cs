@@ -10,6 +10,7 @@ using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
+using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Extra.Controls;
@@ -42,6 +43,9 @@ public sealed class MdPinInput : TemplatedControl
     public static readonly StyledProperty<bool> IsErrorProperty =
         AvaloniaProperty.Register<MdPinInput, bool>(nameof(IsError));
 
+    public static readonly StyledProperty<string?> ErrorTextProperty =
+        AvaloniaProperty.Register<MdPinInput, string?>(nameof(ErrorText));
+
     public static readonly StyledProperty<double> CellSizeProperty =
         AvaloniaProperty.Register<MdPinInput, double>(nameof(CellSize), 52, validate: value => value >= 40);
 
@@ -68,15 +72,18 @@ public sealed class MdPinInput : TemplatedControl
         AcceptsOnlyDigitsProperty.Changed.AddClassHandler<MdPinInput>((control, _) => control.OnCodeChanged());
         IsObscuredProperty.Changed.AddClassHandler<MdPinInput>((control, _) => control.RefreshCells());
         MaskCharacterProperty.Changed.AddClassHandler<MdPinInput>((control, _) => control.RefreshCells());
-        IsErrorProperty.Changed.AddClassHandler<MdPinInput>((control, _) => control.UpdatePseudoClasses());
+        IsErrorProperty.Changed.AddClassHandler<MdPinInput>((control, _) => { control.UpdatePseudoClasses(); control.UpdateAccessibility(); });
+        ErrorTextProperty.Changed.AddClassHandler<MdPinInput>((control, _) => control.UpdateAccessibility());
         CellSizeProperty.Changed.AddClassHandler<MdPinInput>((control, _) => control.RefreshCells());
         CellSpacingProperty.Changed.AddClassHandler<MdPinInput>((control, _) => control.RefreshCells());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdPinInput>((control, _) => control.UpdateAccessibility());
     }
 
     public MdPinInput()
     {
         Focusable = true;
-        AutomationProperties.SetName(this, "Verification code");
+        AutomationProperties.SetName(this, MdLocalization.GetString("VerificationCode", this));
+        AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Assertive);
         AddHandler(PointerPressedEvent, OnPointerPressed, RoutingStrategies.Tunnel);
         GotFocus += (_, _) =>
         {
@@ -102,6 +109,7 @@ public sealed class MdPinInput : TemplatedControl
     public bool IsObscured { get => GetValue(IsObscuredProperty); set => SetValue(IsObscuredProperty, value); }
     public char MaskCharacter { get => GetValue(MaskCharacterProperty); set => SetValue(MaskCharacterProperty, value); }
     public bool IsError { get => GetValue(IsErrorProperty); set => SetValue(IsErrorProperty, value); }
+    public string? ErrorText { get => GetValue(ErrorTextProperty); set => SetValue(ErrorTextProperty, value); }
     public double CellSize { get => GetValue(CellSizeProperty); set => SetValue(CellSizeProperty, value); }
     public double CellSpacing { get => GetValue(CellSpacingProperty); set => SetValue(CellSpacingProperty, value); }
     public ICommand? CompletedCommand { get => GetValue(CompletedCommandProperty); set => SetValue(CompletedCommandProperty, value); }
@@ -131,7 +139,7 @@ public sealed class MdPinInput : TemplatedControl
         _input = e.NameScope.Find<TextBox>("PART_Input");
         if (_input is not null)
         {
-            AutomationProperties.SetName(_input, AutomationProperties.GetName(this) ?? "Verification code");
+            AutomationProperties.SetName(_input, AutomationProperties.GetName(this) ?? MdLocalization.GetString("VerificationCode", this));
             _input.MaxLength = Length;
             _synchronizingInput = true;
             _input.Text = Normalize(Code);
@@ -263,6 +271,25 @@ public sealed class MdPinInput : TemplatedControl
         PseudoClasses.Set(":complete", (Code?.Length ?? 0) == Length);
         PseudoClasses.Set(":md-error", IsError);
         PseudoClasses.Set(":obscured", IsObscured);
+        UpdateAccessibility();
+    }
+
+    private void UpdateAccessibility()
+    {
+        var currentName = AutomationProperties.GetName(this);
+        var en = MdLocalization.GetString("VerificationCode", System.Globalization.CultureInfo.GetCultureInfo("en"));
+        var zh = MdLocalization.GetString("VerificationCode", System.Globalization.CultureInfo.GetCultureInfo("zh"));
+        if (string.IsNullOrWhiteSpace(currentName) || currentName == en || currentName == zh)
+            AutomationProperties.SetName(this, MdLocalization.GetString("VerificationCode", this));
+        var description = IsError
+            ? MdLocalization.Format("ErrorPrefix", this, ErrorText ?? MdLocalization.GetString("InvalidVerificationCode", this))
+            : MdLocalization.Format("CharactersEntered", this, Math.Min(Code?.Length ?? 0, Length), Length);
+        AutomationProperties.SetHelpText(this, description);
+        if (_input is not null)
+        {
+            AutomationProperties.SetName(_input, AutomationProperties.GetName(this));
+            AutomationProperties.SetHelpText(_input, description);
+        }
     }
 }
 

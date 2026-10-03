@@ -16,12 +16,12 @@ tags:
     point: "50%, 35%"
 - assertVisible: "Selected HEX"
 
-# 3. Switch to Motion Tab & Verify M3 Container Transform
+# 3. Switch to Motion and exercise the current experimental container shell
 - tapOn: "Motion"
 - assertVisible: "Motion & Animations"
 - assertVisible: "Container transform (Open Container)"
 
-# 4. Trigger Container Transform Morph Animation
+# 4. Exercise open/close state; this is not evidence of complete M3 choreography
 - tapOn: "Material Design 3 Token Guide"
 - assertVisible: "Design Token Architecture"
 - assertVisible: "Collapse"

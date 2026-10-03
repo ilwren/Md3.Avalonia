@@ -1,5 +1,8 @@
 using Avalonia;
+using Avalonia.Automation;
+using Avalonia.Automation.Peers;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Controls.Metadata;
 
 namespace Md3.Avalonia.Controls;
@@ -35,6 +38,8 @@ public sealed class MdDataTable : ListBox
     public MdDataTable()
     {
         SelectionMode = SelectionMode.Multiple;
+        AutomationProperties.SetName(this, "Data table");
+        AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Polite);
         UpdatePseudoClasses();
     }
 
@@ -55,6 +60,7 @@ public sealed class MdDataTable : ListBox
             : MdDataTableSortDirection.Ascending;
         SetCurrentValue(SortColumnProperty, column);
         SetCurrentValue(SortDirectionProperty, direction);
+        AutomationProperties.SetHelpText(this, $"Sorted by {column}, {direction.ToString().ToLowerInvariant()}");
         SortRequested?.Invoke(this, new MdDataTableSortEventArgs(column, direction));
     }
 
@@ -68,9 +74,26 @@ public sealed class MdDataTable : ListBox
                 row.SetCurrentValue(ThemeProperty, theme);
             row.SetCurrentValue(ListBoxItem.BorderThicknessProperty,
                 ShowDividers ? new Thickness(0, 0, 0, 1) : new Thickness(0));
+            if (string.IsNullOrWhiteSpace(AutomationProperties.GetName(row)) && item is not null)
+                AutomationProperties.SetName(row, item.ToString());
+            AutomationProperties.SetHelpText(row, $"Row {index + 1} of {ItemCount}");
         }
         container.Classes.Set("odd", index % 2 != 0);
     }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Control) && ItemCount > 0 && e.Key is Key.Home or Key.End)
+        {
+            SelectedIndex = e.Key == Key.Home ? 0 : ItemCount - 1;
+            ScrollIntoView(SelectedIndex);
+            e.Handled = true;
+            return;
+        }
+        base.OnKeyDown(e);
+    }
+
+    protected override AutomationPeer OnCreateAutomationPeer() => new MdDataTableAutomationPeer(this);
 
     private void UpdateRealizedRows()
     {
@@ -85,4 +108,11 @@ public sealed class MdDataTable : ListBox
         PseudoClasses.Set(":no-dividers", !ShowDividers);
         PseudoClasses.Set(":striped", IsStriped);
     }
+}
+
+internal sealed class MdDataTableAutomationPeer(MdDataTable owner) : ListBoxAutomationPeer(owner)
+{
+    protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.DataGrid;
+    protected override bool IsControlElementCore() => true;
+    protected override bool IsContentElementCore() => true;
 }

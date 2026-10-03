@@ -12,7 +12,7 @@ public class MdFloatingActionButton : Button
     public static readonly StyledProperty<object?> IconProperty = AvaloniaProperty.Register<MdFloatingActionButton, object?>(nameof(Icon));
     public static readonly StyledProperty<MdFabSize> SizeProperty = AvaloniaProperty.Register<MdFloatingActionButton, MdFabSize>(nameof(Size), MdFabSize.Regular);
     public static readonly StyledProperty<MdFabColor> ColorStyleProperty = AvaloniaProperty.Register<MdFloatingActionButton, MdFabColor>(nameof(ColorStyle), MdFabColor.PrimaryContainer);
-    public static readonly StyledProperty<MdFabAlignment> AlignmentProperty = AvaloniaProperty.Register<MdFloatingActionButton, MdFabAlignment>(nameof(Alignment), MdFabAlignment.Right);
+    public static readonly StyledProperty<MdFabAlignment> AlignmentProperty = AvaloniaProperty.Register<MdFloatingActionButton, MdFabAlignment>(nameof(Alignment), MdFabAlignment.End);
     public static readonly StyledProperty<double> ContainerSizeProperty = AvaloniaProperty.Register<MdFloatingActionButton, double>(nameof(ContainerSize), 56);
     public static readonly StyledProperty<double> IconSizeProperty = AvaloniaProperty.Register<MdFloatingActionButton, double>(nameof(IconSize), 24);
     public static readonly StyledProperty<CornerRadius> ContainerCornerRadiusProperty = AvaloniaProperty.Register<MdFloatingActionButton, CornerRadius>(nameof(ContainerCornerRadius), new CornerRadius(16));
@@ -24,6 +24,7 @@ public class MdFloatingActionButton : Button
         SizeProperty.Changed.AddClassHandler<MdFloatingActionButton>((x, _) => x.UpdatePseudoClasses());
         ColorStyleProperty.Changed.AddClassHandler<MdFloatingActionButton>((x, _) => x.UpdatePseudoClasses());
         AlignmentProperty.Changed.AddClassHandler<MdFloatingActionButton>((x, _) => x.UpdatePseudoClasses());
+        FlowDirectionProperty.Changed.AddClassHandler<MdFloatingActionButton>((x, _) => x.UpdatePseudoClasses());
     }
     public MdFloatingActionButton() => UpdatePseudoClasses();
 
@@ -49,7 +50,8 @@ public class MdFloatingActionButton : Button
         PseudoClasses.Set(":primary", ColorStyle == MdFabColor.Primary);
         PseudoClasses.Set(":secondary", ColorStyle == MdFabColor.Secondary);
         PseudoClasses.Set(":tertiary", ColorStyle == MdFabColor.Tertiary);
-        PseudoClasses.Set(":left", Alignment == MdFabAlignment.Left);
-        PseudoClasses.Set(":right", Alignment == MdFabAlignment.Right);
+        var resolvesLeft = Alignment.ResolvesLeft(FlowDirection);
+        PseudoClasses.Set(":left", resolvesLeft);
+        PseudoClasses.Set(":right", !resolvesLeft);
     }
 }

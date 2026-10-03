@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "baseline": "spec-baseline-manifest.json",
+  "updated_at": "2026-10-02",
+  "status_definitions": {
+    "not_run": "Implementation and/or test exists, but no result from the current revision has been recorded.",
+    "passed": "The named automated evidence passed on the named platform for the current revision.",
+    "failed": "The named automated evidence failed on the named platform for the current revision.",
+    "excluded": "The API is experimental or an API shell and is excluded from parity totals."
+  },
+  "requirements": [
+    {
+      "id": "FAB-DIRECTION-001",
+      "component": "MdFabMenu",
+      "variant": "Up and Down",
+      "platforms": [
+        "headless-linux",
+        "desktop",
+        "android"
+      ],
+      "source": "https://m3.material.io/components/fab-menu",
+      "assertion": "ExpansionDirection independently places actions entirely above or below the trigger without changing the trigger slot.",
+      "automated_evidence": [
+        "MdActionButtonTests.Fab_Menu_Expansion_Direction_Controls_Actual_Geometry_Independent_Of_Parent_Alignment"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "COMBO-NOTCH-001",
+      "component": "MdComboBox",
+      "variant": "Outlined floating label",
+      "platforms": [
+        "headless-linux",
+        "desktop",
+        "android"
+      ],
+      "source": "https://m3.material.io/components/text-fields",
+      "assertion": "The outline has a transparent geometric notch and the label does not paint a host-surface-colored patch.",
+      "automated_evidence": [
+        "MdComboBoxTests.Outlined_Label_Uses_A_Transparent_Notch_On_Arbitrary_Host_Background"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "COMBO-ANDROID-001",
+      "component": "MdComboBox",
+      "variant": "Filled and outlined popup",
+      "platforms": [
+        "android-api-34"
+      ],
+      "source": "https://api-docs.avaloniaui.net/docs/T_Avalonia_Controls_Primitives_Popup",
+      "assertion": "A touch opens the overlay popup, a selection commits, a second open/close succeeds, and the process remains alive.",
+      "automated_evidence": [
+        "tests/maestro/04_combobox_android_regression.yaml",
+        ".github/workflows/android-test.yml"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "MENU-KEYBOARD-001",
+      "component": "MdMenu and MdMenuAnchor",
+      "variant": "Root and cascading, LTR and RTL",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://m3.material.io/components/menus/accessibility",
+      "assertion": "Roving focus wraps, skips disabled rows, supports Home/End/type-ahead, uses direction-aware submenu keys, dismisses, and restores focus.",
+      "automated_evidence": [
+        "MdP0AccessibilityAndKeyboardTests.Menu_Uses_Roving_Focus_Wraps_And_Skips_Disabled_Items",
+        "MdP0AccessibilityAndKeyboardTests.Menu_Anchor_Opens_From_Arrow_And_Restores_Previous_Focus_On_Escape",
+        "MdP0AccessibilityAndKeyboardTests.Cascading_Menu_Escape_Closes_One_Level_And_Leaf_Activation_Closes_Hierarchy"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "MODAL-FOCUS-001",
+      "component": "MdDialogHost, MdNavigationDrawer, MdSheetHost, MdSimpleDialog",
+      "variant": "Modal",
+      "platforms": [
+        "headless-linux",
+        "desktop",
+        "android"
+      ],
+      "source": "https://m3.material.io/components/dialogs/accessibility",
+      "assertion": "Opening captures focus, constrains traversal, makes background pointer/normal automation views inert, and closing restores focus.",
+      "automated_evidence": [
+        "MdP0AccessibilityAndKeyboardTests.Dialog_Host_Constrains_Focus_Isolates_Background_And_Restores_Opener",
+        "MdP0AccessibilityAndKeyboardTests.Standalone_Simple_Dialog_Makes_External_Siblings_Inert",
+        "MdP0AccessibilityAndKeyboardTests.Modal_Drawer_And_Sheet_Isolate_Their_Main_Content"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "DATE-KEYBOARD-001",
+      "component": "MdDatePicker",
+      "variant": "Calendar grid",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://m3.material.io/components/date-pickers/accessibility",
+      "assertion": "One day is a tab stop; arrows, Home/End, PageUp/PageDown and Shift+Page move the active date; day targets are at least 48 DIP.",
+      "automated_evidence": [
+        "MdP0AccessibilityAndKeyboardTests.Date_Picker_Uses_One_Tab_Stop_And_Arrow_Page_Keyboard_Navigation"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "TIME-AUTOMATION-001",
+      "component": "MdTimeDial",
+      "variant": "12-hour and 24-hour",
+      "platforms": [
+        "headless-linux",
+        "windows-uia",
+        "macos-accessibility"
+      ],
+      "source": "https://m3.material.io/components/time-pickers/accessibility",
+      "assertion": "The dial exposes a valid RangeValue and named invokable hour/minute values with values inside the advertised range.",
+      "automated_evidence": [
+        "MdP0AccessibilityAndKeyboardTests.Time_Dial_Exposes_Range_And_Invokable_Virtual_Values"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "RANGE-AUTOMATION-001",
+      "component": "MdRangeSlider",
+      "variant": "Two thumbs, LTR and RTL",
+      "platforms": [
+        "headless-linux",
+        "windows-uia",
+        "macos-accessibility"
+      ],
+      "source": "https://m3.material.io/components/sliders/accessibility",
+      "assertion": "Lower and upper thumbs are separately named RangeValue providers with independent bounds, keyboard selection and RTL direction.",
+      "automated_evidence": [
+        "MdP0AccessibilityAndKeyboardTests.Range_Slider_Exposes_Two_Independent_Range_Thumbs",
+        "MdP0AccessibilityAndKeyboardTests.Range_Slider_Keyboard_Switches_Thumbs_And_Honors_Rtl"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "FLUTTER-FOCUS-001",
+      "component": "MdFocusTraversalGroup",
+      "variant": "VisualOrder, TabIndex, ReadingOrder, cycle and skip",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://github.com/flutter/flutter/tree/5fc346839b5d0eef006ed8404392afb4dfae428d/packages/flutter/lib/src/widgets/focus_traversal.dart",
+      "assertion": "The Avalonia-native subset executes the selected ordering policy and cycle/skip behavior rather than exposing metadata only.",
+      "automated_evidence": [
+        "MdParityHardeningTests.Focus_Traversal_Group_Cycles_Real_Tab_Focus",
+        "MdP0AccessibilityAndKeyboardTests.Focus_Traversal_Group_Applies_TabIndex_Policy"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "FLUTTER-KEYBOARD-INSET-001",
+      "component": "MdKeyboardAvoidingHost",
+      "variant": "Avalonia InputPane integration",
+      "platforms": [
+        "headless-linux",
+        "android",
+        "ios"
+      ],
+      "source": "https://api-docs.avaloniaui.net/docs/T_Avalonia_Controls_Platform_IInputPane",
+      "assertion": "The host subscribes to TopLevel.InputPane, preserves caller padding, applies reported occlusion, and scrolls focused content without double-subtracting an inset viewport.",
+      "automated_evidence": [
+        "MdP0AccessibilityAndKeyboardTests.Keyboard_Avoiding_Host_Preserves_Base_Padding",
+        "src/Md3.Avalonia/Controls/MdFlutterPhase4.cs"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "EXTRA-MOTION-001",
+      "component": "MdSharedAxis, MdFadeThrough, MdContainerTransform, MdAnimatedVisibility",
+      "variant": "Preview shells",
+      "platforms": [
+        "all"
+      ],
+      "source": "https://m3.material.io/styles/motion/overview",
+      "assertion": "Incomplete choreography is marked experimental and excluded from parity claims.",
+      "automated_evidence": [
+        "MdP0AccessibilityAndKeyboardTests.Incomplete_Motion_APIs_Are_Explicitly_Experimental"
+      ],
+      "verification_status": "excluded"
+    },
+    {
+      "id": "FLUTTER-PARITY-001",
+      "component": "Flutter-named controls",
+      "variant": "API status",
+      "platforms": [
+        "all"
+      ],
+      "source": "https://github.com/flutter/flutter/tree/5fc346839b5d0eef006ed8404392afb4dfae428d/packages/flutter/lib/src",
+      "assertion": "Implemented subsets, partial controls, API shells, and experimental controls are documented separately and are not aggregated as complete parity.",
+      "automated_evidence": [
+        "docs/FLUTTER_PARITY_STATUS.md"
+      ],
+      "verification_status": "excluded"
+    }
+  ]
+}

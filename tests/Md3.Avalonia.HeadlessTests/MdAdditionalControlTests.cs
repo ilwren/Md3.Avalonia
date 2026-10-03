@@ -75,7 +75,7 @@ public sealed class MdAdditionalControlTests
     }
 
     [AvaloniaFact]
-    public void Popup_Templates_Do_Not_Force_An_Overlay_Layer()
+    public void Popup_Templates_Allow_Avalonia_To_Select_Native_Or_Overlay_Hosts()
     {
         Control[] owners =
         {

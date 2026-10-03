@@ -1,11 +1,13 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
 using Xunit;
@@ -192,6 +194,60 @@ public sealed class MdComboBoxTests
     }
 
     [AvaloniaFact]
+    public void Outlined_Label_Uses_A_Transparent_Notch_On_Arbitrary_Host_Background()
+    {
+        var comboBox = CreateComboBox();
+        comboBox.Label = "Environment";
+        comboBox.SelectedIndex = 0;
+        comboBox.Variant = MdTextBoxVariant.Outlined;
+        var hostSurface = new Border
+        {
+            Background = new SolidColorBrush(Color.Parse("#123456")),
+            Padding = new Thickness(24),
+            Child = comboBox
+        };
+        using var host = Show(hostSurface);
+
+        var label = comboBox.GetVisualDescendants().OfType<ContentPresenter>()
+            .Single(control => control.Name == "PART_Label");
+        var outline = comboBox.GetVisualDescendants().OfType<MdOutlinedFieldBorder>()
+            .Single(control => control.Name == "PART_Outline");
+
+        Assert.True(outline.IsVisible);
+        Assert.True(outline.IsNotched);
+        Assert.Same(label, outline.NotchTarget);
+        Assert.Equal(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(label.Background).Color);
+        Assert.NotEqual(
+            Assert.IsType<SolidColorBrush>(hostSurface.Background).Color,
+            Assert.IsAssignableFrom<ISolidColorBrush>(label.Background).Color);
+    }
+
+    [AvaloniaFact]
+    public void Popup_Uses_Platform_Default_With_Android_Overlay_Fallback_And_A_Single_Input_Path()
+    {
+        var comboBox = CreateComboBox();
+        using var host = Show(comboBox);
+
+        var popup = comboBox.GetVisualDescendants().OfType<Popup>()
+            .Single(control => control.Name == "PART_Popup");
+        var toggle = comboBox.GetVisualDescendants().OfType<ToggleButton>()
+            .Single(control => control.Name == "PART_DropDownToggle");
+
+        // Do not force the overlay: Windows/macOS/Linux should use their native popup when
+        // available, while Android and Headless automatically fall back to the window's popup
+        // overlay layer supplied by MaterialTheme's Window template.
+        Assert.False(popup.ShouldUseOverlayLayer);
+        Assert.Contains(host.Window.GetVisualDescendants().OfType<VisualLayerManager>(),
+            layer => layer.Name == "PART_VisualLayerManager");
+        comboBox.IsDropDownOpen = true;
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(comboBox.IsDropDownOpen);
+        Assert.True(popup.IsUsingOverlayLayer);
+        Assert.Equal(2, Grid.GetColumn(toggle));
+        Assert.Equal(1, Grid.GetColumnSpan(toggle));
+    }
+
+    [AvaloniaFact]
     public void ComboBox_Matrix_Can_Render_To_Bitmap()
     {
         Application.Current!.RequestedThemeVariant = ThemeVariant.Light;
@@ -264,7 +320,7 @@ public sealed class MdComboBoxTests
         grid.Children.Add(child);
     }
 
-    private static IDisposable Show(Control content) => new WindowScope(ShowWindow(content));
+    private static WindowScope Show(Control content) => new(ShowWindow(content));
 
     private static Window ShowWindow(Control content)
     {
@@ -275,6 +331,7 @@ public sealed class MdComboBoxTests
 
     private sealed class WindowScope(Window window) : IDisposable
     {
-        public void Dispose() => window.Close();
+        public Window Window { get; } = window;
+        public void Dispose() => Window.Close();
     }
 }

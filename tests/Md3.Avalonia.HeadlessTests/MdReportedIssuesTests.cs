@@ -6,6 +6,7 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Threading;
 using System.Globalization;
 using Avalonia.VisualTree;
@@ -272,6 +273,93 @@ public sealed class MdReportedIssuesTests
             CultureInfo.CurrentCulture = previousCulture;
             CultureInfo.CurrentUICulture = previousUiCulture;
         }
+    }
+
+    [AvaloniaFact]
+    public void Breadcrumb_Renders_Rich_Labels_And_Separators_On_The_First_Layout()
+    {
+        var breadcrumb = new MdBreadcrumb
+        {
+            Separator = "/",
+            ItemsSource = new[]
+            {
+                new MdBreadcrumbItem { Label = "Home" },
+                new MdBreadcrumbItem { Label = "Components" },
+                new MdBreadcrumbItem { Label = "Color picker", IsCurrent = true }
+            }
+        };
+
+        using var host = Show(breadcrumb, 520, 100);
+        Dispatcher.UIThread.RunJobs();
+
+        var textBlocks = breadcrumb.GetVisualDescendants().OfType<TextBlock>().ToArray();
+        var labels = textBlocks.Select(text => text.Text).Where(text => text is not null).ToArray();
+        Assert.Contains("Home", labels);
+        Assert.Contains("Components", labels);
+        Assert.Contains("Color picker", labels);
+        Assert.Equal(2, textBlocks.Count(text => text.IsVisible && text.Text == "/"));
+
+        var containers = breadcrumb.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
+        Assert.Equal(3, containers.Length);
+        Assert.Contains("current", containers[^1].Classes);
+    }
+
+    [AvaloniaFact]
+    public void ColorPicker_Swatch_Button_Uses_A_Command_And_Shows_Selection()
+    {
+        var picker = new MdColorPicker { Width = 400 };
+        using var host = Show(picker, 460, 620);
+        Dispatcher.UIThread.RunJobs();
+
+        var red = Color.Parse("#F44336");
+        var swatch = picker.GetVisualDescendants().OfType<Button>()
+            .First(button => button.CommandParameter is Color color && color == red);
+        Assert.Same(picker.SelectColorCommand, swatch.Command);
+
+        swatch.Command!.Execute(swatch.CommandParameter);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(red, picker.SelectedColor);
+        Assert.Equal("#F44336", picker.SelectedHex);
+        var selectionRing = swatch.GetVisualDescendants().OfType<Border>()
+            .Single(border => border.Name == "PART_SelectionRing");
+        Assert.True(selectionRing.IsVisible);
+    }
+
+    [AvaloniaFact]
+    public void ColorPicker_Uses_Material_Surface_And_Connected_Mode_Controls()
+    {
+        var picker = new MdColorPicker { Width = 400 };
+        using var host = Show(picker, 460, 700);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(new CornerRadius(28), picker.CornerRadius);
+        Assert.Equal(new Thickness(0), picker.BorderThickness);
+
+        var group = picker.GetVisualDescendants().OfType<MdConnectedButtonGroup>().Single();
+        var modeButtons = group.GetVisualDescendants().OfType<MdButton>().ToArray();
+        Assert.Equal(3, modeButtons.Length);
+        Assert.Equal(MdButtonVariant.Tonal, modeButtons[0].Variant);
+
+        picker.PickerMode = MdColorPickerMode.SpectrumSliders;
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(MdButtonVariant.Text, modeButtons[0].Variant);
+        Assert.Equal(MdButtonVariant.Tonal, modeButtons[1].Variant);
+    }
+
+    [AvaloniaFact]
+    public void ColorPickerButton_Tracks_Popup_And_Hex_State()
+    {
+        // Keep popup state testing detached because the headless platform intentionally
+        // has neither a native popup implementation nor an overlay host.
+        var button = new MdColorPickerButton { SelectedColor = Color.Parse("#006A6A") };
+
+        Assert.Equal("#006A6A", button.SelectedHex);
+        button.IsDropDownOpen = true;
+        Assert.True(button.IsDropDownOpen);
+        button.IsDropDownOpen = false;
+        Assert.False(button.IsDropDownOpen);
     }
 
     [AvaloniaFact]

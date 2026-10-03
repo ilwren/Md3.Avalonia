@@ -7,6 +7,7 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
 
@@ -40,6 +41,8 @@ public sealed class MdSearchView : ContentControl
     private InputElement? _headerInput;
     private TopLevel? _topLevel;
     private ContentPresenter? _results;
+    private Control? _focusBeforeOpen;
+    private bool _wasOpen;
 
     static MdSearchView()
     {
@@ -67,8 +70,9 @@ public sealed class MdSearchView : ContentControl
 
     public void Show()
     {
+        CaptureFocusBeforeOpen();
         SetCurrentValue(IsOpenProperty, true);
-        _headerInput?.Focus();
+        FocusHeader();
     }
 
     public void Dismiss() => SetCurrentValue(IsOpenProperty, false);
@@ -137,6 +141,13 @@ public sealed class MdSearchView : ContentControl
 
     private void OnTopLevelPreviewKeyDown(object? sender, KeyEventArgs e)
     {
+        if (IsOpen && e.Key == Key.Escape && e.Source is Visual source && IsWithinSearchView(source))
+        {
+            // Escape closes the expanded surface without clearing the preserved query first.
+            Dismiss();
+            e.Handled = true;
+            return;
+        }
         if (!IsShortcutEnabled || OpenGesture is null || !OpenGesture.Matches(e)) return;
         Show();
         e.Handled = true;
@@ -151,7 +162,49 @@ public sealed class MdSearchView : ContentControl
             Dismiss();
             e.Handled = true;
         }
+        else if (e.Key == Key.Down && IsOpen && FocusFirstResult())
+        {
+            // Down moves from the query field into the first keyboard-focusable result.
+            e.Handled = true;
+        }
     }
+
+    private void CaptureFocusBeforeOpen()
+    {
+        if (_wasOpen || _focusBeforeOpen is not null) return;
+        _focusBeforeOpen = TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() as Control;
+    }
+
+    private void FocusHeader()
+    {
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (IsOpen && _headerInput is { IsEffectivelyEnabled: true, IsVisible: true })
+                _headerInput.Focus(NavigationMethod.Unspecified);
+        }, DispatcherPriority.Input);
+    }
+
+    private bool FocusFirstResult()
+    {
+        if (_results is null) return false;
+        var result = _results.GetVisualDescendants().OfType<Control>()
+            .Where(control => control.Focusable && control.IsVisible && control.IsEffectivelyEnabled &&
+                              KeyboardNavigation.GetIsTabStop(control))
+            .OrderBy(KeyboardNavigation.GetTabIndex)
+            .FirstOrDefault();
+        return result?.Focus(NavigationMethod.Directional) == true;
+    }
+
+    private void RestoreFocusAfterClose()
+    {
+        var target = _focusBeforeOpen;
+        _focusBeforeOpen = null;
+        if (target is null || !target.IsAttachedToVisualTree() || !target.IsEffectivelyEnabled) return;
+        Dispatcher.UIThread.Post(() => target.Focus(NavigationMethod.Unspecified), DispatcherPriority.Input);
+    }
+
+    private bool IsWithinSearchView(Visual source) =>
+        ReferenceEquals(source, this) || source.GetVisualAncestors().Contains(this);
 
     private string? ResolveDisplayText(object? result)
     {
@@ -165,16 +218,20 @@ public sealed class MdSearchView : ContentControl
     {
         if (IsOpen)
         {
+            if (!_wasOpen) CaptureFocusBeforeOpen();
             _presence.Update(true, TimeSpan.Zero);
             PseudoClasses.Set(":open", true);
             PseudoClasses.Set(":closed", false);
+            if (this.IsAttachedToVisualTree()) FocusHeader();
         }
         else
         {
             PseudoClasses.Set(":open", false);
             PseudoClasses.Set(":closed", true);
             _presence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Default, MdMotionSpeed.Slow));
+            if (_wasOpen) RestoreFocusAfterClose();
         }
+        _wasOpen = IsOpen;
     }
 
     private void UpdateMotion()

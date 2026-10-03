@@ -242,26 +242,34 @@
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdSimpleDialog}" TargetType="md:MdSimpleDialog">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdSimpleDialog">
-        <Border x:Name="PART_Surface" MinWidth="320" MaxWidth="560" MaxHeight="640" Padding="24,20"
-                Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="28"
-                BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}" IsVisible="False" IsHitTestVisible="False"
-                Opacity="0" RenderTransform="scale(0.9)" RenderTransformOrigin="50%,50%">
-          <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
-            <ContentPresenter Content="{TemplateBinding Title}" FontSize="24"
-                              Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
-            <ListBox x:Name="PART_ItemsHost" Grid.Row="1" Theme="{StaticResource MdFlutterListBoxTheme}"
-                     ItemContainerTheme="{StaticResource MdFlutterListItemTheme}" MaxHeight="480"
-                     ItemsSource="{TemplateBinding ItemsSource}" ItemTemplate="{TemplateBinding ItemTemplate}"
-                     SelectedItem="{TemplateBinding SelectedItem, Mode=TwoWay}" Background="Transparent" BorderThickness="0" />
-            <md:MdButton x:Name="PART_CancelButton" Grid.Row="2" HorizontalAlignment="Right"
-                         Content="{TemplateBinding CancelText}" Size="ExtraSmall" Variant="Text" />
-          </Grid>
-        </Border>
+        <Grid x:Name="PART_Overlay" MinWidth="320" MinHeight="240" IsVisible="False">
+          <Border x:Name="PART_Scrim" Background="{DynamicResource Md.Sys.Color.Scrim.Brush}" Opacity="0.32" />
+          <Border x:Name="PART_Surface" MinWidth="320" MaxWidth="560" MaxHeight="640" Margin="24" Padding="24,20"
+                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                  Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="28"
+                  BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}" IsHitTestVisible="False"
+                  Opacity="0" RenderTransform="scale(0.9)" RenderTransformOrigin="50%,50%">
+            <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+              <ContentPresenter Content="{TemplateBinding Title}" FontSize="24"
+                                Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+              <ListBox x:Name="PART_ItemsHost" Grid.Row="1" Theme="{StaticResource MdFlutterListBoxTheme}"
+                       ItemContainerTheme="{StaticResource MdFlutterListItemTheme}" MaxHeight="480"
+                       ItemsSource="{TemplateBinding ItemsSource}" ItemTemplate="{TemplateBinding ItemTemplate}"
+                       SelectedItem="{TemplateBinding SelectedItem, Mode=TwoWay}" Background="Transparent" BorderThickness="0" />
+              <md:MdButton x:Name="PART_CancelButton" Grid.Row="2" HorizontalAlignment="Right"
+                           Content="{TemplateBinding CancelText}" Size="ExtraSmall" Variant="Text" />
+            </Grid>
+          </Border>
+        </Grid>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:present /template/ Border#PART_Surface"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:present /template/ Grid#PART_Overlay"><Setter Property="IsVisible" Value="True" /></Style>
+    <!-- Hit testing is owned by MdSimpleDialog.UpdateHitTesting so the still-visible exit
+         surface can never intercept input after IsOpen becomes false. -->
     <Style Selector="^:open /template/ Border#PART_Surface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
     <Style Selector="^:reduced-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
   </ControlTheme>

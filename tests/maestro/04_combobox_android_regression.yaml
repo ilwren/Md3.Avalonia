@@ -1,0 +1,29 @@
+appId: io.arena.md3avalonia.gallery
+tags:
+  - android-regression
+  - combobox
+---
+- launchApp
+- assertVisible: "Material 3 · Avalonia"
+
+# Regression: tapping an MdComboBox must use Avalonia's in-window overlay host on Android,
+# expose its options, commit a selection, and remain alive for a second open/close cycle.
+- tapOn: "Combo box"
+- assertVisible: "MdComboBox implements Material's exposed dropdown menu while retaining Avalonia selection and keyboard behavior."
+
+- tapOn: "Framework"
+- assertVisible: "Avalonia"
+- assertVisible: "MAUI"
+- tapOn: "MAUI"
+- assertVisible: "MAUI"
+
+- tapOn: "Platform"
+- assertVisible: "Android"
+- assertVisible: "Linux"
+- tapOn: "Linux"
+- assertVisible: "Linux"
+
+- tapOn: "Platform"
+- assertVisible: "Windows"
+- tapOn: "Platform"
+- assertVisible: "Material 3 · Avalonia"

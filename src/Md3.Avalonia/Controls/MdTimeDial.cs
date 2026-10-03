@@ -1,5 +1,6 @@
 using System.Globalization;
 using Avalonia;
+using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Input;
@@ -132,6 +133,34 @@ public sealed class MdTimeDial : Control
         }
     }
 
+    protected override AutomationPeer OnCreateAutomationPeer() => new MdTimeDialAutomationPeer(this);
+
+    internal int AutomationValue => ActivePart == MdTimeDialPart.Hour
+        ? Is24Hour ? NormalizeHour(Hour) : ToTwelveHour(Hour)
+        : ((Minute % 60) + 60) % 60;
+
+    internal void SetAutomationValue(int value)
+    {
+        if (ActivePart == MdTimeDialPart.Hour)
+        {
+            if (Is24Hour)
+            {
+                SetCurrentValue(HourProperty, ((value % 24) + 24) % 24);
+            }
+            else
+            {
+                var periodOffset = NormalizeHour(Hour) >= 12 ? 12 : 0;
+                var twelveHour = Math.Clamp(value, 1, 12);
+                SetCurrentValue(HourProperty, twelveHour % 12 + periodOffset);
+            }
+        }
+        else
+        {
+            SetCurrentValue(MinuteProperty, ((value % 60) + 60) % 60);
+        }
+        Focus();
+    }
+
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
@@ -179,13 +208,39 @@ public sealed class MdTimeDial : Control
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
-        var delta = e.Key switch { Key.Right or Key.Up => 1, Key.Left or Key.Down => -1, _ => 0 };
+        if (e.Key is Key.Home or Key.End)
+        {
+            var value = e.Key == Key.Home
+                ? ActivePart == MdTimeDialPart.Hour && !Is24Hour ? 1 : 0
+                : ActivePart == MdTimeDialPart.Hour ? Is24Hour ? 23 : 12 : 59;
+            SetAutomationValue(value);
+            e.Handled = true;
+            return;
+        }
+
+        var unit = ActivePart == MdTimeDialPart.Minute && (e.Key is Key.PageUp or Key.PageDown) ? 5 : 1;
+        var delta = e.Key switch
+        {
+            Key.Right or Key.Up or Key.PageUp => unit,
+            Key.Left or Key.Down or Key.PageDown => -unit,
+            _ => 0
+        };
         if (delta != 0)
         {
             if (ActivePart == MdTimeDialPart.Hour)
-                SetCurrentValue(HourProperty, (NormalizeHour(Hour) + delta + 24) % 24);
+            {
+                if (Is24Hour)
+                    SetCurrentValue(HourProperty, (NormalizeHour(Hour) + delta + 24) % 24);
+                else
+                {
+                    var next = (ToTwelveHour(Hour) - 1 + delta + 12) % 12 + 1;
+                    SetAutomationValue(next);
+                }
+            }
             else
+            {
                 SetCurrentValue(MinuteProperty, ((Minute + delta) % 60 + 60) % 60);
+            }
             e.Handled = true;
             return;
         }
@@ -284,4 +339,10 @@ public sealed class MdTimeDial : Control
         new(center.X + Math.Sin(angle) * radius, center.Y - Math.Cos(angle) * radius);
 
     private static int NormalizeHour(int hour) => ((hour % 24) + 24) % 24;
+
+    private static int ToTwelveHour(int hour)
+    {
+        var value = NormalizeHour(hour) % 12;
+        return value == 0 ? 12 : value;
+    }
 }

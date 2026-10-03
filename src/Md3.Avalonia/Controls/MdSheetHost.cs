@@ -3,7 +3,9 @@ using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Presenters;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
@@ -33,7 +35,9 @@ public sealed class MdSheetHost : ContentControl
         AvaloniaProperty.Register<MdSheetHost, bool>(nameof(IsDragDismissEnabled), true);
 
     private readonly MdPresenceController _presence;
+    private readonly MdModalFocusController _modalFocus;
     private readonly TranslateTransform _motionTransform = new();
+    private ContentPresenter? _mainContent;
     private Control? _scrim;
     private Control? _dragHandle;
     private Border? _surface;
@@ -51,12 +55,14 @@ public sealed class MdSheetHost : ContentControl
         IsOpenProperty.Changed.AddClassHandler<MdSheetHost>((host, _) => host.UpdateVisualState());
         IsModalProperty.Changed.AddClassHandler<MdSheetHost>((host, _) => host.UpdateVisualState());
         PlacementProperty.Changed.AddClassHandler<MdSheetHost>((host, _) => host.UpdateVisualState());
+        FlowDirectionProperty.Changed.AddClassHandler<MdSheetHost>((host, _) => host.UpdateVisualState());
         SheetExtentProperty.Changed.AddClassHandler<MdSheetHost>((host, _) => host.UpdateSurfaceTarget());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdSheetHost>((host, _) => host.UpdateMotion());
     }
 
     public MdSheetHost()
     {
+        _modalFocus = new MdModalFocusController(this);
         _presence = new MdPresenceController(value => PseudoClasses.Set(":present", value));
         _presence.Initialize(IsOpen);
         UpdateVisualState();
@@ -77,20 +83,28 @@ public sealed class MdSheetHost : ContentControl
     {
         DetachTemplateHandlers();
         base.OnApplyTemplate(e);
+        _mainContent = e.NameScope.Find<ContentPresenter>("PART_MainContent");
         _scrim = e.NameScope.Find<Control>("PART_Scrim");
         _dragHandle = e.NameScope.Find<Control>("PART_DragHandle");
         _surface = e.NameScope.Find<Border>("PART_Surface");
         if (_scrim is not null) _scrim.PointerPressed += OnScrimPressed;
         if (_dragHandle is not null)
         {
-            _dragHandle.PointerPressed += OnDragPressed;
+            // Button marks pointer input handled as part of its Click contract. Observe handled
+            // press/release events as well so the accessible drag handle still starts a 1:1 drag.
+            _dragHandle.AddHandler(InputElement.PointerPressedEvent, OnDragPressed,
+                RoutingStrategies.Bubble, handledEventsToo: true);
             _dragHandle.PointerMoved += OnDragMoved;
-            _dragHandle.PointerReleased += OnDragReleased;
+            _dragHandle.AddHandler(InputElement.PointerReleasedEvent, OnDragReleased,
+                RoutingStrategies.Bubble, handledEventsToo: true);
             _dragHandle.PointerCaptureLost += OnDragCaptureLost;
+            _dragHandle.KeyDown += OnDragHandleKeyDown;
+            if (_dragHandle is Button button) button.Click += OnDragHandleClick;
         }
         if (_surface is not null) _surface.RenderTransform = _motionTransform;
         UpdateMotion();
         UpdateSurfaceTarget();
+        UpdateModalFocus();
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -102,6 +116,7 @@ public sealed class MdSheetHost : ContentControl
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         _presence.Stop();
+        _modalFocus.Deactivate();
         base.OnDetachedFromVisualTree(e);
     }
 
@@ -120,10 +135,12 @@ public sealed class MdSheetHost : ContentControl
     {
         if (_scrim is not null) _scrim.PointerPressed -= OnScrimPressed;
         if (_dragHandle is null) return;
-        _dragHandle.PointerPressed -= OnDragPressed;
+        _dragHandle.RemoveHandler(InputElement.PointerPressedEvent, OnDragPressed);
         _dragHandle.PointerMoved -= OnDragMoved;
-        _dragHandle.PointerReleased -= OnDragReleased;
+        _dragHandle.RemoveHandler(InputElement.PointerReleasedEvent, OnDragReleased);
         _dragHandle.PointerCaptureLost -= OnDragCaptureLost;
+        _dragHandle.KeyDown -= OnDragHandleKeyDown;
+        if (_dragHandle is Button button) button.Click -= OnDragHandleClick;
     }
 
     private void OnScrimPressed(object? sender, PointerPressedEventArgs e)
@@ -133,6 +150,22 @@ public sealed class MdSheetHost : ContentControl
             Dismiss();
             e.Handled = true;
         }
+    }
+
+    private void OnDragHandleKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (IsOpen && IsModal && e.Key is Key.Space or Key.Enter)
+        {
+            Dismiss();
+            e.Handled = true;
+        }
+    }
+
+    private void OnDragHandleClick(object? sender, RoutedEventArgs e)
+    {
+        // Pointer releases are completed by the drag handlers; Click remains the Invoke/keyboard
+        // path so assistive technology can activate the dismiss affordance.
+        if (!_dragging && IsOpen && IsModal) Dismiss();
     }
 
     private void OnDragPressed(object? sender, PointerPressedEventArgs e)
@@ -221,15 +254,22 @@ public sealed class MdSheetHost : ContentControl
         }
         UpdatePseudoClasses();
         UpdateSurfaceTarget();
+        UpdateModalFocus();
+    }
+
+    private void UpdateModalFocus()
+    {
+        _modalFocus.Update(IsOpen && IsModal, _surface, _mainContent, _dragHandle);
     }
 
     private void UpdatePseudoClasses()
     {
+        var resolvedPlacement = Placement.Resolve(FlowDirection);
         PseudoClasses.Set(":modal", IsModal);
         PseudoClasses.Set(":standard", !IsModal);
-        PseudoClasses.Set(":bottom", Placement == MdSheetPlacement.Bottom);
-        PseudoClasses.Set(":left", Placement == MdSheetPlacement.Left);
-        PseudoClasses.Set(":right", Placement == MdSheetPlacement.Right);
+        PseudoClasses.Set(":bottom", resolvedPlacement == MdSheetPlacement.Bottom);
+        PseudoClasses.Set(":left", resolvedPlacement == MdSheetPlacement.Left);
+        PseudoClasses.Set(":right", resolvedPlacement == MdSheetPlacement.Right);
         PseudoClasses.Set(":dragging", _dragging);
     }
 
@@ -282,12 +322,13 @@ public sealed class MdSheetHost : ContentControl
         }
 
         var extent = Math.Max(0, SheetExtent);
-        _motionTransform.X = Placement switch
+        var resolvedPlacement = Placement.Resolve(FlowDirection);
+        _motionTransform.X = resolvedPlacement switch
         {
             MdSheetPlacement.Left => -extent,
             MdSheetPlacement.Right => extent,
             _ => 0
         };
-        _motionTransform.Y = Placement == MdSheetPlacement.Bottom ? extent : 0;
+        _motionTransform.Y = resolvedPlacement == MdSheetPlacement.Bottom ? extent : 0;
     }
 }

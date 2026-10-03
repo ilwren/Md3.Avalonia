@@ -63,13 +63,6 @@
                  Placement="BottomEdgeAlignedLeft"
                  PlacementTarget="{Binding #PART_AnchorButton}"
                  WindowManagerAddShadowHint="False">
-            <Popup.Styles>
-              <Style Selector="PopupRoot">
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="TransparencyLevelHint" Value="Transparent" />
-                <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
-              </Style>
-            </Popup.Styles>
             <Border x:Name="PART_Surface" Width="360"
                     Padding="24"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
@@ -112,12 +105,10 @@
                 <Grid x:Name="PART_InputPanel" ColumnDefinitions="104,24,104,Auto" ColumnSpacing="4" IsVisible="False">
                   <md:MdTextBox x:Name="PART_HourInput" Grid.Column="0" Label="Hour" MaxLength="2"
                                 HorizontalContentAlignment="Center"
-                                OutlineLabelBackground="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
                                 Text="{TemplateBinding HourText}" Variant="Outlined" />
                   <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="28" Text=":" />
                   <md:MdTextBox x:Name="PART_MinuteInput" Grid.Column="2" Label="Minute" MaxLength="2"
                                 HorizontalContentAlignment="Center"
-                                OutlineLabelBackground="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
                                 Text="{TemplateBinding MinuteText}" Variant="Outlined" />
                   <md:MdButton x:Name="PART_InputPeriodButton" Grid.Column="3" Margin="4,8,0,0"
                                VerticalAlignment="Center" Content="{TemplateBinding PeriodText}"

@@ -4,12 +4,15 @@ using System.Globalization;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Automation;
+using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data.Converters;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
@@ -123,13 +126,24 @@ public sealed class MdChart : Control
     public static readonly StyledProperty<string?> YAxisTitleProperty = AvaloniaProperty.Register<MdChart, string?>(nameof(YAxisTitle));
     public static readonly StyledProperty<string> AccessibleTitleProperty = AvaloniaProperty.Register<MdChart, string>(nameof(AccessibleTitle), "Chart");
     public static readonly DirectProperty<MdChart, MdChartPoint?> HoveredPointProperty = AvaloniaProperty.RegisterDirect<MdChart, MdChartPoint?>(nameof(HoveredPoint), control => control.HoveredPoint);
+    public static readonly DirectProperty<MdChart, string?> PointToolTipTextProperty = AvaloniaProperty.RegisterDirect<MdChart, string?>(nameof(PointToolTipText), control => control.PointToolTipText);
     private MdChartPoint? _hoveredPoint;
+    private string? _pointToolTipText;
+    private int _activePointIndex = -1;
+    private MdChartAutomationPeer? _automationPeer;
     static MdChart()
     {
         AffectsRender<MdChart>(SeriesProperty, KindProperty, ShowGridProperty, AxisBrushProperty, GridBrushProperty, XAxisTitleProperty, YAxisTitleProperty);
+        SeriesProperty.Changed.AddClassHandler<MdChart>((chart, _) => chart.OnSeriesChanged());
         AccessibleTitleProperty.Changed.AddClassHandler<MdChart>((chart, _) => AutomationProperties.SetName(chart, chart.AccessibleTitle));
     }
-    public MdChart() { ClipToBounds = true; Focusable = true; AutomationProperties.SetName(this, AccessibleTitle); }
+    public MdChart()
+    {
+        ClipToBounds = true;
+        Focusable = true;
+        AutomationProperties.SetName(this, AccessibleTitle);
+        AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Polite);
+    }
     public IEnumerable<MdChartSeries>? Series { get => GetValue(SeriesProperty); set => SetValue(SeriesProperty, value); }
     public MdChartKind Kind { get => GetValue(KindProperty); set => SetValue(KindProperty, value); }
     public bool ShowGrid { get => GetValue(ShowGridProperty); set => SetValue(ShowGridProperty, value); }
@@ -139,8 +153,10 @@ public sealed class MdChart : Control
     public string? YAxisTitle { get => GetValue(YAxisTitleProperty); set => SetValue(YAxisTitleProperty, value); }
     public string AccessibleTitle { get => GetValue(AccessibleTitleProperty); set => SetValue(AccessibleTitleProperty, value); }
     public MdChartPoint? HoveredPoint { get => _hoveredPoint; private set => SetAndRaise(HoveredPointProperty, ref _hoveredPoint, value); }
+    public string? PointToolTipText { get => _pointToolTipText; private set => SetAndRaise(PointToolTipTextProperty, ref _pointToolTipText, value); }
     public IMdChartDataProvider? Provider { get; set; }
     public event EventHandler<MdChartPoint?>? HoveredPointChanged;
+    public event EventHandler<MdChartPoint>? PointInvoked;
     public void RefreshProvider() { if (Provider is not null) Series = Provider.GetSeries(); }
     /// <summary>Returns a tab-separated text alternative for screen readers, export, or a host-provided table view.</summary>
     public string BuildAccessibleTable()
@@ -256,6 +272,13 @@ public sealed class MdChart : Control
                 }
             }
         }
+
+        if (HoveredPoint is { } activePoint)
+        {
+            var activePosition = Map(activePoint);
+            context.DrawEllipse(null, new Pen(AxisBrush ?? Brushes.Black, IsKeyboardFocusWithin ? 3 : 2),
+                activePosition, IsKeyboardFocusWithin ? 8 : 6, IsKeyboardFocusWithin ? 8 : 6);
+        }
     }
 
     private static void DrawChartText(DrawingContext context, string text, Point anchor, IBrush brush,
@@ -272,15 +295,182 @@ public sealed class MdChart : Control
     }
     protected override void OnPointerMoved(PointerEventArgs e)
     {
-        base.OnPointerMoved(e); var position = e.GetPosition(this); var all = (Series ?? Array.Empty<MdChartSeries>()).SelectMany(series => series.Points).ToArray();
-        if (all.Length == 0) return;
+        base.OnPointerMoved(e);
+        var position = e.GetPosition(this);
+        var all = GetPointEntries();
+        if (all.Count == 0) return;
         // X-distance is deliberately used for stable touch/pointer exploration independent of Y scale.
-        var normalized = Math.Clamp((position.X - 58) / Math.Max(1, Bounds.Width - 76), 0, 1); var min = all.Min(p => p.X); var max = all.Max(p => p.X);
-        var next = all.MinBy(point => Math.Abs(point.X - (min + normalized * (max - min))));
-        if (!Equals(next, HoveredPoint)) { HoveredPoint = next; HoveredPointChanged?.Invoke(this, next); }
+        var normalized = Math.Clamp((position.X - 58) / Math.Max(1, Bounds.Width - 76), 0, 1);
+        var min = all.Min(entry => entry.Point.X);
+        var max = all.Max(entry => entry.Point.X);
+        var next = all.MinBy(entry => Math.Abs(entry.Point.X - (min + normalized * (max - min))));
+        SetActivePoint(next.Index, true);
     }
-    protected override void OnPointerExited(PointerEventArgs e) { base.OnPointerExited(e); HoveredPoint = null; HoveredPointChanged?.Invoke(this, null); }
+
+    protected override void OnPointerExited(PointerEventArgs e)
+    {
+        base.OnPointerExited(e);
+        if (!IsKeyboardFocusWithin) SetActivePoint(-1, true);
+    }
+
+    protected override void OnGotFocus(GotFocusEventArgs e)
+    {
+        base.OnGotFocus(e);
+        if (_activePointIndex < 0 && GetPointEntries().Count > 0) SetActivePoint(0, true);
+    }
+
+    protected override void OnLostFocus(RoutedEventArgs e)
+    {
+        base.OnLostFocus(e);
+        SetActivePoint(-1, true);
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        var points = GetPointEntries();
+        if (points.Count == 0) { base.OnKeyDown(e); return; }
+        var rtl = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft;
+        var delta = e.Key switch
+        {
+            Key.Right => rtl ? -1 : 1,
+            Key.Left => rtl ? 1 : -1,
+            Key.Down => 1,
+            Key.Up => -1,
+            _ => 0
+        };
+        if (delta != 0)
+        {
+            var current = _activePointIndex < 0 ? 0 : _activePointIndex;
+            SetActivePoint((current + delta + points.Count) % points.Count, true);
+            e.Handled = true;
+        }
+        else if (e.Key is Key.Home or Key.End)
+        {
+            SetActivePoint(e.Key == Key.Home ? 0 : points.Count - 1, true);
+            e.Handled = true;
+        }
+        else if ((e.Key is Key.Enter or Key.Space) && _activePointIndex >= 0)
+        {
+            PointInvoked?.Invoke(this, points[_activePointIndex].Point);
+            e.Handled = true;
+        }
+        else base.OnKeyDown(e);
+    }
+
+    private void OnSeriesChanged()
+    {
+        _activePointIndex = -1;
+        SetActivePoint(-1, false);
+        _automationPeer?.InvalidatePoints();
+    }
+
+    internal IReadOnlyList<MdChartPointEntry> GetPointEntries()
+    {
+        var result = new List<MdChartPointEntry>();
+        var index = 0;
+        foreach (var series in Series ?? Array.Empty<MdChartSeries>())
+        foreach (var point in series.Points)
+            result.Add(new MdChartPointEntry(index++, series.Name, point));
+        return result;
+    }
+
+    internal void SetActivePoint(int index, bool raiseEvent)
+    {
+        var entries = GetPointEntries();
+        _activePointIndex = entries.Count == 0 ? -1 : Math.Clamp(index, -1, entries.Count - 1);
+        var entry = _activePointIndex >= 0 ? entries[_activePointIndex] : null;
+        var point = entry?.Point;
+        var changed = !Equals(point, HoveredPoint);
+        HoveredPoint = point;
+        PointToolTipText = entry is null ? null : DescribePoint(entry);
+        AutomationProperties.SetHelpText(this, PointToolTipText ?? BuildAccessibleTable());
+        InvalidateVisual();
+        if (changed && raiseEvent) HoveredPointChanged?.Invoke(this, point);
+    }
+
+    internal void InvokePoint(int index)
+    {
+        var entries = GetPointEntries();
+        if (index < 0 || index >= entries.Count) return;
+        SetActivePoint(index, true);
+        PointInvoked?.Invoke(this, entries[index].Point);
+    }
+
+    internal Rect GetPointBounds(int index)
+    {
+        var entries = GetPointEntries();
+        if (index < 0 || index >= entries.Count || Bounds.Width <= 120 || Bounds.Height <= 100) return default;
+        var points = entries.Select(entry => entry.Point).ToArray();
+        var minX = points.Min(point => point.X);
+        var maxX = Math.Max(minX + 1, points.Max(point => point.X));
+        var minY = Math.Min(0, points.Min(point => point.Y));
+        var maxY = Math.Max(minY + 1, Math.Max(0, points.Max(point => point.Y)));
+        var plot = new Rect(58, 20, Math.Max(1, Bounds.Width - 76), Math.Max(1, Bounds.Height - 66));
+        var point = entries[index].Point;
+        var center = new Point(
+            plot.Left + (point.X - minX) / (maxX - minX) * plot.Width,
+            plot.Bottom - (point.Y - minY) / (maxY - minY) * plot.Height);
+        return new Rect(center.X - 24, center.Y - 24, 48, 48);
+    }
+
+    internal string DescribePoint(MdChartPointEntry entry)
+    {
+        var label = entry.Point.Label?.ToString() ?? entry.Point.X.ToString("0.##", CultureInfo.CurrentCulture);
+        var value = entry.Point.Value?.ToString() ?? entry.Point.Y.ToString("0.##", CultureInfo.CurrentCulture);
+        return $"{entry.SeriesName}, {label}: {value}, point {entry.Index + 1} of {GetPointEntries().Count}";
+    }
+
+    protected override AutomationPeer OnCreateAutomationPeer() => _automationPeer = new MdChartAutomationPeer(this);
+
     private static readonly IBrush[] Palette = [Brushes.MediumPurple, Brushes.Teal, Brushes.OrangeRed, Brushes.RoyalBlue];
+}
+
+internal sealed record MdChartPointEntry(int Index, string SeriesName, MdChartPoint Point);
+
+internal sealed class MdChartAutomationPeer(MdChart owner) : ControlAutomationPeer(owner)
+{
+    private IReadOnlyList<AutomationPeer>? _points;
+    private MdChart ChartOwner => (MdChart)Owner;
+
+    internal void InvalidatePoints()
+    {
+        _points = null;
+        InvalidateChildren();
+    }
+
+    protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.DataGrid;
+    protected override IReadOnlyList<AutomationPeer>? GetChildrenCore() =>
+        _points ??= ChartOwner.GetPointEntries()
+            .Select(entry => (AutomationPeer)new MdChartPointAutomationPeer(ChartOwner, entry))
+            .ToArray();
+}
+
+internal sealed class MdChartPointAutomationPeer(MdChart owner, MdChartPointEntry entry)
+    : ControlAutomationPeer(owner), IInvokeProvider
+{
+    private MdChart ChartOwner => (MdChart)Owner;
+
+    public void Invoke()
+    {
+        EnsureEnabled();
+        ChartOwner.InvokePoint(entry.Index);
+    }
+
+    protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.DataItem;
+    protected override string? GetNameCore() => ChartOwner.DescribePoint(entry);
+    protected override string? GetAutomationIdCore() => $"ChartPoint_{entry.Index}";
+    protected override bool HasKeyboardFocusCore() => Equals(ChartOwner.HoveredPoint, entry.Point) && ChartOwner.IsKeyboardFocusWithin;
+    protected override void SetFocusCore()
+    {
+        ChartOwner.Focus();
+        ChartOwner.SetActivePoint(entry.Index, true);
+    }
+    protected override Rect GetBoundingRectangleCore()
+    {
+        if (TopLevel.GetTopLevel(ChartOwner) is not Visual root) return default;
+        var transform = ChartOwner.TransformToVisual(root);
+        return transform.HasValue ? ChartOwner.GetPointBounds(entry.Index).TransformToAABB(transform.Value) : default;
+    }
 }
 
 public enum MdRichEditorCommand { Bold, Italic, Underline, StrikeThrough, Heading, Quote, Code, Link, BulletedList, NumberedList, Undo, Redo, HorizontalRule, ClearFormatting }

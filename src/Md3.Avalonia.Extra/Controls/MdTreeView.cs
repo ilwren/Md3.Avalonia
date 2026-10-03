@@ -6,6 +6,8 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Automation;
+using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Input;
@@ -93,6 +95,7 @@ public sealed class MdTreeView : ListBox
     private bool _syncingSelection;
     private bool _suppressNodeRebuild;
     private int _animationVersion;
+    private MdTreeViewAutomationPeer? _automationPeer;
 
     static MdTreeView()
     {
@@ -211,6 +214,20 @@ public sealed class MdTreeView : ListBox
         if (!e.Handled) base.OnKeyDown(e);
     }
 
+    protected override AutomationPeer OnCreateAutomationPeer() =>
+        _automationPeer = new MdTreeViewAutomationPeer(this);
+
+    internal void SelectAutomationNode(MdTreeNode node)
+    {
+        SetCurrentValue(SelectedNodeProperty, node);
+        Focus();
+        var index = VisibleRows.ToList().FindIndex(row => ReferenceEquals(row.Node, node));
+        if (index < 0) return;
+        ScrollIntoView(VisibleRows[index]);
+        Dispatcher.UIThread.Post(() => (ContainerFromIndex(index) as Control)?.Focus(NavigationMethod.Unspecified),
+            DispatcherPriority.Input);
+    }
+
     private bool SetExpanded(MdTreeNode node, bool expanded)
     {
         if (node.Children.Count == 0 || node.IsExpanded == expanded) return false;
@@ -304,6 +321,7 @@ public sealed class MdTreeView : ListBox
         foreach (var root in Roots ?? []) AddVisible(root, null, 0, rows, visited);
         VisibleRows = rows;
         SetCurrentValue(ItemsSourceProperty, rows);
+        _automationPeer?.InvalidateRows();
         SyncSelectedRow();
         var version = ++_animationVersion;
         if (previousNodes is not null && previousLayout is not null)
@@ -408,5 +426,70 @@ public sealed class MdTreeView : ListBox
             if (SelectedItem is not null) ScrollIntoView(SelectedItem);
         }
         finally { _syncingSelection = false; }
+    }
+}
+
+internal sealed class MdTreeViewAutomationPeer(MdTreeView owner) : ListBoxAutomationPeer(owner)
+{
+    private IReadOnlyList<AutomationPeer>? _rows;
+    private MdTreeView TreeOwner => (MdTreeView)Owner;
+
+    internal void InvalidateRows()
+    {
+        _rows = null;
+        InvalidateChildren();
+    }
+
+    protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Tree;
+
+    protected override IReadOnlyList<AutomationPeer>? GetChildrenCore() =>
+        _rows ??= TreeOwner.VisibleRows
+            .Select(row => (AutomationPeer)new MdTreeNodeAutomationPeer(TreeOwner, this, row))
+            .ToArray();
+}
+
+internal sealed class MdTreeNodeAutomationPeer(
+    MdTreeView owner,
+    MdTreeViewAutomationPeer parent,
+    MdTreeRow row)
+    : ControlAutomationPeer(owner), IExpandCollapseProvider, IInvokeProvider, ISelectionItemProvider
+{
+    private MdTreeView TreeOwner => (MdTreeView)Owner;
+
+    public ExpandCollapseState ExpandCollapseState => !row.HasChildren
+        ? ExpandCollapseState.LeafNode
+        : row.Node.IsExpanded ? ExpandCollapseState.Expanded : ExpandCollapseState.Collapsed;
+    public bool ShowsMenu => false;
+    public bool IsSelected => ReferenceEquals(TreeOwner.SelectedNode, row.Node);
+    public ISelectionProvider? SelectionContainer => parent;
+
+    public void Expand() { EnsureEnabled(); TreeOwner.Expand(row.Node); }
+    public void Collapse() { EnsureEnabled(); TreeOwner.Collapse(row.Node); }
+    public void Invoke() { EnsureEnabled(); TreeOwner.Invoke(row.Node); }
+    public void Select() { EnsureEnabled(); TreeOwner.SelectAutomationNode(row.Node); }
+    public void AddToSelection() => Select();
+    public void RemoveFromSelection()
+    {
+        EnsureEnabled();
+        if (IsSelected) TreeOwner.SetCurrentValue(MdTreeView.SelectedNodeProperty, null);
+    }
+
+    protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.TreeItem;
+    protected override string? GetNameCore()
+    {
+        var state = row.HasChildren ? row.Node.IsExpanded ? ", expanded" : ", collapsed" : string.Empty;
+        return $"{row.Node.Label}, level {row.Depth + 1}{state}";
+    }
+    protected override string? GetAutomationIdCore() => row.Node.Id;
+    protected override bool HasKeyboardFocusCore() => IsSelected && TreeOwner.IsKeyboardFocusWithin;
+    protected override void SetFocusCore() => TreeOwner.SelectAutomationNode(row.Node);
+
+    protected override Rect GetBoundingRectangleCore()
+    {
+        var index = TreeOwner.VisibleRows.ToList().FindIndex(value => ReferenceEquals(value.Node, row.Node));
+        if (index < 0 || TreeOwner.ContainerFromIndex(index) is not Control container ||
+            TopLevel.GetTopLevel(TreeOwner) is not Visual root) return default;
+        var transform = container.TransformToVisual(root);
+        return transform.HasValue ? container.Bounds.TransformToAABB(transform.Value) : default;
     }
 }

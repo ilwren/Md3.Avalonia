@@ -91,6 +91,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private Button? _confirmButton;
     private MdTextBox? _hourInput;
     private MdTextBox? _minuteInput;
+    private MdTimeDial? _clockFace;
     private Popup? _popup;
     private Border? _surface;
     private Control? _dialPanel;
@@ -232,6 +233,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         _confirmButton = e.NameScope.Find<Button>("PART_ConfirmButton");
         _hourInput = e.NameScope.Find<MdTextBox>("PART_HourInput");
         _minuteInput = e.NameScope.Find<MdTextBox>("PART_MinuteInput");
+        _clockFace = e.NameScope.Find<MdTimeDial>("PART_ClockFace");
         _popup = e.NameScope.Find<Popup>("PART_Popup");
         _surface = e.NameScope.Find<Border>("PART_Surface");
         _dialPanel = e.NameScope.Find<Control>("PART_DialPanel");
@@ -354,6 +356,12 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
             _valueAtOpen = SelectedTime;
             _commitOnClose = false;
             MdPopupCoordinator.NotifyStateChanged(this);
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (!IsOpen) return;
+                if (Mode == MdTimePickerMode.Input) _hourInput?.Focus();
+                else _clockFace?.Focus(NavigationMethod.Directional);
+            }, DispatcherPriority.Loaded);
             return;
         }
 
@@ -362,6 +370,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         _commitOnClose = false;
         _popupPresence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
         MdPopupCoordinator.NotifyStateChanged(this);
+        Dispatcher.UIThread.Post(() => _anchorButton?.Focus(), DispatcherPriority.Input);
     }
 
     private void OnModeChanged()

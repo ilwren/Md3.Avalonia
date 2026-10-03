@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 
@@ -32,6 +33,8 @@ public sealed class MdDialog : ContentControl
     public object? Headline { get => GetValue(HeadlineProperty); set => SetValue(HeadlineProperty, value); }
     public object? Actions { get => GetValue(ActionsProperty); set => SetValue(ActionsProperty, value); }
 
+    protected override AutomationPeer OnCreateAutomationPeer() => new MdDialogAutomationPeer(this);
+
     private void UpdatePseudoClasses()
     {
         PseudoClasses.Set(":basic", Variant == MdDialogVariant.Basic);
@@ -39,5 +42,26 @@ public sealed class MdDialog : ContentControl
         PseudoClasses.Set(":has-icon", Icon is not null);
         PseudoClasses.Set(":has-headline", Headline is not null);
         PseudoClasses.Set(":has-actions", Actions is not null);
+    }
+}
+
+internal sealed class MdDialogAutomationPeer(MdDialog owner) : ContentControlAutomationPeer(owner)
+{
+    private MdDialog DialogOwner => (MdDialog)Owner;
+
+    protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Window;
+    protected override bool IsControlElementCore() => true;
+    protected override bool IsContentElementCore() => true;
+
+    protected override string? GetNameCore()
+    {
+        var explicitName = global::Avalonia.Automation.AutomationProperties.GetName(DialogOwner);
+        if (!string.IsNullOrWhiteSpace(explicitName)) return explicitName;
+        return DialogOwner.Headline switch
+        {
+            string headline when !string.IsNullOrWhiteSpace(headline) => headline,
+            TextBlock textBlock when !string.IsNullOrWhiteSpace(textBlock.Text) => textBlock.Text,
+            _ => base.GetNameCore()
+        };
     }
 }

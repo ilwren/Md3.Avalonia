@@ -2,13 +2,16 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.VisualTree;
+using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Controls;
@@ -91,10 +94,18 @@ public class MdFormField : ContentControl
     {
         ValueProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.OnValueChanged());
         ErrorTextProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.UpdateValidity());
+        SupportingTextProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.UpdateAccessibility());
+        IsRequiredProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.UpdateAccessibility());
         IsTouchedProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.UpdatePseudoClasses());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.UpdateAccessibility());
     }
 
-    public MdFormField() => UpdatePseudoClasses();
+    public MdFormField()
+    {
+        AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Assertive);
+        UpdatePseudoClasses();
+        UpdateAccessibility();
+    }
     public object? Value { get => GetValue(ValueProperty); set => SetValue(ValueProperty, value); }
     public string? ErrorText { get => GetValue(ErrorTextProperty); set => SetValue(ErrorTextProperty, value); }
     public object? SupportingText { get => GetValue(SupportingTextProperty); set => SetValue(SupportingTextProperty, value); }
@@ -109,7 +120,8 @@ public class MdFormField : ContentControl
     public bool Validate()
     {
         var error = Validator?.Invoke(Value);
-        if (string.IsNullOrEmpty(error) && IsRequired && (Value is null || Value is string text && string.IsNullOrWhiteSpace(text))) error = "This field is required.";
+        if (string.IsNullOrEmpty(error) && IsRequired && (Value is null || Value is string text && string.IsNullOrWhiteSpace(text)))
+            error = MdLocalization.GetString("RequiredField", this);
         SetCurrentValue(ErrorTextProperty, error);
         UpdateValidity();
         return IsValid;
@@ -150,6 +162,22 @@ public class MdFormField : ContentControl
         var value = string.IsNullOrWhiteSpace(ErrorText);
         if (value != IsValid) { IsValid = value; ValidationChanged?.Invoke(this, EventArgs.Empty); }
         else UpdatePseudoClasses();
+        UpdateAccessibility();
+    }
+
+    private void UpdateAccessibility()
+    {
+        var supporting = SupportingText switch
+        {
+            TextBlock textBlock => textBlock.Text,
+            null => null,
+            _ => SupportingText.ToString()
+        };
+        AutomationProperties.SetHelpText(this, !string.IsNullOrWhiteSpace(ErrorText)
+            ? MdLocalization.Format("ErrorPrefix", this, ErrorText)
+            : IsRequired
+                ? string.Join(" ", new[] { supporting, MdLocalization.GetString("RequiredField", this) }.Where(value => !string.IsNullOrWhiteSpace(value)))
+                : supporting);
     }
 
     private void UpdatePseudoClasses()
@@ -195,8 +223,11 @@ public sealed class MdSimpleDialog : TemplatedControl
     public static readonly StyledProperty<object?> CancelTextProperty = AvaloniaProperty.Register<MdSimpleDialog, object?>(nameof(CancelText), "Cancel");
     private SelectingItemsControl? _itemsHost;
     private Button? _cancelButton;
+    private Grid? _overlay;
+    private Border? _scrim;
     private Border? _surface;
     private readonly MdPresenceController _presence;
+    private readonly MdModalFocusController _modalFocus;
 
     static MdSimpleDialog()
     {
@@ -206,7 +237,8 @@ public sealed class MdSimpleDialog : TemplatedControl
 
     public MdSimpleDialog()
     {
-        _presence = new MdPresenceController(present => PseudoClasses.Set(":present", present));
+        _modalFocus = new MdModalFocusController(this);
+        _presence = new MdPresenceController(SetPresence);
         _presence.Initialize(IsOpen);
         PseudoClasses.Set(":open", IsOpen);
     }
@@ -232,21 +264,45 @@ public sealed class MdSimpleDialog : TemplatedControl
     {
         if (_itemsHost is not null) _itemsHost.SelectionChanged -= OnSelectionChanged;
         if (_cancelButton is not null) _cancelButton.Click -= OnCancel;
+        if (_scrim is not null) _scrim.PointerPressed -= OnScrimPressed;
         base.OnApplyTemplate(e);
+        _overlay = e.NameScope.Find<Grid>("PART_Overlay");
         _itemsHost = e.NameScope.Find<SelectingItemsControl>("PART_ItemsHost");
         _cancelButton = e.NameScope.Find<Button>("PART_CancelButton");
+        _scrim = e.NameScope.Find<Border>("PART_Scrim");
         _surface = e.NameScope.Find<Border>("PART_Surface");
         if (_itemsHost is not null) _itemsHost.SelectionChanged += OnSelectionChanged;
         if (_cancelButton is not null) _cancelButton.Click += OnCancel;
+        if (_scrim is not null) _scrim.PointerPressed += OnScrimPressed;
         _presence.Initialize(IsOpen);
+        SetPresence(_presence.IsPresent);
         UpdateMotion();
         UpdateHitTesting();
+        UpdateModalFocus();
+    }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        UpdateModalFocus();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         _presence.Stop();
+        _modalFocus.Deactivate();
         base.OnDetachedFromVisualTree(e);
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        if (IsOpen && e.Key == Key.Escape)
+        {
+            Dismiss();
+            e.Handled = true;
+            return;
+        }
+        base.OnKeyDown(e);
     }
 
     private void UpdateOpenState()
@@ -262,6 +318,21 @@ public sealed class MdSimpleDialog : TemplatedControl
             _presence.Update(false, MdMotion.GetExitDuration(this));
         }
         UpdateHitTesting();
+        UpdateModalFocus();
+    }
+
+    private void UpdateModalFocus()
+    {
+        _modalFocus.Update(IsOpen, _surface, initialFocus: _itemsHost as Control ?? _cancelButton);
+    }
+
+    private void OnScrimPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (IsOpen && ReferenceEquals(e.Source, _scrim))
+        {
+            Dismiss();
+            e.Handled = true;
+        }
     }
 
     private void UpdateMotion()
@@ -276,6 +347,15 @@ public sealed class MdSimpleDialog : TemplatedControl
                 MdMotionTransitions.CreateTransform(this, RenderTransformProperty));
         }
         if (!IsOpen) _presence.Update(false, MdMotion.GetExitDuration(this));
+    }
+
+    private void SetPresence(bool present)
+    {
+        PseudoClasses.Set(":present", present);
+        // Presence controls lifecycle, not just styling. Set the template part directly so a
+        // zero-duration scheme cannot retain a stale :present style value for another layout pass.
+        if (_overlay is not null) _overlay.IsVisible = present;
+        if (_surface is not null) _surface.IsVisible = present;
     }
 
     private void UpdateHitTesting()

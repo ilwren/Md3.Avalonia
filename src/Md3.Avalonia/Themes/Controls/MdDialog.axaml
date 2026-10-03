@@ -67,7 +67,8 @@
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdDialogHost">
         <Grid>
-          <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+          <ContentPresenter x:Name="PART_MainContent"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                             Content="{TemplateBinding Content}"
                             ContentTemplate="{TemplateBinding ContentTemplate}" />
@@ -78,6 +79,7 @@
                               HorizontalAlignment="Center"
                               VerticalAlignment="Center"
                               Content="{TemplateBinding Dialog}"
+                              ContentTemplate="{TemplateBinding DialogTemplate}"
                               Opacity="0"
                               RenderTransform="scale(0.9)"
                               RenderTransformOrigin="50%,50%" />

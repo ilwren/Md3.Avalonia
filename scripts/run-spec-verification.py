@@ -1,241 +1,244 @@
 #!/usr/bin/env python3
-"""
-Material Design 3 & Flutter Specification Verification Test Runner.
-Executes automated specification compliance checks against the Md3.Avalonia repository.
+"""Run repository verification and emit auditable evidence.
+
+This script deliberately does not award Material or Flutter compliance from constants, file names,
+or source-text matches. It validates the pinned baseline, parses markup, and runs the real test
+projects when the .NET SDK is available. Platform claims remain unverified unless their platform
+job supplies evidence separately.
 """
 
-import sys
-import os
+from __future__ import annotations
+
+import argparse
+import datetime as dt
 import json
-import math
+import shutil
+import subprocess
+import sys
 import time
-import datetime
+import xml.etree.ElementTree as ET
 from pathlib import Path
+from typing import Any
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent
+REPORT_PATH = ROOT / "docs" / "reports" / "test-spec-execution-results.json"
+MANIFEST_PATH = ROOT / "docs" / "spec-baseline-manifest.json"
+MATRIX_PATH = ROOT / "docs" / "spec-test-matrix.json"
 
-class SpecTestRunner:
-    def __init__(self):
-        self.results = []
-        self.start_time = time.time()
 
-    def record_test(self, suite: str, name: str, passed: bool, message: str = "", metrics: dict = None):
-        self.results.append({
-            "suite": suite,
-            "name": name,
-            "passed": passed,
+class Verification:
+    def __init__(self) -> None:
+        self.started = time.monotonic()
+        self.results: list[dict[str, Any]] = []
+
+    def record(self, check: str, status: str, message: str, evidence: list[str] | None = None) -> None:
+        assert status in {"passed", "failed", "not_run"}
+        result = {
+            "check": check,
+            "status": status,
             "message": message,
-            "metrics": metrics or {},
-            "timestamp": datetime.datetime.now().isoformat()
-        })
-        status_str = "\033[92m[PASS]\033[0m" if passed else "\033[91m[FAIL]\033[0m"
-        print(f"  {status_str} {suite} :: {name} - {message}")
+            "evidence": evidence or [],
+        }
+        self.results.append(result)
+        label = {"passed": "PASS", "failed": "FAIL", "not_run": "NOT RUN"}[status]
+        print(f"[{label}] {check}: {message}")
 
-    def test_touch_targets(self):
-        """Verify M3 Touch Target size >= 48x48dp for all interactive mobile controls"""
-        controls_to_check = [
-            ("MdButton", 48, 48),
-            ("MdIconButton", 48, 48),
-            ("MdFloatingActionButton", 56, 56),
-            ("MdFabMenu", 56, 56),
-            ("MdCheckBox", 48, 48),
-            ("MdRadioButton", 48, 48),
-            ("MdSwitch", 52, 32),
-            ("MdChip", 48, 32),
-            ("MdSlider", 48, 44),
-            ("MdSegmentedButton", 48, 40),
-            ("MdTabItem", 48, 48),
-            ("MdListItem", 56, 56),
-            ("MdColorPickerButton", 48, 40)
+    def verify_baseline(self) -> None:
+        try:
+            manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+            flutter = manifest["flutter"]
+            material = manifest["material_design_3"]
+            commit = flutter["commit"]
+            urls = material["sources"]
+            valid = (
+                manifest["schema_version"] == 1
+                and len(commit) == 40
+                and all(c in "0123456789abcdef" for c in commit)
+                and bool(flutter["version"])
+                and bool(material["retrieved_at"])
+                and len(urls) >= 1
+                and all(url.startswith("https://m3.material.io/") for url in urls)
+            )
+            if not valid:
+                raise ValueError("required pinned version, commit, retrieval date, or official URLs are invalid")
+            self.record(
+                "pinned-spec-baseline",
+                "passed",
+                f"M3 retrieval date {material['retrieved_at']}; Flutter {flutter['version']} at {commit}.",
+                [str(MANIFEST_PATH.relative_to(ROOT))],
+            )
+        except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+            self.record("pinned-spec-baseline", "failed", str(exc), [str(MANIFEST_PATH.relative_to(ROOT))])
+
+    def verify_requirement_matrix(self) -> None:
+        try:
+            matrix = json.loads(MATRIX_PATH.read_text(encoding="utf-8"))
+            requirements = matrix["requirements"]
+            ids = [entry["id"] for entry in requirements]
+            allowed_statuses = list(matrix["status_definitions"])
+            if len(ids) != len(set(ids)):
+                raise ValueError("requirement IDs must be unique")
+            if not requirements:
+                raise ValueError("at least one requirement is required")
+            for entry in requirements:
+                if entry["verification_status"] not in allowed_statuses:
+                    raise ValueError(f"{entry['id']} has an unknown status")
+                if not entry["platforms"] or not entry["source"].startswith("https://"):
+                    raise ValueError(f"{entry['id']} is missing platforms or an upstream source")
+                if not entry["automated_evidence"]:
+                    raise ValueError(f"{entry['id']} has no named evidence")
+            counts = {
+                status: sum(entry["verification_status"] == status for entry in requirements)
+                for status in allowed_statuses
+            }
+            self.record(
+                "traceable-requirement-matrix",
+                "passed",
+                f"Validated {len(requirements)} uniquely identified requirements; statuses: {counts}. Matrix status is not test execution.",
+                [str(MATRIX_PATH.relative_to(ROOT))],
+            )
+        except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
+            self.record("traceable-requirement-matrix", "failed", str(exc), [str(MATRIX_PATH.relative_to(ROOT))])
+
+    def parse_axaml(self) -> None:
+        files = sorted(ROOT.glob("src/**/*.axaml")) + sorted(ROOT.glob("tests/**/*.axaml"))
+        failures: list[str] = []
+        for path in files:
+            try:
+                ET.parse(path)
+            except ET.ParseError as exc:
+                failures.append(f"{path.relative_to(ROOT)}: {exc}")
+        if failures:
+            self.record("axaml-well-formedness", "failed", "; ".join(failures), failures)
+        else:
+            self.record(
+                "axaml-well-formedness",
+                "passed",
+                f"Parsed {len(files)} AXAML files as XML. This does not prove Avalonia XAML compilation.",
+                ["src/**/*.axaml", "tests/**/*.axaml"],
+            )
+
+    def verify_claim_boundaries(self) -> None:
+        required = {
+            "docs/FLUTTER_PARITY_STATUS.md": ["API shell", "Experimental", "Implemented subset"],
+            "src/Md3.Avalonia.Extra/Controls/MdMotionControls.cs": ["MdExperimental("],
+        }
+        missing: list[str] = []
+        for relative, markers in required.items():
+            path = ROOT / relative
+            text = path.read_text(encoding="utf-8") if path.exists() else ""
+            for marker in markers:
+                if marker not in text:
+                    missing.append(f"{relative}: missing {marker!r}")
+        self.record(
+            "parity-claim-boundaries",
+            "failed" if missing else "passed",
+            "; ".join(missing) if missing else "Parity subsets, API shells, and experimental motion APIs are explicitly separated.",
+            list(required),
+        )
+
+    def run_dotnet_tests(self, source_only: bool) -> None:
+        if source_only:
+            self.record("dotnet-build-and-tests", "not_run", "Skipped by --source-only; no runtime behavior is verified.")
+            return
+        dotnet = shutil.which("dotnet")
+        if dotnet is None:
+            self.record("dotnet-build-and-tests", "not_run", ".NET SDK is unavailable; C#, Avalonia XAML, and Headless tests are unverified.")
+            return
+        command = [
+            dotnet,
+            "test",
+            str(ROOT / "tests" / "Md3.Avalonia.HeadlessTests" / "Md3.Avalonia.HeadlessTests.csproj"),
+            "--configuration",
+            "Release",
+            "--nologo",
         ]
-        for ctrl, min_w, min_h in controls_to_check:
-            # Check source / AXAML themes
-            self.record_test(
-                "TouchTargetSpecification",
-                f"{ctrl}_MinimumTouchBounds",
-                True,
-                f"Interactive touch bounds >= {min_w}x{min_h}dp compliant with M3 guidelines",
-                {"target_width": min_w, "target_height": min_h, "min_spec": 48}
+        completed = subprocess.run(command, cwd=ROOT, text=True, capture_output=True, check=False)
+        log_path = ROOT / "artifacts" / "verification" / "dotnet-test.log"
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        log_path.write_text(completed.stdout + "\n" + completed.stderr, encoding="utf-8")
+        self.record(
+            "dotnet-build-and-tests",
+            "passed" if completed.returncode == 0 else "failed",
+            f"dotnet test exited with code {completed.returncode}.",
+            [str(log_path.relative_to(ROOT))],
+        )
+
+    def record_android_evidence(self, junit_path: str | None) -> None:
+        if junit_path is None:
+            self.record(
+                "android-device-regression",
+                "not_run",
+                "Must be supplied by the Android workflow/device job; Headless execution cannot validate popup/platform crashes.",
+                [".github/workflows/android-test.yml", "tests/maestro"],
             )
-
-    def test_wcag_contrast(self):
-        """Verify WCAG 2.1 AA contrast ratio >= 4.5:1 for all M3 dynamic color roles"""
-        def rel_luminance(r, g, b):
-            def f(c):
-                c = c / 255.0
-                return c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4
-            return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
-
-        def contrast_ratio(rgb1, rgb2):
-            l1 = rel_luminance(*rgb1)
-            l2 = rel_luminance(*rgb2)
-            if l1 < l2:
-                l1, l2 = l2, l1
-            return (l1 + 0.05) / (l2 + 0.05)
-
-        pairs = [
-            ("Primary_OnPrimary", (103, 80, 164), (255, 255, 255), 4.5), # #6750A4 vs #FFFFFF
-            ("PrimaryContainer_OnPrimaryContainer", (234, 221, 255), (33, 0, 93), 4.5), # #EADDFF vs #21005D
-            ("SecondaryContainer_OnSecondaryContainer", (232, 222, 248), (29, 25, 43), 4.5), # #E8DEF8 vs #1D192B
-            ("Surface_OnSurface", (254, 247, 255), (29, 27, 32), 4.5), # #FEF7FF vs #1D1B20
-            ("SurfaceContainer_OnSurface", (243, 237, 247), (29, 27, 32), 4.5), # #F3EDF7 vs #1D1B20
-            ("Error_OnError", (179, 38, 30), (255, 255, 255), 4.5) # #B3261E vs #FFFFFF
-        ]
-
-        for name, fg, bg, threshold in pairs:
-            ratio = contrast_ratio(fg, bg)
-            passed = ratio >= threshold
-            self.record_test(
-                "ColorContrastSpecification",
-                f"{name}_RatioCheck",
-                passed,
-                f"Calculated WCAG contrast {ratio:.2f}:1 >= {threshold}:1",
-                {"contrast_ratio": round(ratio, 2), "threshold": threshold}
+            return
+        path = Path(junit_path)
+        if not path.is_absolute():
+            path = ROOT / path
+        evidence = [str(path.relative_to(ROOT))] if path.is_relative_to(ROOT) else [str(path)]
+        try:
+            root = ET.parse(path).getroot()
+            suites = [root] if root.tag == "testsuite" else list(root.iter("testsuite"))
+            if not suites:
+                raise ValueError("JUnit contains no testsuite")
+            tests = sum(int(suite.attrib.get("tests", "0")) for suite in suites)
+            failures = sum(int(suite.attrib.get("failures", "0")) for suite in suites)
+            errors = sum(int(suite.attrib.get("errors", "0")) for suite in suites)
+            if tests <= 0:
+                raise ValueError("JUnit contains no executed tests")
+            self.record(
+                "android-device-regression",
+                "passed" if failures + errors == 0 else "failed",
+                f"Android Maestro JUnit: {tests} tests, {failures} failures, {errors} errors.",
+                evidence,
             )
+        except (OSError, ValueError, ET.ParseError) as exc:
+            self.record("android-device-regression", "failed", str(exc), evidence)
 
-    def test_motion_curves(self):
-        """Verify M3 Emphasized Decelerate cubic-bezier(0.05, 0.7, 0.1, 1.0) interpolation accuracy"""
-        # Cubic bezier solver
-        def bezier(t, p1, p2):
-            return 3*(1-t)**2 * t * p1 + 3*(1-t) * t**2 * p2 + t**3
-
-        sample_points = [0.1, 0.25, 0.5, 0.75, 0.9, 1.0]
-        for t in sample_points:
-            # Emphasized curve y output
-            y = bezier(t, 0.7, 1.0)
-            passed = 0.0 <= y <= 1.05
-            self.record_test(
-                "MotionCurvesSpecification",
-                f"EmphasizedDecelerate_t_{int(t*100)}",
-                passed,
-                f"Sample at t={t:.2f} yields progress={y:.4f} along M3 easing curve",
-                {"t": t, "progress": round(y, 4)}
-            )
-
-    def test_hsv_hex_color_math(self):
-        """Verify MdColorPicker HSV 360 color space and HEX conversion accuracy"""
-        def hsv_to_rgb(h, s, v):
-            c = v * s
-            x = c * (1 - abs((h / 60.0) % 2 - 1))
-            m = v - c
-            if 0 <= h < 60: r, g, b = c, x, 0
-            elif 60 <= h < 120: r, g, b = x, c, 0
-            elif 120 <= h < 180: r, g, b = 0, c, x
-            elif 180 <= h < 240: r, g, b = 0, x, c
-            elif 240 <= h < 300: r, g, b = x, 0, c
-            else: r, g, b = c, 0, x
-            return round((r + m) * 255), round((g + m) * 255), round((b + m) * 255)
-
-        test_cases = [
-            (0, 1.0, 1.0, (255, 0, 0), "#FFFF0000"),
-            (120, 1.0, 1.0, (0, 255, 0), "#FF00FF00"),
-            (240, 1.0, 1.0, (0, 0, 255), "#FF0000FF"),
-            (270, 0.5, 0.8, (153, 102, 204), "#FF9966CC"),
-            (60, 1.0, 1.0, (255, 255, 0), "#FFFFFF00")
-        ]
-
-        for h, s, v, expected_rgb, expected_hex in test_cases:
-            calc_rgb = hsv_to_rgb(h, s, v)
-            calc_hex = f"#FF{calc_rgb[0]:02X}{calc_rgb[1]:02X}{calc_rgb[2]:02X}"
-            passed = (calc_rgb == expected_rgb) and (calc_hex == expected_hex)
-            self.record_test(
-                "ColorPickerMathSpecification",
-                f"HSV_H{h}_S{int(s*100)}_V{int(v*100)}",
-                passed,
-                f"HSV({h}, {s}, {v}) -> {calc_hex} matched {expected_hex}",
-                {"h": h, "s": s, "v": v, "hex": calc_hex}
-            )
-
-    def test_flutter_slidable_thresholds(self):
-        """Verify Flutter Slidable / Dismissible gesture thresholds (40% dismiss threshold)"""
-        test_distances = [
-            (0.15, False, "Spring rebound to 0, no action invoked"),
-            (0.35, False, "Under 40% threshold, rebound to origin"),
-            (0.45, True, "Over 40% threshold, snaps open and triggers action"),
-            (0.80, True, "Full swipe dismiss triggers Archive action")
-        ]
-        for ratio, expected_trigger, desc in test_distances:
-            self.record_test(
-                "FlutterSlidableSpecification",
-                f"HorizontalSwipeRatio_{int(ratio*100)}pct",
-                True,
-                f"Swipe {int(ratio*100)}% width: {desc}",
-                {"swipe_ratio": ratio, "action_triggered": expected_trigger}
-            )
-
-    def test_component_inventory(self):
-        """Verify all 54 components exist, compile and have themes registered"""
-        components = [
-            # Core Action
-            "MdButton", "MdIconButton", "MdFloatingActionButton", "MdFabMenu", "MdToolbar",
-            # Core Containment
-            "MdCard", "MdSettingsCard", "MdSettingsExpander", "MdSettingsGroup", "MdDivider", "MdScrollViewer", "MdCarousel", "MdList", "MdListItem",
-            # Core Communication
-            "MdBadge", "MdChip", "MdAssistChip", "MdFilterChip", "MdInputChip", "MdSuggestionChip",
-            "MdDialogHost", "MdSheetHost", "MdSnackbarHost", "MdTooltip", "MdLinearProgressIndicator", "MdCircularProgressIndicator", "MdLoadingIndicator",
-            # Core Navigation
-            "MdTopAppBar", "MdBottomAppBar", "MdNavigationBar", "MdNavigationDrawer", "MdNavigationRail", "MdSegmentedButton", "MdTabView", "MdTabItem",
-            # Core Selection & Inputs
-            "MdTextBox", "MdSearchBar", "MdSearchView", "MdCheckBox", "MdRadioButton", "MdSwitch", "MdSlider", "MdRangeSlider", "MdComboBox", "MdAutocompleteBox",
-            # Flutter Parity
-            "MdBanner", "MdExpansionPanel", "MdExpansionPanelList", "MdPaginatedDataTable", "MdReorderableList", "MdForm", "MdHero", "MdFocusTrap", "MdShortcut", "MdRefreshIndicator",
-            # Extra & Ecosystem
-            "MdColorPicker", "MdColorPickerButton", "MdContainerTransform", "MdSharedAxis", "MdFadeThrough", "MdAnimatedVisibility", "MdAnimationSequence", "MdSkeleton",
-            "MdPopover", "MdHoverCard", "MdCommandPalette", "MdSlidableItem", "MdDataGrid", "MdMasonryPanel", "MdPagedItemsView",
-            "MdPinInput", "MdTreeView", "MdTagInput", "MdAsyncSelect", "MdCalendar", "MdCascader", "MdTransfer", "MdRating", "MdBreadcrumb", "MdAvatar",
-            "MdTimeline", "MdResultView", "MdChart", "MdRichEditor", "MdChatView", "MdBorderlessWindow",
-            # Icons
-            "MdIcon", "MdSymbols", "MdSymbolsLite"
-        ]
-
-        for comp in components:
-            self.record_test(
-                "ComponentInventorySpecification",
-                f"{comp}_RegistrationCheck",
-                True,
-                f"Component {comp} registered with full theme & cross-platform support",
-                {"component": comp, "status": "Registered"}
-            )
-
-    def run_all(self):
-        print("\n======================================================================")
-        print("   STARTING MATERIAL DESIGN 3 & FLUTTER AUTOMATED SPECIFICATION TESTS  ")
-        print("======================================================================\n")
-
-        self.test_touch_targets()
-        self.test_wcag_contrast()
-        self.test_motion_curves()
-        self.test_hsv_hex_color_math()
-        self.test_flutter_slidable_thresholds()
-        self.test_component_inventory()
-
-        elapsed = time.time() - self.start_time
-        total = len(self.results)
-        passed = sum(1 for r in self.results if r["passed"])
-        failed = total - passed
-
-        print("\n======================================================================")
-        print(f"   TEST SUMMARY: {total} Executed | {passed} Passed | {failed} Failed | {elapsed:.2f}s")
-        print("======================================================================\n")
-
-        # Save results to json
-        out_dir = REPO_ROOT / "docs" / "reports"
-        out_dir.mkdir(parents=True, exist_ok=True)
-        json_path = out_dir / "test-spec-execution-results.json"
-        with open(json_path, "w", encoding="utf-8") as f:
-            json.dump({
-                "timestamp": datetime.datetime.now().isoformat(),
-                "total": total,
+    def write(self) -> int:
+        failed = sum(result["status"] == "failed" for result in self.results)
+        not_run = sum(result["status"] == "not_run" for result in self.results)
+        passed = sum(result["status"] == "passed" for result in self.results)
+        all_runner_checks_completed = failed == 0 and not_run == 0
+        payload = {
+            "schema_version": 2,
+            "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+            "purpose": "repository verification evidence; not a Material or Flutter certification",
+            "summary": {
                 "passed": passed,
                 "failed": failed,
-                "elapsed_seconds": round(elapsed, 3),
-                "pass_rate": f"{(passed/total)*100:.1f}%",
-                "results": self.results
-            }, f, indent=2, ensure_ascii=False)
-        print(f"Results written to {json_path}")
-        return failed == 0
+                "not_run": not_run,
+                "all_runner_checks_completed": all_runner_checks_completed,
+                "material_or_flutter_compliance_claim": False,
+            },
+            "elapsed_seconds": round(time.monotonic() - self.started, 3),
+            "results": self.results,
+        }
+        REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+        REPORT_PATH.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        print(f"Evidence written to {REPORT_PATH}")
+        if failed:
+            return 1
+        if not_run:
+            return 2
+        return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--source-only", action="store_true", help="skip .NET execution and record it as not run")
+    parser.add_argument("--android-junit", help="Maestro JUnit XML produced by a real Android emulator/device job")
+    args = parser.parse_args()
+    verification = Verification()
+    verification.verify_baseline()
+    verification.verify_requirement_matrix()
+    verification.parse_axaml()
+    verification.verify_claim_boundaries()
+    verification.run_dotnet_tests(args.source_only)
+    verification.record_android_evidence(args.android_junit)
+    return verification.write()
+
 
 if __name__ == "__main__":
-    runner = SpecTestRunner()
-    success = runner.run_all()
-    sys.exit(0 if success else 1)
+    sys.exit(main())

@@ -39,7 +39,8 @@
     <Setter Property="LeadingIconBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
     <Setter Property="TrailingIconBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
     <Setter Property="ActiveIndicatorBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-    <Setter Property="OutlineLabelBackground" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+    <!-- Outlined labels use a real gap in the stroke; they never paint an assumed host color. -->
+    <Setter Property="OutlineLabelBackground" Value="Transparent" />
     <Setter Property="BorderBrush" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="CornerRadius" Value="{DynamicResource Md.Comp.TextField.Filled.Container.Shape}" />
@@ -63,16 +64,22 @@
                     MinWidth="{TemplateBinding MinWidth}"
                     MinHeight="{TemplateBinding MinHeight}"
                     Background="{TemplateBinding Background}"
-                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderBrush="Transparent"
                     BorderThickness="{TemplateBinding BorderThickness}"
                     CornerRadius="{TemplateBinding CornerRadius}">
               <Grid>
-                <Border x:Name="PART_FocusOutline"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{DynamicResource Md.Comp.TextField.Outline.FocusWidth}"
-                        CornerRadius="{TemplateBinding CornerRadius}"
-                        IsHitTestVisible="False"
-                        IsVisible="False" />
+                <md:MdOutlinedFieldBorder x:Name="PART_Outline"
+                                          CornerRadius="{TemplateBinding CornerRadius}"
+                                          IsVisible="False"
+                                          NotchTarget="{Binding #PART_Label}"
+                                          OutlineBrush="{TemplateBinding BorderBrush}"
+                                          OutlineThickness="{TemplateBinding BorderThickness}" />
+                <md:MdOutlinedFieldBorder x:Name="PART_FocusOutline"
+                                          CornerRadius="{TemplateBinding CornerRadius}"
+                                          IsVisible="False"
+                                          NotchTarget="{Binding #PART_Label}"
+                                          OutlineBrush="{TemplateBinding BorderBrush}"
+                                          OutlineThickness="{DynamicResource Md.Comp.TextField.Outline.FocusWidth}" />
 
                 <Grid x:Name="PART_ContentGrid"
                       Margin="{TemplateBinding Padding}"
@@ -272,6 +279,18 @@
     <Style Selector="^:outlined /template/ Border#PART_ActiveIndicator">
       <Setter Property="IsVisible" Value="False" />
     </Style>
+    <Style Selector="^:outlined /template/ md|MdOutlinedFieldBorder#PART_Outline">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:outlined:has-label:not(:empty) /template/ md|MdOutlinedFieldBorder">
+      <Setter Property="IsNotched" Value="True" />
+    </Style>
+    <Style Selector="^:outlined:has-label:focus /template/ md|MdOutlinedFieldBorder">
+      <Setter Property="IsNotched" Value="True" />
+    </Style>
+    <Style Selector="^:outlined:multiline:has-label /template/ md|MdOutlinedFieldBorder">
+      <Setter Property="IsNotched" Value="True" />
+    </Style>
     <Style Selector="^:outlined:has-label /template/ Border#PART_Container">
       <!-- Reserve space for the notched floating label so Android/Skia clips neither glyphs nor focus outline. -->
       <Setter Property="Margin" Value="0,8,0,0" />
@@ -325,11 +344,11 @@
       <Setter Property="Padding" Value="{DynamicResource Md.Comp.TextField.Label.NotchedPadding}" />
     </Style>
     <Style Selector="^:outlined:has-label:not(:empty) /template/ ContentPresenter#PART_Label">
-      <Setter Property="Background" Value="{TemplateBinding OutlineLabelBackground}" />
+      <Setter Property="Background" Value="Transparent" />
       <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -28px)" />
     </Style>
     <Style Selector="^:outlined:has-label:focus /template/ ContentPresenter#PART_Label">
-      <Setter Property="Background" Value="{TemplateBinding OutlineLabelBackground}" />
+      <Setter Property="Background" Value="Transparent" />
       <Setter Property="RenderTransform" Value="scale(0.75) translate(0px, -28px)" />
     </Style>
     <!-- Multiline fields keep the label in a fixed top slot. A vertically centered resting label
@@ -341,7 +360,7 @@
     </Style>
     <Style Selector="^:outlined:multiline:has-label /template/ ContentPresenter#PART_Label">
       <Setter Property="Margin" Value="-4,-8,0,0" />
-      <Setter Property="Background" Value="{TemplateBinding OutlineLabelBackground}" />
+      <Setter Property="Background" Value="Transparent" />
     </Style>
     <Style Selector="^:multiline:has-label /template/ Grid#PART_InputRow">
       <Setter Property="VerticalAlignment" Value="Top" />
@@ -428,7 +447,7 @@
     <Style Selector="^:outlined:focus">
       <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
     </Style>
-    <Style Selector="^:outlined:focus /template/ Border#PART_FocusOutline">
+    <Style Selector="^:outlined:focus /template/ md|MdOutlinedFieldBorder#PART_FocusOutline">
       <Setter Property="IsVisible" Value="True" />
     </Style>
 

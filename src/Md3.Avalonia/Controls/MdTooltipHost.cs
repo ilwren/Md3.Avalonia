@@ -35,6 +35,10 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
         AvaloniaProperty.Register<MdTooltipHost, TimeSpan>(nameof(LongPressDelay), TimeSpan.FromMilliseconds(500));
     public static readonly StyledProperty<bool> OpenOnClickProperty =
         AvaloniaProperty.Register<MdTooltipHost, bool>(nameof(OpenOnClick));
+    public static readonly StyledProperty<TimeSpan> LongPressVisibleDurationProperty =
+        AvaloniaProperty.Register<MdTooltipHost, TimeSpan>(nameof(LongPressVisibleDuration), TimeSpan.FromMilliseconds(1500));
+    public static readonly StyledProperty<double> TouchSlopProperty =
+        AvaloniaProperty.Register<MdTooltipHost, double>(nameof(TouchSlop), 12, validate: value => value >= 0);
 
     private readonly DispatcherTimer _showTimer;
     private readonly DispatcherTimer _hideTimer;
@@ -43,6 +47,8 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
     private Popup? _popup;
     private bool _isPopupOpen;
     private bool _longPressTriggered;
+    private Point _pressOrigin;
+    private IPointer? _pressedPointer;
 
     static MdTooltipHost()
     {
@@ -64,21 +70,24 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
             SetOpen(true);
         });
 
-        PointerEntered += (_, _) =>
+        PointerEntered += (_, e) =>
         {
+            if (e.Pointer.Type != PointerType.Mouse) return;
             _hideTimer.Stop();
             Schedule(_showTimer, ShowDelay);
         };
-        PointerExited += (_, _) =>
+        PointerExited += (_, e) =>
         {
             _showTimer.Stop();
+            if (e.Pointer.Type is PointerType.Touch or PointerType.Pen) CancelLongPress();
             Schedule(_hideTimer, HideDelay);
         };
         GotFocus += (_, _) => Schedule(_showTimer, ShowDelay);
         LostFocus += (_, _) => Schedule(_hideTimer, HideDelay);
-        PointerPressed += OnPointerPressed;
-        PointerReleased += OnPointerReleased;
-        PointerCaptureLost += (_, _) => _longPressTimer.Stop();
+        AddHandler(InputElement.PointerPressedEvent, OnPointerPressed, global::Avalonia.Interactivity.RoutingStrategies.Tunnel, handledEventsToo: true);
+        AddHandler(InputElement.PointerMovedEvent, OnPointerMoved, global::Avalonia.Interactivity.RoutingStrategies.Tunnel, handledEventsToo: true);
+        AddHandler(InputElement.PointerReleasedEvent, OnPointerReleased, global::Avalonia.Interactivity.RoutingStrategies.Tunnel, handledEventsToo: true);
+        PointerCaptureLost += (_, _) => CancelLongPress();
         UpdateOpenState();
     }
 
@@ -96,6 +105,8 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
     public TimeSpan HideDelay { get => GetValue(HideDelayProperty); set => SetValue(HideDelayProperty, value); }
     public TimeSpan LongPressDelay { get => GetValue(LongPressDelayProperty); set => SetValue(LongPressDelayProperty, value); }
     public bool OpenOnClick { get => GetValue(OpenOnClickProperty); set => SetValue(OpenOnClickProperty, value); }
+    public TimeSpan LongPressVisibleDuration { get => GetValue(LongPressVisibleDurationProperty); set => SetValue(LongPressVisibleDurationProperty, value); }
+    public double TouchSlop { get => GetValue(TouchSlopProperty); set => SetValue(TouchSlopProperty, value); }
 
     public void Show() => SetOpen(true);
     public void Dismiss() => SetOpen(false);
@@ -155,13 +166,44 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
     private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         _longPressTriggered = false;
-        Schedule(_longPressTimer, LongPressDelay);
+        _hideTimer.Stop();
+        _pressOrigin = e.GetPosition(this);
+        _pressedPointer = e.Pointer;
+        if (e.Pointer.Type is PointerType.Touch or PointerType.Pen)
+            Schedule(_longPressTimer, LongPressDelay);
+    }
+
+    private void OnPointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (!ReferenceEquals(e.Pointer, _pressedPointer)) return;
+        var point = e.GetPosition(this);
+        var delta = point - _pressOrigin;
+        if (Math.Abs(delta.X) > TouchSlop || Math.Abs(delta.Y) > TouchSlop)
+            CancelLongPress();
     }
 
     private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
+        if (!ReferenceEquals(e.Pointer, _pressedPointer)) return;
         _longPressTimer.Stop();
-        if (OpenOnClick && !_longPressTriggered) SetOpen(!IsOpen);
+        _pressedPointer = null;
+        if (_longPressTriggered)
+        {
+            // Consume the release so a long-press tooltip never also invokes the hosted button.
+            e.Handled = true;
+            if (Tooltip?.Variant != MdTooltipVariant.Rich)
+                Schedule(_hideTimer, LongPressVisibleDuration);
+        }
+        else if (OpenOnClick)
+        {
+            SetOpen(!IsOpen);
+        }
+    }
+
+    private void CancelLongPress()
+    {
+        _longPressTimer.Stop();
+        _pressedPointer = null;
     }
 
     private void OnPopupClosed(object? sender, EventArgs e)
