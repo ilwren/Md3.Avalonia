@@ -107,6 +107,27 @@
     </StackPanel>
 
     <StackPanel Spacing="12">
+      <TextBlock Classes="h2" Text="Visual extras · comparison, animated text and loading recipes" />
+      <TextBlock Classes="body" TextWrapping="Wrap" Text="Optional Extra controls inspired by Flutter ecosystem packages. MdChart remains provider-neutral; these controls do not bundle a chart engine." />
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto,Auto" MaxWidth="760">
+        <Border Grid.RowSpan="3" Padding="12" Height="180" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}">
+          <eco:MdBeforeAfter Position="0.55" Before="BEFORE" After="AFTER" />
+        </Border>
+        <StackPanel Grid.Column="1" Spacing="8">
+          <eco:MdAnimatedText Text="Material motion, one character at a time" Effect="Typewriter" Duration="0:0:1.4" />
+          <eco:MdAnimatedText Text="Fade and reveal" Effect="Fade" Duration="0:0:0.8" />
+          <eco:MdSpinKit Kind="Wave" Size="48" />
+          <eco:MdSpinKit Kind="ThreeBounce" Size="48" />
+        </StackPanel>
+      </Grid>
+      <eco:MdStaggeredPanel AutoPlay="True" Orientation="Horizontal" Spacing="8">
+        <Border Width="100" Height="64" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
+        <Border Width="100" Height="64" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
+        <Border Width="100" Height="64" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" />
+      </eco:MdStaggeredPanel>
+    </StackPanel>
+
+    <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="Wave E · Skeleton and sequence" />
       <WrapPanel Orientation="Horizontal">
         <md:MdButton Content="Toggle loading" Variant="Tonal" Click="ToggleSkeleton" Margin="0,0,8,8" />
