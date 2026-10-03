@@ -39,22 +39,24 @@
         </StackPanel>
       </StackPanel>
 
-      <Border Classes="gallery-section" Padding="24" MinHeight="260">
+      <Border Classes="gallery-section" Padding="24" MinHeight="340">
         <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Stretch">
-          <!-- Left Aligned FAB Menu -->
-          <md:MdFabMenu Grid.Column="0" Alignment="Left" VerticalAlignment="Bottom" ColorStyle="SecondaryContainer">
+          <!-- Alignment places the anchor; ExpansionDirection independently places its actions. -->
+          <md:MdFabMenu Grid.Column="0" Alignment="Left" ExpansionDirection="Up" IsInitiallyOpen="True"
+                        VerticalAlignment="Bottom" ColorStyle="SecondaryContainer">
             <md:MdFabMenuItem Content="Scanner" Icon="{x:Static md:MdSymbols.QrCodeScanner}"/>
             <md:MdFabMenuItem Content="Attachment" Icon="{x:Static md:MdSymbols.AttachFile}"/>
             <md:MdFabMenuItem Content="Voice" Icon="{x:Static md:MdSymbols.Mic}"/>
           </md:MdFabMenu>
 
-          <StackPanel Grid.Column="1" Spacing="8" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="24,0">
-            <TextBlock Classes="h2" Text="FAB menu alignment" HorizontalAlignment="Center"/>
-            <TextBlock Classes="body" TextWrapping="Wrap" MaxWidth="440" TextAlignment="Center" Text="Click either round trigger to play the reversible expand/collapse motion. Set Alignment=&quot;Left&quot; or &quot;Right&quot; to orient the trigger and actions accordingly."/>
+          <StackPanel Grid.Column="1" Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="24,0">
+            <TextBlock Classes="h2" Text="FAB menu direction" HorizontalAlignment="Center"/>
+            <TextBlock Classes="body" TextWrapping="Wrap" MaxWidth="440" TextAlignment="Center"
+                       Text="The left menu starts open and expands up; the right menu opens on click and expands down. IsInitiallyOpen controls only the first attachment, while IsOpen remains the bindable live state."/>
           </StackPanel>
 
-          <!-- Right Aligned FAB Menu -->
-          <md:MdFabMenu Grid.Column="2" Alignment="Right" VerticalAlignment="Bottom">
+          <md:MdFabMenu Grid.Column="2" Alignment="Right" ExpansionDirection="Down"
+                        VerticalAlignment="Top">
             <md:MdFabMenuItem Content="Photo" Icon="{x:Static md:MdSymbols.Photo}"/>
             <md:MdFabMenuItem Content="Document" Icon="{x:Static md:MdSymbols.Description}"/>
             <md:MdFabMenuItem Content="Link" Icon="{x:Static md:MdSymbols.Link}"/>
@@ -64,7 +66,7 @@
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage"/>
-        <gallery:CodeExample XamlCode="&lt;!-- Right aligned FAB menu --&gt;&#10;&lt;md:MdFabMenu Alignment=&quot;Right&quot;&gt;&#10;    &lt;md:MdFabMenuItem Content=&quot;Photo&quot; Icon=&quot;{x:Static md:MdSymbols.Photo}&quot; /&gt;&#10;    &lt;md:MdFabMenuItem Content=&quot;Document&quot; Icon=&quot;{x:Static md:MdSymbols.Description}&quot; /&gt;&#10;&lt;/md:MdFabMenu&gt;&#10;&#10;&lt;!-- Left aligned FAB menu --&gt;&#10;&lt;md:MdFabMenu Alignment=&quot;Left&quot;&gt;&#10;    &lt;md:MdFabMenuItem Content=&quot;Voice&quot; Icon=&quot;{x:Static md:MdSymbols.Mic}&quot; /&gt;&#10;&lt;/md:MdFabMenu&gt;" CSharpCode="var rightMenu = new MdFabMenu { Alignment = MdFabAlignment.Right };&#10;var leftMenu = new MdFabMenu { Alignment = MdFabAlignment.Left };" />
+        <gallery:CodeExample XamlCode="&lt;!-- Material default: actions expand above the trailing anchor --&gt;&#10;&lt;md:MdFabMenu Alignment=&quot;Right&quot; ExpansionDirection=&quot;Up&quot; IsInitiallyOpen=&quot;True&quot;&gt;&#10;    &lt;md:MdFabMenuItem Content=&quot;Photo&quot; Icon=&quot;{x:Static md:MdSymbols.Photo}&quot; /&gt;&#10;    &lt;md:MdFabMenuItem Content=&quot;Document&quot; Icon=&quot;{x:Static md:MdSymbols.Description}&quot; /&gt;&#10;&lt;/md:MdFabMenu&gt;&#10;&#10;&lt;!-- Explicit extension for an anchor near the top edge --&gt;&#10;&lt;md:MdFabMenu Alignment=&quot;Left&quot; ExpansionDirection=&quot;Down&quot;&gt;&#10;    &lt;md:MdFabMenuItem Content=&quot;Voice&quot; Icon=&quot;{x:Static md:MdSymbols.Mic}&quot; /&gt;&#10;&lt;/md:MdFabMenu&gt;" CSharpCode="var menu = new MdFabMenu&#10;{&#10;    Alignment = MdFabAlignment.Right,&#10;    ExpansionDirection = MdFabMenuExpansionDirection.Up,&#10;    IsInitiallyOpen = true&#10;};" />
       </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>

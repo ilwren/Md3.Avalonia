@@ -1,19 +1,24 @@
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Automation;
+using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data.Converters;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Extra.Infrastructure;
+using Md3.Avalonia.Localization;
 
 namespace Md3.Avalonia.Extra.Controls;
 
@@ -123,13 +128,45 @@ public sealed class MdChart : Control
     public static readonly StyledProperty<string?> YAxisTitleProperty = AvaloniaProperty.Register<MdChart, string?>(nameof(YAxisTitle));
     public static readonly StyledProperty<string> AccessibleTitleProperty = AvaloniaProperty.Register<MdChart, string>(nameof(AccessibleTitle), "Chart");
     public static readonly DirectProperty<MdChart, MdChartPoint?> HoveredPointProperty = AvaloniaProperty.RegisterDirect<MdChart, MdChartPoint?>(nameof(HoveredPoint), control => control.HoveredPoint);
+    public static readonly DirectProperty<MdChart, string?> PointToolTipTextProperty = AvaloniaProperty.RegisterDirect<MdChart, string?>(nameof(PointToolTipText), control => control.PointToolTipText);
     private MdChartPoint? _hoveredPoint;
+    private string? _pointToolTipText;
+    private int _activePointIndex = -1;
+    private MdChartAutomationPeer? _automationPeer;
+    private bool _usesDefaultAccessibleTitle = true;
+    private bool _updatingDefaultAccessibleTitle;
     static MdChart()
     {
         AffectsRender<MdChart>(SeriesProperty, KindProperty, ShowGridProperty, AxisBrushProperty, GridBrushProperty, XAxisTitleProperty, YAxisTitleProperty);
-        AccessibleTitleProperty.Changed.AddClassHandler<MdChart>((chart, _) => AutomationProperties.SetName(chart, chart.AccessibleTitle));
+        SeriesProperty.Changed.AddClassHandler<MdChart>((chart, _) => chart.OnSeriesChanged());
+        AccessibleTitleProperty.Changed.AddClassHandler<MdChart>((chart, _) =>
+        {
+            if (!chart._updatingDefaultAccessibleTitle) chart._usesDefaultAccessibleTitle = false;
+            AutomationProperties.SetName(chart, chart.AccessibleTitle);
+        });
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdChart>((chart, _) => chart.UpdateLocalizedTitle());
     }
-    public MdChart() { ClipToBounds = true; Focusable = true; AutomationProperties.SetName(this, AccessibleTitle); }
+    public MdChart()
+    {
+        ClipToBounds = true;
+        Focusable = true;
+        UpdateLocalizedTitle();
+        AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Polite);
+        GotFocus += (_, _) =>
+        {
+            if (_activePointIndex < 0 && GetPointEntries().Count > 0) SetActivePoint(0, true);
+        };
+        LostFocus += (_, _) => SetActivePoint(-1, true);
+    }
+    private void UpdateLocalizedTitle()
+    {
+        if (!_usesDefaultAccessibleTitle) return;
+        _updatingDefaultAccessibleTitle = true;
+        try { SetCurrentValue(AccessibleTitleProperty, MdLocalization.GetString("Chart", this)); }
+        finally { _updatingDefaultAccessibleTitle = false; }
+        AutomationProperties.SetName(this, AccessibleTitle);
+    }
+
     public IEnumerable<MdChartSeries>? Series { get => GetValue(SeriesProperty); set => SetValue(SeriesProperty, value); }
     public MdChartKind Kind { get => GetValue(KindProperty); set => SetValue(KindProperty, value); }
     public bool ShowGrid { get => GetValue(ShowGridProperty); set => SetValue(ShowGridProperty, value); }
@@ -139,8 +176,10 @@ public sealed class MdChart : Control
     public string? YAxisTitle { get => GetValue(YAxisTitleProperty); set => SetValue(YAxisTitleProperty, value); }
     public string AccessibleTitle { get => GetValue(AccessibleTitleProperty); set => SetValue(AccessibleTitleProperty, value); }
     public MdChartPoint? HoveredPoint { get => _hoveredPoint; private set => SetAndRaise(HoveredPointProperty, ref _hoveredPoint, value); }
+    public string? PointToolTipText { get => _pointToolTipText; private set => SetAndRaise(PointToolTipTextProperty, ref _pointToolTipText, value); }
     public IMdChartDataProvider? Provider { get; set; }
     public event EventHandler<MdChartPoint?>? HoveredPointChanged;
+    public event EventHandler<MdChartPoint>? PointInvoked;
     public void RefreshProvider() { if (Provider is not null) Series = Provider.GetSeries(); }
     /// <summary>Returns a tab-separated text alternative for screen readers, export, or a host-provided table view.</summary>
     public string BuildAccessibleTable()
@@ -256,6 +295,13 @@ public sealed class MdChart : Control
                 }
             }
         }
+
+        if (HoveredPoint is { } activePoint)
+        {
+            var activePosition = Map(activePoint);
+            context.DrawEllipse(null, new Pen(AxisBrush ?? Brushes.Black, IsKeyboardFocusWithin ? 3 : 2),
+                activePosition, IsKeyboardFocusWithin ? 8 : 6, IsKeyboardFocusWithin ? 8 : 6);
+        }
     }
 
     private static void DrawChartText(DrawingContext context, string text, Point anchor, IBrush brush,
@@ -272,15 +318,170 @@ public sealed class MdChart : Control
     }
     protected override void OnPointerMoved(PointerEventArgs e)
     {
-        base.OnPointerMoved(e); var position = e.GetPosition(this); var all = (Series ?? Array.Empty<MdChartSeries>()).SelectMany(series => series.Points).ToArray();
-        if (all.Length == 0) return;
+        base.OnPointerMoved(e);
+        var position = e.GetPosition(this);
+        var all = GetPointEntries();
+        if (all.Count == 0) return;
         // X-distance is deliberately used for stable touch/pointer exploration independent of Y scale.
-        var normalized = Math.Clamp((position.X - 58) / Math.Max(1, Bounds.Width - 76), 0, 1); var min = all.Min(p => p.X); var max = all.Max(p => p.X);
-        var next = all.MinBy(point => Math.Abs(point.X - (min + normalized * (max - min))));
-        if (!Equals(next, HoveredPoint)) { HoveredPoint = next; HoveredPointChanged?.Invoke(this, next); }
+        var normalized = Math.Clamp((position.X - 58) / Math.Max(1, Bounds.Width - 76), 0, 1);
+        var min = all.Min(entry => entry.Point.X);
+        var max = all.Max(entry => entry.Point.X);
+        var next = all.MinBy(entry => Math.Abs(entry.Point.X - (min + normalized * (max - min))));
+        if (next is not null) SetActivePoint(next.Index, true);
     }
-    protected override void OnPointerExited(PointerEventArgs e) { base.OnPointerExited(e); HoveredPoint = null; HoveredPointChanged?.Invoke(this, null); }
+
+    protected override void OnPointerExited(PointerEventArgs e)
+    {
+        base.OnPointerExited(e);
+        if (!IsKeyboardFocusWithin) SetActivePoint(-1, true);
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        var points = GetPointEntries();
+        if (points.Count == 0) { base.OnKeyDown(e); return; }
+        var rtl = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft;
+        var delta = e.Key switch
+        {
+            Key.Right => rtl ? -1 : 1,
+            Key.Left => rtl ? 1 : -1,
+            Key.Down => 1,
+            Key.Up => -1,
+            _ => 0
+        };
+        if (delta != 0)
+        {
+            var current = _activePointIndex < 0 ? 0 : _activePointIndex;
+            SetActivePoint((current + delta + points.Count) % points.Count, true);
+            e.Handled = true;
+        }
+        else if (e.Key is Key.Home or Key.End)
+        {
+            SetActivePoint(e.Key == Key.Home ? 0 : points.Count - 1, true);
+            e.Handled = true;
+        }
+        else if ((e.Key is Key.Enter or Key.Space) && _activePointIndex >= 0)
+        {
+            PointInvoked?.Invoke(this, points[_activePointIndex].Point);
+            e.Handled = true;
+        }
+        else base.OnKeyDown(e);
+    }
+
+    private void OnSeriesChanged()
+    {
+        _activePointIndex = -1;
+        SetActivePoint(-1, false);
+        _automationPeer?.InvalidatePoints();
+    }
+
+    internal IReadOnlyList<MdChartPointEntry> GetPointEntries()
+    {
+        var result = new List<MdChartPointEntry>();
+        var index = 0;
+        foreach (var series in Series ?? Array.Empty<MdChartSeries>())
+        foreach (var point in series.Points)
+            result.Add(new MdChartPointEntry(index++, series.Name, point));
+        return result;
+    }
+
+    internal void SetActivePoint(int index, bool raiseEvent)
+    {
+        var entries = GetPointEntries();
+        _activePointIndex = entries.Count == 0 ? -1 : Math.Clamp(index, -1, entries.Count - 1);
+        var entry = _activePointIndex >= 0 ? entries[_activePointIndex] : null;
+        var point = entry?.Point;
+        var changed = !Equals(point, HoveredPoint);
+        HoveredPoint = point;
+        PointToolTipText = entry is null ? null : DescribePoint(entry);
+        AutomationProperties.SetHelpText(this, PointToolTipText ?? BuildAccessibleTable());
+        InvalidateVisual();
+        if (changed && raiseEvent) HoveredPointChanged?.Invoke(this, point);
+    }
+
+    internal void InvokePoint(int index)
+    {
+        var entries = GetPointEntries();
+        if (index < 0 || index >= entries.Count) return;
+        SetActivePoint(index, true);
+        PointInvoked?.Invoke(this, entries[index].Point);
+    }
+
+    internal Rect GetPointBounds(int index)
+    {
+        var entries = GetPointEntries();
+        if (index < 0 || index >= entries.Count || Bounds.Width <= 120 || Bounds.Height <= 100) return default;
+        var points = entries.Select(entry => entry.Point).ToArray();
+        var minX = points.Min(point => point.X);
+        var maxX = Math.Max(minX + 1, points.Max(point => point.X));
+        var minY = Math.Min(0, points.Min(point => point.Y));
+        var maxY = Math.Max(minY + 1, Math.Max(0, points.Max(point => point.Y)));
+        var plot = new Rect(58, 20, Math.Max(1, Bounds.Width - 76), Math.Max(1, Bounds.Height - 66));
+        var point = entries[index].Point;
+        var center = new Point(
+            plot.Left + (point.X - minX) / (maxX - minX) * plot.Width,
+            plot.Bottom - (point.Y - minY) / (maxY - minY) * plot.Height);
+        return new Rect(center.X - 24, center.Y - 24, 48, 48);
+    }
+
+    internal string DescribePoint(MdChartPointEntry entry)
+    {
+        var label = entry.Point.Label?.ToString() ?? entry.Point.X.ToString("0.##", CultureInfo.CurrentCulture);
+        var value = entry.Point.Value?.ToString() ?? entry.Point.Y.ToString("0.##", CultureInfo.CurrentCulture);
+        return $"{entry.SeriesName}, {label}: {value}, point {entry.Index + 1} of {GetPointEntries().Count}";
+    }
+
+    protected override AutomationPeer OnCreateAutomationPeer() => _automationPeer = new MdChartAutomationPeer(this);
+
     private static readonly IBrush[] Palette = [Brushes.MediumPurple, Brushes.Teal, Brushes.OrangeRed, Brushes.RoyalBlue];
+}
+
+internal sealed record MdChartPointEntry(int Index, string SeriesName, MdChartPoint Point);
+
+internal sealed class MdChartAutomationPeer(MdChart owner) : ControlAutomationPeer(owner)
+{
+    private IReadOnlyList<AutomationPeer>? _points;
+    private MdChart ChartOwner => (MdChart)Owner;
+
+    internal void InvalidatePoints()
+    {
+        _points = null;
+        InvalidateChildren();
+    }
+
+    protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.DataGrid;
+    protected override IReadOnlyList<AutomationPeer>? GetChildrenCore() =>
+        _points ??= ChartOwner.GetPointEntries()
+            .Select(entry => (AutomationPeer)new MdChartPointAutomationPeer(ChartOwner, entry))
+            .ToArray();
+}
+
+internal sealed class MdChartPointAutomationPeer(MdChart owner, MdChartPointEntry entry)
+    : ControlAutomationPeer(owner), IInvokeProvider
+{
+    private MdChart ChartOwner => (MdChart)Owner;
+
+    public void Invoke()
+    {
+        EnsureEnabled();
+        ChartOwner.InvokePoint(entry.Index);
+    }
+
+    protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.DataItem;
+    protected override string? GetNameCore() => ChartOwner.DescribePoint(entry);
+    protected override string? GetAutomationIdCore() => $"ChartPoint_{entry.Index}";
+    protected override bool HasKeyboardFocusCore() => Equals(ChartOwner.HoveredPoint, entry.Point) && ChartOwner.IsKeyboardFocusWithin;
+    protected override void SetFocusCore()
+    {
+        ChartOwner.Focus();
+        ChartOwner.SetActivePoint(entry.Index, true);
+    }
+    protected override Rect GetBoundingRectangleCore()
+    {
+        if (TopLevel.GetTopLevel(ChartOwner) is not Visual root) return default;
+        var transform = ChartOwner.TransformToVisual(root);
+        return transform.HasValue ? ChartOwner.GetPointBounds(entry.Index).TransformToAABB(transform.Value) : default;
+    }
 }
 
 public enum MdRichEditorCommand { Bold, Italic, Underline, StrikeThrough, Heading, Quote, Code, Link, BulletedList, NumberedList, Undo, Redo, HorizontalRule, ClearFormatting }
@@ -360,12 +561,30 @@ public interface IMdRichEditorAdapter
     event EventHandler? StateChanged;
 }
 
+/// <summary>Optional formatting-state contract used by toggle-style rich-editor commands.</summary>
+public interface IMdRichEditorStateAdapter
+{
+    bool IsCommandChecked(MdRichEditorCommand command);
+}
+
+public sealed record MdRichEditorCommandDescriptor(
+    MdRichEditorCommand Command,
+    string Name,
+    string Glyph,
+    string? Shortcut,
+    bool IsToggle,
+    bool IsChecked,
+    bool IsEnabled)
+{
+    public string AccessibleDescription => string.IsNullOrEmpty(Shortcut) ? Name : $"{Name}, {Shortcut}";
+}
+
 /// <summary>
 /// Built-in lightweight rich-text adapter for an Avalonia <see cref="TextBox"/>. Commands modify
 /// the selected source using portable rich-text markers and immediately rebuild an optional
 /// WYSIWYG preview panel. Applications can still replace it with a document-engine adapter.
 /// </summary>
-public sealed class MdTextBoxRichEditorAdapter : IMdRichEditorAdapter
+public sealed class MdTextBoxRichEditorAdapter : IMdRichEditorAdapter, IMdRichEditorStateAdapter
 {
     private readonly TextBox _editor;
     private readonly Panel? _previewHost;
@@ -390,6 +609,20 @@ public sealed class MdTextBoxRichEditorAdapter : IMdRichEditorAdapter
         MdRichEditorCommand.Undo => _editor.CanUndo,
         MdRichEditorCommand.Redo => _editor.CanRedo,
         _ => !_editor.IsReadOnly
+    };
+
+    public bool IsCommandChecked(MdRichEditorCommand command) => command switch
+    {
+        MdRichEditorCommand.Bold => HasSelectionWrapper("**", "**"),
+        MdRichEditorCommand.Italic => HasSelectionWrapper("_", "_"),
+        MdRichEditorCommand.Underline => HasSelectionWrapper("<u>", "</u>"),
+        MdRichEditorCommand.StrikeThrough => HasSelectionWrapper("~~", "~~"),
+        MdRichEditorCommand.Code => HasSelectionWrapper("`", "`"),
+        MdRichEditorCommand.Heading => CurrentLineStartsWith("# ", "## ", "### "),
+        MdRichEditorCommand.Quote => CurrentLineStartsWith("> "),
+        MdRichEditorCommand.BulletedList => CurrentLineStartsWith("- ", "* "),
+        MdRichEditorCommand.NumberedList => CurrentLineStartsWith("1. "),
+        _ => false
     };
 
     public void Execute(MdRichEditorCommand command, object? parameter = null)
@@ -608,6 +841,24 @@ public sealed class MdTextBoxRichEditorAdapter : IMdRichEditorAdapter
         StateChanged?.Invoke(this, EventArgs.Empty);
     }
 
+    private bool HasSelectionWrapper(string prefix, string suffix)
+    {
+        var text = _editor.Text ?? string.Empty;
+        var start = Math.Clamp(Math.Min(_editor.SelectionStart, _editor.SelectionEnd), 0, text.Length);
+        var end = Math.Clamp(Math.Max(_editor.SelectionStart, _editor.SelectionEnd), start, text.Length);
+        return start >= prefix.Length && end + suffix.Length <= text.Length &&
+               text.AsSpan(start - prefix.Length, prefix.Length).SequenceEqual(prefix) &&
+               text.AsSpan(end, suffix.Length).SequenceEqual(suffix);
+    }
+
+    private bool CurrentLineStartsWith(params string[] prefixes)
+    {
+        var text = _editor.Text ?? string.Empty;
+        var caret = Math.Clamp(_editor.CaretIndex, 0, text.Length);
+        var lineStart = caret == 0 ? 0 : text.LastIndexOf('\n', caret - 1) + 1;
+        return prefixes.Any(prefix => text.AsSpan(lineStart).StartsWith(prefix, StringComparison.Ordinal));
+    }
+
     private void WrapSelection(string prefix, string suffix, string fallback)
     {
         var text = _editor.Text ?? string.Empty;
@@ -685,13 +936,26 @@ public class MdRichEditor : ContentControl
 {
     public static readonly StyledProperty<IMdRichEditorAdapter?> AdapterProperty = AvaloniaProperty.Register<MdRichEditor, IMdRichEditorAdapter?>(nameof(Adapter));
     public static readonly StyledProperty<IEnumerable<MdRichEditorCommand>?> ToolbarCommandsProperty = AvaloniaProperty.Register<MdRichEditor, IEnumerable<MdRichEditorCommand>?>(nameof(ToolbarCommands));
-    static MdRichEditor() => AdapterProperty.Changed.AddClassHandler<MdRichEditor>((control, _) => control.OnAdapterChanged(control.Adapter));
-    public MdRichEditor() => ToolbarCommands = Enum.GetValues<MdRichEditorCommand>();
+    public static readonly DirectProperty<MdRichEditor, IReadOnlyList<MdRichEditorCommandDescriptor>> ToolbarItemsProperty =
+        AvaloniaProperty.RegisterDirect<MdRichEditor, IReadOnlyList<MdRichEditorCommandDescriptor>>(nameof(ToolbarItems), control => control.ToolbarItems);
+    static MdRichEditor()
+    {
+        AdapterProperty.Changed.AddClassHandler<MdRichEditor>((control, _) => control.OnAdapterChanged(control.Adapter));
+        ToolbarCommandsProperty.Changed.AddClassHandler<MdRichEditor>((control, _) => control.RefreshToolbarItems());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdRichEditor>((control, _) => control.RefreshToolbarItems());
+    }
+    public MdRichEditor()
+    {
+        ToolbarCommands = Enum.GetValues<MdRichEditorCommand>();
+        RefreshToolbarItems();
+    }
     public IMdRichEditorAdapter? Adapter { get => GetValue(AdapterProperty); set => SetValue(AdapterProperty, value); }
     public IEnumerable<MdRichEditorCommand>? ToolbarCommands { get => GetValue(ToolbarCommandsProperty); set => SetValue(ToolbarCommandsProperty, value); }
+    public IReadOnlyList<MdRichEditorCommandDescriptor> ToolbarItems => _toolbarItems;
     public event EventHandler? EditorStateChanged;
     private ItemsControl? _toolbar;
     private IMdRichEditorAdapter? _subscribedAdapter;
+    private IReadOnlyList<MdRichEditorCommandDescriptor> _toolbarItems = Array.Empty<MdRichEditorCommandDescriptor>();
     public bool Execute(MdRichEditorCommand command, object? parameter = null)
     {
         if (Adapter?.CanExecute(command, parameter) != true) return false; Adapter.Execute(command, parameter); return true;
@@ -708,14 +972,22 @@ public class MdRichEditor : ContentControl
         if (e.Source is Visual source)
         {
             var btn = source.GetVisualAncestors().Prepend(source).OfType<Button>().FirstOrDefault();
-            if (btn?.DataContext is MdRichEditorCommand command)
+            if (btn?.DataContext is MdRichEditorCommandDescriptor descriptor)
+            {
+                Execute(descriptor.Command);
+                RefreshToolbarItems();
+                e.Handled = true;
+            }
+            else if (btn?.DataContext is MdRichEditorCommand command)
             {
                 Execute(command);
+                RefreshToolbarItems();
                 e.Handled = true;
             }
             else if (btn?.CommandParameter is MdRichEditorCommand cmdParam)
             {
                 Execute(cmdParam);
+                RefreshToolbarItems();
                 e.Handled = true;
             }
         }
@@ -725,8 +997,45 @@ public class MdRichEditor : ContentControl
         if (_subscribedAdapter is not null) _subscribedAdapter.StateChanged -= OnAdapterStateChanged;
         _subscribedAdapter = newAdapter;
         if (_subscribedAdapter is not null) _subscribedAdapter.StateChanged += OnAdapterStateChanged;
+        RefreshToolbarItems();
     }
-    private void OnAdapterStateChanged(object? sender, EventArgs e) => EditorStateChanged?.Invoke(this, EventArgs.Empty);
+
+    private void OnAdapterStateChanged(object? sender, EventArgs e)
+    {
+        RefreshToolbarItems();
+        EditorStateChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void RefreshToolbarItems()
+    {
+        var stateAdapter = Adapter as IMdRichEditorStateAdapter;
+        var items = (ToolbarCommands ?? Array.Empty<MdRichEditorCommand>()).Select(command =>
+            new MdRichEditorCommandDescriptor(
+                command,
+                MdLocalization.GetString($"Rich{command}", this),
+                MdRichEditorCommandConverters.GetGlyph(command),
+                GetShortcut(command),
+                IsToggleCommand(command),
+                stateAdapter?.IsCommandChecked(command) == true,
+                Adapter?.CanExecute(command) == true)).ToArray();
+        SetAndRaise(ToolbarItemsProperty, ref _toolbarItems, items);
+    }
+
+    private static bool IsToggleCommand(MdRichEditorCommand command) => command is
+        MdRichEditorCommand.Bold or MdRichEditorCommand.Italic or MdRichEditorCommand.Underline or
+        MdRichEditorCommand.StrikeThrough or MdRichEditorCommand.Heading or MdRichEditorCommand.Quote or
+        MdRichEditorCommand.Code or MdRichEditorCommand.BulletedList or MdRichEditorCommand.NumberedList;
+
+    private static string? GetShortcut(MdRichEditorCommand command) => command switch
+    {
+        MdRichEditorCommand.Bold => "Ctrl+B",
+        MdRichEditorCommand.Italic => "Ctrl+I",
+        MdRichEditorCommand.Underline => "Ctrl+U",
+        MdRichEditorCommand.Link => "Ctrl+K",
+        MdRichEditorCommand.Undo => "Ctrl+Z",
+        MdRichEditorCommand.Redo => "Ctrl+Y",
+        _ => null
+    };
 }
 
 /// <summary>Long-form compatibility name for MdRichEditor.</summary>
@@ -751,7 +1060,7 @@ public sealed record MdChatMessage(
     string? Initials = null);
 
 /// <summary>Role-aware message bubble used by <see cref="MdChatView"/>.</summary>
-[PseudoClasses(":user", ":assistant", ":system", ":selected", ":failed", ":reply")]
+[PseudoClasses(":user", ":assistant", ":system", ":selected", ":failed", ":reply", ":text-content")]
 public sealed class MdChatMessagePresenter : ContentControl
 {
     public static readonly StyledProperty<MdChatMessage?> MessageProperty =
@@ -765,11 +1074,14 @@ public sealed class MdChatMessagePresenter : ContentControl
         AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(AvatarGlyph), control => control.AvatarGlyph);
     public static readonly DirectProperty<MdChatMessagePresenter, string> SenderInitialsProperty =
         AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(SenderInitials), control => control.SenderInitials);
+    public static readonly DirectProperty<MdChatMessagePresenter, string?> TextContentProperty =
+        AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string?>(nameof(TextContent), control => control.TextContent);
 
     static MdChatMessagePresenter()
     {
         MessageProperty.Changed.AddClassHandler<MdChatMessagePresenter>((presenter, _) => presenter.UpdateRole());
         IsSelectedProperty.Changed.AddClassHandler<MdChatMessagePresenter>((presenter, _) => presenter.UpdateRole());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdChatMessagePresenter>((presenter, _) => presenter.UpdateRole());
     }
 
     public MdChatMessagePresenter() => UpdateRole();
@@ -777,6 +1089,7 @@ public sealed class MdChatMessagePresenter : ContentControl
     public bool IsSelected { get => GetValue(IsSelectedProperty); set => SetValue(IsSelectedProperty, value); }
 
     public string FormattedTime => Message?.Timestamp.LocalDateTime.ToString("t", CultureInfo.CurrentCulture) ?? string.Empty;
+    public string? TextContent => Message?.Content as string;
     public string AvatarGlyph => Message?.AvatarGlyph ?? (Message?.Role == MdChatMessageRole.Assistant ? "\uf06c" : "\ue7fd");
     public string SenderInitials
     {
@@ -799,9 +1112,24 @@ public sealed class MdChatMessagePresenter : ContentControl
         PseudoClasses.Set(":selected", IsSelected);
         PseudoClasses.Set(":failed", Message?.State == MdAsyncRequestState.Error);
         PseudoClasses.Set(":reply", Message?.ReplyPreview is not null);
+        PseudoClasses.Set(":text-content", Message?.Content is string);
         RaisePropertyChanged(FormattedTimeProperty, string.Empty, FormattedTime);
         RaisePropertyChanged(AvatarGlyphProperty, string.Empty, AvatarGlyph);
         RaisePropertyChanged(SenderInitialsProperty, string.Empty, SenderInitials);
+        RaisePropertyChanged(TextContentProperty, null, TextContent);
+
+        var sender = Message?.Sender;
+        if (string.IsNullOrWhiteSpace(sender)) sender = Message?.Role switch
+        {
+            MdChatMessageRole.Assistant => MdLocalization.GetString("Assistant", this),
+            MdChatMessageRole.System => MdLocalization.GetString("System", this),
+            _ => MdLocalization.GetString("You", this)
+        };
+        var state = Message?.State == MdAsyncRequestState.Error
+            ? $"Send failed. {Message.ErrorText}".Trim()
+            : Message?.State.ToString();
+        AutomationProperties.SetName(this, $"{sender}, {FormattedTime}. {Message?.Content}. {state}".Trim());
+        AutomationProperties.SetHelpText(this, MdLocalization.GetString(IsSelected ? "SelectedMessage" : "Message", this));
     }
 }
 
@@ -824,6 +1152,12 @@ public sealed class MdChatView : TemplatedControl
     public static readonly StyledProperty<bool> AllowMultipleSelectionProperty = AvaloniaProperty.Register<MdChatView, bool>(nameof(AllowMultipleSelection), true);
     public static readonly DirectProperty<MdChatView, int> SelectionCountProperty = AvaloniaProperty.RegisterDirect<MdChatView, int>(nameof(SelectionCount), control => control.SelectionCount);
     public static readonly DirectProperty<MdChatView, MdChatMessage?> QuotedMessageProperty = AvaloniaProperty.RegisterDirect<MdChatView, MdChatMessage?>(nameof(QuotedMessage), control => control.QuotedMessage);
+    public static readonly DirectProperty<MdChatView, string> StatusTextProperty = AvaloniaProperty.RegisterDirect<MdChatView, string>(nameof(StatusText), control => control.StatusText);
+    public static readonly DirectProperty<MdChatView, string> CancelTextProperty = AvaloniaProperty.RegisterDirect<MdChatView, string>(nameof(CancelText), control => control.CancelText);
+    public static readonly DirectProperty<MdChatView, string> RetryTextProperty = AvaloniaProperty.RegisterDirect<MdChatView, string>(nameof(RetryText), control => control.RetryText);
+    public static readonly DirectProperty<MdChatView, string> AttachFileTextProperty = AvaloniaProperty.RegisterDirect<MdChatView, string>(nameof(AttachFileText), control => control.AttachFileText);
+    public static readonly DirectProperty<MdChatView, string> SendMessageTextProperty = AvaloniaProperty.RegisterDirect<MdChatView, string>(nameof(SendMessageText), control => control.SendMessageText);
+    public static readonly DirectProperty<MdChatView, string> MessagesTextProperty = AvaloniaProperty.RegisterDirect<MdChatView, string>(nameof(MessagesText), control => control.MessagesText);
 
     private Button? _sendButton;
     private Button? _attachmentButton;
@@ -836,9 +1170,23 @@ public sealed class MdChatView : TemplatedControl
     private TextBox? _composer;
     private int _selectionCount;
     private MdChatMessage? _quotedMessage;
+    private string _statusText = string.Empty;
+    private string _cancelText = string.Empty;
+    private string _retryText = string.Empty;
+    private string _attachFileText = string.Empty;
+    private string _sendMessageText = string.Empty;
+    private string _messagesText = string.Empty;
     private bool _synchronizingSelection;
+    private INotifyCollectionChanged? _observedMessages;
 
-    static MdChatView() => MessagesSourceProperty.Changed.AddClassHandler<MdChatView>((control, _) => control.ReconcileSelection());
+    static MdChatView()
+    {
+        MessagesSourceProperty.Changed.AddClassHandler<MdChatView>((control, _) => control.OnMessagesSourceChanged());
+        IsBusyProperty.Changed.AddClassHandler<MdChatView>((control, _) => control.StatusText = MdLocalization.GetString(control.IsBusy ? "LoadingMessages" : "MessagesReady", control));
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdChatView>((control, _) => control.UpdateLocalizedText());
+    }
+
+    public MdChatView() => UpdateLocalizedText();
 
     public IEnumerable? MessagesSource { get => GetValue(MessagesSourceProperty); set => SetValue(MessagesSourceProperty, value); }
     public string? ComposerText { get => GetValue(ComposerTextProperty); set => SetValue(ComposerTextProperty, value); }
@@ -852,6 +1200,12 @@ public sealed class MdChatView : TemplatedControl
     public bool AllowMultipleSelection { get => GetValue(AllowMultipleSelectionProperty); set => SetValue(AllowMultipleSelectionProperty, value); }
     public int SelectionCount => _selectionCount;
     public MdChatMessage? QuotedMessage => _quotedMessage;
+    public string StatusText { get => _statusText; private set => SetAndRaise(StatusTextProperty, ref _statusText, value); }
+    public string CancelText => _cancelText;
+    public string RetryText => _retryText;
+    public string AttachFileText => _attachFileText;
+    public string SendMessageText => _sendMessageText;
+    public string MessagesText => _messagesText;
     public ObservableCollection<MdChatMessage> SelectedMessages { get; } = [];
     public Func<CancellationToken, ValueTask<IReadOnlyList<MdChatMessage>>>? HistoryProvider { get; set; }
 
@@ -869,6 +1223,7 @@ public sealed class MdChatView : TemplatedControl
         if (string.IsNullOrEmpty(text) || IsBusy) return false;
         if (SendCommand?.CanExecute(text) == true) SendCommand.Execute(text);
         MessageSubmitted?.Invoke(this, text);
+        StatusText = MdLocalization.GetString("MessageSubmitted", this);
         ComposerText = string.Empty;
         CancelQuote();
         return true;
@@ -897,6 +1252,7 @@ public sealed class MdChatView : TemplatedControl
         if (DeleteMessagesCommand?.CanExecute(selected) == true) DeleteMessagesCommand.Execute(selected);
         DeleteRequested?.Invoke(this, selected);
         ClearSelection();
+        StatusText = MdLocalization.Format("DeletedMessages", this, selected.Length);
         return true;
     }
 
@@ -924,6 +1280,7 @@ public sealed class MdChatView : TemplatedControl
         if (message.State != MdAsyncRequestState.Error) return false;
         if (RetryMessageCommand?.CanExecute(message) == true) RetryMessageCommand.Execute(message);
         RetryRequested?.Invoke(this, message);
+        StatusText = MdLocalization.Format("RetryingMessageFrom", this, message.Sender ?? LocalizeRole(message.Role));
         return true;
     }
 
@@ -933,6 +1290,19 @@ public sealed class MdChatView : TemplatedControl
         IsBusy = true;
         try { HistoryLoaded?.Invoke(this, await HistoryProvider(cancellationToken)); }
         finally { IsBusy = false; }
+    }
+
+    protected override void OnAttachedToVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        ObserveMessagesSource();
+    }
+
+    protected override void OnDetachedFromVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        if (_observedMessages is not null) _observedMessages.CollectionChanged -= OnMessagesCollectionChanged;
+        _observedMessages = null;
+        base.OnDetachedFromVisualTree(e);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -1028,6 +1398,48 @@ public sealed class MdChatView : TemplatedControl
         finally { _synchronizingSelection = false; }
     }
 
+    private void UpdateLocalizedText()
+    {
+        SetAndRaise(CancelTextProperty, ref _cancelText, MdLocalization.GetString("Cancel", this));
+        SetAndRaise(RetryTextProperty, ref _retryText, MdLocalization.GetString("Retry", this));
+        SetAndRaise(AttachFileTextProperty, ref _attachFileText, MdLocalization.GetString("AttachFile", this));
+        SetAndRaise(SendMessageTextProperty, ref _sendMessageText, MdLocalization.GetString("SendMessage", this));
+        SetAndRaise(MessagesTextProperty, ref _messagesText, MdLocalization.GetString("Message", this));
+    }
+
+    private string LocalizeRole(MdChatMessageRole role) => role switch
+    {
+        MdChatMessageRole.Assistant => MdLocalization.GetString("Assistant", this),
+        MdChatMessageRole.System => MdLocalization.GetString("System", this),
+        _ => MdLocalization.GetString("You", this)
+    };
+
+    private void OnMessagesSourceChanged()
+    {
+        ObserveMessagesSource();
+        ReconcileSelection();
+    }
+
+    private void ObserveMessagesSource()
+    {
+        var next = this.IsAttachedToVisualTree() ? MessagesSource as INotifyCollectionChanged : null;
+        if (ReferenceEquals(next, _observedMessages)) return;
+        if (_observedMessages is not null) _observedMessages.CollectionChanged -= OnMessagesCollectionChanged;
+        _observedMessages = next;
+        if (_observedMessages is not null) _observedMessages.CollectionChanged += OnMessagesCollectionChanged;
+    }
+
+    private void OnMessagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        ReconcileSelection();
+        var message = e.NewItems?.OfType<MdChatMessage>().LastOrDefault();
+        if (message is null) return;
+        var senderName = message.Sender ?? LocalizeRole(message.Role);
+        StatusText = message.State == MdAsyncRequestState.Error
+            ? MdLocalization.Format("MessageFromFailed", this, senderName, message.ErrorText)
+            : MdLocalization.Format("NewMessageFrom", this, senderName, message.Content);
+    }
+
     private void ReconcileSelection()
     {
         var available = (MessagesSource ?? Array.Empty<object>()).OfType<MdChatMessage>().ToHashSet();
@@ -1040,6 +1452,9 @@ public sealed class MdChatView : TemplatedControl
     {
         SetAndRaise(SelectionCountProperty, ref _selectionCount, SelectedMessages.Count);
         PseudoClasses.Set(":selection", SelectionCount > 0);
+        StatusText = SelectionCount == 0
+            ? MdLocalization.GetString("SelectionCleared", this)
+            : MdLocalization.Format("MessagesSelected", this, SelectionCount);
         MessageSelectionChanged?.Invoke(this, SelectedMessages.ToArray());
     }
 
@@ -1062,7 +1477,27 @@ public sealed class MdChatView : TemplatedControl
         if (path.OfType<Button>().Any()) return;
         // Selection belongs to the visual bubble. Transparent space in a full-width virtualized
         // row must remain available for scrolling and must never toggle message selection.
-        if (!path.OfType<Border>().Any(border => border.Name == "PART_Bubble")) e.Handled = true;
+        if (!path.OfType<Border>().Any(border => border.Name == "PART_Bubble"))
+        {
+            e.Handled = true;
+            return;
+        }
+
+        // Select explicitly instead of depending on ListBoxItem's presenter surface. Rich and
+        // selectable text inside the bubble may otherwise consume the press before ListBox sees it.
+        var row = path.OfType<ListBoxItem>().FirstOrDefault();
+        if (row?.DataContext is not MdChatMessage) return;
+        var toggle = AllowMultipleSelection && e.KeyModifiers.HasFlag(KeyModifiers.Control);
+        if (toggle)
+        {
+            row.IsSelected = !row.IsSelected;
+        }
+        else
+        {
+            _messagesHost?.UnselectAll();
+            row.IsSelected = true;
+        }
+        e.Handled = true;
     }
 
     private void OnMessageActionClick(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)

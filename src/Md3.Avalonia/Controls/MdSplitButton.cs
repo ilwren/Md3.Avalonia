@@ -6,7 +6,7 @@ using Avalonia.Controls.Metadata;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A two-part Material 3 button with primary action and dropdown action.</summary>
-[PseudoClasses(":filled", ":tonal", ":outlined", ":elevated", ":xsmall", ":small", ":medium", ":large", ":xlarge", ":has-leading-icon")]
+[PseudoClasses(":filled", ":tonal", ":outlined", ":elevated", ":xsmall", ":small", ":medium", ":large", ":xlarge", ":has-leading-icon", ":rtl")]
 public class MdSplitButton : ContentControl
 {
     public static readonly StyledProperty<MdToggleButtonVariant> VariantProperty = AvaloniaProperty.Register<MdSplitButton, MdToggleButtonVariant>(nameof(Variant), MdToggleButtonVariant.Filled);
@@ -18,12 +18,15 @@ public class MdSplitButton : ContentControl
     public static readonly StyledProperty<object?> TrailingCommandParameterProperty = AvaloniaProperty.Register<MdSplitButton, object?>(nameof(TrailingCommandParameter));
     public static readonly StyledProperty<object?> DropDownContentProperty = AvaloniaProperty.Register<MdSplitButton, object?>(nameof(DropDownContent));
     public static readonly StyledProperty<bool> IsDropDownOpenProperty = AvaloniaProperty.Register<MdSplitButton, bool>(nameof(IsDropDownOpen), defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
+    public static readonly StyledProperty<string?> PrimaryAutomationNameProperty = AvaloniaProperty.Register<MdSplitButton, string?>(nameof(PrimaryAutomationName));
+    public static readonly StyledProperty<string?> TrailingAutomationNameProperty = AvaloniaProperty.Register<MdSplitButton, string?>(nameof(TrailingAutomationName), "Show more actions");
 
     static MdSplitButton()
     {
         VariantProperty.Changed.AddClassHandler<MdSplitButton>((x, _) => x.UpdatePseudoClasses());
         SizeProperty.Changed.AddClassHandler<MdSplitButton>((x, _) => x.UpdatePseudoClasses());
         LeadingIconProperty.Changed.AddClassHandler<MdSplitButton>((x, _) => x.UpdatePseudoClasses());
+        FlowDirectionProperty.Changed.AddClassHandler<MdSplitButton>((x, _) => x.UpdatePseudoClasses());
     }
     public MdSplitButton() => UpdatePseudoClasses();
 
@@ -36,6 +39,8 @@ public class MdSplitButton : ContentControl
     public object? TrailingCommandParameter { get => GetValue(TrailingCommandParameterProperty); set => SetValue(TrailingCommandParameterProperty, value); }
     public object? DropDownContent { get => GetValue(DropDownContentProperty); set => SetValue(DropDownContentProperty, value); }
     public bool IsDropDownOpen { get => GetValue(IsDropDownOpenProperty); set => SetValue(IsDropDownOpenProperty, value); }
+    public string? PrimaryAutomationName { get => GetValue(PrimaryAutomationNameProperty); set => SetValue(PrimaryAutomationNameProperty, value); }
+    public string? TrailingAutomationName { get => GetValue(TrailingAutomationNameProperty); set => SetValue(TrailingAutomationNameProperty, value); }
 
     private void UpdatePseudoClasses()
     {
@@ -49,5 +54,6 @@ public class MdSplitButton : ContentControl
         PseudoClasses.Set(":large", Size == MdButtonSize.Large);
         PseudoClasses.Set(":xlarge", Size == MdButtonSize.ExtraLarge);
         PseudoClasses.Set(":has-leading-icon", LeadingIcon is not null);
+        PseudoClasses.Set(":rtl", FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft);
     }
 }

@@ -16,6 +16,23 @@ namespace Md3.Avalonia.HeadlessTests;
 public sealed class MdBorderlessWindowTemplateTests
 {
     [AvaloniaFact]
+    public void Windows_Adapter_Preserves_Full_Caption_Styles_For_Native_Dwm_State_Animations()
+    {
+        var window = new MdBorderlessWindow { PlatformAdapter = new TemplateAdapter() };
+        var adapter = new MdWindowsWindowPlatformAdapter();
+
+        adapter.Apply(window, new MdBorderlessWindowOptions(true, true, 44, true));
+
+        Assert.Equal(WindowDecorations.Full, window.WindowDecorations);
+        Assert.True(window.ExtendClientAreaToDecorationsHint);
+        Assert.Equal(44, window.ExtendClientAreaTitleBarHeightHint);
+        Assert.True(window.CanResize);
+
+        adapter.Apply(window, new MdBorderlessWindowOptions(true, true, 44, false));
+        Assert.Equal(WindowDecorations.None, window.WindowDecorations);
+    }
+
+    [AvaloniaFact]
     public void Borderless_Window_Default_Template_Owns_Chrome_Content_And_Eight_Resize_Roles()
     {
         var content = new TextBlock { Text = "Application content" };
@@ -40,7 +57,14 @@ public sealed class MdBorderlessWindowTemplateTests
                 .Single(control => control.Name == "PART_ContentPresenter");
             var grips = window.GetVisualDescendants().OfType<MdWindowResizeGrip>().ToArray();
 
-            Assert.Equal(9, frame.CornerRadius.TopLeft);
+            // Avalonia 12 draws extended-client decorations outside the Window template. The
+            // dedicated empty theme prevents Fluent/Simple caption visuals from becoming a
+            // second title bar while WindowDecorations.Full keeps native DWM style bits.
+            Assert.NotNull(window.WindowDecorationsTheme);
+            Assert.Equal(new Thickness(0), frame.Margin);
+            Assert.Equal(0, frame.CornerRadius.TopLeft);
+            Assert.Equal(new Thickness(0), frame.BorderThickness);
+            Assert.False(frame.ClipToBounds);
             Assert.Equal("Material application", titleBar.Content);
             Assert.Equal(44, titleBar.Height);
             Assert.Equal(44, presenter.Margin.Top);
@@ -58,6 +82,21 @@ public sealed class MdBorderlessWindowTemplateTests
             Dispatcher.UIThread.RunJobs();
             Assert.Equal(52, titleBar.Height);
             Assert.Equal(52, presenter.Margin.Top);
+
+            window.IsCustomChromeEnabled = false;
+            Dispatcher.UIThread.RunJobs();
+            Assert.Null(window.WindowDecorationsTheme);
+            Assert.False(titleBar.IsVisible);
+
+            window.PreserveNativeBorder = false;
+            window.IsCustomChromeEnabled = true;
+            Dispatcher.UIThread.RunJobs();
+            Assert.NotNull(window.WindowDecorationsTheme);
+            Assert.True(titleBar.IsVisible);
+            Assert.Equal(new Thickness(1), frame.Margin);
+            Assert.Equal(new CornerRadius(9), frame.CornerRadius);
+            Assert.Equal(new Thickness(1), frame.BorderThickness);
+            Assert.True(frame.ClipToBounds);
         }
         finally
         {

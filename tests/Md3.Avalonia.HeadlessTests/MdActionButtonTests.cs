@@ -10,6 +10,7 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Motion;
 using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
@@ -145,6 +146,94 @@ public sealed class MdActionButtonTests
         Assert.True(menu.IsOpen);
         Assert.True(menu.GetVisualDescendants().OfType<ItemsPresenter>()
             .Single(control => control.Name == "PART_MenuItems").IsVisible);
+    }
+
+    [AvaloniaFact]
+    public void Fab_Menu_Can_Open_Initially_Without_Overriding_Explicit_Live_State()
+    {
+        var initiallyOpen = new MdFabMenu
+        {
+            IsInitiallyOpen = true,
+            Items =
+            {
+                new MdFabMenuItem { Content = "Photo" },
+                new MdFabMenuItem { Content = "Document" }
+            }
+        };
+        MdMotion.SetScheme(initiallyOpen, MdMotionScheme.None);
+        using (Show(initiallyOpen))
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(initiallyOpen.IsOpen);
+            Assert.True(initiallyOpen.AreItemsVisible);
+
+            initiallyOpen.Dismiss();
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(initiallyOpen.IsOpen);
+            Assert.False(initiallyOpen.AreItemsVisible);
+        }
+
+        var explicitlyClosed = new MdFabMenu
+        {
+            IsInitiallyOpen = true,
+            IsOpen = false,
+            Items =
+            {
+                new MdFabMenuItem { Content = "Photo" },
+                new MdFabMenuItem { Content = "Document" }
+            }
+        };
+        using (Show(explicitlyClosed))
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(explicitlyClosed.IsOpen);
+            Assert.False(explicitlyClosed.AreItemsVisible);
+        }
+    }
+
+    [AvaloniaFact]
+    public void Fab_Menu_Expansion_Direction_Controls_Actual_Geometry_Independent_Of_Parent_Alignment()
+    {
+        var menu = new MdFabMenu
+        {
+            VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
+            Items =
+            {
+                new MdFabMenuItem { Content = "Photo", Icon = MdSymbols.Photo },
+                new MdFabMenuItem { Content = "Document", Icon = MdSymbols.Description }
+            }
+        };
+        MdMotion.SetScheme(menu, MdMotionScheme.None);
+        using var host = Show(menu);
+        menu.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var presenter = menu.GetVisualDescendants().OfType<ItemsPresenter>()
+            .Single(control => control.Name == "PART_MenuItems");
+        var trigger = menu.GetVisualDescendants().OfType<MdToggleIconButton>()
+            .Single(control => control.Name == "PART_Trigger");
+        var upItemsBottom = presenter.TranslatePoint(
+            new Point(0, presenter.Bounds.Height), menu)!.Value.Y;
+        var upTriggerTop = trigger.TranslatePoint(default, menu)!.Value.Y;
+
+        Assert.Equal(MdFabMenuExpansionDirection.Up, menu.ExpansionDirection);
+        Assert.Contains(":expand-up", menu.Classes);
+        Assert.True(upItemsBottom <= upTriggerTop,
+            $"Up menu bottom {upItemsBottom} must be above trigger top {upTriggerTop}.");
+        Assert.Equal(global::Avalonia.Layout.VerticalAlignment.Center, menu.VerticalAlignment);
+
+        menu.ExpansionDirection = MdFabMenuExpansionDirection.Down;
+        Dispatcher.UIThread.RunJobs();
+
+        var downItemsTop = presenter.TranslatePoint(default, menu)!.Value.Y;
+        var downTriggerBottom = trigger.TranslatePoint(
+            new Point(0, trigger.Bounds.Height), menu)!.Value.Y;
+        Assert.Contains(":expand-down", menu.Classes);
+        Assert.DoesNotContain(":expand-up", menu.Classes);
+        Assert.True(downItemsTop >= downTriggerBottom,
+            $"Down menu top {downItemsTop} must be below trigger bottom {downTriggerBottom}.");
+        Assert.Equal(0, presenter.RenderTransformOrigin.Point.Y);
+        Assert.Equal(global::Avalonia.Layout.VerticalAlignment.Center, menu.VerticalAlignment);
     }
 
     [AvaloniaFact]

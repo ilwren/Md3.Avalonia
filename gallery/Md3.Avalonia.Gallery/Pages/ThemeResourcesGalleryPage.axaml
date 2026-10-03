@@ -79,8 +79,7 @@
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Theme JSON"/>
         <md:MdTextBox x:Name="JsonBox" MinHeight="220" AcceptsReturn="True" TextWrapping="Wrap"
-                      Label="Portable configuration" Variant="Outlined"
-                      OutlineLabelBackground="{DynamicResource Md.Sys.Color.Surface.Brush}"/>
+                      Label="Portable configuration" Variant="Outlined"/>
         <WrapPanel><md:MdButton Content="Apply JSON" Variant="Outlined" Margin="0,0,10,10" Click="ApplyJson"/><md:MdButton Content="Copy JSON" Variant="Text" Margin="0,0,10,10" Click="CopyJson"/></WrapPanel>
       </StackPanel>
 

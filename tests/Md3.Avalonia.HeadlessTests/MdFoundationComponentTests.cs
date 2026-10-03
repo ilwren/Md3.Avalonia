@@ -59,8 +59,8 @@ public sealed class MdFoundationComponentTests
         var trailingLeft = trailingContainer.TranslatePoint(new Point(0, 0), split)!.Value.X;
 
         Assert.InRange(trailingLeft - primaryRight, 1.9, 2.1);
-        Assert.Equal(48, trailing.ContainerWidth);
-        Assert.Equal(22, trailing.IconSize);
+        Assert.Equal(40, trailing.ContainerWidth);
+        Assert.Equal(24, trailing.IconSize);
         Assert.False(trailing.EnableSelectedShapeMorph);
         Assert.Equal(new CornerRadius(4, 20, 20, 4), trailing.ContainerCornerRadius);
         Assert.Single(split.GetVisualDescendants().OfType<MdDropdownMenu>());

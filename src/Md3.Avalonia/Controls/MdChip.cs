@@ -1,9 +1,11 @@
 using System.Windows.Input;
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
+using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Controls;
@@ -46,6 +48,7 @@ public class MdChip : ToggleButton
         TrailingIconProperty.Changed.AddClassHandler<MdChip>((chip, _) => chip.UpdatePseudoClasses());
         IsRemovableProperty.Changed.AddClassHandler<MdChip>((chip, _) => chip.UpdatePseudoClasses());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdChip>((chip, _) => chip.UpdateMotion());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdChip>((chip, _) => chip.UpdateRemoveAutomation());
     }
 
     public MdChip() => UpdatePseudoClasses();
@@ -115,7 +118,13 @@ public class MdChip : ToggleButton
         {
             _removeButton.Click += OnRemoveClick;
         }
+        UpdateRemoveAutomation();
         UpdateMotion();
+    }
+
+    private void UpdateRemoveAutomation()
+    {
+        if (_removeButton is not null) AutomationProperties.SetName(_removeButton, MdLocalization.GetString("Remove", this));
     }
 
     private void OnRemoveClick(object? sender, RoutedEventArgs e)

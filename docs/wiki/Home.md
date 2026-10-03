@@ -13,7 +13,7 @@ Md3.Avalonia is structured into modular NuGet packages:
 | **`Md3.Avalonia`** | Core Material Design 3 controls (Buttons, TextBoxes, Cards, FAB, Navigation, Dialogs, Sliders, Sheets, etc.) | `.NET 10.0` |
 | **`Md3.Avalonia.Extra`** | Extended controls inspired by Flutter ecosystem widgets (Rich Editor, Chat View, Timeline, DataGrid, Chart, Calendar, TreeView, Breadcrumb, PIN Input, etc.) | `.NET 10.0` |
 | **`Md3.Avalonia.Icons`** | Full Material Symbols Rounded icon catalog (4,000+ glyphs) with embedded TTF font resource. | `.NET 10.0` |
-| **`Md3.Avalonia.Icons.Lite`** | Lightweight Material Symbols Rounded icon subset with embedded compact TTF font resource (~25 KB). | `.NET 10.0` |
+| **`Md3.Avalonia.Icons.Lite`** | Lightweight Material Symbols Rounded icon subset with embedded compact TTF font resource (~98 KB). | `.NET 10.0` |
 
 ---
 

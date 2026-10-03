@@ -5,7 +5,7 @@ public sealed class MdCarouselController
 {
     private WeakReference<MdCarousel>? _carousel;
     public MdCarousel? Carousel => _carousel?.TryGetTarget(out var carousel) == true ? carousel : null;
-    public int SelectedIndex { get => Carousel?.SelectedIndex ?? -1; set { if (Carousel is { } carousel) carousel.SelectedIndex = value; } }
+    public int SelectedIndex { get => Carousel?.SelectedIndex ?? -1; set { if (Carousel is { } carousel) carousel.ScrollTo(value); } }
     public bool Next() => Carousel?.MoveNext() == true;
     public bool Previous() => Carousel?.MovePrevious() == true;
     public void StartAutoPlay() => Carousel?.StartAutoPlay();

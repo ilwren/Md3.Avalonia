@@ -5,7 +5,7 @@
     <AssemblyName>Md3.Avalonia.Icons.Lite</AssemblyName>
     <Description>Lite Material Symbols font and glyph catalog with embedded subset font for Md3.Avalonia.</Description>
     <PackageId>Md3.Avalonia.Icons.Lite</PackageId>
-    <Version>0.1.0-preview.1</Version>
+    <Version>0.3.0-preview.1</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;icons;fonts;material-symbols;lite;subset</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
@@ -21,6 +21,7 @@
     <PackageReference Include="Avalonia" />
     <ProjectReference Include="../Md3.Avalonia/Md3.Avalonia.csproj" />
     <AvaloniaResource Include="Assets/Fonts/MaterialSymbolsRounded-Lite.ttf" />
+    <None Include="../Md3.Avalonia.Icons/Assets/Fonts/MaterialSymbolsRounded-LICENSE.txt" Pack="true" PackagePath="licenses/MaterialSymbolsRounded-LICENSE.txt" Link="MaterialSymbolsRounded-LICENSE.txt" />
     <None Include="../../README.md" Pack="true" PackagePath="/" Link="README.md" />
     <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />
   </ItemGroup>

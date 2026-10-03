@@ -66,6 +66,8 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         AvaloniaProperty.RegisterDirect<MdTimePicker, string>(nameof(CancelText), picker => picker.CancelText);
     public static readonly DirectProperty<MdTimePicker, string> ConfirmTextProperty =
         AvaloniaProperty.RegisterDirect<MdTimePicker, string>(nameof(ConfirmText), picker => picker.ConfirmText);
+    public static readonly DirectProperty<MdTimePicker, string> HeaderTextProperty =
+        AvaloniaProperty.RegisterDirect<MdTimePicker, string>(nameof(HeaderText), picker => picker.HeaderText);
     public static readonly DirectProperty<MdTimePicker, bool> IsPopupOpenProperty =
         AvaloniaProperty.RegisterDirect<MdTimePicker, bool>(nameof(IsPopupOpen), picker => picker.IsPopupOpen);
 
@@ -76,6 +78,8 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private string _periodText = "PM";
     private string _cancelText = "Cancel";
     private string _confirmText = "OK";
+    private string _headerText = "Choose time";
+    private string _defaultLabelText = "Time";
     private TimeSpan? _valueAtOpen;
     private bool _commitOnClose;
     private Button? _anchorButton;
@@ -91,6 +95,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private Button? _confirmButton;
     private MdTextBox? _hourInput;
     private MdTextBox? _minuteInput;
+    private MdTimeDial? _clockFace;
     private Popup? _popup;
     private Border? _surface;
     private Control? _dialPanel;
@@ -208,6 +213,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
 
     public string CancelText => _cancelText;
     public string ConfirmText => _confirmText;
+    public string HeaderText => _headerText;
     public bool IsPopupOpen
     {
         get => _isPopupOpen;
@@ -232,6 +238,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         _confirmButton = e.NameScope.Find<Button>("PART_ConfirmButton");
         _hourInput = e.NameScope.Find<MdTextBox>("PART_HourInput");
         _minuteInput = e.NameScope.Find<MdTextBox>("PART_MinuteInput");
+        _clockFace = e.NameScope.Find<MdTimeDial>("PART_ClockFace");
         _popup = e.NameScope.Find<Popup>("PART_Popup");
         _surface = e.NameScope.Find<Border>("PART_Surface");
         _dialPanel = e.NameScope.Find<Control>("PART_DialPanel");
@@ -354,6 +361,12 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
             _valueAtOpen = SelectedTime;
             _commitOnClose = false;
             MdPopupCoordinator.NotifyStateChanged(this);
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (!IsOpen) return;
+                if (Mode == MdTimePickerMode.Input) _hourInput?.Focus();
+                else _clockFace?.Focus(NavigationMethod.Directional);
+            }, DispatcherPriority.Loaded);
             return;
         }
 
@@ -362,6 +375,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         _commitOnClose = false;
         _popupPresence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
         MdPopupCoordinator.NotifyStateChanged(this);
+        Dispatcher.UIThread.Post(() => _anchorButton?.Focus(), DispatcherPriority.Input);
     }
 
     private void OnModeChanged()
@@ -479,8 +493,14 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private void UpdateLocalizedText()
     {
         var culture = MdLocalization.ResolveCulture(this);
+        if (Equals(Label, _defaultLabelText))
+        {
+            _defaultLabelText = MdLocalization.GetString("Time", culture);
+            SetCurrentValue(LabelProperty, _defaultLabelText);
+        }
         SetAndRaise(CancelTextProperty, ref _cancelText, MdLocalization.GetString("Cancel", culture));
         SetAndRaise(ConfirmTextProperty, ref _confirmText, MdLocalization.GetString("OK", culture));
+        SetAndRaise(HeaderTextProperty, ref _headerText, MdLocalization.GetString("ChooseTime", culture));
     }
 
     private void RefreshTextAndState()

@@ -255,8 +255,10 @@ public sealed class MdMotionLifecycleTests
         var sharedIndicator = tabs.GetVisualDescendants().OfType<Border>()
             .Single(control => control.Name == "PART_SelectionIndicator");
         Assert.True(sharedIndicator.IsVisible);
-        Assert.Equal(2, sharedIndicator.Transitions!.Count);
-        Assert.Single(Assert.IsType<TranslateTransform>(sharedIndicator.RenderTransform).Transitions!);
+        // Spatial X/width movement is owned by MdSpatialSpringRunner so interrupted retargeting
+        // preserves velocity. Only the low-risk effects transition remains on the indicator.
+        Assert.Single(sharedIndicator.Transitions!);
+        Assert.Null(Assert.IsType<TranslateTransform>(sharedIndicator.RenderTransform).Transitions);
 
         tabs.SelectedIndex = 1;
         navigation.SelectedIndex = 1;
@@ -336,14 +338,16 @@ public sealed class MdMotionLifecycleTests
         dialog.Dismiss();
         Dispatcher.UIThread.RunJobs();
         Assert.True(surface.IsVisible);
-        Assert.False(surface.IsHitTestVisible);
+        Assert.False(surface.IsHitTestVisible,
+            "The exiting dialog surface must remain visible for motion but stop intercepting input immediately.");
         Assert.Equal(2, surface.Transitions!.Count);
 
         MdMotion.SetScheme(dialog, MdMotionScheme.Reduced);
         Assert.Single(surface.Transitions!);
         MdMotion.SetScheme(dialog, MdMotionScheme.None);
         Dispatcher.UIThread.RunJobs();
-        Assert.False(surface.IsVisible);
+        Assert.False(surface.IsVisible,
+            "No-motion must remove the retained dialog surface without waiting for an exit timer.");
         Assert.Null(surface.Transitions);
     }
 
@@ -394,8 +398,8 @@ public sealed class MdMotionLifecycleTests
         var items = carousel.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
         Assert.True(items.Length >= 3);
         Assert.Contains(items, item => Math.Abs(item.Width - 240) < 0.01);
-        Assert.Contains(items, item => Math.Abs(item.Width - 172.8) < 0.01);
-        Assert.Contains(items, item => Math.Abs(item.Width - 115.2) < 0.01);
+        Assert.Contains(items, item => Math.Abs(item.Width - 148) < 0.01);
+        Assert.Contains(items, item => Math.Abs(item.Width - 56) < 0.01);
         Assert.All(items, item => Assert.Null(item.Transitions));
 
         MdMotion.SetScheme(carousel, MdMotionScheme.Standard);
@@ -996,7 +1000,8 @@ public sealed class MdMotionLifecycleTests
         Assert.Contains(":open", snackbar.Classes);
         Assert.Contains(":open", dialog.Classes);
         Assert.Contains(":open", cascader.Classes);
-        Assert.Equal(2, Part<Border>(cascader, "PART_Surface").Transitions!.Count);
+        var cascaderSurface = PrivateField<Border>(cascader, "_surface");
+        Assert.Equal(2, cascaderSurface.Transitions!.Count);
         var asyncSurface = PrivateField<Border>(asyncSelect, "_surface");
         Assert.Equal(2, asyncSurface.Transitions!.Count);
 
@@ -1020,7 +1025,7 @@ public sealed class MdMotionLifecycleTests
         cascader.IsDropDownOpen = false;
         Assert.False(snackbar.IsVisible);
         Assert.False(Part<Grid>(dialog, "PART_Overlay").IsVisible);
-        Assert.Null(Part<Border>(cascader, "PART_Surface").Transitions);
+        Assert.Null(cascaderSurface.Transitions);
         Assert.Null(asyncSurface.Transitions);
 
         snackbar.IsOpen = true;

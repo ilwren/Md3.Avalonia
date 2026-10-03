@@ -157,11 +157,16 @@ public sealed class MdEcosystemWaveFTests
         var picker = new MdColorPicker { SelectedColor = Color.Parse("#6750A4") };
         Assert.Equal("#6750A4", picker.SelectedHex);
         Assert.NotEmpty(picker.MaterialPrimaryColors);
-        Assert.NotEmpty(picker.MaterialShades);
+        Assert.Equal(11, picker.MaterialShades.Count);
 
-        picker.SelectColor(Color.Parse("#006A6A"));
+        var teal = Color.Parse("#006A6A");
+        picker.SelectColorCommand.Execute(teal);
+        Assert.Equal(teal, picker.SelectedColor);
         Assert.Equal("#006A6A", picker.SelectedHex);
-        Assert.Contains(Color.Parse("#006A6A"), picker.RecentColors);
+        Assert.Contains(teal, picker.RecentColors);
+
+        picker.SetPickerModeCommand.Execute(nameof(MdColorPickerMode.SpectrumSliders));
+        Assert.Equal(MdColorPickerMode.SpectrumSliders, picker.PickerMode);
 
         Assert.True(picker.TryApplyHex("#FF5722"));
         Assert.Equal(Color.Parse("#FF5722"), picker.SelectedColor);

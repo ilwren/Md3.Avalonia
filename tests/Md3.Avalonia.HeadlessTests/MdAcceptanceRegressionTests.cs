@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Embedding;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Templates;
@@ -22,7 +23,7 @@ namespace Md3.Avalonia.HeadlessTests;
 public sealed class MdAcceptanceRegressionTests
 {
     [AvaloniaFact]
-    public void Every_Material_Popup_Template_Provides_A_Scoped_Transparent_Host_Style()
+    public void Every_Material_Popup_Template_Allows_Platform_Host_Selection()
     {
         var controls = new Control[]
         {
@@ -44,7 +45,43 @@ public sealed class MdAcceptanceRegressionTests
             var popup = control.Template!.Build(control)!.NameScope.Find<Popup>("PART_Popup");
             Assert.True(popup is not null, $"{control.GetType().Name} did not expose PART_Popup");
             Assert.False(popup!.ShouldUseOverlayLayer);
-            Assert.NotEmpty(popup.Styles);
+            // MaterialTheme supplies global PopupRoot and OverlayPopupHost templates. Leaving this
+            // false lets desktop use a native host and Android fall back to the popup overlay.
+        }
+    }
+
+    [AvaloniaFact]
+    public void Single_View_Root_Provides_Android_Popup_Overlay_For_ComboBox()
+    {
+        Assert.True(Application.Current!.TryGetResource(typeof(EmbeddableControlRoot), null, out var rootTheme));
+        Assert.NotEmpty(Assert.IsType<global::Avalonia.Styling.ControlTheme>(rootTheme).Setters);
+
+        try
+        {
+            using var root = new EmbeddableControlRoot
+            {
+                Width = 420,
+                Height = 720,
+                Content = new MdComboBox { ItemsSource = new[] { "One", "Two" } }
+            };
+            root.Prepare();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Contains(root.GetVisualDescendants().OfType<VisualLayerManager>(),
+                layer => layer.Name == "PART_VisualLayerManager");
+            var comboBox = Assert.IsType<MdComboBox>(root.Content);
+            comboBox.IsDropDownOpen = true;
+            Dispatcher.UIThread.RunJobs();
+            var popup = comboBox.GetVisualDescendants().OfType<Popup>()
+                .Single(control => control.Name == "PART_Popup");
+            Assert.True(popup.IsUsingOverlayLayer);
+            Assert.True(comboBox.IsDropDownOpen);
+        }
+        catch (PlatformNotSupportedException)
+        {
+            // Avalonia's headless backend cannot instantiate EmbeddableControlRoot. The theme
+            // registration above remains a headless contract check; Android Maestro provides the
+            // runtime open/select/no-crash evidence on the actual single-view lifetime.
         }
     }
 

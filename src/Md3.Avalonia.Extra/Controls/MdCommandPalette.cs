@@ -9,11 +9,16 @@ using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Md3.Avalonia.Extra.Infrastructure;
+using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Extra.Controls;
 
-public sealed record MdCommandItem(string Title, ICommand Command, object? Parameter = null, string? Description = null, string? Keywords = null, KeyGesture? Gesture = null);
+public sealed record MdCommandItem(string Title, ICommand Command, object? Parameter = null, string? Description = null, string? Keywords = null, KeyGesture? Gesture = null)
+{
+    public bool IsEnabled => Command.CanExecute(Parameter);
+}
 
 /// <summary>A keyboard-first searchable command surface with real shortcut routing.</summary>
 [PseudoClasses(":open", ":present", ":empty", ":reduced-motion", ":no-motion")]
@@ -25,6 +30,9 @@ public sealed class MdCommandPalette : TemplatedControl
     public static readonly StyledProperty<KeyGesture?> OpenGestureProperty = AvaloniaProperty.Register<MdCommandPalette, KeyGesture?>(nameof(OpenGesture), new KeyGesture(Key.P, KeyModifiers.Control | KeyModifiers.Shift));
     public static readonly StyledProperty<int> SelectedIndexProperty = AvaloniaProperty.Register<MdCommandPalette, int>(nameof(SelectedIndex));
     public static readonly DirectProperty<MdCommandPalette, IReadOnlyList<MdCommandItem>> FilteredItemsProperty = AvaloniaProperty.RegisterDirect<MdCommandPalette, IReadOnlyList<MdCommandItem>>(nameof(FilteredItems), control => control.FilteredItems);
+    public static readonly DirectProperty<MdCommandPalette, string> AccessibleNameProperty = AvaloniaProperty.RegisterDirect<MdCommandPalette, string>(nameof(AccessibleName), control => control.AccessibleName);
+    public static readonly DirectProperty<MdCommandPalette, string> SearchPlaceholderProperty = AvaloniaProperty.RegisterDirect<MdCommandPalette, string>(nameof(SearchPlaceholder), control => control.SearchPlaceholder);
+    public static readonly DirectProperty<MdCommandPalette, string> EmptyTextProperty = AvaloniaProperty.RegisterDirect<MdCommandPalette, string>(nameof(EmptyText), control => control.EmptyText);
 
     private IReadOnlyList<MdCommandItem> _filteredItems = Array.Empty<MdCommandItem>();
     private TextBox? _queryBox;
@@ -33,6 +41,11 @@ public sealed class MdCommandPalette : TemplatedControl
     private Border? _surface;
     private TopLevel? _topLevel;
     private readonly MdPresenceController _presence;
+    private readonly MdFocusReturnScope _focusReturn = new();
+    private readonly HashSet<ICommand> _observedCommands = [];
+    private string _accessibleName = string.Empty;
+    private string _searchPlaceholder = string.Empty;
+    private string _emptyText = string.Empty;
     private int _resultsVersion;
 
     static MdCommandPalette()
@@ -41,11 +54,13 @@ public sealed class MdCommandPalette : TemplatedControl
         QueryProperty.Changed.AddClassHandler<MdCommandPalette>((control, _) => control.Refresh());
         IsOpenProperty.Changed.AddClassHandler<MdCommandPalette>((control, _) => control.OnOpenChanged());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdCommandPalette>((control, _) => control.UpdateMotion());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdCommandPalette>((control, _) => control.UpdateLocalizedText());
     }
     public MdCommandPalette()
     {
         _presence = new MdPresenceController(present => PseudoClasses.Set(":present", present));
         _presence.Initialize(IsOpen);
+        UpdateLocalizedText();
         Refresh();
     }
 
@@ -55,6 +70,9 @@ public sealed class MdCommandPalette : TemplatedControl
     public KeyGesture? OpenGesture { get => GetValue(OpenGestureProperty); set => SetValue(OpenGestureProperty, value); }
     public int SelectedIndex { get => GetValue(SelectedIndexProperty); set => SetValue(SelectedIndexProperty, value); }
     public IReadOnlyList<MdCommandItem> FilteredItems => _filteredItems;
+    public string AccessibleName => _accessibleName;
+    public string SearchPlaceholder => _searchPlaceholder;
+    public string EmptyText => _emptyText;
 
     public event EventHandler<MdCommandItem>? CommandInvoked;
     public void Show() => SetCurrentValue(IsOpenProperty, true);
@@ -98,12 +116,14 @@ public sealed class MdCommandPalette : TemplatedControl
         base.OnAttachedToVisualTree(e);
         _topLevel = TopLevel.GetTopLevel(this);
         _topLevel?.AddHandler(InputElement.KeyDownEvent, OnTopLevelKeyDown, RoutingStrategies.Tunnel, true);
+        SynchronizeCommandHandlers();
     }
 
     protected override void OnDetachedFromVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e)
     {
         _topLevel?.RemoveHandler(InputElement.KeyDownEvent, OnTopLevelKeyDown);
         _topLevel = null;
+        ClearCommandHandlers();
         _presence.Stop();
         base.OnDetachedFromVisualTree(e);
     }
@@ -120,12 +140,42 @@ public sealed class MdCommandPalette : TemplatedControl
 
     private void OnTopLevelKeyDown(object? sender, KeyEventArgs e)
     {
+        if (IsOpen)
+        {
+            if (e.Key == Key.Escape)
+            {
+                Dismiss();
+                e.Handled = true;
+                return;
+            }
+            if (e.Key == Key.Tab && TrapTabFocus(e)) return;
+        }
+
         if (OpenGesture?.Matches(e) == true) { Show(); e.Handled = true; return; }
         if (!IsOpen)
         {
             var command = (ItemsSource ?? Array.Empty<object>()).OfType<MdCommandItem>().FirstOrDefault(item => item.Gesture?.Matches(e) == true);
             if (command is not null && Execute(command)) e.Handled = true;
         }
+    }
+
+    private bool TrapTabFocus(KeyEventArgs e)
+    {
+        if (_surface is null) return false;
+        var focusable = _surface.GetVisualDescendants().OfType<Control>()
+            .Where(control => control.Focusable && control.IsVisible && control.IsEnabled)
+            .ToArray();
+        if (focusable.Length == 0) return false;
+        var focused = _topLevel?.FocusManager?.GetFocusedElement() as Visual;
+        var inside = focused is not null &&
+                     (ReferenceEquals(focused, _surface) || focused.GetVisualAncestors().Contains(_surface));
+        var reverse = e.KeyModifiers.HasFlag(KeyModifiers.Shift);
+        var atBoundary = !inside || (reverse && ReferenceEquals(focused, focusable[0])) ||
+                         (!reverse && ReferenceEquals(focused, focusable[^1]));
+        if (!atBoundary) return false;
+        focusable[reverse ? focusable.Length - 1 : 0].Focus(NavigationMethod.Tab);
+        e.Handled = true;
+        return true;
     }
 
     private void OnBackdropPressed(object? sender, PointerPressedEventArgs e)
@@ -151,6 +201,7 @@ public sealed class MdCommandPalette : TemplatedControl
     {
         if (IsOpen)
         {
+            _focusReturn.Capture(_topLevel?.FocusManager?.GetFocusedElement() as InputElement);
             _presence.Update(true, TimeSpan.Zero);
             PseudoClasses.Set(":open", true);
             Dispatcher.UIThread.Post(() => { if (IsOpen) _queryBox?.Focus(); }, DispatcherPriority.Loaded);
@@ -159,6 +210,7 @@ public sealed class MdCommandPalette : TemplatedControl
         {
             PseudoClasses.Set(":open", false);
             _presence.Update(false, MdMotion.GetExitDuration(this));
+            _focusReturn.Restore();
         }
         UpdateHitTesting();
     }
@@ -192,8 +244,45 @@ public sealed class MdCommandPalette : TemplatedControl
         if (_backdrop is not null) _backdrop.IsHitTestVisible = IsOpen;
     }
 
+    private void UpdateLocalizedText()
+    {
+        SetAndRaise(AccessibleNameProperty, ref _accessibleName, MdLocalization.GetString("CommandPalette", this));
+        SetAndRaise(SearchPlaceholderProperty, ref _searchPlaceholder, MdLocalization.GetString("SearchCommands", this));
+        SetAndRaise(EmptyTextProperty, ref _emptyText, MdLocalization.GetString("NoResults", this));
+    }
+
+    private void SynchronizeCommandHandlers()
+    {
+        var desired = _topLevel is null
+            ? new HashSet<ICommand>()
+            : (ItemsSource ?? Array.Empty<object>()).OfType<MdCommandItem>().Select(item => item.Command).ToHashSet();
+        foreach (var command in _observedCommands.Where(command => !desired.Contains(command)).ToArray())
+        {
+            command.CanExecuteChanged -= OnCommandCanExecuteChanged;
+            _observedCommands.Remove(command);
+        }
+        foreach (var command in desired.Where(command => !_observedCommands.Contains(command)))
+        {
+            command.CanExecuteChanged += OnCommandCanExecuteChanged;
+            _observedCommands.Add(command);
+        }
+    }
+
+    private void ClearCommandHandlers()
+    {
+        foreach (var command in _observedCommands) command.CanExecuteChanged -= OnCommandCanExecuteChanged;
+        _observedCommands.Clear();
+    }
+
+    private void OnCommandCanExecuteChanged(object? sender, EventArgs e)
+    {
+        if (Dispatcher.UIThread.CheckAccess()) Refresh();
+        else Dispatcher.UIThread.Post(Refresh);
+    }
+
     private void Refresh()
     {
+        SynchronizeCommandHandlers();
         var animateResults = _itemsHost is not null && MdMotion.GetScheme(this) != MdMotionScheme.None;
         var version = ++_resultsVersion;
         if (animateResults) _itemsHost!.Opacity = 0;

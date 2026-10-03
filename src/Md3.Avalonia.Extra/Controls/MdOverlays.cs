@@ -29,6 +29,7 @@ public class MdPopover : TemplatedControl
     private readonly MdPresenceController _popupPresence;
     private Button? _anchorButton;
     private InputElement? _popoverInput;
+    private ScrollViewer? _ownerScrollViewer;
     private TopLevel? _topLevel;
     private Popup? _popup;
     private Border? _surface;
@@ -63,6 +64,9 @@ public class MdPopover : TemplatedControl
 
     public event EventHandler? Opened;
     public event EventHandler? Closed;
+    protected virtual bool ShouldFocusPopoverContent => true;
+    protected virtual void OnPopoverContentAttached(Control content) { }
+    protected virtual void OnPopoverContentDetached(Control content) { }
     public void Show() => SetCurrentValue(IsOpenProperty, true);
     public void Dismiss() => SetCurrentValue(IsOpenProperty, false);
     /// <summary>Closes the transient surface when its owning viewport changes position.</summary>
@@ -76,12 +80,14 @@ public class MdPopover : TemplatedControl
     {
         if (_anchorButton is not null) _anchorButton.Click -= OnAnchorClick;
         if (_popup is not null) _popup.Closed -= OnPopupClosed;
+        DetachOwnerScrollHandler();
         base.OnApplyTemplate(e);
         _anchorButton = e.NameScope.Find<Button>("PART_AnchorButton");
         _popup = e.NameScope.Find<Popup>("PART_Popup");
         _surface = e.NameScope.Find<Border>("PART_Surface");
         if (_anchorButton is not null) _anchorButton.Click += OnAnchorClick;
         if (_popup is not null) _popup.Closed += OnPopupClosed;
+        AttachOwnerScrollHandler();
         _popupPresence.Initialize(IsOpen);
         UpdateMotion();
         UpdateSurfaceHitTesting();
@@ -91,16 +97,15 @@ public class MdPopover : TemplatedControl
     {
         base.OnAttachedToVisualTree(e);
         _topLevel = TopLevel.GetTopLevel(this);
-        _topLevel?.AddHandler(InputElement.PointerWheelChangedEvent, OnTopLevelPointerWheel,
-            global::Avalonia.Interactivity.RoutingStrategies.Tunnel, true);
+        AttachOwnerScrollHandler();
         _topLevel?.AddHandler(InputElement.KeyDownEvent, OnPopupKeyDown,
             global::Avalonia.Interactivity.RoutingStrategies.Tunnel, true);
     }
 
     protected override void OnDetachedFromVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e)
     {
-        _topLevel?.RemoveHandler(InputElement.PointerWheelChangedEvent, OnTopLevelPointerWheel);
         _topLevel?.RemoveHandler(InputElement.KeyDownEvent, OnPopupKeyDown);
+        DetachOwnerScrollHandler();
         DetachPopoverInput();
         _topLevel = null;
         if (IsOpen) SetCurrentValue(IsOpenProperty, false);
@@ -118,13 +123,27 @@ public class MdPopover : TemplatedControl
     private void OnPopupKeyDown(object? sender, KeyEventArgs e) => TryDismissFromEscape(e);
     private bool TryDismissFromEscape(KeyEventArgs e)
     {
-        if (e.Key != Key.Escape || !IsOpen) return false;
+        if (e.Key != Key.Escape || !IsOpen || !EcosystemPopupCoordinator.IsCurrent(this)) return false;
         Dismiss();
         e.Handled = true;
         return true;
     }
 
-    private void OnTopLevelPointerWheel(object? sender, PointerWheelEventArgs e) => NotifyOwnerScrolled();
+    private void AttachOwnerScrollHandler()
+    {
+        if (_ownerScrollViewer is not null || _anchorButton is null || !this.IsAttachedToVisualTree()) return;
+        _ownerScrollViewer = _anchorButton.GetVisualAncestors().OfType<ScrollViewer>().FirstOrDefault();
+        _ownerScrollViewer?.AddHandler(InputElement.PointerWheelChangedEvent, OnOwnerPointerWheel,
+            global::Avalonia.Interactivity.RoutingStrategies.Bubble, true);
+    }
+
+    private void DetachOwnerScrollHandler()
+    {
+        _ownerScrollViewer?.RemoveHandler(InputElement.PointerWheelChangedEvent, OnOwnerPointerWheel);
+        _ownerScrollViewer = null;
+    }
+
+    private void OnOwnerPointerWheel(object? sender, PointerWheelEventArgs e) => NotifyOwnerScrolled();
 
     private void OnAnchorClick(object? sender, RoutedEventArgs e) => Toggle();
     private void OnOpenChanged()
@@ -134,7 +153,7 @@ public class MdPopover : TemplatedControl
         {
             _popupPresence.Update(true, TimeSpan.Zero);
             UpdateState();
-            _focusReturn.Capture(_anchorButton);
+            _focusReturn.Capture(_topLevel?.FocusManager?.GetFocusedElement() as InputElement ?? _anchorButton);
             EcosystemPopupCoordinator.Open(this);
             if (this.IsAttachedToVisualTree())
                 Dispatcher.UIThread.Post(AttachAndFocusPopoverContent, DispatcherPriority.Loaded);
@@ -195,6 +214,8 @@ public class MdPopover : TemplatedControl
         _popoverInput = root;
         _popoverInput.AddHandler(InputElement.KeyDownEvent, OnPopupKeyDown,
             global::Avalonia.Interactivity.RoutingStrategies.Tunnel, true);
+        OnPopoverContentAttached(root);
+        if (!ShouldFocusPopoverContent) return;
         var focusTarget = root.GetVisualDescendants().OfType<Control>()
             .FirstOrDefault(control => control.Focusable && control.IsEnabled && control.IsVisible);
         if (focusTarget is not null) focusTarget.Focus();
@@ -204,6 +225,7 @@ public class MdPopover : TemplatedControl
     private void DetachPopoverInput()
     {
         _popoverInput?.RemoveHandler(InputElement.KeyDownEvent, OnPopupKeyDown);
+        if (_popoverInput is Control content) OnPopoverContentDetached(content);
         _popoverInput = null;
     }
 
@@ -221,6 +243,9 @@ public class MdPopover : TemplatedControl
             }
             _open = new WeakReference<MdPopover>(current);
         }
+
+        public static bool IsCurrent(MdPopover candidate) =>
+            _open?.TryGetTarget(out var current) == true && ReferenceEquals(current, candidate);
     }
 }
 
@@ -231,14 +256,39 @@ public sealed class MdHoverCard : MdPopover
     public static readonly StyledProperty<TimeSpan> CloseDelayProperty = AvaloniaProperty.Register<MdHoverCard, TimeSpan>(nameof(CloseDelay), TimeSpan.FromMilliseconds(120));
     private readonly DispatcherTimer _timer = new();
     private bool _pendingOpen;
+    private bool _interactiveOpen;
+    private bool _pointerOverContent;
+    private Control? _attachedContent;
 
     public MdHoverCard()
     {
-        _timer.Tick += (_, _) => { _timer.Stop(); if (_pendingOpen) Show(); else Dismiss(); };
-        PointerEntered += (_, _) => Schedule(true);
-        PointerExited += (_, _) => Schedule(false);
-        GotFocus += (_, _) => Schedule(true);
-        LostFocus += (_, _) => Schedule(false);
+        _timer.Tick += (_, _) =>
+        {
+            _timer.Stop();
+            if (_pendingOpen) Show();
+            else if (!_pointerOverContent && !IsFocusWithinContent()) Dismiss();
+        };
+        PointerEntered += (_, _) => Schedule(true, false);
+        PointerExited += (_, _) => Schedule(false, false);
+        GotFocus += (_, _) => Schedule(true, true);
+        LostFocus += (_, _) => Schedule(false, true);
+    }
+
+    protected override bool ShouldFocusPopoverContent => _interactiveOpen;
+
+    protected override void OnPopoverContentAttached(Control content)
+    {
+        _attachedContent = content;
+        content.PointerEntered += OnContentPointerEntered;
+        content.PointerExited += OnContentPointerExited;
+    }
+
+    protected override void OnPopoverContentDetached(Control content)
+    {
+        content.PointerEntered -= OnContentPointerEntered;
+        content.PointerExited -= OnContentPointerExited;
+        if (ReferenceEquals(_attachedContent, content)) _attachedContent = null;
+        _pointerOverContent = false;
     }
 
     public TimeSpan OpenDelay { get => GetValue(OpenDelayProperty); set => SetValue(OpenDelayProperty, value); }
@@ -250,12 +300,36 @@ public sealed class MdHoverCard : MdPopover
         base.OnDetachedFromVisualTree(e);
     }
 
-    private void Schedule(bool open)
+    private void Schedule(bool open, bool interactive)
     {
         _pendingOpen = open;
+        if (open) _interactiveOpen = interactive;
         _timer.Stop();
         _timer.Interval = open ? OpenDelay : CloseDelay;
-        if (_timer.Interval <= TimeSpan.Zero) { if (open) Show(); else Dismiss(); }
+        if (_timer.Interval <= TimeSpan.Zero)
+        {
+            if (open) Show();
+            else if (!_pointerOverContent && !IsFocusWithinContent()) Dismiss();
+        }
         else _timer.Start();
+    }
+
+    private void OnContentPointerEntered(object? sender, PointerEventArgs e)
+    {
+        _pointerOverContent = true;
+        _timer.Stop();
+    }
+
+    private void OnContentPointerExited(object? sender, PointerEventArgs e)
+    {
+        _pointerOverContent = false;
+        Schedule(false, false);
+    }
+
+    private bool IsFocusWithinContent()
+    {
+        if (_attachedContent is null) return false;
+        var focused = TopLevel.GetTopLevel(_attachedContent)?.FocusManager?.GetFocusedElement() as Visual;
+        return focused is not null && (ReferenceEquals(focused, _attachedContent) || focused.GetVisualAncestors().Contains(_attachedContent));
     }
 }

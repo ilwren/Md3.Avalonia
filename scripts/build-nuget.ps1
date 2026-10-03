@@ -17,10 +17,11 @@ $projects = @(
     (Join-Path $root "src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj")
 )
 
-$fontPath = Join-Path $root "src/Md3.Avalonia.Icons/Assets/Fonts/MaterialSymbolsRounded.ttf"
-if (-not (Test-Path $fontPath)) {
-    python3 (Join-Path $root "scripts/generate-fonts.py")
-}
+$python = Get-Command python3 -ErrorAction SilentlyContinue
+if (-not $python) { $python = Get-Command python -ErrorAction SilentlyContinue }
+if (-not $python) { throw "Python is required to verify the embedded official fonts." }
+& $python.Source (Join-Path $root "scripts/verify-fonts.py")
+if ($LASTEXITCODE -ne 0) { throw "Official Material Symbols font verification failed." }
 
 if (-not (Test-Path $outputDir)) {
     New-Item -ItemType Directory -Path $outputDir -Force | Out-Null

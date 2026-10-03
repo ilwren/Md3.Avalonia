@@ -11,7 +11,7 @@
         <TextBlock Classes="body" Text="Breadcrumbs display the current location within a hierarchy and enable fast multi-level navigation back to parent destinations." />
       </StackPanel>
 
-      <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="h2" Text="Interactive breadcrumb" />
         <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
           <extra:MdBreadcrumb x:Name="DemoBreadcrumb" Separator="›" ItemInvoked="OnBreadcrumbItemInvoked" />
@@ -19,17 +19,20 @@
         <TextBlock x:Name="BreadcrumbStatus" Classes="body" Text="Click any breadcrumb segment to navigate." />
       </StackPanel>
 
-      <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="h2" Text="Breadcrumb with icons and slash separator" />
         <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
-          <extra:MdBreadcrumb x:Name="IconBreadcrumb" Separator="/" ItemInvoked="OnIconBreadcrumbInvoked" />
+          <extra:MdBreadcrumb x:Name="IconBreadcrumb" Separator="/" OverflowBehavior="Scroll" ItemInvoked="OnIconBreadcrumbInvoked" />
         </Border>
       </StackPanel>
 
-      <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
-        <TextBlock Classes="h2" Text="Deep path with custom separator glyph" />
+      <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="12">
+        <TextBlock Classes="h2" Text="Collapsed deep path" />
         <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
-          <extra:MdBreadcrumb x:Name="DeepBreadcrumb" Separator="•" ItemInvoked="OnDeepBreadcrumbInvoked" />
+          <extra:MdBreadcrumb x:Name="DeepBreadcrumb" Separator="›"
+                              OverflowBehavior="Collapse" MaxDisplayedItems="4"
+                              ItemsBeforeCollapse="1" ItemsAfterCollapse="2"
+                              ItemInvoked="OnDeepBreadcrumbInvoked" />
         </Border>
       </StackPanel>
 

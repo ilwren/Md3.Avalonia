@@ -3,12 +3,50 @@
                     xmlns:chrome="using:Avalonia.Controls.Chrome"
                     xmlns:md="using:Md3.Avalonia.Controls">
   <!-- Scroll infrastructure is opt-in: native Avalonia controls are never globally restyled. -->
-  <ControlTheme x:Key="MdScrollThumbTheme" TargetType="Thumb">
+  <!-- Keep the draggable Thumb at the full 12-DIP cross-axis hit size. Hover changes only the
+       inner visual thickness, never the track-computed length along the scrolling axis. -->
+  <ControlTheme x:Key="MdVerticalScrollThumbTheme" TargetType="Thumb">
+    <Setter Property="Width" Value="12" />
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
     <Setter Property="CornerRadius" Value="4" />
-    <Setter Property="Template"><ControlTemplate><Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" /></ControlTemplate></Setter>
-    <Style Selector="^:pointerover /template/ Border"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" /></Style>
-    <Style Selector="^:pressed /template/ Border"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid Background="Transparent">
+          <Border x:Name="PART_ThumbVisual" Width="8" HorizontalAlignment="Center"
+                  Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_ThumbVisual">
+      <Setter Property="Width" Value="10" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_ThumbVisual">
+      <Setter Property="Width" Value="10" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="MdHorizontalScrollThumbTheme" TargetType="Thumb">
+    <Setter Property="Height" Value="12" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid Background="Transparent">
+          <Border x:Name="PART_ThumbVisual" Height="8" VerticalAlignment="Center"
+                  Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_ThumbVisual">
+      <Setter Property="Height" Value="10" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_ThumbVisual">
+      <Setter Property="Height" Value="10" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
   </ControlTheme>
 
   <ControlTheme x:Key="MdScrollPageButtonTheme" TargetType="RepeatButton">
@@ -30,7 +68,7 @@
                  Value="{TemplateBinding Value, Mode=TwoWay}" ViewportSize="{TemplateBinding ViewportSize}"
                  Orientation="Vertical" IsDirectionReversed="True">
             <Track.DecreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.DecreaseButton>
-            <Track.Thumb><Thumb Width="8" MinHeight="32" Margin="2" Theme="{StaticResource MdScrollThumbTheme}" /></Track.Thumb>
+            <Track.Thumb><Thumb MinHeight="32" Theme="{StaticResource MdVerticalScrollThumbTheme}" /></Track.Thumb>
             <Track.IncreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.IncreaseButton>
           </Track>
         </ControlTemplate>
@@ -46,16 +84,14 @@
                  Value="{TemplateBinding Value, Mode=TwoWay}" ViewportSize="{TemplateBinding ViewportSize}"
                  Orientation="Horizontal">
             <Track.DecreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.DecreaseButton>
-            <Track.Thumb><Thumb Height="8" MinWidth="32" Margin="2" Theme="{StaticResource MdScrollThumbTheme}" /></Track.Thumb>
+            <Track.Thumb><Thumb MinWidth="32" Theme="{StaticResource MdHorizontalScrollThumbTheme}" /></Track.Thumb>
             <Track.IncreaseButton><RepeatButton Theme="{StaticResource MdScrollPageButtonTheme}" /></Track.IncreaseButton>
           </Track>
         </ControlTemplate>
       </Setter>
     </Style>
-    <Style Selector="^:pointerover /template/ Thumb">
-      <Setter Property="Width" Value="10" />
-      <Setter Property="Height" Value="10" />
-    </Style>
+    <!-- Thumb hover visuals live inside the orientation-specific Thumb themes so the interactive
+         geometry and the track-computed axis length remain stable for the whole drag gesture. -->
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdScrollViewer}" TargetType="md:MdScrollViewer">
@@ -130,7 +166,7 @@
                             Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
                             HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
           <StackPanel Name="PART_SpinnerPanel" Width="32" Height="42"
-                      Margin="0,0,8,0" VerticalAlignment="Center" HorizontalAlignment="Right"
+                      Margin="0,15,8,0" VerticalAlignment="Top" HorizontalAlignment="Right"
                       Background="Transparent" Spacing="2" ZIndex="2"
                       IsVisible="{TemplateBinding ShowButtonSpinner}">
             <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}"
@@ -150,12 +186,13 @@
       </ControlTemplate>
     </Setter>
     <Style Selector="^[ButtonSpinnerLocation=Left] /template/ StackPanel#PART_SpinnerPanel">
-      <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="Margin" Value="8,0,0,0" />
+      <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="Margin" Value="8,15,0,0" />
     </Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdNumericBox}" TargetType="md:MdNumericBox">
     <Setter Property="MinWidth" Value="160" /><Setter Property="MinHeight" Value="56" />
+    <Setter Property="VerticalAlignment" Value="Top" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
     <Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" />
     <Setter Property="Template">
@@ -289,11 +326,29 @@
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
   </ControlTheme>
 
-  <!-- A complete custom-chrome window template. The native frame remains available through
-       BorderOnly while Material owns the title content, clipping, outline and caption visuals. -->
+  <!-- Avalonia 12 inserts WindowDrawnDecorations outside the Window control template whenever
+       the client area extends into Full decorations. FluentTheme/SimpleTheme normally draw their
+       own title, caption buttons and frame there. MdBorderlessWindow supplies all of those itself,
+       so use an intentionally empty decoration template while preserving the native Full style
+       bits which DWM needs for minimize/maximize/restore animation. -->
+  <ControlTheme x:Key="MdBorderlessWindowDrawnDecorationsTheme" TargetType="chrome:WindowDrawnDecorations">
+    <Setter Property="DefaultTitleBarHeight" Value="0" />
+    <Setter Property="DefaultFrameThickness" Value="0" />
+    <Setter Property="DefaultShadowThickness" Value="0" />
+    <Setter Property="Template">
+      <WindowDrawnDecorationsTemplate>
+        <chrome:WindowDrawnDecorationsContent />
+      </WindowDrawnDecorationsTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- A complete custom-chrome window template. On Windows the adapter retains Full native
+       decorations (and therefore DWM state animations) while the extended client area and this
+       template own title content. The native frame is never duplicated by a second Material line. -->
   <ControlTheme x:Key="{x:Type md:MdBorderlessWindow}" TargetType="md:MdBorderlessWindow"
                 BasedOn="{StaticResource {x:Type md:MdWindow}}">
     <Setter Property="UseLayoutRounding" Value="True" />
+    <Setter Property="WindowDecorationsTheme" Value="{StaticResource MdBorderlessWindowDrawnDecorationsTheme}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdBorderlessWindow">
         <Grid Background="Transparent">
@@ -344,8 +399,14 @@
         </Grid>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:not(:custom-chrome)">
+      <Setter Property="WindowDecorationsTheme" Value="{x:Null}" />
+    </Style>
+    <Style Selector="^:native-frame /template/ Border#PART_WindowFrame">
+      <Setter Property="Margin" Value="0" /><Setter Property="BorderThickness" Value="0" /><Setter Property="CornerRadius" Value="0" /><Setter Property="ClipToBounds" Value="False" />
+    </Style>
     <Style Selector="^:maximized /template/ Border#PART_WindowFrame">
-      <Setter Property="Margin" Value="0" /><Setter Property="BorderThickness" Value="0" /><Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Margin" Value="0" /><Setter Property="BorderThickness" Value="0" /><Setter Property="CornerRadius" Value="0" /><Setter Property="ClipToBounds" Value="False" />
     </Style>
     <Style Selector="^:maximized /template/ md|MdWindowResizeGrip.window-resize-grip"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:not(:custom-chrome) /template/ md|MdWindowTitleBar#PART_DefaultTitleBar"><Setter Property="IsVisible" Value="False" /></Style>

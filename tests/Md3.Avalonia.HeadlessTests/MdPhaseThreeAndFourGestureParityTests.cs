@@ -5,8 +5,10 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Extra.Controls;
 using Md3.Avalonia.Gallery;
@@ -48,6 +50,7 @@ public class MdPhaseThreeAndFourGestureParityTests
         {
             Width = 300,
             Height = 200,
+            AllowMouseDrag = true,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             Content = new StackPanel
             {
@@ -83,6 +86,244 @@ public class MdPhaseThreeAndFourGestureParityTests
 
         // Stop inertia clean-up
         scrollViewer.StopInertia();
+    }
+
+    [AvaloniaFact]
+    public void ScrollViewer_Mouse_Drag_Is_OptIn_On_Desktop()
+    {
+        var scrollViewer = new MdScrollViewer
+        {
+            Width = 300,
+            Height = 200,
+            Content = new Border { Height = 900, Background = Brushes.Blue }
+        };
+
+        using var host = Show(scrollViewer, 400, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        var startPoint = scrollViewer.TranslatePoint(new Point(150, 150), host.Window)!.Value;
+        var endPoint = scrollViewer.TranslatePoint(new Point(150, 50), host.Window)!.Value;
+        host.Window.MouseMove(startPoint, RawInputModifiers.None);
+        host.Window.MouseDown(startPoint, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseMove(endPoint, RawInputModifiers.LeftMouseButton);
+        host.Window.MouseUp(endPoint, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(0, scrollViewer.Offset.Y);
+    }
+
+    [AvaloniaFact]
+    public void ScrollViewer_OptIn_Mouse_Drag_Defers_To_Child_Direct_Manipulation()
+    {
+        var rangeSlider = new MdRangeSlider
+        {
+            Width = 280,
+            Height = 80,
+            LowerValue = 25,
+            UpperValue = 75
+        };
+        var scrollViewer = new MdScrollViewer
+        {
+            Width = 300,
+            Height = 200,
+            AllowMouseDrag = true,
+            Content = new StackPanel
+            {
+                Children =
+                {
+                    rangeSlider,
+                    new Border { Height = 700, Background = Brushes.Blue }
+                }
+            }
+        };
+
+        using var host = Show(scrollViewer, 400, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        var valueBeforeDrag = rangeSlider.LowerValue;
+        var startPoint = rangeSlider.TranslatePoint(new Point(82, 40), host.Window)!.Value;
+        var endPoint = startPoint + new Vector(80, -24);
+        host.Window.MouseMove(startPoint, RawInputModifiers.None);
+        host.Window.MouseDown(startPoint, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseMove(endPoint, RawInputModifiers.LeftMouseButton);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.MouseUp(endPoint, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(rangeSlider.LowerValue > valueBeforeDrag,
+            "The inner range slider must retain its pointer drag.");
+        Assert.Equal(0, scrollViewer.Offset.Y);
+    }
+
+    [AvaloniaFact]
+    public void ScrollViewer_OptIn_Mouse_Drag_Yields_When_Custom_Content_Handles_Press()
+    {
+        var precisionSurface = new Border { Height = 700, Background = Brushes.Orange };
+        precisionSurface.PointerPressed += (_, e) => e.Handled = true;
+
+        var scrollViewer = new MdScrollViewer
+        {
+            Width = 300,
+            Height = 200,
+            AllowMouseDrag = true,
+            Content = precisionSurface
+        };
+
+        using var host = Show(scrollViewer, 400, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        var startPoint = precisionSurface.TranslatePoint(new Point(150, 150), host.Window)!.Value;
+        var endPoint = startPoint + new Vector(0, -100);
+        host.Window.MouseMove(startPoint, RawInputModifiers.None);
+        host.Window.MouseDown(startPoint, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseMove(endPoint, RawInputModifiers.LeftMouseButton);
+        host.Window.MouseUp(endPoint, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(0, scrollViewer.Offset.Y);
+    }
+
+    [AvaloniaFact]
+    public void ScrollViewer_OptIn_Mouse_Drag_Yields_When_Custom_Content_Captures_Pointer()
+    {
+        var pointerMoved = false;
+        var hitSurface = new Border { Height = 700, Background = Brushes.Orange };
+        var precisionSurface = new Border { Height = 700, Child = hitSurface };
+        precisionSurface.PointerPressed += (_, e) => e.Pointer.Capture(precisionSurface);
+        precisionSurface.AddHandler(InputElement.PointerMovedEvent, (_, _) => pointerMoved = true,
+            RoutingStrategies.Bubble, handledEventsToo: true);
+
+        var scrollViewer = new MdScrollViewer
+        {
+            Width = 300,
+            Height = 200,
+            AllowMouseDrag = true,
+            Content = precisionSurface
+        };
+
+        using var host = Show(scrollViewer, 400, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        var startPoint = precisionSurface.TranslatePoint(new Point(150, 150), host.Window)!.Value;
+        var endPoint = startPoint + new Vector(0, -100);
+        host.Window.MouseMove(startPoint, RawInputModifiers.None);
+        host.Window.MouseDown(startPoint, MouseButton.Left, RawInputModifiers.None);
+        pointerMoved = false;
+        host.Window.MouseMove(endPoint, RawInputModifiers.LeftMouseButton);
+        host.Window.MouseUp(endPoint, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(pointerMoved, "Captured pointer movement must remain routed to custom content.");
+        Assert.Equal(0, scrollViewer.Offset.Y);
+    }
+
+    [AvaloniaFact]
+    public void ScrollViewer_OptIn_Mouse_Drag_Honors_Suppressed_Content_Subtree()
+    {
+        var precisionSurface = new Border { Height = 700, Background = Brushes.Green };
+        MdScrollViewer.SetSuppressMouseDragScrolling(precisionSurface, true);
+        var scrollViewer = new MdScrollViewer
+        {
+            Width = 300,
+            Height = 200,
+            AllowMouseDrag = true,
+            Content = precisionSurface
+        };
+
+        using var host = Show(scrollViewer, 400, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        var startPoint = precisionSurface.TranslatePoint(new Point(150, 150), host.Window)!.Value;
+        var endPoint = startPoint + new Vector(0, -100);
+        host.Window.MouseMove(startPoint, RawInputModifiers.None);
+        host.Window.MouseDown(startPoint, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseMove(endPoint, RawInputModifiers.LeftMouseButton);
+        host.Window.MouseUp(endPoint, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(0, scrollViewer.Offset.Y);
+    }
+
+    [AvaloniaFact]
+    public void ScrollViewer_Thumb_Hover_Preserves_Axis_Length_And_Mouse_Drag_Scrolls()
+    {
+        var scrollViewer = new MdScrollViewer
+        {
+            Width = 300,
+            Height = 220,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            Content = new Border { Width = 280, Height = 1100, Background = Brushes.Blue }
+        };
+
+        using var host = Show(scrollViewer, 400, 360);
+        Dispatcher.UIThread.RunJobs();
+
+        var scrollBar = scrollViewer.GetVisualDescendants().OfType<MdScrollBar>()
+            .Single(bar => bar.Orientation == global::Avalonia.Layout.Orientation.Vertical);
+        var thumb = scrollBar.GetVisualDescendants().OfType<Thumb>().Single();
+        Assert.True(thumb.Bounds.Height >= 32);
+
+        var axisLengthBeforeHover = thumb.Bounds.Height;
+        var thumbCenter = thumb.TranslatePoint(
+            new Point(thumb.Bounds.Width / 2, thumb.Bounds.Height / 2), host.Window)!.Value;
+
+        host.Window.MouseMove(thumbCenter, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.InRange(Math.Abs(thumb.Bounds.Height - axisLengthBeforeHover), 0, 0.01);
+
+        var offsetBeforeDrag = scrollViewer.Offset.Y;
+        var dragEnd = thumbCenter + new Vector(0, 56);
+        host.Window.MouseDown(thumbCenter, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseMove(dragEnd, RawInputModifiers.LeftMouseButton);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.MouseUp(dragEnd, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(scrollViewer.Offset.Y > offsetBeforeDrag,
+            $"Dragging the vertical scrollbar thumb must increase Offset.Y (actual: {scrollViewer.Offset.Y}).");
+    }
+
+    [AvaloniaFact]
+    public void ScrollViewer_Horizontal_Thumb_Hover_Preserves_Axis_Length_And_Mouse_Drag_Scrolls()
+    {
+        var scrollViewer = new MdScrollViewer
+        {
+            Width = 300,
+            Height = 180,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Visible,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            Content = new Border { Width = 1100, Height = 160, Background = Brushes.Green }
+        };
+
+        using var host = Show(scrollViewer, 420, 300);
+        Dispatcher.UIThread.RunJobs();
+
+        var scrollBar = scrollViewer.GetVisualDescendants().OfType<MdScrollBar>()
+            .Single(bar => bar.Orientation == global::Avalonia.Layout.Orientation.Horizontal);
+        var thumb = scrollBar.GetVisualDescendants().OfType<Thumb>().Single();
+        Assert.True(thumb.Bounds.Width >= 32);
+
+        var axisLengthBeforeHover = thumb.Bounds.Width;
+        var thumbCenter = thumb.TranslatePoint(
+            new Point(thumb.Bounds.Width / 2, thumb.Bounds.Height / 2), host.Window)!.Value;
+
+        host.Window.MouseMove(thumbCenter, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.InRange(Math.Abs(thumb.Bounds.Width - axisLengthBeforeHover), 0, 0.01);
+
+        var offsetBeforeDrag = scrollViewer.Offset.X;
+        var dragEnd = thumbCenter + new Vector(56, 0);
+        host.Window.MouseDown(thumbCenter, MouseButton.Left, RawInputModifiers.None);
+        host.Window.MouseMove(dragEnd, RawInputModifiers.LeftMouseButton);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.MouseUp(dragEnd, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(scrollViewer.Offset.X > offsetBeforeDrag,
+            $"Dragging the horizontal scrollbar thumb must increase Offset.X (actual: {scrollViewer.Offset.X}).");
     }
 
     [AvaloniaFact]
@@ -193,9 +434,20 @@ public class MdPhaseThreeAndFourGestureParityTests
         fabMenu.IsOpen = true;
         Dispatcher.UIThread.RunJobs();
 
-        // Trigger should remain anchored and not jump horizontally or stretch container
+        // Trigger should remain anchored and every expanded action shares its trailing edge.
         Assert.True(fabMenu.IsOpen);
         Assert.True(fabMenu.Bounds.Width > 0);
+
+        var trigger = fabMenu.GetVisualDescendants().OfType<MdToggleIconButton>()
+            .Single(control => control.Name == "PART_Trigger");
+        var triggerRight = trigger.TranslatePoint(new Point(trigger.Bounds.Width, 0), fabMenu)!.Value.X;
+        var actions = fabMenu.GetVisualDescendants().OfType<MdFabMenuItem>().ToArray();
+        Assert.NotEmpty(actions);
+        Assert.All(actions, action =>
+        {
+            var actionRight = action.TranslatePoint(new Point(action.Bounds.Width, 0), fabMenu)!.Value.X;
+            Assert.InRange(Math.Abs(actionRight - triggerRight), 0, 0.5);
+        });
     }
 
     [AvaloniaFact]
@@ -329,10 +581,14 @@ public class MdPhaseThreeAndFourGestureParityTests
             }
         };
 
+        object? invoked = null;
+        breadcrumb.ItemInvoked += (_, item) => invoked = item;
         using var host = Show(breadcrumb, 500, 100);
         Dispatcher.UIThread.RunJobs();
 
         breadcrumb.SelectedIndex = 1;
-        Assert.Equal(1, breadcrumb.SelectedIndex);
+        Assert.Equal("Settings", Assert.IsType<MdBreadcrumbItem>(invoked).Label);
+        Assert.Equal(-1, breadcrumb.SelectedIndex);
+        Assert.Null(breadcrumb.SelectedItem);
     }
 }

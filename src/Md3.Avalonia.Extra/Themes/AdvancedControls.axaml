@@ -26,11 +26,13 @@
     <Style Selector="^:selected"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /></Style>
   </ControlTheme>
   <ControlTheme x:Key="EcoCalendarListItemTheme" TargetType="ListBoxItem" BasedOn="{StaticResource EcoListItemTheme}">
-    <Setter Property="MinHeight" Value="40" /><Setter Property="Padding" Value="0" />
+    <Setter Property="MinWidth" Value="48" /><Setter Property="MinHeight" Value="48" /><Setter Property="Padding" Value="0" />
   </ControlTheme>
   <ControlTheme x:Key="EcoCommandPaletteItemTheme" TargetType="ListBoxItem" BasedOn="{StaticResource EcoListItemTheme}">
     <Setter Property="MinHeight" Value="60" /><Setter Property="Padding" Value="16,8" />
     <Setter Property="CornerRadius" Value="16" />
+    <Setter Property="IsEnabled" Value="{ReflectionBinding IsEnabled}" />
+    <Setter Property="AutomationProperties.Name" Value="{ReflectionBinding Title}" />
   </ControlTheme>
   <!-- Chat selection belongs to the bubble, never the full-width row. -->
   <ControlTheme x:Key="EcoChatListItemTheme" TargetType="ListBoxItem">
@@ -69,7 +71,7 @@
             <Popup.Styles><Style Selector="PopupRoot"><Setter Property="Background" Value="Transparent" /><Setter Property="TransparencyLevelHint" Value="Transparent" /><Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /></Style></Popup.Styles>
             <Border x:Name="PART_Surface" Classes="eco-popover-surface" Margin="0,4,0,0" Padding="16,12" MinWidth="160" MaxWidth="400"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="12"
-                    BoxShadow="0 4 16 0 #33000000" Opacity="0"
+                    BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}" Opacity="0"
                     RenderTransform="scale(0.8) translate(0px,-8px)" RenderTransformOrigin="0%,0%">
               <ContentPresenter Content="{TemplateBinding PopoverContent}" />
             </Border>
@@ -87,12 +89,13 @@
     <Setter Property="VerticalAlignment" Value="Stretch" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Grid x:Name="PART_Backdrop" IsVisible="False" IsHitTestVisible="False" Opacity="0" Background="#66000000">
-          <Border x:Name="PART_Surface" Width="600" MaxWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}" MaxHeight="480" VerticalAlignment="Top" Margin="24,72,24,24" Padding="8"
-                  Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="28" BoxShadow="0 8 32 0 #55000000"
+        <Grid x:Name="PART_Backdrop" IsVisible="False" IsHitTestVisible="False" Opacity="0" Background="{DynamicResource Md.Sys.Color.Scrim.Standard.Brush}">
+          <Border x:Name="PART_Surface" MinWidth="0" MaxWidth="600" MaxHeight="480" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="24,72,24,24" Padding="8"
+                  KeyboardNavigation.TabNavigation="Cycle" AutomationProperties.Name="{TemplateBinding AccessibleName}"
+                  Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="28" BoxShadow="{DynamicResource Md.Sys.Elevation.Level5}"
                   Opacity="0" RenderTransform="scale(0.96) translate(0px,-16px)" RenderTransformOrigin="50%,0%">
             <Grid RowDefinitions="Auto,*">
-              <md:MdTextBox Name="PART_QueryBox" Margin="8" PlaceholderText="Search commands"
+              <md:MdTextBox Name="PART_QueryBox" Margin="8" PlaceholderText="{TemplateBinding SearchPlaceholder}"
                             ShowClearButton="True" Variant="Outlined" Text="{TemplateBinding Query, Mode=TwoWay}" />
               <ListBox Name="PART_ItemsHost" Grid.Row="1" Theme="{StaticResource EcoListTheme}"
                        ItemContainerTheme="{StaticResource EcoCommandPaletteItemTheme}"
@@ -100,7 +103,7 @@
                        Background="Transparent">
                 <ListBox.ItemTemplate>
                   <DataTemplate x:DataType="eco:MdCommandItem">
-                    <Grid ColumnDefinitions="*,Auto" MinHeight="44">
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="48" IsEnabled="{Binding IsEnabled}" AutomationProperties.Name="{Binding Title}">
                       <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="{Binding Title}" FontWeight="Medium" />
                         <TextBlock Text="{Binding Description}" FontSize="12" Opacity=".72" />
@@ -110,7 +113,7 @@
                   </DataTemplate>
                 </ListBox.ItemTemplate>
               </ListBox>
-              <TextBlock Grid.Row="1" Classes="eco-empty" IsVisible="False" Margin="24" Text="No matching commands" HorizontalAlignment="Center" />
+              <TextBlock Grid.Row="1" Classes="eco-empty" IsVisible="False" Margin="24" Text="{TemplateBinding EmptyText}" HorizontalAlignment="Center" />
             </Grid>
           </Border>
         </Grid>
@@ -186,15 +189,15 @@
     <Setter Property="Focusable" Value="True" /><Setter Property="Template">
       <ControlTemplate>
         <Grid>
-          <md:MdTextBox Name="PART_Query" Text="{TemplateBinding Query, Mode=TwoWay}" Label="Search" ShowClearButton="True" Variant="Outlined" />
+          <md:MdTextBox Name="PART_Query" Text="{TemplateBinding Query, Mode=TwoWay}" Label="{TemplateBinding SearchText}" ShowClearButton="True" Variant="Outlined" />
           <Popup Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}" Placement="BottomEdgeAlignedLeft" PlacementTarget="{Binding #PART_Query}" IsLightDismissEnabled="True" WindowManagerAddShadowHint="False">
             <Popup.Styles><Style Selector="PopupRoot"><Setter Property="Background" Value="Transparent" /><Setter Property="TransparencyLevelHint" Value="Transparent" /><Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /></Style></Popup.Styles>
             <Border Name="PART_Surface" MinWidth="260" MaxHeight="320" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="0,0,12,12" Padding="4" Opacity="0" RenderTransform="scale(0.96) translate(0px,-8px)" RenderTransformOrigin="50%,0%">
               <Grid>
                 <ListBox Name="PART_Results" Theme="{StaticResource EcoListTheme}" ItemContainerTheme="{StaticResource EcoListItemTheme}" ItemsSource="{TemplateBinding Results}" Background="Transparent" />
                 <md:MdLinearProgressIndicator Classes="eco-loading" IsVisible="False" IsIndeterminate="True" VerticalAlignment="Top" />
-                <TextBlock Classes="eco-empty" IsVisible="False" Text="No results" HorizontalAlignment="Center" Margin="16" />
-                <TextBlock Classes="eco-error" IsVisible="False" Text="Search failed. Try again." HorizontalAlignment="Center" Margin="16" />
+                <TextBlock Classes="eco-empty" IsVisible="False" Text="{TemplateBinding NoResultsText}" HorizontalAlignment="Center" Margin="16" />
+                <TextBlock Classes="eco-error" IsVisible="False" Text="{TemplateBinding SearchErrorText}" HorizontalAlignment="Center" Margin="16" />
               </Grid>
             </Border>
           </Popup>
@@ -210,7 +213,7 @@
 
   <ControlTheme x:Key="{x:Type eco:MdCalendar}" TargetType="eco:MdCalendar">
     <Setter Property="Focusable" Value="True" />
-    <Setter Property="MinWidth" Value="336" />
+    <Setter Property="MinWidth" Value="368" />
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdCalendar">
         <Border Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="20">
@@ -236,8 +239,8 @@
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type eco:MdCalendarDayPresenter}" TargetType="eco:MdCalendarDayPresenter">
-    <Setter Property="Width" Value="40" /><Setter Property="Height" Value="40" />
-    <Setter Property="Template"><ControlTemplate><Border Name="PART_DaySurface" CornerRadius="20" Background="Transparent"><Grid><TextBlock Text="{Binding Day.Date.Day, RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Center" VerticalAlignment="Center" /><ContentPresenter Content="{Binding Day.Badge, RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="9" Margin="0,0,0,1" /></Grid></Border></ControlTemplate></Setter>
+    <Setter Property="Width" Value="48" /><Setter Property="Height" Value="48" />
+    <Setter Property="Template"><ControlTemplate><Border Name="PART_DaySurface" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="20" Background="Transparent"><Grid><TextBlock Text="{Binding Day.Date.Day, RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Center" VerticalAlignment="Center" /><ContentPresenter Content="{Binding Day.Badge, RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="9" Margin="0,0,0,1" /></Grid></Border></ControlTemplate></Setter>
     <Style Selector="^:outside"><Setter Property="Opacity" Value=".55" /></Style>
     <Style Selector="^:today /template/ Border#PART_DaySurface"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="1" /></Style>
     <Style Selector="^:selected /template/ Border#PART_DaySurface"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" /></Style>
@@ -289,7 +292,7 @@
     <Setter Property="Focusable" Value="True" />
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdCascader">
-        <StackPanel Spacing="6">
+        <Grid>
           <Grid>
             <Button Name="PART_Anchor" Theme="{StaticResource EcoCascaderAnchorTheme}">
               <Grid ColumnDefinitions="*,48">
@@ -304,23 +307,28 @@
               <TextBlock FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{TemplateBinding Label}" />
             </Border>
           </Grid>
-          <Border Name="PART_Surface" IsVisible="False" Padding="4"
-                  Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
-                  BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1"
-                  CornerRadius="0,0,12,12" BoxShadow="0 4 16 0 #33000000" ClipToBounds="True"
-                  Opacity="0" RenderTransform="scale(0.96) translate(0px,-8px)" RenderTransformOrigin="50%,0%">
-            <ItemsControl Name="PART_Columns" Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding Columns}">
-              <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-              <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                  <ListBox Theme="{StaticResource EcoListTheme}" ItemContainerTheme="{StaticResource EcoListItemTheme}" ItemsSource="{Binding}" MinWidth="160" MaxHeight="240">
-                    <ListBox.ItemTemplate><DataTemplate x:DataType="eco:MdCascaderItem"><Grid Margin="4" ColumnDefinitions="*,Auto"><TextBlock Text="{Binding Label}" /><TextBlock Grid.Column="1" Text="›" Opacity=".65" IsVisible="{Binding HasChildren}" /></Grid></DataTemplate></ListBox.ItemTemplate>
-                  </ListBox>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-          </Border>
-        </StackPanel>
+          <Popup Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}"
+                 Placement="Bottom" PlacementTarget="{Binding #PART_Anchor}"
+                 IsLightDismissEnabled="True" WindowManagerAddShadowHint="False">
+            <Popup.Styles><Style Selector="PopupRoot"><Setter Property="Background" Value="Transparent" /><Setter Property="TransparencyLevelHint" Value="Transparent" /><Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /></Style></Popup.Styles>
+            <Border Name="PART_Surface" Padding="4"
+                    Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
+                    BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1"
+                    CornerRadius="12" BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}" ClipToBounds="True"
+                    Opacity="0" RenderTransform="scale(0.96) translate(0px,-8px)" RenderTransformOrigin="50%,0%">
+              <ItemsControl Name="PART_Columns" Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding Columns}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <ListBox Theme="{StaticResource EcoListTheme}" ItemContainerTheme="{StaticResource EcoListItemTheme}" ItemsSource="{Binding}" MinWidth="160" MaxHeight="240">
+                      <ListBox.ItemTemplate><DataTemplate x:DataType="eco:MdCascaderItem"><Grid Margin="4" ColumnDefinitions="*,Auto"><TextBlock Text="{Binding Label}" /><TextBlock Grid.Column="1" Text="›" Opacity=".65" IsVisible="{Binding HasChildren}" /></Grid></DataTemplate></ListBox.ItemTemplate>
+                    </ListBox>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Border>
+          </Popup>
+        </Grid>
       </ControlTemplate>
     </Setter>
     <Style Selector="^:present /template/ Border#PART_Surface"><Setter Property="IsVisible" Value="True" /></Style>
@@ -332,28 +340,39 @@
   <ControlTheme x:Key="{x:Type eco:MdTransfer}" TargetType="eco:MdTransfer">
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdTransfer">
-        <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="12">
+        <Grid RowDefinitions="*,Auto" RowSpacing="8">
+          <eco:MdTransferLayoutPanel Name="PART_TransferLayout" IsCompact="{TemplateBinding IsCompact}" Spacing="12">
           <Border Name="PART_SourceSurface" Padding="8" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="16">
             <Grid RowDefinitions="Auto,*" RowSpacing="8">
-              <md:MdTextBox Label="Filter available" ShowClearButton="True" Variant="Outlined" Text="{TemplateBinding SourceFilter, Mode=TwoWay}" />
+              <md:MdTextBox Label="{TemplateBinding SourceFilterLabel}" ShowClearButton="True" Variant="Outlined" Text="{TemplateBinding SourceFilter, Mode=TwoWay}" />
               <ListBox Name="PART_Available" Grid.Row="1" Theme="{StaticResource EcoListTheme}" ItemContainerTheme="{StaticResource EcoListItemTheme}" ItemsSource="{TemplateBinding AvailableItems}" SelectionMode="Multiple" MinHeight="180" />
             </Grid>
           </Border>
-          <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
-            <md:MdIconButton Name="PART_MoveTarget" Icon="{DynamicResource Md.Icon.ChevronRight}" ToolTip.Tip="Move selected to target" />
-            <md:MdButton Name="PART_MoveAllTarget" Content="All →" Size="ExtraSmall" Variant="Text" />
-            <md:MdIconButton Name="PART_MoveSource" Icon="{DynamicResource Md.Icon.ChevronLeft}" ToolTip.Tip="Move selected to available" />
-            <md:MdButton Name="PART_MoveAllSource" Content="← All" Size="ExtraSmall" Variant="Text" />
+          <StackPanel Name="PART_TransferActions" Grid.Column="1" VerticalAlignment="Center" Spacing="8">
+            <md:MdIconButton Name="PART_MoveTarget" Icon="{DynamicResource Md.Icon.ChevronRight}" />
+            <md:MdButton Name="PART_MoveAllTarget" Content="{TemplateBinding AllText}" Size="ExtraSmall" Variant="Text" />
+            <md:MdIconButton Name="PART_MoveSource" Icon="{DynamicResource Md.Icon.ChevronLeft}" />
+            <md:MdButton Name="PART_MoveAllSource" Content="{TemplateBinding AllText}" Size="ExtraSmall" Variant="Text" />
           </StackPanel>
           <Border Name="PART_TargetSurface" Grid.Column="2" Padding="8" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="16">
             <Grid RowDefinitions="Auto,*" RowSpacing="8">
-              <md:MdTextBox Label="Filter selected" ShowClearButton="True" Variant="Outlined" Text="{TemplateBinding TargetFilter, Mode=TwoWay}" />
+              <md:MdTextBox Label="{TemplateBinding TargetFilterLabel}" ShowClearButton="True" Variant="Outlined" Text="{TemplateBinding TargetFilter, Mode=TwoWay}" />
               <ListBox Name="PART_Target" Grid.Row="1" Theme="{StaticResource EcoListTheme}" ItemContainerTheme="{StaticResource EcoListItemTheme}" ItemsSource="{TemplateBinding TargetItems}" SelectionMode="Multiple" MinHeight="180" />
             </Grid>
           </Border>
+          </eco:MdTransferLayoutPanel>
+          <TextBlock Grid.Row="1" Margin="8,0" FontSize="12"
+                     Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                     Text="{TemplateBinding StatusText}"
+                     AutomationProperties.LiveSetting="Polite" />
         </Grid>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:compact /template/ StackPanel#PART_TransferActions"><Setter Property="Orientation" Value="Horizontal" /><Setter Property="HorizontalAlignment" Value="Center" /></Style>
+    <Style Selector="^:compact /template/ ListBox#PART_Available"><Setter Property="MinHeight" Value="128" /></Style>
+    <Style Selector="^:compact /template/ ListBox#PART_Target"><Setter Property="MinHeight" Value="128" /></Style>
+    <Style Selector="^:rtl /template/ md|MdIconButton#PART_MoveTarget"><Setter Property="RenderTransform" Value="scale(-1,1)" /></Style>
+    <Style Selector="^:rtl /template/ md|MdIconButton#PART_MoveSource"><Setter Property="RenderTransform" Value="scale(-1,1)" /></Style>
     <Style Selector="^:dragging"><Setter Property="Cursor" Value="Hand" /></Style>
     <Style Selector="^:drag-to-source /template/ Border#PART_SourceSurface"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="3" /></Style>
     <Style Selector="^:drag-to-target /template/ Border#PART_TargetSurface"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="3" /></Style>
@@ -419,20 +438,23 @@
         <Border BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="12" ClipToBounds="True">
           <Grid RowDefinitions="Auto,*">
             <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" Padding="6,4" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,0,1">
-              <ItemsControl Name="PART_Toolbar" Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding ToolbarCommands}">
+              <ItemsControl Name="PART_Toolbar" Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding ToolbarItems}">
                 <ItemsControl.ItemsPanel>
                   <ItemsPanelTemplate>
                     <WrapPanel Orientation="Horizontal" />
                   </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
-                  <DataTemplate>
-                    <Button Width="34" Height="34" Margin="2" Padding="0" CornerRadius="8"
-                            Background="Transparent" BorderThickness="0"
-                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                            ToolTip.Tip="{Binding Converter={x:Static eco:MdRichEditorCommandConverters.TooltipConverter}}">
-                      <md:MdIcon Glyph="{Binding Converter={x:Static eco:MdRichEditorCommandConverters.GlyphConverter}}" Size="18" />
-                    </Button>
+                  <DataTemplate x:DataType="eco:MdRichEditorCommandDescriptor">
+                    <ToggleButton Width="48" Height="48" Margin="2" Padding="0" CornerRadius="12"
+                                  Background="Transparent" BorderThickness="0"
+                                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                  IsEnabled="{Binding IsEnabled}" IsChecked="{Binding IsChecked, Mode=OneWay}"
+                                  ToolTip.Tip="{Binding AccessibleDescription}"
+                                  AutomationProperties.Name="{Binding Name}"
+                                  AutomationProperties.HelpText="{Binding AccessibleDescription}">
+                      <md:MdIcon Glyph="{Binding Glyph}" Size="18" />
+                    </ToggleButton>
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
@@ -481,8 +503,11 @@
                         </StackPanel>
                       </Grid>
                     </Border>
-                    <ContentPresenter Content="{Binding Message.Content, RelativeSource={RelativeSource TemplatedParent}}"
+                    <ContentPresenter x:Name="PART_RichContent" Content="{Binding Message.Content, RelativeSource={RelativeSource TemplatedParent}}"
                                       Foreground="{TemplateBinding Foreground}" />
+                    <SelectableTextBlock x:Name="PART_TextContent" IsVisible="False" TextWrapping="Wrap"
+                                         Text="{Binding TextContent, RelativeSource={RelativeSource TemplatedParent}}"
+                                         Foreground="{TemplateBinding Foreground}" />
                   </StackPanel>
                   <Border x:Name="PART_State" Background="{TemplateBinding Foreground}" CornerRadius="16" IsHitTestVisible="False" Opacity="0" />
                 </Grid>
@@ -497,7 +522,7 @@
                   <md:MdIcon Glyph="&#xe000;" Size="12" Foreground="{DynamicResource Md.Sys.Color.Error.Brush}" VerticalAlignment="Center" />
                   <TextBlock VerticalAlignment="Center" FontSize="10" Foreground="{DynamicResource Md.Sys.Color.Error.Brush}"
                              Text="{Binding Message.ErrorText, RelativeSource={RelativeSource TemplatedParent}, FallbackValue='Send failed'}" />
-                  <md:MdButton Classes="retry" Content="Retry" Size="ExtraSmall" Variant="Text" />
+                  <md:MdButton Classes="retry" Content="{Binding RetryText, RelativeSource={RelativeSource AncestorType=eco:MdChatView}}" Size="ExtraSmall" Variant="Text" />
                 </StackPanel>
               </Grid>
             </StackPanel>
@@ -508,6 +533,8 @@
     <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.06" /></Style>
     <Style Selector="^:selected /template/ Border#PART_Bubble"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="2.5" /></Style>
     <Style Selector="^:reply /template/ Border#PART_Reply"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:text-content /template/ ContentPresenter#PART_RichContent"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:text-content /template/ SelectableTextBlock#PART_TextContent"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:failed /template/ StackPanel#PART_Failure"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:failed /template/ StackPanel#PART_DeliveryStatus"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:user"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
@@ -536,10 +563,10 @@
   <ControlTheme x:Key="{x:Type eco:MdChatView}" TargetType="eco:MdChatView">
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdChatView">
-        <Grid RowDefinitions="Auto,*,Auto,Auto,Auto">
+        <Grid RowDefinitions="Auto,*,Auto,Auto,Auto,Auto">
           <Border x:Name="PART_SelectionToolbar" Margin="8,4" Padding="12,6" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" CornerRadius="16" IsVisible="False">
             <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8">
-              <md:MdButton Name="PART_CancelSelectionButton" Content="Cancel" Size="Small" Variant="Text" />
+              <md:MdButton Name="PART_CancelSelectionButton" Content="{TemplateBinding CancelText}" Size="Small" Variant="Text" />
               <TextBlock Grid.Column="1" VerticalAlignment="Center" FontWeight="Medium"
                          Text="{Binding SelectionCount, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0} selected'}" />
               <md:MdButton Name="PART_QuoteButton" Grid.Column="2" Content="Quote" Size="Small" Variant="Tonal" />
@@ -547,7 +574,8 @@
             </Grid>
           </Border>
           <ListBox Name="PART_MessagesHost" Grid.Row="1" Theme="{StaticResource EcoListTheme}" ItemContainerTheme="{StaticResource EcoChatListItemTheme}"
-                   ItemsSource="{TemplateBinding MessagesSource}" SelectionMode="Multiple" Background="Transparent" Padding="8,4">
+                   ItemsSource="{TemplateBinding MessagesSource}" SelectionMode="Multiple" Background="Transparent" Padding="8,4"
+                   AutomationProperties.Name="{TemplateBinding MessagesText}">
             <ListBox.ItemTemplate>
               <DataTemplate x:DataType="eco:MdChatMessage">
                 <eco:MdChatMessagePresenter Message="{Binding}"
@@ -555,11 +583,15 @@
               </DataTemplate>
             </ListBox.ItemTemplate>
           </ListBox>
-          <ItemsControl Name="PART_SuggestionsHost" Grid.Row="2" Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding SuggestionsSource}" Margin="8,4">
+          <TextBlock Name="PART_Status" Grid.Row="2" Margin="12,0" MinHeight="16" FontSize="11"
+                     Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                     Text="{TemplateBinding StatusText}" TextWrapping="Wrap"
+                     AutomationProperties.LiveSetting="Polite" />
+          <ItemsControl Name="PART_SuggestionsHost" Grid.Row="3" Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding SuggestionsSource}" Margin="8,4">
             <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate><DataTemplate><md:MdAssistChip Content="{Binding}" Margin="3" /></DataTemplate></ItemsControl.ItemTemplate>
           </ItemsControl>
-          <Border x:Name="PART_QuotePreview" Grid.Row="3" Margin="8,2" Padding="12,8"
+          <Border x:Name="PART_QuotePreview" Grid.Row="4" Margin="8,2" Padding="12,8"
                   Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" CornerRadius="12" IsVisible="False">
             <Grid ColumnDefinitions="3,*,Auto" ColumnSpacing="8">
               <Border Background="{DynamicResource Md.Sys.Color.Primary.Brush}" CornerRadius="2" />
@@ -567,18 +599,18 @@
                 <TextBlock FontSize="11" FontWeight="SemiBold" Text="{Binding QuotedMessage.Sender, RelativeSource={RelativeSource TemplatedParent}, StringFormat='Replying to {0}'}" />
                 <ContentPresenter Content="{Binding QuotedMessage.Content, RelativeSource={RelativeSource TemplatedParent}}" MaxHeight="32" Opacity=".75" />
               </StackPanel>
-              <md:MdButton Name="PART_CancelQuoteButton" Grid.Column="2" Content="Cancel" Size="ExtraSmall" Variant="Text" />
+              <md:MdButton Name="PART_CancelQuoteButton" Grid.Column="2" Content="{TemplateBinding CancelText}" Size="ExtraSmall" Variant="Text" />
             </Grid>
           </Border>
-          <Border Grid.Row="4" Margin="8,6,8,8" Padding="6,4,6,4"
+          <Border Grid.Row="5" Margin="8,6,8,8" Padding="6,4,6,4"
                   Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
                   BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1"
                   CornerRadius="28">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="6" VerticalAlignment="Center">
-              <Button Name="PART_AttachmentButton" Width="36" Height="36" CornerRadius="999"
+              <Button Name="PART_AttachmentButton" Width="48" Height="48" CornerRadius="999"
                       Background="Transparent" BorderThickness="0" Padding="0"
                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                      ToolTip.Tip="Attach file">
+                      ToolTip.Tip="{TemplateBinding AttachFileText}" AutomationProperties.Name="{TemplateBinding AttachFileText}">
                 <md:MdIcon Glyph="&#xe226;" Size="20" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
               </Button>
               <TextBox Name="PART_Composer" Grid.Column="1"
@@ -587,12 +619,13 @@
                        VerticalContentAlignment="Center" Padding="8,6"
                        Background="Transparent" BorderThickness="0"
                        Watermark="Type a message..." TextWrapping="Wrap" />
-              <Button Name="PART_SendButton" Grid.Column="2" Width="36" Height="36" CornerRadius="999"
+              <Button Name="PART_SendButton" Grid.Column="2" Width="48" Height="48" CornerRadius="999"
+                      AutomationProperties.Name="{TemplateBinding SendMessageText}"
                       Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
                       Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}"
                       BorderThickness="0" Padding="0"
                       HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                      ToolTip.Tip="Send message">
+                      ToolTip.Tip="{TemplateBinding SendMessageText}">
                 <md:MdIcon Glyph="&#xe163;" Size="18" Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" />
               </Button>
             </Grid>
@@ -616,12 +649,85 @@
     <Style Selector="^:text /template/ Border.eco-highlight"><Setter Property="CornerRadius" Value="4" /></Style>
   </ControlTheme>
 
+  <ControlTheme x:Key="EcoColorSwatchButtonTheme" TargetType="Button">
+    <!-- A 36-DIP color tile inside the Material minimum 48-DIP interaction target. Selection is
+         communicated by both a high-contrast ring and a checkmark, never by color alone. -->
+    <Setter Property="Width" Value="48" />
+    <Setter Property="Height" Value="48" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Button">
+        <Grid Background="Transparent">
+          <Border x:Name="PART_FocusRing"
+                  Width="46" Height="46" CornerRadius="15"
+                  BorderBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                  BorderThickness="2" Opacity="0" />
+          <Border x:Name="PART_SelectionRing"
+                  Width="42" Height="42" CornerRadius="14"
+                  BorderBrush="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                  BorderThickness="3">
+            <Border.IsVisible>
+              <MultiBinding Converter="{x:Static eco:MdColorConverters.ColorsEqual}">
+                <ReflectionBinding />
+                <Binding Path="SelectedColor" RelativeSource="{RelativeSource AncestorType=eco:MdColorPicker}" />
+              </MultiBinding>
+            </Border.IsVisible>
+          </Border>
+          <Border Width="34" Height="34" CornerRadius="11"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{DynamicResource Md.Sys.Color.Outline.Brush}"
+                  BorderThickness="1" ClipToBounds="True">
+            <Grid>
+              <Border x:Name="PART_StateLayer" Background="{TemplateBinding Foreground}"
+                      Opacity="0" IsHitTestVisible="False" />
+              <ContentPresenter x:Name="PART_SelectedMark"
+                                Content="{TemplateBinding Content}"
+                                Foreground="{TemplateBinding Foreground}"
+                                FontSize="17" FontWeight="Bold"
+                                HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ContentPresenter.IsVisible>
+                  <MultiBinding Converter="{x:Static eco:MdColorConverters.ColorsEqual}">
+                    <ReflectionBinding />
+                    <Binding Path="SelectedColor" RelativeSource="{RelativeSource AncestorType=eco:MdColorPicker}" />
+                  </MultiBinding>
+                </ContentPresenter.IsVisible>
+              </ContentPresenter>
+            </Grid>
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusRing"><Setter Property="Opacity" Value="1" /></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" /></Style>
+  </ControlTheme>
+
+  <LinearGradientBrush x:Key="EcoColorPickerHueBrush" StartPoint="0%,50%" EndPoint="100%,50%">
+    <GradientStop Offset="0" Color="#FFFF0000" />
+    <GradientStop Offset="0.1667" Color="#FFFFFF00" />
+    <GradientStop Offset="0.3333" Color="#FF00FF00" />
+    <GradientStop Offset="0.5" Color="#FF00FFFF" />
+    <GradientStop Offset="0.6667" Color="#FF0000FF" />
+    <GradientStop Offset="0.8333" Color="#FFFF00FF" />
+    <GradientStop Offset="1" Color="#FFFF0000" />
+  </LinearGradientBrush>
+
   <ControlTheme x:Key="{x:Type eco:MdColorPicker}" TargetType="eco:MdColorPicker">
+    <!-- Material has no first-party ColorPicker component. This custom control composes current M3
+         surface, text-field, connected-button, slider, state-layer and target-size guidance. -->
+    <Setter Property="MinWidth" Value="336" />
+    <Setter Property="MaxWidth" Value="420" />
+    <Setter Property="MaxHeight" Value="640" />
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="20" />
-    <Setter Property="Padding" Value="16" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="28" />
+    <Setter Property="Padding" Value="24" />
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdColorPicker">
         <Border Background="{TemplateBinding Background}"
@@ -629,116 +735,260 @@
                 BorderThickness="{TemplateBinding BorderThickness}"
                 CornerRadius="{TemplateBinding CornerRadius}"
                 Padding="{TemplateBinding Padding}"
-                MaxWidth="380">
-          <StackPanel Spacing="14">
-            <!-- Header: Preview Swatch + Hex Input + Copy Button -->
-            <Grid ColumnDefinitions="48,*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
-              <Border Width="48" Height="48" CornerRadius="12"
-                      Background="{TemplateBinding SelectedColor, Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
-                      BoxShadow="{DynamicResource Md.Sys.Elevation.Level1}"
-                      BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
-                      BorderThickness="1" />
-              <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                <TextBlock Text="Color Hex" FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-                <TextBox Name="PART_HexTextBox" Text="{TemplateBinding SelectedHex}" Height="34" CornerRadius="8" FontSize="13" FontWeight="SemiBold" VerticalContentAlignment="Center" Padding="8,4" />
+                ClipToBounds="True">
+          <!-- The picker owns the vertical viewport so a constrained dialog or popup can scroll its
+               full content instead of clipping the lower panels. In an unconstrained page the
+               ScrollViewer keeps the natural content height. -->
+          <ScrollViewer x:Name="PART_ContentScrollViewer"
+                        HorizontalScrollBarVisibility="Disabled"
+                        VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="20">
+            <!-- Selected source color, including a checkerboard behind translucent colors. -->
+            <Border x:Name="PART_PreviewPanel"
+                    IsVisible="{TemplateBinding IsPreviewPanelVisible}"
+                    Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                    CornerRadius="20" Padding="12">
+              <Grid ColumnDefinitions="64,*,48" RowDefinitions="Auto,Auto" ColumnSpacing="12" VerticalAlignment="Center">
+                <Border Width="64" Height="64" CornerRadius="18"
+                        BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                        BorderThickness="1" ClipToBounds="True">
+                  <Grid RowDefinitions="*,*" ColumnDefinitions="*,*">
+                    <Border Background="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+                    <Border Grid.Column="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+                    <Border Grid.Row="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+                    <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+                    <Border Grid.RowSpan="2" Grid.ColumnSpan="2"
+                            Background="{TemplateBinding SelectedColor, Converter={x:Static eco:MdColorConverters.ColorToBrush}}" />
+                  </Grid>
+                </Border>
+                <md:MdTextBox Name="PART_HexTextBox" Grid.Column="1"
+                              Text="{Binding SelectedHex, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                              ErrorText="{TemplateBinding HexValidationMessage}"
+                              IsError="{Binding HexValidationMessage, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static ObjectConverters.IsNotNull}}"
+                              Label="HEX value" Variant="Outlined"
+                              PlaceholderText="#RRGGBB" />
+                <md:MdIconButton Name="PART_CopyHexButton" Grid.Column="2"
+                                 Icon="&#xe14d;"
+                                 Variant="Standard" Size="Small"
+                                 ToolTip.Tip="Copy HEX value"
+                                 AutomationProperties.Name="Copy HEX value" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="4,2,0,0"
+                           FontSize="12" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                           Text="{TemplateBinding CopyStatusMessage}"
+                           AutomationProperties.LiveSetting="Polite" />
+              </Grid>
+            </Border>
+
+            <!-- M3 Expressive recommends connected button groups instead of legacy segmented buttons. -->
+            <md:MdConnectedButtonGroup x:Name="PART_ModeSelector" Size="Small" HorizontalAlignment="Center">
+              <md:MdButton x:Name="PART_PaletteModeButton" Content="Palette" Size="Small" Variant="Text"
+                           Command="{Binding $parent[eco:MdColorPicker].SetPickerModeCommand}"
+                           CommandParameter="MaterialPalette" />
+              <md:MdButton x:Name="PART_SpectrumModeButton" Content="Adjust" Size="Small" Variant="Text"
+                           Command="{Binding $parent[eco:MdColorPicker].SetPickerModeCommand}"
+                           CommandParameter="SpectrumSliders" />
+              <md:MdButton x:Name="PART_PresetsModeButton" Content="Recent" Size="Small" Variant="Text"
+                           Command="{Binding $parent[eco:MdColorPicker].SetPickerModeCommand}"
+                           CommandParameter="Presets" />
+            </md:MdConnectedButtonGroup>
+
+            <StackPanel x:Name="PART_PaletteSection" Spacing="18">
+              <StackPanel Spacing="8">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="Source colors" FontSize="16" FontWeight="Medium" />
+                  <TextBlock Text="Choose a source color for the generated scheme."
+                             FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+                <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding MaterialPrimaryColors}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel Orientation="Horizontal" ItemWidth="48" ItemHeight="48" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="Color">
+                      <Button Theme="{StaticResource EcoColorSwatchButtonTheme}" Content="✓"
+                              Background="{Binding Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
+                              Foreground="{Binding Converter={x:Static eco:MdColorConverters.ContrastBrush}}"
+                              Command="{Binding $parent[eco:MdColorPicker].SelectColorCommand}"
+                              CommandParameter="{Binding}"
+                              ToolTip.Tip="{Binding Converter={x:Static eco:MdColorConverters.ColorToHex}}"
+                              AutomationProperties.Name="{Binding Converter={x:Static eco:MdColorConverters.ColorToHex}}" />
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
               </StackPanel>
-              <Button Name="PART_CopyHexButton" Grid.Column="2" Width="36" Height="36" CornerRadius="18"
-                      Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
-                      Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
-                      BorderThickness="0" Padding="0"
-                      HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                      ToolTip.Tip="Copy Hex Code">
-                <md:MdIcon Glyph="&#xe14d;" Size="18" />
-              </Button>
-            </Grid>
 
-            <!-- Material Primary Colors Grid -->
-            <StackPanel Spacing="6">
-              <TextBlock Text="Material Colors" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-              <ItemsControl ItemsSource="{TemplateBinding MaterialPrimaryColors}">
-                <ItemsControl.ItemsPanel>
-                  <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal" ItemWidth="32" ItemHeight="32" />
-                  </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+              <StackPanel Spacing="8">
+                <StackPanel Spacing="2">
+                  <TextBlock Text="Tonal palette" FontSize="16" FontWeight="Medium" />
+                  <TextBlock Text="HCT tones generated by Material Color Utilities."
+                             FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+                <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding MaterialShades}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel Orientation="Horizontal" ItemWidth="48" ItemHeight="48" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="Color">
+                      <Button Theme="{StaticResource EcoColorSwatchButtonTheme}" Content="✓"
+                              Background="{Binding Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
+                              Foreground="{Binding Converter={x:Static eco:MdColorConverters.ContrastBrush}}"
+                              Command="{Binding $parent[eco:MdColorPicker].SelectColorCommand}"
+                              CommandParameter="{Binding}"
+                              ToolTip.Tip="{Binding Converter={x:Static eco:MdColorConverters.ColorToHex}}"
+                              AutomationProperties.Name="{Binding Converter={x:Static eco:MdColorConverters.ColorToHex}}" />
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </StackPanel>
+
+            <StackPanel x:Name="PART_SpectrumSection" Spacing="10">
+              <StackPanel Spacing="2">
+                <TextBlock Text="Adjust color" FontSize="16" FontWeight="Medium" />
+                <TextBlock Text="Fine-tune HSV values and optional transparency."
+                           FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              </StackPanel>
+              <StackPanel Spacing="0">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Text="Hue" FontSize="14" FontWeight="Medium" />
+                  <TextBlock Grid.Column="1" Text="{Binding Hue, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}°'}"
+                             FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </Grid>
+                <Border Height="10" Margin="0,8,0,0" CornerRadius="5" Background="{StaticResource EcoColorPickerHueBrush}" />
+                <md:MdSlider Minimum="0" Maximum="360" Value="{TemplateBinding Hue, Mode=TwoWay}" ShowValueIndicator="True" />
+              </StackPanel>
+              <StackPanel Spacing="0">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Text="Saturation" FontSize="14" FontWeight="Medium" />
+                  <TextBlock Grid.Column="1" Text="{Binding Saturation, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}%'}"
+                             FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </Grid>
+                <md:MdSlider Minimum="0" Maximum="100" Value="{TemplateBinding Saturation, Mode=TwoWay}" ShowValueIndicator="True" />
+              </StackPanel>
+              <StackPanel Spacing="0">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Text="Value" FontSize="14" FontWeight="Medium" />
+                  <TextBlock Grid.Column="1" Text="{Binding ColorValue, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}%'}"
+                             FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </Grid>
+                <md:MdSlider Minimum="0" Maximum="100" Value="{TemplateBinding ColorValue, Mode=TwoWay}" ShowValueIndicator="True" />
+              </StackPanel>
+              <StackPanel x:Name="PART_AlphaSection" Spacing="0" IsVisible="{TemplateBinding IsAlphaEnabled}">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Text="Opacity" FontSize="14" FontWeight="Medium" />
+                  <TextBlock Grid.Column="1" Text="{Binding Alpha, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}%'}"
+                             FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </Grid>
+                <md:MdSlider Minimum="0" Maximum="100" Value="{TemplateBinding Alpha, Mode=TwoWay}" ShowValueIndicator="True" />
+              </StackPanel>
+            </StackPanel>
+
+            <StackPanel x:Name="PART_PresetsSection" Spacing="8">
+              <StackPanel Spacing="2">
+                <TextBlock Text="Recent colors" FontSize="16" FontWeight="Medium" />
+                <TextBlock Text="Colors selected during this session."
+                           FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              </StackPanel>
+              <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{Binding RecentColors, RelativeSource={RelativeSource TemplatedParent}}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel Orientation="Horizontal" ItemWidth="48" ItemHeight="48" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="Color">
-                    <Button Width="26" Height="26" CornerRadius="13" Margin="2" Padding="0" BorderThickness="0"
+                    <Button Theme="{StaticResource EcoColorSwatchButtonTheme}" Content="✓"
                             Background="{Binding Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
-                            Command="{Binding $parent[eco:MdColorPicker].SelectColor}"
-                            CommandParameter="{Binding}" />
+                            Foreground="{Binding Converter={x:Static eco:MdColorConverters.ContrastBrush}}"
+                            Command="{Binding $parent[eco:MdColorPicker].SelectColorCommand}"
+                            CommandParameter="{Binding}"
+                            ToolTip.Tip="{Binding Converter={x:Static eco:MdColorConverters.ColorToHex}}"
+                              AutomationProperties.Name="{Binding Converter={x:Static eco:MdColorConverters.ColorToHex}}" />
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
             </StackPanel>
-
-            <!-- Shades of Selected Color -->
-            <StackPanel Spacing="6">
-              <TextBlock Text="Tonal Palette (50 - 900)" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-              <ItemsControl ItemsSource="{TemplateBinding MaterialShades}">
-                <ItemsControl.ItemsPanel>
-                  <ItemsPanelTemplate>
-                    <UniformGrid Rows="1" />
-                  </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="Color">
-                    <Button Height="24" CornerRadius="4" Margin="1" Padding="0" BorderThickness="0"
-                            Background="{Binding Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
-                            Command="{Binding $parent[eco:MdColorPicker].SelectColor}"
-                            CommandParameter="{Binding}" />
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
             </StackPanel>
-
-            <!-- Sliders: Hue, Saturation, Value, Alpha -->
-            <StackPanel Spacing="8">
-              <Grid ColumnDefinitions="36,*,36" VerticalAlignment="Center">
-                <TextBlock Text="Hue" FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" VerticalAlignment="Center" />
-                <Slider Grid.Column="1" Minimum="0" Maximum="360" Value="{TemplateBinding Hue, Mode=TwoWay}" Margin="6,0" />
-                <TextBlock Grid.Column="2" Text="{Binding Hue, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}°'}" FontSize="11" TextAlignment="Right" VerticalAlignment="Center" />
-              </Grid>
-              <Grid ColumnDefinitions="36,*,36" VerticalAlignment="Center">
-                <TextBlock Text="Sat" FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" VerticalAlignment="Center" />
-                <Slider Grid.Column="1" Minimum="0" Maximum="100" Value="{TemplateBinding Saturation, Mode=TwoWay}" Margin="6,0" />
-                <TextBlock Grid.Column="2" Text="{Binding Saturation, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}%'}" FontSize="11" TextAlignment="Right" VerticalAlignment="Center" />
-              </Grid>
-              <Grid ColumnDefinitions="36,*,36" VerticalAlignment="Center">
-                <TextBlock Text="Val" FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" VerticalAlignment="Center" />
-                <Slider Grid.Column="1" Minimum="0" Maximum="100" Value="{TemplateBinding ColorValue, Mode=TwoWay}" Margin="6,0" />
-                <TextBlock Grid.Column="2" Text="{Binding ColorValue, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}%'}" FontSize="11" TextAlignment="Right" VerticalAlignment="Center" />
-              </Grid>
-              <Grid ColumnDefinitions="36,*,36" VerticalAlignment="Center" IsVisible="{TemplateBinding IsAlphaEnabled}">
-                <TextBlock Text="Alpha" FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" VerticalAlignment="Center" />
-                <Slider Grid.Column="1" Minimum="0" Maximum="100" Value="{TemplateBinding Alpha, Mode=TwoWay}" Margin="6,0" />
-                <TextBlock Grid.Column="2" Text="{Binding Alpha, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:F0}%'}" FontSize="11" TextAlignment="Right" VerticalAlignment="Center" />
-              </Grid>
-            </StackPanel>
-
-            <!-- Recent Colors -->
-            <StackPanel Spacing="6">
-              <TextBlock Text="Recent Colors" FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-              <ItemsControl ItemsSource="{Binding RecentColors, RelativeSource={RelativeSource TemplatedParent}}">
-                <ItemsControl.ItemsPanel>
-                  <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="6" />
-                  </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate x:DataType="Color">
-                    <Button Width="22" Height="22" CornerRadius="11" Padding="0" BorderThickness="0"
-                            Background="{Binding Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
-                            Command="{Binding $parent[eco:MdColorPicker].SelectColor}"
-                            CommandParameter="{Binding}" />
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-            </StackPanel>
-          </StackPanel>
+          </ScrollViewer>
         </Border>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^ /template/ md|MdConnectedButtonGroup#PART_ModeSelector"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:mode-selector-visible /template/ md|MdConnectedButtonGroup#PART_ModeSelector"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^ /template/ md|MdButton#PART_PaletteModeButton"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^ /template/ md|MdButton#PART_SpectrumModeButton"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^ /template/ md|MdButton#PART_PresetsModeButton"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:palette-panel-visible /template/ md|MdButton#PART_PaletteModeButton"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:spectrum-panel-visible /template/ md|MdButton#PART_SpectrumModeButton"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:presets-panel-visible /template/ md|MdButton#PART_PresetsModeButton"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^ /template/ StackPanel#PART_PaletteSection"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^ /template/ StackPanel#PART_SpectrumSection"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^ /template/ StackPanel#PART_PresetsSection"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:palette /template/ StackPanel#PART_PaletteSection"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:spectrum /template/ StackPanel#PART_SpectrumSection"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:presets /template/ StackPanel#PART_PresetsSection"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:palette /template/ md|MdButton#PART_PaletteModeButton"><Setter Property="Variant" Value="Tonal" /></Style>
+    <Style Selector="^:spectrum /template/ md|MdButton#PART_SpectrumModeButton"><Setter Property="Variant" Value="Tonal" /></Style>
+    <Style Selector="^:presets /template/ md|MdButton#PART_PresetsModeButton"><Setter Property="Variant" Value="Tonal" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type eco:MdColorPickerButton}" TargetType="eco:MdColorPickerButton">
+    <Setter Property="Width" Value="48" />
+    <Setter Property="Height" Value="48" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdColorPickerButton">
+        <Grid>
+          <Button x:Name="PART_DropDownButton"
+                  Theme="{StaticResource EcoColorSwatchButtonTheme}"
+                  Background="{TemplateBinding SelectedColor, Converter={x:Static eco:MdColorConverters.ColorToBrush}}"
+                  Foreground="{TemplateBinding SelectedColor, Converter={x:Static eco:MdColorConverters.ContrastBrush}}"
+                  ToolTip.Tip="{TemplateBinding SelectedHex}"
+                  AutomationProperties.Name="Choose color" />
+          <Popup x:Name="PART_Popup"
+                 PlacementTarget="{Binding #PART_DropDownButton}"
+                 Placement="BottomEdgeAlignedLeft"
+                 IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                 IsLightDismissEnabled="True"
+                 WindowManagerAddShadowHint="False">
+            <Popup.Styles>
+              <Style Selector="PopupRoot">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="TransparencyLevelHint" Value="Transparent" />
+                <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
+              </Style>
+            </Popup.Styles>
+            <Border Margin="0,8,0,0" CornerRadius="28"
+                    BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}"
+                    ClipToBounds="True">
+              <eco:MdColorPicker x:Name="PART_Picker"
+                                 Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
+                                 SelectedColor="{TemplateBinding SelectedColor, Mode=TwoWay}"
+                                 SelectedHex="{TemplateBinding SelectedHex, Mode=TwoWay}" />
+            </Border>
+          </Popup>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- Experimental motion shells: these themes guarantee content rendering only. They are not
+       counted as completed Material transitions until outgoing-content lifecycle and interruption
+       behavior are implemented. -->
+  <ControlTheme x:Key="{x:Type eco:MdSharedAxis}" TargetType="eco:MdSharedAxis">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdSharedAxis">
+        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type eco:MdFadeThrough}" TargetType="eco:MdFadeThrough">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdFadeThrough">
+        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type eco:MdAnimatedVisibility}" TargetType="eco:MdAnimatedVisibility">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdAnimatedVisibility">
+        <ContentPresenter x:Name="PART_Content" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:hidden /template/ ContentPresenter#PART_Content"><Setter Property="IsVisible" Value="False" /></Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type eco:MdContainerTransform}" TargetType="eco:MdContainerTransform">

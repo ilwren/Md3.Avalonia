@@ -77,7 +77,7 @@
                                  AutomationProperties.Name="Next page" />
               </Grid>
             </Border>
-              <Border x:Name="PART_LoadingLayer" Grid.RowSpan="3" Background="#66000000" IsVisible="False">
+              <Border x:Name="PART_LoadingLayer" Grid.RowSpan="3" Background="{DynamicResource Md.Sys.Color.Scrim.Standard.Brush}" IsVisible="False">
                 <md:MdCircularProgressIndicator HorizontalAlignment="Center" VerticalAlignment="Center" IsIndeterminate="True" />
               </Border>
             </Grid>
@@ -149,7 +149,7 @@
     <Setter Property="Foreground" Value="White" /><Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdGridTileBar">
-        <Border MinHeight="56" Background="#B3000000" ClipToBounds="True">
+        <Border MinHeight="56" Background="{DynamicResource Md.Sys.Color.Scrim.Strong.Brush}" ClipToBounds="True">
           <Grid>
             <Grid Margin="12,8" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
               <ContentPresenter Grid.Column="0" VerticalAlignment="Center" Content="{TemplateBinding Leading}" />
@@ -242,63 +242,70 @@
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdSimpleDialog}" TargetType="md:MdSimpleDialog">
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdSimpleDialog">
-        <Border x:Name="PART_Surface" MinWidth="320" MaxWidth="560" MaxHeight="640" Padding="24,20"
-                Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="28"
-                BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}" IsVisible="False" IsHitTestVisible="False"
-                Opacity="0" RenderTransform="scale(0.9)" RenderTransformOrigin="50%,50%">
-          <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
-            <ContentPresenter Content="{TemplateBinding Title}" FontSize="24"
-                              Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
-            <ListBox x:Name="PART_ItemsHost" Grid.Row="1" Theme="{StaticResource MdFlutterListBoxTheme}"
-                     ItemContainerTheme="{StaticResource MdFlutterListItemTheme}" MaxHeight="480"
-                     ItemsSource="{TemplateBinding ItemsSource}" ItemTemplate="{TemplateBinding ItemTemplate}"
-                     SelectedItem="{TemplateBinding SelectedItem, Mode=TwoWay}" Background="Transparent" BorderThickness="0" />
-            <md:MdButton x:Name="PART_CancelButton" Grid.Row="2" HorizontalAlignment="Right"
-                         Content="{TemplateBinding CancelText}" Size="ExtraSmall" Variant="Text" />
-          </Grid>
-        </Border>
+        <Grid x:Name="PART_Overlay" MinWidth="0" MinHeight="0" IsVisible="False">
+          <Border x:Name="PART_Scrim" Background="{DynamicResource Md.Sys.Color.Scrim.Brush}" Opacity="0.32" />
+          <Border x:Name="PART_Surface" MinWidth="0" MaxWidth="560" MaxHeight="640" Margin="24" Padding="24,20"
+                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                  Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="28"
+                  BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}" IsHitTestVisible="False"
+                  Opacity="0" RenderTransform="scale(0.9)" RenderTransformOrigin="50%,50%">
+            <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+              <ContentPresenter Content="{TemplateBinding Title}" FontSize="24"
+                                Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+              <ListBox x:Name="PART_ItemsHost" Grid.Row="1" Theme="{StaticResource MdFlutterListBoxTheme}"
+                       ItemContainerTheme="{StaticResource MdFlutterListItemTheme}" MaxHeight="480"
+                       ItemsSource="{TemplateBinding ItemsSource}" ItemTemplate="{TemplateBinding ItemTemplate}"
+                       SelectedItem="{TemplateBinding SelectedItem, Mode=TwoWay}" Background="Transparent" BorderThickness="0" />
+              <md:MdButton x:Name="PART_CancelButton" Grid.Row="2" HorizontalAlignment="Right"
+                           Content="{TemplateBinding CancelText}" Size="ExtraSmall" Variant="Text" />
+            </Grid>
+          </Border>
+        </Grid>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:present /template/ Border#PART_Surface"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:present /template/ Grid#PART_Overlay"><Setter Property="IsVisible" Value="True" /></Style>
+    <!-- Hit testing is owned by MdSimpleDialog.UpdateHitTesting so the still-visible exit
+         surface can never intercept input after IsOpen becomes false. -->
     <Style Selector="^:open /template/ Border#PART_Surface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
     <Style Selector="^:reduced-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdAboutDialog}" TargetType="md:MdAboutDialog">
-    <Setter Property="Template"><ControlTemplate TargetType="md:MdAboutDialog"><Border MinWidth="320" MaxWidth="560" Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="28"><Grid ColumnDefinitions="Auto,*" ColumnSpacing="20"><ContentPresenter Content="{TemplateBinding ApplicationIcon}" /><StackPanel Grid.Column="1" Spacing="6"><TextBlock FontSize="24" Text="{TemplateBinding ApplicationName}" /><TextBlock Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{TemplateBinding ApplicationVersion}" /><TextBlock Margin="0,8,0,0" TextWrapping="Wrap" Text="{TemplateBinding Legalese}" /><ContentPresenter Margin="0,8,0,0" Content="{TemplateBinding Content}" /></StackPanel></Grid></Border></ControlTemplate></Setter>
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdAboutDialog"><Border MinWidth="0" MaxWidth="560" Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="28"><Grid ColumnDefinitions="Auto,*" ColumnSpacing="20"><ContentPresenter Content="{TemplateBinding ApplicationIcon}" /><StackPanel Grid.Column="1" Spacing="6"><TextBlock FontSize="24" Text="{TemplateBinding ApplicationName}" /><TextBlock Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{TemplateBinding ApplicationVersion}" /><TextBlock Margin="0,8,0,0" TextWrapping="Wrap" Text="{TemplateBinding Legalese}" /><ContentPresenter Margin="0,8,0,0" Content="{TemplateBinding Content}" /></StackPanel></Grid></Border></ControlTemplate></Setter>
   </ControlTheme>
   <ControlTheme x:Key="{x:Type md:MdLicensePage}" TargetType="md:MdLicensePage">
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdLicensePage">
-        <Grid ColumnDefinitions="260,*" ColumnSpacing="16">
-          <Grid RowDefinitions="Auto,*" RowSpacing="10">
-            <md:MdTextBox Label="{TemplateBinding FilterLabel}" ShowClearButton="True"
-                          Text="{TemplateBinding Filter, Mode=TwoWay}" Variant="Outlined" />
-            <ListBox Grid.Row="1" Theme="{StaticResource MdFlutterListBoxTheme}"
-                     ItemContainerTheme="{StaticResource MdFlutterListItemTheme}"
-                     ItemsSource="{TemplateBinding FilteredLicenses}"
-                     SelectedItem="{TemplateBinding SelectedLicense, Mode=TwoWay}">
-              <ListBox.ItemTemplate>
-                <DataTemplate x:DataType="md:MdLicenseEntry">
-                  <StackPanel Spacing="2"><TextBlock FontWeight="Medium" Text="{Binding Package}" /><TextBlock FontSize="12" Text="{Binding License}" /></StackPanel>
-                </DataTemplate>
-              </ListBox.ItemTemplate>
-            </ListBox>
+        <Grid>
+          <Grid x:Name="PART_WideLayout" ColumnDefinitions="260,*" ColumnSpacing="16">
+            <Grid RowDefinitions="Auto,*" RowSpacing="10">
+              <md:MdTextBox Label="{TemplateBinding FilterLabel}" ShowClearButton="True" Text="{TemplateBinding Filter, Mode=TwoWay}" Variant="Outlined" />
+              <ListBox Grid.Row="1" Theme="{StaticResource MdFlutterListBoxTheme}" ItemContainerTheme="{StaticResource MdFlutterListItemTheme}" ItemsSource="{TemplateBinding FilteredLicenses}" SelectedItem="{TemplateBinding SelectedLicense, Mode=TwoWay}">
+                <ListBox.ItemTemplate><DataTemplate x:DataType="md:MdLicenseEntry"><StackPanel Spacing="2"><TextBlock FontWeight="Medium" Text="{Binding Package}" TextWrapping="Wrap" /><TextBlock FontSize="12" Text="{Binding License}" TextWrapping="Wrap" /></StackPanel></DataTemplate></ListBox.ItemTemplate>
+              </ListBox>
+            </Grid>
+            <Border Grid.Column="1" Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
+              <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Spacing="8"><TextBlock FontSize="24" Text="{Binding SelectedLicense.Package, RelativeSource={RelativeSource TemplatedParent}}" TextWrapping="Wrap" /><TextBlock Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{Binding SelectedLicense.License, RelativeSource={RelativeSource TemplatedParent}}" TextWrapping="Wrap" /><TextBlock TextWrapping="Wrap" Text="{Binding SelectedLicense.Text, RelativeSource={RelativeSource TemplatedParent}}" /></StackPanel></md:MdScrollViewer>
+            </Border>
           </Grid>
-          <Border Grid.Column="1" Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
-            <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-              <StackPanel Spacing="8">
-                <TextBlock FontSize="24" Text="{Binding SelectedLicense.Package, RelativeSource={RelativeSource TemplatedParent}}" />
-                <TextBlock Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{Binding SelectedLicense.License, RelativeSource={RelativeSource TemplatedParent}}" />
-                <TextBlock TextWrapping="Wrap" Text="{Binding SelectedLicense.Text, RelativeSource={RelativeSource TemplatedParent}}" />
-              </StackPanel>
-            </md:MdScrollViewer>
-          </Border>
+          <Grid x:Name="PART_CompactLayout" RowDefinitions="Auto,160,*" RowSpacing="12" IsVisible="False">
+            <md:MdTextBox Label="{TemplateBinding FilterLabel}" ShowClearButton="True" Text="{TemplateBinding Filter, Mode=TwoWay}" Variant="Outlined" />
+            <ListBox Grid.Row="1" Theme="{StaticResource MdFlutterListBoxTheme}" ItemContainerTheme="{StaticResource MdFlutterListItemTheme}" ItemsSource="{TemplateBinding FilteredLicenses}" SelectedItem="{TemplateBinding SelectedLicense, Mode=TwoWay}">
+              <ListBox.ItemTemplate><DataTemplate x:DataType="md:MdLicenseEntry"><StackPanel Spacing="2"><TextBlock FontWeight="Medium" Text="{Binding Package}" TextWrapping="Wrap" /><TextBlock FontSize="12" Text="{Binding License}" TextWrapping="Wrap" /></StackPanel></DataTemplate></ListBox.ItemTemplate>
+            </ListBox>
+            <Border Grid.Row="2" Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
+              <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Spacing="8"><TextBlock FontSize="22" Text="{Binding SelectedLicense.Package, RelativeSource={RelativeSource TemplatedParent}}" TextWrapping="Wrap" /><TextBlock Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{Binding SelectedLicense.License, RelativeSource={RelativeSource TemplatedParent}}" TextWrapping="Wrap" /><TextBlock TextWrapping="Wrap" Text="{Binding SelectedLicense.Text, RelativeSource={RelativeSource TemplatedParent}}" /></StackPanel></md:MdScrollViewer>
+            </Border>
+          </Grid>
         </Grid>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:compact /template/ Grid#PART_WideLayout"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:compact /template/ Grid#PART_CompactLayout"><Setter Property="IsVisible" Value="True" /></Style>
   </ControlTheme>
 
   <!-- Flutter Material phase 4: advanced surfaces and adaptation -->

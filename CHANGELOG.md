@@ -2,6 +2,56 @@
 
 All notable changes follow Keep a Changelog. The project intends to use Semantic Versioning after the preview cycle.
 
+## [0.3.0-preview.1] - 2026-10-03
+
+### Added
+
+- Added an Android `EmbeddableControlRoot` visual-layer host so ComboBox and other popup controls can use Avalonia's overlay fallback in a single-view lifetime.
+- Added a complete, grouped and scrollable Android Gallery navigation shell covering every registered sample page.
+- Added `MdFabMenu.IsInitiallyOpen` while preserving two-way `IsOpen` and independent up/down expansion.
+- Added configurable ColorPicker preview, palette, spectrum and recent-color panels plus an internal constrained-height scroll viewport.
+- Added focused P0/P1/P2 accessibility, responsive, localization, motion and token regression tests.
+- Added the complete official Material Symbols Rounded variable TTF and a real-outline Lite subset, both pinned and verified from the Google upstream asset.
+- Added a standalone Material theme for native Avalonia `ItemsControl`, so `ItemsSource` plus `ItemTemplate` renders without requiring FluentTheme.
+
+### Changed
+
+- Completed the 2026-10-02 audit remediation across menu/modal focus, picker and range semantics, RTL, reduced motion, touch targets, automation peers, overlay behavior, responsive layouts and inherited en/zh localization.
+- Replaced fixed outlined-field label patches with transparent outline notches and kept host backgrounds visible.
+- Retargeted tab indicator spatial motion with a velocity-preserving spring runner; reduced/none schemes snap without spatial animation.
+- Updated app bars, toolbars, button groups and split buttons to audited Material component tokens and logical RTL geometry.
+- Made Cascader a true popup, Transfer and CommandPalette responsive, and Breadcrumb overflow behavior invokable.
+- Improved failed-test diagnostics so GitHub annotations include the exact headless test name.
+- Aligned breadcrumb overflow with the audited Flutter package model: wrap, horizontal scroll, or explicit collapse, with no trailing divider or persistent parent selection by default.
+- Changed carousel geometry to follow Material keyline/navigation state rather than pointer selection; small items now stay in the official 40–56 DIP range.
+- Reworked Gallery navigation selection so exactly one destination owns the active indicator, and added 360/412 DIP Android page constraint/reflow handling.
+
+### Fixed
+
+- Fixed connected/standard button-group defaults so group-managed style-trigger values never overwrite explicit local child values.
+- Fixed compact rating hit testing to retain full 48-DIP input cells around smaller visible stars.
+- Fixed chat selection so only presses inside the visual message bubble select a row.
+- Fixed Cascader open staging and prevented initial keyboard focus from committing a hierarchy selection.
+- Fixed the split-button two-DIP visible gap while preserving the independent 48-DIP trailing touch target.
+- Fixed Windows custom chrome to preserve Full native caption style bits for Windows 11 DWM state animations, use the Win32 system menu, and avoid drawing a second outer border.
+
+### Validation status
+
+- Desktop Gallery build, NuGet package verification and the full headless suite are required green release gates.
+- Physical Android, Narrator, VoiceOver and Orca sign-off remain explicit external validation items; this preview does not claim those checks without recorded hardware/OS evidence.
+
+## [0.2.0] - 2026-10-02
+
+- Fixed Gallery diagnostics restore, Android deployment mappings, scrolling input parity, FAB menu alignment, breadcrumb rendering, and color-picker selection.
+- Updated all NuGet packages to `0.2.0` and added Material 3 HCT tonal-palette generation for color picking.
+- Added independent up/down FAB-menu expansion and refreshed the custom color picker with current Material surfaces, connected mode controls, accessible swatches, and generated role previews.
+- Fixed `MdScrollBar` hover sizing so the track-computed thumb length remains stable and mouse thumb dragging works.
+- Added type-selected `MdDialogHost.DataTemplates` support and an `MdSnackbarHost`/`IMdSnackbarService` queue for ViewModel-driven transient messages.
+- Changed desktop `MdScrollViewer` mouse panning to opt-in and made child direct-manipulation gestures take precedence over page dragging.
+- Fixed the Android Gallery startup theme to inherit from AppCompat, as required by `AvaloniaMainActivity`.
+- Added standalone Material `Window`, `PopupRoot`, and `OverlayPopupHost` themes so Android can use Avalonia's popup fallback while desktop retains native popups.
+- Replaced fixed-color outlined field label patches with transparent stroke notches for `MdTextBox` and `MdComboBox`.
+
 ## [0.1.0-preview.1] - 2026-09-24
 
 ### Added
@@ -34,5 +84,4 @@ All notable changes follow Keep a Changelog. The project intends to use Semantic
 
 ### Known limitations
 
-- Material Symbols Rounded TTF is intentionally excluded from this preview; unresolved symbol slots remain visually empty until the optional Icons package or a host-provided font/resource mapping is registered.
 - Physical Android ARM64, Narrator, VoiceOver and Orca acceptance require external hardware/OS sign-off; see `docs/RELEASE_VALIDATION.md`.

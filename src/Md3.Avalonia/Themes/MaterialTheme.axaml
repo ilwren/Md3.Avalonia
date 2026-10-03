@@ -13,6 +13,8 @@
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/CheckBoxTokens.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/ComboBoxTokens.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/ActionButtonTokens.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/ToolbarTokens.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdTopLevel.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdFoundation.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdDesktopAdapters.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdButton.axaml" />
@@ -34,6 +36,7 @@
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdTimePicker.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdDialog.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdDivider.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdItemsControl.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdList.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdProgress.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdMenu.axaml" />

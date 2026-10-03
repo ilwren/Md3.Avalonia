@@ -3,6 +3,8 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows.Input;
 using Avalonia;
+using Avalonia.Automation;
+using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
@@ -31,6 +33,9 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
     public static readonly DirectProperty<MdAsyncSelect, MdAsyncRequestState> StateProperty = AvaloniaProperty.RegisterDirect<MdAsyncSelect, MdAsyncRequestState>(nameof(State), control => control.State);
     public static readonly DirectProperty<MdAsyncSelect, Exception?> ErrorProperty = AvaloniaProperty.RegisterDirect<MdAsyncSelect, Exception?>(nameof(Error), control => control.Error);
     public static readonly DirectProperty<MdAsyncSelect, bool> IsPopupOpenProperty = AvaloniaProperty.RegisterDirect<MdAsyncSelect, bool>(nameof(IsPopupOpen), control => control.IsPopupOpen);
+    public static readonly DirectProperty<MdAsyncSelect, string> SearchTextProperty = AvaloniaProperty.RegisterDirect<MdAsyncSelect, string>(nameof(SearchText), control => control.SearchText);
+    public static readonly DirectProperty<MdAsyncSelect, string> NoResultsTextProperty = AvaloniaProperty.RegisterDirect<MdAsyncSelect, string>(nameof(NoResultsText), control => control.NoResultsText);
+    public static readonly DirectProperty<MdAsyncSelect, string> SearchErrorTextProperty = AvaloniaProperty.RegisterDirect<MdAsyncSelect, string>(nameof(SearchErrorText), control => control.SearchErrorText);
     private readonly DispatcherTimer _timer = new();
     private readonly MdPresenceController _popupPresence;
     private IReadOnlyList<object?> _results = Array.Empty<object?>();
@@ -47,6 +52,9 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
     private bool _isAttached;
     private bool _synchronizingDisplayText;
     private bool _synchronizingSelection;
+    private string _searchText = string.Empty;
+    private string _noResultsText = string.Empty;
+    private string _searchErrorText = string.Empty;
 
     static MdAsyncSelect()
     {
@@ -56,12 +64,14 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
         IsDropDownOpenProperty.Changed.AddClassHandler<MdAsyncSelect>((control, _) => control.UpdateOpenState());
         IsMultiSelectProperty.Changed.AddClassHandler<MdAsyncSelect>((control, _) => control.UpdateSelectionMode());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdAsyncSelect>((control, _) => control.UpdateMotion());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdAsyncSelect>((control, _) => control.UpdateLocalizedText());
     }
     public MdAsyncSelect()
     {
         _popupPresence = new MdPresenceController(control => SetPopupPresence(control));
         _popupPresence.Initialize(IsDropDownOpen);
         _timer.Tick += async (_, _) => { _timer.Stop(); await SearchAsync(); };
+        UpdateLocalizedText();
         UpdateRequestState();
         UpdateOpenState();
     }
@@ -79,6 +89,9 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
     public bool IsMultiSelect { get => GetValue(IsMultiSelectProperty); set => SetValue(IsMultiSelectProperty, value); }
     public ObservableCollection<object?> SelectedItems { get; } = [];
     public IReadOnlyList<object?> Results => _results;
+    public string SearchText => _searchText;
+    public string NoResultsText => _noResultsText;
+    public string SearchErrorText => _searchErrorText;
     public bool IsPopupOpen
     {
         get => _isPopupOpen;
@@ -135,6 +148,13 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
         }
         SelectionCommitted?.Invoke(this, item);
         if (!IsMultiSelect) IsDropDownOpen = false;
+    }
+
+    private void UpdateLocalizedText()
+    {
+        SetAndRaise(SearchTextProperty, ref _searchText, MdLocalization.GetString("Search", this));
+        SetAndRaise(NoResultsTextProperty, ref _noResultsText, MdLocalization.GetString("NoResults", this));
+        SetAndRaise(SearchErrorTextProperty, ref _searchErrorText, MdLocalization.GetString("SearchFailed", this));
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -369,7 +389,12 @@ public sealed class MdCalendar : TemplatedControl
         SelectionModeProperty.Changed.AddClassHandler<MdCalendar>((control, _) => control.Rebuild());
         MdLocalization.CultureProperty.Changed.AddClassHandler<MdCalendar>((control, _) => control.Rebuild());
     }
-    public MdCalendar() => Rebuild();
+    public MdCalendar()
+    {
+        AutomationProperties.SetName(this, MdLocalization.GetString("Calendar", this));
+        AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Polite);
+        Rebuild();
+    }
     public DateTimeOffset DisplayMonth { get => GetValue(DisplayMonthProperty); set => SetValue(DisplayMonthProperty, value); }
     public DateTimeOffset? SelectedDate { get => GetValue(SelectedDateProperty); set => SetValue(SelectedDateProperty, value); }
     public DateTimeOffset? RangeEnd { get => GetValue(RangeEndProperty); set => SetValue(RangeEndProperty, value); }
@@ -465,13 +490,34 @@ public sealed class MdCalendar : TemplatedControl
             _daysList.AddHandler(InputElement.PointerMovedEvent, OnDayPointerMoved, global::Avalonia.Interactivity.RoutingStrategies.Tunnel, true);
             _daysList.AddHandler(InputElement.PointerReleasedEvent, OnDayPointerReleased, global::Avalonia.Interactivity.RoutingStrategies.Tunnel, true);
         }
-        if (_previousButton is not null) _previousButton.Click += OnPreviousMonth;
-        if (_nextButton is not null) _nextButton.Click += OnNextMonth;
+        if (_previousButton is not null)
+        {
+            _previousButton.Click += OnPreviousMonth;
+            AutomationProperties.SetName(_previousButton, MdLocalization.GetString("PreviousMonth", this));
+        }
+        if (_nextButton is not null)
+        {
+            _nextButton.Click += OnNextMonth;
+            AutomationProperties.SetName(_nextButton, MdLocalization.GetString("NextMonth", this));
+        }
+        Dispatcher.UIThread.Post(UpdateDayAutomation, DispatcherPriority.Loaded);
     }
     protected override void OnKeyDown(KeyEventArgs e)
     {
         var current = SelectedDate ?? DisplayMonth;
-        var next = e.Key switch { Key.Left => current.AddDays(-1), Key.Right => current.AddDays(1), Key.Up => current.AddDays(-7), Key.Down => current.AddDays(7), Key.PageUp => current.AddMonths(-1), Key.PageDown => current.AddMonths(1), Key.Home => current.AddDays(-(int)current.DayOfWeek), Key.End => current.AddDays(6 - (int)current.DayOfWeek), _ => current };
+        var rtl = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft;
+        var next = e.Key switch
+        {
+            Key.Left => current.AddDays(rtl ? 1 : -1),
+            Key.Right => current.AddDays(rtl ? -1 : 1),
+            Key.Up => current.AddDays(-7),
+            Key.Down => current.AddDays(7),
+            Key.PageUp => current.AddMonths(-1),
+            Key.PageDown => current.AddMonths(1),
+            Key.Home => current.AddDays(-(int)current.DayOfWeek),
+            Key.End => current.AddDays(6 - (int)current.DayOfWeek),
+            _ => current
+        };
         if (next != current) { SelectDate(next); DisplayMonth = new DateTimeOffset(next.Year, next.Month, 1, 0, 0, 0, next.Offset); e.Handled = true; }
         else base.OnKeyDown(e);
     }
@@ -548,7 +594,40 @@ public sealed class MdCalendar : TemplatedControl
             return new MdCalendarDay(date, date.Month == month.Month, date.Date == DateTimeOffset.Now.Date, selected, rangeStart == date.Date, rangeEnd == date.Date, BadgeProvider?.Invoke(date), IsDateEnabled?.Invoke(date) != false);
         }).ToArray();
         SetAndRaise(VisibleDaysProperty, ref _visibleDays, days);
+        AutomationProperties.SetName(this, $"{MdLocalization.GetString("Calendar", this)}, {DisplayMonthText}");
+        AutomationProperties.SetHelpText(this, SelectedDate is { } selected
+            ? selected.ToString("D", culture)
+            : DisplayMonthText);
+        Dispatcher.UIThread.Post(UpdateDayAutomation, DispatcherPriority.Loaded);
     }
+
+    private void UpdateDayAutomation()
+    {
+        if (_daysList is null) return;
+        var culture = MdLocalization.ResolveCulture(this);
+        foreach (var row in _daysList.GetRealizedContainers().OfType<ListBoxItem>())
+        {
+            var day = row.DataContext as MdCalendarDay ?? row.Content as MdCalendarDay;
+            if (day is null) continue;
+            var index = VisibleDays.ToList().FindIndex(value => value.Date.Date == day.Date.Date);
+            var states = new List<string>();
+            if (day.IsSelected) states.Add(MdLocalization.GetString("Selected", this));
+            if (day.IsToday) states.Add(MdLocalization.GetString("Today", this));
+            if (!day.IsEnabled) states.Add(MdLocalization.GetString("Unavailable", this));
+            AutomationProperties.SetName(row, day.Date.ToString("D", culture));
+            AutomationProperties.SetHelpText(row,
+                $"Row {index / 7 + 1}, column {index % 7 + 1}{(states.Count > 0 ? ", " + string.Join(", ", states) : string.Empty)}");
+        }
+    }
+
+    protected override AutomationPeer OnCreateAutomationPeer() => new MdCalendarAutomationPeer(this);
+}
+
+internal sealed class MdCalendarAutomationPeer(MdCalendar owner) : ControlAutomationPeer(owner)
+{
+    protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Calendar;
+    protected override bool IsControlElementCore() => true;
+    protected override bool IsContentElementCore() => true;
 }
 
 public enum MdResultKind { Information, Success, Warning, Error, Empty }

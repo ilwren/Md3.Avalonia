@@ -51,6 +51,10 @@
   <x:Double x:Key="Md.Sys.Motion.Ripple.DurationMilliseconds">450</x:Double>
   <x:Double x:Key="Md.Sys.Motion.Ripple.Opacity">0.16</x:Double>
 
+  <!-- Semantic overlays derive from the active light/dark scrim token. -->
+  <SolidColorBrush x:Key="Md.Sys.Color.Scrim.Standard.Brush" Color="{DynamicResource Md.Sys.Color.Scrim}" Opacity="0.32" />
+  <SolidColorBrush x:Key="Md.Sys.Color.Scrim.Strong.Brush" Color="{DynamicResource Md.Sys.Color.Scrim}" Opacity="0.70" />
+
   <x:Double x:Key="Md.Comp.RadioButton.Target.Size">48</x:Double>
   <x:Double x:Key="Md.Comp.RadioButton.StateLayer.Size">40</x:Double>
   <x:Double x:Key="Md.Comp.RadioButton.Icon.Size">20</x:Double>

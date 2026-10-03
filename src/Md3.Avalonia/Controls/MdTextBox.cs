@@ -1,10 +1,12 @@
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Controls;
@@ -91,18 +93,19 @@ public class MdTextBox : TextBox
     private Button? _clearButton;
     private ContentPresenter? _labelPresenter;
     private Grid? _inputRow;
+    private bool _generatedAutomationName;
 
     static MdTextBox()
     {
         VariantProperty.Changed.AddClassHandler<MdTextBox>((control, _) => control.UpdateVariantPseudoClasses());
-        LabelProperty.Changed.AddClassHandler<MdTextBox>((control, _) => control.UpdateContentPseudoClasses());
-        SupportingTextProperty.Changed.AddClassHandler<MdTextBox>((control, _) => control.UpdateContentPseudoClasses());
-        ErrorTextProperty.Changed.AddClassHandler<MdTextBox>((control, _) => control.UpdateContentPseudoClasses());
+        LabelProperty.Changed.AddClassHandler<MdTextBox>((control, _) => { control.UpdateContentPseudoClasses(); control.UpdateAccessibility(); });
+        SupportingTextProperty.Changed.AddClassHandler<MdTextBox>((control, _) => { control.UpdateContentPseudoClasses(); control.UpdateAccessibility(); });
+        ErrorTextProperty.Changed.AddClassHandler<MdTextBox>((control, _) => { control.UpdateContentPseudoClasses(); control.UpdateAccessibility(); });
         LeadingIconProperty.Changed.AddClassHandler<MdTextBox>((control, _) => control.UpdateContentPseudoClasses());
         TrailingIconProperty.Changed.AddClassHandler<MdTextBox>((control, _) => control.UpdateContentPseudoClasses());
         PrefixTextProperty.Changed.AddClassHandler<MdTextBox>((control, _) => control.UpdateContentPseudoClasses());
         SuffixTextProperty.Changed.AddClassHandler<MdTextBox>((control, _) => control.UpdateContentPseudoClasses());
-        IsErrorProperty.Changed.AddClassHandler<MdTextBox>((control, _) => control.UpdateErrorPseudoClass());
+        IsErrorProperty.Changed.AddClassHandler<MdTextBox>((control, _) => { control.UpdateErrorPseudoClass(); control.UpdateAccessibility(); });
         ShowCharacterCounterProperty.Changed.AddClassHandler<MdTextBox>((control, _) => control.UpdateCounterPseudoClass());
         ShowClearButtonProperty.Changed.AddClassHandler<MdTextBox>((control, _) => control.UpdateContentPseudoClasses());
         IsPasswordProperty.Changed.AddClassHandler<MdTextBox>((control, _) => control.UpdatePasswordState());
@@ -110,6 +113,7 @@ public class MdTextBox : TextBox
         TextProperty.Changed.AddClassHandler<MdTextBox>((control, _) => control.UpdateCharacterCounter());
         MaxLengthProperty.Changed.AddClassHandler<MdTextBox>((control, _) => control.UpdateCharacterCounter());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdTextBox>((control, _) => control.UpdateMotion());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdTextBox>((control, _) => control.UpdateAccessibility());
     }
 
     public MdTextBox()
@@ -120,6 +124,8 @@ public class MdTextBox : TextBox
         UpdateCounterPseudoClass();
         UpdatePasswordState();
         UpdateCharacterCounter();
+        AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Assertive);
+        UpdateAccessibility();
         MdTextEditingContextMenu.Attach(this);
     }
 
@@ -323,6 +329,34 @@ public class MdTextBox : TextBox
     }
 
     private void UpdateErrorPseudoClass() => PseudoClasses.Set(":md-error", IsError);
+
+    private void UpdateAccessibility()
+    {
+        var currentName = AutomationProperties.GetName(this);
+        var label = AccessibleText(Label);
+        if (!string.IsNullOrWhiteSpace(label) && (string.IsNullOrWhiteSpace(currentName) || _generatedAutomationName))
+        {
+            AutomationProperties.SetName(this, label);
+            _generatedAutomationName = true;
+        }
+
+        var error = AccessibleText(ErrorText);
+        var supporting = AccessibleText(SupportingText);
+        var hasError = IsError || !string.IsNullOrWhiteSpace(error);
+        AutomationProperties.SetHelpText(this, hasError
+            ? string.IsNullOrWhiteSpace(error)
+                ? MdLocalization.GetString("InvalidValue", this)
+                : MdLocalization.Format("ErrorPrefix", this, error)
+            : supporting);
+    }
+
+    private static string? AccessibleText(object? value) => value switch
+    {
+        null => null,
+        TextBlock textBlock => textBlock.Text,
+        ContentControl { Content: string text } => text,
+        _ => value.ToString()
+    };
 
     private void UpdateCounterPseudoClass() =>
         PseudoClasses.Set(":show-counter", ShowCharacterCounter);

@@ -11,6 +11,9 @@ Usage:
                          [--configuration Release]
                          [--no-restore]
 
+The repository includes the pinned official Material Symbols Rounded fonts.
+Their provenance and checksums are verified before packaging.
+
 A .NET 10 SDK is required.
 EOF
 }
@@ -22,9 +25,6 @@ RESTORE=1
 
 while (($#)); do
   case "$1" in
-    --font)
-      [[ $# -ge 2 ]] || { echo "error: --font requires a path" >&2; exit 2; }
-      shift 2 ;;
     --output)
       [[ $# -ge 2 ]] || { echo "error: --output requires a path" >&2; exit 2; }
       OUTPUT="$2"; shift 2 ;;
@@ -59,12 +59,13 @@ PROJECTS=(
   "$ROOT/src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj"
 )
 
-if [[ ! -f "$ROOT/src/Md3.Avalonia.Icons/Assets/Fonts/MaterialSymbolsRounded.ttf" ]]; then
-  if command -v python3 >/dev/null 2>&1; then
-    python3 "$ROOT/scripts/generate-fonts.py"
-  elif command -v python >/dev/null 2>&1; then
-    python "$ROOT/scripts/generate-fonts.py"
-  fi
+if command -v python3 >/dev/null 2>&1; then
+  python3 "$ROOT/scripts/verify-fonts.py"
+elif command -v python >/dev/null 2>&1; then
+  python "$ROOT/scripts/verify-fonts.py"
+else
+  echo "error: Python is required to verify the embedded official fonts" >&2
+  exit 1
 fi
 
 cleanup_intermediate() {
@@ -92,9 +93,19 @@ for proj in "${PROJECTS[@]}"; do
   dotnet pack "$proj" -c "$CONFIGURATION" --no-build --no-restore --nologo -o "$OUTPUT"
 done
 
+VERSION="$(sed -n 's:.*<Version>\([^<]*\)</Version>.*:\1:p' "${PROJECTS[0]}" | head -1)"
+[[ -n "$VERSION" ]] || { echo "error: package version is missing" >&2; exit 1; }
+PACKAGE_IDS=(Md3.Avalonia Md3.Avalonia.Icons Md3.Avalonia.Icons.Lite Md3.Avalonia.Extra)
+for package_id in "${PACKAGE_IDS[@]}"; do
+  for extension in nupkg snupkg; do
+    package="$OUTPUT/$package_id.$VERSION.$extension"
+    [[ -f "$package" ]] || { echo "error: expected package is missing: $package" >&2; exit 1; }
+  done
+done
+
 PACKAGE_COUNT="$(find "$OUTPUT" -maxdepth 1 -type f \( -name '*.nupkg' -o -name '*.snupkg' \) | wc -l | tr -d '[:space:]')"
-if ((PACKAGE_COUNT < 4)); then
-  echo "error: expected at least 4 package files, found $PACKAGE_COUNT in $OUTPUT" >&2
+if ((PACKAGE_COUNT != 8)); then
+  echo "error: expected exactly 8 package files for version $VERSION, found $PACKAGE_COUNT in $OUTPUT" >&2
   exit 1
 fi
 

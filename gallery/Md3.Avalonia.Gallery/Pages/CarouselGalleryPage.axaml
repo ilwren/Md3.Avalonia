@@ -14,7 +14,7 @@
       <!-- Multi-browse -->
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Multi-browse" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Displays a focal large item with smaller trailing cards that adapt smoothly on selection." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Displays large, medium, and 40–56dp small keyline items. Tapping invokes content without changing its size; sizes advance only with scrolling or controller navigation." />
         <md:MdCarousel Height="240" ItemHeight="220" ItemWidth="280" SelectedIndex="0">
           <Border Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" CornerRadius="28" ClipToBounds="True" Padding="16">
             <Grid RowDefinitions="*,Auto">

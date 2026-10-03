@@ -26,7 +26,7 @@
 - `MdConnectedButtonGroup`：2 DIP 间距，自动计算首、中、尾按钮的外圆内方轮廓；
 - `MdFloatingActionButton`：Small、Regular、Medium、Large，Primary/Secondary/Tertiary 配色与 Level 3/4 elevation；
 - `MdExtendedFloatingActionButton`：当前 Expressive Small、Medium、Large；
-- `MdFabMenu` + `MdFabMenuItem`：可展开 2–6 个相关动作，56 DIP full-pill item、双向 `IsOpen`、`Show`/`Dismiss`、Escape 和可逆展开/收缩 motion。
+- `MdFabMenu` + `MdFabMenuItem`：可展开 2–6 个相关动作，56 DIP full-pill item、独立 `ExpansionDirection="Up|Down"`（默认向上）、首次挂载 `IsInitiallyOpen`、双向 `IsOpen`、`Show`/`Dismiss`、Escape 和可逆展开/收缩 motion。
 
 所有按钮、Icon Button 和 FAB 模板都接入 `MdRipplePresenter`：按下位置产生涟漪，裁切到完整 container shape，并支持 Expressive、Standard、Reduced、None motion scheme。
 
@@ -35,7 +35,7 @@
 ### Radio、App bars 与 Badge
 
 - `MdRadioButton : RadioButton`：20 DIP icon、40 DIP state layer、48 DIP target，支持 selected、error、disabled、`GroupName`、键盘和自动化；
-- `MdTopAppBar`：Small、Medium Flexible、Large Flexible、centered title 和 scrolled container；subtitle 自动采用完整双行高度，组件自身负责四角 outline/clip；
+- `MdTopAppBar`：Small、Medium Flexible、Large Flexible、centered title 和 scrolled container；subtitle 自动采用完整双行高度，默认保持 edge-to-edge surface，不绘制 card 式 outline/圆角；
 - `MdBottomAppBar`：仅用于 Baseline 兼容，新设计应优先使用后续 docked toolbar；
 - `MdBadge`：6 DIP dot 与 16 DIP labeled badge；
 - `MdBadgedBox`：将 badge 放置到任意 icon/control 的 top-trailing corner。
@@ -68,7 +68,7 @@
 
 ### 桌面适配与响应式基础
 
-- `MdScrollViewer` + `MdScrollBar`：独立 Material 滚动模板，保留 wheel、touch、chaining、extent、viewport 与双向 offset，不覆盖原生 ScrollViewer；
+- `MdScrollViewer` + `MdScrollBar`：独立 Material 滚动模板，保留 wheel、touch、chaining、extent、viewport 与双向 offset，不覆盖原生 ScrollViewer；桌面鼠标拖页默认关闭并可用 `AllowMouseDrag` 显式启用，子控件直接操作和 `SuppressMouseDragScrolling` 子树优先；
 - `MdAutoCompleteBox : AutoCompleteBox`：原生同步/异步过滤、text completion、selection 与键盘 API，采用 Material exposed-field 与弱引用 popup coordinator；
 - `MdNumericBox : NumericUpDown`：原生 Value/Minimum/Maximum/Increment、解析、键盘、滚轮和 validation，复用 Material text-field 外观；
 - `MdAdaptiveLayout`：按可配置 600/840/1200/1600 DIP breakpoint 选择 Compact/Medium/Expanded/Large/ExtraLarge 内容，并公开 portrait/landscape 与 Touch/Pointer/Keyboard input mode；
@@ -77,7 +77,7 @@
 
 ### Carousel、Card、Chips 与 Pickers
 
-- `MdCarousel : ListBox` + `MdCarouselItem`：MultiBrowse、Hero、CenterAligned、Uncontained；Material 横向滚动、原生 selection/ItemsSource/DataTemplate、键盘导航、`MdCarouselController`、autoplay/hover pause 与 finite/infinite loop；
+- `MdCarousel : ListBox` + `MdCarouselItem`：MultiBrowse、Hero、CenterAligned、Uncontained；按 Material/Flutter keyline 跟随滚动和 controller 导航调整 large/medium/40–56 DIP small 尺寸，点击选择不会令卡片突变；保留 ItemsSource/DataTemplate、键盘、autoplay/hover pause 与 finite/infinite loop；
 - `MdCard : Button`：Elevated、Filled、Outlined；支持 `Command`/`Click`，`IsInteractive=False` 可作为纯展示容器；
 - `MdChip : ToggleButton` 及 `MdAssistChip`、`MdFilterChip`、`MdInputChip`、`MdSuggestionChip`：Filter 使用双向 `IsChecked`，Input 支持 `RemoveCommand`/`RemoveRequested`；
 - `MdDatePicker` / `MdDatePickerDialog`：Docked/Modal、固定 42 格完整日期网格、按当前 CultureInfo 本地化星期顺序和文本、最小/最大日期、双向 `SelectedDate`/`IsOpen`；
@@ -86,7 +86,7 @@
 
 ### Dialog、Divider、Lists 与进度反馈
 
-- `MdDialog` + `MdDialogHost`：Basic/FullScreen、声明式 `IsOpen` 双向绑定，以及返回结果的 `ShowAsync`/`Close(result)` 直接调用；支持 Escape 与可选 scrim dismiss；
+- `MdDialog` + `MdDialogHost`：Basic/FullScreen、声明式 `IsOpen` 双向绑定、按模型类型匹配多个预声明 `DataTemplates`，以及返回结果的 `ShowAsync(model)`/`Close(result)`；支持 Escape 与可选 scrim dismiss；
 - `MdDivider : Control`：水平/垂直、任意 inset/thickness/brush；
 - `MdList : ListBox` + `MdListItem`：Standard/Segmented、单选/多选、leading/headline/supporting/trailing slots，保留 `ItemsSource`、selection、command 与键盘行为；
 - `MdLoadingIndicator`：遵循继承式 motion scheme 的 Expressive morphing indicator，支持官网当前 contained/uncontained 两种形式；
@@ -100,7 +100,7 @@
 - `MdSearchBar` + `MdSearchView`：搜索输入、leading/trailing actions、展开结果 surface，支持绑定与直接操作；
 - `MdSheetHost`：Bottom/Left/Right 的 Standard/Modal sheet、drag handle、scrim dismiss、Escape 与双向 `IsOpen`；
 - `MdSlider : Slider`：continuous/discrete step、16 DIP track、44×4 DIP handle、stop indicator 和随 thumb 移动的 value indicator；
-- `MdSnackbar`：single/two-line、inverse color roles、action/dismiss slots、timeout 与 `Show`/`Dismiss`；
+- `MdSnackbar`：single/two-line、inverse color roles、action/dismiss slots、timeout 与 `Show`/`Dismiss`；`MdSnackbarHost` + `IMdSnackbarService` 为 ViewModel 提供单实例排队显示入口；
 - `MdSwitch : ToggleButton`：selected/unselected、可选状态图标、双向 `IsChecked`、`Command`、键盘与 pointer 行为。
 
 ### Flutter 生态补全与桌面计划
@@ -109,7 +109,7 @@
 - Phase 2：`MdPaginatedDataTable`、`MdReorderableList`、`MdGridTile`/`MdGridTileBar`、`MdDismissible` 与交互式 `MdScrollBar`；
 - Phase 3：`MdForm`/`MdFormField`、`MdDropdownFormField`、`MdSimpleDialog`、`MdAboutDialog`、`MdLicensePage` 与 `MdPickerRestorationStore`；
 - Phase 4：`MdDraggableScrollableSheet`、`MdAdaptiveSwitch`、`MdAdaptiveProgressIndicator`、`MdHero`、`MdFocusTraversalGroup` 与 `MdShortcutScope`；
-- 独立 `Md3.Avalonia.Ecosystem` 包包含 `MdAvatar`/`MdAvatarGroup`、fractional `MdRating` 与 `MdBreadcrumb`，并通过 opt-in `EcosystemTheme` 复用核心 Material tokens；
+- 独立 `Md3.Avalonia.Extra` 包包含 `MdAvatar`/`MdAvatarGroup`、fractional `MdRating` 与 `MdBreadcrumb`，并通过 opt-in `ExtraTheme` 复用核心 Material tokens；
 - Ecosystem Waves A–C：density/overlay/async/shortcut contracts、`MdPopover`、`MdHoverCard`、`MdCommandPalette`、`MdSlidableItem`、`MdPagedItemsView`、`MdMasonryPanel`、`MdDataGrid`、`MdAsyncSelect`、`MdCalendar`、`MdTimeline`、`MdResultView`、`MdCascader` 与 `MdTransfer`；
 - Ecosystem Waves D–E：provider-neutral `MdChart`、`MdRichEditor`、`MdChatView`、`MdSkeleton` 与 `MdAnimationSequence`；不捆绑 chart vendor、editor engine、network/AI provider 或数据库；
 - Ecosystem Wave F：`MdPinInput` 分格输入/粘贴/遮罩/完成状态，`MdTreeView` 无限层级/展开选择/键盘/RTL，以及由正式 Material input chips 构成的 `MdTagInput` 标签输入、建议、验证和换行布局；
@@ -137,31 +137,21 @@
 - 每个组件页使用 AvaloniaEdit 提供具备 Light/Dark 语法高亮、选择、滚动和一键复制能力的 AXAML/C# 示例；示例语言使用单选 Material segmented button group 切换；Symbols 页面虚拟化浏览并点击复制官方 catalog 中的全部图标；
 - Avalonia Headless + Skia 行为、输入、主题隔离、布局和渲染测试。
 
-### 离线补充 Material Symbols 字体
+### 已内嵌官方 Material Symbols 字体
 
-仓库不提交约 15 MB 的官方字体二进制，但 `Md3.Avalonia.Icons` 的发布包必须嵌入字体。请从 Google Material Design Icons 仓库离线取得官方 **Material Symbols Rounded** variable TTF，并复制/重命名为：
+仓库直接包含并随 `Md3.Avalonia.Icons` 分发完整 Google **Material Symbols Rounded** variable TTF；`Md3.Avalonia.Icons.Lite` 也包含由同一官方文件生成的真实轮廓子集。使用者无需下载、复制或手动注册字体。
 
-```text
-src/Md3.Avalonia.Icons/Assets/Fonts/MaterialSymbolsRounded.ttf
-```
-
-字体缺失时 `Md3.Avalonia.Icons` 会主动中止编译。也可以不复制文件，通过打包脚本传入 workspace 外的绝对路径：
+来源固定为 `google/material-design-icons` commit `737e3324305806514d7909874fa1818ae1808232`，完整 TTF SHA-256 为 `95b24392bb49efd1bc3e92cff4e2452ad094461bab7c97e7d8723fab97e330ca`。构建和 CI 会执行：
 
 ```bash
-scripts/build-nuget.sh --font /offline/path/MaterialSymbolsRounded.ttf
+python3 scripts/verify-fonts.py
 ```
 
-Windows PowerShell 或命令提示符使用：
+验证器会核对完整字体与 Lite 子集 checksum、真实 variable-font tables 和 glyph 数量，拒绝缺失、占位矩形或被替换的二进制。Apache-2.0 字体许可证同时打入两个 Icons 包。
 
-```powershell
-.\scripts\build-nuget.ps1 -Font "D:\OfflineAssets\MaterialSymbolsRounded.ttf"
-# 或从 cmd.exe 调用包装脚本
-.\scripts\build-nuget.cmd -Font "D:\OfflineAssets\MaterialSymbolsRounded.ttf"
-```
+打包脚本要求 .NET 10 SDK，依次打包 Core、Icons、Icons.Lite 与 Extra，并在 `artifacts/nuget` 生成四个 `.nupkg` 和四个 `.snupkg`。Bash 使用 `--output`，PowerShell 使用 `-Output` 修改输出目录。
 
-脚本要求 .NET 10 SDK，依次构建 `net8.0;net10.0`，分别打包 Core、Icons、Ecosystem，并在 `artifacts/nuget` 生成三个 `.nupkg` 和三个 `.snupkg`。Bash 使用 `--output`，PowerShell 使用 `-Output` 修改输出目录。
-
-同时引用 Core 与 Icons 后不再需要手动调用 `ConfigureFonts`：`MdSymbols` 和核心 `MdSymbolPresenter` 会自动发现 Icons provider、注册程序集内嵌字体，验证 internal family、typeface 和官方 `search` glyph，再注入核心 `Md.Icon.*` resources。`MD3_MATERIAL_SYMBOLS_FONT_DIR` 外部路径仍作为诊断回退保留。验证失败时 symbol glyph 保持隐藏，不使用 Unicode 仿制图标。字体许可证文本已保留，但发布者仍须记录离线资产来源和 checksum。
+同时引用 Core 与 Icons 后不需要手动调用 `ConfigureFonts`：`MdSymbols` 和核心 `MdSymbolPresenter` 会自动发现 Icons provider、注册程序集内嵌字体，验证 internal family、typeface 和官方 `search` glyph，再注入核心 `Md.Icon.*` resources。验证失败时 symbol glyph 保持隐藏，不使用 Unicode 仿制图标。
 
 ## 目录
 
@@ -179,8 +169,8 @@ src/Md3.Avalonia/                 # 官方 Flutter Material 对齐核心包；�
    │  ├─ CheckBoxTokens.axaml
    │  └─ ComboBoxTokens.axaml
    └─ Controls/                    # 每类控件的 scoped ControlTheme
-src/Md3.Avalonia.Icons/           # 可选 Symbols catalog/loader；构建前须离线补充 TTF
-src/Md3.Avalonia.Ecosystem/       # 第三方 Flutter clean-room 控件；依赖核心，不依赖 Icons
+src/Md3.Avalonia.Icons/           # 可选 Symbols catalog/loader；内嵌完整官方 TTF
+src/Md3.Avalonia.Extra/           # 第三方 Flutter clean-room 控件；依赖核心，不依赖 Icons
 
 gallery/Md3.Avalonia.Gallery/     # 组件、Theme Lab、资源与字体图标页面
 samples/Md3.Avalonia.Gallery.Android/ # net8.0-android single-view host（solution 外）
@@ -194,16 +184,16 @@ spec-snapshot/manifest.json        # 官网、AndroidX commit、token 版本与�
 ```xml
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:themes="using:Md3.Avalonia.Themes"
-             xmlns:ecosystem="using:Md3.Avalonia.Ecosystem.Themes">
+             xmlns:extra="using:Md3.Avalonia.Extra.Themes">
   <Application.Styles>
     <themes:MaterialTheme />
-    <!-- 仅引用 Md3.Avalonia.Ecosystem 时加入： -->
-    <ecosystem:EcosystemTheme />
+    <!-- 引用 Md3.Avalonia.Extra 时加入： -->
+    <extra:ExtraTheme />
   </Application.Styles>
 </Application>
 ```
 
-三个可独立 pack 的 NuGet 预发布包版本均为 `0.1.0-preview.1`：`Md3.Avalonia`（核心）、`Md3.Avalonia.Icons`（可选图标/字体 provider）和 `Md3.Avalonia.Ecosystem`（依赖核心）。核心与生态包都不强制引用 Icons；三个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
+四个可独立 pack 的 NuGet 包版本均为 `0.3.0-preview.1`（0.3.0 预览版）：`Md3.Avalonia`（核心）、`Md3.Avalonia.Icons`、`Md3.Avalonia.Icons.Lite`（两种可选图标 provider）和 `Md3.Avalonia.Extra`（依赖核心）。核心与 Extra 都不强制引用 Icons；四个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
 
 任意 seed 主题可在启动时或运行时应用：
 
@@ -220,7 +210,7 @@ MdThemeManager.Apply(Application.Current, options, dark);
 var json = MdThemeJson.Serialize(options);
 ```
 
-完整 API 入口见 [`docs/API.md`](docs/API.md)，兼容策略见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)，本版说明见 [`docs/RELEASE_NOTES_0.1.0-preview.1.md`](docs/RELEASE_NOTES_0.1.0-preview.1.md)。
+完整 API 入口见 [`docs/API.md`](docs/API.md)，兼容策略见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)，本版说明见 [`docs/RELEASE_NOTES_0.3.0-preview.1.md`](docs/RELEASE_NOTES_0.3.0-preview.1.md)。
 
 ## XAML 与 MVVM
 
@@ -285,9 +275,16 @@ var comboBox = new MdComboBox
 };
 comboBox.IsDropDownOpen = true;
 
-var dialog = new MdDialog { Headline = "Discard draft?", Content = message };
-var result = await dialogHost.ShowAsync(dialog);
+// DialogHost.DataTemplates can predeclare one MdDialog view for each model type.
+var result = await dialogHost.ShowAsync(new DiscardDraftDialogModel(message));
 dialogHost.Close(result: true);
+
+// Inject the same service instance into the ViewModel and an attached MdSnackbarHost.
+await snackbarService.ShowAsync(new MdSnackbarMessage("Draft archived")
+{
+    ActionContent = "Undo",
+    ActionCommand = undoCommand
+});
 ```
 
 ## Android 约束
@@ -303,17 +300,14 @@ dialogHost.Close(result: true);
 ## 构建与测试
 
 ```bash
-# 先把官方字体放入预留位置，或用 --font 传入离线绝对路径
-scripts/build-nuget.sh --font /offline/path/MaterialSymbolsRounded.ttf
+python3 scripts/verify-fonts.py
+scripts/build-nuget.sh
 
-# solution 验证也可通过 MSBuild 属性引用 workspace 外字体
-dotnet build Md3.Avalonia.sln -c Release \
-  -p:MaterialSymbolsRoundedFontFile=/offline/path/MaterialSymbolsRounded.ttf
-
+dotnet build Md3.Avalonia.sln -c Release
 dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --no-build
 ```
 
-当前验证基线：三个发布项目的 `net8.0;net10.0` Release build **0 warnings / 0 errors**；完整 Headless tests **196/196 passed**；三个 `.nupkg` 与三个 `.snupkg` 均可生成。仓库仍不保留字体二进制和构建产物。测试覆盖 Light/Dark Gallery screenshots、任意 HCT seed golden vectors、49 roles、三档 contrast、主题 JSON round-trip、五档 breakpoint、搜索索引、LTR/RTL 渲染、CommunityToolkit.Mvvm、Automation/live-region、虚拟化和主题生命周期、AvaloniaEdit 双语言编辑器、真实 ScrollViewer extent/viewport/wheel offset、Autocomplete/Numeric input、adaptive breakpoints、Flexible NavigationBar、official chip/item 类型、popup 非强制 OverlayLayer、Tabs/Toolbars/Tooltips、Menus/Drawer/Rail/Search/Sheets/Slider/Snackbar/Switch 的渲染与直接 API，以及 Dialog、Lists、contained Loading/Progress、popup 互斥、文化日期网格、一分钟 TimePicker、state layer、buttons、fields、Carousel/Card/Chips、AppBar、Symbols、Radio、Badge、ripple/motion。
+当前发布门禁会构建四个包并严格检查四个 `.nupkg`、四个 `.snupkg`、统一版本和已内嵌官方字体。仓库不保留普通构建产物。测试覆盖 Light/Dark Gallery screenshots、任意 HCT seed golden vectors、49 roles、三档 contrast、主题 JSON round-trip、五档 breakpoint、搜索索引、LTR/RTL 渲染、CommunityToolkit.Mvvm、Automation/live-region、虚拟化和主题生命周期、AvaloniaEdit 双语言编辑器、真实 ScrollViewer extent/viewport/wheel offset、Autocomplete/Numeric input、adaptive breakpoints、Flexible NavigationBar、official chip/item 类型、popup 非强制 OverlayLayer、Tabs/Toolbars/Tooltips、Menus/Drawer/Rail/Search/Sheets/Slider/Snackbar/Switch 的渲染与直接 API，以及 Dialog、Lists、contained Loading/Progress、popup 互斥、文化日期网格、一分钟 TimePicker、state layer、buttons、fields、Carousel/Card/Chips、AppBar、Symbols、Radio、Badge、ripple/motion。
 
 每一次 build、test 或 pack 命令结束后必须立即清理编译产物，再继续后续实现或验证。Workspace 不交付 `bin/`、`obj/`、`TestResults/`、DLL、PDB、NuGet、APK 或 AAB；`docs/*.png` 是保留的文档参考图。
 
@@ -323,6 +317,6 @@ dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -
 - HCT dynamic theme、49 个当前 Material role、Theme Lab 与 JSON round-trip 已完成；`MdTextBox.IsPassword` 已覆盖密码输入与 reveal 行为；
 - Android Gallery 源码宿主已提供，但当前环境未安装 Android workload，也没有 ARM64 设备，因此 APK、旋转、生命周期、真机/模拟器矩阵不得视为已签署；
 - Narrator、VoiceOver 和 Orca 必须由具备对应 OS/辅助技术的人员按发布清单人工验收；
-- Material Symbols TTF 不提交到仓库；Icons 项目会在字体缺失时拒绝编译，发布者须离线补入官方字体或通过 `MaterialSymbolsRoundedFontFile`/打包脚本引用，并记录许可证与 checksum。
+- 完整 Material Symbols Rounded variable TTF 与真实 Lite 子集已提交并自动打包；CI 以固定 upstream commit、SHA-256、variable tables 和 glyph 数量阻止占位或替代字体混入发布。
 
 官网页面、冻结 AndroidX commit `e2171b56112f43bf962f5d608413f74033b580b6` 和 token 版本见 [`spec-snapshot/manifest.json`](spec-snapshot/manifest.json)。

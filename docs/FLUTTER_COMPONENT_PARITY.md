@@ -14,7 +14,7 @@ The goal is behavioral/API parity where that behavior fits Avalonia, not a Dart 
 | Package | Responsibility | Dependency rule |
 |---|---|---|
 | `Md3.Avalonia` | Official Flutter Material-aligned controls, Material tokens, motion, localization, and platform-neutral infrastructure | Does not reference a concrete icon/font provider |
-| `Md3.Avalonia.Icons` | Optional Material Symbols catalog, verified external-font loader, codepoints, license, and `Md.Icon.*` injection | Standalone optional provider; preview TTF remains unbundled |
+| `Md3.Avalonia.Icons` | Optional Material Symbols catalog, checked-in complete official variable TTF, codepoints, license, and `Md.Icon.*` injection | Standalone optional provider; no manual font download |
 | `Md3.Avalonia.Ecosystem` | Clean-room controls based on audited third-party Flutter interaction documentation | References `Md3.Avalonia`; does not reference Icons |
 
 Core icon slots resolve `Md.Sys.Typeface.Symbols.Rounded` and `Md.Icon.*`. Core supplies visually empty fallbacks; when referenced, the optional Icons package is discovered automatically on first symbol use and injects its verified Material Symbols resources. Applications can still replace every token with their own icon font or objects.

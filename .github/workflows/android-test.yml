@@ -1,4 +1,4 @@
-name: Android Automated UI & Spec Tests
+name: Android UI Regression Tests
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ on:
 
 jobs:
   maestro-android-test:
-    name: Run Maestro Android Tests on Emulator
+    name: Run Android UI Regressions on Emulator
     runs-on: macos-14 # macOS runners have hardware acceleration for Android Emulator
     timeout-minutes: 30
 
@@ -30,11 +30,11 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Generate fonts
+      - name: Verify embedded official fonts
         shell: bash
         run: |
           mkdir -p src/Md3.Avalonia.Icons/Assets/Fonts
-          python3 scripts/generate-fonts.py
+          python3 scripts/verify-fonts.py
 
       - name: Install Android Workload
         run: dotnet workload install android
@@ -54,22 +54,32 @@ jobs:
           arch: x86_64
           profile: pixel_6
           script: |
-            # 1. Install built APK onto Android Emulator
+            # Install the APK and retain logcat even when a regression flow fails.
             adb install artifacts/android/*.apk
-            
-            # 2. Install Maestro CLI
+            adb logcat -c
+            trap 'mkdir -p artifacts/android-test; adb logcat -d > artifacts/android-test/logcat.txt || true' EXIT
+
             curl -Ls "https://get.maestro.mobile.dev" | bash
             export PATH="$PATH:$HOME/.maestro/bin"
-            
-            # 3. Execute Material Design 3 and Flutter Parity test flows
-            maestro test tests/maestro/01_material_design_specs.yaml
-            maestro test tests/maestro/02_colorpicker_and_motion.yaml
-            maestro test tests/maestro/03_flutter_parity_gestures.yaml
 
-      - name: Upload Test Screenshots
+            # These are product UI regressions, not a Material/Flutter certification.
+            mkdir -p artifacts/android-test
+            maestro test --format junit --output artifacts/android-test/maestro-results.xml tests/maestro/
+
+            # Merge real Headless and Android execution into the non-certifying evidence schema.
+            python3 scripts/run-spec-verification.py \
+              --android-junit artifacts/android-test/maestro-results.xml
+            cp docs/reports/test-spec-execution-results.json artifacts/android-test/verification-results.json
+
+      - name: Upload Android Regression Evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: android-spec-test-screenshots
-          path: ~/.maestro/tests/screenshots/
-          if-no-files-found: ignore
+          name: android-ui-regression-evidence
+          path: |
+            ~/.maestro/tests/screenshots/
+            artifacts/android-test/logcat.txt
+            artifacts/android-test/maestro-results.xml
+            artifacts/android-test/verification-results.json
+            artifacts/verification/dotnet-test.log
+          if-no-files-found: warn

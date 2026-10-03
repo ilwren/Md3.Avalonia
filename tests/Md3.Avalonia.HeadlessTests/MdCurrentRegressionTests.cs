@@ -47,15 +47,17 @@ public sealed class MdCurrentRegressionTests
         Dispatcher.UIThread.RunJobs();
         var origin = rating.TranslatePoint(default, window)!.Value;
 
-        // Third star, left half -> 2.5.
-        var leftHalf = origin + new Vector(2 * (32 + 12) + 8, 16);
+        // Every compact 32-DIP star now owns a full 48-DIP Material touch target. The left half
+        // of the third target therefore resolves to 2.5 without reducing the visible glyph size.
+        const double targetSize = 48;
+        var leftHalf = origin + new Vector(2 * (targetSize + 12) + 12, targetSize / 2);
         window.MouseMove(leftHalf, RawInputModifiers.None);
         window.MouseDown(leftHalf, MouseButton.Left, RawInputModifiers.None);
         window.MouseUp(leftHalf, MouseButton.Left, RawInputModifiers.None);
         Assert.Equal(2.5, rating.Value);
 
         // The gap after the same star still belongs to its full value, never a shifted fraction.
-        var gapPosition = 2 * (32 + 12) + 36;
+        var gapPosition = 2 * (targetSize + 12) + targetSize + 6;
         rating.SetValueFromPosition(gapPosition);
         Assert.Equal(3, rating.Value);
     }

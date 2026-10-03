@@ -21,7 +21,7 @@
 
   <!-- m3.material.io desktop scaffold: a persistent primary destination rail, a contextual
        component index, the document pane, and an optional on-this-page pane. -->
-  <Grid x:Name="RootLayout" ColumnDefinitions="104,*">
+  <Grid x:Name="RootLayout" ColumnDefinitions="96,*">
     <Border x:Name="PrimaryNavigationRail" Grid.Column="0" Padding="8,12"
             Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
             BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,1,0">
@@ -34,19 +34,19 @@
         <md:MdIconButton Grid.Row="1" Icon="{x:Static md:MdSymbols.Search}" Click="FocusGallerySearch"
                          HorizontalAlignment="Center" ToolTip.Tip="Search" />
         <StackPanel x:Name="TopNavigation" Grid.Row="2" Spacing="4" VerticalAlignment="Top">
-          <md:MdButton x:Name="GetStartedTopNav" Width="88" Height="64" ContainerHeight="64" ContainerCornerRadius="20" Padding="4" Variant="Text" Click="ShowGetStarted">
+          <md:MdButton x:Name="GetStartedTopNav" Width="80" Height="64" ContainerHeight="64" ContainerCornerRadius="20" Padding="4" Variant="Text" Click="ShowGetStarted">
             <StackPanel HorizontalAlignment="Center" Spacing="2"><md:MdIcon Glyph="{x:Static md:MdSymbols.Home}" Size="22"/><TextBlock FontSize="11" Text="Get started"/></StackPanel>
           </md:MdButton>
-          <md:MdButton x:Name="DevelopTopNav" Width="88" Height="64" ContainerHeight="64" ContainerCornerRadius="20" Padding="4" Variant="Text" Click="ShowDevelop">
+          <md:MdButton x:Name="DevelopTopNav" Width="80" Height="64" ContainerHeight="64" ContainerCornerRadius="20" Padding="4" Variant="Text" Click="ShowDevelop">
             <StackPanel HorizontalAlignment="Center" Spacing="2"><md:MdIcon Glyph="{x:Static md:MdSymbols.Code}" Size="22"/><TextBlock FontSize="11" Text="Develop"/></StackPanel>
           </md:MdButton>
-          <md:MdButton x:Name="FoundationsTopNav" Width="88" Height="64" ContainerHeight="64" ContainerCornerRadius="20" Padding="4" Variant="Text" Click="ShowFoundations">
+          <md:MdButton x:Name="FoundationsTopNav" Width="80" Height="64" ContainerHeight="64" ContainerCornerRadius="20" Padding="4" Variant="Text" Click="ShowFoundations">
             <StackPanel HorizontalAlignment="Center" Spacing="2"><md:MdIcon Glyph="{x:Static md:MdSymbols.Bookmark}" Size="22"/><TextBlock FontSize="11" Text="Foundations"/></StackPanel>
           </md:MdButton>
-          <md:MdButton x:Name="StylesTopNav" Width="88" Height="64" ContainerHeight="64" ContainerCornerRadius="20" Padding="4" Variant="Text" Click="ShowStyles">
+          <md:MdButton x:Name="StylesTopNav" Width="80" Height="64" ContainerHeight="64" ContainerCornerRadius="20" Padding="4" Variant="Text" Click="ShowStyles">
             <StackPanel HorizontalAlignment="Center" Spacing="2"><md:MdIcon Glyph="{x:Static md:MdSymbols.Palette}" Size="22"/><TextBlock FontSize="11" Text="Styles"/></StackPanel>
           </md:MdButton>
-          <md:MdButton x:Name="ComponentsTopNav" Width="88" Height="64" ContainerHeight="64" ContainerCornerRadius="20" Padding="4" Variant="Tonal" Click="ShowComponents">
+          <md:MdButton x:Name="ComponentsTopNav" Width="80" Height="64" ContainerHeight="64" ContainerCornerRadius="20" Padding="4" Variant="Tonal" Click="ShowComponents">
             <StackPanel HorizontalAlignment="Center" Spacing="2"><md:MdIcon Glyph="{x:Static md:MdSymbols.Settings}" Size="22"/><TextBlock FontSize="11" Text="Components"/></StackPanel>
           </md:MdButton>
         </StackPanel>

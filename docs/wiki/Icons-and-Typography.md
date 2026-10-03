@@ -10,8 +10,8 @@ Md3.Avalonia includes first-class support for **Material Symbols Rounded** with 
 
 | Feature | `Md3.Avalonia.Icons` | `Md3.Avalonia.Icons.Lite` |
 | :--- | :--- | :--- |
-| **Glyph Count** | 4,000+ full Google catalog | ~400 essential common UI icons |
-| **Binary Size** | ~240 KB | ~25 KB (Ultra lightweight) |
+| **Glyph Count** | 4,405 mapped code points / 6,646 glyphs | 45 curated code points / 66 glyphs |
+| **Binary Size** | ~14.5 MiB official variable TTF | ~98 KiB real-outline subset |
 | **Best For** | Full-featured apps requiring specialized icons | Mobile, embedded, or bandwidth-conscious applications |
 | **Class Name** | `MdSymbols.<IconName>` | `MdSymbolsLite.<IconName>` |
 
