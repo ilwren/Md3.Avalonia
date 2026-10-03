@@ -2,12 +2,14 @@ using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Templates;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Threading;
 using System.Globalization;
@@ -32,12 +34,15 @@ public sealed class MdReportedIssuesTests
         try
         {
             Dispatcher.UIThread.RunJobs();
-            Assert.True(window.NavigateToIndexedPage("Carousel"));
+            var carouselDestination = window.GetVisualDescendants().OfType<MdButton>()
+                .Single(button => button.Name == "CarouselNav");
+            carouselDestination.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Dispatcher.UIThread.RunJobs();
             var navigationButtons = window.GetVisualDescendants().OfType<MdButton>()
                 .Where(button => button.Name?.EndsWith("Nav", StringComparison.Ordinal) == true)
                 .ToArray();
-            Assert.Equal("CarouselNav", Assert.Single(navigationButtons.Where(button => button.Variant == MdButtonVariant.Tonal)).Name);
+            Assert.Equal("CarouselNav", Assert.Single(navigationButtons,
+                button => button.Variant == MdButtonVariant.Tonal).Name);
         }
         finally { window.Close(); }
     }
@@ -49,7 +54,9 @@ public sealed class MdReportedIssuesTests
         {
             var view = new AndroidGalleryView();
             using var host = Show(view, width, 760);
-            Assert.True(view.NavigateToPage("Segmented and range"));
+            var destination = view.GetLogicalDescendants().OfType<MdButton>()
+                .Single(button => Equals(button.Content, "Segmented and range"));
+            destination.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Dispatcher.UIThread.RunJobs();
 
             var pageHost = view.GetVisualDescendants().OfType<ContentControl>()
@@ -430,7 +437,7 @@ public sealed class MdReportedIssuesTests
         Dispatcher.UIThread.RunJobs();
         Assert.Equal("Library", invoked);
         Assert.Equal(-1, breadcrumb.SelectedIndex);
-        Assert.Empty(breadcrumb.GetVisualDescendants().OfType<ListBoxItem>().Where(item => item.IsSelected));
+        Assert.DoesNotContain(breadcrumb.GetVisualDescendants().OfType<ListBoxItem>(), item => item.IsSelected);
     }
 
     [AvaloniaFact]
