@@ -10,8 +10,8 @@ namespace Md3.Avalonia.Controls;
 public class MdConnectedButtonGroup : ItemsControl
 {
     private readonly Dictionary<Control, IDisposable> _sizeManagedValues = [];
-    private readonly Dictionary<Control, IDisposable> _shapeManagedValues = [];
-    private readonly Dictionary<MdToggleButton, IDisposable> _shapeMorphManagedValues = [];
+    private readonly Dictionary<Control, IDisposable?> _shapeManagedValues = [];
+    private readonly Dictionary<MdToggleButton, IDisposable?> _shapeMorphManagedValues = [];
     private bool _shapesScheduled;
 
     public static readonly StyledProperty<MdButtonSize> SizeProperty = AvaloniaProperty.Register<MdConnectedButtonGroup, MdButtonSize>(nameof(Size), MdButtonSize.Small);
@@ -47,8 +47,8 @@ public class MdConnectedButtonGroup : ItemsControl
     protected override void ClearContainerForItemOverride(Control container)
     {
         if (_sizeManagedValues.Remove(container, out var sizeValue)) sizeValue.Dispose();
-        if (_shapeManagedValues.Remove(container, out var shapeValue)) shapeValue.Dispose();
-        if (container is MdToggleButton toggle && _shapeMorphManagedValues.Remove(toggle, out var morphValue)) morphValue.Dispose();
+        if (_shapeManagedValues.Remove(container, out var shapeValue)) shapeValue?.Dispose();
+        if (container is MdToggleButton toggle && _shapeMorphManagedValues.Remove(toggle, out var morphValue)) morphValue?.Dispose();
         base.ClearContainerForItemOverride(container);
     }
 
@@ -125,7 +125,7 @@ public class MdConnectedButtonGroup : ItemsControl
                         ? lastRadius
                         : new CornerRadius(inner);
 
-            IDisposable shapeValue;
+            IDisposable? shapeValue;
             if (buttons[index] is MdButton button)
             {
                 shapeValue = button.SetValue(MdButton.ContainerCornerRadiusProperty, radius, BindingPriority.Style);
@@ -134,7 +134,7 @@ public class MdConnectedButtonGroup : ItemsControl
             {
                 shapeValue = toggle.SetValue(MdToggleButton.ContainerCornerRadiusProperty, radius, BindingPriority.Style);
                 var morphValue = toggle.SetValue(MdToggleButton.EnableSelectedShapeMorphProperty, false, BindingPriority.Style);
-                if (_shapeMorphManagedValues.Remove(toggle, out var previousMorph)) previousMorph.Dispose();
+                if (_shapeMorphManagedValues.Remove(toggle, out var previousMorph)) previousMorph?.Dispose();
                 _shapeMorphManagedValues[toggle] = morphValue;
             }
             else
@@ -142,7 +142,7 @@ public class MdConnectedButtonGroup : ItemsControl
                 continue;
             }
 
-            if (_shapeManagedValues.Remove(buttons[index], out var previousShape)) previousShape.Dispose();
+            if (_shapeManagedValues.Remove(buttons[index], out var previousShape)) previousShape?.Dispose();
             _shapeManagedValues[buttons[index]] = shapeValue;
         }
     }
