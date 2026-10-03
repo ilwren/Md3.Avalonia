@@ -143,10 +143,12 @@ public sealed class MdParityHardeningTests
         var invocations = 0;
         breadcrumb.ItemInvoked += (_, _) => invocations++;
 
-        breadcrumb.Invoke("Components");
+        breadcrumb.Invoke("Home");
+        breadcrumb.Invoke("Components"); // The current/last location is intentionally inert.
 
         Assert.Equal(1, invocations);
-        Assert.Equal("Components", breadcrumb.SelectedItem);
+        Assert.Null(breadcrumb.SelectedItem);
+        Assert.Equal(-1, breadcrumb.SelectedIndex);
     }
 
     [AvaloniaFact]

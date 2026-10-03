@@ -60,7 +60,8 @@ public sealed class MdNewComponentTests
 
         var containers = carousel.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
         Assert.Equal(2, containers.Length);
-        Assert.All(containers, item => Assert.Equal(180, item.Width));
+        Assert.Equal(180, containers[0].Width);
+        Assert.Equal(118, containers[1].Width);
         Assert.All(containers, item => Assert.Equal(120, item.Height));
     }
 

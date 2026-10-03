@@ -120,7 +120,8 @@ public sealed class MdPackagingAndAdvancedParityTests
 
         Assert.NotNull(avatar.Template);
         Assert.Equal(3.5, rating.Value);
-        Assert.Equal("Components", breadcrumb.SelectedItem);
+        Assert.Null(breadcrumb.SelectedItem);
+        Assert.Equal(-1, breadcrumb.SelectedIndex);
         Assert.NotNull(((Scope)host).Window.CaptureRenderedFrame());
     }
 

@@ -222,8 +222,13 @@ public sealed class MdBreadcrumb : ListBox
                 var index = IndexFromContainer(container);
                 if (index < 0) continue;
                 GetOverflowState(index, out var isVisible, out var isOverflow);
-                if (container.IsVisible != isVisible || container.Classes.Contains("overflow") != isOverflow)
+                var isLast = index == ItemCount - 1;
+                if (container.IsVisible != isVisible ||
+                    container.Classes.Contains("overflow") != isOverflow ||
+                    container.Classes.Contains("last") != isLast)
+                {
                     PrepareContainerForItemOverride(container, ItemFromContainer(container), index);
+                }
             }
         }
         finally { _updatingOverflow = false; }

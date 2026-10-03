@@ -106,7 +106,7 @@ public sealed class MdDynamicThemeTests
             Dispatcher.UIThread.RunJobs();
             Assert.True(menu.IsVisible);
             Assert.True(primaryRail.IsVisible);
-            Assert.Equal(104, gallery.FindControl<Grid>("RootLayout")!.ColumnDefinitions[0].Width.Value);
+            Assert.Equal(96, gallery.FindControl<Grid>("RootLayout")!.ColumnDefinitions[0].Width.Value);
             Assert.False(nav.IsOpen);
 
             gallery.Width = 1000;

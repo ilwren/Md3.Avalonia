@@ -581,10 +581,14 @@ public class MdPhaseThreeAndFourGestureParityTests
             }
         };
 
+        object? invoked = null;
+        breadcrumb.ItemInvoked += (_, item) => invoked = item;
         using var host = Show(breadcrumb, 500, 100);
         Dispatcher.UIThread.RunJobs();
 
         breadcrumb.SelectedIndex = 1;
-        Assert.Equal(1, breadcrumb.SelectedIndex);
+        Assert.Equal("Settings", Assert.IsType<MdBreadcrumbItem>(invoked).Label);
+        Assert.Equal(-1, breadcrumb.SelectedIndex);
+        Assert.Null(breadcrumb.SelectedItem);
     }
 }
