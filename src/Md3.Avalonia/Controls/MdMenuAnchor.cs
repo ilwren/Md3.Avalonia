@@ -42,8 +42,13 @@ public sealed class MdMenuAnchor : ContentControl, IMdPopupOwner, IMdPopupPresen
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdMenuAnchor>((anchor, _) => anchor.UpdateMotion());
     }
 
+    // Android has no Escape key. The system back gesture arrives as TopLevel.BackRequested and
+    // has to dismiss this surface, or it is unreachable by the one gesture phone users rely on.
+    private readonly MdBackScope _backScope;
+
     public MdMenuAnchor()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _presence = new MdPresenceController(SetPopupPresence);
         _presence.Initialize(IsOpen);
         SubscribeToMenu();
@@ -150,6 +155,7 @@ public sealed class MdMenuAnchor : ContentControl, IMdPopupOwner, IMdPopupPresen
 
     private void UpdateState()
     {
+        _backScope.Update(IsOpen);
         ConfigureSurfaceTransitions(IsOpen ? MdMotionSpeed.Slow : MdMotionSpeed.Fast);
         if (IsOpen)
         {
@@ -208,6 +214,14 @@ public sealed class MdMenuAnchor : ContentControl, IMdPopupOwner, IMdPopupPresen
             MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects, speed),
             MdMotionTransitions.CreateTransform(this, RenderTransformProperty, speed));
     }
+
+    private bool OnBackRequested()
+    {
+        if (!IsOpen) return false;
+        Dismiss();
+        return true;
+    }
+
 }
 
 internal sealed class MdMenuAnchorAutomationPeer(MdMenuAnchor owner)

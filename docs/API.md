@@ -73,6 +73,7 @@ The following catalog covers the public control surface shipped by the core pack
 | **Surfaces and content** | `MdSurface`, `MdCard`, `MdList`, `MdListItem`, `MdDivider`, `MdCarousel`, `MdCarouselItem`, `MdGridTile`, `MdGridTileBar`, `MdBanner`, `MdExpansionPanel`, `MdExpansionPanelList`, `MdDataTable`, `MdPaginatedDataTable` |
 | **Menus and dialogs** | `MdMenu`, `MdMenuItem`, `MdSubMenuItem`, `MdMenuAnchor`, `MdDropdownMenu`, `MdDialog`, `MdDialogHost`, `MdSimpleDialog`, `MdAboutDialog`, `MdLicensePage`, `MdSheetHost`, `MdTooltip`, `MdTooltipHost` |
 | **Navigation and layout** | `MdScaffold`, `MdTopAppBar`, `MdBottomAppBar`, `MdToolbar`, `MdNavigationBar`, `MdNavigationBarItem`, `MdNavigationDrawer`, `MdNavigationRail`, `MdNavigationRailItem`, `MdNavigationSuite`, `MdTabs`, `MdTabItem`, `MdTabView`, `MdTabViewItem`, `MdAdaptiveLayout`, `MdAdaptiveSwitch`, `MdKeyboardAvoidingHost`, `MdDraggableScrollableSheet` |
+| **Mobile platform integration** | `MdSafeArea`, `MdBackNavigation`, `MdBackScope`, `MdKeyboardAvoidingHost` |
 | **Settings and preference surfaces** | `MdSettingsGroup`, `MdSettingsCard`, `MdSettingsExpander` |
 | **Feedback and status** | `MdLoadingIndicator`, `MdLinearProgressIndicator`, `MdCircularProgressIndicator`, `MdAdaptiveProgressIndicator`, `MdBadge`, `MdBadgedBox`, `MdRefreshIndicator`, `MdSnackbar`, `MdSnackbarHost`, `MdSnackbarService` |
 | **Pickers and calendars** | `MdDatePicker`, `MdDatePickerDialog`, `MdDateRangePicker`, `MdCalendarGrid`, `MdCalendarDay`, `MdTimePicker`, `MdTimePickerDialog`, `MdTimeDial`, `MdTimeDialPart`, `MdPickerRestorationStore` |
@@ -80,7 +81,7 @@ The following catalog covers the public control surface shipped by the core pack
 | **Foundations and icons** | `MdText`, `MdIcon`, `MdSymbolPresenter`, `MdStateLayer`, `MdRipplePresenter`, `MdFocusRing`, `MdScrollViewer`, `MdScrollBar`, `MdSliderThumb`, `MdWindow` |
 | **Window chrome** | `MdBorderlessWindow`, `MdWindowTitleBar`, `MdCaptionButton`, `MdWindowCaptionButton`, `MdWindowDragRegion`, `MdWindowResizeGrip`, `IMdWindowPlatformAdapter`, `MdWindowPlatformAdapterResolver`, `MdWindowsWindowPlatformAdapter`, `MdMacOsWindowPlatformAdapter`, `MdLinuxWindowPlatformAdapter`, `MdAvaloniaWindowPlatformAdapter`, `MdAndroidWindowPlatformAdapter` |
 
-Most core controls expose styled properties, bindable `Items`/`ItemsSource` where applicable, routed events, commands, and native Avalonia automation peers. Variant and option enums are part of the public API and should be preferred over string values. All 78 of them are listed with their members under [Enumerations](#enumerations).
+Most core controls expose styled properties, bindable `Items`/`ItemsSource` where applicable, routed events, commands, and native Avalonia automation peers. Variant and option enums are part of the public API and should be preferred over string values. All 79 of them are listed with their members under [Enumerations](#enumerations).
 
 ### Core control quick reference
 
@@ -274,7 +275,7 @@ Every public enumeration, with its members in declaration order. Generated from 
 held in place by `python3 scripts/check-api-doc-coverage.py`, which fails when a public type is
 missing from this document.
 
-### Core (`Md3.Avalonia`) — 59 enumerations
+### Core (`Md3.Avalonia`) — 60 enumerations
 
 | Enum | Members |
 |---|---|
@@ -313,6 +314,7 @@ missing from this document.
 | `MdNavigationSuiteMode` | `Auto` · `NavigationBar` · `NavigationRail` · `NavigationDrawer` |
 | `MdPlaybackRequest` | `Play` · `Pause` · `Previous` · `Next` · `Rewind` · `Forward` · `Mute` · `Unmute` · `EnterFullScreen` · `ExitFullScreen` |
 | `MdProgressShape` | `Flat` · `Wavy` |
+| `MdSafeAreaEdges` | `None` · `Left` · `Top` · `Right` · `Bottom` · `Horizontal` · `Vertical` · `All` |
 | `MdScrollbarThumbVisibility` | `Auto` · `Always` · `Hidden` |
 | `MdSettingsCardVariant` | `Flat` · `Filled` · `Elevated` · `Outlined` |
 | `MdSheetPlacement` | `Bottom` · `Start` · `End` · `Left` · `Right` |

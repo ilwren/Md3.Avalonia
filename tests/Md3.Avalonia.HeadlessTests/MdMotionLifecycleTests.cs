@@ -7,6 +7,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -1194,7 +1195,15 @@ public sealed class MdMotionLifecycleTests
     public void Reveal_Host_Clips_Its_Child_Rather_Than_Squashing_It()
     {
         var child = new Border { Width = 200, Height = 100 };
-        var host = new MdRevealHost { Child = child, Fraction = 0.25 };
+        // Top-left aligned so the host's bounds report the extent it asked for rather than the
+        // window's: the whole point of the control is the size it requests.
+        var host = new MdRevealHost
+        {
+            Child = child,
+            Fraction = 0.25,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top
+        };
         using var scope = Show(host);
 
         Assert.Equal(25d, host.Bounds.Height, 1);
@@ -1215,7 +1224,9 @@ public sealed class MdMotionLifecycleTests
             ClosedContent = new Border { Width = 120, Height = 60 },
             OpenContent = new Border { Width = 320, Height = 200 },
             ClosedCornerRadius = new CornerRadius(16),
-            OpenCornerRadius = new CornerRadius(28)
+            OpenCornerRadius = new CornerRadius(28),
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top
         };
         MdMotion.SetScheme(transform, MdMotionScheme.None);
         using var scope = Show(transform);

@@ -46,8 +46,13 @@ public sealed class MdNavigationDrawer : ContentControl
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdNavigationDrawer>((drawer, _) => drawer.UpdateMotion());
     }
 
+    // Android has no Escape key. The system back gesture arrives as TopLevel.BackRequested and
+    // has to dismiss this surface, or it is unreachable by the one gesture phone users rely on.
+    private readonly MdBackScope _backScope;
+
     public MdNavigationDrawer()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _modalFocus = new MdModalFocusController(this);
         _presence = new MdPresenceController(value => PseudoClasses.Set(":present", value));
         _presence.Initialize(IsOpen);
@@ -113,6 +118,7 @@ public sealed class MdNavigationDrawer : ContentControl
 
     private void UpdateVisualState()
     {
+        _backScope.Update(IsModal && IsOpen);
         if (IsOpen)
         {
             _presence.Update(true, TimeSpan.Zero);
@@ -169,5 +175,12 @@ public sealed class MdNavigationDrawer : ContentControl
         _motionTransform.X = Placement == MdNavigationDrawerPlacement.Right
             ? Math.Max(0, DrawerWidth)
             : -Math.Max(0, DrawerWidth);
+    }
+
+    private bool OnBackRequested()
+    {
+        if (!IsModal || !IsOpen) return false;
+        Dismiss();
+        return true;
     }
 }

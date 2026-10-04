@@ -117,8 +117,13 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdTimePicker>((picker, _) => picker.UpdateMotion());
     }
 
+    // Android has no Escape key. The system back gesture arrives as TopLevel.BackRequested and
+    // has to dismiss this surface, or it is unreachable by the one gesture phone users rely on.
+    private readonly MdBackScope _backScope;
+
     public MdTimePicker()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _popupPresence = new MdPresenceController(SetPopupPresence);
         _popupPresence.Initialize(IsOpen);
         UpdateLocalizedText();
@@ -355,6 +360,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
 
     private void OnOpenStateChanged()
     {
+        _backScope.Update(IsOpen);
         if (IsOpen)
         {
             _popupPresence.Update(true, TimeSpan.Zero);
@@ -532,5 +538,12 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         PseudoClasses.Set(":has-value", SelectedTime is not null);
         PseudoClasses.Set(":hour-dial", ActiveDialPart == MdTimeDialPart.Hour);
         PseudoClasses.Set(":minute-dial", ActiveDialPart == MdTimeDialPart.Minute);
+    }
+
+    private bool OnBackRequested()
+    {
+        if (!IsOpen) return false;
+        CancelSelection();
+        return true;
     }
 }

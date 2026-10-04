@@ -53,8 +53,13 @@ public sealed class MdSearchView : ContentControl
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdSearchView>((view, _) => view.UpdateMotion());
     }
 
+    // Android has no Escape key. The system back gesture arrives as TopLevel.BackRequested and
+    // has to dismiss this surface, or it is unreachable by the one gesture phone users rely on.
+    private readonly MdBackScope _backScope;
+
     public MdSearchView()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _presence = new MdPresenceController(value => PseudoClasses.Set(":present", value));
         _presence.Initialize(IsOpen);
         UpdateVisualState();
@@ -257,6 +262,7 @@ public sealed class MdSearchView : ContentControl
 
     private void UpdateVisualState()
     {
+        _backScope.Update(IsOpen);
         if (IsOpen)
         {
             if (!_wasOpen) CaptureFocusBeforeOpen();
@@ -289,10 +295,17 @@ public sealed class MdSearchView : ContentControl
         if (!IsOpen)
             _presence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Default, MdMotionSpeed.Slow));
     }
+
+    private bool OnBackRequested()
+    {
+        if (!IsOpen) return false;
+        Dismiss();
+        return true;
+    }
+
 }
 
 public sealed class MdSearchResultCommittedEventArgs(object? result, string? displayText) : EventArgs
 {
     public object? Result { get; } = result;
-    public string? DisplayText { get; } = displayText;
-}
+    public string? DisplayText { get; } = displayText;}
