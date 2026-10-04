@@ -216,11 +216,37 @@ page, nav entry, search keywords and usage snippet. The gallery went from 48 pag
 | 8 | Slider's water-drop is dark in light mode | This is correct M3. material-components-android's `Slider.md` lists the value label's style as `@style/Widget.Material3.Tooltip` and notes "The value label is a Tooltip"; independently spec-sourced M3 implementations record the value indicator as `inverseSurface` / `inverseOnSurface`. Dark in light mode is the intent, exactly like a tooltip or snackbar. |
 | 28b | Numeric `+`/`−` pair sits too low | **I changed this and was wrong.** The hand-tuned 15 DIP top margin looked like 8 too much, since the input row is 56 and the panel 42 (centring at 7). The regression test reported a button origin of −1 relative to `PART_Container`, which proves the container starts 8 DIP down, under the label: 15 = 8 + 7, already centred. Reverted, with the arithmetic now written into the template. |
 
+### 9 · pickers "don't apply the selection" — the rule was right, the page hid it
+
+The reported symptom could not be reproduced as a bug, and the behaviour behind it is pinned by a
+test that predates the report. What the page was missing is any way to see which rule applied.
+
+Read out of the controls themselves, the commit rule is not symmetric, and the asymmetry is
+deliberate:
+
+| Picker | Mode | On dismiss without confirming |
+|--------|------|-------------------------------|
+| `MdDatePicker` | `Docked` | keeps the new value — writes straight through |
+| `MdDatePicker` | `Modal` | restores the value held at open |
+| `MdTimePicker` | `Dial` | restores the value held at open |
+| `MdTimePicker` | `Input` | restores the value held at open |
+
+`MdDatePicker` guards its rollback with `Mode == MdDatePickerMode.Modal`; `MdTimePicker` has no
+such guard because M3 gives the time picker no docked variant — every time picker is a dialog, so
+every time picker is provisional until OK. A reporter who tried the dial picker, picked a time and
+pressed Escape saw "it didn't apply" and was seeing the spec.
+
+The real defect was observability: the five pickers on `PickerGalleryPage` and the range picker had
+no value displayed anywhere, so a committed selection and a rolled-back one looked identical. Each
+picker now prints its live bound value next to it and labels its own commit rule, and the page
+leads with a panel stating the rule. `Docked_Date_Picker_Commits_Immediately_While_Dialogs_Stay_Provisional`
+pins the half that was never covered — docked commits, dial does not — so the asymmetry cannot be
+"tidied up" by accident later.
+
 ## Diagnosed, not yet fixed
 
 | # | Item | Finding |
 |---|------|---------|
-| 9 | Date / time / range pickers don't apply the selection | The modal rollback is **deliberate and covered by a test** (`Modal_Pickers_Roll_Back_Provisional_Values_When_Dismissed`): closing a modal picker without pressing OK restores the value held at open. Docked mode commits immediately. Needs a precise repro — which picker, which mode, and whether OK was pressed — before changing tested behaviour. The picker gallery page also shows no bound value, so the outcome is invisible either way. |
 | 26 | Borderless window corners missing | Depends on OS-level window shaping (transparency hints, DWM rounded corners, the platform adapters) — not observable or testable headless. Needs a desktop run to diagnose rather than a guess. |
 
 ## Not yet investigated
@@ -266,6 +292,22 @@ one. Found when the page split changed allocation timing enough to keep the stal
 across headless test sessions. The coordinator now deregisters on close and only reaches into a
 previous popover from the thread that opened it; `Ecosystem_Popover_Deregisters_Itself_When_It_Closes`
 covers it.
+
+**`MdModalFocusController` could spin the UI thread forever.** When a modal surface took focus
+away from its scope, the controller posted a job to pull focus back. The guard flag that stopped
+it arming a second job was cleared *at the start* of that job rather than after the focus attempt
+had run — so the attempt's own focus traffic armed the next redirect, which armed the next.
+`Dispatcher.RunJobs()` drains until the queue is empty, and this queue refilled itself as fast as
+it drained. It never threw; the headless suite just ran for 45 minutes against a 1m48s baseline.
+A scope that cannot accept focus at all — most often one whose `IsOpen` was set in an object
+initializer, before attachment — made it permanent.
+
+The flag now clears in a `finally` after the attempt, and three consecutive attempts that fail to
+land focus inside the scope stop the redirect for good. Giving up on focus is not giving up on
+modality: containment, isolation and Escape all still work, and the counter resets as soon as
+focus reaches the scope, so a surface that simply needed a layout pass recovers.
+`MdModalFocusControllerTests` asserts the guard positively through an `internal`
+`HasAbandonedFocusRedirect` rather than inferring it from the suite not hanging.
 
 ## Agreed approach
 

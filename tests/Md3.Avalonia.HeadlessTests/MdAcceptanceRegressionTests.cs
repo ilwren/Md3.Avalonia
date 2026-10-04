@@ -261,6 +261,31 @@ public sealed class MdAcceptanceRegressionTests
     }
 
     [AvaloniaFact]
+    public void Docked_Date_Picker_Commits_Immediately_While_Dialogs_Stay_Provisional()
+    {
+        // Defect #9 was "the picker doesn't apply the selection". It applies, but only where M3
+        // says it should: the docked date picker writes straight through, and every picker that
+        // opens as a dialog holds the value back until it is confirmed. The gallery page shows no
+        // bound value, which is why both outcomes looked identical to the reporter.
+        var original = new DateTimeOffset(2026, 9, 23, 0, 0, 0, TimeSpan.Zero);
+        var picked = original.AddDays(4);
+
+        var docked = new MdDatePicker { Mode = MdDatePickerMode.Docked, SelectedDate = original };
+        docked.IsOpen = true;
+        docked.SelectedDate = picked;
+        docked.IsOpen = false;
+        Assert.Equal(picked, docked.SelectedDate);
+
+        // The time picker has no docked variant, so dial mode is provisional too - a difference
+        // between the two controls that is deliberate, not an oversight.
+        var dial = new MdTimePicker { Mode = MdTimePickerMode.Dial, SelectedTime = new TimeSpan(9, 15, 0) };
+        dial.IsOpen = true;
+        dial.SelectedTime = new TimeSpan(14, 42, 0);
+        dial.IsOpen = false;
+        Assert.Equal(new TimeSpan(9, 15, 0), dial.SelectedTime);
+    }
+
+    [AvaloniaFact]
     public void Search_Escape_Dismisses_Expanded_View_And_Enter_Submits()
     {
         var submitted = string.Empty;

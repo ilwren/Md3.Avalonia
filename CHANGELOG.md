@@ -46,6 +46,17 @@
   segmented-button icon reservation, settings-expander header padding.
 
 ### Fixed
+- The picker gallery pages print their bound values. `MdDatePicker` in `Docked` mode commits as you
+  pick while modal date pickers and both time-picker modes stay provisional until confirmed; with
+  no value shown anywhere, the two outcomes were indistinguishable and read as "the picker doesn't
+  apply the selection" (gallery defect 9). Behaviour is unchanged and now pinned in both
+  directions.
+- `MdModalFocusController` no longer re-arms its focus redirect from inside the redirect itself. The
+  pending-redirect guard is now cleared after the focus attempt rather than before it, and three
+  consecutive attempts that cannot land focus inside the modal scope stop the redirect — a scope
+  that is unfocusable (typically one opened before it was attached) used to keep the dispatcher
+  queue refilling itself, so `Dispatcher.RunJobs()` never returned. Containment, isolation and
+  Escape are unaffected, and the counter resets once focus reaches the scope.
 - `MdPopover` deregisters from the open-popover coordinator when it closes. A closed popover used
   to stay on record as the open one for as long as it was alive, so the next popover to open
   anywhere in the process reached back into it and cut its exit animation short — and threw a

@@ -11,7 +11,8 @@
       </StackPanel>
 
       <StackPanel Width="720" HorizontalAlignment="Left" Spacing="12">
-        <md:MdDateRangePicker StartLabel="Start date" EndLabel="End date" />
+        <md:MdDateRangePicker x:Name="RangePicker" StartLabel="Start date" EndLabel="End date" />
+        <TextBlock x:Name="RangeValue" Classes="body" Opacity="0.78" />
       </StackPanel>
 
       <StackPanel Spacing="10">
