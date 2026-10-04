@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.Reflection;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Automation;
@@ -400,6 +401,12 @@ public sealed class MdSimpleDialog : TemplatedControl
 public sealed record MdLicenseEntry(string Package, string License, string Text, Uri? ProjectUrl = null);
 
 /// <summary>A Material about surface with application metadata and a license-page hook.</summary>
+/// <remarks>
+/// Anything left unset is read from the entry assembly, so the common case needs no properties at
+/// all. Explicit values always win; the resolved text is exposed through the
+/// <c>Effective…</c> properties the control template binds to.
+/// </remarks>
+[PseudoClasses(":has-icon", ":has-version", ":has-legalese")]
 public sealed class MdAboutDialog : ContentControl
 {
     public static readonly StyledProperty<object?> ApplicationIconProperty = AvaloniaProperty.Register<MdAboutDialog, object?>(nameof(ApplicationIcon));
@@ -407,13 +414,89 @@ public sealed class MdAboutDialog : ContentControl
     public static readonly StyledProperty<string?> ApplicationVersionProperty = AvaloniaProperty.Register<MdAboutDialog, string?>(nameof(ApplicationVersion));
     public static readonly StyledProperty<string?> LegaleseProperty = AvaloniaProperty.Register<MdAboutDialog, string?>(nameof(Legalese));
     public static readonly StyledProperty<IEnumerable<MdLicenseEntry>?> LicensesProperty = AvaloniaProperty.Register<MdAboutDialog, IEnumerable<MdLicenseEntry>?>(nameof(Licenses));
+    public static readonly DirectProperty<MdAboutDialog, string?> EffectiveApplicationNameProperty = AvaloniaProperty.RegisterDirect<MdAboutDialog, string?>(nameof(EffectiveApplicationName), dialog => dialog.EffectiveApplicationName);
+    public static readonly DirectProperty<MdAboutDialog, string?> EffectiveApplicationVersionProperty = AvaloniaProperty.RegisterDirect<MdAboutDialog, string?>(nameof(EffectiveApplicationVersion), dialog => dialog.EffectiveApplicationVersion);
+    public static readonly DirectProperty<MdAboutDialog, string?> EffectiveLegaleseProperty = AvaloniaProperty.RegisterDirect<MdAboutDialog, string?>(nameof(EffectiveLegalese), dialog => dialog.EffectiveLegalese);
+
+    private static readonly Lazy<EntryMetadata> AssemblyMetadata = new(EntryMetadata.Read, isThreadSafe: true);
+    private string? _effectiveApplicationName;
+    private string? _effectiveApplicationVersion;
+    private string? _effectiveLegalese;
+
+    static MdAboutDialog()
+    {
+        ApplicationNameProperty.Changed.AddClassHandler<MdAboutDialog>((dialog, _) => dialog.UpdateEffectiveMetadata());
+        ApplicationVersionProperty.Changed.AddClassHandler<MdAboutDialog>((dialog, _) => dialog.UpdateEffectiveMetadata());
+        LegaleseProperty.Changed.AddClassHandler<MdAboutDialog>((dialog, _) => dialog.UpdateEffectiveMetadata());
+        ApplicationIconProperty.Changed.AddClassHandler<MdAboutDialog>((dialog, _) => dialog.UpdateEffectiveMetadata());
+    }
+
+    public MdAboutDialog() => UpdateEffectiveMetadata();
+
     public object? ApplicationIcon { get => GetValue(ApplicationIconProperty); set => SetValue(ApplicationIconProperty, value); }
+
+    /// <summary>The application name to show, or <see langword="null"/> to use the entry assembly's title.</summary>
     public string? ApplicationName { get => GetValue(ApplicationNameProperty); set => SetValue(ApplicationNameProperty, value); }
+
+    /// <summary>The version to show, or <see langword="null"/> to use the entry assembly's informational version.</summary>
     public string? ApplicationVersion { get => GetValue(ApplicationVersionProperty); set => SetValue(ApplicationVersionProperty, value); }
+
+    /// <summary>The copyright line to show, or <see langword="null"/> to use the entry assembly's copyright attribute.</summary>
     public string? Legalese { get => GetValue(LegaleseProperty); set => SetValue(LegaleseProperty, value); }
+
     public IEnumerable<MdLicenseEntry>? Licenses { get => GetValue(LicensesProperty); set => SetValue(LicensesProperty, value); }
+
+    /// <summary><see cref="ApplicationName"/> if set, otherwise the name read from the entry assembly.</summary>
+    public string? EffectiveApplicationName { get => _effectiveApplicationName; private set => SetAndRaise(EffectiveApplicationNameProperty, ref _effectiveApplicationName, value); }
+
+    /// <summary><see cref="ApplicationVersion"/> if set, otherwise the version read from the entry assembly.</summary>
+    public string? EffectiveApplicationVersion { get => _effectiveApplicationVersion; private set => SetAndRaise(EffectiveApplicationVersionProperty, ref _effectiveApplicationVersion, value); }
+
+    /// <summary><see cref="Legalese"/> if set, otherwise the copyright read from the entry assembly.</summary>
+    public string? EffectiveLegalese { get => _effectiveLegalese; private set => SetAndRaise(EffectiveLegaleseProperty, ref _effectiveLegalese, value); }
+
     public event EventHandler? LicensesRequested;
     public void ShowLicenses() => LicensesRequested?.Invoke(this, EventArgs.Empty);
+
+    private void UpdateEffectiveMetadata()
+    {
+        var metadata = AssemblyMetadata.Value;
+        EffectiveApplicationName = Prefer(ApplicationName, metadata.Name);
+        EffectiveApplicationVersion = Prefer(ApplicationVersion, metadata.Version);
+        EffectiveLegalese = Prefer(Legalese, metadata.Legalese);
+
+        // An absent line must not leave a gap behind: the template's spacing applies per row.
+        PseudoClasses.Set(":has-icon", ApplicationIcon is not null);
+        PseudoClasses.Set(":has-version", !string.IsNullOrWhiteSpace(EffectiveApplicationVersion));
+        PseudoClasses.Set(":has-legalese", !string.IsNullOrWhiteSpace(EffectiveLegalese));
+    }
+
+    private static string? Prefer(string? explicitValue, string? inferred) =>
+        string.IsNullOrWhiteSpace(explicitValue) ? inferred : explicitValue;
+
+    private sealed record EntryMetadata(string? Name, string? Version, string? Legalese)
+    {
+        // Assembly-level attributes survive trimming, so this needs no annotation: the attribute
+        // types are named here and nothing is looked up by string.
+        internal static EntryMetadata Read()
+        {
+            var assembly = Assembly.GetEntryAssembly();
+            if (assembly is null) return new EntryMetadata(null, null, null);
+
+            var name = Trimmed(assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title)
+                ?? Trimmed(assembly.GetCustomAttribute<AssemblyProductAttribute>()?.Product)
+                ?? Trimmed(assembly.GetName().Name);
+            var version = Trimmed(assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion)
+                ?? Trimmed(assembly.GetName().Version?.ToString());
+            // SourceLink appends "+<commit sha>" to the informational version; that is build
+            // provenance, not something to show a user.
+            if (version is not null && version.IndexOf('+') is var plus && plus >= 0) version = Trimmed(version[..plus]);
+            return new EntryMetadata(name, version, Trimmed(assembly.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright));
+        }
+
+        private static string? Trimmed(string? value) =>
+            string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+    }
 }
 
 /// <summary>A searchable, selectable license list suitable for dialog or routed-page presentation.</summary>

@@ -319,8 +319,49 @@
     <Style Selector="^:reduced-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
   </ControlTheme>
 
+  <!-- Bound to the Effective* values so an app that sets nothing still shows its own name and
+       version. Absent icon, version and legalese collapse instead of leaving a gap. -->
   <ControlTheme x:Key="{x:Type md:MdAboutDialog}" TargetType="md:MdAboutDialog">
-    <Setter Property="Template"><ControlTemplate TargetType="md:MdAboutDialog"><Border MinWidth="0" MaxWidth="560" Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="28"><Grid ColumnDefinitions="Auto,*" ColumnSpacing="20"><ContentPresenter Content="{TemplateBinding ApplicationIcon}" /><StackPanel Grid.Column="1" Spacing="6"><TextBlock FontSize="24" Text="{TemplateBinding ApplicationName}" /><TextBlock Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{TemplateBinding ApplicationVersion}" /><TextBlock Margin="0,8,0,0" TextWrapping="Wrap" Text="{TemplateBinding Legalese}" /><ContentPresenter Margin="0,8,0,0" Content="{TemplateBinding Content}" /></StackPanel></Grid></Border></ControlTemplate></Setter>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdAboutDialog">
+        <Border MinWidth="0" MaxWidth="560" Padding="24"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
+                CornerRadius="28">
+          <Grid x:Name="PART_Layout" ColumnDefinitions="Auto,*" ColumnSpacing="0">
+            <ContentPresenter x:Name="PART_Icon"
+                              Content="{TemplateBinding ApplicationIcon}"
+                              IsVisible="False" />
+            <StackPanel Grid.Column="1" Spacing="6">
+              <TextBlock FontSize="24"
+                         TextWrapping="Wrap"
+                         Text="{TemplateBinding EffectiveApplicationName}" />
+              <TextBlock x:Name="PART_Version"
+                         Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                         Text="{TemplateBinding EffectiveApplicationVersion}"
+                         IsVisible="False" />
+              <TextBlock x:Name="PART_Legalese"
+                         Margin="0,8,0,0"
+                         TextWrapping="Wrap"
+                         Text="{TemplateBinding EffectiveLegalese}"
+                         IsVisible="False" />
+              <ContentPresenter Margin="0,8,0,0" Content="{TemplateBinding Content}" />
+            </StackPanel>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:has-icon /template/ ContentPresenter#PART_Icon">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-icon /template/ Grid#PART_Layout">
+      <Setter Property="ColumnSpacing" Value="20" />
+    </Style>
+    <Style Selector="^:has-version /template/ TextBlock#PART_Version">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-legalese /template/ TextBlock#PART_Legalese">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
   </ControlTheme>
   <ControlTheme x:Key="{x:Type md:MdLicensePage}" TargetType="md:MdLicensePage">
     <Setter Property="Template">
