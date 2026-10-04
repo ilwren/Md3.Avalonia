@@ -51,7 +51,7 @@ jobs:
         # Emulator startup is infrastructure-dependent on hosted macOS runners. Keep the
         # regression evidence available without blocking the package and desktop release checks.
         continue-on-error: true
-        timeout-minutes: 15
+        timeout-minutes: 5
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
