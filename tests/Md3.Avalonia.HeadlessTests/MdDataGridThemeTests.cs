@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Xunit;
@@ -106,8 +107,13 @@ public class MdDataGridThemeTests
     private static Visual? Named(Visual root, string name) =>
         root.GetVisualDescendants().FirstOrDefault(visual => (visual as StyledElement)?.Name == name);
 
-    private static IBrush? Brush(StyledElement scope, string key) =>
-        scope.TryFindResource(key, out var value) ? value as IBrush : null;
+    // The tokens live in themed dictionaries, so the lookup has to name the variant the grid
+    // is actually rendering in.
+    private static IBrush Brush(StyledElement scope, string key)
+    {
+        Assert.True(Application.Current!.TryGetResource(key, scope.ActualThemeVariant, out var value), key);
+        return Assert.IsAssignableFrom<IBrush>(value);
+    }
 
     private static IDisposable Show(Control content)
     {
