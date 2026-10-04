@@ -574,7 +574,7 @@ public sealed class MdMobilePlatformTests
     [AvaloniaFact]
     public void Back_Request_Closes_A_Popover()
     {
-        var popover = new MdPopover { Content = new Button { Content = "Action" } };
+        var popover = new MdPopover { PopoverContent = new Button { Content = "Action" } };
         var window = ShowWindow(popover);
         try
         {
