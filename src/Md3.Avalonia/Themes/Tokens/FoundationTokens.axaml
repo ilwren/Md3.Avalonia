@@ -42,6 +42,19 @@
   <x:Double x:Key="Md.Sys.Motion.Expressive.DefaultSpatial.Stiffness">380</x:Double>
   <x:Double x:Key="Md.Sys.Motion.Expressive.SlowSpatial.DampingRatio">0.8</x:Double>
   <x:Double x:Key="Md.Sys.Motion.Expressive.SlowSpatial.Stiffness">200</x:Double>
+  <!--
+    The standard (non-expressive) spatial springs. MdMotionTokens has carried these constants
+    since motion shipped, but they had no declared counterpart, so the published token surface
+    described only half the motion system. See docs/SPEC_VERIFICATION.md on what these tokens
+    do and do not currently control at runtime.
+  -->
+  <x:Double x:Key="Md.Sys.Motion.Standard.FastSpatial.DampingRatio">0.9</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.Standard.FastSpatial.Stiffness">1400</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.Standard.DefaultSpatial.DampingRatio">0.9</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.Standard.DefaultSpatial.Stiffness">700</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.Standard.SlowSpatial.DampingRatio">0.9</x:Double>
+  <x:Double x:Key="Md.Sys.Motion.Standard.SlowSpatial.Stiffness">300</x:Double>
+
   <x:Double x:Key="Md.Sys.Motion.FastEffects.DampingRatio">1</x:Double>
   <x:Double x:Key="Md.Sys.Motion.FastEffects.Stiffness">3800</x:Double>
   <x:Double x:Key="Md.Sys.Motion.DefaultEffects.DampingRatio">1</x:Double>

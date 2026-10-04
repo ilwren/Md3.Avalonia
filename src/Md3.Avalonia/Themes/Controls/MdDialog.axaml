@@ -7,7 +7,7 @@
     <Setter Property="Padding" Value="24" />
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
-    <Setter Property="CornerRadius" Value="28" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Md.Comp.Dialog.Container.Shape}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdDialog">
         <Border x:Name="PART_Container"

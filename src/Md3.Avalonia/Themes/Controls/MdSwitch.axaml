@@ -8,10 +8,13 @@
       <ControlTemplate TargetType="md:MdSwitch">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
           <ContentPresenter Grid.Column="0" VerticalAlignment="Center" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" />
-          <Grid Grid.Column="1" Width="52" Height="48" VerticalAlignment="Center">
-            <Border x:Name="PART_Track" Width="52" Height="32" VerticalAlignment="Center" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" BorderBrush="{DynamicResource Md.Sys.Color.Outline.Brush}" BorderThickness="2" CornerRadius="16" />
+          <!-- Transparent, not unpainted: the 52x48 slot is the switch's touch target, and an
+               unpainted Grid would let a tap near the track's edge fall through to whatever is
+               behind it. -->
+          <Grid Grid.Column="1" Width="52" Height="48" VerticalAlignment="Center" Background="Transparent">
+            <Border x:Name="PART_Track" Width="{DynamicResource Md.Comp.Switch.Track.Width}" Height="{DynamicResource Md.Comp.Switch.Track.Height}" VerticalAlignment="Center" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" BorderBrush="{DynamicResource Md.Sys.Color.Outline.Brush}" BorderThickness="2" CornerRadius="16" />
             <Border x:Name="PART_ThumbState" Width="40" Height="40" Margin="-4,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" CornerRadius="20" Opacity="0" RenderTransform="translate(0px,0px)" />
-            <Border x:Name="PART_Thumb" Width="24" Height="24" Margin="4,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{DynamicResource Md.Sys.Color.Outline.Brush}" CornerRadius="12" RenderTransform="scale(0.667) translate(0px,0px)" RenderTransformOrigin="50%,50%">
+            <Border x:Name="PART_Thumb" Width="{DynamicResource Md.Comp.Switch.Handle.Selected.Size}" Height="{DynamicResource Md.Comp.Switch.Handle.Selected.Size}" Margin="4,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{DynamicResource Md.Sys.Color.Outline.Brush}" CornerRadius="12" RenderTransform="scale(0.667) translate(0px,0px)" RenderTransformOrigin="50%,50%">
               <Grid>
                 <md:MdIcon x:Name="PART_CheckedIcon" Glyph="{DynamicResource Md.Icon.Check}" Size="16" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" IsVisible="False" />
                 <md:MdIcon x:Name="PART_UncheckedIcon" Glyph="{DynamicResource Md.Icon.Close}" Size="16" Foreground="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" IsVisible="False" />

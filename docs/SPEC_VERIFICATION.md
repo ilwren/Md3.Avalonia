@@ -137,6 +137,44 @@ The bootstrap inventory is real output, not a placeholder. From `scripts/lint-de
 The shape scale is also missing M3 Expressive's `LargeIncreased` (20dp) and `ExtraLargeIncreased`
 (32dp) steps; that one is waived with an expiry because adding them is purely additive.
 
+### 4.1 What the first run found in the harness itself
+
+Two of the fourteen L2 "gaps" were defects in the measurement, not in the controls, and are worth
+recording because both are easy to repeat:
+
+- **The host panel was changing the answer.** `WrapPanel` arranges every child in a row at that
+  row's height, so a tall neighbour inflated short controls and `MdChip` measured 66dp against a
+  32dp oracle. The chip was correct all along. Pinning each case to `Top`/`Left` makes `Bounds` the
+  control's own desired size.
+- **The touch-target rule was looking in one place.** It inspected only the template's root panel,
+  so `MdRadioButton` was reported as not hit-testable while its `PART_InteractiveArea` painted a
+  correct 48x48 transparent surface one level down. It now looks for a painted surface anywhere in
+  the control's visual subtree that actually covers the target.
+
+A conformance layer is code, and its first run tests the layer as much as the subject.
+
+### 4.2 Resolved
+
+- **Twelve of the fourteen L1 gaps are closed** by `Themes/Tokens/ContainmentTokens.axaml`. Every
+  value involved already existed as a literal inside the matching control theme and agreed with the
+  oracle, so this is pure extraction: rendering is unchanged by construction, and the numbers became
+  addressable by a consumer theme and checkable by the oracle.
+- **The three `Md.Sys.Motion.Standard.*Spatial` springs are now declared.** `MdMotionTokens` had
+  carried them since motion shipped while the published surface described only the expressive half.
+- **`MdSwitch`'s 48dp target is hit-testable.** Its 52x48 slot painted no background, so a tap near
+  the track's edge fell through. This was the one genuine touch-target defect in the matrix.
+
+### 4.3 Open, and why they are still open
+
+| Finding | Status |
+| --- | --- |
+| `Md.Comp.NavigationBar.Container.Height` — M3 says 80dp, the theme uses 64dp (80dp only under `:baseline`) | **Deliberate, needs a decision.** Fixing it changes the height of every navigation bar in every consuming app. It is a product call, not a lint fix, so it stays a visible gap rather than being quietly waived. |
+| `Md.Comp.NavigationRail.Container.Width` — M3 says 80dp, the theme uses 96dp | Same. |
+| `MdChip/*/touch-target` — the 32dp chip has no 48dp target | Real and by M3's own guidance a defect, but widening it changes chip layout; recorded rather than changed. |
+| `Md.Comp.Fab.*` and `Md.Comp.Button.XSmall.Content.Padding` | Medium confidence. The oracle entry is the weaker party here: re-verify the published value before touching rendering. |
+| `Md.Sys.Motion.*` keys are declarative | `MdMotion` resolves only `Md.Sys.Motion.Scheme` at runtime and takes every spring from the compiled constants, so overriding a spring key changes nothing. Recorded as a note by the L5 layer so the catalogue cannot be mistaken for a theming hook. |
+| `Md.Comp.Switch.Handle.Unselected.Size` is declared but unreferenced | The template animates one 24dp handle under `scale(0.667)` instead of swapping two sizes. The token states the specified size; the lint warning is accurate and accepted. |
+
 ---
 
 ## 5. Running it

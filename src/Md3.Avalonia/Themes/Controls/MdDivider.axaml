@@ -3,7 +3,7 @@
                     xmlns:md="using:Md3.Avalonia.Controls">
   <ControlTheme x:Key="{x:Type md:MdDivider}" TargetType="md:MdDivider">
     <Setter Property="LineBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
-    <Setter Property="LineThickness" Value="1" />
+    <Setter Property="LineThickness" Value="{DynamicResource Md.Comp.Divider.Thickness}" />
     <Setter Property="MinHeight" Value="1" />
     <Setter Property="HorizontalAlignment" Value="Stretch" />
     <Style Selector="^:vertical">

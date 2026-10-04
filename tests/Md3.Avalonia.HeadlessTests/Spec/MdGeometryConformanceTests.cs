@@ -1,7 +1,9 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
 using Xunit;
@@ -67,6 +69,12 @@ public sealed class MdGeometryConformanceTests
         var host = new WrapPanel { Orientation = Orientation.Horizontal };
         foreach (var item in cases)
         {
+            // WrapPanel arranges every child in a row at that row's height, so one tall neighbour
+            // silently inflates a short control's Bounds and the measurement becomes a statement
+            // about the panel instead of the control. Pinning both alignments makes Bounds the
+            // control's own desired size, which is what the oracle is actually about.
+            item.Control.HorizontalAlignment = HorizontalAlignment.Left;
+            item.Control.VerticalAlignment = VerticalAlignment.Top;
             host.Children.Add(item.Control);
         }
 
@@ -213,25 +221,43 @@ public sealed class MdGeometryConformanceTests
             return;
         }
 
-        var templateRoot = item.Control.GetVisualDescendants().OfType<Panel>().FirstOrDefault();
-        if (templateRoot is null)
-        {
-            report.Gap(subject, "template root is not a Panel, so the hit-test surface could not be inspected",
-                highConfidence: false);
-            return;
-        }
+        // Being large enough is necessary but not sufficient: an element only receives pointer
+        // input where something is painted. A 48dp slot around a 32dp visual that paints nothing
+        // is empty space the pointer passes straight through, which is the characteristic way a
+        // control passes a size audit and still misses taps near its edge. So look for a painted
+        // surface anywhere in the control's own visual subtree that actually covers the target.
+        var surface = item.Control.GetVisualDescendants()
+            .OfType<Control>()
+            .Prepend(item.Control)
+            .FirstOrDefault(c =>
+                BackgroundOf(c) is not null &&
+                c.Bounds.Width + oracle.ToleranceDip >= minimum &&
+                c.Bounds.Height + oracle.ToleranceDip >= minimum);
 
-        if (templateRoot.Background is null)
+        if (surface is null)
         {
             report.Gap(
                 subject,
-                $"arranged at {bounds.Width:0.##}x{bounds.Height:0.##}dp but the template root paints no " +
-                "Background, so pointer input falls through the padding around the visual container");
+                $"arranged at {bounds.Width:0.##}x{bounds.Height:0.##}dp, but nothing in the template paints " +
+                $"a background over {minimum:0}x{minimum:0}dp, so pointer input falls through the padding " +
+                "around the visual container");
             return;
         }
 
         report.Pass(subject);
     }
+
+    /// <summary>
+    /// Background lives on three unrelated types rather than on a shared base, so a hit-test
+    /// surface has to be recognised by shape rather than by a common interface.
+    /// </summary>
+    private static IBrush? BackgroundOf(Control control) => control switch
+    {
+        Panel panel => panel.Background,
+        Border border => border.Background,
+        TemplatedControl templated => templated.Background,
+        _ => null
+    };
 
     private static List<MdGeometryCase> BuildMatrix()
     {

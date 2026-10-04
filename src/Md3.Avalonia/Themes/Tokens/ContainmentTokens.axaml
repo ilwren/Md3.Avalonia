@@ -1,0 +1,45 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!--
+    Geometry for the containment, selection and navigation families, frozen through
+    spec-snapshot/manifest.json and verified by the L1 token layer.
+
+    Every value here already existed as a literal inside the corresponding control template.
+    Declaring it as a token changes no rendering; what it changes is that the value becomes
+    addressable - a consumer theme can retarget it, and the conformance oracle can check it
+    against the published specification instead of the number being invisible to both.
+  -->
+
+  <!-- Chips: M3 ChipTokens, 32dp container on an 8dp corner with an 18dp leading icon. -->
+  <x:Double x:Key="Md.Comp.Chip.Container.Height">32</x:Double>
+  <CornerRadius x:Key="Md.Comp.Chip.Container.Shape">8</CornerRadius>
+  <x:Double x:Key="Md.Comp.Chip.Icon.Size">18</x:Double>
+
+  <!-- Cards and dialogs: the two corner values most often mistaken for each other. -->
+  <CornerRadius x:Key="Md.Comp.Card.Container.Shape">12</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.Dialog.Container.Shape">28</CornerRadius>
+
+  <!--
+    Divider: 1dp, deliberately not scaled with density. Declared as x:Double rather than
+    Thickness because MdDivider.LineThickness is a scalar; a Thickness here would silently
+    fail to bind, and the oracle types this entry as a scalar for the same reason.
+  -->
+  <x:Double x:Key="Md.Comp.Divider.Thickness">1</x:Double>
+
+  <!-- Menus: the surface corner, shared by MdMenu, MdMenuAnchor and the ComboBox popup. -->
+  <CornerRadius x:Key="Md.Comp.Menu.Container.Shape">4</CornerRadius>
+
+  <!--
+    Switch: the track is 52x32 and the handle changes size with state, which the template
+    expresses as a 24dp handle under a 0.667 scale (16.008dp) rather than two literal sizes,
+    so the transition can be animated. Both endpoint sizes are published here because the
+    specification states them as sizes, and that is the form the oracle can verify.
+  -->
+  <x:Double x:Key="Md.Comp.Switch.Track.Width">52</x:Double>
+  <x:Double x:Key="Md.Comp.Switch.Track.Height">32</x:Double>
+  <x:Double x:Key="Md.Comp.Switch.Handle.Selected.Size">24</x:Double>
+  <x:Double x:Key="Md.Comp.Switch.Handle.Unselected.Size">16</x:Double>
+
+  <!-- Navigation drawer: the modal and standard drawers share one width. -->
+  <x:Double x:Key="Md.Comp.NavigationDrawer.Container.Width">360</x:Double>
+</ResourceDictionary>

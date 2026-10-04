@@ -261,6 +261,14 @@ public sealed class MdMotionConformanceTests
     /// The C# tokens and the XAML tokens are two independent declarations of the same frozen
     /// values. Nothing in the build keeps them in step, which is exactly why this is worth testing.
     /// </summary>
+    /// <remarks>
+    /// This is a catalogue-completeness and agreement check, deliberately not a claim that the
+    /// XAML drives anything: <c>MdMotion</c> reads only <c>Md.Sys.Motion.Scheme</c> at runtime and
+    /// takes every spring from the compiled constants. The resource keys document the motion
+    /// system and let a consumer read the values; overriding one does not currently change an
+    /// animation. That limitation is recorded as a note below so the token surface cannot be
+    /// mistaken for a theming hook.
+    /// </remarks>
     private static void VerifyXamlTokenParity(MdSpecReport report)
     {
         var application = Application.Current!;
@@ -288,7 +296,7 @@ public sealed class MdMotionConformanceTests
                 report.Gap(
                     prefix,
                     $"MdMotionTokens.{tokenName} = ({spring.DampingRatio:0.##}, {spring.Stiffness:0}) has no XAML " +
-                    "counterpart, so this spring cannot be retargeted by a consumer theme",
+                    "counterpart, so the published token surface describes only part of the motion system",
                     highConfidence: false);
                 continue;
             }
@@ -300,6 +308,15 @@ public sealed class MdMotionConformanceTests
                 $"XAML declares ({dampingValue:0.##}, {stiffnessValue:0}) but MdMotionTokens.{tokenName} is " +
                 $"({spring.DampingRatio:0.##}, {spring.Stiffness:0})");
         }
+
+        // Stated once, as a finding rather than a comment, because the gap between "there is a
+        // token for it" and "changing the token changes the behaviour" is exactly the kind of
+        // thing a token catalogue is read as promising.
+        report.Note(
+            "Md.Sys.Motion.*",
+            "These keys are declarative. MdMotion resolves only Md.Sys.Motion.Scheme from resources " +
+            "and takes every spring from the compiled MdMotionTokens constants, so overriding a " +
+            "spring key in a consumer theme does not currently retarget any animation.");
     }
 
     /// <summary>
