@@ -356,6 +356,52 @@ Insets are reported on Android, iOS and browser. Desktop has no insets manager, 
 is safe to ship on every target. `MdKeyboardAvoidingHost` handles the separate case of the soft
 keyboard covering a focused field.
 
+## Trimming
+
+All four packages set `IsTrimmable`, so an application that publishes with
+`PublishTrimmed=true` can trim them, and they build with the IL2xxx analyzer on, so a new
+reflective call fails the build rather than breaking a trimmed app quietly.
+
+Two things in a UI library genuinely need reflection, and both are handled:
+
+- **Theme JSON** (`MdThemeJson`) uses a source-generated serializer context. The contract is
+  closed and owned by the library, so nothing is discovered at runtime.
+- **String property paths** are the library's only remaining reflective step, because the model
+  type belongs to the application. Every control that accepts one also accepts a delegate that
+  reaches the same data directly:
+
+| Control | Path property | Reflection-free alternative |
+|---|---|---|
+| `MdDataGrid` / `MdDataGridColumn` | `PropertyName` | `ValueSelector` to read, `ValueParser` + `ValueSetter` to edit |
+| `MdAsyncSelect` | `DisplayMemberPath` | `DisplaySelector` |
+| `MdSearchView` | `ResultDisplayMemberPath` | `ResultDisplaySelector` |
+
+```csharp
+// Reflective: needs Invoice.Number and Invoice.Total to survive trimming.
+grid.Columns.Add(new MdDataGridColumn { Header = "Number", PropertyName = nameof(Invoice.Number) });
+
+// Reflection-free: nothing to preserve, and faster on large grids.
+grid.Columns.Add(new MdDataGridColumn
+{
+    Header = "Total",
+    PropertyName = nameof(Invoice.Total),          // still the sort key
+    ValueSelector = item => ((Invoice)item!).Total,
+    ValueParser = text => decimal.TryParse(text, out var value) ? value : null,
+    ValueSetter = (item, value) => ((Invoice)item).Total = (decimal)value!
+});
+```
+
+Keeping `PropertyName` on its own is fine as long as the application preserves its own models —
+with `[DynamicallyAccessedMembers]`, a `TrimmerRootDescriptor`, or simply by binding to the same
+properties elsewhere in XAML. The selector exists so that is a choice rather than a trap.
+
+`MdCommandItem` is bound by name from a control theme, which no analyzer can see;
+`MdCommandPalette` roots its properties, so no action is needed. The optional icon packages are
+discovered by assembly probing, which is annotated and degrades to the zero-width fallback glyphs
+when neither package is present.
+
+AOT is a separate question and is not claimed: these packages do not set `IsAotCompatible`.
+
 ## Enumerations
 
 Every public enumeration, with its members in declaration order. Generated from the sources and

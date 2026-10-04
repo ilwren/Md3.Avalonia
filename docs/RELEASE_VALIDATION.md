@@ -14,6 +14,8 @@ Automated baseline date: 2026-10-03
 | Package | `bash scripts/build-nuget.sh` for Core, Icons, Icons.Lite and Extra | `.nupkg` and `.snupkg`; `0.3.5-preview.1` metadata/readme/notices/XML docs and one-way dependencies present |
 | Immediate artifact cleanup | after every build/test/pack, scan and remove `bin`, `obj`, `TestResults`, DLL/PDB and packages before continuing | No generated workspace artifacts |
 | Dynamic color | golden seed vectors, arbitrary seed/variant, contrast pairs, JSON round-trip | Pass |
+| Trim analysis | CI `Build tests` with `EnableTrimAnalyzer` on all four packages | 0 IL2xxx warnings; every suppression carries a written justification |
+| Trim escape hatches | `MdTrimmingTests` | Selector delegates on `MdDataGrid`, `MdAsyncSelect` and `MdSearchView` return without reflection; `IsTrimmable` present on shipped assemblies |
 | Responsive Gallery | 599/600/839/840/1199/1200/1599/1600 boundary behavior | Pass |
 | Visual directions/themes | LTR/RTL, Light/Dark, Standard/Medium/High | Render without exception |
 | Virtualization | large `MdList` and `MdCarousel` data sets | Bounded realized containers |

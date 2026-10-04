@@ -14,6 +14,11 @@
   `MinimumPadding` floor and a settable `SafeAreaPadding` for previewing a layout without a
   device.
 - `MdRevealHost` and `MdMorphPanel`, the layout primitives behind the rebuilt motion controls.
+- **Trimming support.** All four packages declare `IsTrimmable` and build with the IL2xxx
+  analyzer enabled. `MdThemeJson` moved to a source-generated serializer context, and every
+  control that takes a string property path gained a reflection-free delegate:
+  `MdDataGridColumn.ValueSelector` / `.ValueParser` / `.ValueSetter`,
+  `MdAsyncSelect.DisplaySelector`, `MdSearchView.ResultDisplaySelector`.
 
 ### Changed
 
