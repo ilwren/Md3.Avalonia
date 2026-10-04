@@ -252,12 +252,19 @@ public sealed class MdSearchView : ContentControl
     private bool IsWithinSearchView(Visual source) =>
         ReferenceEquals(source, this) || source.GetVisualAncestors().Contains(this);
 
-    private string? ResolveDisplayText(object? result)
+    /// <summary>
+    /// Produces a result's display text without reflection. When set it takes precedence over
+    /// <see cref="ResultDisplayMemberPath"/>, and the result type's properties no longer have to
+    /// survive trimming.
+    /// </summary>
+    public Func<object?, string?>? ResultDisplaySelector { get; set; }
+
+    internal string? ResolveDisplayText(object? result)
     {
         if (result is null) return null;
+        if (ResultDisplaySelector is { } selector) return selector(result);
         if (string.IsNullOrWhiteSpace(ResultDisplayMemberPath)) return result.ToString();
-        return result.GetType().GetProperty(ResultDisplayMemberPath,
-            BindingFlags.Instance | BindingFlags.Public)?.GetValue(result)?.ToString();
+        return MdMemberAccess.GetValue(result, ResultDisplayMemberPath)?.ToString();
     }
 
     private void UpdateVisualState()

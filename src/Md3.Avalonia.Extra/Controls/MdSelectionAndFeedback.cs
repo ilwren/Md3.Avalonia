@@ -256,7 +256,17 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
         var values = (ItemsSource ?? Array.Empty<object>()).Cast<object?>().Where(item => string.IsNullOrEmpty(query) || GetDisplay(item).Contains(query, StringComparison.OrdinalIgnoreCase)).ToArray();
         SetAndRaise(ResultsProperty, ref _results, values); State = values.Length == 0 ? MdAsyncRequestState.Empty : MdAsyncRequestState.Data;
     }
-    private string GetDisplay(object? item) => string.IsNullOrWhiteSpace(DisplayMemberPath) ? item?.ToString() ?? string.Empty : item?.GetType().GetProperty(DisplayMemberPath)?.GetValue(item)?.ToString() ?? string.Empty;
+    /// <summary>
+    /// Produces an item's display text without reflection. When set it takes precedence over
+    /// <see cref="DisplayMemberPath"/>, and the item type's properties no longer have to survive
+    /// trimming.
+    /// </summary>
+    public Func<object?, string?>? DisplaySelector { get; set; }
+
+    private string GetDisplay(object? item) =>
+        DisplaySelector is { } selector
+            ? selector(item) ?? string.Empty
+            : MdMemberAccess.GetText(item, DisplayMemberPath);
 
     void IMdPopupPresenceOwner.ClosePopupImmediately() => _popupPresence.Initialize(false);
 

@@ -31,6 +31,14 @@ internal static class MdSymbolFontResolver
         "Md3.Avalonia.Icons.MdExternalMaterialSymbols", "Md3.Avalonia.Icons")]
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicMethods,
         "Md3.Avalonia.Icons.Lite.MdExternalMaterialSymbolsLite", "Md3.Avalonia.Icons.Lite")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026",
+        Justification = "The icon packages are optional, so core must not reference them. The two " +
+                        "DynamicDependency attributes above keep the entry point either package " +
+                        "exposes, and a package that is absent is a supported outcome: the catch " +
+                        "below leaves the zero-width fallback glyphs in place.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2057",
+        Justification = "Both type names are constants rooted by the DynamicDependency attributes " +
+                        "above, so the trimmer keeps them when the package is referenced.")]
     private static void TryConfigureOptionalProvider()
     {
         try
