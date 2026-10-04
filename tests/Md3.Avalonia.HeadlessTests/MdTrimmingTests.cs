@@ -157,6 +157,28 @@ public sealed class MdTrimmingTests
     }
 
     [AvaloniaFact]
+    public void Theme_Json_Is_Backed_By_Generated_Metadata_Not_Reflection()
+    {
+        // Reflection-based JsonSerializer cannot be trimmed. If this contract ever goes back to
+        // it, theme import and export break only in a trimmed build — which is the hardest kind
+        // of regression to notice.
+        Assert.NotNull(Md3.Avalonia.Themes.Dynamic.MdThemeJsonContext.Default
+            .GetTypeInfo(typeof(Md3.Avalonia.Themes.Dynamic.MdThemeOptions)));
+
+        var theme = new Md3.Avalonia.Themes.Dynamic.MdThemeOptions
+        {
+            SeedColor = "#B3261E",
+            SchemeVariant = Md3.Avalonia.Themes.Dynamic.MdThemeSchemeVariant.Fidelity
+        };
+        var json = Md3.Avalonia.Themes.Dynamic.MdThemeJson.Serialize(theme);
+
+        // The wire format is a contract: files already on disk use camelCase on both sides.
+        Assert.Contains("\"seedColor\": \"#B3261E\"", json, StringComparison.Ordinal);
+        Assert.Contains("\"schemeVariant\": \"fidelity\"", json, StringComparison.Ordinal);
+        Assert.Equal(theme, Md3.Avalonia.Themes.Dynamic.MdThemeJson.Deserialize(json));
+    }
+
+    [AvaloniaFact]
     public void The_Shipped_Assemblies_Declare_Themselves_Trimmable()
     {
         // The flag is what lets an application's trimmer touch these assemblies at all. If it is
