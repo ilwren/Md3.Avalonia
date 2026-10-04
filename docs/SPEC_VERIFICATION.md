@@ -125,7 +125,7 @@ The bootstrap inventory is real output, not a placeholder. From `scripts/lint-de
 - **15 high-confidence token gaps.** Seven component families — `Chip`, `Card`, `Dialog`, `Divider`,
   `Menu`, `NavigationBar`/`Rail`/`Drawer`, `Switch` — have no `Md.Comp.*` tokens at all; their
   values are hard-coded inside the control themes. They render correctly today and cannot be
-  retargeted by a consumer theme.
+  retargeted by a consumer theme. *(Twelve of these are now closed — see 4.2.)*
 - **3 medium-confidence divergences**, including `Md.Comp.Fab.Medium.Shape` at 24dp against an
   expected 20dp.
 - **105 orphan tokens** that are declared and never referenced.
@@ -155,6 +155,18 @@ A conformance layer is code, and its first run tests the layer as much as the su
 
 ### 4.2 Resolved
 
+After acting on the first run, the layer counts moved as follows:
+
+| Layer | Before | After |
+| --- | --- | --- |
+| L1 token conformance | 157 conforming, 14 gaps | **169 conforming, 2 gaps** |
+| L2 rendered geometry | 105 conforming, 14 gaps | **114 conforming, 5 gaps** |
+| L5 spring physics | 51 conforming, 0 gaps | 51 conforming, 0 gaps |
+| L5 runtime motion | 15 conforming, 4 advisory | **18 conforming, 2 advisory** |
+
+The remaining gaps are the ones listed in 4.3: every one of them is a deliberate open question
+rather than an oversight.
+
 - **Twelve of the fourteen L1 gaps are closed** by `Themes/Tokens/ContainmentTokens.axaml`. Every
   value involved already existed as a literal inside the matching control theme and agreed with the
   oracle, so this is pure extraction: rendering is unchanged by construction, and the numbers became
@@ -171,6 +183,7 @@ A conformance layer is code, and its first run tests the layer as much as the su
 | `Md.Comp.NavigationBar.Container.Height` — M3 says 80dp, the theme uses 64dp (80dp only under `:baseline`) | **Deliberate, needs a decision.** Fixing it changes the height of every navigation bar in every consuming app. It is a product call, not a lint fix, so it stays a visible gap rather than being quietly waived. |
 | `Md.Comp.NavigationRail.Container.Width` — M3 says 80dp, the theme uses 96dp | Same. |
 | `MdChip/*/touch-target` — the 32dp chip has no 48dp target | Real and by M3's own guidance a defect, but widening it changes chip layout; recorded rather than changed. |
+| `MdChip/Input/height` — 50dp against a 32dp specification | **Real bug, root cause known.** `Variant = Input` implies `:removable` (`MdChip.cs`), which reveals `PART_RemoveButton`. That is an `MdIconButton`, and both its `ControlTheme` and its template's root `Grid` hardcode a 48dp minimum for a standalone icon button's touch target. Nested in a chip it sets the floor, so the chip measures 48dp plus padding. The fix is to constrain the button to `Md.Comp.Chip.Icon.Size` inside a chip and let the chip body be the touch target, as M3 does — but it changes rendering and the 48dp minimum is load-bearing elsewhere, so it wants a visual review rather than a blind edit. |
 | `Md.Comp.Fab.*` and `Md.Comp.Button.XSmall.Content.Padding` | Medium confidence. The oracle entry is the weaker party here: re-verify the published value before touching rendering. |
 | `Md.Sys.Motion.*` keys are declarative | `MdMotion` resolves only `Md.Sys.Motion.Scheme` at runtime and takes every spring from the compiled constants, so overriding a spring key changes nothing. Recorded as a note by the L5 layer so the catalogue cannot be mistaken for a theming hook. |
 | `Md.Comp.Switch.Handle.Unselected.Size` is declared but unreferenced | The template animates one 24dp handle under `scale(0.667)` instead of swapping two sizes. The token states the specified size; the lint warning is accurate and accepted. |
