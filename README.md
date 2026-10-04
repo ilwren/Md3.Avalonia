@@ -144,7 +144,7 @@
 - 核心 `Md3.Avalonia` 控件库不依赖 `Avalonia.Themes.Fluent` 或 `Avalonia.Themes.Simple`；Gallery 仅在 `CodeExample` 内局部加载 Fluent resources，作为 AvaloniaEdit 原生内部 template parts 的资源依赖，不会覆盖应用或控件库的原生控件；
 - 核心程序集不引用 Desktop、Win32、X11 或 macOS 专属程序集，可由 Android 宿主引用；当前 Android Gallery 的 CI target 为 `net10.0-android`；
 - Gallery 使用官网式顶部导航、真实 `MdNavigationDrawer` 左侧组件栏、中央文档与右侧动态目录；按 Compact `<600`、Medium `600–839`、Expanded `840–1199`、Large `1200–1599`、Extra-large `>=1600` 五档切换一至三栏，compact/medium 使用 modal drawer 并自动收缩过宽示例；Android bottom destinations 会切换真实页面；
-- shell 由单一 `MdScrollViewer` 持有有限 viewport，导航时解包页面预览用根 ScrollViewer，避免嵌套无限测量，并已用真实 wheel input 验证 Offset 变化；包含 Numeric input、Desktop adapters、Theme Lab、Material Symbols 和 Motion；
+- shell 由单一 `MdScrollViewer` 持有有限 viewport，导航时解包页面预览用根 ScrollViewer，避免嵌套无限测量，并已用真实 wheel input 验证 Offset 变化；Gallery 现为 97 个页面、每个组件独立成页（见 `docs/GALLERY_DEFECTS.md` 的 #12），Components 概览页由 gallery index 生成并有测试钉死不会出现死链；
 - 每个组件页使用 AvaloniaEdit 提供具备 Light/Dark 语法高亮、选择、滚动和一键复制能力的 AXAML/C# 示例；示例语言使用单选 Material segmented button group 切换；Symbols 页面虚拟化浏览并点击复制官方 catalog 中的全部图标；
 - Avalonia Headless + Skia 行为、输入、主题隔离、布局和渲染测试。
 
@@ -338,7 +338,7 @@ await snackbarService.ShowAsync(new MdSnackbarMessage("Draft archived")
 - `ShowMinimizeButton`、`ShowMaximizeButton`、`ShowCloseButton` 控制按钮是否显示；
 - `IsMinimizeButtonEnabled`、`IsMaximizeButtonEnabled`、`IsCloseButtonEnabled` 控制按钮是否可操作；
 - `PreserveNativeBorder`、`CanResize`、`ExtendIntoTitleBar` 控制 native frame 和客户区扩展；
-- Android adapter 是 safe no-op，Android Gallery 不展示 Borderless windows 和 Desktop adapters 页面。
+- Android adapter 是 safe no-op，Android Gallery 不展示 Borderless windows 页面。
 
 ```xml
 <md:MdBorderlessWindow Title="My app"
@@ -359,7 +359,7 @@ await snackbarService.ShowAsync(new MdSnackbarMessage("Draft archived")
 - TextBox/可编辑 ComboBox 保留原生 IME 和软键盘链路；
 - Popup 继续由 Avalonia 原生 popup/fallback 宿主处理可用空间、light-dismiss 与返回键；模板不强制 OverlayLayer，避免无可用 overlay 的 Android/headless host 卡死或崩溃；
 - 小尺寸按钮仍保留至少 48 DIP 的 interaction target；
-- Android Gallery 源码宿主已加入且独立于 desktop solution；Android 导航隐藏不适用移动端的 Borderless windows 和 Desktop adapters 页面；ARM64、旋转、生命周期和真机/模拟器人工矩阵仍须在具备 Android workload/设备的环境按 `docs/RELEASE_VALIDATION.md` 签署。
+- Android Gallery 源码宿主已加入且独立于 desktop solution；Android 导航隐藏不适用移动端的 Borderless windows 页面；ARM64、旋转、生命周期和真机/模拟器人工矩阵仍须在具备 Android workload/设备的环境按 `docs/RELEASE_VALIDATION.md` 签署。
 
 ## 构建与测试
 

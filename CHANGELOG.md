@@ -28,6 +28,17 @@
 
 ### Changed
 
+- **Gallery: one page per component.** Five pages that each held a scroll of unrelated controls —
+  `FlutterParityGalleryPage`, `EcosystemGalleryPage`, `DesktopAdaptersGalleryPage` and
+  `AdvancedSelectionGalleryPage` — were split into 52 pages, one per component, each with its own
+  nav entry, search keywords and usage snippet checked against the real API. The gallery went from
+  48 to 97 pages. `MotionGalleryPage` and the components overview were kept whole: one is a topic
+  page, the other is the category index.
+- **Gallery: the components overview is generated from the gallery index.** It had accumulated
+  links to two deleted pages and covered only a third of the gallery. `MdGalleryIndexTests` now
+  fails the build if a link stops resolving or a page is missing from the index.
+
+
 - The four motion controls (`MdSharedAxis`, `MdFadeThrough`, `MdContainerTransform`,
   `MdAnimatedVisibility`) now animate rather than toggling `IsVisible`, and are no longer marked
   experimental.
@@ -35,6 +46,10 @@
   segmented-button icon reservation, settings-expander header padding.
 
 ### Fixed
+- `MdPopover` deregisters from the open-popover coordinator when it closes. A closed popover used
+  to stay on record as the open one for as long as it was alive, so the next popover to open
+  anywhere in the process reached back into it and cut its exit animation short — and threw a
+  cross-thread `InvalidOperationException` when that stale popover belonged to another UI thread.
 - `MdFormField` supporting and error text: the supporting line no longer reserves a row when
   empty, both lines indent to the field's inner edge, the error replaces the supporting text
   instead of stacking under it, and `MdDropdownFormField` no longer draws a second supporting
