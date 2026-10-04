@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Threading;
 using Md3.Avalonia.Controls;
@@ -241,6 +242,151 @@ public sealed class MdMobilePlatformTests
         var registration = MdBackNavigation.Register(anchor, () => true);
         registration.Dispose();
         Assert.False(MdBackNavigation.RequestBack(anchor));
+    }
+
+    [AvaloniaFact]
+    public void Platform_Back_Requested_Event_Is_Marked_Handled_Once_A_Surface_Consumes_It()
+    {
+        var surface = new TestSurface(isOpen: true);
+        var window = ShowWindow(surface);
+        try
+        {
+            var args = new RoutedEventArgs(TopLevel.BackRequestedEvent);
+            window.RaiseEvent(args);
+
+            // Handled is what stops Android popping the activity behind the surface.
+            Assert.True(args.Handled);
+            Assert.False(surface.IsOpen);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Platform_Back_Request_Stays_Unhandled_When_No_Surface_Wants_It()
+    {
+        var surface = new TestSurface(isOpen: false);
+        var window = ShowWindow(surface);
+        try
+        {
+            var args = new RoutedEventArgs(TopLevel.BackRequestedEvent);
+            window.RaiseEvent(args);
+            Assert.False(args.Handled);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    // ---- the real surfaces ----------------------------------------------
+    // Each is opened after the window is shown, which is both how they are used and the only
+    // order the modal focus trap settles in.
+
+    [AvaloniaFact]
+    public void Back_Request_Closes_A_Modal_Navigation_Drawer()
+    {
+        var drawer = new MdNavigationDrawer
+        {
+            IsModal = true,
+            IsOpen = false,
+            Content = new Button { Content = "Page" },
+            DrawerContent = new Button { Content = "Destination" }
+        };
+        var window = ShowWindow(drawer);
+        try
+        {
+            drawer.Show();
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(1, MdBackNavigation.GetHandlerCount(window));
+
+            Assert.True(MdBackNavigation.RequestBack(drawer));
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(drawer.IsOpen);
+            Assert.Equal(0, MdBackNavigation.GetHandlerCount(window));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Back_Request_Closes_A_Modal_Sheet()
+    {
+        var sheet = new MdSheetHost
+        {
+            IsModal = true,
+            IsOpen = false,
+            Content = new Button { Content = "Page" },
+            SheetContent = new Button { Content = "Share" }
+        };
+        var window = ShowWindow(sheet);
+        try
+        {
+            sheet.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(MdBackNavigation.RequestBack(sheet));
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(sheet.IsOpen);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void A_Non_Modal_Sheet_Ignores_Back_So_The_Page_Behind_It_Can_Navigate()
+    {
+        var sheet = new MdSheetHost
+        {
+            IsModal = false,
+            IsOpen = false,
+            Content = new Button { Content = "Page" },
+            SheetContent = new Button { Content = "Share" }
+        };
+        var window = ShowWindow(sheet);
+        try
+        {
+            sheet.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(MdBackNavigation.RequestBack(sheet));
+            Assert.True(sheet.IsOpen);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Back_Request_Closes_An_Open_Dialog_Host()
+    {
+        var host = new MdDialogHost
+        {
+            Content = new Button { Content = "Page" },
+            Dialog = new MdDialog { Headline = "Delete draft?", Content = "This cannot be undone." }
+        };
+        var window = ShowWindow(host);
+        try
+        {
+            host.SetCurrentValue(MdDialogHost.IsOpenProperty, true);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(1, MdBackNavigation.GetHandlerCount(window));
+
+            Assert.True(MdBackNavigation.RequestBack(host));
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(host.IsOpen);
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     // ---- safe area -------------------------------------------------------
