@@ -24,6 +24,13 @@ env:
   DOTNET_CLI_UI_LANGUAGE: en
   MSBUILDTERMINALLOGGER: 'off'
 
+# Least privilege, declared rather than inherited: the conformance publisher needs to write a
+# pull request comment, and relying on the repository-wide default would make this workflow's
+# behaviour depend on a setting that is not in the repository.
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   # ---------------------------------------------------------------------------------------------
   # Pure Python, no SDK, no restore: finishes in seconds and fails the run before a two-minute
@@ -49,6 +56,12 @@ jobs:
         # decision for a human, not a build failure. --soft keeps it off the critical path.
         continue-on-error: true
         run: python3 scripts/sync-spec-tokens.py --soft
+
+      - name: Publish static analysis report
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/publish-conformance.py
 
       - name: Upload static analysis reports
         if: always()
@@ -134,18 +147,9 @@ jobs:
 
       - name: Publish specification conformance reports
         if: always()
-        shell: bash
-        run: |
-          shopt -s nullglob
-          reports=(artifacts/spec/*.md)
-          if [ ${#reports[@]} -eq 0 ]; then
-            echo "No conformance reports were produced." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          for report in "${reports[@]}"; do
-            cat "$report" >> "$GITHUB_STEP_SUMMARY"
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/publish-conformance.py
 
       - name: Upload test and conformance evidence
         if: always()
