@@ -163,7 +163,7 @@ public sealed class MdVisualGoldenTests
         {
             Width = scene.Width,
             Height = scene.Height,
-            SystemDecorations = SystemDecorations.None,
+            WindowDecorations = WindowDecorations.None,
             Content = scene.Build()
         };
 

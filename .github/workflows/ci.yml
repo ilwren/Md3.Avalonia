@@ -103,27 +103,19 @@ jobs:
       - name: Build Gallery Desktop
         shell: bash
         run: |
-          set +e
-          set -o pipefail
-          dotnet build gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj \
-            -c Release --no-restore 2>&1 | tee gallery-build.log
-          status=${PIPESTATUS[0]}
-          if [ "$status" -ne 0 ]; then
-            grep -E 'error (CS|AVLN|MSB)[0-9]+|: error :' gallery-build.log | head -50 | while IFS= read -r line; do
-              line=${line//'%'/'%25'}
-              line=${line//$'\r'/'%0D'}
-              line=${line//$'\n'/'%0A'}
-              echo "::error title=.NET build failed::$line"
-            done
-          fi
-          exit "$status"
+          scripts/ci-build.sh \
+            gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj \
+            "Gallery Desktop"
 
       - name: Build tests
+        shell: bash
         run: |
-          dotnet build tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
-            -c Release --no-restore
+          scripts/ci-build.sh \
+            tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
+            "Headless tests"
 
       - name: Run headless tests
+        id: tests
         env:
           # Documentation preview bitmaps are asset generation, not verification. They are
           # produced only on main, where the artefact is actually published.
@@ -134,8 +126,10 @@ jobs:
             --logger "trx;LogFileName=results.trx" \
             --logger "console;verbosity=normal"
 
+      # Only meaningful once the test runner actually produced a .trx. Running it after a
+      # compile failure would add a second red step that says nothing about the real cause.
       - name: Summarize headless test results
-        if: always()
+        if: always() && steps.tests.outcome != 'skipped'
         run: python3 scripts/report-test-results.py
 
       - name: Publish specification conformance reports
