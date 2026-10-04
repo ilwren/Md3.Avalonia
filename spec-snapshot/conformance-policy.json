@@ -15,7 +15,7 @@
     "A waiver is a deliberate, documented divergence. 'reason' is mandatory and is reproduced in the",
     "generated report so that nobody has to diff this file to understand the divergence."
   ],
-  "mode": "bootstrap",
+  "mode": "enforce",
   "layers": {
     "L1_tokens": {
       "enabled": true

@@ -187,7 +187,25 @@ Everything in the first round of open questions has now been answered. What is l
 | `Md.Comp.Switch.Handle.Unselected.Size` and the two `*Increased` shape steps are declared but unreferenced | The switch animates one 24dp handle under `scale(0.667)` rather than swapping two sizes, and nothing uses the new shape steps yet. The lint warnings are accurate and accepted. |
 | 3 L3 goldens have no committed baseline | By design. Candidates are written to `artifacts/spec/baselines-new/`; a human reviews one and copies it into `Spec/baselines/` to arm it. The layer never adopts its own output. |
 
-### 4.4 Second round: conformed to the specification
+### 4.4 The ratchet is closed
+
+Every layer now reports **zero high-confidence gaps**, so the policy has been moved from
+`bootstrap` to `enforce`. From here a high-confidence divergence fails the build rather than
+appearing in a report nobody reads.
+
+| Layer | Checks | Conforming | Gaps | Advisory |
+| --- | ---: | ---: | ---: | ---: |
+| L1 token conformance | 178 | 172 | **0** | 5 |
+| L2 rendered geometry | 120 | 119 | **0** | 1 |
+| L3 visual goldens | 3 | 0 | **0** | 3 |
+| L5 spring physics | 51 | 51 | **0** | 0 |
+| L5 runtime motion | 20 | 18 | **0** | 2 |
+
+Flipping the switch is safe precisely because the number is zero: nothing fails today, and the
+next regression does. The remaining advisories are listed in 4.3 and none of them can fail a
+build by construction.
+
+### 4.5 Second round: conformed to the specification
 
 These were open in 4.3 and have since been resolved rather than waived.
 
