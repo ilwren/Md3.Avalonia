@@ -4,6 +4,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
+using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
 
