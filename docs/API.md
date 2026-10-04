@@ -43,7 +43,7 @@ All component themes are scoped to `Md*` types. Registering `MaterialTheme` does
 - Pickers: `MdDatePicker`, `MdDatePickerDialog`, `MdDateRangePicker`, `MdTimePicker`, `MdTimePickerDialog`, and the interactive `MdTimeDial`/`MdTimeDialPart` clock-face API.
 - Navigation: `MdTopAppBar`, `MdBottomAppBar`, `MdNavigationBar`, `MdNavigationBarItem`, `MdNavigationDrawer`, `MdNavigationRail`, `MdTabs`, `MdTabItem`, `MdTabsView`, `MdTabView`, `MdTabViewItem`.
 - Tabs come in two shapes. `MdTabView` carries its own tab strip and content, like a classic `TabControl`. `MdTabs` is only the bar, for the common Material case where it sits in an app bar or header away from the pages; pair it with `MdTabsView`, whose children are the pages matched to the bar's tabs by position, and whose `Tabs` property keeps selection in step both ways. This mirrors Flutter's `TabBar` and `TabBarView`.
-- Transient surfaces: `MdDialog`, `MdDialogHost`, `MdDropdownMenu`, `MdMenuAnchor`, `MdMenu`, `MdMenuItem`, `MdSheetHost`, `MdSnackbar`, `MdSnackbarHost`, `MdSnackbarService`, `IMdSnackbarService`, `MdTooltip`, `MdTooltipHost`.
+- Transient surfaces: `MdDialog`, `MdDialogHost`, `MdDialogService`, `IMdDialogService`, `MdDialogServiceExtensions`, `MdDropdownMenu`, `MdMenuAnchor`, `MdMenu`, `MdMenuItem`, `MdSheetHost`, `MdSnackbar`, `MdSnackbarHost`, `MdSnackbarService`, `IMdSnackbarService`, `MdTooltip`, `MdTooltipHost`.
 - Feedback: `MdLoadingIndicator`, `MdLinearProgressIndicator`, `MdCircularProgressIndicator`, `MdBadge`, `MdBadgedBox`.
 - Flutter-inspired Avalonia APIs: `MdBanner`, `MdExpansionPanelList`, `MdDataTable`, `MdStepper`, `MdRefreshIndicator`, `MdPaginatedDataTable`, `MdReorderableList`, `MdGridTile`, `MdDismissible`, `MdForm`, `MdFormField`, `MdDropdownFormField`, `MdSimpleDialog`, `MdAboutDialog`, `MdLicensePage`, `MdDraggableScrollableSheet`, `MdAdaptiveSwitch`, `MdAdaptiveProgressIndicator`, `MdHero`, `MdFocusTraversalGroup`, `MdShortcutScope`. These names do not imply complete Flutter parity; see [Flutter parity status](FLUTTER_PARITY_STATUS.md).
 - `MdAboutDialog` fills itself in from the entry assembly when `ApplicationName`, `ApplicationVersion` or `Legalese` are left unset, matching Flutter's `showAboutDialog`. The resolved text is readable through `EffectiveApplicationName`, `EffectiveApplicationVersion` and `EffectiveLegalese`; explicit values always win, and a blank string counts as unset. The icon, version and copyright lines collapse when empty.
@@ -95,7 +95,7 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 | `MdCheckBox`, `MdRadioButton`, `MdSwitch` | Boolean and mutually exclusive choices | `IsChecked`, `GroupName`/selection binding, `Command` and native input events |
 | `MdSlider`, `MdRangeSlider` | Single and interval values | `Minimum`, `Maximum`; `MdSlider` uses the native `Value` and tick properties, `MdRangeSlider` uses `LowerValue`/`UpperValue` plus `Step` and `ShowValueIndicators` |
 | `MdCard`, `MdSurface`, `MdList`, `MdListItem` | Material containers and lists | variant/elevation/surface properties, content, `ItemsSource`, item templates, selection/invocation events |
-| `MdDialogHost`, `MdSheetHost` | Modal dialogs and bottom/side sheets | `ShowAsync`, `Close`, `Dialog`, placement, dismissal and result APIs |
+| `MdDialogHost`, `MdSheetHost` | Modal dialogs and bottom/side sheets | `ShowAsync`, `Close`, `Dialog`, `Service`, placement, dismissal and result APIs |
 | `MdMenu`, `MdDropdownMenu`, `MdMenuAnchor` | Contextual and anchored actions | items, submenu support, placement, `Show`/`Dismiss`, keyboard navigation |
 | `MdNavigationBar`, `MdNavigationRail`, `MdNavigationDrawer` | Primary application navigation | item collections, selected index/item, placement/layout and `ItemInvoked` |
 | `MdTabs`, `MdTabView` | Peer navigation and document views | tab collections, selected item/index, closable/reorderable view items |
@@ -224,9 +224,32 @@ Properties that represent user state use Avalonia styled/direct properties and a
 
 `MdDialogHost.Dialog` accepts either a control or a view model. Add multiple type-specific templates to the host's inherited `DataTemplates` collection, then call `ShowAsync(model)`; Avalonia selects the matching dialog template while the host keeps one modal dialog active.
 
+The host can be driven three ways, and they interoperate — pick per call site rather than per application:
+
+| From | How | Result |
+|------|-----|--------|
+| View code-behind | `await DialogHost.ShowAsync(model)` / `DialogHost.Close(result)` | awaited return value |
+| View model | inject `IMdDialogService`; `await _dialogs.ShowAsync(model)` | awaited return value |
+| Bindings only | two-way `IsOpen` with `Dialog` | view model state, no await |
+
+For the view-model route, place one `MdDialogHost` in the application shell, assign a shared `MdDialogService` to its `Service` property, and inject that same instance as `IMdDialogService` — the same arrangement `MdSnackbarService` uses. `MdDialogServiceExtensions.ShowAsync<TResult>` returns a typed result, or `default` when the dialog was dismissed without one:
+
+```csharp
+// App composition
+var dialogs = new MdDialogService();
+services.AddSingleton<IMdDialogService>(dialogs);
+shell.DialogHost.Service = dialogs;
+
+// View model — no control reference
+if (await _dialogs.ShowAsync<bool>(new ConfirmDeleteDialogModel(item)))
+    Items.Remove(item);
+```
+
+Material allows one dialog at a time, so a request made while another is displayed, or before the host is attached, waits its turn instead of replacing it. Dismissal by the scrim, Escape, the Android back gesture, a cancelled token, or a view model clearing a bound `IsOpen` completes the pending `ShowAsync` with `null`.
+
 An `MdSnackbar` is a visual control, so calling `Show()` on an instance that was never attached to a window cannot render it. For code-behind or ViewModels, place one `MdSnackbarHost` in the application shell, assign a shared `MdSnackbarService`, and inject that same instance as `IMdSnackbarService`. The service queues consecutive messages and the attached host displays them one at a time.
 
-Direct APIs include `Show`/`Dismiss` on transient components, `ShowAsync`/`Close` on `MdDialogHost`, `Show`/`ShowAsync`/`Dismiss` on `MdSnackbarHost` and `IMdSnackbarService`, direct collection APIs inherited from Avalonia item controls, and standard routed events. Ecosystem controls additionally expose provider delegates and direct state-machine methods such as `LoadNextPageAsync`, `RefreshAsync`, `SearchAsync`, `SelectDate`, `MoveToTarget`, `Execute`, `Submit`, `PlayAsync`, `NotifyOwnerScrolled`, `MdPinInput.SetCode`/`Clear`, `MdTreeView.ExpandAll`/`CollapseAll`/`SelectById`, `MdTagInput.AddTag`/`RemoveTag`/`ClearTags`, and `MdRating.SetValueFromPosition`.
+Direct APIs include `Show`/`Dismiss` on transient components, `ShowAsync`/`Show`/`Close` on `MdDialogHost` and `IMdDialogService`, `Show`/`ShowAsync`/`Dismiss` on `MdSnackbarHost` and `IMdSnackbarService`, direct collection APIs inherited from Avalonia item controls, and standard routed events. Ecosystem controls additionally expose provider delegates and direct state-machine methods such as `LoadNextPageAsync`, `RefreshAsync`, `SearchAsync`, `SelectDate`, `MoveToTarget`, `Execute`, `Submit`, `PlayAsync`, `NotifyOwnerScrolled`, `MdPinInput.SetCode`/`Clear`, `MdTreeView.ExpandAll`/`CollapseAll`/`SelectById`, `MdTagInput.AddTag`/`RemoveTag`/`ClearTags`, and `MdRating.SetValueFromPosition`.
 
 `MdCarousel` supports a bindable `MdCarouselController`, `ScrollTo`, autoplay, pointer-hover pause and finite or wrapping navigation. Weighted variants use viewport-fitted scroll/controller keylines and constrain `SmallItemWidth` to Material's 40–56 DIP range; pointer selection does not resize an item. `MdRefreshIndicator.RequestRefreshAsync` accepts a cancelable provider-neutral handler.
 
