@@ -344,8 +344,8 @@ public sealed class MdParityHardeningTests
 
         // The combo box owns the supporting and error rows; the form field must not add a
         // second, unindented pair of its own.
-        Assert.Empty(field.GetVisualDescendants().OfType<ContentPresenter>()
-            .Where(presenter => presenter.Name == "PART_Supporting"));
+        Assert.DoesNotContain(field.GetVisualDescendants().OfType<ContentPresenter>(),
+            presenter => presenter.Name == "PART_Supporting");
 
         var editor = Named<MdComboBox>(field, "PART_Editor");
         Assert.Equal("Where you file taxes.", editor.SupportingText);
