@@ -80,10 +80,10 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
         {
             _showTimer.Stop();
             if (e.Pointer.Type is PointerType.Touch or PointerType.Pen) CancelLongPress();
-            Schedule(_hideTimer, HideDelay);
+            Schedule(_hideTimer, EffectiveHideDelay);
         };
         GotFocus += (_, _) => Schedule(_showTimer, ShowDelay);
-        LostFocus += (_, _) => Schedule(_hideTimer, HideDelay);
+        LostFocus += (_, _) => Schedule(_hideTimer, EffectiveHideDelay);
         AddHandler(InputElement.PointerPressedEvent, OnPointerPressed, global::Avalonia.Interactivity.RoutingStrategies.Tunnel, handledEventsToo: true);
         AddHandler(InputElement.PointerMovedEvent, OnPointerMoved, global::Avalonia.Interactivity.RoutingStrategies.Tunnel, handledEventsToo: true);
         AddHandler(InputElement.PointerReleasedEvent, OnPointerReleased, global::Avalonia.Interactivity.RoutingStrategies.Tunnel, handledEventsToo: true);
@@ -103,6 +103,22 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
     public double VerticalOffset { get => GetValue(VerticalOffsetProperty); set => SetValue(VerticalOffsetProperty, value); }
     public TimeSpan ShowDelay { get => GetValue(ShowDelayProperty); set => SetValue(ShowDelayProperty, value); }
     public TimeSpan HideDelay { get => GetValue(HideDelayProperty); set => SetValue(HideDelayProperty, value); }
+
+    /// <summary>
+    /// How long the surface survives after the pointer or focus leaves the anchor.
+    /// </summary>
+    /// <remarks>
+    /// A rich tooltip is interactive: the pointer has to leave the anchor, cross the gap and land
+    /// on the surface to reach its links and actions. The plain 100 ms exit delay expired while
+    /// the pointer was still in flight, so the surface disappeared before it could be entered and
+    /// the tooltip looked like it dismissed itself. Entering the surface stops this timer and
+    /// leaving it restarts the same countdown, so the grace period only has to cover the gap.
+    /// </remarks>
+    private TimeSpan EffectiveHideDelay => Tooltip?.Variant == MdTooltipVariant.Rich
+        ? TimeSpan.FromTicks(Math.Max(HideDelay.Ticks, RichPointerBridgeDelay.Ticks))
+        : HideDelay;
+
+    private static readonly TimeSpan RichPointerBridgeDelay = TimeSpan.FromMilliseconds(600);
     public TimeSpan LongPressDelay { get => GetValue(LongPressDelayProperty); set => SetValue(LongPressDelayProperty, value); }
     public bool OpenOnClick { get => GetValue(OpenOnClickProperty); set => SetValue(OpenOnClickProperty, value); }
     public TimeSpan LongPressVisibleDuration { get => GetValue(LongPressVisibleDurationProperty); set => SetValue(LongPressVisibleDurationProperty, value); }
@@ -228,7 +244,7 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
     }
 
     private void TooltipPointerEntered(object? sender, PointerEventArgs e) => _hideTimer.Stop();
-    private void TooltipPointerExited(object? sender, PointerEventArgs e) => Schedule(_hideTimer, HideDelay);
+    private void TooltipPointerExited(object? sender, PointerEventArgs e) => Schedule(_hideTimer, EffectiveHideDelay);
 
     private void SetOpen(bool value) => SetCurrentValue(IsOpenProperty, value);
 

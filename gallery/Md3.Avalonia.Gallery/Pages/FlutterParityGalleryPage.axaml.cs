@@ -165,8 +165,10 @@ public partial class FlutterParityGalleryPage : UserControl
 
     private void SimpleDialogDismissed(object? sender, EventArgs e)
     {
+        // Dismissed now only fires when the dialog closed without a choice, so this no longer
+        // has to infer the outcome from a field the selection handler has already cleared.
         if (ActiveDialogHost.IsOpen) ActiveDialogHost.Close();
-        if (_simpleDialog?.SelectedItem is null) DialogStatus.Text = L("Account selection cancelled.", "已取消账户选择。");
+        DialogStatus.Text = L("Account selection cancelled.", "已取消账户选择。");
         _simpleDialog = null;
     }
 

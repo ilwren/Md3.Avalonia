@@ -264,11 +264,18 @@ public sealed class MdSimpleDialog : TemplatedControl
     }
 
     public void Show() => SetCurrentValue(IsOpenProperty, true);
-    public void Dismiss()
+
+    /// <summary>Closes the dialog without a choice and raises <see cref="Dismissed"/>.</summary>
+    public void Dismiss() => Close(notifyDismissed: true);
+
+    // Choosing an item closes the dialog too, but a choice is not a dismissal. Raising both
+    // events for one click forced every listener to handle two contradictory outcomes, and the
+    // cancel branch -- running second -- overwrote the selection that had just been reported.
+    private void Close(bool notifyDismissed)
     {
         var wasOpen = IsOpen;
         SetCurrentValue(IsOpenProperty, false);
-        if (wasOpen) Dismissed?.Invoke(this, EventArgs.Empty);
+        if (wasOpen && notifyDismissed) Dismissed?.Invoke(this, EventArgs.Empty);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -382,7 +389,7 @@ public sealed class MdSimpleDialog : TemplatedControl
         SetCurrentValue(SelectedItemProperty, selected);
         if (SelectionCommand?.CanExecute(selected) == true) SelectionCommand.Execute(selected);
         ItemSelected?.Invoke(this, selected);
-        Dismiss();
+        Close(notifyDismissed: false);
     }
 }
 

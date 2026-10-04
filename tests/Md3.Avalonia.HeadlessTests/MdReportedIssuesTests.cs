@@ -625,6 +625,40 @@ public sealed class MdReportedIssuesTests
         finally { window.Close(); }
     }
 
+    [AvaloniaFact]
+    public void Simple_Dialog_Selecting_An_Item_Does_Not_Also_Report_A_Dismissal()
+    {
+        // Reported from the gallery: clicking an account answered "selection cancelled". Choosing
+        // an item closed the dialog through Dismiss(), so ItemSelected and Dismissed both fired
+        // for one click and the cancel listener, running second, overwrote the selection.
+        var dialog = new MdSimpleDialog
+        {
+            ItemsSource = new[] { "material@example.com", "avalonia@example.com" },
+            IsOpen = true
+        };
+
+        object? selected = null;
+        var dismissals = 0;
+        dialog.ItemSelected += (_, item) => selected = item;
+        dialog.Dismissed += (_, _) => dismissals++;
+
+        using var host = Show(dialog, 600, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        var items = dialog.GetVisualDescendants().OfType<SelectingItemsControl>().First(c => c.Name == "PART_ItemsHost");
+        items.SelectedIndex = 1;
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal("avalonia@example.com", selected);
+        Assert.Equal(0, dismissals);
+        Assert.False(dialog.IsOpen);
+
+        // Cancelling still reports exactly one dismissal.
+        dialog.Show();
+        dialog.Dismiss();
+        Assert.Equal(1, dismissals);
+    }
+
     private static Scope Show(Control content, double width, double height)
     {
         var window = new Window { Width = width, Height = height, Content = content };
