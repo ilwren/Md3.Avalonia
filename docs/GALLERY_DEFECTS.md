@@ -19,7 +19,9 @@ need confirmation on a real desktop run.
 | 14 | Simple dialog: clicking an item reports "cancelled" | Selection closed the dialog via `Dismiss()`, so one click raised **both** `ItemSelected` and `Dismissed`, and the cancel listener ran second and overwrote the result. A choice is no longer a dismissal. *(The styling half of this item is still open.)* | `ecc3d5f` |
 | 16 | "Move avatar": a fragment of the content shows for a few frames | The page revealed the destination hero and started the flight **in the same pass**, so `MdHero` measured a hero with no layout yet, photographed a zero-sized rectangle and abandoned the transition — then the source was hidden immediately, reflowing the row under a transition that had already recorded the geometry. Now: reveal, let one layout pass run, await the flight, then hide the source. | `6189b95` |
 | 18 | Load next page gives only a text message | Two causes. `MdPagedItemsView` had **no `ItemTemplate`**, so records rendered as bare `ToString` text, indistinguishable from the status label. And the demo provider returned synchronously, so the view went `Loading → Data` inside one dispatcher pass and the progress indicator was switched on and off before it could be painted. | `6189b95` |
+| 17 | "Swipe this row" shows wrong colours at all four corners | `PART_Foreground` was rounded to 12 but the archive/delete layers behind it were **square**, and the clipping container was a `Grid` — rectangular clip. The primary and error containers showed through outside the foreground's rounded corners. One rounded `Border` now clips the whole row. | `bf55924` |
 | 20 | Dragging a row between the transfer lists hides the row | The drag translated the **real `ListBoxItem`**, which stays inside its own `ListBox`, so the scroll viewport clipped it the moment it moved toward the other list. A picture of the row now rides in the overlay layer, which nothing clips. | `6189b95` |
+| 28 | Numeric `−` is not centred in its target | The glyph `M3 8H15V10H3Z` is **12 wide by 2 tall**, but the `Path` declared a 12×12 box. `Stretch="Uniform"` scales by 1 and seats the geometry at the **top** of the box, so only the `+` — whose ink really is 12×12 — came out centred. This is also what made the pair look badly aligned. The numeric control also gained **its own gallery page**. | `bf55924` |
 | 23① | Tree expander's hover area is a small square, not a full circle | `PART_State` was inside a centred grid, so it was sized by the 16 DIP chevron, and it had no `CornerRadius`. It now fills the 40 DIP circle. | `ecc3d5f` |
 | 23② | Expanding one node rotates other nodes' chevrons | `Rebuild()` replaces the whole flattened row list, so every container rebinds to a different row — and the 0.2 s transition on the chevron's `Angle` animated each one to its new value. Rotation is now instant. | `ecc3d5f` |
 | 24①② | Rating is cut off **and** can only be lowered, never raised | One cause. The gallery pinned `Width="176"` while the natural row is `5 × 48 + 4 × 4 = 256`: trailing stars were clipped away, and the positions still reachable were mapped against the unclipped 256 scale, so every visible star reported a lower value than it drew. Render and hit testing now share one `GetMetrics(arrangedWidth)`. | `0e30402` |
@@ -32,21 +34,28 @@ Regression tests added: `Rating_Arranged_Narrower_Than_Its_Natural_Row_Still_Rea
 `Rating_Hit_Test_Quantizes_Inside_Each_Star_And_Ignores_Spacing` was corrected: it used a 260 DIP
 window for a row needing 288, so it pinned the overflow behaviour that caused #24.
 
+## Checked and found correct — no change made
+
+| # | Item | Evidence |
+|---|------|----------|
+| 8 | Slider's water-drop is dark in light mode | This is correct M3. material-components-android's `Slider.md` lists the value label's style as `@style/Widget.Material3.Tooltip` and notes "The value label is a Tooltip"; independently spec-sourced M3 implementations record the value indicator as `inverseSurface` / `inverseOnSurface`. Dark in light mode is the intent, exactly like a tooltip or snackbar. |
+| 28b | Numeric `+`/`−` pair sits too low | **I changed this and was wrong.** The hand-tuned 15 DIP top margin looked like 8 too much, since the input row is 56 and the panel 42 (centring at 7). The regression test reported a button origin of −1 relative to `PART_Container`, which proves the container starts 8 DIP down, under the label: 15 = 8 + 7, already centred. Reverted, with the arithmetic now written into the template. |
+
 ## Diagnosed, not yet fixed
 
 | # | Item | Finding |
 |---|------|---------|
 | 9 | Date / time / range pickers don't apply the selection | The modal rollback is **deliberate and covered by a test** (`Modal_Pickers_Roll_Back_Provisional_Values_When_Dismissed`): closing a modal picker without pressing OK restores the value held at open. Docked mode commits immediately. Needs a precise repro — which picker, which mode, and whether OK was pressed — before changing tested behaviour. The picker gallery page also shows no bound value, so the outcome is invisible either way. |
+| 26 | Borderless window corners missing | Depends on OS-level window shaping (transparency hints, DWM rounded corners, the platform adapters) — not observable or testable headless. Needs a desktop run to diagnose rather than a guess. |
 | 10 | Tabs have no content host | `MdTabs`/`MdTabItem` are separate types from `MdTabView`/`MdTabViewItem`; only the latter pair carries content. |
 | 13 | `MdDataGrid` is not a drop-in for `DataGrid` | It exposes 10 styled properties in total. The gap is real and needs an explicit API decision, not a rename. |
 
 ## Not yet investigated
 
 1 breadcrumb overlay + no interaction · 2 carousel text layout · 5 usage button alignment ·
-7 expander margins · 8 slider handle dark in light mode · 12 one page per parity component ·
-15 AboutDialog auto-fill · 17 snackbar corners · 19 selection rendering ·
-21 rich text (adapter-based) · 22 image compare (adapter-based) · 26 borderless window corners ·
-27 container transform / animated visibility don't animate · 28 numeric +/- centring and its own page
+7 expander margins · 12 one page per parity component · 15 AboutDialog auto-fill ·
+19 selection rendering · 21 rich text (adapter-based) · 22 image compare (adapter-based) ·
+27 container transform / animated visibility don't animate
 
 ## API gaps found while fixing
 
