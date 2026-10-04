@@ -2,9 +2,9 @@ using Avalonia.Controls;
 
 namespace Md3.Avalonia.Gallery.Pages;
 
-public partial class DesktopAdaptersGalleryPage : UserControl
+public partial class AutoCompleteGalleryPage : UserControl
 {
-    public DesktopAdaptersGalleryPage()
+    public AutoCompleteGalleryPage()
     {
         InitializeComponent();
         TechnologyAutoComplete.ItemsSource = new[]
@@ -13,4 +13,6 @@ public partial class DesktopAdaptersGalleryPage : UserControl
             "MAUI", "Material Design", "React", "SwiftUI", "WinUI", "WPF"
         };
     }
+
+
 }

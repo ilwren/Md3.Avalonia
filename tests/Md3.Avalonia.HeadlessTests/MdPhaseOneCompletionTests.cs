@@ -118,12 +118,13 @@ public sealed class MdPhaseOneCompletionTests
         try
         {
             var navigation = gallery.GetVisualDescendants().OfType<MdButton>()
-                .Single(button => button.Name == "AdvancedSelectionNav");
+                .Single(button => button.Name == "DataGridNav");
             navigation.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Dispatcher.UIThread.RunJobs();
             var pageHost = gallery.GetVisualDescendants().OfType<ContentControl>()
                 .Single(control => control.Name == "PageHost");
-            Assert.IsType<AdvancedSelectionGalleryPage>(pageHost.Content);
+            // Segmented & range was split per #12; the data-grid page is now the tall one.
+            Assert.IsType<DataGridGalleryPage>(pageHost.Content);
             var scroll = gallery.GetVisualDescendants().OfType<ScrollViewer>()
                 .Single(viewer => viewer.Name == "PageScroll");
             Assert.True(scroll.Extent.Height > scroll.Viewport.Height,

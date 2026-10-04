@@ -45,7 +45,7 @@ public partial class MainWindow : Window
             ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, BreadcrumbNav, TextFieldNav,
             CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, ColorPickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
-            NavigationDrawerNav, AdaptiveNav, SearchNav, SettingsCardNav, SheetNav, SliderNav, AdvancedSelectionNav,
+            NavigationDrawerNav, AdaptiveNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
             SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, BorderlessWindowNav,
 AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             BeforeAfterNav, CalendarNav, CascaderNav, ChartNav,
@@ -54,11 +54,13 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             PopoverNav, RatingNav, ResultViewNav, RichEditorNav,
             SkeletonNav, SlidableNav, SpinKitNav, StaggeredPanelNav,
             TagInputNav, TimelineNav, TransferNav, TreeViewNav,
-            NumericNav, DesktopAdaptersNav, ThemeResourcesNav, SymbolsNav, MotionNav,
+            NumericNav, ThemeResourcesNav, SymbolsNav, MotionNav,
             BannerNav, DataTableNav, PaginatedTableNav, DismissibleNav, ExpansionPanelNav,
             GridTileNav, RefreshNav, ReorderableListNav, StepperNav,
             FormValidationNav, SimpleDialogNav, AboutDialogNav, PickerRestoreNav,
-            DraggableSheetNav, KeyboardAvoidNav, AdaptiveControlsNav, FocusHeroNav
+            DraggableSheetNav, KeyboardAvoidNav, AdaptiveControlsNav, FocusHeroNav,
+            AutoCompleteNav, DateRangePickerNav, RangeSliderNav, ResponsiveContentNav,
+            ScrollViewerNav, SegmentedButtonNav, SurfaceNav
         ];
         _topNavigationButtons = [GetStartedTopNav, DevelopTopNav, FoundationsTopNav, StylesTopNav, ComponentsTopNav];
         _galleryIndex =
@@ -94,7 +96,13 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Settings cards", "settings card preference group expander android tile", SettingsCardNav, () => new SettingsCardGalleryPage()),
             Entry("Sheets", "bottom side sheet", SheetNav, () => new SheetGalleryPage()),
             Entry("Slider", "slider range value", SliderNav, () => new SliderGalleryPage()),
-            Entry("Segmented and range", "segmented button range slider", AdvancedSelectionNav, () => new AdvancedSelectionGalleryPage()),
+            Entry("Autocomplete", "autocomplete auto complete suggestion filter typeahead text field", AutoCompleteNav, () => new AutoCompleteGalleryPage()),
+            Entry("Date range picker", "date range picker start end calendar localized", DateRangePickerNav, () => new DateRangePickerGalleryPage()),
+            Entry("Range slider", "range slider two handle lower upper span step", RangeSliderNav, () => new RangeSliderGalleryPage()),
+            Entry("Responsive content", "responsive adaptive layout breakpoint compact medium expanded", ResponsiveContentNav, () => new ResponsiveContentGalleryPage()),
+            Entry("Scrolling surface", "scroll viewer scrollbar scrolling surface overscroll", ScrollViewerNav, () => new ScrollViewerGalleryPage()),
+            Entry("Segmented buttons", "segmented button group single multiple toggle", SegmentedButtonNav, () => new SegmentedButtonGalleryPage()),
+            Entry("Surfaces and type scale", "surface container elevation type scale text role semantic", SurfaceNav, () => new SurfaceGalleryPage()),
             Entry("Snackbar", "snackbar message action", SnackbarNav, () => new SnackbarGalleryPage()),
             Entry("Switch", "switch toggle", SwitchNav, () => new SwitchGalleryPage()),
             Entry("Tabs", "tabs tab view", TabNav, () => new TabGalleryPage()),
@@ -130,7 +138,6 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Tree view", "tree hierarchy expand collapse node virtualized", TreeViewNav, () => new TreeViewGalleryPage()),
             Entry("Borderless windows", "custom chrome title bar caption drag resize platform adapter", BorderlessWindowNav, () => new BorderlessWindowGalleryPage()),
             Entry("Numeric input", "numeric number stepper spinner increment decrement quantity", NumericNav, () => new NumericGalleryPage()),
-            Entry("Desktop adapters", "scrollbar autocomplete window surface text focus", DesktopAdaptersNav, () => new DesktopAdaptersGalleryPage()),
             Entry("Theme Lab", "theme color seed hct contrast json shape font", ThemeResourcesNav, () => new ThemeResourcesGalleryPage()),
             Entry("Material Symbols", "icons glyph copy symbols", SymbolsNav, () => new SymbolGalleryPage()),
             Entry("Motion", "animation ripple spring easing", MotionNav, () => new MotionGalleryPage()),
@@ -169,6 +176,12 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
 
     private static GalleryIndexEntry Entry(string title, string keywords, MdButton button, Func<Control> factory) =>
         new(title, keywords, button, factory);
+
+    /// <summary>
+    /// Titles of every indexed page, in index order. The components overview page links to pages
+    /// by title, so a test compares the two lists and fails the build if a link goes stale.
+    /// </summary>
+    public IReadOnlyList<string> IndexedPageTitles => _galleryIndex.Select(entry => entry.Title).ToArray();
 
     internal bool NavigateToIndexedPage(string title)
     {
@@ -216,7 +229,13 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
     private void ShowSettingsCard(object? s, RoutedEventArgs e) => Navigate(new SettingsCardGalleryPage(), SettingsCardNav);
     private void ShowSheets(object? s, RoutedEventArgs e) => Navigate(new SheetGalleryPage(), SheetNav);
     private void ShowSlider(object? s, RoutedEventArgs e) => Navigate(new SliderGalleryPage(), SliderNav);
-    private void ShowAdvancedSelection(object? s, RoutedEventArgs e) => Navigate(new AdvancedSelectionGalleryPage(), AdvancedSelectionNav);
+    private void ShowAutoComplete(object? s, RoutedEventArgs e) => Navigate(new AutoCompleteGalleryPage(), AutoCompleteNav);
+    private void ShowDateRangePicker(object? s, RoutedEventArgs e) => Navigate(new DateRangePickerGalleryPage(), DateRangePickerNav);
+    private void ShowRangeSlider(object? s, RoutedEventArgs e) => Navigate(new RangeSliderGalleryPage(), RangeSliderNav);
+    private void ShowResponsiveContent(object? s, RoutedEventArgs e) => Navigate(new ResponsiveContentGalleryPage(), ResponsiveContentNav);
+    private void ShowScrollViewer(object? s, RoutedEventArgs e) => Navigate(new ScrollViewerGalleryPage(), ScrollViewerNav);
+    private void ShowSegmentedButton(object? s, RoutedEventArgs e) => Navigate(new SegmentedButtonGalleryPage(), SegmentedButtonNav);
+    private void ShowSurface(object? s, RoutedEventArgs e) => Navigate(new SurfaceGalleryPage(), SurfaceNav);
     private void ShowSnackbar(object? s, RoutedEventArgs e) => Navigate(new SnackbarGalleryPage(), SnackbarNav);
     private void ShowSwitch(object? s, RoutedEventArgs e) => Navigate(new SwitchGalleryPage(), SwitchNav);
     private void ShowTabs(object? s, RoutedEventArgs e) => Navigate(new TabGalleryPage(), TabNav);
@@ -252,7 +271,6 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
     private void ShowTreeView(object? s, RoutedEventArgs e) => Navigate(new TreeViewGalleryPage(), TreeViewNav);
     private void ShowBorderlessWindows(object? s, RoutedEventArgs e) => Navigate(new BorderlessWindowGalleryPage(), BorderlessWindowNav);
     private void ShowNumeric(object? s, RoutedEventArgs e) => Navigate(new NumericGalleryPage(), NumericNav);
-    private void ShowDesktopAdapters(object? s, RoutedEventArgs e) => Navigate(new DesktopAdaptersGalleryPage(), DesktopAdaptersNav);
     private void ShowThemeResources(object? s, RoutedEventArgs e) => Navigate(new ThemeResourcesGalleryPage(), ThemeResourcesNav);
     private void ShowSymbols(object? s, RoutedEventArgs e) => Navigate(new SymbolGalleryPage(), SymbolsNav);
     private void ShowMotion(object? s, RoutedEventArgs e) => Navigate(new MotionGalleryPage(), MotionNav);
@@ -446,7 +464,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             ? ComponentsTopNav
             : ReferenceEquals(selected, ThemeResourcesNav) || ReferenceEquals(selected, SymbolsNav) || ReferenceEquals(selected, MotionNav)
                 ? FoundationsTopNav
-                : ReferenceEquals(selected, DesktopAdaptersNav) ? DevelopTopNav : ComponentsTopNav;
+                : ComponentsTopNav;
         _currentPageType = page.GetType();
         _currentNavigationButton = selected;
         // The M3 site has hierarchical primary and contextual navigation, but only the actual

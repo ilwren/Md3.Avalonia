@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.RangeSliderGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Range slider" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A slider with two handles and a stepped span between them. Both handles are keyboard reachable and the value indicators follow the active handle." />
+      </StackPanel>
+
+      <StackPanel Width="720" HorizontalAlignment="Left" Spacing="12">
+        <TextBlock x:Name="RangeValueText" Classes="body" Text="20 — 80" />
+        <md:MdRangeSlider LowerValue="20" UpperValue="80" Step="5" ShowValueIndicators="True" PropertyChanged="RangePropertyChanged" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdRangeSlider LowerValue=&quot;{Binding Min}&quot; UpperValue=&quot;{Binding Max}&quot; Step=&quot;5&quot; ShowValueIndicators=&quot;True&quot; /&gt;"
+                            CSharpCode="var range = new MdRangeSlider { LowerValue = 20, UpperValue = 80 };" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

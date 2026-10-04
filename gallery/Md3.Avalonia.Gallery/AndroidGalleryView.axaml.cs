@@ -69,6 +69,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Banner", () => new BannerGalleryPage());
         AddPage("Breadcrumbs", () => new BreadcrumbGalleryPage());
         AddPage("Text fields", () => new TextBoxGalleryPage());
+        AddPage("Numeric input", () => new NumericGalleryPage());
         AddPage("Keyboard avoidance", () => new KeyboardAvoidanceGalleryPage());
         AddPage("Checkbox", () => new CheckBoxGalleryPage());
         AddPage("Radio buttons", () => new RadioButtonGalleryPage());
@@ -105,7 +106,13 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Draggable sheet", () => new DraggableSheetGalleryPage());
         AddPage("Slider", () => new SliderGalleryPage());
         AddPage("Stepper", () => new StepperGalleryPage());
-        AddPage("Segmented and range", () => new AdvancedSelectionGalleryPage());
+        AddPage("Segmented buttons", () => new SegmentedButtonGalleryPage());
+        AddPage("Range slider", () => new RangeSliderGalleryPage());
+        AddPage("Date range picker", () => new DateRangePickerGalleryPage());
+        AddPage("Autocomplete", () => new AutoCompleteGalleryPage());
+        AddPage("Surfaces and type scale", () => new SurfaceGalleryPage());
+        AddPage("Responsive content", () => new ResponsiveContentGalleryPage());
+        AddPage("Scrolling surface", () => new ScrollViewerGalleryPage());
         AddPage("Snackbar", () => new SnackbarGalleryPage());
         AddPage("Switch", () => new SwitchGalleryPage());
         AddPage("Tabs", () => new TabGalleryPage());

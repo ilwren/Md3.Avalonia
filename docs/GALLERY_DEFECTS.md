@@ -159,6 +159,56 @@ scroll is gone. `EcosystemGalleryPage` was deleted rather than left as an empty 
 what #12 was asking for. `MdEcosystemWaveAndWindowTests` kept its render assertion by pointing at
 `ChatViewGalleryPage`, the heaviest of the twenty-eight.
 
+### 12 · batch 4 — the last two crowded pages, and what stays whole
+
+`DesktopAdaptersGalleryPage` grouped four unrelated controls under "they are desktop-ish", and
+`AdvancedSelectionGalleryPage` ("Segmented & range") grouped three. Seven more pages:
+
+Autocomplete · Surfaces and type scale · Responsive content · Scrolling surface ·
+Segmented buttons · Range slider · Date range picker
+
+Single and multiple selection stayed on one page: they are the same `MdSegmentedButtonGroup` with
+`AllowMultiple` flipped, so separating them would describe one control twice. The desktop-adapters
+usage snippet was stale — it still showed `MdNumericBox`, which had already moved to its own page.
+
+Two pages were examined and deliberately **not** split:
+
+- **`MotionGalleryPage`** is a topic page, not a dumping ground. Spring schemes, container
+  transform and animated visibility are three views of one subject — the M3 motion system — and
+  the spring comparison only means anything next to the transitions it parameterises.
+- **`ComponentsOverviewGalleryPage`** has no demos at all; it is the category index behind the
+  "Components" tab. Splitting an index is meaningless.
+
+#### The overview index had dead links
+
+The overview links to pages *by title*, through `MainWindow.NavigateToIndexedPage`. Nothing checked
+those titles, so the splits rotted it silently: **"Flutter parity" and "Flutter ecosystem" were
+still listed after both pages had been deleted**, and clicking them did nothing at all. It was also
+badly incomplete — 35 of what are now 93 pages.
+
+It is now generated from the gallery index itself, grouped into nine categories (the six M3
+categories plus Data, Motion and style, and Sample apps), with every indexed page appearing exactly
+once. `MdGalleryIndexTests` makes the rot a build failure:
+
+- every overview link resolves through `NavigateToIndexedPage`, and
+- every indexed page is linked from the overview, so a new page cannot be added without appearing
+  there.
+
+One more pre-existing gap closed on the way: `NumericGalleryPage` was in the desktop index but
+missing from the Android single-view shell, so numeric input was unreachable on Android.
+
+#### Where #12 ended up
+
+| Batch | Page removed | Pages created |
+|---|---|---|
+| 1 | — (`FlutterParityGalleryPage` thinned) | 9 |
+| 2 | `FlutterParityGalleryPage` | 8 |
+| 3 | `EcosystemGalleryPage` | 28 |
+| 4 | `DesktopAdaptersGalleryPage`, `AdvancedSelectionGalleryPage` | 7 |
+
+Fifty-two components that could only be reached by scrolling a shared page now have their own
+page, nav entry, search keywords and usage snippet. The gallery went from 48 pages to 97.
+
 ## Checked and found correct — no change made
 
 | # | Item | Evidence |

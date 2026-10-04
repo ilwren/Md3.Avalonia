@@ -4,9 +4,9 @@ using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Gallery.Pages;
 
-public partial class AdvancedSelectionGalleryPage : UserControl
+public partial class RangeSliderGalleryPage : UserControl
 {
-    public AdvancedSelectionGalleryPage() => InitializeComponent();
+    public RangeSliderGalleryPage() => InitializeComponent();
 
     private void RangePropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {

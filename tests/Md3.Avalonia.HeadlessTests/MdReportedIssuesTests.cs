@@ -54,13 +54,13 @@ public sealed class MdReportedIssuesTests
             var view = new AndroidGalleryView();
             using var host = Show(view, width, 760);
             var destination = view.GetVisualDescendants().OfType<MdButton>()
-                .Single(button => Equals(button.Content, "Segmented and range"));
+                .Single(button => Equals(button.Content, "Segmented buttons"));
             destination.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Dispatcher.UIThread.RunJobs();
 
             var pageHost = view.GetVisualDescendants().OfType<ContentControl>()
                 .Single(control => control.Name == "MobilePageHost");
-            var page = view.GetVisualDescendants().OfType<AdvancedSelectionGalleryPage>().Single();
+            var page = view.GetVisualDescendants().OfType<SegmentedButtonGalleryPage>().Single();
             var groups = page.GetVisualDescendants().OfType<MdSegmentedButtonGroup>().ToArray();
             Assert.NotEmpty(groups);
             Assert.All(groups, group =>
@@ -73,8 +73,9 @@ public sealed class MdReportedIssuesTests
 
             host.Window.Width = 900;
             Dispatcher.UIThread.RunJobs();
-            Assert.Equal(new[] { 480d, 560d, double.NaN }, groups.Select(group => group.Width).ToArray());
-            Assert.All(groups.Take(2), group => Assert.Equal(HorizontalAlignment.Left, group.HorizontalAlignment));
+            // The third group used to come from MdDateRangePicker, which now has its own page.
+            Assert.Equal(new[] { 480d, 560d }, groups.Select(group => group.Width).ToArray());
+            Assert.All(groups, group => Assert.Equal(HorizontalAlignment.Left, group.HorizontalAlignment));
         }
     }
 

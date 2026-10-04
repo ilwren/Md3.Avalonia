@@ -97,7 +97,6 @@
             <Border Margin="0,12,0,4" Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
             <TextBlock Margin="14,8,14,10" Classes="body" Text="LIBRARY EXTENSIONS" />
             <md:MdButton x:Name="NumericNav" Content="Numeric input" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNumeric" />
-            <md:MdButton x:Name="DesktopAdaptersNav" Content="Desktop adapters" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDesktopAdapters" />
             <md:MdButton x:Name="ThemeResourcesNav" Content="Theme Lab" Variant="Text" HorizontalContentAlignment="Left" Click="ShowThemeResources" />
             <md:MdButton x:Name="SymbolsNav" Content="Material Symbols" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSymbols" />
             <md:MdButton x:Name="MotionNav" Content="Motion" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMotion" />
@@ -148,7 +147,13 @@
             <md:MdButton x:Name="DraggableSheetNav" Content="Draggable sheet" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDraggableSheet" />
             <md:MdButton x:Name="SliderNav" Content="Slider" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSlider" />
             <md:MdButton x:Name="StepperNav" Content="Stepper" Variant="Text" HorizontalContentAlignment="Left" Click="ShowStepper" />
-            <md:MdButton x:Name="AdvancedSelectionNav" Content="Segmented &amp; range" Variant="Text" HorizontalContentAlignment="Left" Click="ShowAdvancedSelection" />
+            <md:MdButton x:Name="AutoCompleteNav" Content="Autocomplete" Variant="Text" HorizontalContentAlignment="Left" Click="ShowAutoComplete" />
+            <md:MdButton x:Name="DateRangePickerNav" Content="Date range picker" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDateRangePicker" />
+            <md:MdButton x:Name="RangeSliderNav" Content="Range slider" Variant="Text" HorizontalContentAlignment="Left" Click="ShowRangeSlider" />
+            <md:MdButton x:Name="ResponsiveContentNav" Content="Responsive content" Variant="Text" HorizontalContentAlignment="Left" Click="ShowResponsiveContent" />
+            <md:MdButton x:Name="ScrollViewerNav" Content="Scrolling surface" Variant="Text" HorizontalContentAlignment="Left" Click="ShowScrollViewer" />
+            <md:MdButton x:Name="SegmentedButtonNav" Content="Segmented buttons" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSegmentedButton" />
+            <md:MdButton x:Name="SurfaceNav" Content="Surfaces and type scale" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSurface" />
             <md:MdButton x:Name="SnackbarNav" Content="Snackbar" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSnackbar" />
             <md:MdButton x:Name="SwitchNav" Content="Switch" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSwitch" />
             <md:MdButton x:Name="TabNav" Content="Tabs" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTabs" />
