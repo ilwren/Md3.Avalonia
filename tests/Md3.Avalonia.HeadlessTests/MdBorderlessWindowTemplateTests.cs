@@ -61,10 +61,10 @@ public sealed class MdBorderlessWindowTemplateTests
             // dedicated empty theme prevents Fluent/Simple caption visuals from becoming a
             // second title bar while WindowDecorations.Full keeps native DWM style bits.
             Assert.NotNull(window.WindowDecorationsTheme);
-            Assert.Equal(new Thickness(1), frame.Margin);
-            Assert.Equal(9, frame.CornerRadius.TopLeft);
-            Assert.Equal(new Thickness(1), frame.BorderThickness);
-            Assert.True(frame.ClipToBounds);
+            Assert.Equal(new Thickness(0), frame.Margin);
+            Assert.Equal(0, frame.CornerRadius.TopLeft);
+            Assert.Equal(new Thickness(0), frame.BorderThickness);
+            Assert.False(frame.ClipToBounds);
             Assert.Equal("Material application", titleBar.Content);
             Assert.True(titleBar.ShowIcon);
             Assert.Equal(44, titleBar.Height);
