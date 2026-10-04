@@ -119,9 +119,12 @@ for package_id in "${PACKAGE_IDS[@]}"; do
   done
 done
 
+# Derived rather than written down, so adding a package cannot leave this behind: one .nupkg
+# and one .snupkg each.
+EXPECTED_COUNT=$((${#PACKAGE_IDS[@]} * 2))
 PACKAGE_COUNT="$(find "$OUTPUT" -maxdepth 1 -type f \( -name '*.nupkg' -o -name '*.snupkg' \) | wc -l | tr -d '[:space:]')"
-if ((PACKAGE_COUNT != 8)); then
-  echo "error: expected exactly 8 package files for version $VERSION, found $PACKAGE_COUNT in $OUTPUT" >&2
+if ((PACKAGE_COUNT != EXPECTED_COUNT)); then
+  echo "error: expected exactly $EXPECTED_COUNT package files for version $VERSION, found $PACKAGE_COUNT in $OUTPUT" >&2
   exit 1
 fi
 
