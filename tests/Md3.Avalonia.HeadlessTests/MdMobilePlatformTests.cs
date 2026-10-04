@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
-using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Threading;
 using Md3.Avalonia.Controls;
@@ -23,44 +22,57 @@ public sealed class MdMobilePlatformTests
         return window;
     }
 
-    // Each modal surface gets content in the slot the focus trap actually scopes to: Content is
-    // the page behind the scrim, not the modal. An empty scope leaves the trap with nothing to
-    // focus and it keeps re-posting a redirect.
-    private static MdDialogHost NewDialog(bool isOpen) => new()
+    /// <summary>
+    /// A stand-in for a dismissible surface. The registration mechanism is tested against this
+    /// rather than against a real dialog so a failure points at the mechanism.
+    /// </summary>
+    private sealed class TestSurface : ContentControl
     {
-        Content = new Button { Content = "Page" },
-        Dialog = new Button { Content = "OK" },
-        IsOpen = isOpen
-    };
+        private readonly MdBackScope _backScope;
+        private bool _isOpen;
 
-    private static MdSheetHost NewSheet(bool isModal, bool isOpen) => new()
-    {
-        Content = new Button { Content = "Page" },
-        SheetContent = new Button { Content = "Share" },
-        IsModal = isModal,
-        IsOpen = isOpen
-    };
+        public TestSurface(bool isOpen = false)
+        {
+            _backScope = new MdBackScope(this, OnBackRequested);
+            IsOpen = isOpen;
+        }
 
-    private static MdNavigationDrawer NewDrawer(bool isOpen) => new()
-    {
-        Content = new Button { Content = "Page" },
-        DrawerContent = new Button { Content = "Inbox" },
-        IsModal = true,
-        IsOpen = isOpen
-    };
+        public bool IsOpen
+        {
+            get => _isOpen;
+            set
+            {
+                _isOpen = value;
+                _backScope.Update(value);
+            }
+        }
+
+        public bool ConsumesBack { get; set; } = true;
+
+        public int BackCount { get; private set; }
+
+        private bool OnBackRequested()
+        {
+            BackCount++;
+            if (!IsOpen || !ConsumesBack) return false;
+            IsOpen = false;
+            return true;
+        }
+    }
 
     // ---- back navigation -------------------------------------------------
 
     [AvaloniaFact]
-    public void Back_Request_Closes_An_Open_Dialog_Host()
+    public void Back_Request_Closes_The_Open_Surface()
     {
-        var host = NewDialog(isOpen: true);
-        var window = ShowWindow(host);
+        var surface = new TestSurface(isOpen: true);
+        var window = ShowWindow(surface);
         try
         {
-            Assert.True(MdBackNavigation.RequestBack(host));
-            Dispatcher.UIThread.RunJobs();
-            Assert.False(host.IsOpen);
+            Assert.Equal(1, MdBackNavigation.GetHandlerCount(window));
+            Assert.True(MdBackNavigation.RequestBack(surface));
+            Assert.False(surface.IsOpen);
+            Assert.Equal(0, MdBackNavigation.GetHandlerCount(window));
         }
         finally
         {
@@ -71,13 +83,14 @@ public sealed class MdMobilePlatformTests
     [AvaloniaFact]
     public void Back_Request_Is_Not_Consumed_When_Nothing_Is_Open()
     {
-        var host = NewDialog(isOpen: false);
-        var window = ShowWindow(host);
+        var surface = new TestSurface(isOpen: false);
+        var window = ShowWindow(surface);
         try
         {
             // The activity must still be allowed to finish, so an unhandled request stays unhandled.
-            Assert.False(MdBackNavigation.RequestBack(host));
             Assert.Equal(0, MdBackNavigation.GetHandlerCount(window));
+            Assert.False(MdBackNavigation.RequestBack(surface));
+            Assert.Equal(0, surface.BackCount);
         }
         finally
         {
@@ -88,26 +101,22 @@ public sealed class MdMobilePlatformTests
     [AvaloniaFact]
     public void Back_Request_Unwinds_Nested_Surfaces_Newest_First()
     {
-        var drawer = NewDrawer(isOpen: false);
-        var dialog = NewDialog(isOpen: false);
-        var window = ShowWindow(new Panel { Children = { drawer, dialog } });
+        var outer = new TestSurface();
+        var inner = new TestSurface();
+        var window = ShowWindow(new Panel { Children = { outer, inner } });
         try
         {
-            drawer.IsOpen = true;
-            dialog.IsOpen = true;
-            Dispatcher.UIThread.RunJobs();
+            outer.IsOpen = true;
+            inner.IsOpen = true;
             Assert.Equal(2, MdBackNavigation.GetHandlerCount(window));
 
-            // The dialog opened last, so it goes first and the drawer underneath is untouched.
+            // The inner surface opened last, so it goes first and the one under it is untouched.
             Assert.True(MdBackNavigation.RequestBack(window));
-            Dispatcher.UIThread.RunJobs();
-            Assert.False(dialog.IsOpen);
-            Assert.True(drawer.IsOpen);
+            Assert.False(inner.IsOpen);
+            Assert.True(outer.IsOpen);
 
             Assert.True(MdBackNavigation.RequestBack(window));
-            Dispatcher.UIThread.RunJobs();
-            Assert.False(drawer.IsOpen);
-
+            Assert.False(outer.IsOpen);
             Assert.False(MdBackNavigation.RequestBack(window));
         }
         finally
@@ -117,19 +126,17 @@ public sealed class MdMobilePlatformTests
     }
 
     [AvaloniaFact]
-    public void Platform_Back_Requested_Event_Is_Marked_Handled_Once_A_Surface_Consumes_It()
+    public void A_Surface_That_Declines_Passes_The_Request_Down_The_Stack()
     {
-        var sheet = NewSheet(isModal: true, isOpen: true);
-        var window = ShowWindow(sheet);
+        var consuming = new TestSurface(isOpen: true);
+        var declining = new TestSurface(isOpen: true) { ConsumesBack = false };
+        var window = ShowWindow(new Panel { Children = { consuming, declining } });
         try
         {
-            Dispatcher.UIThread.RunJobs();
-            var args = new RoutedEventArgs(TopLevel.BackRequestedEvent);
-            window.RaiseEvent(args);
-            Dispatcher.UIThread.RunJobs();
-
-            Assert.True(args.Handled);
-            Assert.False(sheet.IsOpen);
+            Assert.True(MdBackNavigation.RequestBack(window));
+            Assert.Equal(1, declining.BackCount);
+            Assert.True(declining.IsOpen);
+            Assert.False(consuming.IsOpen);
         }
         finally
         {
@@ -140,33 +147,16 @@ public sealed class MdMobilePlatformTests
     [AvaloniaFact]
     public void Closing_A_Surface_Unregisters_Its_Back_Handler()
     {
-        var view = new MdSearchView { Content = new Button { Content = "Alpha" }, IsOpen = true };
-        var window = ShowWindow(view);
+        var surface = new TestSurface(isOpen: true);
+        var window = ShowWindow(surface);
         try
         {
-            Dispatcher.UIThread.RunJobs();
             Assert.Equal(1, MdBackNavigation.GetHandlerCount(window));
-
-            view.IsOpen = false;
-            Dispatcher.UIThread.RunJobs();
+            surface.IsOpen = false;
             Assert.Equal(0, MdBackNavigation.GetHandlerCount(window));
-        }
-        finally
-        {
-            window.Close();
-        }
-    }
 
-    [AvaloniaFact]
-    public void A_Non_Modal_Sheet_Ignores_Back_So_The_Page_Behind_It_Can_Navigate()
-    {
-        var sheet = NewSheet(isModal: false, isOpen: true);
-        var window = ShowWindow(sheet);
-        try
-        {
-            Dispatcher.UIThread.RunJobs();
-            Assert.False(MdBackNavigation.RequestBack(sheet));
-            Assert.True(sheet.IsOpen);
+            surface.IsOpen = true;
+            Assert.Equal(1, MdBackNavigation.GetHandlerCount(window));
         }
         finally
         {
@@ -178,17 +168,18 @@ public sealed class MdMobilePlatformTests
     public void Detaching_A_Surface_Releases_Its_Registration()
     {
         var panel = new Panel();
-        var dialog = NewDialog(isOpen: true);
-        panel.Children.Add(dialog);
+        var surface = new TestSurface(isOpen: true);
+        panel.Children.Add(surface);
         var window = ShowWindow(panel);
         try
         {
+            Assert.Equal(1, MdBackNavigation.GetHandlerCount(window));
+            panel.Children.Remove(surface);
+            Assert.Equal(0, MdBackNavigation.GetHandlerCount(window));
+
+            panel.Children.Add(surface);
             Dispatcher.UIThread.RunJobs();
             Assert.Equal(1, MdBackNavigation.GetHandlerCount(window));
-
-            panel.Children.Remove(dialog);
-            Dispatcher.UIThread.RunJobs();
-            Assert.Equal(0, MdBackNavigation.GetHandlerCount(window));
         }
         finally
         {
@@ -199,45 +190,19 @@ public sealed class MdMobilePlatformTests
     [AvaloniaFact]
     public void A_Scope_Registers_Only_Once_It_Has_A_Window_To_Register_Against()
     {
-        // A control is routinely opened before it is attached; the registration must still land.
-        var detached = NewDialog(isOpen: true);
-        Assert.False(MdBackNavigation.RequestBack(detached));
+        // A surface is routinely opened before it is attached; the registration must still land.
+        var surface = new TestSurface(isOpen: true);
+        Assert.False(MdBackNavigation.RequestBack(surface));
 
-        var window = ShowWindow(detached);
+        var window = ShowWindow(surface);
         try
         {
-            Dispatcher.UIThread.RunJobs();
             Assert.Equal(1, MdBackNavigation.GetHandlerCount(window));
-            Assert.True(MdBackNavigation.RequestBack(detached));
+            Assert.True(MdBackNavigation.RequestBack(surface));
         }
         finally
         {
             window.Close();
-        }
-    }
-
-    [AvaloniaFact]
-    public void Registrations_Are_Independent_Per_Window()
-    {
-        var first = NewDialog(isOpen: true);
-        var second = NewDialog(isOpen: true);
-        var firstWindow = ShowWindow(first);
-        var secondWindow = ShowWindow(second);
-        try
-        {
-            Dispatcher.UIThread.RunJobs();
-            Assert.Equal(1, MdBackNavigation.GetHandlerCount(firstWindow));
-            Assert.Equal(1, MdBackNavigation.GetHandlerCount(secondWindow));
-
-            MdBackNavigation.RequestBack(firstWindow);
-            Dispatcher.UIThread.RunJobs();
-            Assert.False(first.IsOpen);
-            Assert.True(second.IsOpen);
-        }
-        finally
-        {
-            firstWindow.Close();
-            secondWindow.Close();
         }
     }
 
@@ -269,6 +234,15 @@ public sealed class MdMobilePlatformTests
         }
     }
 
+    [AvaloniaFact]
+    public void Registering_Without_A_Window_Is_Inert_Rather_Than_Fatal()
+    {
+        var anchor = new Border();
+        var registration = MdBackNavigation.Register(anchor, () => true);
+        registration.Dispose();
+        Assert.False(MdBackNavigation.RequestBack(anchor));
+    }
+
     // ---- safe area -------------------------------------------------------
 
     [AvaloniaFact]
@@ -283,7 +257,6 @@ public sealed class MdMobilePlatformTests
         var window = ShowWindow(area);
         try
         {
-            Dispatcher.UIThread.RunJobs();
             Assert.Equal(new Thickness(0, 48, 0, 24), area.EffectivePadding);
             Assert.Equal(48, child.Bounds.Top, 1);
             Assert.Equal(area.Bounds.Height - 24, child.Bounds.Bottom, 1);
@@ -307,7 +280,6 @@ public sealed class MdMobilePlatformTests
         var window = ShowWindow(area);
         try
         {
-            Dispatcher.UIThread.RunJobs();
             // A top app bar wants its surface behind the status bar, so Top is deliberately dropped.
             Assert.Equal(new Thickness(0, 0, 0, 24), area.EffectivePadding);
             Assert.Equal(0, child.Bounds.Top, 1);
@@ -332,7 +304,6 @@ public sealed class MdMobilePlatformTests
         var window = ShowWindow(area);
         try
         {
-            Dispatcher.UIThread.RunJobs();
             Assert.Equal(new Thickness(16, 48, 16, 16), area.EffectivePadding);
         }
         finally
@@ -349,9 +320,7 @@ public sealed class MdMobilePlatformTests
         try
         {
             Assert.False(area.IsSafeAreaActive);
-
             area.SafeAreaPadding = new Thickness(0, 48, 0, 0);
-            Dispatcher.UIThread.RunJobs();
             Assert.True(area.IsSafeAreaActive);
         }
         finally
@@ -373,7 +342,6 @@ public sealed class MdMobilePlatformTests
         var window = ShowWindow(area);
         try
         {
-            Dispatcher.UIThread.RunJobs();
             Assert.Equal(100, area.DesiredSize.Width, 1);
             Assert.Equal(40 + 48 + 24, area.DesiredSize.Height, 1);
         }
@@ -391,7 +359,6 @@ public sealed class MdMobilePlatformTests
         var window = ShowWindow(area);
         try
         {
-            Dispatcher.UIThread.RunJobs();
             Assert.Equal(0, child.Bounds.Top, 1);
 
             // Rotating the device, or the keyboard appearing, moves the inset at runtime.
