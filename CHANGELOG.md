@@ -1,5 +1,25 @@
 # Changelog
 
+## [3.1.0-preview.1] - 2026-10-04
+
+### Added
+
+- `MdBorderlessWindow` now inherits `Window.Icon` into the Material title bar by default.
+- Added independent title-bar icon visibility and caption-button state controls.
+
+### Changed
+
+- Preserved native Windows DWM minimize, maximize, and restore animations.
+- Unified the title bar with the window `Surface` and removed the visible divider line.
+- Updated desktop and Android Gallery behavior and release documentation.
+
+### Fixed
+
+- Prevented native and Material window frames from being rendered as a double border.
+- Corrected headless template expectations for native-frame behavior.
+
+For details, see [`docs/RELEASE_NOTES_3.1.0-preview.1.md`](docs/RELEASE_NOTES_3.1.0-preview.1.md).
+
 All notable changes follow Keep a Changelog. The project intends to use Semantic Versioning after the preview cycle.
 
 ## [0.3.0-preview.1] - 2026-10-03

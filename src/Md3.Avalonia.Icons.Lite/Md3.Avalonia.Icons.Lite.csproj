@@ -5,7 +5,7 @@
     <AssemblyName>Md3.Avalonia.Icons.Lite</AssemblyName>
     <Description>Lite Material Symbols font and glyph catalog with embedded subset font for Md3.Avalonia.</Description>
     <PackageId>Md3.Avalonia.Icons.Lite</PackageId>
-    <Version>0.3.0-preview.1</Version>
+    <Version>3.1.0-preview.1</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;icons;fonts;material-symbols;lite;subset</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
