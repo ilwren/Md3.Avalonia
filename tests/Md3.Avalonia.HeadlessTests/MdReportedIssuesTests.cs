@@ -659,6 +659,44 @@ public sealed class MdReportedIssuesTests
         Assert.Equal(1, dismissals);
     }
 
+    [AvaloniaFact]
+    public void Expanded_Search_Reopens_When_The_Header_Is_Typed_In_Again()
+    {
+        // Reported from the gallery: choose a result, clear the field, type again, and the
+        // suggestions never came back. Committing a result writes the chosen text into the header
+        // and closes the view, and nothing reopened it, so the filter ran against a hidden list.
+        // The header presenter stays visible while the view is closed, so typing in it must bring
+        // the results back.
+        var header = new MdSearchBar();
+        var view = new MdSearchView
+        {
+            Header = header,
+            Content = new TextBlock { Text = "results" },
+            IsOpen = true
+        };
+
+        using var host = Show(view, 800, 600);
+        Dispatcher.UIThread.RunJobs();
+
+        view.CommitResult("MdSearchView.cs", "MdSearchView.cs");
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(view.IsOpen);
+
+        header.Focus();
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(header.IsKeyboardFocusWithin, "the header stays visible while the view is closed, so it must be focusable");
+
+        // Clearing the field on its own leaves the view closed.
+        header.Text = string.Empty;
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(view.IsOpen);
+
+        // Typing brings the result list back.
+        header.Text = "search";
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(view.IsOpen);
+    }
+
     private static Scope Show(Control content, double width, double height)
     {
         var window = new Window { Width = width, Height = height, Content = content };

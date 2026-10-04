@@ -39,6 +39,8 @@ public sealed class MdSearchView : ContentControl
 
     private readonly MdPresenceController _presence;
     private InputElement? _headerInput;
+    private TextBox? _headerTextBox;
+    private bool _suppressAutoOpen;
     private TopLevel? _topLevel;
     private ContentPresenter? _results;
     private Control? _focusBeforeOpen;
@@ -77,11 +79,36 @@ public sealed class MdSearchView : ContentControl
 
     public void Dismiss() => SetCurrentValue(IsOpenProperty, false);
 
+    private void OnHeaderTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        // Typing in the header has to bring the view back. Committing a result writes the chosen
+        // text into the search bar and then closes the view, and nothing reopened it afterwards:
+        // clearing the field and typing again filtered a result list nobody could see, so the
+        // suggestions appeared to be gone for good. Only the user's own typing counts, hence the
+        // focus check, and an empty field stays closed so clearing alone does not expand it.
+        if (_suppressAutoOpen || IsOpen) return;
+        if (sender is not TextBox { Text.Length: > 0 } header || !header.IsKeyboardFocusWithin) return;
+        Show();
+    }
+
     /// <summary>
     /// Commits a result through one binding/command/event path, updates a search-bar header,
     /// and optionally closes the expanded view.
     /// </summary>
     public void CommitResult(object? result, string? displayText = null)
+    {
+        _suppressAutoOpen = true;
+        try
+        {
+            CommitResultCore(result, displayText);
+        }
+        finally
+        {
+            _suppressAutoOpen = false;
+        }
+    }
+
+    private void CommitResultCore(object? result, string? displayText)
     {
         SetCurrentValue(SelectedResultProperty, result);
         displayText ??= ResolveDisplayText(result);
@@ -120,10 +147,15 @@ public sealed class MdSearchView : ContentControl
     {
         if (_headerInput is not null)
             _headerInput.RemoveHandler(InputElement.KeyDownEvent, OnHeaderPreviewKeyDown);
+        if (_headerTextBox is not null)
+            _headerTextBox.TextChanged -= OnHeaderTextChanged;
         base.OnApplyTemplate(e);
         _headerInput = Header as InputElement;
         _headerInput?.AddHandler(InputElement.KeyDownEvent, OnHeaderPreviewKeyDown,
             RoutingStrategies.Tunnel, handledEventsToo: true);
+        _headerTextBox = Header as TextBox;
+        if (_headerTextBox is not null)
+            _headerTextBox.TextChanged += OnHeaderTextChanged;
         _results = e.NameScope.Find<ContentPresenter>("PART_Results");
         UpdateMotion();
     }
