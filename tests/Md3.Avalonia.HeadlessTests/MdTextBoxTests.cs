@@ -271,9 +271,7 @@ public sealed class MdTextBoxTests
         {
             var frame = window.CaptureRenderedFrame();
             Assert.NotNull(frame);
-            var path = Path.Combine(AppContext.BaseDirectory, "MdTextBoxPreview.png");
-            using var stream = File.Create(path);
-            frame.Save(stream, new PngBitmapEncoderOptions());
+            MdPreviewAssets.Save(frame, "MdTextBoxPreview.png");
         }
         finally
         {

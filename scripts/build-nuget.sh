@@ -10,6 +10,13 @@ Usage:
   scripts/build-nuget.sh [--output /absolute/or/relative/path]
                          [--configuration Release]
                          [--no-restore]
+                         [--keep-intermediate]
+
+By default the script deletes bin/ and obj/ for the four packaged projects before and
+after packing, so a release artifact can never pick up a stale intermediate. Pass
+--keep-intermediate when a CI job has already produced the same configuration and the
+run is a packaging *check* rather than a release build; that reuses the existing
+compilation instead of paying for a second full rebuild.
 
 The repository includes the pinned official Material Symbols Rounded fonts.
 Their provenance and checksums are verified before packaging.
@@ -22,6 +29,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONFIGURATION="Release"
 OUTPUT="$ROOT/artifacts/nuget"
 RESTORE=1
+KEEP_INTERMEDIATE=0
 
 while (($#)); do
   case "$1" in
@@ -33,6 +41,8 @@ while (($#)); do
       CONFIGURATION="$2"; shift 2 ;;
     --no-restore)
       RESTORE=0; shift ;;
+    --keep-intermediate)
+      KEEP_INTERMEDIATE=1; shift ;;
     -h|--help)
       usage; exit 0 ;;
     *)
@@ -69,6 +79,10 @@ else
 fi
 
 cleanup_intermediate() {
+  # Must return 0 on every path: this runs both directly and from the EXIT trap under `set -e`.
+  if ((KEEP_INTERMEDIATE)); then
+    return 0
+  fi
   find "$ROOT/src/Md3.Avalonia" \
        "$ROOT/src/Md3.Avalonia.Icons" \
        "$ROOT/src/Md3.Avalonia.Icons.Lite" \

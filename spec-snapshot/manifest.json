@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "purpose": "Frozen provenance for every external source the Md3.Avalonia conformance harness treats as an oracle. This file is referenced by README.md, the design specification, THIRD-PARTY-NOTICES.md and docs/FLUTTER_PARITY_STATUS.md.",
+  "captured_at": "2026-10-04",
+  "not_a_certification": "Provenance only. Nothing in this file asserts Material Design or Flutter compliance; see docs/SPEC_VERIFICATION.md for what each verification layer can and cannot prove.",
+
+  "material_design_3": {
+    "edition": "Material Design 3 / M3 Expressive web guidance",
+    "note": "m3.material.io is mutable and client-rendered. Each URL is therefore paired with a retrieval date, and re-baselining requires an explicit change to this file plus spec-snapshot/tokens.json.",
+    "retrieved_at": "2026-10-04",
+    "sources": {
+      "components": "https://m3.material.io/components",
+      "all-buttons": "https://m3.material.io/components/all-buttons",
+      "buttons": "https://m3.material.io/components/buttons/specs",
+      "icon-buttons": "https://m3.material.io/components/icon-buttons/specs",
+      "fab": "https://m3.material.io/components/floating-action-button/specs",
+      "extended-fab": "https://m3.material.io/components/extended-fab/specs",
+      "checkbox": "https://m3.material.io/components/checkbox/specs",
+      "radio-button": "https://m3.material.io/components/radio-button/specs",
+      "switch": "https://m3.material.io/components/switch/specs",
+      "chips": "https://m3.material.io/components/chips/specs",
+      "cards": "https://m3.material.io/components/cards/specs",
+      "dialogs": "https://m3.material.io/components/dialogs/specs",
+      "divider": "https://m3.material.io/components/divider/specs",
+      "badges": "https://m3.material.io/components/badges/specs",
+      "menus": "https://m3.material.io/components/menus/specs",
+      "app-bars": "https://m3.material.io/components/app-bars/specs",
+      "navigation-bar": "https://m3.material.io/components/navigation-bar/specs",
+      "navigation-rail": "https://m3.material.io/components/navigation-rail/specs",
+      "navigation-drawer": "https://m3.material.io/components/navigation-drawer/specs",
+      "text-fields": "https://m3.material.io/components/text-fields/specs",
+      "shape": "https://m3.material.io/styles/shape/corner-radius-scale",
+      "typography": "https://m3.material.io/styles/typography/type-scale-tokens",
+      "states": "https://m3.material.io/foundations/interaction/states/state-layers",
+      "accessibility-targets": "https://m3.material.io/foundations/designing/structure",
+      "motion": "https://m3.material.io/styles/motion/overview/how-it-works",
+      "breakpoints": "https://m3.material.io/foundations/layout/applying-layout/window-size-classes"
+    }
+  },
+
+  "androidx_compose_material3": {
+    "note": "Generated token constants are the highest-fidelity machine-readable form of the published values. scripts/sync-spec-tokens.py parses these files to regenerate spec-snapshot/tokens.json.",
+    "repository": "https://github.com/androidx/androidx",
+    "commit": "e2171b56112f43bf962f5d608413f74033b580b6",
+    "token_root": "compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens",
+    "files": [
+      "ShapeTokens.kt",
+      "TypeScaleTokens.kt",
+      "StateTokens.kt",
+      "ElevationTokens.kt",
+      "ButtonSmallTokens.kt",
+      "IconButtonSmallTokens.kt",
+      "FabBaselineTokens.kt",
+      "ExtendedFabSmallTokens.kt",
+      "CheckboxTokens.kt",
+      "RadioButtonTokens.kt",
+      "SwitchTokens.kt",
+      "AssistChipTokens.kt",
+      "FilterChipTokens.kt",
+      "InputChipTokens.kt",
+      "SuggestionChipTokens.kt",
+      "FilledCardTokens.kt",
+      "DialogTokens.kt",
+      "DividerTokens.kt",
+      "BadgeTokens.kt",
+      "MenuTokens.kt",
+      "TopAppBarSmallTokens.kt",
+      "NavigationBarTokens.kt",
+      "NavigationRailTokens.kt",
+      "NavigationDrawerTokens.kt",
+      "FilledTextFieldTokens.kt",
+      "OutlinedTextFieldTokens.kt",
+      "ExpressiveMotionTokens.kt",
+      "StandardMotionTokens.kt"
+    ]
+  },
+
+  "material_web": {
+    "note": "Secondary cross-check for component tokens exposed as CSS custom properties.",
+    "repository": "https://github.com/material-components/material-web",
+    "package": "@material/web",
+    "token_root": "tokens"
+  },
+
+  "flutter": {
+    "channel": "stable",
+    "version": "3.47.6",
+    "commit": "5fc346839b5d0eef006ed8404392afb4dfae428d",
+    "repository": "https://github.com/flutter/flutter",
+    "api_docs": "https://api.flutter.dev/flutter/material/material-library.html",
+    "note": "Used only for the explicitly scoped parity table in docs/FLUTTER_PARITY_STATUS.md. Flutter-only widgets are never counted as official Material 3 components."
+  },
+
+  "fonts": {
+    "family": "Material Symbols Rounded",
+    "repository": "https://github.com/google/material-design-icons",
+    "commit": "737e3324305806514d7909874fa1818ae1808232",
+    "license": "Apache-2.0",
+    "verifier": "scripts/verify-fonts.py"
+  },
+
+  "avalonia": {
+    "version": "12.1.2",
+    "api_docs": "https://api-docs.avaloniaui.net/"
+  },
+
+  "claim_policy": {
+    "source_scan_is_compliance_evidence": false,
+    "headless_test_is_platform_test": false,
+    "android_claim_requires_android_job": true,
+    "experimental_or_api_shell_counts_as_parity": false,
+    "unconditional_pass_is_forbidden": true
+  }
+}

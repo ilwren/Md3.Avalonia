@@ -279,9 +279,7 @@ public sealed class MdActionButtonTests
         {
             var frame = window.CaptureRenderedFrame();
             Assert.NotNull(frame);
-            var path = Path.Combine(AppContext.BaseDirectory, "MdActionButtonsPreview.png");
-            using var stream = File.Create(path);
-            frame.Save(stream, new PngBitmapEncoderOptions());
+            MdPreviewAssets.Save(frame, "MdActionButtonsPreview.png");
         }
         finally
         {

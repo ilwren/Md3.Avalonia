@@ -167,9 +167,7 @@ public sealed class MdNewComponentTests
         {
             var frame = window.CaptureRenderedFrame();
             Assert.NotNull(frame);
-            var path = Path.Combine(AppContext.BaseDirectory, "MdNewComponentsPreview.png");
-            using var stream = File.Create(path);
-            frame.Save(stream, new PngBitmapEncoderOptions());
+            MdPreviewAssets.Save(frame, "MdNewComponentsPreview.png");
         }
         finally
         {

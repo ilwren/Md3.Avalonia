@@ -185,8 +185,18 @@ src/Md3.Avalonia.Extra/           # 第三方 Flutter clean-room 控件；依赖
 gallery/Md3.Avalonia.Gallery/     # 组件、Theme Lab、资源与字体图标页面
 gallery/Md3.Avalonia.Gallery.Android/ # net10.0-android single-view host（solution 外）
 tests/Md3.Avalonia.HeadlessTests/ # API、输入、主题、回归及渲染测试
+tests/.../Spec/                   # 规范一致性分层校验（L1 令牌 / L2 几何 / L3 金图 / L5 动效）
 docs/                              # API、兼容性、发布验证与参考渲染图
 spec-snapshot/manifest.json        # 官网、AndroidX commit、token 版本与决策
+spec-snapshot/tokens.json          # 外部来源的期望值 oracle（禁止由本仓库生成）
+spec-snapshot/conformance-policy.json # 棘轮开关 bootstrap/enforce 与豁免清单
+```
+
+规范一致性校验的分层职责、棘轮流程与**已知差距清单**见
+[`docs/SPEC_VERIFICATION.md`](docs/SPEC_VERIFICATION.md)。纯静态的令牌 lint 不需要 SDK：
+
+```bash
+python3 scripts/lint-design-tokens.py
 ```
 
 ## 引入主题

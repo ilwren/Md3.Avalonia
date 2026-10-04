@@ -182,9 +182,7 @@ public sealed class MdComboBoxTests
 
             var frame = window.CaptureRenderedFrame();
             Assert.NotNull(frame);
-            var path = Path.Combine(AppContext.BaseDirectory, "MdOutlinedDarkPreview.png");
-            using var stream = File.Create(path);
-            frame.Save(stream, new PngBitmapEncoderOptions());
+            MdPreviewAssets.Save(frame, "MdOutlinedDarkPreview.png");
         }
         finally
         {
@@ -297,9 +295,7 @@ public sealed class MdComboBoxTests
         {
             var frame = window.CaptureRenderedFrame();
             Assert.NotNull(frame);
-            var path = Path.Combine(AppContext.BaseDirectory, "MdComboBoxPreview.png");
-            using var stream = File.Create(path);
-            frame.Save(stream, new PngBitmapEncoderOptions());
+            MdPreviewAssets.Save(frame, "MdComboBoxPreview.png");
         }
         finally
         {

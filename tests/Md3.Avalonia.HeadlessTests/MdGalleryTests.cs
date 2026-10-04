@@ -76,9 +76,7 @@ public sealed class MdGalleryTests
                 Assert.True(page.Bounds.Width > 0);
                 var pageFrame = host.CaptureRenderedFrame();
                 Assert.NotNull(pageFrame);
-                var pagePath = Path.Combine(AppContext.BaseDirectory, $"{page.GetType().Name}.png");
-                using var pageStream = File.Create(pagePath);
-                pageFrame.Save(pageStream, new PngBitmapEncoderOptions());
+                MdPreviewAssets.Save(pageFrame, $"{page.GetType().Name}.png");
             }
             finally
             {
@@ -92,11 +90,7 @@ public sealed class MdGalleryTests
         {
             var frame = gallery.CaptureRenderedFrame();
             Assert.NotNull(frame);
-            var path = Path.Combine(AppContext.BaseDirectory, "MdGalleryPreview.png");
-            using (var stream = File.Create(path))
-            {
-                frame.Save(stream, new PngBitmapEncoderOptions());
-            }
+            MdPreviewAssets.Save(frame, "MdGalleryPreview.png");
 
             var themeSelector = gallery.GetVisualDescendants().OfType<MdComboBox>()
                 .Single(control => control.Name == "ThemeSelector");
@@ -104,9 +98,7 @@ public sealed class MdGalleryTests
             Dispatcher.UIThread.RunJobs();
             var darkFrame = gallery.CaptureRenderedFrame();
             Assert.NotNull(darkFrame);
-            var darkPath = Path.Combine(AppContext.BaseDirectory, "MdGalleryDarkPreview.png");
-            using var darkStream = File.Create(darkPath);
-            darkFrame.Save(darkStream, new PngBitmapEncoderOptions());
+            MdPreviewAssets.Save(darkFrame, "MdGalleryDarkPreview.png");
         }
         finally
         {

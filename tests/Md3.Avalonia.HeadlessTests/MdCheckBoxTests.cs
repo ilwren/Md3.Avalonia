@@ -158,9 +158,7 @@ public sealed class MdCheckBoxTests
         {
             var frame = window.CaptureRenderedFrame();
             Assert.NotNull(frame);
-            var path = Path.Combine(AppContext.BaseDirectory, "MdCheckBoxPreview.png");
-            using var stream = File.Create(path);
-            frame.Save(stream, new PngBitmapEncoderOptions());
+            MdPreviewAssets.Save(frame, "MdCheckBoxPreview.png");
         }
         finally
         {
