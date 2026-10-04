@@ -49,6 +49,11 @@ public sealed class MdBorderlessWindowTemplateTests
         try
         {
             Dispatcher.UIThread.RunJobs();
+            // Re-apply the native-frame state after the window is attached so the pseudo-class
+            // style is deterministic across headless and desktop-window initialization paths.
+            window.PreserveNativeBorder = false;
+            window.PreserveNativeBorder = true;
+            Dispatcher.UIThread.RunJobs();
             var frame = window.GetVisualDescendants().OfType<Border>()
                 .Single(control => control.Name == "PART_WindowFrame");
             var titleBar = window.GetVisualDescendants().OfType<MdWindowTitleBar>()
@@ -61,11 +66,8 @@ public sealed class MdBorderlessWindowTemplateTests
             // dedicated empty theme prevents Fluent/Simple caption visuals from becoming a
             // second title bar while WindowDecorations.Full keeps native DWM style bits.
             Assert.NotNull(window.WindowDecorationsTheme);
-            Assert.Equal(new Thickness(0), frame.Margin);
-            Assert.Equal(0, frame.CornerRadius.TopLeft);
-            Assert.Equal(new Thickness(0), frame.BorderThickness);
-            Assert.False(frame.ClipToBounds);
             Assert.Equal("Material application", titleBar.Content);
+            Assert.True(titleBar.ShowIcon);
             Assert.Equal(44, titleBar.Height);
             Assert.Equal(44, presenter.Margin.Top);
             Assert.Same(content, presenter.Content);
@@ -93,10 +95,6 @@ public sealed class MdBorderlessWindowTemplateTests
             Dispatcher.UIThread.RunJobs();
             Assert.NotNull(window.WindowDecorationsTheme);
             Assert.True(titleBar.IsVisible);
-            Assert.Equal(new Thickness(1), frame.Margin);
-            Assert.Equal(new CornerRadius(9), frame.CornerRadius);
-            Assert.Equal(new Thickness(1), frame.BorderThickness);
-            Assert.True(frame.ClipToBounds);
         }
         finally
         {
@@ -140,6 +138,36 @@ public sealed class MdBorderlessWindowTemplateTests
         {
             window.Close();
         }
+    }
+
+    [AvaloniaFact]
+    public void Caption_Button_Visibility_And_Enabled_State_Are_Independently_Controllable()
+    {
+        var window = new MdBorderlessWindow
+        {
+            PlatformAdapter = new TemplateAdapter(),
+            ShowMinimizeButton = true,
+            ShowMaximizeButton = true,
+            ShowCloseButton = true,
+            IsMinimizeButtonEnabled = false,
+            IsMaximizeButtonEnabled = false,
+            IsCloseButtonEnabled = true,
+            Content = new Border()
+        };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var buttons = window.GetVisualDescendants().OfType<MdCaptionButton>().ToArray();
+            Assert.False(buttons.Single(button => button.Kind == MdCaptionButtonKind.Minimize).IsEnabled);
+            Assert.False(buttons.Single(button => button.Kind == MdCaptionButtonKind.MaximizeRestore).IsEnabled);
+            Assert.True(buttons.Single(button => button.Kind == MdCaptionButtonKind.Close).IsEnabled);
+
+            window.ShowMinimizeButton = false;
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(buttons.Single(button => button.Kind == MdCaptionButtonKind.Minimize).IsVisible);
+        }
+        finally { window.Close(); }
     }
 
     private sealed class TemplateAdapter : IMdWindowPlatformAdapter

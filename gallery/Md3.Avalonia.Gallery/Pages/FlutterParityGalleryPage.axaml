@@ -11,6 +11,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap" Text="Official Flutter Material collection, form/dialog, advanced-surface, adaptive, focus, shortcut, and restoration patterns mapped to independent Avalonia controls." />
       </StackPanel>
 
+      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Material banner" />
         <md:MdButton Width="140" HorizontalAlignment="Left" Content="Show banner" Variant="Outlined" Click="ShowBanner" />
@@ -26,7 +27,9 @@
         </md:MdBanner>
         <TextBlock x:Name="BannerStatus" Classes="body" Text="Banner ready." />
       </StackPanel>
+      </Border>
 
+      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
         <TextBlock Classes="h2" Text="Expansion panels" />
         <md:MdExpansionPanelList AllowMultiple="False">
@@ -41,7 +44,9 @@
           </md:MdExpansionPanel>
         </md:MdExpansionPanelList>
       </StackPanel>
+      </Border>
 
+      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
         <TextBlock Classes="h2" Text="Data table" />
         <md:MdDataTable x:Name="DemoTable" Height="280" IsStriped="True" SortRequested="TableSortRequested">
@@ -59,7 +64,9 @@
         </md:MdDataTable>
         <TextBlock x:Name="SortStatus" Classes="body" Text="Select rows or a sortable heading." />
       </StackPanel>
+      </Border>
 
+      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
         <TextBlock Classes="h2" Text="Stepper" />
         <md:MdStepper x:Name="DemoStepper" ActiveStepChanged="StepperChanged" ContinueRequested="StepperContinue">
@@ -75,7 +82,9 @@
         </md:MdStepper>
         <TextBlock x:Name="StepperStatus" Classes="body" Text="Step 1 is active." />
       </StackPanel>
+      </Border>
 
+      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
         <TextBlock Classes="h2" Text="Pull to refresh" />
         <md:MdButton Width="150" HorizontalAlignment="Left" Content="Simulate refresh" Variant="Outlined" Click="StartRefresh" />
@@ -91,7 +100,9 @@
           </md:MdScrollViewer>
         </md:MdRefreshIndicator>
       </StackPanel>
+      </Border>
 
+      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
         <TextBlock Classes="h2" Text="Phase 2 · paginated data table" />
         <md:MdPaginatedDataTable x:Name="PagedTable" Height="310" RowsPerPage="3" PageChanged="PagedTableChanged">
@@ -106,7 +117,9 @@
         </md:MdPaginatedDataTable>
         <TextBlock x:Name="PagedStatus" Classes="body" Text="Rows 1–3" />
       </StackPanel>
+      </Border>
 
+      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <Grid Width="820" HorizontalAlignment="Left" ColumnDefinitions="*,*" ColumnSpacing="20">
         <StackPanel Spacing="12">
           <TextBlock Classes="h2" Text="Reorderable list" />
@@ -132,7 +145,9 @@
           <TextBlock x:Name="GridTileStatus" Classes="body" Text="No project action yet." />
         </StackPanel>
       </Grid>
+      </Border>
 
+      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
         <TextBlock Classes="h2" Text="Dismissible" />
         <md:MdDismissible x:Name="DismissibleDemo" Height="72" Dismissed="DismissibleDismissed">
@@ -142,7 +157,9 @@
         </md:MdDismissible>
         <md:MdButton Width="110" HorizontalAlignment="Left" Content="Restore" Variant="Text" Click="RestoreDismissible" />
       </StackPanel>
+      </Border>
 
+      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
         <TextBlock Classes="h2" Text="Phase 3 · form validation" />
         <md:MdForm x:Name="AccountForm" AutovalidateMode="OnUserInteraction" Submitted="FormSubmitted">
@@ -156,7 +173,9 @@
         </md:MdForm>
         <TextBlock x:Name="FormStatus" Classes="body" Text="Validation has not run." />
       </StackPanel>
+      </Border>
 
+      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <Grid Width="820" HorizontalAlignment="Left" ColumnDefinitions="*,*" ColumnSpacing="20">
         <StackPanel Spacing="12">
           <TextBlock Classes="h2" Text="Simple dialog" />
@@ -171,14 +190,18 @@
           <TextBlock x:Name="LicenseStatus" Classes="body" Text="About dialog is closed." />
         </StackPanel>
       </Grid>
+      </Border>
 
+      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
         <TextBlock Classes="h2" Text="Restorable picker state" />
         <StackPanel Orientation="Horizontal" Spacing="12"><md:MdDatePicker x:Name="RestorableDate" Width="280" SelectedDate="2026-09-24" /><md:MdTimePicker x:Name="RestorableTime" Width="280" SelectedTime="10:15" /></StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="8"><md:MdButton Content="Save state" Variant="Outlined" Click="SavePickerState" /><md:MdButton Content="Clear values" Variant="Text" Click="ClearPickerValues" /><md:MdButton Content="Restore state" Variant="Text" Click="RestorePickerState" /></StackPanel>
         <TextBlock x:Name="RestorationStatus" Classes="body" Text="State is held by a provider-agnostic store." />
       </StackPanel>
+      </Border>
 
+      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
         <TextBlock Classes="h2" Text="Phase 4 · draggable scrollable sheet" />
         <Border Height="420" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="20" ClipToBounds="True">
@@ -189,7 +212,9 @@
         </Border>
         <TextBlock x:Name="SheetStatus" Classes="body" Text="Extent 50%" />
       </StackPanel>
+      </Border>
 
+      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
         <TextBlock Classes="h2" Text="Phase 4 · Soft keyboard avoidance host" />
         <TextBlock Classes="body" Text="Simulate a virtual keyboard inset to verify that the host automatically adjusts viewport bottom padding and scrolls focused text controls into view." />
@@ -212,7 +237,9 @@
         </Border>
         <TextBlock x:Name="KeyboardStatus" Classes="body" Text="Virtual keyboard inactive (height: 0dp)." />
       </StackPanel>
+      </Border>
 
+      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
         <TextBlock Classes="h2" Text="Adaptive controls · cross-platform sync settings" />
         <TextBlock Classes="body" Text="The switches choose the platform policy. Run the same upload to compare Material and Cupertino progress metrics." />
@@ -265,6 +292,7 @@
         </md:MdFocusTraversalGroup>
         <TextBlock x:Name="AdvancedStatus" Classes="body" Text="Focus and shortcut workflow is ready." />
       </StackPanel>
+      </Border>
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />

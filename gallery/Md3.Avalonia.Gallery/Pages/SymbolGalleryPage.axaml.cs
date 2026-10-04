@@ -89,13 +89,30 @@ public partial class SymbolGalleryPage : UserControl
                 {
                     SymbolName = symbol.Name,
                     Glyph = symbol.Glyph,
-                    CopyText = symbol.Name
+                    CopyText = $"{{x:Static md:MdSymbols.{ToPropertyName(symbol.Name)}}}"
                 });
             }
 
             Canvas.SetTop(row, rowIndex * SymbolRowHeight);
             SymbolCanvas.Children.Add(row);
         }
+    }
+
+    private static string ToPropertyName(string symbolName)
+    {
+        var builder = new System.Text.StringBuilder(symbolName.Length);
+        var capitalize = true;
+        foreach (var character in symbolName)
+        {
+            if (character is '_' or '-' or ' ')
+            {
+                capitalize = true;
+                continue;
+            }
+            builder.Append(capitalize ? char.ToUpperInvariant(character) : character);
+            capitalize = false;
+        }
+        return builder.ToString();
     }
 
     private static IReadOnlyList<SymbolEntry> LoadCatalog()

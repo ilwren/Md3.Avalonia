@@ -9,7 +9,7 @@
       <TextBlock HorizontalAlignment="Center" Text="{Binding SymbolName, ElementName=Root}" />
       <TextBlock HorizontalAlignment="Center" FontSize="10"
                  Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
-                 Text="Click to copy name" />
+                 Text="Copy AXAML reference" />
     </StackPanel>
   </md:MdCard>
 </UserControl>
