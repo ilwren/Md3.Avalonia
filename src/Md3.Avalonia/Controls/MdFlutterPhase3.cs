@@ -77,6 +77,7 @@ public sealed class MdFormSubmittedEventArgs(bool isValid) : EventArgs { public 
 
 /// <summary>A validation/decorator field. Set <see cref="Validator"/> for direct use or bind ErrorText from a view model.</summary>
 [PseudoClasses(":valid", ":invalid", ":touched")]
+[PseudoClasses(":valid", ":invalid", ":touched", ":has-supporting-text")]
 public class MdFormField : ContentControl
 {
     public static readonly StyledProperty<object?> ValueProperty = AvaloniaProperty.Register<MdFormField, object?>(nameof(Value), defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
@@ -94,7 +95,7 @@ public class MdFormField : ContentControl
     {
         ValueProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.OnValueChanged());
         ErrorTextProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.UpdateValidity());
-        SupportingTextProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.UpdateAccessibility());
+        SupportingTextProperty.Changed.AddClassHandler<MdFormField>((field, _) => { field.UpdatePseudoClasses(); field.UpdateAccessibility(); });
         IsRequiredProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.UpdateAccessibility());
         IsTouchedProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.UpdatePseudoClasses());
         MdLocalization.CultureProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.UpdateAccessibility());
@@ -185,6 +186,9 @@ public class MdFormField : ContentControl
         PseudoClasses.Set(":valid", IsValid);
         PseudoClasses.Set(":invalid", !IsValid);
         PseudoClasses.Set(":touched", IsTouched);
+        // Without this the supporting line is an empty presenter that still takes a row, so a
+        // field with nothing to say sits lower than its neighbours.
+        PseudoClasses.Set(":has-supporting-text", SupportingText is not null);
     }
 }
 

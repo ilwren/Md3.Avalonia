@@ -231,14 +231,59 @@
   <ControlTheme x:Key="{x:Type md:MdForm}" TargetType="md:MdForm">
     <Setter Property="Template"><ControlTemplate TargetType="md:MdForm"><ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" /></ControlTemplate></Setter>
   </ControlTheme>
+  <!-- Supporting and error share one slot, indented to the field's inner edge with the same
+       token the text field and combo box use. M3 has the error message replace the supporting
+       text, not stack under it, and neither takes a row when it has nothing to show. -->
   <ControlTheme x:Key="{x:Type md:MdFormField}" TargetType="md:MdFormField">
-    <Setter Property="Template"><ControlTemplate TargetType="md:MdFormField"><StackPanel Spacing="4"><ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" /><ContentPresenter Content="{TemplateBinding SupportingText}" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /><TextBlock x:Name="PART_Error" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.Error.Brush}" Text="{TemplateBinding ErrorText}" IsVisible="False" /></StackPanel></ControlTemplate></Setter>
-    <Style Selector="^:invalid /template/ TextBlock#PART_Error"><Setter Property="IsVisible" Value="True" /></Style>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdFormField">
+        <StackPanel>
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+          <ContentPresenter x:Name="PART_Supporting"
+                            Margin="{DynamicResource Md.Comp.TextField.Supporting.Row.Margin}"
+                            Content="{TemplateBinding SupportingText}"
+                            FontSize="12"
+                            Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                            IsVisible="False" />
+          <TextBlock x:Name="PART_Error"
+                     Margin="{DynamicResource Md.Comp.TextField.Supporting.Row.Margin}"
+                     FontSize="12"
+                     Foreground="{DynamicResource Md.Sys.Color.Error.Brush}"
+                     Text="{TemplateBinding ErrorText}"
+                     TextWrapping="Wrap"
+                     IsVisible="False" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:has-supporting-text /template/ ContentPresenter#PART_Supporting">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:invalid /template/ TextBlock#PART_Error">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:invalid /template/ ContentPresenter#PART_Supporting">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
   </ControlTheme>
+  <!-- The combo box already draws a supporting row and an error row to M3 metrics. Forwarding
+       into it is what stops the dropdown showing two supporting lines, one of them unindented. -->
   <ControlTheme x:Key="{x:Type md:MdDropdownFormField}" TargetType="md:MdDropdownFormField" BasedOn="{StaticResource {x:Type md:MdFormField}}">
-    <Setter Property="Template"><ControlTemplate TargetType="md:MdDropdownFormField"><StackPanel Spacing="4"><md:MdComboBox x:Name="PART_Editor" Label="{TemplateBinding Label}" ItemsSource="{TemplateBinding ItemsSource}" ItemTemplate="{TemplateBinding ItemTemplate}" SelectedItem="{TemplateBinding Value, Mode=TwoWay}" Variant="Outlined" /><ContentPresenter Content="{TemplateBinding SupportingText}" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /><TextBlock x:Name="PART_Error" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.Error.Brush}" Text="{TemplateBinding ErrorText}" IsVisible="False" /></StackPanel></ControlTemplate></Setter>
-    <Style Selector="^:invalid /template/ md|MdComboBox#PART_Editor"><Setter Property="IsError" Value="True" /></Style>
-    <Style Selector="^:invalid /template/ TextBlock#PART_Error"><Setter Property="IsVisible" Value="True" /></Style>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdDropdownFormField">
+        <md:MdComboBox x:Name="PART_Editor"
+                       Label="{TemplateBinding Label}"
+                       ItemsSource="{TemplateBinding ItemsSource}"
+                       ItemTemplate="{TemplateBinding ItemTemplate}"
+                       SelectedItem="{TemplateBinding Value, Mode=TwoWay}"
+                       SupportingText="{TemplateBinding SupportingText}"
+                       ErrorText="{TemplateBinding ErrorText}"
+                       Variant="Outlined" />
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:invalid /template/ md|MdComboBox#PART_Editor">
+      <Setter Property="IsError" Value="True" />
+    </Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdSimpleDialog}" TargetType="md:MdSimpleDialog">
