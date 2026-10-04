@@ -1,7 +1,7 @@
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 
-namespace Md3.Avalonia.DataGrid.Themes;
+namespace Md3.Avalonia.Themes;
 
 /// <summary>
 /// Material Design 3 theme for Avalonia's <c>DataGrid</c>. Add it after
