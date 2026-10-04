@@ -1,24 +1,54 @@
 # Changelog
 
-## [3.1.0-preview.1] - 2026-10-04
+## [0.3.5-preview.1] - 2026-10-04
+
+Previously numbered `3.1.0-preview.1`. That number was a typo for the 0.3.x line and the
+packages were never tagged or published, so this entry is renumbered in place rather than
+leaving a version that reads as a major release.
 
 ### Added
 
 - `MdBorderlessWindow` now inherits `Window.Icon` into the Material title bar by default.
 - Added independent title-bar icon visibility and caption-button state controls.
+- `MdPagedItemsView.ItemTemplate`, so loaded records can be presented as something other than
+  their `ToString()`.
+- A dedicated "Numeric input" Gallery page covering the stepper variants, a suppressed stepper,
+  fractional steps and read-only values.
 
 ### Changed
 
 - Preserved native Windows DWM minimize, maximize, and restore animations.
 - Unified the title bar with the window `Surface` and removed the visible divider line.
 - Updated desktop and Android Gallery behavior and release documentation.
+- The transfer control drags a picture of the row in the overlay layer instead of translating
+  the row itself.
 
 ### Fixed
 
 - Prevented native and Material window frames from being rendered as a double border.
 - Corrected headless template expectations for native-frame behavior.
+- A row dragged between the transfer lists is no longer clipped away by its own scroll viewport.
+- `MdHero` flights started from a just-revealed destination now measure it after layout instead
+  of photographing a zero-sized rectangle and abandoning the transition.
+- `MdSlidableItem` clips its swipe actions to the row's rounded shape, so the action colours no
+  longer show through at the four corners.
+- The numeric stepper's minus glyph is centred in its target; its 12x2 ink had been declared in
+  a 12x12 box, which seated it at the top.
+- Expanded search reopens its result list when the header is typed in again after a commit.
+- `MdSimpleDialog` no longer reports a dismissal when an item is chosen.
+- Rating, breadcrumb and tree-view rendering and hit-testing defects from the Gallery review.
 
-For details, see [`docs/RELEASE_NOTES_3.1.0-preview.1.md`](docs/RELEASE_NOTES_3.1.0-preview.1.md).
+### Documentation
+
+- Corrected `docs/API.md`: the `MdPagedItemsView` and `MdResultView` samples used properties
+  that do not exist, `MdRangeSlider` is `LowerValue`/`UpperValue` rather than
+  `StartValue`/`EndValue`, and the search controls expose `Text`/`SearchSubmitted`/
+  `ResultCommitted` rather than `Query`/`SearchResultCommitted`.
+- Corrected the borderless-window icon default in both `README.md` and `docs/API.md`: a
+  borderless window shows its icon by default, which both documents had stated backwards.
+- Refreshed the token-dictionary listing in `README.md`, which named 7 of the 11 dictionaries.
+
+For details, see [`docs/RELEASE_NOTES_0.3.5-preview.1.md`](docs/RELEASE_NOTES_0.3.5-preview.1.md).
 
 All notable changes follow Keep a Changelog. The project intends to use Semantic Versioning after the preview cycle.
 

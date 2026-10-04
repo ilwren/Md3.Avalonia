@@ -1,8 +1,12 @@
-# Md3.Avalonia 3.1.0-preview.1 release notes
+# Md3.Avalonia 0.3.5-preview.1 release notes
 
 发布日期：2026-10-04
 
-这是 3.1 预览版，重点完善桌面窗口 chrome、图标、caption buttons、跨平台 Gallery 与发布验证流程。
+这是 0.3.5 预览版，重点完善桌面窗口 chrome、图标、caption buttons、跨平台 Gallery 与发布验证流程，
+并修复了一批 Gallery 评审反馈的控件缺陷。
+
+> 版本号说明：本版曾被误编为 `3.1.0-preview.1`。该编号是 0.3.x 的笔误，且从未打 tag 或发布，
+> 因此直接更正为 `0.3.5-preview.1`，不保留会被读成大版本的编号。
 
 ## 重要变更
 
@@ -24,7 +28,7 @@
 
 ### 发布与验证
 
-- 四个包统一版本为 `3.1.0-preview.1`：
+- 四个包统一版本为 `0.3.5-preview.1`：
   - `Md3.Avalonia`
   - `Md3.Avalonia.Icons`
   - `Md3.Avalonia.Icons.Lite`

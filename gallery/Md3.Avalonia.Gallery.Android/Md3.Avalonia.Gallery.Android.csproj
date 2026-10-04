@@ -5,7 +5,7 @@
     <SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
     <ApplicationId>io.arena.md3avalonia.gallery</ApplicationId>
     <ApplicationVersion>3</ApplicationVersion>
-    <ApplicationDisplayVersion>3.1.0-preview.1</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>0.3.5-preview.1</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
     <Nullable>enable</Nullable>

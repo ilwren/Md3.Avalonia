@@ -5,7 +5,7 @@
     <AssemblyName>Md3.Avalonia.Icons</AssemblyName>
     <Description>Full Material Symbols font and glyph catalog with embedded font for Md3.Avalonia.</Description>
     <PackageId>Md3.Avalonia.Icons</PackageId>
-    <Version>3.1.0-preview.1</Version>
+    <Version>0.3.5-preview.1</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;icons;fonts;material-symbols;material-design</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

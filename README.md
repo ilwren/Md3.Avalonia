@@ -2,7 +2,7 @@
 
 一个面向 Avalonia 12 的跨平台 Material 3 / M3 Expressive 控件库与组件 Gallery。项目同时提供核心控件、动态 HCT 主题、Material Symbols provider、Flutter-inspired Extra 控件、桌面窗口适配和 Android single-view Gallery。
 
-> 当前版本：`3.1.0-preview.1`。项目适合预览、内部应用和组件验证；物理 Android/TalkBack、Windows Narrator、macOS VoiceOver、Linux Orca 等外部验收仍需单独签署。
+> 当前版本：`0.3.5-preview.1`。项目适合预览、内部应用和组件验证；物理 Android/TalkBack、Windows Narrator、macOS VoiceOver、Linux Orca 等外部验收仍需单独签署。
 
 设计原则：
 
@@ -143,7 +143,7 @@
 - 核心 `Md3.Avalonia` 控件库不依赖 `Avalonia.Themes.Fluent` 或 `Avalonia.Themes.Simple`；Gallery 仅在 `CodeExample` 内局部加载 Fluent resources，作为 AvaloniaEdit 原生内部 template parts 的资源依赖，不会覆盖应用或控件库的原生控件；
 - 核心程序集不引用 Desktop、Win32、X11 或 macOS 专属程序集，可由 Android 宿主引用；当前 Android Gallery 的 CI target 为 `net10.0-android`；
 - Gallery 使用官网式顶部导航、真实 `MdNavigationDrawer` 左侧组件栏、中央文档与右侧动态目录；按 Compact `<600`、Medium `600–839`、Expanded `840–1199`、Large `1200–1599`、Extra-large `>=1600` 五档切换一至三栏，compact/medium 使用 modal drawer 并自动收缩过宽示例；Android bottom destinations 会切换真实页面；
-- shell 由单一 `MdScrollViewer` 持有有限 viewport，导航时解包页面预览用根 ScrollViewer，避免嵌套无限测量，并已用真实 wheel input 验证 Offset 变化；包含 Desktop adapters、Theme Lab、Material Symbols 和 Motion；
+- shell 由单一 `MdScrollViewer` 持有有限 viewport，导航时解包页面预览用根 ScrollViewer，避免嵌套无限测量，并已用真实 wheel input 验证 Offset 变化；包含 Numeric input、Desktop adapters、Theme Lab、Material Symbols 和 Motion；
 - 每个组件页使用 AvaloniaEdit 提供具备 Light/Dark 语法高亮、选择、滚动和一键复制能力的 AXAML/C# 示例；示例语言使用单选 Material segmented button group 切换；Symbols 页面虚拟化浏览并点击复制官方 catalog 中的全部图标；
 - Avalonia Headless + Skia 行为、输入、主题隔离、布局和渲染测试。
 
@@ -170,14 +170,18 @@ src/Md3.Avalonia/                 # 官方 Flutter Material 对齐核心包；�
 ├─ Controls/                       # 核心 Md* CLR 控件、枚举和属性 API
 └─ Themes/
    ├─ MaterialTheme.axaml
-   ├─ Tokens/
-   │  ├─ ColorTokens.axaml
+   ├─ Tokens/                      # 11 个 token 字典，全部登记在 MaterialTheme.axaml
+   │  ├─ ColorTokens.axaml          # M3 基线配色 + Light/Dark ThemeDictionaries
+   │  ├─ ExtendedColorTokens.axaml
+   │  ├─ SystemTokens.axaml
    │  ├─ FoundationTokens.axaml
+   │  ├─ ContainmentTokens.axaml
    │  ├─ ButtonTokens.axaml
    │  ├─ ActionButtonTokens.axaml
    │  ├─ TextFieldTokens.axaml
    │  ├─ CheckBoxTokens.axaml
-   │  └─ ComboBoxTokens.axaml
+   │  ├─ ComboBoxTokens.axaml
+   │  └─ ToolbarTokens.axaml
    └─ Controls/                    # 每类控件的 scoped ControlTheme
 src/Md3.Avalonia.Icons/           # 可选 Symbols catalog/loader；内嵌完整官方 TTF
 src/Md3.Avalonia.Extra/           # 第三方 Flutter clean-room 控件；依赖核心，不依赖 Icons
@@ -213,7 +217,7 @@ python3 scripts/lint-design-tokens.py
 </Application>
 ```
 
-四个可独立 pack 的 NuGet 包版本均为 `3.1.0-preview.1`（0.3.0 预览版）：`Md3.Avalonia`（核心）、`Md3.Avalonia.Icons`、`Md3.Avalonia.Icons.Lite`（两种可选图标 provider）和 `Md3.Avalonia.Extra`（依赖核心）。核心与 Extra 都不强制引用 Icons；四个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
+四个可独立 pack 的 NuGet 包版本均为 `0.3.5-preview.1`：`Md3.Avalonia`（核心）、`Md3.Avalonia.Icons`、`Md3.Avalonia.Icons.Lite`（两种可选图标 provider）和 `Md3.Avalonia.Extra`（依赖核心）。核心与 Extra 都不强制引用 Icons；四个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
 
 任意 seed 主题可在启动时或运行时应用：
 
@@ -230,7 +234,7 @@ MdThemeManager.Apply(Application.Current, options, dark);
 var json = MdThemeJson.Serialize(options);
 ```
 
-完整 API 入口见 [`docs/API.md`](docs/API.md)，兼容策略见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)，本版说明见 [`docs/RELEASE_NOTES_3.1.0-preview.1.md`](docs/RELEASE_NOTES_3.1.0-preview.1.md)。
+完整 API 入口见 [`docs/API.md`](docs/API.md)，兼容策略见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)，本版说明见 [`docs/RELEASE_NOTES_0.3.5-preview.1.md`](docs/RELEASE_NOTES_0.3.5-preview.1.md)。
 
 ## XAML 与 MVVM
 
@@ -328,7 +332,7 @@ await snackbarService.ShowAsync(new MdSnackbarMessage("Draft archived")
 
 - Windows 保留原生 Full caption style bits，以保留 DWM 的最小化、最大化和还原行为；
 - Material 自己绘制客户区标题栏，不再叠加 Fluent/Simple 的第二套标题栏；
-- 默认不显示图标，标题栏使用窗口主体 surface 颜色且不绘制额外分隔线；
+- `ShowIcon` 默认为 `true`，标题栏显示 `Window.Icon`；设为 `False` 可隐藏。标题栏使用窗口主体 surface 颜色且不绘制额外分隔线；
 - `ShowMinimizeButton`、`ShowMaximizeButton`、`ShowCloseButton` 控制按钮是否显示；
 - `IsMinimizeButtonEnabled`、`IsMaximizeButtonEnabled`、`IsCloseButtonEnabled` 控制按钮是否可操作；
 - `PreserveNativeBorder`、`CanResize`、`ExtendIntoTitleBar` 控制 native frame 和客户区扩展；

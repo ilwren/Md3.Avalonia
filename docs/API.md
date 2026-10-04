@@ -1,16 +1,16 @@
 # Md3.Avalonia public API overview
 
-This document is the public entry point for the `3.1.0-preview.1` API. Preview APIs may still receive compatibility-preserving refinements before 0.3.0 stable. The NuGet package also emits `Md3.Avalonia.xml` from the source XML comments for IDE IntelliSense and API documentation generation.
+This document is the public entry point for the `0.3.5-preview.1` API. Preview APIs may still receive compatibility-preserving refinements before the first stable release. The NuGet package also emits `Md3.Avalonia.xml` from the source XML comments for IDE IntelliSense and API documentation generation.
 
 ## Install and register
 
 ```xml
-<PackageReference Include="Md3.Avalonia" Version="3.1.0-preview.1" />
+<PackageReference Include="Md3.Avalonia" Version="0.3.5-preview.1" />
 <!-- Optional symbol providers (choose one): -->
-<PackageReference Include="Md3.Avalonia.Icons" Version="3.1.0-preview.1" />
-<PackageReference Include="Md3.Avalonia.Icons.Lite" Version="3.1.0-preview.1" />
+<PackageReference Include="Md3.Avalonia.Icons" Version="0.3.5-preview.1" />
+<PackageReference Include="Md3.Avalonia.Icons.Lite" Version="0.3.5-preview.1" />
 <!-- Optional clean-room third-party Flutter patterns (depends on core): -->
-<PackageReference Include="Md3.Avalonia.Extra" Version="3.1.0-preview.1" />
+<PackageReference Include="Md3.Avalonia.Extra" Version="0.3.5-preview.1" />
 ```
 
 ```xml
@@ -46,7 +46,7 @@ All component themes are scoped to `Md*` types. Registering `MaterialTheme` does
 - Feedback: `MdLoadingIndicator`, `MdLinearProgressIndicator`, `MdCircularProgressIndicator`, `MdBadge`, `MdBadgedBox`.
 - Flutter-inspired Avalonia APIs: `MdBanner`, `MdExpansionPanelList`, `MdDataTable`, `MdStepper`, `MdRefreshIndicator`, `MdPaginatedDataTable`, `MdReorderableList`, `MdGridTile`, `MdDismissible`, `MdForm`, `MdFormField`, `MdDropdownFormField`, `MdSimpleDialog`, `MdAboutDialog`, `MdLicensePage`, `MdDraggableScrollableSheet`, `MdAdaptiveSwitch`, `MdAdaptiveProgressIndicator`, `MdHero`, `MdFocusTraversalGroup`, `MdShortcutScope`. These names do not imply complete Flutter parity; see [Flutter parity status](FLUTTER_PARITY_STATUS.md).
 - Foundations and desktop adapters: `MdScrollViewer`, `MdScrollBar`, five-breakpoint/input-aware `MdAdaptiveLayout`, `MdSurface`, `MdText`, `MdStateLayer`, `MdFocusRing`, `MdWindow`, `MdIcon`, `MdSymbolPresenter`.
-- Borderless/chromeless windows: `MdBorderlessWindow`, `MdWindowTitleBar`, `MdCaptionButton`/`MdWindowCaptionButton`, `MdWindowDragRegion`, `MdWindowResizeGrip`, `IMdWindowPlatformAdapter`, named platform adapters and `MdWindowPlatformAdapterResolver`. The default caption is icon-free and has no separator line; visibility and enabled state are independently configurable through `ShowMinimizeButton`/`ShowMaximizeButton`/`ShowCloseButton` and `IsMinimizeButtonEnabled`/`IsMaximizeButtonEnabled`/`IsCloseButtonEnabled`.
+- Borderless/chromeless windows: `MdBorderlessWindow`, `MdWindowTitleBar`, `MdCaptionButton`/`MdWindowCaptionButton`, `MdWindowDragRegion`, `MdWindowResizeGrip`, `IMdWindowPlatformAdapter`, named platform adapters and `MdWindowPlatformAdapterResolver`. The caption shows the window icon by default (`ShowIcon`) and has no separator line; visibility and enabled state are independently configurable through `ShowMinimizeButton`/`ShowMaximizeButton`/`ShowCloseButton` and `IsMinimizeButtonEnabled`/`IsMaximizeButtonEnabled`/`IsCloseButtonEnabled`.
 
 - Optional Icons package: `MdExternalMaterialSymbols`, `MdSymbols` and the `Md.Icon.*` resource injection contract.
 - Optional Ecosystem foundations: `MdDensity`, `MdAsyncRequestState`, `MdPageRequest`, `MdPageResult<T>`, `IMdPageProvider<T>`, `MdShortcutBinding`, `MdOverlayPlacement`, `MdFocusReturnScope`.
@@ -87,10 +87,10 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 | Type | Primary use | Important API surface |
 |---|---|---|
 | `MdButton`, `MdIconButton`, `MdToggleButton` | Actions and two-state actions | `Command`, `CommandParameter`, `IsEnabled`, `IsChecked`, content/icon properties, variant and size properties |
-| `MdTextBox`, `MdNumericBox`, `MdAutoCompleteBox` | Text, numeric, and suggestion input | `Text`/`Value`, validation properties, `ItemsSource`/suggestion provider, `Watermark`, `IsReadOnly` |
-| `MdSearchBar`, `MdSearchView` | Search entry and result presentation | `Query`, `SearchCommand`, result templates, `SearchResultCommitted` |
+| `MdTextBox`, `MdNumericBox`, `MdAutoCompleteBox` | Text, numeric, and suggestion input | `Text`/`Value`, `Label`, `SupportingText`, `IsError`, `PlaceholderText`, `IsReadOnly`, `ItemsSource`/suggestion provider; `MdNumericBox` adds the native `Minimum`/`Maximum`/`Increment` and `ShowButtonSpinner` |
+| `MdSearchBar`, `MdSearchView` | Search entry and result presentation | `Text` (inherited from `TextBox`), `SearchCommand`, `SearchSubmitted`; the view adds `Header`, `IsOpen`, `SelectedResult`, `ResultDisplayMemberPath`, `CloseOnResultCommit` and `ResultCommitted` |
 | `MdCheckBox`, `MdRadioButton`, `MdSwitch` | Boolean and mutually exclusive choices | `IsChecked`, `GroupName`/selection binding, `Command` and native input events |
-| `MdSlider`, `MdRangeSlider` | Single and interval values | `Minimum`, `Maximum`, `Value` or `StartValue`/`EndValue`, `Step`, `Orientation` |
+| `MdSlider`, `MdRangeSlider` | Single and interval values | `Minimum`, `Maximum`; `MdSlider` uses the native `Value` and tick properties, `MdRangeSlider` uses `LowerValue`/`UpperValue` plus `Step` and `ShowValueIndicators` |
 | `MdCard`, `MdSurface`, `MdList`, `MdListItem` | Material containers and lists | variant/elevation/surface properties, content, `ItemsSource`, item templates, selection/invocation events |
 | `MdDialogHost`, `MdSheetHost` | Modal dialogs and bottom/side sheets | `ShowAsync`, `Close`, `Dialog`, placement, dismissal and result APIs |
 | `MdMenu`, `MdDropdownMenu`, `MdMenuAnchor` | Contextual and anchored actions | items, submenu support, placement, `Show`/`Dismiss`, keyboard navigation |
@@ -114,6 +114,8 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 | **Data visualization and editing** | `MdChart`, `MdChartSeries`, `MdChartPoint`, `MdRichEditor`, `MdRichTextEditor`, `MdChatView`, `MdChatMessage`, `MdTimeline`, `MdTimelineItem` |
 | **Motion and visual extras** | `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, `MdStaggeredPanel`, `MdAnimationSequence`, `MdAnimatedVisibility`, `MdContainerTransform`, `MdFadeThrough`, `MdSharedAxis` |
 | **Navigation/content** | `MdBreadcrumb`, `MdBreadcrumbItem`, `MdGridTile`-style content helpers |
+
+`MdPagedItemsView.ItemTemplate` sets the presentation of each loaded record; `MdDataGrid` is a narrower surface than Avalonia `DataGrid` and is not a drop-in replacement for it.
 
 The Extra support contracts are also public: `IMdPageProvider<T>`, `MdPageRequest`, `MdPageResult<T>`, `MdAsyncRequestState`, `MdDensity`, `MdEcosystemDensity`, `MdOverlayPlacement`, `MdOverlayAlignment`, `MdShortcutBinding`, and `MdFocusReturnScope`. Data and adapter contracts include `IMdChartDataProvider`, `IMdRichEditorAdapter`, and `IMdRichEditorStateAdapter`. Supporting enums and records such as `MdCalendarSelectionMode`, `MdTransferLayoutMode`, `MdMasonryLayoutStrategy`, `MdResultKind`, `MdSkeletonShape`, `MdSpinKitKind`, `MdAnimatedTextEffect`, and `MdTimelineItemState` configure those controls.
 
@@ -159,10 +161,35 @@ The Extra support contracts are also public: `IMdPageProvider<T>`, `MdPageReques
 **Use an Extra provider-backed control:**
 
 ```xml
-<extra:MdPagedItemsView ItemsSource="{Binding Items}"
-                        LoadPageAsync="{Binding LoadPageAsync}" />
-<extra:MdResultView Result="{Binding RequestResult}" />
+<extra:MdPagedItemsView x:Name="Records" PageSize="20" AutoLoad="True"
+                        EmptyContent="No records">
+  <extra:MdPagedItemsView.ItemTemplate>
+    <DataTemplate x:DataType="vm:Record">
+      <TextBlock Text="{Binding Title}" />
+    </DataTemplate>
+  </extra:MdPagedItemsView.ItemTemplate>
+</extra:MdPagedItemsView>
+
+<extra:MdResultView Kind="Empty" Title="Nothing here yet"
+                    ActionContent="Reload" ActionCommand="{Binding ReloadCommand}" />
 ```
+
+`MdPagedItemsView` has no `ItemsSource`: pages arrive from a provider and the control owns the
+accumulated `Items`. Assign the provider in code, because it is a delegate rather than a bindable
+property, and drive it with `LoadNextPageAsync()`, `RefreshAsync()` and `RetryAsync()`:
+
+```csharp
+Records.PageProvider = async request =>
+{
+    var page = await api.GetRecordsAsync(request.PageKey, request.PageSize, request.CancellationToken);
+    return new MdPageResult<object?>(page.Items, page.NextKey, page.IsLast);
+};
+await Records.LoadNextPageAsync();
+```
+
+`State` reports `Idle`, `Loading`, `Data`, `Empty`, `Completed` or `Error`, and the template shows
+the matching progress, empty, error or load-more affordance. Supply `ItemTemplate`, otherwise each
+record renders as its `ToString()`.
 
 Provider-backed controls are intentionally adapter-neutral. The application owns HTTP, caching, error policy, and cancellation; the control owns loading, empty, error, and retry presentation.
 
@@ -204,7 +231,7 @@ Direct APIs include `Show`/`Dismiss` on transient components, `ShowAsync`/`Close
 
 `MdScrollViewer` keeps wheel, trackpad, touch, pen and scrollbar behavior native. Desktop primary-button panning is opt-in through `AllowMouseDrag`; when enabled, focusable controls retain direct manipulation, and custom content takes precedence by handling the press or capturing the pointer. Set `md:MdScrollViewer.SuppressMouseDragScrolling="True"` on any precision-interaction subtree that does neither.
 
-`MdBorderlessWindow.PlatformAdapter` is replaceable. `PreserveNativeBorder` defaults to `true`: Windows uses `WindowDecorations.Full` plus an extended client area so the native `WS_CAPTION`/minimize/maximize styles and DWM state animations remain available, while macOS/Linux retain the portable border-only path. The Material template suppresses its own outer outline whenever a native frame is present, and an empty Avalonia 12 `WindowDrawnDecorations` theme prevents Fluent/Simple title and caption visuals from being layered over the Material title bar. The default caption is icon-free and uses the window surface background without a separator rule. `ShowMinimizeButton`/`ShowMaximizeButton`/`ShowCloseButton` control visibility, while `IsMinimizeButtonEnabled`/`IsMaximizeButtonEnabled`/`IsCloseButtonEnabled` control each action independently. View models use Avalonia `WindowState`; Android resolves to a safe no-op adapter.
+`MdBorderlessWindow.PlatformAdapter` is replaceable. `PreserveNativeBorder` defaults to `true`: Windows uses `WindowDecorations.Full` plus an extended client area so the native `WS_CAPTION`/minimize/maximize styles and DWM state animations remain available, while macOS/Linux retain the portable border-only path. The Material template suppresses its own outer outline whenever a native frame is present, and an empty Avalonia 12 `WindowDrawnDecorations` theme prevents Fluent/Simple title and caption visuals from being layered over the Material title bar. The caption uses the window surface background without a separator rule, and shows `Window.Icon` unless `ShowIcon="False"`. `ShowMinimizeButton`/`ShowMaximizeButton`/`ShowCloseButton` control visibility, while `IsMinimizeButtonEnabled`/`IsMaximizeButtonEnabled`/`IsCloseButtonEnabled` control each action independently. View models use Avalonia `WindowState`; Android resolves to a safe no-op adapter.
 
 ## Extra visual controls
 
@@ -237,7 +264,7 @@ The optional `Md3.Avalonia.Extra` package contains visual and ecosystem controls
 </md:MdBorderlessWindow>
 ```
 
-`Show*Button` properties remove a caption button from the visual tree. `Is*ButtonEnabled` keeps the button visible but disables its command and applies the disabled state layer/opacity. Programmatic `Minimize()`, `ToggleMaximizeRestore()` and `RequestClose()` enforce the same state as the visual buttons. `MdWindowTitleBar.ShowIcon` defaults to `false`; set it to `true` and provide `LeadingContent` only when an application wants a leading mark.
+`Show*Button` properties remove a caption button from the visual tree. `Is*ButtonEnabled` keeps the button visible but disables its command and applies the disabled state layer/opacity. Programmatic `Minimize()`, `ToggleMaximizeRestore()` and `RequestClose()` enforce the same state as the visual buttons. The two `ShowIcon` properties have different defaults and the window drives the title bar. `MdBorderlessWindow.ShowIcon` defaults to `true`, and the window template passes it down, so a borderless window shows `Window.Icon` in its caption unless `ShowIcon="False"` is set. A bare `MdWindowTitleBar` composed by hand defaults to `false`, because it has no window to inherit an icon from. Use `LeadingContent` for a mark other than the window icon.
 
 The Windows adapter preserves native caption style bits when `PreserveNativeBorder=true`, while the Material template owns the title bar surface. Android uses a safe no-op adapter; desktop-only Gallery pages are not registered in `AndroidGalleryView`.
 

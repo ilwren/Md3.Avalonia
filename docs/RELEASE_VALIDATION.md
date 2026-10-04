@@ -1,6 +1,6 @@
 # Release validation record
 
-Version: `3.1.0-preview.1`
+Version: `0.3.5-preview.1`
 Automated baseline date: 2026-10-03
 
 ## Automated gates
@@ -11,7 +11,7 @@ Automated baseline date: 2026-10-03
 | Restore | `dotnet restore Md3.Avalonia.sln` | Success |
 | Release compile | CI `Build Gallery Desktop` plus multi-platform Gallery workflow | 0 warnings, 0 errors for .NET 10 release projects |
 | Tests | `dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release` | 0 failed; no unexplained skipped tests |
-| Package | `bash scripts/build-nuget.sh` for Core, Icons, Icons.Lite and Extra | `.nupkg` and `.snupkg`; `3.1.0-preview.1` metadata/readme/notices/XML docs and one-way dependencies present |
+| Package | `bash scripts/build-nuget.sh` for Core, Icons, Icons.Lite and Extra | `.nupkg` and `.snupkg`; `0.3.5-preview.1` metadata/readme/notices/XML docs and one-way dependencies present |
 | Immediate artifact cleanup | after every build/test/pack, scan and remove `bin`, `obj`, `TestResults`, DLL/PDB and packages before continuing | No generated workspace artifacts |
 | Dynamic color | golden seed vectors, arbitrary seed/variant, contrast pairs, JSON round-trip | Pass |
 | Responsive Gallery | 599/600/839/840/1199/1200/1599/1600 boundary behavior | Pass |
@@ -23,7 +23,7 @@ Automated baseline date: 2026-10-03
 
 - GitHub CI builds the Desktop Gallery with warnings as errors, runs the complete xUnit v3 headless suite, emits named failure annotations, and verifies all NuGet packages.
 - The multi-platform workflow publishes Linux, Windows and macOS Desktop Gallery outputs and builds the Android APK with the .NET Android workload.
-- Independent package verification checks Core, Icons, Icons.Lite and Extra `3.1.0-preview.1` `.nupkg`/`.snupkg`, XML docs, README/notices and one-way dependencies. Temporary validation packages are deleted after inspection.
+- Independent package verification checks Core, Icons, Icons.Lite and Extra `0.3.5-preview.1` `.nupkg`/`.snupkg`, XML docs, README/notices and one-way dependencies. Temporary validation packages are deleted after inspection.
 - The final 0.3 preview run URL and exact test totals are recorded by GitHub Actions; release readiness requires **0 failed**. Do not copy historical 0.1 totals into this release record.
 - Android source/APK compilation is automated. Physical-device interaction is **not** inferred from compilation and remains in the unsigned matrix below.
 
