@@ -17,6 +17,9 @@ need confirmation on a real desktop run.
 | 6 | `FontSize` on a settings card / group / expander title does nothing | The templates wrote `FontSize="16"/"14"` **directly on the presenters**. A literal inside a template outranks any value from outside. Moved to `ControlTheme` setters + `{TemplateBinding FontSize}`; defaults unchanged, now overridable. | `0e30402` |
 | 11 | Rich tooltip disappears before it can be reached (same on focus) | `HideDelay` is 100 ms for every variant. A rich tooltip is interactive, so the pointer must cross the gap to reach it; the timer expired mid-flight. Leaving now starts a variant-aware countdown with a 600 ms bridge for rich tooltips. | `ecc3d5f` |
 | 14 | Simple dialog: clicking an item reports "cancelled" | Selection closed the dialog via `Dismiss()`, so one click raised **both** `ItemSelected` and `Dismissed`, and the cancel listener ran second and overwrote the result. A choice is no longer a dismissal. *(The styling half of this item is still open.)* | `ecc3d5f` |
+| 16 | "Move avatar": a fragment of the content shows for a few frames | The page revealed the destination hero and started the flight **in the same pass**, so `MdHero` measured a hero with no layout yet, photographed a zero-sized rectangle and abandoned the transition — then the source was hidden immediately, reflowing the row under a transition that had already recorded the geometry. Now: reveal, let one layout pass run, await the flight, then hide the source. | `6189b95` |
+| 18 | Load next page gives only a text message | Two causes. `MdPagedItemsView` had **no `ItemTemplate`**, so records rendered as bare `ToString` text, indistinguishable from the status label. And the demo provider returned synchronously, so the view went `Loading → Data` inside one dispatcher pass and the progress indicator was switched on and off before it could be painted. | `6189b95` |
+| 20 | Dragging a row between the transfer lists hides the row | The drag translated the **real `ListBoxItem`**, which stays inside its own `ListBox`, so the scroll viewport clipped it the moment it moved toward the other list. A picture of the row now rides in the overlay layer, which nothing clips. | `6189b95` |
 | 23① | Tree expander's hover area is a small square, not a full circle | `PART_State` was inside a centred grid, so it was sized by the 16 DIP chevron, and it had no `CornerRadius`. It now fills the 40 DIP circle. | `ecc3d5f` |
 | 23② | Expanding one node rotates other nodes' chevrons | `Rebuild()` replaces the whole flattened row list, so every container rebinds to a different row — and the 0.2 s transition on the chevron's `Angle` animated each one to its new value. Rotation is now instant. | `ecc3d5f` |
 | 24①② | Rating is cut off **and** can only be lowered, never raised | One cause. The gallery pinned `Width="176"` while the natural row is `5 × 48 + 4 × 4 = 256`: trailing stars were clipped away, and the positions still reachable were mapped against the unclipped 256 scale, so every visible star reported a lower value than it drew. Render and hit testing now share one `GetMetrics(arrangedWidth)`. | `0e30402` |
@@ -41,10 +44,15 @@ window for a row needing 288, so it pinned the overflow behaviour that caused #2
 
 1 breadcrumb overlay + no interaction · 2 carousel text layout · 5 usage button alignment ·
 7 expander margins · 8 slider handle dark in light mode · 12 one page per parity component ·
-15 AboutDialog auto-fill · 16 avatar first-frame glitch · 17 snackbar corners ·
-18 load-more gives no visible change · 19 selection rendering · 20 dragged item hidden ·
+15 AboutDialog auto-fill · 17 snackbar corners · 19 selection rendering ·
 21 rich text (adapter-based) · 22 image compare (adapter-based) · 26 borderless window corners ·
 27 container transform / animated visibility don't animate · 28 numeric +/- centring and its own page
+
+## API gaps found while fixing
+
+`MdPagedItemsView` gained `ItemTemplate`; without it a consumer could not style loaded rows at
+all. That is the same shape of problem as #13 — these controls expose too little to be used for
+real. Worth a sweep of the Extra controls for missing template/presentation hooks.
 
 ## Agreed approach
 
