@@ -165,10 +165,17 @@
           <ContentPresenter Name="PART_ContentPresenter"
                             Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
                             HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+          <!-- The pair is centred on the text field's 56 DIP input row rather than pushed down by
+               a hand-tuned top margin, which left it 8 DIP low. Pinning the host to the top keeps
+               it on the input row when supporting text adds height underneath. -->
+          <Border Name="PART_SpinnerHost"
+                  Height="{DynamicResource Md.Comp.TextField.Container.MinHeight}"
+                  VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,8,0"
+                  Background="Transparent" ZIndex="2"
+                  IsVisible="{TemplateBinding ShowButtonSpinner}">
           <StackPanel Name="PART_SpinnerPanel" Width="32" Height="42"
-                      Margin="0,15,8,0" VerticalAlignment="Top" HorizontalAlignment="Right"
-                      Background="Transparent" Spacing="2" ZIndex="2"
-                      IsVisible="{TemplateBinding ShowButtonSpinner}">
+                      VerticalAlignment="Center"
+                      Background="Transparent" Spacing="2">
             <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}"
                           HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
               <Path Width="12" Height="12" Data="{StaticResource Md.Numeric.Plus}" Stretch="Uniform"
@@ -177,16 +184,20 @@
             </RepeatButton>
             <RepeatButton Name="PART_DecreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}"
                           HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
-              <Path Width="12" Height="12" Data="{StaticResource Md.Numeric.Minus}" Stretch="Uniform"
+              <!-- Height matches the bar's own 12x2 ink. Declaring 12x12 like the plus made
+                   Stretch="Uniform" scale by 1 and seat the geometry at the top of the box, so
+                   the minus rode about 5 DIP above the centre of its target. -->
+              <Path Width="12" Height="2" Data="{StaticResource Md.Numeric.Minus}" Stretch="Uniform"
                     HorizontalAlignment="Center" VerticalAlignment="Center"
                     Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
             </RepeatButton>
           </StackPanel>
+          </Border>
         </Grid>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^[ButtonSpinnerLocation=Left] /template/ StackPanel#PART_SpinnerPanel">
-      <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="Margin" Value="8,15,0,0" />
+    <Style Selector="^[ButtonSpinnerLocation=Left] /template/ Border#PART_SpinnerHost">
+      <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="Margin" Value="8,0,0,0" />
     </Style>
   </ControlTheme>
 

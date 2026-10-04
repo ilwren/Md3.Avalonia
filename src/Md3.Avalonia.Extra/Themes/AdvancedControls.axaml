@@ -150,7 +150,11 @@
     <Setter Property="ClipToBounds" Value="True" /><Setter Property="Focusable" Value="True" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Grid ClipToBounds="True">
+        <!-- One rounded clip for the whole row. The action layers behind the foreground used to
+             be square while PART_Foreground was rounded, and a Grid's ClipToBounds is
+             rectangular, so the archive and delete colours showed through at all four corners. -->
+        <Border CornerRadius="12" ClipToBounds="True">
+        <Grid>
           <Border HorizontalAlignment="Left" Width="{TemplateBinding ActionExtent}" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"><ContentPresenter x:Name="PART_StartActions" Content="{TemplateBinding StartActions}" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="{TemplateBinding RevealProgress}" RenderTransform="scale(0.8)" RenderTransformOrigin="50%,50%" /></Border>
           <Border HorizontalAlignment="Right" Width="{TemplateBinding ActionExtent}" Background="{DynamicResource Md.Sys.Color.ErrorContainer.Brush}"><ContentPresenter x:Name="PART_EndActions" Content="{TemplateBinding EndActions}" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="{TemplateBinding RevealProgress}" RenderTransform="scale(0.8)" RenderTransformOrigin="50%,50%" /></Border>
           <Border x:Name="PART_Foreground" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="12">
@@ -158,6 +162,7 @@
             <ContentPresenter Content="{TemplateBinding Content}" Padding="{TemplateBinding Padding}" />
           </Border>
         </Grid>
+        </Border>
       </ControlTemplate>
     </Setter>
     <Style Selector="^:start-open /template/ ContentPresenter#PART_StartActions"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
