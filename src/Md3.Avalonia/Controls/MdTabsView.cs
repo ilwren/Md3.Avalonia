@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.VisualTree;
 
@@ -37,15 +38,28 @@ public sealed class MdTabsView : TabControl
         AvaloniaProperty.Register<MdTabsView, MdTabs?>(nameof(Tabs));
 
     private MdTabs? _subscribed;
+    private ContentPresenter? _host;
 
     static MdTabsView()
     {
         TabsProperty.Changed.AddClassHandler<MdTabsView>((view, e) =>
             view.Rebind(e.OldValue as MdTabs, e.NewValue as MdTabs));
-        SelectedIndexProperty.Changed.AddClassHandler<MdTabsView>((view, _) => view.PushToBar());
+        SelectedIndexProperty.Changed.AddClassHandler<MdTabsView>((view, _) =>
+        {
+            view.PushToBar();
+            view.UpdateContent();
+        });
+        SelectedItemProperty.Changed.AddClassHandler<MdTabsView>((view, _) => view.UpdateContent());
     }
 
     public MdTabs? Tabs { get => GetValue(TabsProperty); set => SetValue(TabsProperty, value); }
+
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        base.OnApplyTemplate(e);
+        _host = e.NameScope.Find<ContentPresenter>("PART_SelectedContentHost");
+        UpdateContent();
+    }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
@@ -81,6 +95,18 @@ public sealed class MdTabsView : TabControl
         // A bar with more tabs than this view has pages must not blank the page that is showing.
         if (index < 0 || index >= ItemCount || index == SelectedIndex) return;
         SetCurrentValue(SelectedIndexProperty, index);
+    }
+
+    private void UpdateContent()
+    {
+        if (_host is null) return;
+
+        // TabControl normally reads the selected page off a realized container, and this
+        // template has no strip to realize one in. Resolving it from the item directly is what
+        // lets the pages be plain controls rather than TabItem wrappers nobody asked for.
+        var selected = SelectedItem;
+        _host.Content = selected is TabItem tab ? tab.Content : selected;
+        _host.ContentTemplate = (selected as TabItem)?.ContentTemplate ?? ItemTemplate;
     }
 
     private void PushToBar()
