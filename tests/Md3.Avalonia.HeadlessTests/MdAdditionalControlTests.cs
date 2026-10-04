@@ -203,10 +203,14 @@ public sealed class MdAdditionalControlTests
         window.Show();
         Dispatcher.UIThread.RunJobs();
 
+        tabs.SelectedIndex = 1;
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(1, view.SelectedIndex);
+
         tabs.SelectedIndex = 2;
         Dispatcher.UIThread.RunJobs();
 
-        // Blanking the view would be worse than leaving the last real page up.
+        // There is no third page; blanking the view would be worse than leaving the last one up.
         Assert.Equal(1, view.SelectedIndex);
         Assert.NotNull(view.SelectedItem);
 
