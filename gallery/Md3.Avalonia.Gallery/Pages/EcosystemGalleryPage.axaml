@@ -60,7 +60,19 @@
         <md:MdButton Content="Load next page" Variant="Tonal" Click="LoadNextPage" Margin="0,0,8,8" />
         <md:MdButton Content="Refresh pages" Variant="Text" Click="RefreshPages" Margin="0,0,8,8" />
       </WrapPanel>
-      <eco:MdPagedItemsView x:Name="PagedItems" AutoLoad="False" PageSize="4" EmptyContent="No records" Refreshed="PagesRefreshed" />
+      <eco:MdPagedItemsView x:Name="PagedItems" AutoLoad="False" PageSize="4" EmptyContent="No records" Refreshed="PagesRefreshed">
+        <eco:MdPagedItemsView.ItemTemplate>
+          <!-- PagedRecord is private to the code-behind, so reflection bindings, as elsewhere. -->
+          <DataTemplate x:CompileBindings="False">
+            <Border Margin="0,0,0,8" Padding="12" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}">
+              <StackPanel>
+                <TextBlock FontWeight="Medium" Text="{Binding Title}" />
+                <TextBlock Classes="body" Opacity="0.72" Text="{Binding Detail}" />
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </eco:MdPagedItemsView.ItemTemplate>
+      </eco:MdPagedItemsView>
       <TextBlock x:Name="PagingStatus" Classes="body" Text="No page loaded. Load next page to append four records." />
     </StackPanel>
     </Border>

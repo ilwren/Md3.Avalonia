@@ -39,10 +39,19 @@ public partial class EcosystemGalleryPage : UserControl
         EnterpriseGrid.Columns.Add(new MdDataGridColumn { Header = L("Score", "分数"), PropertyName = nameof(GridRow.Score), Width = new GridLength(96), IsEditable = true });
         EnterpriseGrid.DataSource = new[] { new GridRow("Ada", L("Design", "设计"), 92), new GridRow("Lin", L("Engineering", "工程"), 97), new GridRow("Maya", L("Research", "研究"), 89), new GridRow("Noah", L("Design", "设计"), 94), new GridRow("Zoe", L("Engineering", "工程"), 91) };
 
-        PagedItems.PageProvider = request =>
+        PagedItems.PageProvider = async request =>
         {
-            var page = Enumerable.Range(request.PageKey * request.PageSize + 1, request.PageSize).Select(number => (object?)L($"Record {number}", $"记录 {number}")).ToArray();
-            return ValueTask.FromResult(new MdPageResult<object?>(page, request.PageKey >= 2 ? null : request.PageKey + 1, request.PageKey >= 2));
+            // A provider that returns synchronously never lets the loading state be seen: the
+            // view went Loading -> Data inside one dispatcher pass, so the progress indicator
+            // was shown and hidden before it could ever be painted, and the only evidence a page
+            // had loaded was the status line. Real paging is I/O, so model it as such.
+            await Task.Delay(450, request.CancellationToken);
+            var page = Enumerable.Range(request.PageKey * request.PageSize + 1, request.PageSize)
+                .Select(number => (object?)new PagedRecord(
+                    L($"Record {number}", $"记录 {number}"),
+                    L($"Page {request.PageKey + 1} · loaded {DateTime.Now:HH:mm:ss}", $"第 {request.PageKey + 1} 页 · 加载于 {DateTime.Now:HH:mm:ss}")))
+                .ToArray();
+            return new MdPageResult<object?>(page, request.PageKey >= 2 ? null : request.PageKey + 1, request.PageKey >= 2);
         };
 
         AsyncSelect.ItemsSource = new[]
@@ -205,6 +214,8 @@ public partial class EcosystemGalleryPage : UserControl
     private void AssignReviewer(object? sender, RoutedEventArgs e) =>
         ReviewerStatus.Text = L($"Review assigned to {(sender as Control)?.Tag}.", $"评审已分配给 {(sender as Control)?.Tag}。");
     private void RatingChanged(object? sender, RangeBaseValueChangedEventArgs e) => RatingStatus.Text = L($"Rating {e.NewValue:0.#} of 5", $"评分 {e.NewValue:0.#} / 5");
+    private sealed record PagedRecord(string Title, string Detail);
+
     private sealed class GridRow(string name, string team, int score)
     {
         public string Name { get; } = name;

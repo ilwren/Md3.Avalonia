@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -213,6 +214,8 @@ public sealed class MdPagedItemsView : TemplatedControl
     public static readonly StyledProperty<int> PageSizeProperty = AvaloniaProperty.Register<MdPagedItemsView, int>(nameof(PageSize), 20);
     public static readonly StyledProperty<bool> AutoLoadProperty = AvaloniaProperty.Register<MdPagedItemsView, bool>(nameof(AutoLoad), true);
     public static readonly StyledProperty<object?> EmptyContentProperty = AvaloniaProperty.Register<MdPagedItemsView, object?>(nameof(EmptyContent));
+    /// <summary>Template for each loaded record. Without it every page renders as bare ToString text.</summary>
+    public static readonly StyledProperty<IDataTemplate?> ItemTemplateProperty = AvaloniaProperty.Register<MdPagedItemsView, IDataTemplate?>(nameof(ItemTemplate));
     public static readonly StyledProperty<object?> ErrorContentProperty = AvaloniaProperty.Register<MdPagedItemsView, object?>(nameof(ErrorContent));
     public static readonly StyledProperty<ICommand?> PageRequestCommandProperty = AvaloniaProperty.Register<MdPagedItemsView, ICommand?>(nameof(PageRequestCommand));
     public static readonly DirectProperty<MdPagedItemsView, IReadOnlyList<object?>> ItemsProperty = AvaloniaProperty.RegisterDirect<MdPagedItemsView, IReadOnlyList<object?>>(nameof(Items), view => view.Items);
@@ -233,6 +236,7 @@ public sealed class MdPagedItemsView : TemplatedControl
     public object? EmptyContent { get => GetValue(EmptyContentProperty); set => SetValue(EmptyContentProperty, value); }
     public object? ErrorContent { get => GetValue(ErrorContentProperty); set => SetValue(ErrorContentProperty, value); }
     public ICommand? PageRequestCommand { get => GetValue(PageRequestCommandProperty); set => SetValue(PageRequestCommandProperty, value); }
+    public IDataTemplate? ItemTemplate { get => GetValue(ItemTemplateProperty); set => SetValue(ItemTemplateProperty, value); }
     public IReadOnlyList<object?> Items => _items;
     public MdAsyncRequestState State { get => _state; private set { SetAndRaise(StateProperty, ref _state, value); UpdateState(); } }
     public Exception? Error { get => _error; private set => SetAndRaise(ErrorProperty, ref _error, value); }

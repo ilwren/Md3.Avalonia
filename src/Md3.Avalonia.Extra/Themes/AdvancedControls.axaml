@@ -170,7 +170,7 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Grid RowDefinitions="*,Auto">
-          <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding Items}" />
+          <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding Items}" ItemTemplate="{TemplateBinding ItemTemplate}" />
           <StackPanel Grid.Row="1" HorizontalAlignment="Center" Margin="8">
             <md:MdLinearProgressIndicator Classes="eco-loading" IsVisible="False" IsIndeterminate="True" Width="120" />
             <StackPanel Classes="eco-error" IsVisible="False" HorizontalAlignment="Center"><ContentPresenter Content="{TemplateBinding ErrorContent}" /><md:MdButton Name="PART_RetryButton" Content="Retry" Variant="Text" HorizontalAlignment="Center" Margin="0,8,0,0" /></StackPanel>
