@@ -406,8 +406,12 @@ public sealed class MdP0AccessibilityAndKeyboardTests
     }
 
     [Fact]
-    public void Incomplete_Motion_APIs_Are_Explicitly_Experimental()
+    public void Completed_Motion_APIs_No_Longer_Claim_To_Be_Experimental()
     {
+        // These four shipped as state shells: pseudo-classes plus an IsVisible switch, no
+        // choreography. They now run real Material transitions with a retained outgoing phase,
+        // so the warning attribute has to come off with them. The behaviour that replaced the
+        // shells is pinned in MdMotionLifecycleTests; this only guards the labelling.
         var types = new[]
         {
             typeof(MdSharedAxis),
@@ -415,7 +419,8 @@ public sealed class MdP0AccessibilityAndKeyboardTests
             typeof(MdContainerTransform),
             typeof(MdAnimatedVisibility)
         };
-        Assert.All(types, type => Assert.NotEmpty(type.GetCustomAttributes(typeof(MdExperimentalAttribute), false)));
+        Assert.All(types, type => Assert.Empty(type.GetCustomAttributes(typeof(MdExperimentalAttribute), false)));
+        Assert.All(types, type => Assert.NotNull(type.GetProperty("Duration")));
     }
 
     private static void Press(Window window, Key key, PhysicalKey physicalKey, string? text = null,

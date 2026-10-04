@@ -42,6 +42,19 @@ public sealed class MdCarousel : ListBox
     public static readonly StyledProperty<MdCarouselController?> ControllerProperty =
         AvaloniaProperty.Register<MdCarousel, MdCarouselController?>(nameof(Controller));
 
+    /// <summary>
+    /// Width the item template lays its content out at, regardless of how far the item itself has
+    /// been squeezed by the keyline arrangement. Material shrinks a carousel item by *masking* it,
+    /// not by reflowing what is inside: a 56 DIP small item still shows the left edge of a full
+    /// card. Laying the content out at the small extent instead collapses labels to an ellipsis,
+    /// or wraps them one character per line.
+    /// </summary>
+    public static readonly AttachedProperty<double> ContentExtentProperty =
+        AvaloniaProperty.RegisterAttached<MdCarousel, Control, double>("ContentExtent", double.NaN);
+
+    public static double GetContentExtent(Control control) => control.GetValue(ContentExtentProperty);
+    public static void SetContentExtent(Control control, double value) => control.SetValue(ContentExtentProperty, value);
+
     private readonly DispatcherTimer _autoPlayTimer = new();
     private readonly DispatcherTimer _wheelSnapTimer = new();
     private readonly DispatcherTimer _settleCleanupTimer = new();
@@ -237,6 +250,7 @@ public sealed class MdCarousel : ListBox
             MdMotionTransitions.CreateDouble(this, WidthProperty, MdMotionKind.Spatial));
         container.SetCurrentValue(WidthProperty, GetTargetWidth(index));
         container.SetCurrentValue(HeightProperty, ItemHeight);
+        SetContentExtent(container, GetArrangement().Large);
         container.SetCurrentValue(MarginProperty, FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft
             ? new Thickness(ItemSpacing, 0, 0, 0)
             : new Thickness(0, 0, ItemSpacing, 0));
@@ -250,10 +264,11 @@ public sealed class MdCarousel : ListBox
         }
     }
 
-    private double GetTargetWidth(int index)
+    /// <summary>The large and small keyline extents for the current viewport and variant.</summary>
+    private (double Large, double Small) GetArrangement()
     {
         var preferredLarge = Math.Max(0, ItemWidth);
-        if (index < 0 || Variant == MdCarouselVariant.Uncontained) return preferredLarge;
+        if (Variant == MdCarouselVariant.Uncontained) return (preferredLarge, preferredLarge);
 
         var preferredSmall = Math.Min(preferredLarge, Math.Clamp(SmallItemWidth, 40, 56));
         var viewport = GetLayoutViewportWidth();
@@ -288,6 +303,14 @@ public sealed class MdCarousel : ListBox
             }
             small = Math.Min(small, large);
         }
+
+        return (large, small);
+    }
+
+    private double GetTargetWidth(int index)
+    {
+        var (large, small) = GetArrangement();
+        if (index < 0 || Variant == MdCarouselVariant.Uncontained) return large;
 
         var distance = Math.Abs(index - _layoutAnchorIndex);
         if (distance == 0) return large;

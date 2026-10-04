@@ -19,7 +19,8 @@ normative for documentation and release notes.
 | `MdAdaptiveSwitch` | API shell | Material switch behavior with platform-size selection | Cupertino rendering and animation are not implemented |
 | `MdAdaptiveProgressIndicator` | API shell | Material progress semantics with platform-tuned dimensions | Cupertino activity-indicator rendering is not implemented |
 | `MdAboutDialog` | API shell | About metadata surface and license callback | No built-in dialog route or complete Flutter license flow |
-| `MdSharedAxis`, `MdFadeThrough`, `MdContainerTransform`, `MdAnimatedVisibility` (Extra) | Experimental | State/content shells only | Full transition choreography and retained outgoing lifecycle are not implemented; each type carries `MdExperimentalAttribute` |
+| `MdContainerTransform`, `MdAnimatedVisibility` (Extra) | Implemented subset | Bounds and shape morph on Material's 30/70 cross-fade; clip-based enter/exit that never reflows content | Elevation morph and interruption velocity are not modelled; a reversal restarts rather than retargets |
+| `MdSharedAxis`, `MdFadeThrough` (Extra) | Partial | Phased entrance with slide/scale, retained exit for templated and view-model content | A `Control` assigned to `Content` cannot be shown by two presenters at once, so its exit phase is skipped and only the entrance animates |
 
 ## Release policy
 

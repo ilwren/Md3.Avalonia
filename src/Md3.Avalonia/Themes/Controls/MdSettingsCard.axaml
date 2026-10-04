@@ -213,7 +213,10 @@
               </ToggleButton.Styles>
               <ToggleButton.Template>
                 <ControlTemplate TargetType="ToggleButton">
-                  <Grid Background="Transparent">
+                  <!-- The template has to consume Padding itself. Without this the declared
+                       16,14 was silently dropped, so the header icon and title sat flush against
+                       the card edge while the cards inside the expanded area were inset 32. -->
+                  <Grid Background="Transparent" Margin="{TemplateBinding Padding}">
                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16" VerticalAlignment="Center">
                       <Border Width="40" Height="40" CornerRadius="20"
                               Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
@@ -254,12 +257,14 @@
             </ToggleButton>
 
             <!-- Expanded Content Area -->
+            <!-- No horizontal padding: the hosted MdSettingsCards already carry 16, so adding
+                 another 16 here indented them to 32 and broke alignment with the header above. -->
             <Border x:Name="PART_ContentArea"
                     IsVisible="{TemplateBinding IsExpanded}"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
                     BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
                     BorderThickness="0,1,0,0"
-                    Padding="16,8">
+                    Padding="0,4">
               <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
             </Border>
           </StackPanel>

@@ -112,7 +112,7 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 | **Selection and transfer** | `MdAsyncSelect`, `MdCalendar`, `MdCascader`, `MdCascaderItem`, `MdTransfer`, `MdColorPicker`, `MdColorPickerButton` |
 | **Feedback and identity** | `MdAvatar`, `MdAvatarGroup`, `MdRating`, `MdResultView`, `MdSkeleton`, `MdSkeletonGroup`, `MdPinInput`, `MdPinCell`, `MdTagInput`, `MdTagEntry` |
 | **Data visualization and editing** | `MdChart`, `MdChartSeries`, `MdChartPoint`, `MdRichEditor`, `MdRichTextEditor`, `MdChatView`, `MdChatMessage`, `MdTimeline`, `MdTimelineItem` |
-| **Motion and visual extras** | `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, `MdStaggeredPanel`, `MdAnimationSequence`, `MdAnimatedVisibility`, `MdContainerTransform`, `MdFadeThrough`, `MdSharedAxis` |
+| **Motion and visual extras** | `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, `MdStaggeredPanel`, `MdAnimationSequence`, `MdAnimatedVisibility`, `MdContainerTransform`, `MdFadeThrough`, `MdSharedAxis`, `MdRevealHost`, `MdMorphPanel` |
 | **Navigation/content** | `MdBreadcrumb`, `MdBreadcrumbItem`, `MdGridTile`-style content helpers |
 
 `MdPagedItemsView.ItemTemplate` sets the presentation of each loaded record; `MdDataGrid` is a narrower surface than Avalonia `DataGrid` and is not a drop-in replacement for it.
@@ -355,6 +355,7 @@ missing from this document.
 | `MdOverlayAlignment` | `Start` · `Center` · `End` |
 | `MdResultKind` | `Information` · `Success` · `Warning` · `Error` · `Empty` |
 | `MdRichEditorCommand` | `Bold` · `Italic` · `Underline` · `StrikeThrough` · `Heading` · `Quote` · `Code` · `Link` · `BulletedList` · `NumberedList` · `Undo` · `Redo` · `HorizontalRule` · `ClearFormatting` |
+| `MdRevealAxis` | `Vertical` · `Horizontal` · `Both` |
 | `MdSharedAxisKind` | `X` · `Y` · `Z` |
 | `MdSkeletonShape` | `Rectangle` · `RoundedRectangle` · `Circle` · `Text` |
 | `MdSpinKitKind` | `RotatingPlain` · `ThreeBounce` · `Wave` · `FadingCircle` · `ChasingDots` |

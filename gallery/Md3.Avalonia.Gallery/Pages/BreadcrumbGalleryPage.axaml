@@ -13,10 +13,14 @@
 
       <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="h2" Text="Interactive breadcrumb" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Clicking a parent segment navigates to it and drops everything below, which is what a breadcrumb is for. The trailing segment is the current location: it has no hover state and no hand cursor." />
         <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
           <extra:MdBreadcrumb x:Name="DemoBreadcrumb" Separator="›" ItemInvoked="OnBreadcrumbItemInvoked" />
         </Border>
-        <TextBlock x:Name="BreadcrumbStatus" Classes="body" Text="Click any breadcrumb segment to navigate." />
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <md:MdButton Content="Reset path" Variant="Outlined" Click="OnResetPath" />
+          <TextBlock x:Name="BreadcrumbStatus" VerticalAlignment="Center" Classes="body" Text="Click any breadcrumb segment to navigate to it." />
+        </StackPanel>
       </StackPanel>
 
       <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="12">

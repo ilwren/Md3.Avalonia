@@ -988,13 +988,22 @@
     </Setter>
   </ControlTheme>
 
-  <!-- Experimental motion shells: these themes guarantee content rendering only. They are not
-       counted as completed Material transitions until outgoing-content lifecycle and interruption
-       behavior are implemented. -->
+  <!-- Material transitions. The control code drives opacity, transform, bounds and shape through
+       the motion tokens, so these templates only have to name the parts and give them their
+       resting values. Both presenters stay mounted: the outgoing one is what makes the exit
+       phase visible, and the container transform needs both measured to morph between them. -->
   <ControlTheme x:Key="{x:Type eco:MdSharedAxis}" TargetType="eco:MdSharedAxis">
+    <Setter Property="ClipToBounds" Value="True" />
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdSharedAxis">
-        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+        <Panel>
+          <ContentPresenter x:Name="PART_OutgoingContent" IsVisible="False" Opacity="0"
+                            IsHitTestVisible="False" RenderTransformOrigin="50%,50%" />
+          <ContentPresenter x:Name="PART_Content"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            RenderTransformOrigin="50%,50%" />
+        </Panel>
       </ControlTemplate>
     </Setter>
   </ControlTheme>
@@ -1002,7 +1011,14 @@
   <ControlTheme x:Key="{x:Type eco:MdFadeThrough}" TargetType="eco:MdFadeThrough">
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdFadeThrough">
-        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+        <Panel>
+          <ContentPresenter x:Name="PART_OutgoingContent" IsVisible="False" Opacity="0"
+                            IsHitTestVisible="False" RenderTransformOrigin="50%,50%" />
+          <ContentPresenter x:Name="PART_Content"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            RenderTransformOrigin="50%,50%" />
+        </Panel>
       </ControlTemplate>
     </Setter>
   </ControlTheme>
@@ -1010,33 +1026,37 @@
   <ControlTheme x:Key="{x:Type eco:MdAnimatedVisibility}" TargetType="eco:MdAnimatedVisibility">
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdAnimatedVisibility">
-        <ContentPresenter x:Name="PART_Content" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+        <eco:MdRevealHost x:Name="PART_Reveal">
+          <ContentPresenter x:Name="PART_Content"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            RenderTransformOrigin="50%,50%" />
+        </eco:MdRevealHost>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:hidden /template/ ContentPresenter#PART_Content"><Setter Property="IsVisible" Value="False" /></Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type eco:MdContainerTransform}" TargetType="eco:MdContainerTransform">
     <Setter Property="ContainerBackground" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdContainerTransform">
-        <Border Background="{TemplateBinding ContainerBackground}"
+        <Border x:Name="PART_Container"
+                Background="{TemplateBinding ContainerBackground}"
                 CornerRadius="{TemplateBinding ClosedCornerRadius}"
                 BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}"
                 ClipToBounds="True">
-          <Panel>
-            <ContentPresenter Name="PART_ClosedContent"
+          <!-- Child order is the morph order: index 0 is the closed extent, index 1 the open one. -->
+          <eco:MdMorphPanel x:Name="PART_Morph">
+            <ContentPresenter x:Name="PART_ClosedContent"
                               Content="{TemplateBinding ClosedContent}"
-                              IsVisible="True" />
-            <ContentPresenter Name="PART_OpenContent"
+                              Opacity="1" />
+            <ContentPresenter x:Name="PART_OpenContent"
                               Content="{TemplateBinding OpenContent}"
-                              IsVisible="False" />
-          </Panel>
+                              Opacity="0"
+                              IsHitTestVisible="False" />
+          </eco:MdMorphPanel>
         </Border>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:expanded /template/ ContentPresenter#PART_ClosedContent"><Setter Property="IsVisible" Value="False" /></Style>
-    <Style Selector="^:expanded /template/ ContentPresenter#PART_OpenContent"><Setter Property="IsVisible" Value="True" /></Style>
-    <Style Selector="^:expanded /template/ Border"><Setter Property="CornerRadius" Value="{Binding OpenCornerRadius, RelativeSource={RelativeSource TemplatedParent}}" /></Style>
   </ControlTheme>
 </ResourceDictionary>
