@@ -17,7 +17,12 @@
                    painting a circular/rectangular overlay across the whole destination. -->
               <Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
                       CornerRadius="16" IsHitTestVisible="False" Opacity="0" />
-              <md:MdRipplePresenter RippleBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsCentered="True" />
+              <!-- The ripple must be clipped by the pill, not by the cell. A Grid's ClipToBounds is
+                   rectangular, so the wash squared off the rounded indicator and read as a
+                   separate layer pasted over it. -->
+              <Border CornerRadius="16" ClipToBounds="True">
+                <md:MdRipplePresenter RippleBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsCentered="True" />
+              </Border>
               <md:MdSymbolPresenter x:Name="PART_Icon" HorizontalAlignment="Center" VerticalAlignment="Center"
                                 Content="{TemplateBinding Icon}"
                                 FontSize="24" Foreground="{TemplateBinding Foreground}" />

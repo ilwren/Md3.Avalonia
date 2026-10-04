@@ -42,7 +42,11 @@ public sealed class MdCurrentRegressionTests
     public void Rating_Hit_Test_Quantizes_Inside_Each_Star_And_Ignores_Spacing()
     {
         var rating = new MdRating { ItemSize = 32, Spacing = 12, Precision = .5, Value = 0 };
-        using var host = Show(rating, 260, 80);
+
+        // 5 * 48 + 4 * 12 = 288. The window has to grant the row its natural width: below it the
+        // control now folds the spacing in to keep every star reachable, which is the right
+        // behaviour but a different arithmetic than the untouched pitch this test pins.
+        using var host = Show(rating, 320, 80);
         var window = host.Window;
         Dispatcher.UIThread.RunJobs();
         var origin = rating.TranslatePoint(default, window)!.Value;
@@ -60,6 +64,24 @@ public sealed class MdCurrentRegressionTests
         var gapPosition = 2 * (targetSize + 12) + targetSize + 6;
         rating.SetValueFromPosition(gapPosition);
         Assert.Equal(3, rating.Value);
+    }
+
+    [AvaloniaFact]
+    public void Rating_Arranged_Narrower_Than_Its_Natural_Row_Still_Reaches_Both_Ends()
+    {
+        // Reported from the gallery: the row was pinned to 176 DIP while its natural width is
+        // 5 * 48 + 4 * 4 = 256. The trailing stars were clipped away and every pixel the pointer
+        // could still reach mapped to a lower value than the star drawn there, so the score could
+        // be dragged down but never back up. The visible row must span the whole range.
+        var rating = new MdRating { ItemSize = 32, Spacing = 4, Precision = .5, Value = 3.5, Width = 176 };
+        using var host = Show(rating, 400, 120);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(176d, rating.Bounds.Width);
+        rating.SetValueFromPosition(rating.Bounds.Width);
+        Assert.Equal(5, rating.Value);
+        rating.SetValueFromPosition(0);
+        Assert.Equal(0.5, rating.Value);
     }
 
     [AvaloniaFact]

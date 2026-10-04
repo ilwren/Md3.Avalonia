@@ -54,10 +54,46 @@ public sealed class MdRating : RangeBase
 
     protected override Size MeasureOverride(Size availableSize)
     {
-        var count = Math.Max(1, (int)Math.Ceiling(Maximum - Minimum));
-        var target = Math.Max(48, ItemSize);
-        return new Size(count * target + (count - 1) * Math.Max(0, Spacing), target);
+        var metrics = GetMetrics(0);
+        return new Size(metrics.Width, metrics.Target);
     }
+
+    /// <summary>
+    /// Resolves the row geometry. Rendering and hit testing both read it, so the star under the
+    /// pointer is always the star the pointer selects.
+    /// </summary>
+    /// <param name="arrangedWidth">The width the control was arranged at, or 0 to ask for the natural width.</param>
+    private RowMetrics GetMetrics(double arrangedWidth)
+    {
+        var count = Math.Max(1, (int)Math.Ceiling(Maximum - Minimum));
+        var size = Math.Max(16, ItemSize);
+        var target = Math.Max(48, size);
+        var spacing = Math.Max(0, Spacing);
+        var width = (count * target) + ((count - 1) * spacing);
+
+        // A host that arranges the row narrower than its natural width (an explicit Width, a tight
+        // grid cell) used to leave the trailing stars drawn past the clip while hit testing kept
+        // mapping the pointer across the full natural width. The stars still on screen therefore
+        // answered with a lower value than they depicted, so the rating could be dragged down but
+        // never back up. Fold the row into the width actually granted -- spacing first, then the
+        // cell -- so every value stays both visible and reachable.
+        if (arrangedWidth > 0 && arrangedWidth < width)
+        {
+            spacing = count > 1 ? Math.Clamp((arrangedWidth - (count * target)) / (count - 1), 0, spacing) : 0;
+            var cell = (arrangedWidth - ((count - 1) * spacing)) / count;
+            if (cell < target)
+            {
+                target = Math.Max(1, cell);
+                size = Math.Min(size, target);
+            }
+
+            width = (count * target) + ((count - 1) * spacing);
+        }
+
+        return new RowMetrics(count, size, target, spacing, target + spacing, width);
+    }
+
+    private readonly record struct RowMetrics(int Count, double Size, double Target, double Spacing, double Pitch, double Width);
 
     public override void Render(DrawingContext context)
     {
@@ -66,10 +102,11 @@ public sealed class MdRating : RangeBase
         // participate in hit testing; the visible star remains compact and does not define the
         // pointer target by its irregular outline.
         context.DrawRectangle(Brushes.Transparent, null, new Rect(Bounds.Size));
-        var count = Math.Max(1, (int)Math.Ceiling(Maximum - Minimum));
-        var size = Math.Max(16, ItemSize);
-        var target = Math.Max(48, size);
-        var spacing = Math.Max(0, Spacing);
+        var metrics = GetMetrics(Bounds.Width);
+        var count = metrics.Count;
+        var size = metrics.Size;
+        var target = metrics.Target;
+        var spacing = metrics.Spacing;
         var active = ActiveBrush ?? Brushes.Goldenrod;
         var inactive = InactiveBrush ?? Brushes.Gray;
         var rtl = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft;
@@ -143,12 +180,11 @@ public sealed class MdRating : RangeBase
 
     private void SetFromPosition(double x)
     {
-        var count = Math.Max(1, (int)Math.Ceiling(Maximum - Minimum));
-        var size = Math.Max(16, ItemSize);
-        var target = Math.Max(48, size);
-        var spacing = Math.Max(0, Spacing);
-        var pitch = target + spacing;
-        var renderedWidth = count * target + (count - 1) * spacing;
+        var metrics = GetMetrics(Bounds.Width);
+        var count = metrics.Count;
+        var target = metrics.Target;
+        var pitch = metrics.Pitch;
+        var renderedWidth = metrics.Width;
         var position = Math.Clamp(x, 0, renderedWidth);
         if (FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft) position = renderedWidth - position;
         var itemIndex = Math.Min(count - 1, Math.Max(0, (int)Math.Floor(position / pitch)));

@@ -27,7 +27,12 @@
                 <Border x:Name="PART_Indicator" Background="Transparent" CornerRadius="16"
                         Opacity="0" RenderTransform="scale(0.6)" RenderTransformOrigin="50%,50%" />
                 <Border x:Name="PART_StateLayer" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" CornerRadius="16" IsHitTestVisible="False" Opacity="0" />
-                <md:MdRipplePresenter RippleBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsCentered="True" />
+                <!-- The ripple must be clipped by the pill, not by the cell. A Grid's ClipToBounds is
+                     rectangular, so the wash squared off the rounded indicator and read as a
+                     separate layer pasted over it. -->
+                <Border CornerRadius="16" ClipToBounds="True">
+                  <md:MdRipplePresenter RippleBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsCentered="True" />
+                </Border>
                 <md:MdSymbolPresenter x:Name="PART_Icon" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Icon}" Foreground="{TemplateBinding Foreground}" FontSize="24" />
                 <md:MdSymbolPresenter x:Name="PART_SelectedIcon" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding SelectedIcon}" Foreground="{TemplateBinding Foreground}" FontSize="24" IsVisible="False" Opacity="0" />
                 <ContentPresenter x:Name="PART_Badge" Margin="30,-3,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Content="{TemplateBinding Badge}" IsVisible="False" />

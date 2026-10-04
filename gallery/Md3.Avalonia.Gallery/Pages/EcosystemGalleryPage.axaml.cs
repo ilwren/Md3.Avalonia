@@ -205,12 +205,6 @@ public partial class EcosystemGalleryPage : UserControl
     private void AssignReviewer(object? sender, RoutedEventArgs e) =>
         ReviewerStatus.Text = L($"Review assigned to {(sender as Control)?.Tag}.", $"评审已分配给 {(sender as Control)?.Tag}。");
     private void RatingChanged(object? sender, RangeBaseValueChangedEventArgs e) => RatingStatus.Text = L($"Rating {e.NewValue:0.#} of 5", $"评分 {e.NewValue:0.#} / 5");
-    private void BreadcrumbInvoked(object? sender, object? item)
-    {
-        if (BreadcrumbStatus is not null)
-            BreadcrumbStatus.Text = L($"Selected {(item as MdBreadcrumbItem)?.Label ?? (item as TextBlock)?.Text ?? (item as ContentControl)?.Content ?? item}.", $"已选择 {(item as MdBreadcrumbItem)?.Label ?? (item as TextBlock)?.Text ?? (item as ContentControl)?.Content ?? item}。");
-    }
-
     private sealed class GridRow(string name, string team, int score)
     {
         public string Name { get; } = name;
