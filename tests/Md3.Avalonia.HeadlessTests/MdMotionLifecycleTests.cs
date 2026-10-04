@@ -330,6 +330,26 @@ public sealed class MdMotionLifecycleTests
     }
 
     [AvaloniaFact]
+    public void Ecosystem_Popover_Deregisters_Itself_When_It_Closes()
+    {
+        // A closed popover used to stay on record as "the open one" for as long as it was alive,
+        // so the next popover to open anywhere in the process reached back into it and cut its
+        // exit animation short. Worse, that reference outlived the UI thread that created it.
+        var stale = new MdPopover { Anchor = "Stale", PopoverContent = "Closed" };
+        stale.Show();
+        stale.Dismiss();
+        Assert.True(stale.IsPopupOpen);
+
+        var fresh = new MdPopover { Anchor = "Fresh", PopoverContent = "Open" };
+        fresh.Show();
+        Assert.True(fresh.IsOpen);
+        Assert.True(stale.IsPopupOpen);
+
+        MdMotion.SetScheme(stale, MdMotionScheme.None);
+        MdMotion.SetScheme(fresh, MdMotionScheme.None);
+    }
+
+    [AvaloniaFact]
     public void Simple_Dialog_Keeps_Surface_Present_Through_Exit()
     {
         var dialog = new MdSimpleDialog { Title = "Choose", ItemsSource = new[] { "One", "Two" }, IsOpen = true };

@@ -256,6 +256,17 @@ animation on a real device and cutout geometry still need manual sign-off.
 all. That is the same shape of problem as #13 — these controls expose too little to be used for
 real. Worth a sweep of the Extra controls for missing template/presentation hooks.
 
+**`MdPopover` leaked its "currently open" registration.** `EcosystemPopupCoordinator` recorded the
+open popover in a static weak reference but never cleared it on close, so a *closed* popover stayed
+on record for as long as it was alive. The next popover to open anywhere in the process reached
+back into it — `Dismiss()` then `ClosePopupImmediately()` — cutting an exit animation short at
+best, and throwing `InvalidOperationException: the calling thread cannot access this object` at
+worst, because Avalonia allows more than one UI thread and the stale popover belonged to another
+one. Found when the page split changed allocation timing enough to keep the stale object alive
+across headless test sessions. The coordinator now deregisters on close and only reaches into a
+previous popover from the thread that opened it; `Ecosystem_Popover_Deregisters_Itself_When_It_Closes`
+covers it.
+
 ## Agreed approach
 
 - **#12 page split**: incremental — pull each component onto its own page as it gets fixed, rather
