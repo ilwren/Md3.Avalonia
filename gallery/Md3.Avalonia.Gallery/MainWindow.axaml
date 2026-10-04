@@ -96,6 +96,7 @@
             <md:MdButton x:Name="TasksNav" Content="Tasks &amp; todo" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTasks" />
             <Border Margin="0,12,0,4" Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
             <TextBlock Margin="14,8,14,10" Classes="body" Text="LIBRARY EXTENSIONS" />
+            <md:MdButton x:Name="NumericNav" Content="Numeric input" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNumeric" />
             <md:MdButton x:Name="DesktopAdaptersNav" Content="Desktop adapters" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDesktopAdapters" />
             <md:MdButton x:Name="ThemeResourcesNav" Content="Theme Lab" Variant="Text" HorizontalContentAlignment="Left" Click="ShowThemeResources" />
             <md:MdButton x:Name="SymbolsNav" Content="Material Symbols" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSymbols" />

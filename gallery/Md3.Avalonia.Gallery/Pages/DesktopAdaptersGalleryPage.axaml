@@ -15,15 +15,13 @@
       </StackPanel>
 
       <StackPanel Spacing="12">
-        <TextBlock Classes="h2" Text="Autocomplete and numeric input" />
+        <TextBlock Classes="h2" Text="Autocomplete" />
+        <!-- MdNumericBox moved to its own "Numeric input" page. -->
         <WrapPanel Orientation="Horizontal">
           <md:MdAutoCompleteBox x:Name="TechnologyAutoComplete" Width="320" Margin="0,0,20,16"
                                 Label="Technology" PlaceholderText="Start typing"
                                 SupportingText="Native filtering and keyboard selection"
                                 FilterMode="ContainsOrdinal" IsTextCompletionEnabled="True" />
-          <md:MdNumericBox Width="260" Margin="0,0,0,16" Label="Quantity" Value="12"
-                           Minimum="0" Maximum="100" Increment="1"
-                           SupportingText="Wheel, keyboard, and MVVM Value" />
         </WrapPanel>
       </StackPanel>
 

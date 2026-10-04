@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.NumericGalleryPage"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="900">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Numeric input" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="A Material text field with a stepper. The increment and decrement targets are centred on the field's input row, so they stay aligned when supporting text adds height underneath." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Variants" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdNumericBox x:Name="QuantityBox" Width="260" Margin="0,0,20,16"
+                           Label="Quantity" Value="12" Minimum="0" Maximum="100" Increment="1"
+                           SupportingText="Wheel, keyboard, and MVVM Value" />
+          <md:MdNumericBox Width="260" Margin="0,0,20,16" Variant="Filled"
+                           Label="Filled" Value="4" Minimum="0" Maximum="20" Increment="2"
+                           SupportingText="Steps of two" />
+          <md:MdNumericBox Width="260" Margin="0,0,0,16"
+                           Label="Leading stepper" Value="7" Minimum="0" Maximum="50"
+                           ButtonSpinnerLocation="Left"
+                           SupportingText="ButtonSpinnerLocation=Left" />
+        </WrapPanel>
+        <TextBlock Classes="body" Text="{Binding #QuantityBox.Value, StringFormat='Quantity is {0}.'}" />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Without a stepper" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="Set ShowButtonSpinner to false to keep the numeric parsing and clamping while typing is the only way in." />
+        <md:MdNumericBox Width="260" HorizontalAlignment="Left"
+                         Label="Typed only" Value="42" Minimum="0" Maximum="999"
+                         ShowButtonSpinner="False" />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Range and precision" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdNumericBox Width="260" Margin="0,0,20,16"
+                           Label="Temperature" Value="21.5" Minimum="-40" Maximum="60" Increment="0.5"
+                           SupportingText="Negative minimum, fractional step" />
+          <md:MdNumericBox Width="260" Margin="0,0,0,16"
+                           Label="Read-only" Value="100" Minimum="0" Maximum="100" IsReadOnly="True"
+                           SupportingText="Value is fixed" />
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdNumericBox Label=&quot;Quantity&quot;&#10;                 Value=&quot;{Binding Quantity}&quot;&#10;                 Minimum=&quot;0&quot; Maximum=&quot;100&quot; Increment=&quot;1&quot; /&gt;&#10;&#10;&lt;md:MdNumericBox Label=&quot;Typed only&quot; ShowButtonSpinner=&quot;False&quot; /&gt;"
+                             CSharpCode="var amount = new MdNumericBox&#10;{&#10;    Label = &quot;Amount&quot;,&#10;    Minimum = 0,&#10;    Maximum = 100,&#10;    Increment = 1&#10;};&#10;amount.ValueChanged += (_, e) =&gt; viewModel.Amount = e.NewValue;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

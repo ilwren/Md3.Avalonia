@@ -92,7 +92,8 @@ public partial class MainWindow : Window
             Entry("Flutter parity", "banner expansion panel paginated table reorder form dialog adaptive hero focus shortcut sheet refresh", FlutterParityNav, () => new FlutterParityGalleryPage()),
             Entry("Flutter ecosystem", "third party avatar rating breadcrumb clean room chart chat calendar transfer masonry data grid skeleton command palette", EcosystemNav, () => new EcosystemGalleryPage()),
             Entry("Borderless windows", "custom chrome title bar caption drag resize platform adapter", BorderlessWindowNav, () => new BorderlessWindowGalleryPage()),
-            Entry("Desktop adapters", "scrollbar numeric autocomplete window surface text focus", DesktopAdaptersNav, () => new DesktopAdaptersGalleryPage()),
+            Entry("Numeric input", "numeric number stepper spinner increment decrement quantity", NumericNav, () => new NumericGalleryPage()),
+            Entry("Desktop adapters", "scrollbar autocomplete window surface text focus", DesktopAdaptersNav, () => new DesktopAdaptersGalleryPage()),
             Entry("Theme Lab", "theme color seed hct contrast json shape font", ThemeResourcesNav, () => new ThemeResourcesGalleryPage()),
             Entry("Material Symbols", "icons glyph copy symbols", SymbolsNav, () => new SymbolGalleryPage()),
             Entry("Motion", "animation ripple spring easing", MotionNav, () => new MotionGalleryPage())
@@ -170,6 +171,7 @@ public partial class MainWindow : Window
     private void ShowFlutterParity(object? s, RoutedEventArgs e) => Navigate(new FlutterParityGalleryPage(), FlutterParityNav);
     private void ShowEcosystem(object? s, RoutedEventArgs e) => Navigate(new EcosystemGalleryPage(), EcosystemNav);
     private void ShowBorderlessWindows(object? s, RoutedEventArgs e) => Navigate(new BorderlessWindowGalleryPage(), BorderlessWindowNav);
+    private void ShowNumeric(object? s, RoutedEventArgs e) => Navigate(new NumericGalleryPage(), NumericNav);
     private void ShowDesktopAdapters(object? s, RoutedEventArgs e) => Navigate(new DesktopAdaptersGalleryPage(), DesktopAdaptersNav);
     private void ShowThemeResources(object? s, RoutedEventArgs e) => Navigate(new ThemeResourcesGalleryPage(), ThemeResourcesNav);
     private void ShowSymbols(object? s, RoutedEventArgs e) => Navigate(new SymbolGalleryPage(), SymbolsNav);
