@@ -9,12 +9,9 @@ namespace Md3.Avalonia.Gallery.Pages;
 
 public partial class FlutterParityGalleryPage : UserControl
 {
-    private readonly DispatcherTimer _refreshTimer;
     private readonly MdPickerRestorationStore _restorationStore = new();
     private readonly MdLicenseEntry[] _licenses;
     private MdSimpleDialog? _simpleDialog;
-    private int _refreshCount;
-    private bool _gridTileFavorite;
     private bool _heroExpanded;
     private bool _heroTransitionRunning;
     private bool _adaptiveSyncRunning;
@@ -24,17 +21,6 @@ public partial class FlutterParityGalleryPage : UserControl
     public FlutterParityGalleryPage()
     {
         InitializeComponent();
-        PlanBox.ItemsSource = new[] { L("Starter", "入门版"), L("Team", "团队版"), L("Enterprise", "企业版") };
-        PagedTable.ItemsSource = new[]
-        {
-            new PackageRow("Md3.Avalonia", L("All", "全部"), 98),
-            new PackageRow("Gallery.Desktop", L("Desktop", "桌面"), 95),
-            new PackageRow("Gallery.Android", "Android", 92),
-            new PackageRow("Theme.Tools", L("All", "全部"), 90),
-            new PackageRow("Icons", L("Optional", "可选"), 88),
-            new PackageRow("Ecosystem", L("All", "全部"), 86),
-            new PackageRow("HeadlessTests", "CI", 99)
-        };
         RoleField.ItemsSource = new[] { L("Designer", "设计师"), L("Developer", "开发者"), L("Tester", "测试人员") };
         _licenses =
         [
@@ -46,91 +32,7 @@ public partial class FlutterParityGalleryPage : UserControl
         HeroDestination.TransitionRequested += (_, args) => AdvancedStatus.Text = L($"Avatar returned: {args.SourceBounds} → {args.DestinationBounds}.", $"头像已返回：{args.SourceBounds} → {args.DestinationBounds}。");
         ShortcutScope.Register(new KeyGesture(Key.S, KeyModifiers.Control | KeyModifiers.Shift),
             new RelayCommand(ExecuteShortcutAction));
-        _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(650) };
-        _refreshTimer.Tick += (_, _) =>
-        {
-            _refreshTimer.Stop();
-            _refreshCount++;
-            RefreshStatus.Text = L($"Updated just now · refresh {_refreshCount}", $"刚刚更新 · 第 {_refreshCount} 次刷新");
-            DemoRefresh.CompleteRefresh();
-        };
     }
-
-    private void ShowBanner(object? sender, RoutedEventArgs e)
-    {
-        DemoBanner.Show();
-        BannerStatus.Text = L("Banner shown.", "横幅已显示。");
-    }
-
-    private void BannerDismissed(object? sender, EventArgs e) => BannerStatus.Text = L("Banner dismissed.", "横幅已关闭。");
-
-    private void BannerAction(object? sender, RoutedEventArgs e)
-    {
-        BannerStatus.Text = L($"{(sender as ContentControl)?.Content} selected.", $"已选择 {(sender as ContentControl)?.Content}。");
-        DemoBanner.Dismiss();
-    }
-
-    private void SortTable(object? sender, RoutedEventArgs e)
-    {
-        if ((sender as Control)?.Tag is string column) DemoTable.ToggleSort(column);
-    }
-
-    private void TableSortRequested(object? sender, MdDataTableSortEventArgs e) =>
-        SortStatus.Text = L($"Sort {e.Column} · {e.Direction}. The host applies ordering to ItemsSource.", $"排序 {e.Column} · {e.Direction}。宿主负责对 ItemsSource 应用排序。");
-
-    private void StepperChanged(object? sender, int step) =>
-        StepperStatus.Text = L($"Step {step + 1} is active.", $"当前为第 {step + 1} 步。");
-
-    private void StepperContinue(object? sender, int step)
-    {
-        if (step >= 2) StepperStatus.Text = L("Flow completed.", "流程已完成。");
-    }
-
-    private void StartRefresh(object? sender, RoutedEventArgs e) => DemoRefresh.BeginRefresh();
-
-    private void RefreshRequested(object? sender, EventArgs e)
-    {
-        RefreshStatus.Text = L("Refreshing…", "正在刷新…");
-        _refreshTimer.Stop();
-        _refreshTimer.Start();
-    }
-
-    private void PagedTableChanged(object? sender, MdPageChangedEventArgs e) =>
-        PagedStatus.Text = L($"Page {e.PageIndex + 1}; first row index {e.FirstRowIndex}.", $"第 {e.PageIndex + 1} 页；首行索引 {e.FirstRowIndex}。");
-
-    private void MoveReorderUp(object? sender, RoutedEventArgs e) => ReorderList.MoveSelectedUp();
-    private void MoveReorderDown(object? sender, RoutedEventArgs e) => ReorderList.MoveSelectedDown();
-
-    private void ReorderCompleted(object? sender, MdReorderEventArgs e)
-    {
-        var item = ReorderList.SelectedItem is TextBlock text ? text.Text : ReorderList.SelectedItem?.ToString();
-        ReorderStatus.Text = L($"Moved {item ?? "item"} from {e.OldIndex + 1} to {e.NewIndex + 1}.", $"已将 {item ?? "项目"} 从第 {e.OldIndex + 1} 位移动到第 {e.NewIndex + 1} 位。");
-    }
-
-    private void OpenGridTile(object? sender, RoutedEventArgs e)
-    {
-        AuroraTile.Activate();
-        GridTileStatus.Text = L("Opened Aurora dashboard project · the primary outline marks the active tile.", "已打开 Aurora 仪表板项目 · 主色描边表示当前活动磁贴。");
-    }
-
-    private void GridTileBarInvoked(object? sender, EventArgs e)
-    {
-        AuroraTile.IsActivated = true;
-        GridTileStatus.Text = L("Opened Aurora project details from GridTileBar.", "已从 GridTileBar 打开 Aurora 项目详情。");
-    }
-
-    private void ToggleGridTileFavorite(object? sender, RoutedEventArgs e)
-    {
-        _gridTileFavorite = !_gridTileFavorite;
-        AuroraTile.IsFavorite = _gridTileFavorite;
-        GridTileStatus.Text = _gridTileFavorite
-            ? L("Aurora dashboard added to favorites · the tertiary badge is visible.", "已收藏 Aurora 仪表板 · 三级色徽标已显示。")
-            : L("Aurora dashboard removed from favorites.", "已取消收藏 Aurora 仪表板。");
-        e.Handled = true;
-    }
-
-    private void DismissibleDismissed(object? sender, EventArgs e) => DialogStatus.Text = L("Dismissible action completed.", "可滑动移除操作已完成。");
-    private void RestoreDismissible(object? sender, RoutedEventArgs e) => DismissibleDemo.Restore();
 
     private void FormNameChanged(object? sender, TextChangedEventArgs e)
     {
@@ -316,6 +218,4 @@ public partial class FlutterParityGalleryPage : UserControl
         _heroExpanded = !_heroExpanded;
         _heroTransitionRunning = false;
     }
-
-    private sealed record PackageRow(string Name, string Platform, int Score);
 }

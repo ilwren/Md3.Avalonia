@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.PaginatedDataTableGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Paginated data table" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A data table that pages its rows, reporting the page index and first row index as the user moves through them." />
+      </StackPanel>
+
+      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
+        <md:MdPaginatedDataTable x:Name="PagedTable" Height="310" RowsPerPage="3" PageChanged="PagedTableChanged">
+          <md:MdPaginatedDataTable.Header>
+            <Grid ColumnDefinitions="2*,*,*"><TextBlock FontWeight="Medium" Text="Package" /><TextBlock Grid.Column="1" FontWeight="Medium" Text="Platform" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" FontWeight="Medium" Text="Score" /></Grid>
+          </md:MdPaginatedDataTable.Header>
+          <md:MdPaginatedDataTable.ItemTemplate>
+            <DataTemplate x:CompileBindings="False">
+              <Grid Margin="4" ColumnDefinitions="2*,*,*"><TextBlock Text="{Binding Name}" /><TextBlock Grid.Column="1" Text="{Binding Platform}" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="{Binding Score}" /></Grid>
+            </DataTemplate>
+          </md:MdPaginatedDataTable.ItemTemplate>
+        </md:MdPaginatedDataTable>
+        <TextBlock x:Name="PagedStatus" Classes="body" Text="Rows 1–3" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdPaginatedDataTable RowsPerPage=&quot;5&quot;&#10;                         ItemsSource=&quot;{Binding Rows}&quot;&#10;                         PageChanged=&quot;OnPageChanged&quot; /&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

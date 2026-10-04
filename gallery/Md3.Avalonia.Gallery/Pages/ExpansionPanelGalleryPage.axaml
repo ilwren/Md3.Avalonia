@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.ExpansionPanelGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Expansion panels" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Expansion panels edit lightweight settings in place. AllowMultiple decides whether opening one closes the others." />
+      </StackPanel>
+
+      <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
+        <md:MdExpansionPanelList AllowMultiple="False">
+          <md:MdExpansionPanel Header="Account details" IsExpanded="True">
+            <TextBlock TextWrapping="Wrap" Text="Edit lightweight settings without navigating away from the current page." />
+          </md:MdExpansionPanel>
+          <md:MdExpansionPanel Header="Notification preferences">
+            <StackPanel Spacing="8"><md:MdSwitch Content="Product updates" IsChecked="True" /><md:MdSwitch Content="Security alerts" IsChecked="True" /></StackPanel>
+          </md:MdExpansionPanel>
+          <md:MdExpansionPanel Header="Danger zone">
+            <md:MdButton HorizontalAlignment="Left" Content="Delete local cache" Variant="Outlined" />
+          </md:MdExpansionPanel>
+        </md:MdExpansionPanelList>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdExpansionPanelList AllowMultiple=&quot;False&quot;&gt;&#10;  &lt;md:MdExpansionPanel Header=&quot;Account&quot; IsExpanded=&quot;True&quot;&gt;&#10;    &lt;TextBlock Text=&quot;Panel body&quot; /&gt;&#10;  &lt;/md:MdExpansionPanel&gt;&#10;&lt;/md:MdExpansionPanelList&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

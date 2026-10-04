@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.RefreshIndicatorGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Pull to refresh" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Pull the list down, or call BeginRefresh, and the host completes the gesture when its work is done." />
+      </StackPanel>
+
+      <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
+        <md:MdButton Width="150" HorizontalAlignment="Left" Content="Simulate refresh" Variant="Outlined" Click="StartRefresh" />
+        <md:MdRefreshIndicator x:Name="DemoRefresh" Height="240" RefreshRequested="RefreshRequested">
+          <md:MdScrollViewer Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="16" Spacing="8">
+              <TextBlock x:Name="RefreshStatus" FontWeight="Medium" Text="Pull down from the top" />
+              <TextBlock Text="Release after the indicator is armed." />
+              <Border Height="72" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="12" />
+              <Border Height="72" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="12" />
+              <Border Height="72" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="12" />
+            </StackPanel>
+          </md:MdScrollViewer>
+        </md:MdRefreshIndicator>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdRefreshIndicator RefreshRequested=&quot;OnRefreshRequested&quot;&gt;&#10;  &lt;ListBox ItemsSource=&quot;{Binding Items}&quot; /&gt;&#10;&lt;/md:MdRefreshIndicator&gt;&#10;&#10;&lt;!-- the host calls CompleteRefresh() when its work is done --&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

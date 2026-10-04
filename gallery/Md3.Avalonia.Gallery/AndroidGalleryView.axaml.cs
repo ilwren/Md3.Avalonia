@@ -66,6 +66,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("FABs", () => new FabGalleryPage());
         AddPage("App bars", () => new AppBarGalleryPage());
         AddPage("Badges", () => new BadgeGalleryPage());
+        AddPage("Banner", () => new BannerGalleryPage());
         AddPage("Breadcrumbs", () => new BreadcrumbGalleryPage());
         AddPage("Text fields", () => new TextBoxGalleryPage());
         AddPage("Checkbox", () => new CheckBoxGalleryPage());
@@ -76,11 +77,18 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Chips", () => new ChipGalleryPage());
         AddPage("Date and time pickers", () => new PickerGalleryPage());
         AddPage("Color picker", () => new ColorPickerGalleryPage());
+        AddPage("Data table", () => new DataTableGalleryPage());
+        AddPage("Paginated table", () => new PaginatedDataTableGalleryPage());
         AddPage("Dialogs", () => new DialogGalleryPage());
+        AddPage("Dismissible", () => new DismissibleGalleryPage());
         AddPage("Divider", () => new DividerGalleryPage());
+        AddPage("Expansion panels", () => new ExpansionPanelGalleryPage());
+        AddPage("Grid tiles", () => new GridTileGalleryPage());
         AddPage("Lists", () => new ListGalleryPage());
         AddPage("Loading", () => new LoadingGalleryPage());
         AddPage("Progress", () => new ProgressGalleryPage());
+        AddPage("Pull to refresh", () => new RefreshIndicatorGalleryPage());
+        AddPage("Reorderable list", () => new ReorderableListGalleryPage());
         AddPage("Menus", () => new MenuGalleryPage());
         AddPage("Navigation bar", () => new NavigationBarGalleryPage());
         AddPage("Navigation drawer", () => new NavigationDrawerGalleryPage());
@@ -89,6 +97,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Settings cards", () => new SettingsCardGalleryPage());
         AddPage("Sheets", () => new SheetGalleryPage());
         AddPage("Slider", () => new SliderGalleryPage());
+        AddPage("Stepper", () => new StepperGalleryPage());
         AddPage("Segmented and range", () => new AdvancedSelectionGalleryPage());
         AddPage("Snackbar", () => new SnackbarGalleryPage());
         AddPage("Switch", () => new SwitchGalleryPage());

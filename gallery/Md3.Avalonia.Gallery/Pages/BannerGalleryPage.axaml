@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.BannerGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Banner" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A Material banner carries a persistent message with up to two actions. It stays until an action is taken rather than timing out like a snackbar." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <md:MdButton Width="140" HorizontalAlignment="Left" Content="Show banner" Variant="Outlined" Click="ShowBanner" />
+        <md:MdBanner x:Name="DemoBanner" IsDismissible="True" Dismissed="BannerDismissed">
+          <md:MdBanner.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.Warning}" Size="28" /></md:MdBanner.LeadingContent>
+          <md:MdBanner.Actions>
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <md:MdButton Content="Learn more" Variant="Text" Click="BannerAction" />
+              <md:MdButton Content="Retry" Variant="Text" Click="BannerAction" />
+            </StackPanel>
+          </md:MdBanner.Actions>
+          <TextBlock TextWrapping="Wrap" Text="Your changes could not be synchronized. The banner remains visible until an action is taken." />
+        </md:MdBanner>
+        <TextBlock x:Name="BannerStatus" Classes="body" Text="Banner ready." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdBanner IsDismissible=&quot;True&quot; Dismissed=&quot;OnDismissed&quot;&gt;&#10;  &lt;md:MdBanner.Actions&gt;&#10;    &lt;md:MdButton Content=&quot;Retry&quot; Variant=&quot;Text&quot; Click=&quot;OnAction&quot; /&gt;&#10;  &lt;/md:MdBanner.Actions&gt;&#10;  &lt;TextBlock Text=&quot;Could not sync your changes.&quot; /&gt;&#10;&lt;/md:MdBanner&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

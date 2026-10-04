@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.StepperGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Stepper" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A stepper walks through an ordered flow, reporting the active step and when the last one is confirmed." />
+      </StackPanel>
+
+      <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
+        <md:MdStepper x:Name="DemoStepper" ActiveStepChanged="StepperChanged" ContinueRequested="StepperContinue">
+          <md:MdStep Header="Choose a plan" Subtitle="Select the deployment tier" State="Complete">
+            <md:MdComboBox x:Name="PlanBox" Width="280" HorizontalAlignment="Left" Label="Plan" SelectedIndex="0" />
+          </md:MdStep>
+          <md:MdStep Header="Configure" Subtitle="Set application preferences" State="Editing">
+            <StackPanel Spacing="8"><md:MdSwitch Content="Enable telemetry" /><md:MdSwitch Content="Use dynamic color" IsChecked="True" /></StackPanel>
+          </md:MdStep>
+          <md:MdStep Header="Review" Subtitle="Confirm and create">
+            <TextBlock Text="Review the values, then press Continue to finish." />
+          </md:MdStep>
+        </md:MdStepper>
+        <TextBlock x:Name="StepperStatus" Classes="body" Text="Step 1 is active." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdStepper ActiveStepChanged=&quot;OnStepChanged&quot; ContinueRequested=&quot;OnContinue&quot;&gt;&#10;  &lt;md:MdStep Header=&quot;Choose a plan&quot; Subtitle=&quot;Select the tier&quot; State=&quot;Complete&quot;&gt;&#10;    &lt;md:MdComboBox Label=&quot;Plan&quot; /&gt;&#10;  &lt;/md:MdStep&gt;&#10;&lt;/md:MdStepper&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

@@ -47,7 +47,9 @@ public partial class MainWindow : Window
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
             NavigationDrawerNav, AdaptiveNav, SearchNav, SettingsCardNav, SheetNav, SliderNav, AdvancedSelectionNav,
             SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, FlutterParityNav, EcosystemNav, BorderlessWindowNav,
-            DesktopAdaptersNav, ThemeResourcesNav, SymbolsNav, MotionNav
+            NumericNav, DesktopAdaptersNav, ThemeResourcesNav, SymbolsNav, MotionNav,
+            BannerNav, DataTableNav, PaginatedTableNav, DismissibleNav, ExpansionPanelNav,
+            GridTileNav, RefreshNav, ReorderableListNav, StepperNav
         ];
         _topNavigationButtons = [GetStartedTopNav, DevelopTopNav, FoundationsTopNav, StylesTopNav, ComponentsTopNav];
         _galleryIndex =
@@ -89,14 +91,23 @@ public partial class MainWindow : Window
             Entry("Tabs", "tabs tab view", TabNav, () => new TabGalleryPage()),
             Entry("Toolbars", "toolbar dock floating", ToolbarNav, () => new ToolbarGalleryPage()),
             Entry("Tooltips", "tooltip rich plain", TooltipNav, () => new TooltipGalleryPage()),
-            Entry("Flutter parity", "banner expansion panel paginated table reorder form dialog adaptive hero focus shortcut sheet refresh", FlutterParityNav, () => new FlutterParityGalleryPage()),
+            Entry("Flutter parity", "form validation simple dialog about licenses restoration draggable sheet keyboard adaptive hero focus shortcut", FlutterParityNav, () => new FlutterParityGalleryPage()),
             Entry("Flutter ecosystem", "third party avatar rating breadcrumb clean room chart chat calendar transfer masonry data grid skeleton command palette", EcosystemNav, () => new EcosystemGalleryPage()),
             Entry("Borderless windows", "custom chrome title bar caption drag resize platform adapter", BorderlessWindowNav, () => new BorderlessWindowGalleryPage()),
             Entry("Numeric input", "numeric number stepper spinner increment decrement quantity", NumericNav, () => new NumericGalleryPage()),
             Entry("Desktop adapters", "scrollbar autocomplete window surface text focus", DesktopAdaptersNav, () => new DesktopAdaptersGalleryPage()),
             Entry("Theme Lab", "theme color seed hct contrast json shape font", ThemeResourcesNav, () => new ThemeResourcesGalleryPage()),
             Entry("Material Symbols", "icons glyph copy symbols", SymbolsNav, () => new SymbolGalleryPage()),
-            Entry("Motion", "animation ripple spring easing", MotionNav, () => new MotionGalleryPage())
+            Entry("Motion", "animation ripple spring easing", MotionNav, () => new MotionGalleryPage()),
+            Entry("Banner", "banner message action persistent dismiss", BannerNav, () => new BannerGalleryPage()),
+            Entry("Data table", "data table sort column header rows", DataTableNav, () => new DataTableGalleryPage()),
+            Entry("Paginated table", "paginated data table rows per page pagination", PaginatedTableNav, () => new PaginatedDataTableGalleryPage()),
+            Entry("Dismissible", "dismissible swipe to dismiss restore slidable", DismissibleNav, () => new DismissibleGalleryPage()),
+            Entry("Expansion panels", "expansion panel accordion expand collapse", ExpansionPanelNav, () => new ExpansionPanelGalleryPage()),
+            Entry("Grid tiles", "grid tile bar media footer favorite", GridTileNav, () => new GridTileGalleryPage()),
+            Entry("Pull to refresh", "refresh indicator pull to refresh swipe reload", RefreshNav, () => new RefreshIndicatorGalleryPage()),
+            Entry("Reorderable list", "reorderable list drag reorder move up down", ReorderableListNav, () => new ReorderableListGalleryPage()),
+            Entry("Stepper", "stepper wizard steps flow continue", StepperNav, () => new StepperGalleryPage())
         ];
 
         ThemeSelector.ItemsSource = new[] { "Light", "Dark", "System" };
@@ -176,6 +187,15 @@ public partial class MainWindow : Window
     private void ShowThemeResources(object? s, RoutedEventArgs e) => Navigate(new ThemeResourcesGalleryPage(), ThemeResourcesNav);
     private void ShowSymbols(object? s, RoutedEventArgs e) => Navigate(new SymbolGalleryPage(), SymbolsNav);
     private void ShowMotion(object? s, RoutedEventArgs e) => Navigate(new MotionGalleryPage(), MotionNav);
+    private void ShowBanner(object? s, RoutedEventArgs e) => Navigate(new BannerGalleryPage(), BannerNav);
+    private void ShowDataTable(object? s, RoutedEventArgs e) => Navigate(new DataTableGalleryPage(), DataTableNav);
+    private void ShowPaginatedTable(object? s, RoutedEventArgs e) => Navigate(new PaginatedDataTableGalleryPage(), PaginatedTableNav);
+    private void ShowDismissible(object? s, RoutedEventArgs e) => Navigate(new DismissibleGalleryPage(), DismissibleNav);
+    private void ShowExpansionPanels(object? s, RoutedEventArgs e) => Navigate(new ExpansionPanelGalleryPage(), ExpansionPanelNav);
+    private void ShowGridTiles(object? s, RoutedEventArgs e) => Navigate(new GridTileGalleryPage(), GridTileNav);
+    private void ShowRefresh(object? s, RoutedEventArgs e) => Navigate(new RefreshIndicatorGalleryPage(), RefreshNav);
+    private void ShowReorderableList(object? s, RoutedEventArgs e) => Navigate(new ReorderableListGalleryPage(), ReorderableListNav);
+    private void ShowStepper(object? s, RoutedEventArgs e) => Navigate(new StepperGalleryPage(), StepperNav);
 
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {

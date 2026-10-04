@@ -76,6 +76,35 @@ had to change beyond colour: `MaterialTheme` is standalone and the app loads no 
 so every `System*` brush and the Fluent-derived cell editor theme would have failed to resolve
 and rendered an invisible grid.
 
+### 12 · one page per component — batch 1 of the incremental split
+
+`FlutterParityGalleryPage` carried eighteen unrelated components in one 305-line scroll, which is
+the worst instance of the problem: nothing on it could be found, linked to, or reviewed on its own.
+The eight most loosely coupled sections now have their own pages, nine in total because
+`MdReorderableList` and `MdGridTile` were sharing a single two-column section:
+
+Banner · Expansion panels · Data table · Paginated table · Stepper · Pull to refresh ·
+Reorderable list · Grid tiles · Dismissible
+
+Each one is a normal gallery page — h1, a description, the live demo, and a usage snippet checked
+against the real API rather than copied from the old page. Four of the snippets were wrong before
+they were checked: the data table one referenced an `MdDataColumn` type that does not exist, and
+the stepper one used `StepChanged` and `Title` instead of `ActiveStepChanged` and `Header`.
+
+Splitting also surfaced a real cross-section bug: `DismissibleDismissed` wrote its status into
+`DialogStatus`, the status line of the *simple dialog* section several components further down,
+so dismissing the row appeared to do nothing. Each page now owns its own status line.
+
+What stays on `FlutterParityGalleryPage` is what genuinely spans several controls — form
+validation, the simple/about/licenses dialog flow, picker state restoration, the draggable sheet,
+the keyboard host, and the adaptive/hero/focus/shortcut workflow. Those six share
+`ActiveDialogHost`, `_simpleDialog`, `_licenses` and the hero state, so they move as later
+batches, not this one. The page lost its dev-era "Phase 3 ·" / "Phase 4 ·" heading prefixes and
+the stale `MinHeight="5200"` that sized it for the content it no longer holds.
+
+One pre-existing gap turned up next door: `NumericNav` was in the gallery index but missing from
+`_navigationButtons`, so its selected state was never cleared when navigating away. Added.
+
 ## Checked and found correct — no change made
 
 | # | Item | Evidence |
@@ -92,7 +121,7 @@ and rendered an invisible grid.
 
 ## Not yet investigated
 
-12 one page per parity component · 21 rich text (adapter-based) · 22 image compare (adapter-based)
+21 rich text (adapter-based) · 22 image compare (adapter-based)
 
 ## P0 mobile platform gaps
 
@@ -126,6 +155,8 @@ real. Worth a sweep of the Extra controls for missing template/presentation hook
 ## Agreed approach
 
 - **#12 page split**: incremental — pull each component onto its own page as it gets fixed, rather
-  than one big-bang restructure.
+  than one big-bang restructure. Batch 1 (nine pages) is done; the remaining `FlutterParity`
+  sections share dialog/hero state and follow in later batches, then `Ecosystem`,
+  `ComponentsOverview`, `DesktopAdapters`, `AdvancedSelection` and `Motion`.
 - **#21 / #22**: adapter-based. No third-party dependency in the library; ship the Material UI and
   an adapter seam, and let the gallery demo one implementation. `MdRichEditor` already has one.

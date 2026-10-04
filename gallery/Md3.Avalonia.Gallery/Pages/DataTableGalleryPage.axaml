@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.DataTableGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Data table" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A Material data table with sortable column headers. Sorting is reported to the host, which owns the ordering of ItemsSource." />
+      </StackPanel>
+
+      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
+        <md:MdDataTable x:Name="DemoTable" Height="280" IsStriped="True" SortRequested="TableSortRequested">
+          <md:MdDataTable.Header>
+            <Grid ColumnDefinitions="2*,*,*">
+              <md:MdButton Grid.Column="0" HorizontalAlignment="Left" Content="Package" Variant="Text" Tag="Package" Click="SortTable" />
+              <md:MdButton Grid.Column="1" HorizontalAlignment="Left" Content="Platform" Variant="Text" Tag="Platform" Click="SortTable" />
+              <md:MdButton Grid.Column="2" HorizontalAlignment="Right" Content="Downloads" Variant="Text" Tag="Downloads" Click="SortTable" />
+            </Grid>
+          </md:MdDataTable.Header>
+          <md:MdDataTableRow><Grid ColumnDefinitions="2*,*,*"><TextBlock Text="Md3.Avalonia" /><TextBlock Grid.Column="1" Text="All" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="24,810" /></Grid></md:MdDataTableRow>
+          <md:MdDataTableRow><Grid ColumnDefinitions="2*,*,*"><TextBlock Text="Gallery.Desktop" /><TextBlock Grid.Column="1" Text="Desktop" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="8,392" /></Grid></md:MdDataTableRow>
+          <md:MdDataTableRow><Grid ColumnDefinitions="2*,*,*"><TextBlock Text="Gallery.Android" /><TextBlock Grid.Column="1" Text="Android" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="6,147" /></Grid></md:MdDataTableRow>
+          <md:MdDataTableRow><Grid ColumnDefinitions="2*,*,*"><TextBlock Text="Theme.Tools" /><TextBlock Grid.Column="1" Text="All" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="3,920" /></Grid></md:MdDataTableRow>
+        </md:MdDataTable>
+        <TextBlock x:Name="SortStatus" Classes="body" Text="Select rows or a sortable heading." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdDataTable IsStriped=&quot;True&quot; SortRequested=&quot;OnSortRequested&quot;&gt;&#10;  &lt;md:MdDataTable.Header&gt;&#10;    &lt;md:MdButton Content=&quot;Package&quot; Tag=&quot;Package&quot; Variant=&quot;Text&quot; Click=&quot;OnHeaderClick&quot; /&gt;&#10;  &lt;/md:MdDataTable.Header&gt;&#10;  &lt;md:MdDataTableRow&gt;&#10;    &lt;TextBlock Text=&quot;Md3.Avalonia&quot; /&gt;&#10;  &lt;/md:MdDataTableRow&gt;&#10;&lt;/md:MdDataTable&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

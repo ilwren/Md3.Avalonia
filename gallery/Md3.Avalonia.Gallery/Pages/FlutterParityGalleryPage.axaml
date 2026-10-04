@@ -5,163 +5,15 @@
              x:Class="Md3.Avalonia.Gallery.Pages.FlutterParityGalleryPage">
   <Grid>
   <md:MdScrollViewer x:Name="StandalonePageScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <StackPanel MinHeight="5200" Spacing="28">
+    <StackPanel Spacing="28">
       <StackPanel Spacing="8">
-        <TextBlock Classes="h1" Text="Flutter Material parity · phases 1–4" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Official Flutter Material collection, form/dialog, advanced-surface, adaptive, focus, shortcut, and restoration patterns mapped to independent Avalonia controls." />
+        <TextBlock Classes="h1" Text="Flutter Material parity" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Flutter patterns that span several controls at once — forms, dialog flows, state restoration, adaptive surfaces, focus and shortcuts. Components that stand on their own have their own pages." />
       </StackPanel>
-
-      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
-      <StackPanel Spacing="12">
-        <TextBlock Classes="h2" Text="Material banner" />
-        <md:MdButton Width="140" HorizontalAlignment="Left" Content="Show banner" Variant="Outlined" Click="ShowBanner" />
-        <md:MdBanner x:Name="DemoBanner" IsDismissible="True" Dismissed="BannerDismissed">
-          <md:MdBanner.LeadingContent><md:MdIcon Glyph="{x:Static md:MdSymbols.Warning}" Size="28" /></md:MdBanner.LeadingContent>
-          <md:MdBanner.Actions>
-            <StackPanel Orientation="Horizontal" Spacing="4">
-              <md:MdButton Content="Learn more" Variant="Text" Click="BannerAction" />
-              <md:MdButton Content="Retry" Variant="Text" Click="BannerAction" />
-            </StackPanel>
-          </md:MdBanner.Actions>
-          <TextBlock TextWrapping="Wrap" Text="Your changes could not be synchronized. The banner remains visible until an action is taken." />
-        </md:MdBanner>
-        <TextBlock x:Name="BannerStatus" Classes="body" Text="Banner ready." />
-      </StackPanel>
-      </Border>
-
-      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
-      <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
-        <TextBlock Classes="h2" Text="Expansion panels" />
-        <md:MdExpansionPanelList AllowMultiple="False">
-          <md:MdExpansionPanel Header="Account details" IsExpanded="True">
-            <TextBlock TextWrapping="Wrap" Text="Edit lightweight settings without navigating away from the current page." />
-          </md:MdExpansionPanel>
-          <md:MdExpansionPanel Header="Notification preferences">
-            <StackPanel Spacing="8"><md:MdSwitch Content="Product updates" IsChecked="True" /><md:MdSwitch Content="Security alerts" IsChecked="True" /></StackPanel>
-          </md:MdExpansionPanel>
-          <md:MdExpansionPanel Header="Danger zone">
-            <md:MdButton HorizontalAlignment="Left" Content="Delete local cache" Variant="Outlined" />
-          </md:MdExpansionPanel>
-        </md:MdExpansionPanelList>
-      </StackPanel>
-      </Border>
 
       <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
-        <TextBlock Classes="h2" Text="Data table" />
-        <md:MdDataTable x:Name="DemoTable" Height="280" IsStriped="True" SortRequested="TableSortRequested">
-          <md:MdDataTable.Header>
-            <Grid ColumnDefinitions="2*,*,*">
-              <md:MdButton Grid.Column="0" HorizontalAlignment="Left" Content="Package" Variant="Text" Tag="Package" Click="SortTable" />
-              <md:MdButton Grid.Column="1" HorizontalAlignment="Left" Content="Platform" Variant="Text" Tag="Platform" Click="SortTable" />
-              <md:MdButton Grid.Column="2" HorizontalAlignment="Right" Content="Downloads" Variant="Text" Tag="Downloads" Click="SortTable" />
-            </Grid>
-          </md:MdDataTable.Header>
-          <md:MdDataTableRow><Grid ColumnDefinitions="2*,*,*"><TextBlock Text="Md3.Avalonia" /><TextBlock Grid.Column="1" Text="All" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="24,810" /></Grid></md:MdDataTableRow>
-          <md:MdDataTableRow><Grid ColumnDefinitions="2*,*,*"><TextBlock Text="Gallery.Desktop" /><TextBlock Grid.Column="1" Text="Desktop" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="8,392" /></Grid></md:MdDataTableRow>
-          <md:MdDataTableRow><Grid ColumnDefinitions="2*,*,*"><TextBlock Text="Gallery.Android" /><TextBlock Grid.Column="1" Text="Android" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="6,147" /></Grid></md:MdDataTableRow>
-          <md:MdDataTableRow><Grid ColumnDefinitions="2*,*,*"><TextBlock Text="Theme.Tools" /><TextBlock Grid.Column="1" Text="All" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="3,920" /></Grid></md:MdDataTableRow>
-        </md:MdDataTable>
-        <TextBlock x:Name="SortStatus" Classes="body" Text="Select rows or a sortable heading." />
-      </StackPanel>
-      </Border>
-
-      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
-      <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
-        <TextBlock Classes="h2" Text="Stepper" />
-        <md:MdStepper x:Name="DemoStepper" ActiveStepChanged="StepperChanged" ContinueRequested="StepperContinue">
-          <md:MdStep Header="Choose a plan" Subtitle="Select the deployment tier" State="Complete">
-            <md:MdComboBox x:Name="PlanBox" Width="280" HorizontalAlignment="Left" Label="Plan" SelectedIndex="0" />
-          </md:MdStep>
-          <md:MdStep Header="Configure" Subtitle="Set application preferences" State="Editing">
-            <StackPanel Spacing="8"><md:MdSwitch Content="Enable telemetry" /><md:MdSwitch Content="Use dynamic color" IsChecked="True" /></StackPanel>
-          </md:MdStep>
-          <md:MdStep Header="Review" Subtitle="Confirm and create">
-            <TextBlock Text="Review the values, then press Continue to finish." />
-          </md:MdStep>
-        </md:MdStepper>
-        <TextBlock x:Name="StepperStatus" Classes="body" Text="Step 1 is active." />
-      </StackPanel>
-      </Border>
-
-      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
-      <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
-        <TextBlock Classes="h2" Text="Pull to refresh" />
-        <md:MdButton Width="150" HorizontalAlignment="Left" Content="Simulate refresh" Variant="Outlined" Click="StartRefresh" />
-        <md:MdRefreshIndicator x:Name="DemoRefresh" Height="240" RefreshRequested="RefreshRequested">
-          <md:MdScrollViewer Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="16" Spacing="8">
-              <TextBlock x:Name="RefreshStatus" FontWeight="Medium" Text="Pull down from the top" />
-              <TextBlock Text="Release after the indicator is armed." />
-              <Border Height="72" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="12" />
-              <Border Height="72" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="12" />
-              <Border Height="72" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="12" />
-            </StackPanel>
-          </md:MdScrollViewer>
-        </md:MdRefreshIndicator>
-      </StackPanel>
-      </Border>
-
-      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
-      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
-        <TextBlock Classes="h2" Text="Phase 2 · paginated data table" />
-        <md:MdPaginatedDataTable x:Name="PagedTable" Height="310" RowsPerPage="3" PageChanged="PagedTableChanged">
-          <md:MdPaginatedDataTable.Header>
-            <Grid ColumnDefinitions="2*,*,*"><TextBlock FontWeight="Medium" Text="Package" /><TextBlock Grid.Column="1" FontWeight="Medium" Text="Platform" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" FontWeight="Medium" Text="Score" /></Grid>
-          </md:MdPaginatedDataTable.Header>
-          <md:MdPaginatedDataTable.ItemTemplate>
-            <DataTemplate x:CompileBindings="False">
-              <Grid Margin="4" ColumnDefinitions="2*,*,*"><TextBlock Text="{Binding Name}" /><TextBlock Grid.Column="1" Text="{Binding Platform}" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="{Binding Score}" /></Grid>
-            </DataTemplate>
-          </md:MdPaginatedDataTable.ItemTemplate>
-        </md:MdPaginatedDataTable>
-        <TextBlock x:Name="PagedStatus" Classes="body" Text="Rows 1–3" />
-      </StackPanel>
-      </Border>
-
-      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
-      <Grid Width="820" HorizontalAlignment="Left" ColumnDefinitions="*,*" ColumnSpacing="20">
-        <StackPanel Spacing="12">
-          <TextBlock Classes="h2" Text="Reorderable list" />
-          <TextBlock Classes="body" Text="Drag a row or use Ctrl+Up / Ctrl+Down. Buttons exercise the direct API." />
-          <md:MdReorderableList x:Name="ReorderList" Height="220" SelectionMode="Single" SelectedIndex="0"
-                                  ReorderCompleted="ReorderCompleted">
-            <TextBlock Text="Design tokens" /><TextBlock Text="Core controls" /><TextBlock Text="Gallery" /><TextBlock Text="Android validation" />
-          </md:MdReorderableList>
-          <StackPanel Orientation="Horizontal" Spacing="8"><md:MdButton Content="Move up" Variant="Outlined" Click="MoveReorderUp" /><md:MdButton Content="Move down" Variant="Outlined" Click="MoveReorderDown" /></StackPanel>
-          <TextBlock x:Name="ReorderStatus" Classes="body" Text="Selected: Design tokens · position 1 of 4" />
-        </StackPanel>
-        <StackPanel Grid.Column="1" Spacing="12">
-          <TextBlock Classes="h2" Text="GridTile and GridTileBar" />
-          <TextBlock Classes="body" Text="Open the project tile or use its trailing favorite action." />
-          <md:MdGridTile x:Name="AuroraTile" Height="220" AutomationProperties.Name="Open Aurora project" Click="OpenGridTile">
-            <Border Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"><StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"><md:MdIcon Glyph="{x:Static md:MdSymbols.Image}" Size="64" /><TextBlock Text="Project preview" /></StackPanel></Border>
-            <md:MdGridTile.Footer>
-              <md:MdGridTileBar Title="Aurora dashboard" Subtitle="Last edited 2 minutes ago" IsInteractive="True" Invoked="GridTileBarInvoked">
-                <md:MdGridTileBar.Trailing><md:MdIconButton Icon="{x:Static md:MdSymbols.Favorite}" ToolTip.Tip="Toggle favorite" Click="ToggleGridTileFavorite" /></md:MdGridTileBar.Trailing>
-              </md:MdGridTileBar>
-            </md:MdGridTile.Footer>
-          </md:MdGridTile>
-          <TextBlock x:Name="GridTileStatus" Classes="body" Text="No project action yet." />
-        </StackPanel>
-      </Grid>
-      </Border>
-
-      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
-      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
-        <TextBlock Classes="h2" Text="Dismissible" />
-        <md:MdDismissible x:Name="DismissibleDemo" Height="72" Dismissed="DismissibleDismissed">
-          <md:MdDismissible.BackgroundContent><Border Width="180" Padding="20" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"><TextBlock VerticalAlignment="Center" Text="Archive" /></Border></md:MdDismissible.BackgroundContent>
-          <md:MdDismissible.SecondaryBackgroundContent><Border Width="180" Padding="20" Background="{DynamicResource Md.Sys.Color.Error.Brush}"><TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Text="Delete" /></Border></md:MdDismissible.SecondaryBackgroundContent>
-          <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"><TextBlock VerticalAlignment="Center" Text="Swipe this notification in either direction" /></Border>
-        </md:MdDismissible>
-        <md:MdButton Width="110" HorizontalAlignment="Left" Content="Restore" Variant="Text" Click="RestoreDismissible" />
-      </StackPanel>
-      </Border>
-
-      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
-      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
-        <TextBlock Classes="h2" Text="Phase 3 · form validation" />
+        <TextBlock Classes="h2" Text="Form validation" />
         <md:MdForm x:Name="AccountForm" AutovalidateMode="OnUserInteraction" Submitted="FormSubmitted">
           <StackPanel Spacing="12">
             <md:MdFormField x:Name="NameField" IsRequired="True" SupportingText="Required display name">
@@ -203,7 +55,7 @@
 
       <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
-        <TextBlock Classes="h2" Text="Phase 4 · draggable scrollable sheet" />
+        <TextBlock Classes="h2" Text="Draggable scrollable sheet" />
         <Border Height="420" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="20" ClipToBounds="True">
           <md:MdDraggableScrollableSheet x:Name="DraggableSheet" MinimumExtent="0.25" InitialExtent="0.5" MaximumExtent="1" Snap="True" ExtentChanged="SheetExtentChanged">
             <md:MdDraggableScrollableSheet.Header><TextBlock FontWeight="Medium" Text="Drag to resize · scroll after expansion" /></md:MdDraggableScrollableSheet.Header>
@@ -216,7 +68,7 @@
 
       <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
       <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
-        <TextBlock Classes="h2" Text="Phase 4 · Soft keyboard avoidance host" />
+        <TextBlock Classes="h2" Text="Soft keyboard avoidance host" />
         <TextBlock Classes="body" Text="Simulate a virtual keyboard inset to verify that the host automatically adjusts viewport bottom padding and scrolls focused text controls into view." />
         <StackPanel Orientation="Horizontal" Spacing="8">
           <md:MdButton Content="Toggle virtual keyboard" Variant="Outlined" Click="ToggleVirtualKeyboard" />
