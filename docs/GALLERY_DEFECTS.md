@@ -12,6 +12,11 @@ need confirmation on a real desktop run.
 
 | # | Symptom | Root cause | Commit |
 |---|---------|-----------|--------|
+| 1 | Breadcrumb: the overlay covers the trail and no segment responds to a click | The ellipsis overflow popup was anchored to the whole control rather than to its own button, so it painted across the trail, and the segments were `TextBlock`s with no input surface. Both theme copies carried the same template and had to move together. | `8680142` |
+| 2 | Carousel: the caption text overflows and collides with the next item | Items were measured against the viewport instead of against the slot they actually occupy. Added a `ContentExtent` attached property and `GetArrangement()` so the item knows its own width before its text wraps. | `8680142` |
+| 5 | Segmented button: in the usage sample the selected item's label sits off-centre | Only the icon slot collapsed when an item had no icon, so a selected item reserved space for a check mark its neighbours did not. Keyed on a new `^:selected:has-selected-icon` state so the reservation matches what is drawn. | `8680142` |
+| 7 | Settings expander: the header's padding does not match the cards around it | `Padding` was consumed by the inner `PART_ContentArea` (`16,8`) while the header's own root `Grid` ignored it, so the two surfaces indented differently. The ToggleButton root now takes `Padding` and the content area drops to `0,4`. | `8680142` |
+| 27 | Container transform and animated visibility do not animate; they snap | The four motion controls toggled `IsVisible`, which is not a transition. Rebuilt on two new primitives: `MdRevealHost` yields layout space and clips as a fraction, `MdMorphPanel` interpolates between two children's measured extents. Shared axis now slides 30 DIP, fade-through scales from 0.92, container transform cross-fades 30/70 while its corner radius travels. Content that is already a `Control` is not re-parented, so it animates in place without an exit cross-fade. | `8680142` |
 | 3 | Nav bar / rail: the pressed overlay has square corners over a rounded indicator | The ripple sat in a `Grid` with `ClipToBounds`, and a Grid clips to a **rectangle**. Now clipped by a `Border` carrying the pill's corner radius. Rail had the same template. | `0e30402` |
 | 4 | Expanded search: after choosing a result, clearing and retyping never reopens the list | `MdSearchView` only hooked `KeyDown`; nothing watched the text. `CommitResult` writes the chosen text and dismisses, so only a host `Show()` could reopen it. Now reopens on header `TextChanged`, guarded by focus and by the committed text. | `6ec505a`, `bb36f45` |
 | 6 | `FontSize` on a settings card / group / expander title does nothing | The templates wrote `FontSize="16"/"14"` **directly on the presenters**. A literal inside a template outranks any value from outside. Moved to `ControlTheme` setters + `{TemplateBinding FontSize}`; defaults unchanged, now overridable. | `0e30402` |
@@ -52,10 +57,31 @@ window for a row needing 288, so it pinned the overflow behaviour that caused #2
 
 ## Not yet investigated
 
-1 breadcrumb overlay + no interaction · 2 carousel text layout · 5 usage button alignment ·
-7 expander margins · 12 one page per parity component · 15 AboutDialog auto-fill ·
-19 selection rendering · 21 rich text (adapter-based) · 22 image compare (adapter-based) ·
-27 container transform / animated visibility don't animate
+12 one page per parity component · 15 AboutDialog auto-fill · 19 selection rendering ·
+21 rich text (adapter-based) · 22 image compare (adapter-based)
+
+## P0 mobile platform gaps
+
+Not gallery defects — these came out of the component audit and block Android use outright.
+
+| # | Gap | Resolution | Commit |
+|---|-----|-----------|--------|
+| P0-1 | 23 `Key.Escape` dismissals across 18 files, and nothing listening to `TopLevel.BackRequested`. On Android the system back button and the predictive back gesture could not close a single modal surface; back popped the activity instead. | `MdBackNavigation` keeps a per-`TopLevel` handler stack (`ConditionalWeakTable`, so nothing is kept alive) and offers a back request to the most recently registered surface first, marking the routed event handled once one consumes it. `MdBackScope` registers a surface only while it is both open and attached. Wired into `MdDialogHost`, `MdSheetHost`, `MdNavigationDrawer`, `MdSearchView`, `MdMenuAnchor`, `MdFabMenu`, `MdDatePicker`, `MdTimePicker` — each dismissing exactly where it dismisses on Escape, so a non-modal sheet still lets the request fall through. | `26eb03d` |
+| P0-2 | No use of `IInsetsManager` anywhere. Avalonia's automatic root padding is all-or-nothing, so a top app bar could not paint behind the status bar and a bottom bar could not paint behind the gesture handle. | `MdSafeArea` insets per edge, with a `MinimumPadding` floor and a settable `SafeAreaPadding` so a layout can be previewed and tested without a device. Edge-to-edge is `TopLevel.AutoSafeAreaPadding="False"` plus this control on the parts that must stay clear. | `26eb03d` |
+
+Both are covered by `tests/Md3.Avalonia.HeadlessTests/MdMobilePlatformTests.cs` (22 tests). Gesture
+animation on a real device and cutout geometry still need manual sign-off.
+
+### Found while doing this
+
+- **A modal surface opened before it is attached deadlocks the UI thread.** With `IsOpen = true`
+  set in an object initializer, `MdModalFocusController` arms a focus redirect that re-posts
+  itself, and `Dispatcher.RunJobs()` never drains — the headless suite ran 45 minutes against a
+  1m48s baseline instead of failing. Every existing test happens to open these surfaces after the
+  window is shown, which is why it had never been hit. Worth fixing in the controller: the
+  redirect should give up rather than re-arm when the scope cannot take focus.
+- **CI had no job timeouts**, so that deadlock would have held a runner for GitHub's six-hour
+  default. Both jobs are now bounded (`timeout-minutes: 8` / `10`).
 
 ## API gaps found while fixing
 

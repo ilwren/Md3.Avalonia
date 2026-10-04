@@ -1,5 +1,32 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- **Android system back.** `MdBackNavigation` routes `TopLevel.BackRequested` to the top-most
+  open Material surface, newest first, and marks the event handled so the activity is not popped
+  behind it. `MdDialogHost`, `MdSheetHost`, `MdNavigationDrawer`, `MdSearchView`, `MdMenuAnchor`,
+  `MdFabMenu`, `MdDatePicker` and `MdTimePicker` opt in automatically; `MdBackScope` lets any
+  other surface join.
+- **Safe area insets.** `MdSafeArea` insets content past the status bar, a display cutout, the
+  navigation bar and the gesture handle, with per-edge control (`MdSafeAreaEdges`), a
+  `MinimumPadding` floor and a settable `SafeAreaPadding` for previewing a layout without a
+  device.
+- `MdRevealHost` and `MdMorphPanel`, the layout primitives behind the rebuilt motion controls.
+
+### Changed
+
+- The four motion controls (`MdSharedAxis`, `MdFadeThrough`, `MdContainerTransform`,
+  `MdAnimatedVisibility`) now animate rather than toggling `IsVisible`, and are no longer marked
+  experimental.
+- Gallery fixes: breadcrumb overflow anchoring and clickable segments, carousel item measurement,
+  segmented-button icon reservation, settings-expander header padding.
+
+### Fixed
+
+- CI jobs are bounded by a timeout; a deadlocked test previously held a runner for six hours.
+
 ## [0.3.5-preview.1] - 2026-10-04
 
 Previously numbered `3.1.0-preview.1`, which was a typo for `0.3.1-preview.1`. The packages
