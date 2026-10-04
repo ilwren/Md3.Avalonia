@@ -22,6 +22,9 @@ public partial class PaginatedDataTableGalleryPage : UserControl
         };
     }
 
+    // Moved here with the section: the row shape is this page's alone.
+    private sealed record PackageRow(string Name, string Platform, int Score);
+
     private void PagedTableChanged(object? sender, MdPageChangedEventArgs e) =>
         PagedStatus.Text = L($"Page {e.PageIndex + 1}; first row index {e.FirstRowIndex}.", $"第 {e.PageIndex + 1} 页；首行索引 {e.FirstRowIndex}。");
 }
