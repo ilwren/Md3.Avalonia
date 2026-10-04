@@ -661,6 +661,45 @@ public sealed class MdReportedIssuesTests
     }
 
     [AvaloniaFact]
+    public void Simple_Dialog_Options_Run_Edge_To_Edge_With_M3_Spacing()
+    {
+        // The other half of the same report: the options were inset by the surface's own 24 of
+        // padding, so a row's hover and selection layers stopped short of the dialog edge and the
+        // title/option rhythm was a flat 12 everywhere. M3 composes it the way Flutter's
+        // SimpleDialog does - title padded 24/24/24/0, content 0/12/0/16, option 24/8 - which puts
+        // 20 between the title and the first option and 24 under the last, with the option's own
+        // padding supplying the side inset so its state layer spans the full width.
+        var dialog = new MdSimpleDialog
+        {
+            Title = "Set backup account",
+            ItemsSource = new[] { "material@example.com", "avalonia@example.com" },
+            IsOpen = true
+        };
+        using var host = Show(dialog, 700, 520);
+        Dispatcher.UIThread.RunJobs();
+
+        var surface = dialog.GetVisualDescendants().OfType<Border>().Single(b => b.Name == "PART_Surface");
+        var items = dialog.GetVisualDescendants().OfType<SelectingItemsControl>().Single(c => c.Name == "PART_ItemsHost");
+        var option = items.GetVisualDescendants().OfType<ListBoxItem>().First();
+
+        Assert.Equal(new Thickness(24, 8), option.Padding);
+        Assert.Equal(new CornerRadius(0), option.CornerRadius);
+
+        // Full bleed: the row starts at the surface's edge and is as wide as it is.
+        var offset = option.TranslatePoint(default, surface);
+        Assert.NotNull(offset);
+        Assert.Equal(0d, offset!.Value.X, 1);
+        Assert.Equal(surface.Bounds.Width, option.Bounds.Width, 1);
+
+        // And the title collapses when there is none instead of leaving its 24/24 behind.
+        var untitled = new MdSimpleDialog { ItemsSource = new[] { "One" }, IsOpen = true };
+        using var untitledHost = Show(untitled, 700, 520);
+        Dispatcher.UIThread.RunJobs();
+        var title = untitled.GetVisualDescendants().OfType<ContentPresenter>().Single(p => p.Name == "PART_Title");
+        Assert.False(title.IsVisible);
+    }
+
+    [AvaloniaFact]
     public void Expanded_Search_Reopens_When_The_Header_Is_Typed_In_Again()
     {
         // Reported from the gallery: choose a result, clear the field, type again, and the
