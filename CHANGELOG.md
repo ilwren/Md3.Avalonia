@@ -46,6 +46,11 @@
   segmented-button icon reservation, settings-expander header padding.
 
 ### Fixed
+- `MdBeforeAfter`: `DividerBrush` is honoured instead of being overridden by a literal in the
+  template, `PositionChanged` is raised for keyboard and binding changes rather than only for
+  pointer drags, and `IsInteractive="False"` now makes the control a non-tab-stop that ignores the
+  arrow keys as well as the pointer. The gallery page compares two photographs instead of the
+  words "BEFORE" and "AFTER" (gallery defect 22).
 - Simple dialog options run edge to edge with the M3 spacing (title 24/24/24/0, content
   0/12/0/16, option 24/8). The surface's own padding used to inset the list, so a row's hover and
   selection layers stopped short of the dialog edge. `MdFlutterListItemTheme` now takes its corner

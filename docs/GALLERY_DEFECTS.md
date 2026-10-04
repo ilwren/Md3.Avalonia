@@ -209,11 +209,28 @@ missing from the Android single-view shell, so numeric input was unreachable on 
 Fifty-two components that could only be reached by scrolling a shared page now have their own
 page, nav entry, search keywords and usage snippet. The gallery went from 48 pages to 97.
 
+### 22 · image comparison — the control was fine, the page compared two words
+
+`MdBeforeAfter` wiped its divider between the strings `"BEFORE"` and `"AFTER"`. Nothing about that
+reads as an image comparison, which is why it was reported as missing. The page now compares two
+grades of one photograph — ungraded and graded, pixel-aligned — with a slider bound to `Position`
+beside it, a vertical example with a thicker divider, and a non-image example to show both layers
+take arbitrary content.
+
+Commits `f2d00e4`, `ef308b5`. Building the demo found three defects in the control itself:
+
+| Defect | Cause | Fix |
+|--------|-------|-----|
+| `DividerBrush` did nothing | The template painted the divider with a literal `Md.Sys.Color.Primary.Brush`, which outranks any value from outside — defect 6's trap again | Moved to a `ControlTheme` setter with the old literal as the default; the template uses `{TemplateBinding DividerBrush}` |
+| `PositionChanged` was silent for the keyboard and for bindings | It was raised from the pointer handler rather than from the property | Raised from the `PositionProperty` class handler, so every path reports |
+| `IsInteractive="False"` was still a tab stop whose divider moved | The flag gated the pointer only | It also sets a `:non-interactive` pseudo-class the theme keys `Focusable` off, and the key handler returns early. `SetCurrentValue(FocusableProperty, …)` was tried first and lost to the theme setter the moment the theme was applied on attach |
+
 ## Checked and found correct — no change made
 
 | # | Item | Evidence |
 |---|------|----------|
 | 8 | Slider's water-drop is dark in light mode | This is correct M3. material-components-android's `Slider.md` lists the value label's style as `@style/Widget.Material3.Tooltip` and notes "The value label is a Tooltip"; independently spec-sourced M3 implementations record the value indicator as `inverseSurface` / `inverseOnSurface`. Dark in light mode is the intent, exactly like a tooltip or snackbar. |
+| 21 | Rich text editing is missing | Already shipped under the agreed approach. `MdRichEditor` supplies the Material toolbar, command descriptors, glyphs, shortcuts and toggle state; `IMdRichEditorAdapter` / `IMdRichEditorStateAdapter` are the seam; `MdTextBoxRichEditorAdapter` is a working markdown implementation over a plain `TextBox` with undo/redo, selection wrapping, line prefixing and a live preview, and the gallery page demos it. No editor engine is pulled into the library, which was the point. |
 | 28b | Numeric `+`/`−` pair sits too low | **I changed this and was wrong.** The hand-tuned 15 DIP top margin looked like 8 too much, since the input row is 56 and the panel 42 (centring at 7). The regression test reported a button origin of −1 relative to `PART_Container`, which proves the container starts 8 DIP down, under the label: 15 = 8 + 7, already centred. Reverted, with the arithmetic now written into the template. |
 
 ### 9 · pickers "don't apply the selection" — the rule was right, the page hid it
@@ -248,10 +265,6 @@ pins the half that was never covered — docked commits, dial does not — so th
 | # | Item | Finding |
 |---|------|---------|
 | 26 | Borderless window corners missing | Depends on OS-level window shaping (transparency hints, DWM rounded corners, the platform adapters) — not observable or testable headless. Needs a desktop run to diagnose rather than a guess. |
-
-## Not yet investigated
-
-21 rich text (adapter-based) · 22 image compare (adapter-based)
 
 ## P0 mobile platform gaps
 
@@ -321,9 +334,10 @@ focus reaches the scope, so a surface that simply needed a layout pass recovers.
 
 ## Agreed approach
 
-- **#12 page split**: incremental — pull each component onto its own page as it gets fixed, rather
-  than one big-bang restructure. `FlutterParity` is fully split (seventeen pages over two
-  batches) and the page is gone. Still crowded, in descending order: `Ecosystem` (9 sections),
-  `ComponentsOverview` (7), `DesktopAdapters` (5), `AdvancedSelection` (5), `Motion` (4).
-- **#21 / #22**: adapter-based. No third-party dependency in the library; ship the Material UI and
-  an adapter seam, and let the gallery demo one implementation. `MdRichEditor` already has one.
+- **#12 page split**: done over four batches. Fifty-two components moved onto their own page, the
+  three accumulator pages are gone, and the gallery went 48 → 97 pages. What stays whole and why
+  is recorded in the batch sections above.
+- **#21 / #22**: adapter-based, and both now closed. No third-party dependency in the library:
+  ship the Material UI and an adapter seam, and let the gallery demo one implementation.
+  `MdRichEditor` has `IMdRichEditorAdapter` plus a markdown adapter over `TextBox`; `MdBeforeAfter`
+  needed no adapter at all, since both layers are plain content slots.
