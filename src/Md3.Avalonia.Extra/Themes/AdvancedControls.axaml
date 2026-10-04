@@ -24,6 +24,8 @@
         </Grid>
       </ControlTemplate>
     </Setter>
+    <!-- A display-only comparison is not a tab stop. -->
+    <Style Selector="^:non-interactive"><Setter Property="Focusable" Value="False" /></Style>
   </ControlTheme>
   <ControlTheme x:Key="{x:Type eco:MdAnimatedText}" TargetType="eco:MdAnimatedText">
     <Setter Property="Template"><ControlTemplate><TextBlock x:Name="PART_Text" TextWrapping="Wrap" /></ControlTemplate></Setter>

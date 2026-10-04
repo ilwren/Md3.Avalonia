@@ -53,6 +53,7 @@ public sealed class MdBeforeAfter : TemplatedControl
         base.OnApplyTemplate(e);
         _afterClip = e.NameScope.Find<Border>("PART_AfterClip");
         _divider = e.NameScope.Find<Border>("PART_Divider");
+        UpdateInteractivity();
         UpdateOrientation();
         UpdateGeometry();
     }
@@ -115,7 +116,10 @@ public sealed class MdBeforeAfter : TemplatedControl
         else base.OnKeyDown(e);
     }
 
-    private void UpdateInteractivity() => SetCurrentValue(FocusableProperty, IsInteractive);
+    // A pseudo-class, not SetCurrentValue on Focusable: SetCurrentValue does not establish a
+    // local value, so the theme's Focusable setter wins back the moment the theme is applied on
+    // attach. The theme keys the override off this instead.
+    private void UpdateInteractivity() => PseudoClasses.Set(":non-interactive", !IsInteractive);
     private void UpdateFromPointer(Point point)
     {
         var value = Orientation == MdComparisonOrientation.Horizontal ? point.X / Math.Max(1, Bounds.Width) : point.Y / Math.Max(1, Bounds.Height);
