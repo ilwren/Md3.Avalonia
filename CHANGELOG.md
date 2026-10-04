@@ -46,6 +46,15 @@
   segmented-button icon reservation, settings-expander header padding.
 
 ### Fixed
+- Simple dialog options run edge to edge with the M3 spacing (title 24/24/24/0, content
+  0/12/0/16, option 24/8). The surface's own padding used to inset the list, so a row's hover and
+  selection layers stopped short of the dialog edge. `MdFlutterListItemTheme` now takes its corner
+  radius from a setter rather than a literal in the template, so it can be squared off; defaults
+  are unchanged.
+- Five more surfaces answer the Android back gesture: `MdSimpleDialog`, `MdCommandPalette`,
+  `MdPopover`, `MdCascader` and `MdAsyncSelect`. Each handled Escape but never registered with
+  `MdBackNavigation`, so on Android back popped the activity out from under an open surface.
+  `MdSimpleDialog` reports exactly one dismissal for a back request, like its cancel button.
 - The picker gallery pages print their bound values. `MdDatePicker` in `Docked` mode commits as you
   pick while modal date pickers and both time-picker modes stay provisional until confirmed; with
   no value shown anywhere, the two outcomes were indistinguishable and read as "the picker doesn't

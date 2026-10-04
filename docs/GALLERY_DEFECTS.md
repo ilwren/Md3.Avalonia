@@ -259,11 +259,21 @@ Not gallery defects — these came out of the component audit and block Android 
 
 | # | Gap | Resolution | Commit |
 |---|-----|-----------|--------|
-| P0-1 | 23 `Key.Escape` dismissals across 18 files, and nothing listening to `TopLevel.BackRequested`. On Android the system back button and the predictive back gesture could not close a single modal surface; back popped the activity instead. | `MdBackNavigation` keeps a per-`TopLevel` handler stack (`ConditionalWeakTable`, so nothing is kept alive) and offers a back request to the most recently registered surface first, marking the routed event handled once one consumes it. `MdBackScope` registers a surface only while it is both open and attached. Wired into `MdDialogHost`, `MdSheetHost`, `MdNavigationDrawer`, `MdSearchView`, `MdMenuAnchor`, `MdFabMenu`, `MdDatePicker`, `MdTimePicker` — each dismissing exactly where it dismisses on Escape, so a non-modal sheet still lets the request fall through. | `26eb03d` |
+| P0-1 | 23 `Key.Escape` dismissals across 18 files, and nothing listening to `TopLevel.BackRequested`. On Android the system back button and the predictive back gesture could not close a single modal surface; back popped the activity instead. | `MdBackNavigation` keeps a per-`TopLevel` handler stack (`ConditionalWeakTable`, so nothing is kept alive) and offers a back request to the most recently registered surface first, marking the routed event handled once one consumes it. `MdBackScope` registers a surface only while it is both open and attached. Wired into `MdDialogHost`, `MdSheetHost`, `MdNavigationDrawer`, `MdSearchView`, `MdMenuAnchor`, `MdFabMenu`, `MdDatePicker`, `MdTimePicker`, and in a second pass `MdSimpleDialog`, `MdCommandPalette`, `MdPopover`, `MdCascader`, `MdAsyncSelect` — each dismissing exactly where it dismisses on Escape, so a non-modal sheet still lets the request fall through. | `26eb03d`, `0dcc2ff` |
 | P0-2 | No use of `IInsetsManager` anywhere. Avalonia's automatic root padding is all-or-nothing, so a top app bar could not paint behind the status bar and a bottom bar could not paint behind the gesture handle. | `MdSafeArea` insets per edge, with a `MinimumPadding` floor and a settable `SafeAreaPadding` so a layout can be previewed and tested without a device. Edge-to-edge is `TopLevel.AutoSafeAreaPadding="False"` plus this control on the parts that must stay clear. | `26eb03d` |
 
-Both are covered by `tests/Md3.Avalonia.HeadlessTests/MdMobilePlatformTests.cs` (22 tests). Gesture
+Both are covered by `tests/Md3.Avalonia.HeadlessTests/MdMobilePlatformTests.cs` (26 tests). Gesture
 animation on a real device and cutout geometry still need manual sign-off.
+
+The second pass came from auditing every `Key.Escape` site rather than the eight surfaces the
+first pass listed. The rule applied: a back handler belongs on something that floats **over** the
+page and whose Escape dismisses the whole surface. That caught five more — the simple dialog, the
+command palette, the popover, and the cascader and async-select drop-downs. It deliberately left
+out `MdSearchBar` (Escape clears the text), `MdSwipeAction` and `MdChatView` (Escape cancels an
+edit or a selection), `MdSubMenuItem` and `MdMenu` (the owning `MdMenuAnchor` already registers,
+and a second handler would just double-unwind), and `MdTooltipHost` — a tooltip is transient, not
+a place the user navigated to, and consuming back to close one would swallow a gesture the user
+meant for the page.
 
 ### Found while doing this
 

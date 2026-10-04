@@ -38,6 +38,7 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
     public static readonly DirectProperty<MdAsyncSelect, string> SearchErrorTextProperty = AvaloniaProperty.RegisterDirect<MdAsyncSelect, string>(nameof(SearchErrorText), control => control.SearchErrorText);
     private readonly DispatcherTimer _timer = new();
     private readonly MdPresenceController _popupPresence;
+    private readonly MdBackScope _backScope;
     private IReadOnlyList<object?> _results = Array.Empty<object?>();
     private MdAsyncRequestState _state;
     private Exception? _error;
@@ -68,6 +69,7 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
     }
     public MdAsyncSelect()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _popupPresence = new MdPresenceController(control => SetPopupPresence(control));
         _popupPresence.Initialize(IsDropDownOpen);
         _timer.Tick += async (_, _) => { _timer.Stop(); await SearchAsync(); };
@@ -308,6 +310,16 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
             PseudoClasses.Set(":closed", true);
             _popupPresence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
         }
+        _backScope.Update(IsDropDownOpen);
+    }
+
+    // Android sends a back request where desktop sends Escape. Without this the gesture falls
+    // through to the platform and pops the activity while the surface is still open.
+    private bool OnBackRequested()
+    {
+        if (!IsDropDownOpen) return false;
+        SetCurrentValue(IsDropDownOpenProperty, false);
+        return true;
     }
 
     private void SetPopupPresence(bool value)

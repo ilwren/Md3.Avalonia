@@ -6,6 +6,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Md3.Avalonia.Controls;
 using Md3.Avalonia.Extra.Infrastructure;
 using Md3.Avalonia.Motion;
 
@@ -27,6 +28,7 @@ public class MdPopover : TemplatedControl
 
     private readonly MdFocusReturnScope _focusReturn = new();
     private readonly MdPresenceController _popupPresence;
+    private readonly MdBackScope _backScope;
     private Button? _anchorButton;
     private InputElement? _popoverInput;
     private ScrollViewer? _ownerScrollViewer;
@@ -43,6 +45,7 @@ public class MdPopover : TemplatedControl
 
     public MdPopover()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _popupPresence = new MdPresenceController(SetPopupPresence);
         _popupPresence.Initialize(IsOpen);
         UpdateState();
@@ -169,6 +172,16 @@ public class MdPopover : TemplatedControl
             Closed?.Invoke(this, EventArgs.Empty);
         }
         UpdateSurfaceHitTesting();
+        _backScope.Update(IsOpen);
+    }
+
+    // Android sends a back request where desktop sends Escape. Without this the gesture falls
+    // through to the platform and pops the activity while the surface is still open.
+    private bool OnBackRequested()
+    {
+        if (!IsOpen) return false;
+        Dismiss();
+        return true;
     }
 
     private void SetPopupPresence(bool value)

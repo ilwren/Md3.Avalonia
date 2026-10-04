@@ -10,6 +10,7 @@ using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Md3.Avalonia.Controls;
 using Md3.Avalonia.Extra.Infrastructure;
 using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
@@ -49,6 +50,7 @@ public sealed class MdCommandPalette : TemplatedControl
     private Border? _surface;
     private TopLevel? _topLevel;
     private readonly MdPresenceController _presence;
+    private readonly MdBackScope _backScope;
     private readonly MdFocusReturnScope _focusReturn = new();
     private readonly HashSet<ICommand> _observedCommands = [];
     private string _accessibleName = string.Empty;
@@ -70,6 +72,7 @@ public sealed class MdCommandPalette : TemplatedControl
     }
     public MdCommandPalette()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _presence = new MdPresenceController(present => PseudoClasses.Set(":present", present));
         _presence.Initialize(IsOpen);
         UpdateLocalizedText();
@@ -225,6 +228,16 @@ public sealed class MdCommandPalette : TemplatedControl
             _focusReturn.Restore();
         }
         UpdateHitTesting();
+        _backScope.Update(IsOpen);
+    }
+
+    // The palette is a modal surface, so Android's back gesture has to close it the way Escape
+    // does on desktop - otherwise back pops the whole activity out from under an open palette.
+    private bool OnBackRequested()
+    {
+        if (!IsOpen) return false;
+        Dismiss();
+        return true;
     }
 
     private void UpdateMotion()

@@ -43,6 +43,7 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
     private IReadOnlyList<IReadOnlyList<MdCascaderItem>> _columns = Array.Empty<IReadOnlyList<MdCascaderItem>>();
     private bool _isPopupOpen;
     private readonly MdPresenceController _presence;
+    private readonly MdBackScope _backScope;
     private ItemsControl? _columnsHost;
     private Button? _anchorButton;
     private Border? _surface;
@@ -61,6 +62,7 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
     }
     public MdCascader()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _presence = new MdPresenceController(SetPopupPresence);
         _presence.Initialize(IsDropDownOpen);
         AutomationProperties.SetName(this, Label ?? MdLocalization.GetString("HierarchySelector", this));
@@ -289,6 +291,17 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
             PseudoClasses.Set(":closed", true);
             _presence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
         }
+        _backScope.Update(IsDropDownOpen);
+    }
+
+    // Android sends a back request where desktop sends Escape. Without this the gesture falls
+    // through to the platform and pops the activity while the surface is still open.
+    private bool OnBackRequested()
+    {
+        if (!IsDropDownOpen) return false;
+        SetCurrentValue(IsDropDownOpenProperty, false);
+        _anchorButton?.Focus();
+        return true;
     }
 
     private void UpdateMotion()

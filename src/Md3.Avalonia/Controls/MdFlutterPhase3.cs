@@ -233,6 +233,7 @@ public sealed class MdSimpleDialog : TemplatedControl
     private Border? _surface;
     private readonly MdPresenceController _presence;
     private readonly MdModalFocusController _modalFocus;
+    private readonly MdBackScope _backScope;
     private object? _defaultCancelText = "Cancel";
 
     static MdSimpleDialog()
@@ -245,6 +246,7 @@ public sealed class MdSimpleDialog : TemplatedControl
     public MdSimpleDialog()
     {
         _modalFocus = new MdModalFocusController(this);
+        _backScope = new MdBackScope(this, OnBackRequested);
         _presence = new MdPresenceController(SetPresence);
         _presence.Initialize(IsOpen);
         PseudoClasses.Set(":open", IsOpen);
@@ -342,6 +344,16 @@ public sealed class MdSimpleDialog : TemplatedControl
         }
         UpdateHitTesting();
         UpdateModalFocus();
+        _backScope.Update(IsOpen);
+    }
+
+    // Android has no Escape key. A back request on an open dialog is a cancellation, so it goes
+    // through Dismiss() and reports exactly one dismissal, same as the cancel button.
+    private bool OnBackRequested()
+    {
+        if (!IsOpen) return false;
+        Dismiss();
+        return true;
     }
 
     private void UpdateModalFocus()

@@ -5,6 +5,7 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Threading;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Extra.Controls;
 using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
@@ -511,6 +512,113 @@ public sealed class MdMobilePlatformTests
             area.SafeAreaPadding = new Thickness(0, 64, 0, 0);
             Dispatcher.UIThread.RunJobs();
             Assert.Equal(64, child.Bounds.Top, 1);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    // The five surfaces that handled Escape but never registered for back. A dismissible surface
+    // the gesture cannot reach is worse than no surface: back pops the activity out from under it.
+
+    [AvaloniaFact]
+    public void Back_Request_Closes_A_Simple_Dialog_And_Reports_One_Dismissal()
+    {
+        var dialog = new MdSimpleDialog { ItemsSource = new[] { "One", "Two" } };
+        var window = ShowWindow(dialog);
+        try
+        {
+            var dismissals = 0;
+            dialog.Dismissed += (_, _) => dismissals++;
+
+            dialog.Show();
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(1, MdBackNavigation.GetHandlerCount(window));
+
+            Assert.True(MdBackNavigation.RequestBack(dialog));
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(dialog.IsOpen);
+            // Back is a cancellation, so it reports exactly once - the trap defect 14 fell into.
+            Assert.Equal(1, dismissals);
+            Assert.Equal(0, MdBackNavigation.GetHandlerCount(window));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Back_Request_Closes_A_Command_Palette()
+    {
+        var palette = new MdCommandPalette();
+        var window = ShowWindow(palette);
+        try
+        {
+            palette.Show();
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(1, MdBackNavigation.GetHandlerCount(window));
+
+            Assert.True(MdBackNavigation.RequestBack(palette));
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(palette.IsOpen);
+            Assert.Equal(0, MdBackNavigation.GetHandlerCount(window));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Back_Request_Closes_A_Popover()
+    {
+        var popover = new MdPopover { Content = new Button { Content = "Action" } };
+        var window = ShowWindow(popover);
+        try
+        {
+            popover.Show();
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(1, MdBackNavigation.GetHandlerCount(window));
+
+            Assert.True(MdBackNavigation.RequestBack(popover));
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(popover.IsOpen);
+            Assert.Equal(0, MdBackNavigation.GetHandlerCount(window));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Back_Request_Closes_The_Open_Drop_Downs()
+    {
+        var cascader = new MdCascader();
+        var select = new MdAsyncSelect();
+        var window = ShowWindow(new StackPanel { Children = { cascader, select } });
+        try
+        {
+            cascader.IsDropDownOpen = true;
+            select.IsDropDownOpen = true;
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(2, MdBackNavigation.GetHandlerCount(window));
+
+            // Newest first: the async select opened last, so it closes first.
+            Assert.True(MdBackNavigation.RequestBack(window));
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(select.IsDropDownOpen);
+            Assert.True(cascader.IsDropDownOpen);
+
+            Assert.True(MdBackNavigation.RequestBack(window));
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(cascader.IsDropDownOpen);
+            Assert.Equal(0, MdBackNavigation.GetHandlerCount(window));
+
+            // Nothing left to close, so the platform gets the request back.
+            Assert.False(MdBackNavigation.RequestBack(window));
         }
         finally
         {
