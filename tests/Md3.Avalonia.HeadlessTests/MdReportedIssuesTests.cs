@@ -73,9 +73,9 @@ public sealed class MdReportedIssuesTests
 
             host.Window.Width = 900;
             Dispatcher.UIThread.RunJobs();
-            // The third group used to come from MdDateRangePicker, which now has its own page.
-            Assert.Equal(new[] { 480d, 560d }, groups.Select(group => group.Width).ToArray());
-            Assert.All(groups, group => Assert.Equal(HorizontalAlignment.Left, group.HorizontalAlignment));
+            // Two authored groups plus the one inside the page's CodeExample tab strip.
+            Assert.Equal(new[] { 480d, 560d, double.NaN }, groups.Select(group => group.Width).ToArray());
+            Assert.All(groups.Take(2), group => Assert.Equal(HorizontalAlignment.Left, group.HorizontalAlignment));
         }
     }
 
