@@ -23,12 +23,38 @@ public sealed class MdMobilePlatformTests
         return window;
     }
 
+    // Each modal surface gets content in the slot the focus trap actually scopes to: Content is
+    // the page behind the scrim, not the modal. An empty scope leaves the trap with nothing to
+    // focus and it keeps re-posting a redirect.
+    private static MdDialogHost NewDialog(bool isOpen) => new()
+    {
+        Content = new Button { Content = "Page" },
+        Dialog = new Button { Content = "OK" },
+        IsOpen = isOpen
+    };
+
+    private static MdSheetHost NewSheet(bool isModal, bool isOpen) => new()
+    {
+        Content = new Button { Content = "Page" },
+        SheetContent = new Button { Content = "Share" },
+        IsModal = isModal,
+        IsOpen = isOpen
+    };
+
+    private static MdNavigationDrawer NewDrawer(bool isOpen) => new()
+    {
+        Content = new Button { Content = "Page" },
+        DrawerContent = new Button { Content = "Inbox" },
+        IsModal = true,
+        IsOpen = isOpen
+    };
+
     // ---- back navigation -------------------------------------------------
 
     [AvaloniaFact]
     public void Back_Request_Closes_An_Open_Dialog_Host()
     {
-        var host = new MdDialogHost { IsOpen = true };
+        var host = NewDialog(isOpen: true);
         var window = ShowWindow(host);
         try
         {
@@ -45,7 +71,7 @@ public sealed class MdMobilePlatformTests
     [AvaloniaFact]
     public void Back_Request_Is_Not_Consumed_When_Nothing_Is_Open()
     {
-        var host = new MdDialogHost { IsOpen = false };
+        var host = NewDialog(isOpen: false);
         var window = ShowWindow(host);
         try
         {
@@ -62,8 +88,8 @@ public sealed class MdMobilePlatformTests
     [AvaloniaFact]
     public void Back_Request_Unwinds_Nested_Surfaces_Newest_First()
     {
-        var drawer = new MdNavigationDrawer { IsModal = true, IsOpen = false };
-        var dialog = new MdDialogHost { IsOpen = false };
+        var drawer = NewDrawer(isOpen: false);
+        var dialog = NewDialog(isOpen: false);
         var window = ShowWindow(new Panel { Children = { drawer, dialog } });
         try
         {
@@ -93,7 +119,7 @@ public sealed class MdMobilePlatformTests
     [AvaloniaFact]
     public void Platform_Back_Requested_Event_Is_Marked_Handled_Once_A_Surface_Consumes_It()
     {
-        var sheet = new MdSheetHost { IsModal = true, IsOpen = true };
+        var sheet = NewSheet(isModal: true, isOpen: true);
         var window = ShowWindow(sheet);
         try
         {
@@ -114,7 +140,7 @@ public sealed class MdMobilePlatformTests
     [AvaloniaFact]
     public void Closing_A_Surface_Unregisters_Its_Back_Handler()
     {
-        var view = new MdSearchView { IsOpen = true };
+        var view = new MdSearchView { Content = new Button { Content = "Alpha" }, IsOpen = true };
         var window = ShowWindow(view);
         try
         {
@@ -134,7 +160,7 @@ public sealed class MdMobilePlatformTests
     [AvaloniaFact]
     public void A_Non_Modal_Sheet_Ignores_Back_So_The_Page_Behind_It_Can_Navigate()
     {
-        var sheet = new MdSheetHost { IsModal = false, IsOpen = true };
+        var sheet = NewSheet(isModal: false, isOpen: true);
         var window = ShowWindow(sheet);
         try
         {
@@ -152,15 +178,15 @@ public sealed class MdMobilePlatformTests
     public void Detaching_A_Surface_Releases_Its_Registration()
     {
         var panel = new Panel();
-        var menu = new MdMenuAnchor { IsOpen = true };
-        panel.Children.Add(menu);
+        var dialog = NewDialog(isOpen: true);
+        panel.Children.Add(dialog);
         var window = ShowWindow(panel);
         try
         {
             Dispatcher.UIThread.RunJobs();
             Assert.Equal(1, MdBackNavigation.GetHandlerCount(window));
 
-            panel.Children.Remove(menu);
+            panel.Children.Remove(dialog);
             Dispatcher.UIThread.RunJobs();
             Assert.Equal(0, MdBackNavigation.GetHandlerCount(window));
         }
@@ -174,7 +200,7 @@ public sealed class MdMobilePlatformTests
     public void A_Scope_Registers_Only_Once_It_Has_A_Window_To_Register_Against()
     {
         // A control is routinely opened before it is attached; the registration must still land.
-        var detached = new MdDialogHost { IsOpen = true };
+        var detached = NewDialog(isOpen: true);
         Assert.False(MdBackNavigation.RequestBack(detached));
 
         var window = ShowWindow(detached);
@@ -193,8 +219,8 @@ public sealed class MdMobilePlatformTests
     [AvaloniaFact]
     public void Registrations_Are_Independent_Per_Window()
     {
-        var first = new MdDialogHost { IsOpen = true };
-        var second = new MdDialogHost { IsOpen = true };
+        var first = NewDialog(isOpen: true);
+        var second = NewDialog(isOpen: true);
         var firstWindow = ShowWindow(first);
         var secondWindow = ShowWindow(second);
         try

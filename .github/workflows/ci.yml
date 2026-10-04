@@ -31,6 +31,12 @@ permissions:
   contents: read
   pull-requests: write
 
+# One run per ref. A superseded push should release its runner immediately rather than finish a
+# build nobody will read, and a job that hangs should not hold one for the six-hour default.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # ---------------------------------------------------------------------------------------------
   # Pure Python, no SDK, no restore: finishes in seconds and fails the run before a two-minute
@@ -39,6 +45,7 @@ jobs:
   static-checks:
     name: Static checks
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -93,6 +100,9 @@ jobs:
     name: Build & Test
     needs: static-checks
     runs-on: ubuntu-latest
+    # The suite runs in well under two minutes. A ten-fold margin still catches a deadlocked
+    # test in minutes instead of letting it occupy a runner all day.
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
