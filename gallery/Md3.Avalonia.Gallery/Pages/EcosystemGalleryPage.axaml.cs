@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia.Controls;
+using Avalonia.Data;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using CommunityToolkit.Mvvm.Input;
@@ -38,6 +39,12 @@ public partial class EcosystemGalleryPage : UserControl
         EnterpriseGrid.Columns.Add(new MdDataGridColumn { Header = L("Team", "团队"), PropertyName = nameof(GridRow.Team), Width = new GridLength(1, GridUnitType.Star) });
         EnterpriseGrid.Columns.Add(new MdDataGridColumn { Header = L("Score", "分数"), PropertyName = nameof(GridRow.Score), Width = new GridLength(96), IsEditable = true });
         EnterpriseGrid.DataSource = new[] { new GridRow("Ada", L("Design", "设计"), 92), new GridRow("Lin", L("Engineering", "工程"), 97), new GridRow("Maya", L("Research", "研究"), 89), new GridRow("Noah", L("Design", "设计"), 94), new GridRow("Zoe", L("Engineering", "工程"), 91) };
+
+        // The stock Avalonia control, wearing the Material theme from Md3.Avalonia.DataGrid.
+        ThemedDataGrid.Columns.Add(new DataGridTextColumn { Header = L("Name", "姓名"), Binding = new Binding(nameof(GridRow.Name)), Width = new DataGridLength(2, DataGridLengthUnitType.Star) });
+        ThemedDataGrid.Columns.Add(new DataGridTextColumn { Header = L("Team", "团队"), Binding = new Binding(nameof(GridRow.Team)), Width = new DataGridLength(1, DataGridLengthUnitType.Star) });
+        ThemedDataGrid.Columns.Add(new DataGridTextColumn { Header = L("Score", "分数"), Binding = new Binding(nameof(GridRow.Score)), Width = new DataGridLength(96) });
+        ThemedDataGrid.ItemsSource = new[] { new GridRow("Ada", L("Design", "设计"), 92), new GridRow("Lin", L("Engineering", "工程"), 97), new GridRow("Maya", L("Research", "研究"), 89), new GridRow("Noah", L("Design", "设计"), 94), new GridRow("Zoe", L("Engineering", "工程"), 91) };
 
         PagedItems.PageProvider = async request =>
         {

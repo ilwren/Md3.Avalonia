@@ -4,7 +4,7 @@ set -Eeuo pipefail
 usage() {
   cat <<'EOF'
 Build the release NuGet packages for Md3.Avalonia, Md3.Avalonia.Icons,
-Md3.Avalonia.Icons.Lite, and Md3.Avalonia.Extra.
+Md3.Avalonia.Icons.Lite, Md3.Avalonia.Extra and Md3.Avalonia.DataGrid.
 
 Usage:
   scripts/build-nuget.sh [--output /absolute/or/relative/path]
@@ -12,7 +12,7 @@ Usage:
                          [--no-restore]
                          [--keep-intermediate]
 
-By default the script deletes bin/ and obj/ for the four packaged projects before and
+By default the script deletes bin/ and obj/ for the five packaged projects before and
 after packing, so a release artifact can never pick up a stale intermediate. Pass
 --keep-intermediate when a CI job has already produced the same configuration and the
 run is a packaging *check* rather than a release build; that reuses the existing
@@ -67,6 +67,7 @@ PROJECTS=(
   "$ROOT/src/Md3.Avalonia.Icons/Md3.Avalonia.Icons.csproj"
   "$ROOT/src/Md3.Avalonia.Icons.Lite/Md3.Avalonia.Icons.Lite.csproj"
   "$ROOT/src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj"
+  "$ROOT/src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj"
 )
 
 if command -v python3 >/dev/null 2>&1; then
@@ -87,6 +88,7 @@ cleanup_intermediate() {
        "$ROOT/src/Md3.Avalonia.Icons" \
        "$ROOT/src/Md3.Avalonia.Icons.Lite" \
        "$ROOT/src/Md3.Avalonia.Extra" \
+       "$ROOT/src/Md3.Avalonia.DataGrid" \
        -type d \( -name bin -o -name obj \) -prune -exec rm -rf {} + 2>/dev/null || true
 }
 trap cleanup_intermediate EXIT
@@ -109,7 +111,7 @@ done
 
 VERSION="$(sed -n 's:.*<Version>\([^<]*\)</Version>.*:\1:p' "${PROJECTS[0]}" | head -1)"
 [[ -n "$VERSION" ]] || { echo "error: package version is missing" >&2; exit 1; }
-PACKAGE_IDS=(Md3.Avalonia Md3.Avalonia.Icons Md3.Avalonia.Icons.Lite Md3.Avalonia.Extra)
+PACKAGE_IDS=(Md3.Avalonia Md3.Avalonia.Icons Md3.Avalonia.Icons.Lite Md3.Avalonia.Extra Md3.Avalonia.DataGrid)
 for package_id in "${PACKAGE_IDS[@]}"; do
   for extension in nupkg snupkg; do
     package="$OUTPUT/$package_id.$VERSION.$extension"

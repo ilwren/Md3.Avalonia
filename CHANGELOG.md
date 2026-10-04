@@ -16,6 +16,10 @@
 - `MdRevealHost` and `MdMorphPanel`, the layout primitives behind the rebuilt motion controls.
 - `MdTabsView`, the content area for an `MdTabs` bar. Children are the pages, matched to the
   bar's tabs by position, with selection kept in step in both directions.
+- **`Md3.Avalonia.DataGrid`**, a new opt-in package with a Material Design 3 theme for
+  Avalonia's own `DataGrid`. It is the only package that depends on `Avalonia.Controls.DataGrid`.
+  Add `MaterialDataGridTheme` after `MaterialTheme`; it replaces the control's Fluent theme and,
+  like the rest of the library, does not require Avalonia's `FluentTheme`.
 - **Trimming support.** All four packages declare `IsTrimmable` and build with the IL2xxx
   analyzer enabled. `MdThemeJson` moved to a source-generated serializer context, and every
   control that takes a string property path gained a reflection-free delegate:

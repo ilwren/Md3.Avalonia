@@ -358,6 +358,33 @@ Insets are reported on Android, iOS and browser. Desktop has no insets manager, 
 is safe to ship on every target. `MdKeyboardAvoidingHost` handles the separate case of the soft
 keyboard covering a focused field.
 
+## Avalonia DataGrid
+
+`MdDataGrid` in `Md3.Avalonia.Extra` is a Material data table: columns, sorting, filtering,
+sticky headers and inline edit. It is not a replacement for Avalonia's `DataGrid` and does not
+try to be — no column resizing or reordering, no frozen columns, no grouping, no
+auto-generated columns.
+
+When an application needs the real thing, the opt-in `Md3.Avalonia.DataGrid` package themes
+Avalonia's own control to Material, so the choice is about capability rather than appearance:
+
+```xml
+<Application.Styles>
+  <themes:MaterialTheme />
+  <themes:MaterialDataGridTheme />
+</Application.Styles>
+```
+
+It is the only package that depends on `Avalonia.Controls.DataGrid`, so nothing is dragged in
+unless it is asked for, and it replaces the control's Fluent theme — do not include both. Like
+`MaterialTheme` it is standalone and does not need Avalonia's `FluentTheme`.
+
+The theme is derived from the DataGrid package's own Fluent theme (MIT, see
+THIRD-PARTY-NOTICES.md), keeping its control templates and `PART_` names so the control finds
+everything it looks up. Changed: M3 tokens throughout, a 56 DIP header and 52 DIP rows with
+16 DIP gutters, a divider between rows, `secondaryContainer` for the selected row, Material
+scrollbars, and a cell editor that no longer derives from Fluent's `TextBox` theme.
+
 ## Trimming
 
 All four packages set `IsTrimmable`, so an application that publishes with

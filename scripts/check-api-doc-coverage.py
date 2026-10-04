@@ -16,7 +16,8 @@ import pathlib
 import re
 import sys
 
-PACKAGES = ["Md3.Avalonia", "Md3.Avalonia.Extra", "Md3.Avalonia.Icons", "Md3.Avalonia.Icons.Lite"]
+PACKAGES = ["Md3.Avalonia", "Md3.Avalonia.Extra", "Md3.Avalonia.Icons", "Md3.Avalonia.Icons.Lite",
+            "Md3.Avalonia.DataGrid"]
 # 16k lines of generated glyph constants; the catalog is documented as a whole, not per glyph.
 SKIP_FILES = {"MdSymbols.cs", "MdSymbolsLite.cs"}
 DOC = pathlib.Path("docs/API.md")

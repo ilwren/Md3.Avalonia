@@ -63,6 +63,19 @@ than fold content into the bar, which Material places in app bars away from the 
 half is now `MdTabsView`: children are the pages, matched to the bar by position, with selection
 synchronised both ways. Same split as Flutter's `TabBar`/`TabBarView`.
 
+**13 `MdDataGrid` is not a drop-in for `DataGrid`** — true, and growing it into one was the
+wrong answer: Avalonia already ships that control, and a rename would not have changed what
+`MdDataGrid` can do. The decision taken was to theme the real thing. `Md3.Avalonia.DataGrid` is
+a new opt-in package carrying the `Avalonia.Controls.DataGrid` dependency alone, so the other
+four packages stay clean, and `MdDataGrid` keeps its job as a Material data table. The gallery
+now shows both, one above the other, with the boundary written between them.
+
+The theme is derived from the DataGrid package's own Fluent theme rather than hand-written,
+because the control finds its parts by name and a fresh template would have drifted. Two things
+had to change beyond colour: `MaterialTheme` is standalone and the app loads no `FluentTheme`,
+so every `System*` brush and the Fluent-derived cell editor theme would have failed to resolve
+and rendered an invisible grid.
+
 ## Checked and found correct — no change made
 
 | # | Item | Evidence |
@@ -76,7 +89,6 @@ synchronised both ways. Same split as Flutter's `TabBar`/`TabBarView`.
 |---|------|---------|
 | 9 | Date / time / range pickers don't apply the selection | The modal rollback is **deliberate and covered by a test** (`Modal_Pickers_Roll_Back_Provisional_Values_When_Dismissed`): closing a modal picker without pressing OK restores the value held at open. Docked mode commits immediately. Needs a precise repro — which picker, which mode, and whether OK was pressed — before changing tested behaviour. The picker gallery page also shows no bound value, so the outcome is invisible either way. |
 | 26 | Borderless window corners missing | Depends on OS-level window shaping (transparency hints, DWM rounded corners, the platform adapters) — not observable or testable headless. Needs a desktop run to diagnose rather than a guess. |
-| 13 | `MdDataGrid` is not a drop-in for `DataGrid` | It exposes 10 styled properties in total. The gap is real and needs an explicit API decision, not a rename. |
 
 ## Not yet investigated
 

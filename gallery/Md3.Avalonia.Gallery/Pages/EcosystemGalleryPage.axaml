@@ -46,6 +46,9 @@
       </WrapPanel>
       <eco:MdDataGrid x:Name="EnterpriseGrid" Height="240" />
       <TextBlock x:Name="GridStatus" Classes="body" Text="Virtualized rows, sortable columns, editable score cells." TextWrapping="Wrap" />
+      <TextBlock Classes="h3" Text="Avalonia DataGrid · Material themed" />
+      <TextBlock Classes="body" TextWrapping="Wrap" Text="MdDataGrid above is a Material table. When you need the full spreadsheet control — column resizing and reordering, frozen columns, grouping, auto-generated columns — use Avalonia's own DataGrid with the opt-in Md3.Avalonia.DataGrid theme package. This one is the stock control; only the theme is ours." />
+      <DataGrid x:Name="ThemedDataGrid" Height="240" AutoGenerateColumns="False" CanUserResizeColumns="True" CanUserReorderColumns="True" CanUserSortColumns="True" />
       <TextBlock Classes="h3" Text="Project board · responsive masonry cards" />
       <TextBlock Classes="body" TextWrapping="Wrap" Text="Each uneven card is a real task target. Activate one to open its project context; the panel demonstrates dense dashboard reflow rather than decorative blocks." />
       <eco:MdMasonryPanel ColumnCount="3" Strategy="Quilted" ColumnSpacing="12" RowSpacing="12">
