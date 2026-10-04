@@ -41,6 +41,7 @@ public sealed class MdSearchView : ContentControl
     private InputElement? _headerInput;
     private TextBox? _headerTextBox;
     private bool _suppressAutoOpen;
+    private string? _committedHeaderText;
     private TopLevel? _topLevel;
     private ContentPresenter? _results;
     private Control? _focusBeforeOpen;
@@ -88,6 +89,13 @@ public sealed class MdSearchView : ContentControl
         // focus check, and an empty field stays closed so clearing alone does not expand it.
         if (_suppressAutoOpen || IsOpen) return;
         if (sender is not TextBox { Text.Length: > 0 } header || !header.IsKeyboardFocusWithin) return;
+
+        // The text a commit just wrote is not the user typing. A flag held only for the duration
+        // of CommitResult is not enough: the header's TextChanged can arrive on a later dispatcher
+        // pass, once the flag is already cleared, which reopened the view the commit had closed.
+        // Comparing against the committed text is state, not timing, so it holds whenever the
+        // event lands and stops applying the moment the user actually edits the field.
+        if (string.Equals(header.Text, _committedHeaderText, StringComparison.Ordinal)) return;
         Show();
     }
 
@@ -114,6 +122,7 @@ public sealed class MdSearchView : ContentControl
         displayText ??= ResolveDisplayText(result);
         if (Header is MdSearchBar searchBar && displayText is not null)
         {
+            _committedHeaderText = displayText;
             searchBar.SetCurrentValue(TextBox.TextProperty, displayText);
             searchBar.CaretIndex = displayText.Length;
             searchBar.SelectionStart = displayText.Length;

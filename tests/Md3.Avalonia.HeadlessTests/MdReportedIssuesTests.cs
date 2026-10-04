@@ -680,7 +680,7 @@ public sealed class MdReportedIssuesTests
 
         view.CommitResult("MdSearchView.cs", "MdSearchView.cs");
         Dispatcher.UIThread.RunJobs();
-        Assert.False(view.IsOpen);
+        Assert.False(view.IsOpen, "committing a result closes the view and must not reopen it");
 
         header.Focus();
         Dispatcher.UIThread.RunJobs();
@@ -689,7 +689,7 @@ public sealed class MdReportedIssuesTests
         // Clearing the field on its own leaves the view closed.
         header.Text = string.Empty;
         Dispatcher.UIThread.RunJobs();
-        Assert.False(view.IsOpen);
+        Assert.False(view.IsOpen, "clearing the field alone must not expand the view");
 
         // Typing brings the result list back.
         header.Text = "search";
