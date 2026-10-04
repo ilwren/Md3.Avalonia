@@ -601,24 +601,32 @@ public sealed class MdMobilePlatformTests
         var window = ShowWindow(new StackPanel { Children = { cascader, select } });
         try
         {
+            // One at a time. MdPopupCoordinator allows a single Material popup per UI thread, so
+            // opening the second drop-down closes the first and the registrations never stack -
+            // which is also why back never has to unwind two of these.
             cascader.IsDropDownOpen = true;
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(1, MdBackNavigation.GetHandlerCount(window));
+
             select.IsDropDownOpen = true;
             Dispatcher.UIThread.RunJobs();
-            Assert.Equal(2, MdBackNavigation.GetHandlerCount(window));
+            Assert.False(cascader.IsDropDownOpen);
+            Assert.Equal(1, MdBackNavigation.GetHandlerCount(window));
 
-            // Newest first: the async select opened last, so it closes first.
             Assert.True(MdBackNavigation.RequestBack(window));
             Dispatcher.UIThread.RunJobs();
             Assert.False(select.IsDropDownOpen);
-            Assert.True(cascader.IsDropDownOpen);
-
-            Assert.True(MdBackNavigation.RequestBack(window));
-            Dispatcher.UIThread.RunJobs();
-            Assert.False(cascader.IsDropDownOpen);
             Assert.Equal(0, MdBackNavigation.GetHandlerCount(window));
 
             // Nothing left to close, so the platform gets the request back.
             Assert.False(MdBackNavigation.RequestBack(window));
+
+            // And the cascader on its own still answers.
+            cascader.IsDropDownOpen = true;
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(MdBackNavigation.RequestBack(window));
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(cascader.IsDropDownOpen);
         }
         finally
         {
