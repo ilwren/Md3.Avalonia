@@ -51,6 +51,11 @@ jobs:
       - name: Lint design tokens
         run: python3 scripts/lint-design-tokens.py --github --summary
 
+      - name: Check API documentation coverage
+        # docs/API.md drifted into documenting properties that did not exist and omitting
+        # 80 public types. This is static, so it costs nothing to hold the line.
+        run: python3 scripts/check-api-doc-coverage.py
+
       - name: Check the specification oracle against pinned upstream sources
         # Network-dependent and advisory by design: upstream moving is a re-baselining
         # decision for a human, not a build failure. --soft keeps it off the critical path.

@@ -2,8 +2,8 @@
 
 ## [0.3.5-preview.1] - 2026-10-04
 
-Previously numbered `3.1.0-preview.1`. That number was a typo for the 0.3.x line and the
-packages were never tagged or published, so this entry is renumbered in place rather than
+Previously numbered `3.1.0-preview.1`, which was a typo for `0.3.1-preview.1`. The packages
+were never tagged or published under it, so this entry is renumbered in place rather than
 leaving a version that reads as a major release.
 
 ### Added

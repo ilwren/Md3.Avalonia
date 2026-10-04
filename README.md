@@ -197,10 +197,11 @@ spec-snapshot/conformance-policy.json # 棘轮开关 bootstrap/enforce 与豁免
 ```
 
 规范一致性校验的分层职责、棘轮流程与**已知差距清单**见
-[`docs/SPEC_VERIFICATION.md`](docs/SPEC_VERIFICATION.md)。纯静态的令牌 lint 不需要 SDK：
+[`docs/SPEC_VERIFICATION.md`](docs/SPEC_VERIFICATION.md)。以下静态检查不需要 SDK：
 
 ```bash
-python3 scripts/lint-design-tokens.py
+python3 scripts/lint-design-tokens.py        # 设计令牌 lint
+python3 scripts/check-api-doc-coverage.py    # docs/API.md 是否覆盖全部公共类型
 ```
 
 ## 引入主题

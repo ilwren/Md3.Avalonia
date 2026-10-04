@@ -80,7 +80,7 @@ The following catalog covers the public control surface shipped by the core pack
 | **Foundations and icons** | `MdText`, `MdIcon`, `MdSymbolPresenter`, `MdStateLayer`, `MdRipplePresenter`, `MdFocusRing`, `MdScrollViewer`, `MdScrollBar`, `MdSliderThumb`, `MdWindow` |
 | **Window chrome** | `MdBorderlessWindow`, `MdWindowTitleBar`, `MdCaptionButton`, `MdWindowCaptionButton`, `MdWindowDragRegion`, `MdWindowResizeGrip`, `IMdWindowPlatformAdapter`, `MdWindowPlatformAdapterResolver`, `MdWindowsWindowPlatformAdapter`, `MdMacOsWindowPlatformAdapter`, `MdLinuxWindowPlatformAdapter`, `MdAvaloniaWindowPlatformAdapter`, `MdAndroidWindowPlatformAdapter` |
 
-Most core controls expose styled properties, bindable `Items`/`ItemsSource` where applicable, routed events, commands, and native Avalonia automation peers. The following variant/support enums are part of the public API and should be preferred over string values: `MdButtonVariant`, `MdButtonSize`, `MdButtonShape`, `MdCardVariant`, `MdChipVariant`, `MdDialogVariant`, `MdListVariant`, `MdNavigationBarVariant`, `MdNavigationBarLayout`, `MdNavigationDrawerPlacement`, `MdProgressShape`, `MdTabVariant`, `MdTextBoxVariant`, `MdTimePickerMode`, `MdToolbarDensity`, `MdToolbarMode`, `MdToolbarVariant`, `MdTooltipVariant`, and `MdTopAppBarVariant`.
+Most core controls expose styled properties, bindable `Items`/`ItemsSource` where applicable, routed events, commands, and native Avalonia automation peers. Variant and option enums are part of the public API and should be preferred over string values. All 78 of them are listed with their members under [Enumerations](#enumerations).
 
 ### Core control quick reference
 
@@ -267,6 +267,203 @@ The optional `Md3.Avalonia.Extra` package contains visual and ecosystem controls
 `Show*Button` properties remove a caption button from the visual tree. `Is*ButtonEnabled` keeps the button visible but disables its command and applies the disabled state layer/opacity. Programmatic `Minimize()`, `ToggleMaximizeRestore()` and `RequestClose()` enforce the same state as the visual buttons. The two `ShowIcon` properties have different defaults and the window drives the title bar. `MdBorderlessWindow.ShowIcon` defaults to `true`, and the window template passes it down, so a borderless window shows `Window.Icon` in its caption unless `ShowIcon="False"` is set. A bare `MdWindowTitleBar` composed by hand defaults to `false`, because it has no window to inherit an icon from. Use `LeadingContent` for a mark other than the window icon.
 
 The Windows adapter preserves native caption style bits when `PreserveNativeBorder=true`, while the Material template owns the title bar surface. Android uses a safe no-op adapter; desktop-only Gallery pages are not registered in `AndroidGalleryView`.
+
+## Enumerations
+
+Every public enumeration, with its members in declaration order. Generated from the sources and
+held in place by `python3 scripts/check-api-doc-coverage.py`, which fails when a public type is
+missing from this document.
+
+### Core (`Md3.Avalonia`) — 59 enumerations
+
+| Enum | Members |
+|---|---|
+| `MdAdaptiveBreakpoint` | `Compact` · `Medium` · `Expanded` · `Large` · `ExtraLarge` |
+| `MdAdaptiveInputMode` | `Automatic` · `Touch` · `Pointer` · `Keyboard` |
+| `MdAdaptiveLayoutMode` | `Compact` · `Medium` · `Expanded` |
+| `MdAdaptivePlatform` | `Automatic` · `Material` · `Cupertino` |
+| `MdAutovalidateMode` | `Disabled` · `OnUserInteraction` · `Always` |
+| `MdBadgeVariant` | `Dot` · `Label` |
+| `MdButtonShape` | `Round` · `Square` |
+| `MdButtonSize` | `ExtraSmall` · `Small` · `Medium` · `Large` · `ExtraLarge` |
+| `MdButtonVariant` | `Filled` · `Tonal` · `Outlined` · `Text` · `Elevated` |
+| `MdCaptionButtonKind` | `Minimize` · `MaximizeRestore` · `Close` |
+| `MdCardVariant` | `Elevated` · `Filled` · `Outlined` |
+| `MdCarouselVariant` | `MultiBrowse` · `Hero` · `CenterAligned` · `Uncontained` |
+| `MdChipVariant` | `Assist` · `Filter` · `Input` · `Suggestion` |
+| `MdDataTableSortDirection` | `None` · `Ascending` · `Descending` |
+| `MdDatePickerMode` | `Docked` · `Modal` |
+| `MdDialogVariant` | `Basic` · `FullScreen` |
+| `MdDismissDirection` | `Horizontal` · `StartToEnd` · `EndToStart` |
+| `MdExtendedFabSize` | `Small` · `Medium` · `Large` |
+| `MdFabAlignment` | `End` · `Start` · `Right` · `Left` |
+| `MdFabColor` | `PrimaryContainer` · `SecondaryContainer` · `TertiaryContainer` · `Primary` · `Secondary` · `Tertiary` |
+| `MdFabMenuExpansionDirection` | `Up` · `Down` |
+| `MdFabSize` | `Small` · `Regular` · `Medium` · `Large` |
+| `MdFocusTraversalPolicy` | `VisualOrder` · `TabIndex` · `ReadingOrder` |
+| `MdIconButtonVariant` | `Standard` · `Filled` · `Tonal` · `Outlined` |
+| `MdIconButtonWidth` | `Narrow` · `Default` · `Wide` |
+| `MdListVariant` | `Standard` · `Segmented` |
+| `MdMotionKind` | `Spatial` · `Effects` |
+| `MdMotionScheme` | `Expressive` · `Standard` · `Reduced` · `None` |
+| `MdMotionSpeed` | `Fast` · `Default` · `Slow` |
+| `MdNavigationBarLayout` | `Stacked` · `Horizontal` |
+| `MdNavigationBarVariant` | `Flexible` · `Baseline` |
+| `MdNavigationDrawerPlacement` | `Left` · `Right` |
+| `MdNavigationSuiteMode` | `Auto` · `NavigationBar` · `NavigationRail` · `NavigationDrawer` |
+| `MdPlaybackRequest` | `Play` · `Pause` · `Previous` · `Next` · `Rewind` · `Forward` · `Mute` · `Unmute` · `EnterFullScreen` · `ExitFullScreen` |
+| `MdProgressShape` | `Flat` · `Wavy` |
+| `MdScrollbarThumbVisibility` | `Auto` · `Always` · `Hidden` |
+| `MdSettingsCardVariant` | `Flat` · `Filled` · `Elevated` · `Outlined` |
+| `MdSheetPlacement` | `Bottom` · `Start` · `End` · `Left` · `Right` |
+| `MdSnackbarResult` | `Dismissed` · `ActionInvoked` |
+| `MdStepState` | `Indexed` · `Editing` · `Complete` · `Error` · `Disabled` |
+| `MdSurfaceVariant` | `Surface` · `ContainerLowest` · `ContainerLow` · `Container` · `ContainerHigh` · `ContainerHighest` · `Inverse` |
+| `MdTabVariant` | `Primary` · `Secondary` |
+| `MdTextBoxVariant` | `Filled` · `Outlined` |
+| `MdTextStyle` | `DisplayLarge` · `DisplayMedium` · `DisplaySmall` · `HeadlineLarge` · `HeadlineMedium` · `HeadlineSmall` · `TitleLarge` · `TitleMedium` · `TitleSmall` · `BodyLarge` · `BodyMedium` · `BodySmall` · `LabelLarge` · `LabelMedium` · `LabelSmall` |
+| `MdThemeContrastLevel` | `Standard` · `Medium` · `High` |
+| `MdThemeFontProfile` | `Brand` · `Plain` |
+| `MdThemeMode` | `System` · `Light` · `Dark` |
+| `MdThemeSchemeVariant` | `TonalSpot` · `Neutral` · `Vibrant` · `Expressive` · `Monochrome` · `Fidelity` |
+| `MdThemeShapeScale` | `Compact` · `Standard` · `Expressive` |
+| `MdTimeDialPart` | `Hour` · `Minute` |
+| `MdTimePickerMode` | `Dial` · `Input` |
+| `MdToggleButtonVariant` | `Elevated` · `Filled` · `Tonal` · `Outlined` |
+| `MdToolbarDensity` | `Standard` · `Compact` |
+| `MdToolbarMode` | `Docked` · `Floating` |
+| `MdToolbarVariant` | `Standard` · `Vibrant` |
+| `MdTooltipVariant` | `Plain` · `Rich` |
+| `MdTopAppBarVariant` | `Small` · `MediumFlexible` · `LargeFlexible` |
+| `MdWindowCapabilities` | `None` · `Move` · `Resize` · `Minimize` · `Maximize` · `Close` · `SystemMenu` · `All` |
+| `MdWindowPlatform` | `Unknown` · `Windows` · `MacOS` · `Linux` · `Android` |
+
+### Optional (`Md3.Avalonia.Extra`) — 19 enumerations
+
+| Enum | Members |
+|---|---|
+| `MdAnimatedTextEffect` | `Typewriter` · `Fade` · `Pop` · `None` |
+| `MdAsyncRequestState` | `Idle` · `Loading` · `Data` · `Empty` · `Error` · `Completed` |
+| `MdBreadcrumbOverflowBehavior` | `Wrap` · `Scroll` · `Collapse` |
+| `MdCalendarSelectionMode` | `Single` · `Range` · `Multiple` |
+| `MdChartKind` | `Line` · `Area` · `Bar` |
+| `MdChatMessageRole` | `User` · `Assistant` · `System` |
+| `MdColorPickerMode` | `MaterialPalette` · `SpectrumSliders` · `Presets` |
+| `MdComparisonOrientation` | `Horizontal` · `Vertical` |
+| `MdEcosystemDensity` | `Comfortable` · `Compact` · `Touch` |
+| `MdMasonryLayoutStrategy` | `Masonry` · `Quilted` · `Woven` |
+| `MdOverlayAlignment` | `Start` · `Center` · `End` |
+| `MdResultKind` | `Information` · `Success` · `Warning` · `Error` · `Empty` |
+| `MdRichEditorCommand` | `Bold` · `Italic` · `Underline` · `StrikeThrough` · `Heading` · `Quote` · `Code` · `Link` · `BulletedList` · `NumberedList` · `Undo` · `Redo` · `HorizontalRule` · `ClearFormatting` |
+| `MdSharedAxisKind` | `X` · `Y` · `Z` |
+| `MdSkeletonShape` | `Rectangle` · `RoundedRectangle` · `Circle` · `Text` |
+| `MdSpinKitKind` | `RotatingPlain` · `ThreeBounce` · `Wave` · `FadingCircle` · `ChasingDots` |
+| `MdTimelineItemState` | `Neutral` · `Active` · `Completed` · `Error` |
+| `MdTransferLayoutMode` | `Auto` · `Standard` · `Compact` |
+| `MdVisibilityTransition` | `Fade` · `ExpandVertical` · `ExpandHorizontal` · `Scale` · `SlideAndFade` |
+
+## Events and event arguments
+
+Components raise ordinary Avalonia routed or CLR events. These argument types are public so
+handlers can be written without casting:
+
+| Event argument | Raised by |
+|---|---|
+| `MdSearchResultCommittedEventArgs` | `MdSearchView.ResultCommitted` — carries the committed result |
+| `MdDataTableSortEventArgs` | `MdDataTable` / `MdPaginatedDataTable` column sorting |
+| `MdPageChangedEventArgs` | `MdPaginatedDataTable` page navigation |
+| `MdReorderEventArgs` | `MdReorderableList` drag completion |
+| `MdDismissRequestedEventArgs` | `MdDismissible` swipe-to-dismiss |
+| `MdFormSubmittedEventArgs` | `MdForm.Submitted` |
+| `MdHeroTransitionEventArgs` | `MdHero.TransitionRequested` — source and destination rectangles |
+| `MdPlaybackRequestEventArgs` | media/playback affordances, paired with `MdPlaybackRequest` |
+| `MdDataGridCellEditEventArgs` | `MdDataGrid` cell commit (Extra) |
+
+`MdSearchBar.SearchSubmitted` passes the submitted text as a plain `string`.
+
+`MdSnackbarMessage` is the queue item accepted by `MdSnackbarHost` and `IMdSnackbarService`:
+
+```csharp
+await snackbarService.ShowAsync(new MdSnackbarMessage("Draft archived")
+{
+    ActionContent = "Undo",
+    ActionCommand = undoCommand,
+    ActionCommandParameter = draftId
+});
+```
+
+`Content` is set through the constructor; `ActionContent`, `ActionCommand` and
+`ActionCommandParameter` are init-only. The result of a shown message is an `MdSnackbarResult`.
+
+## Motion
+
+`MdMotion` is the inherited motion entry point. `MdMotion.SetScheme(element, scheme)` and
+`GetScheme` attach an `MdMotionScheme` that flows down the visual tree, and
+`MdMotion.Resolve(element, MdMotionKind, MdMotionSpeed)` returns the `MdMotionSpec` a control
+should animate with:
+
+```csharp
+MdMotion.SetScheme(page, MdMotionScheme.Expressive);
+var spec = MdMotion.Resolve(page, MdMotionKind.Spatial, MdMotionSpeed.Default);
+```
+
+`MdMotionKind` separates `Spatial` motion (position, size, rotation, corner shape) from `Effects`
+(opacity, colour, elevation). `MdMotionSpec` is a readonly record struct describing one resolved
+animation, and `MdSpring(DampingRatio, Stiffness)` describes the physics. `MdMotionTokens` holds
+the compiled spring constants, `MdSpringEasing` is the `Easing` implementation that plays them,
+`MdMotionTransitions` builds `Transitions` collections from a spec, and `MdSpatialSpringRunner`
+and `MdPresenceController` drive spring-based and enter/exit animations.
+
+Motion springs are compiled constants rather than resources, so `Md.Sys.Motion.*` entries
+declared in XAML are descriptive and do not override `MdMotionTokens`.
+
+## Localization
+
+`MdLocalization` resolves the culture used by built-in strings such as picker weekday names and
+caption-button automation names:
+
+```csharp
+MdLocalization.SetCulture(window, new CultureInfo("zh-CN"));
+var culture = MdLocalization.ResolveCulture(element);
+var text = MdLocalization.GetString("MoveAllToSource", element);
+```
+
+`Culture` is an attached property, so a subtree can override the application culture. `GetString`
+and `Format` accept either an element or an explicit `CultureInfo`.
+
+## Supporting and infrastructure types
+
+| Type | Role |
+|---|---|
+| `MdLicenseEntry(Package, License, Text, ProjectUrl?)` | One row for `MdAboutDialog` and `MdLicensePage` |
+| `MdContrastDiagnostic(ForegroundRole, BackgroundRole, Purpose, Ratio, RequiredRatio)` | One result from `MdThemeManager.Diagnose` |
+| `MdBorderlessWindowOptions(CanResize, ExtendIntoTitleBar, TitleBarHeight, PreserveNativeBorder)` | Values an `IMdWindowPlatformAdapter` receives |
+| `MdWindowTemplateSettings` | Template-facing window metrics |
+| `MdWindowCapabilities`, `MdWindowPlatform` | What an adapter supports, and which platform resolved |
+| `IMdPopupOwner` | Implemented by transient surfaces so the shared popup coordinator can close the previous one |
+| `MdDataTableRow` | Row model for `MdDataTable` |
+| `MdRichEditorCommandDescriptor`, `MdRichEditorCommandConverters` | Describe and bind `MdRichEditorCommand` toolbar actions (Extra) |
+| `MdTextBoxRichEditorAdapter` | The default `IMdRichEditorAdapter`, backed by a plain text box (Extra) |
+| `MdColorConverters` | Value converters used by `MdColorPicker` (Extra) |
+| `MdExperimentalAttribute` | Marks an Extra type whose shape may still change; carries a `Reason` |
+| `ExtraCatalog` | Static listing of the Extra control surface |
+| `EcosystemTheme` | Styles entry registered by `ExtraTheme` |
+| `MdCalendarDayPresenter`, `MdChatMessagePresenter`, `MdPinCellPresenter`, `MdTimelineItemPresenter`, `MdDataGridHeaderPresenter`, `MdTransferLayoutPanel` | Template-internal presenters, public so templates can be replaced |
+
+## Icon packages
+
+Two interchangeable symbol providers are offered; reference at most one.
+
+| Package | Contents | Catalog type |
+|---|---|---|
+| `Md3.Avalonia.Icons` | The complete Material Symbols Rounded variable TTF | `MdSymbols`, `MdExternalMaterialSymbols` |
+| `Md3.Avalonia.Icons.Lite` | A real outline subset cut from the same official file | `MdSymbolsLite`, `MdExternalMaterialSymbolsLite` |
+
+Both providers expose the same shape: `FontFamily`, `IsAvailable`, `EnsureConfigured()` and
+`ApplyTo(Application)`. Referencing a provider alongside the core package is enough — the core
+`MdSymbolPresenter` discovers it, registers the embedded font, verifies the family, typeface and a
+known glyph, then injects the `Md.Icon.*` resources. If verification fails the glyph stays blank
+rather than falling back to a look-alike character.
 
 ## Accessibility
 
