@@ -2,7 +2,6 @@ using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.VisualTree;
 
 namespace Md3.Avalonia.Controls;
 
@@ -178,7 +177,7 @@ public sealed class MdBackScope : IDisposable
 
     private void Sync()
     {
-        if (_isActive && _registration is null && _owner.GetVisualRoot() is not null)
+        if (_isActive && _registration is null && TopLevel.GetTopLevel(_owner) is not null)
             _registration = MdBackNavigation.Register(_owner, _handler);
         else if (!_isActive) Unregister();
     }

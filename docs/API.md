@@ -269,6 +269,93 @@ The optional `Md3.Avalonia.Extra` package contains visual and ecosystem controls
 
 The Windows adapter preserves native caption style bits when `PreserveNativeBorder=true`, while the Material template owns the title bar surface. Android uses a safe no-op adapter; desktop-only Gallery pages are not registered in `AndroidGalleryView`.
 
+## Mobile platform integration
+
+### System back gesture
+
+Android has no Escape key. The system back button, and the predictive back gesture from API 33,
+arrive as `TopLevel.BackRequested`. `MdBackNavigation` routes that request to the top-most open
+Material surface so a dialog, sheet or drawer closes instead of the activity finishing.
+
+`MdDialogHost`, `MdSheetHost`, `MdNavigationDrawer`, `MdSearchView`, `MdMenuAnchor`, `MdFabMenu`,
+`MdDatePicker` and `MdTimePicker` register themselves while they are open. Nothing is needed to
+opt in, and each surface dismisses on back exactly where it dismisses on Escape — a non-modal
+sheet or drawer stays put and lets the request fall through to the page behind it.
+
+Register your own surfaces with `MdBackScope`, which keeps a handler registered only while the
+surface is open and only while it is attached to a window:
+
+```csharp
+public sealed class MyOverlay : ContentControl
+{
+    private readonly MdBackScope _backScope;
+
+    public MyOverlay() => _backScope = new MdBackScope(this, OnBackRequested);
+
+    private void UpdateState() => _backScope.Update(IsOpen);
+
+    private bool OnBackRequested()
+    {
+        if (!IsOpen) return false;
+        IsOpen = false;
+        return true;   // consumed: the activity is not popped
+    }
+}
+```
+
+Handlers run most recently registered first, so nested surfaces unwind in the order the user
+opened them. Returning `false` passes the request on. When no handler consumes it the routed
+event stays unhandled and the platform performs its default back action.
+
+`MdBackNavigation.RequestBack(visual)` raises the same chain directly, which is how the behaviour
+is tested without a device, and `MdBackNavigation.GetHandlerCount(topLevel)` reports how many
+surfaces are currently listening.
+
+### Safe area insets
+
+`MdSafeArea` insets its content past the status bar, a display cutout, the navigation bar and the
+gesture handle — the Material counterpart of Flutter's `SafeArea`.
+
+Avalonia already pads the whole root view to the safe area. That is correct but blunt: with it on
+a top app bar can never paint its surface behind the status bar, which is what Material asks for.
+For an edge-to-edge layout, turn the global padding off and inset only the parts that must stay
+clear:
+
+```xml
+<Window xmlns:md="https://github.com/ilwren/Md3.Avalonia"
+        TopLevel.AutoSafeAreaPadding="False">
+  <md:MdScaffold>
+    <md:MdScaffold.TopBar>
+      <!-- the bar surface runs under the status bar; only its content is inset -->
+      <md:MdTopAppBar Headline="Inbox">
+        <md:MdTopAppBar.Styles>
+          <Style Selector="md|MdTopAppBar">
+            <Setter Property="Padding" Value="0" />
+          </Style>
+        </md:MdTopAppBar.Styles>
+      </md:MdTopAppBar>
+    </md:MdScaffold.TopBar>
+    <md:MdSafeArea Edges="Horizontal,Bottom">
+      <views:InboxList />
+    </md:MdSafeArea>
+  </md:MdScaffold>
+</Window>
+```
+
+| Member | Purpose |
+|---|---|
+| `Edges` | Which edges to inset; defaults to `All`. Drop `Top` to let a bar paint behind the status bar. |
+| `MinimumPadding` | A per-edge floor, so content keeps breathing room where the inset is zero. |
+| `SafeAreaPadding` | The platform's current inset, written from the insets manager as it changes. Settable, so a layout can be previewed and tested without a device. |
+| `EffectivePadding` | What is actually applied, after edge filtering and the minimum. |
+| `IsSafeAreaActive` | True when the platform reports a non-zero inset on a selected edge. |
+| `MdSafeArea.GetPlatformInsets(visual)` | The raw platform inset, or zero where there is no insets manager. |
+
+Insets are reported on Android, iOS and browser. Desktop has no insets manager, where
+`SafeAreaPadding` stays zero and `MdSafeArea` collapses to `MinimumPadding` — so the same layout
+is safe to ship on every target. `MdKeyboardAvoidingHost` handles the separate case of the soft
+keyboard covering a focused field.
+
 ## Enumerations
 
 Every public enumeration, with its members in declaration order. Generated from the sources and
