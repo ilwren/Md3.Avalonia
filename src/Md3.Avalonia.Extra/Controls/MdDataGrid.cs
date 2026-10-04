@@ -145,7 +145,7 @@ public sealed class MdDataGrid : ListBox
             return true;
         }
 
-        var accessor = MdMemberAccess.For(item.GetType(), column.PropertyName);
+        var accessor = MdMemberAccess.ForInstance(item, column.PropertyName);
         if (accessor?.CanWrite != true) return false;
         if (column.ValueParser is { } reflectionParser)
         {

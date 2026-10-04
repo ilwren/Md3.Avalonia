@@ -69,18 +69,31 @@ internal static class MdMemberAccess
     /// and no annotation here can make a trimmer keep a type it has never seen. Controls that
     /// accept a string path all accept a selector delegate that skips this entirely.
     /// </remarks>
-    [UnconditionalSuppressMessage("Trimming", "IL2072",
-        Justification = "The model type belongs to the application, which is the only party that " +
-                        "can preserve its properties. Every caller also offers a reflection-free " +
-                        "selector; see the type remarks.")]
-    [UnconditionalSuppressMessage("Trimming", "IL2075",
-        Justification = "As above: the runtime type of an application model cannot be annotated " +
-                        "from inside the library.")]
     internal static object? GetValue(object? item, string? path)
     {
         if (item is null || string.IsNullOrWhiteSpace(path)) return null;
-        return For(item.GetType(), path)?.Get(item);
+        return ForInstance(item, path)?.Get(item);
     }
+
+    /// <summary>
+    /// Resolves <paramref name="name"/> against an item's runtime type.
+    /// </summary>
+    /// <remarks>
+    /// The library's single unknowable step, and the only reason it is a separate method: the
+    /// item's type is the application's, and no annotation inside the library can make a trimmer
+    /// keep a type it has never seen. Every control that reaches this also offers a selector
+    /// delegate that skips it. Call this rather than <see cref="For"/> whenever the type comes
+    /// from an instance, so the reasoning stays in one place.
+    /// </remarks>
+    [UnconditionalSuppressMessage("Trimming", "IL2072",
+        Justification = "The model type belongs to the application, which is the only party that " +
+                        "can preserve its properties. Every caller also offers a reflection-free " +
+                        "selector; see the remarks.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2075",
+        Justification = "As above: the runtime type of an application model cannot be annotated " +
+                        "from inside the library.")]
+    internal static MdMemberAccessor? ForInstance(object item, string name) =>
+        For(item.GetType(), name);
 
     /// <summary>
     /// Reads <paramref name="path"/> as display text. An empty path means "use the item itself",
