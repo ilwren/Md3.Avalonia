@@ -53,6 +53,9 @@ jobs:
           api-level: 34
           arch: x86_64
           profile: pixel_6
+          force-avd-creation: true
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           script: |
             # Install the APK and retain logcat even when a regression flow fails.
             adb install artifacts/android/*.apk
