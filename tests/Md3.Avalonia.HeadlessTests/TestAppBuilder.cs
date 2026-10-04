@@ -14,6 +14,7 @@ public sealed class TestApplication : Application
     {
         Styles.Add(new MaterialTheme());
         Styles.Add(new EcosystemTheme());
+        Styles.Add(new global::Md3.Avalonia.DataGrid.Themes.MaterialDataGridTheme());
     }
 }
 
