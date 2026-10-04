@@ -41,12 +41,21 @@
   <x:Double x:Key="Md.Comp.Switch.Handle.Unselected.Size">16</x:Double>
 
   <!--
-    Navigation. The rail is 80dp because that is what its own item was built for: a 56dp
-    indicator inside 12dp of padding on each side comes to exactly 80. It had been 96, which
-    left 8dp of unexplained slack on either side of the indicator.
+    Navigation. Both of these are M3 Expressive values and both differ from the pre-Expressive
+    numbers that are still the first hit in most searches:
+
+      * the bar is 80dp with stacked items (baseline) and 64dp with horizontal items
+        (flexible, the default here) - two configurations, not one value;
+      * the collapsed rail went from 80dp to 96dp in M3 Expressive.
+
+    Both were briefly "corrected" to the older figures on the strength of an oracle entry that
+    had been transcribed by review rather than mapped to a pinned source. An existing test and
+    then material-components-android's own docs said otherwise. The numbers below are the
+    Expressive ones.
   -->
   <x:Double x:Key="Md.Comp.NavigationBar.Container.Height">80</x:Double>
-  <x:Double x:Key="Md.Comp.NavigationRail.Container.Width">80</x:Double>
+  <x:Double x:Key="Md.Comp.NavigationBar.Flexible.Container.Height">64</x:Double>
+  <x:Double x:Key="Md.Comp.NavigationRail.Container.Width">96</x:Double>
   <x:Double x:Key="Md.Comp.NavigationDrawer.Container.Width">360</x:Double>
 
   <!--

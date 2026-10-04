@@ -182,7 +182,7 @@ Everything in the first round of open questions has now been answered. What is l
 
 | Finding | Status |
 | --- | --- |
-| `Md.Comp.Fab.Medium.Shape` 24dp vs 20dp, `Md.Comp.Fab.Large.IconSize` 32dp vs 36dp, `Md.Comp.Button.XSmall.Content.Padding` 16dp vs 12dp | **Medium confidence: the oracle is the weaker party.** These three entries were transcribed by review rather than mapped to a pinned upstream file, so the published value needs re-verifying before any rendering changes. They never fail a build. |
+| `Md.Comp.Fab.Medium.Shape` 24dp vs 20dp, `Md.Comp.Fab.Large.IconSize` 32dp vs 36dp, `Md.Comp.Button.XSmall.Content.Padding` 16dp vs 12dp | **Medium confidence: the oracle is the weaker party**, and after the navigation episode that should be the default assumption for any entry transcribed by review. All three need mapping to a pinned upstream file before any rendering changes. They never fail a build. |
 | `Md.Sys.Motion.*` keys are declarative | `MdMotion` resolves only `Md.Sys.Motion.Scheme` at runtime and takes every spring from the compiled constants, so overriding a spring key changes nothing. Recorded as a note by the L5 layer so the catalogue cannot be mistaken for a theming hook. Making motion genuinely themeable is a behavioural change, not a token change. |
 | `Md.Comp.Switch.Handle.Unselected.Size` and the two `*Increased` shape steps are declared but unreferenced | The switch animates one 24dp handle under `scale(0.667)` rather than swapping two sizes, and nothing uses the new shape steps yet. The lint warnings are accurate and accepted. |
 | 3 L3 goldens have no committed baseline | By design. Candidates are written to `artifacts/spec/baselines-new/`; a human reviews one and copies it into `Spec/baselines/` to arm it. The layer never adopts its own output. |
@@ -191,11 +191,21 @@ Everything in the first round of open questions has now been answered. What is l
 
 These were open in 4.3 and have since been resolved rather than waived.
 
-- **Navigation bar 64dp -> 80dp, navigation rail 96dp -> 80dp.** Both now M3's published values. The
-  rail is the more interesting one: its own item draws a 56dp indicator inside 12dp of padding per
-  side, which comes to exactly 80, so the control had been carrying 16dp of slack that nothing in
-  its own template asked for. Verified that no `ComboBox` sits inside a rail or bar, so the
-  containment problem that motivated the original sizes is not affected.
+- **Navigation: the oracle was wrong and the library was right — twice.** Both nav entries were
+  "corrected" towards the oracle and both corrections were wrong.
+  `MdPhaseTwoToFourCompletionTests` failed immediately on the bar, and
+  `material-components-android`'s own component docs settled the rail. M3 Expressive moved the
+  collapsed rail **from 80dp to 96dp**, and the bar is **two** configurations rather than one
+  number: 80dp with stacked items (`Baseline`) and 64dp with horizontal items (`Flexible`, the
+  default). Both controls were already correct. What changed is the oracle: the rail entry now
+  reads 96, and `Md.Comp.NavigationBar.Flexible.Container.Height` (64) was added beside the
+  baseline entry so the pair is explicit.
+
+  This is the most useful thing the exercise produced. Two entries marked `high` confidence —
+  entitled to fail a build — were transcribed by review rather than mapped to a pinned upstream
+  file, and both carried pre-Expressive values. The lesson is in §1: confidence has to track
+  *provenance*, not plausibility. `bootstrap` mode and the existing test suite are what stopped a
+  bad oracle from rewriting correct controls.
 - **Input chip 50dp -> 32dp.** `Variant = Input` implies `:removable`, revealing `PART_RemoveButton`
   - an `MdIconButton` whose 48dp standalone target set the floor for the whole chip. The root grid
   in `MdIconButton`'s template now template-binds its minimum instead of hardcoding 48, so the

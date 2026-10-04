@@ -53,7 +53,7 @@
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdNavigationBar}" TargetType="md:MdNavigationBar">
-    <Setter Property="Height" Value="{DynamicResource Md.Comp.NavigationBar.Container.Height}" />
+    <Setter Property="Height" Value="{DynamicResource Md.Comp.NavigationBar.Flexible.Container.Height}" />
     <Setter Property="Padding" Value="8,0" />
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
     <Setter Property="BorderThickness" Value="0" />
@@ -66,8 +66,7 @@
         </Border>
       </ControlTemplate>
     </Setter>
-    <!-- Baseline and the default are both 80dp in M3; the selector stays so the variant keeps
-         an explicit declaration rather than inheriting one silently. -->
+    <!-- Stacked items need the taller container; horizontal items do not. -->
     <Style Selector="^:baseline"><Setter Property="Height" Value="{DynamicResource Md.Comp.NavigationBar.Container.Height}" /></Style>
   </ControlTheme>
 </ResourceDictionary>
