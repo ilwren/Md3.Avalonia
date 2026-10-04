@@ -49,18 +49,33 @@ internal static class MdMemberAccess
     /// public instance property. Results are cached, so a sort or filter over thousands of rows
     /// pays for the lookup once rather than once per cell.
     /// </summary>
-    [UnconditionalSuppressMessage("Trimming", "IL2070",
-        Justification = "The model type belongs to the application, which is the only party that " +
-                        "can preserve its properties. Controls that accept a string path also " +
-                        "accept a reflection-free selector delegate; see the type remarks.")]
-    internal static MdMemberAccessor? For(Type type, string name) =>
-        Cache.GetOrAdd((type, name), static key =>
-        {
-            var property = key.Type.GetProperty(key.Name, BindingFlags.Instance | BindingFlags.Public);
-            return property is null ? null : new MdMemberAccessor(property);
-        });
+    internal static MdMemberAccessor? For(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type type,
+        string name)
+    {
+        // The lookup is deliberately not inside the cache factory: routing the Type through a
+        // tuple field would lose the annotation above and reopen the hole this closes.
+        if (Cache.TryGetValue((type, name), out var cached)) return cached;
+
+        var property = type.GetProperty(name, BindingFlags.Instance | BindingFlags.Public);
+        var accessor = property is null ? null : new MdMemberAccessor(property);
+        Cache[(type, name)] = accessor;
+        return accessor;
+    }
 
     /// <summary>Reads <paramref name="path"/> off <paramref name="item"/>, or null when either is absent.</summary>
+    /// <remarks>
+    /// This is the library's one unknowable step: the item's runtime type is the application's,
+    /// and no annotation here can make a trimmer keep a type it has never seen. Controls that
+    /// accept a string path all accept a selector delegate that skips this entirely.
+    /// </remarks>
+    [UnconditionalSuppressMessage("Trimming", "IL2072",
+        Justification = "The model type belongs to the application, which is the only party that " +
+                        "can preserve its properties. Every caller also offers a reflection-free " +
+                        "selector; see the type remarks.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2075",
+        Justification = "As above: the runtime type of an application model cannot be annotated " +
+                        "from inside the library.")]
     internal static object? GetValue(object? item, string? path)
     {
         if (item is null || string.IsNullOrWhiteSpace(path)) return null;
@@ -83,10 +98,13 @@ internal static class MdMemberAccess
     /// anything else goes through the type's converter.
     /// </summary>
     /// <returns>False when the text is not valid for the target type, leaving the model untouched.</returns>
+    [UnconditionalSuppressMessage("Trimming", "IL2067",
+        Justification = "TypeDescriptor.GetConverter inspects the application's model type, which " +
+                        "the library cannot annotate. A trimmed app should supply " +
+                        "MdDataGridColumn.ValueParser, which converts without reflection.")]
     [UnconditionalSuppressMessage("Trimming", "IL2026",
-        Justification = "TypeDescriptor.GetConverter reads the application's model type. A trimmed " +
-                        "app should supply MdDataGridColumn.ValueParser, which converts without " +
-                        "reflection; see the type remarks.")]
+        Justification = "As above: the converter for an application type is the application's to " +
+                        "preserve, and ValueParser avoids needing one.")]
     internal static bool TryConvert(string? text, Type targetType, out object? value)
     {
         if (targetType == typeof(string))
