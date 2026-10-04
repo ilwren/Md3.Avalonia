@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Headless;
@@ -149,6 +150,86 @@ public sealed class MdAdditionalControlTests
         var drawer = new MdNavigationDrawer { IsOpen = false };
         drawer.IsOpen = true;
         Assert.True(drawer.IsOpen);
+    }
+
+    [AvaloniaFact]
+    public void Tabs_View_Shows_The_Page_For_The_Selected_Tab()
+    {
+        var tabs = new MdTabs { Width = 640, SelectedIndex = 0 };
+        tabs.Items.Add(new MdTabItem { Content = "Overview" });
+        tabs.Items.Add(new MdTabItem { Content = "Activity" });
+
+        var overview = new Border { Child = new TextBlock { Text = "Overview page" } };
+        var activity = new Border { Child = new TextBlock { Text = "Activity page" } };
+        var view = new MdTabsView { Tabs = tabs, Height = 120 };
+        view.Items.Add(overview);
+        view.Items.Add(activity);
+
+        var window = new Window { Width = 700, Height = 300, Content = new StackPanel { Children = { tabs, view } } };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var host = view.GetVisualDescendants().OfType<ContentPresenter>().Single(part => part.Name == "PART_SelectedContentHost");
+        Assert.Equal(0, view.SelectedIndex);
+        Assert.Same(overview, host.Content);
+
+        // Choosing a tab pages the content.
+        tabs.SelectedIndex = 1;
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(1, view.SelectedIndex);
+        Assert.Same(activity, host.Content);
+
+        // And paging the content moves the bar, so neither can be left behind the other.
+        view.SelectedIndex = 0;
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(0, tabs.SelectedIndex);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void Tabs_View_Keeps_Its_Page_When_The_Bar_Has_More_Tabs_Than_Pages()
+    {
+        var tabs = new MdTabs { Width = 640, SelectedIndex = 0 };
+        tabs.Items.Add(new MdTabItem { Content = "One" });
+        tabs.Items.Add(new MdTabItem { Content = "Two" });
+        tabs.Items.Add(new MdTabItem { Content = "Three" });
+
+        var view = new MdTabsView { Tabs = tabs, Height = 120 };
+        view.Items.Add(new Border { Child = new TextBlock { Text = "One" } });
+        view.Items.Add(new Border { Child = new TextBlock { Text = "Two" } });
+
+        var window = new Window { Width = 700, Height = 300, Content = new StackPanel { Children = { tabs, view } } };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        tabs.SelectedIndex = 2;
+        Dispatcher.UIThread.RunJobs();
+
+        // Blanking the view would be worse than leaving the last real page up.
+        Assert.Equal(1, view.SelectedIndex);
+        Assert.NotNull(view.SelectedItem);
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void Tabs_View_Draws_No_Second_Tab_Strip()
+    {
+        var tabs = new MdTabs { Width = 640, SelectedIndex = 0 };
+        tabs.Items.Add(new MdTabItem { Content = "Overview" });
+
+        var view = new MdTabsView { Tabs = tabs, Height = 120 };
+        view.Items.Add(new Border());
+
+        var window = new Window { Width = 700, Height = 300, Content = new StackPanel { Children = { tabs, view } } };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        // The bar is the strip; a TabControl template would otherwise bring its own.
+        Assert.DoesNotContain(view.GetVisualDescendants().OfType<ItemsPresenter>(), _ => true);
+
+        window.Close();
     }
 
     [AvaloniaFact]

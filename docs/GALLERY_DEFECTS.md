@@ -39,6 +39,30 @@ Regression tests added: `Rating_Arranged_Narrower_Than_Its_Natural_Row_Still_Rea
 `Rating_Hit_Test_Quantizes_Inside_Each_Star_And_Ignores_Spacing` was corrected: it used a 260 DIP
 window for a row needing 288, so it pinned the overflow behaviour that caused #24.
 
+19, 15 and 10 were fixed after that table was written.
+
+**19 selection rendering** turned out to be four faults in one slot of `MdFormField`. The
+supporting presenter had no visibility binding, so a field with nothing to say still reserved a
+row; neither the supporting nor the error line was indented, while `MdTextBox` and `MdComboBox`
+both indent to 16 DIP through `Md.Comp.TextField.Supporting.Row.Margin`; error and supporting
+showed at the same time, where M3 has the error replace the supporting text; and
+`MdDropdownFormField` added its own pair on top of the two `MdComboBox` already draws, so the
+dropdown showed the supporting line twice, one copy unindented. The dropdown now forwards
+`SupportingText` and `ErrorText` into the combo box that was already rendering them correctly.
+
+**15 AboutDialog auto-fill** — the dialog made the application restate its own name, version and
+copyright, all of which the entry assembly declares. Unset properties now fall back to
+`AssemblyTitle`/`AssemblyProduct`, the informational version with SourceLink's `+sha` stripped,
+and `AssemblyCopyright`, read through new `EffectiveApplicationName`/`EffectiveApplicationVersion`/
+`EffectiveLegalese` properties so an explicit value is never overwritten. Absent icon, version and
+legalese rows collapse.
+
+**10 tabs have no content host** — correct as far as it went: `MdTabs` is a bar and `MdTabItem`'s
+`Content` is its label, so pages had nowhere to go without hand-wiring `SelectionChanged`. Rather
+than fold content into the bar, which Material places in app bars away from the pages, the missing
+half is now `MdTabsView`: children are the pages, matched to the bar by position, with selection
+synchronised both ways. Same split as Flutter's `TabBar`/`TabBarView`.
+
 ## Checked and found correct — no change made
 
 | # | Item | Evidence |
@@ -52,13 +76,11 @@ window for a row needing 288, so it pinned the overflow behaviour that caused #2
 |---|------|---------|
 | 9 | Date / time / range pickers don't apply the selection | The modal rollback is **deliberate and covered by a test** (`Modal_Pickers_Roll_Back_Provisional_Values_When_Dismissed`): closing a modal picker without pressing OK restores the value held at open. Docked mode commits immediately. Needs a precise repro — which picker, which mode, and whether OK was pressed — before changing tested behaviour. The picker gallery page also shows no bound value, so the outcome is invisible either way. |
 | 26 | Borderless window corners missing | Depends on OS-level window shaping (transparency hints, DWM rounded corners, the platform adapters) — not observable or testable headless. Needs a desktop run to diagnose rather than a guess. |
-| 10 | Tabs have no content host | `MdTabs`/`MdTabItem` are separate types from `MdTabView`/`MdTabViewItem`; only the latter pair carries content. |
 | 13 | `MdDataGrid` is not a drop-in for `DataGrid` | It exposes 10 styled properties in total. The gap is real and needs an explicit API decision, not a rename. |
 
 ## Not yet investigated
 
-12 one page per parity component · 15 AboutDialog auto-fill · 19 selection rendering ·
-21 rich text (adapter-based) · 22 image compare (adapter-based)
+12 one page per parity component · 21 rich text (adapter-based) · 22 image compare (adapter-based)
 
 ## P0 mobile platform gaps
 

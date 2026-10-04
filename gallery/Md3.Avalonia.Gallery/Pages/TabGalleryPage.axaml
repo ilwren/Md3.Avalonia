@@ -23,12 +23,24 @@
       </StackPanel>
 
       <StackPanel Width="720" HorizontalAlignment="Left" Spacing="12">
-        <TextBlock Classes="h2" Text="Secondary tabs" />
-        <md:MdTabs Variant="Secondary" SelectedIndex="0">
+        <TextBlock Classes="h2" Text="Secondary tabs with a content area" />
+        <TextBlock Classes="body" Text="MdTabs is the bar on its own; MdTabsView holds the pages and follows it." />
+        <md:MdTabs x:Name="SecondaryTabs" Variant="Secondary" SelectedIndex="0">
           <md:MdTabItem Content="Overview" />
           <md:MdTabItem Content="Specifications" />
           <md:MdTabItem Content="Reviews" />
         </md:MdTabs>
+        <md:MdTabsView Tabs="{Binding #SecondaryTabs}" Height="104">
+          <Border Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20">
+            <TextBlock VerticalAlignment="Center" FontSize="18" Text="A short summary of the product." />
+          </Border>
+          <Border Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20">
+            <TextBlock VerticalAlignment="Center" FontSize="18" Text="Dimensions, weight and materials." />
+          </Border>
+          <Border Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20">
+            <TextBlock VerticalAlignment="Center" FontSize="18" Text="4.6 stars from 212 reviews." />
+          </Border>
+        </md:MdTabsView>
       </StackPanel>
 
       <StackPanel Width="720" HorizontalAlignment="Left" Spacing="12">
@@ -53,7 +65,7 @@
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
-        <gallery:CodeExample XamlCode="&lt;md:MdTabs SelectedItem=&quot;{Binding Section}&quot;&#10;           IsScrollable=&quot;True&quot;&gt;&#10;  &lt;md:MdTabItem Content=&quot;Overview&quot; Icon=&quot;...&quot; /&gt;&#10;  &lt;md:MdTabItem Content=&quot;Activity&quot; Icon=&quot;...&quot; /&gt;&#10;&lt;/md:MdTabs&gt;" CSharpCode="var tabs = new MdTabs { Variant = MdTabVariant.Primary };&#10;tabs.Items.Add(new MdTabItem { Content = &quot;Overview&quot; });&#10;tabs.SelectedIndex = 0;" />
+        <gallery:CodeExample XamlCode="&lt;md:MdTabs x:Name=&quot;Sections&quot; SelectedIndex=&quot;0&quot;&gt;&#10;  &lt;md:MdTabItem Content=&quot;Overview&quot; /&gt;&#10;  &lt;md:MdTabItem Content=&quot;Activity&quot; /&gt;&#10;&lt;/md:MdTabs&gt;&#10;&lt;md:MdTabsView Tabs=&quot;{Binding #Sections}&quot;&gt;&#10;  &lt;Border&gt;Overview page&lt;/Border&gt;&#10;  &lt;Border&gt;Activity page&lt;/Border&gt;&#10;&lt;/md:MdTabsView&gt;" CSharpCode="var tabs = new MdTabs { Variant = MdTabVariant.Primary };&#10;tabs.Items.Add(new MdTabItem { Content = &quot;Overview&quot; });&#10;tabs.SelectedIndex = 0;" />
       </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>

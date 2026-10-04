@@ -14,6 +14,8 @@
   `MinimumPadding` floor and a settable `SafeAreaPadding` for previewing a layout without a
   device.
 - `MdRevealHost` and `MdMorphPanel`, the layout primitives behind the rebuilt motion controls.
+- `MdTabsView`, the content area for an `MdTabs` bar. Children are the pages, matched to the
+  bar's tabs by position, with selection kept in step in both directions.
 - **Trimming support.** All four packages declare `IsTrimmable` and build with the IL2xxx
   analyzer enabled. `MdThemeJson` moved to a source-generated serializer context, and every
   control that takes a string property path gained a reflection-free delegate:
@@ -29,6 +31,12 @@
   segmented-button icon reservation, settings-expander header padding.
 
 ### Fixed
+- `MdFormField` supporting and error text: the supporting line no longer reserves a row when
+  empty, both lines indent to the field's inner edge, the error replaces the supporting text
+  instead of stacking under it, and `MdDropdownFormField` no longer draws a second supporting
+  line on top of the one `MdComboBox` already renders.
+- `MdAboutDialog` now fills `ApplicationName`, `ApplicationVersion` and `Legalese` from the entry
+  assembly when they are not set, and collapses the icon, version and copyright rows when empty.
 
 - CI jobs are bounded by a timeout; a deadlocked test previously held a runner for six hours.
 
