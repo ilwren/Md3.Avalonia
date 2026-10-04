@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.PagedItemsGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Paged items view" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="An incrementally loading collection. The page provider is async by contract, so the loading state is observable rather than skipped in one dispatcher pass." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <WrapPanel Orientation="Horizontal">
+          <md:MdButton Content="Load next page" Variant="Tonal" Click="LoadNextPage" Margin="0,0,8,8" />
+          <md:MdButton Content="Refresh pages" Variant="Text" Click="RefreshPages" Margin="0,0,8,8" />
+        </WrapPanel>
+        <eco:MdPagedItemsView x:Name="PagedItems" AutoLoad="False" PageSize="4" EmptyContent="No records" Refreshed="PagesRefreshed">
+          <eco:MdPagedItemsView.ItemTemplate>
+            <!-- PagedRecord is private to the code-behind, so reflection bindings, as elsewhere. -->
+            <DataTemplate x:CompileBindings="False">
+              <Border Margin="0,0,0,8" Padding="12" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}">
+                <StackPanel>
+                  <TextBlock FontWeight="Medium" Text="{Binding Title}" />
+                  <TextBlock Classes="body" Opacity="0.72" Text="{Binding Detail}" />
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </eco:MdPagedItemsView.ItemTemplate>
+        </eco:MdPagedItemsView>
+        <TextBlock x:Name="PagingStatus" Classes="body" Text="No page loaded. Load next page to append four records." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample CSharpCode="pages.PageProvider = async request =&gt;&#10;{&#10;    var items = await service.LoadPageAsync(request.PageKey, request.PageSize, request.CancellationToken);&#10;    return new MdPageResult&lt;object?&gt;(items, nextPageKey, isLastPage);&#10;};&#10;await pages.LoadNextPageAsync();" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

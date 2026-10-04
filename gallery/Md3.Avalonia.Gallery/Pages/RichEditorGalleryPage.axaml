@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.RichEditorGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Rich editor" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="MdRichEditor supplies the Material command surface and leaves the document to an adapter, so no editor engine is pulled into the library. This page uses the bundled TextBox adapter." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <eco:MdRichEditor x:Name="RichEditor" MinHeight="220" EditorStateChanged="EditorStateChanged">
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+            <md:MdTextBox x:Name="EditorText" MinHeight="150" AcceptsReturn="True" TextWrapping="Wrap"
+                          Label="Rich-text source" Variant="Outlined"
+                          Text="## Release notes&#10;Select words, then try **Bold**, _Italic_, quote, lists, links, undo, and redo." />
+            <Border Grid.Column="1" Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                    BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="12">
+              <StackPanel Spacing="6"><TextBlock FontSize="12" FontWeight="Medium" Opacity=".7" Text="LIVE RICH PREVIEW" /><StackPanel x:Name="RichPreview" /></StackPanel>
+            </Border>
+          </Grid>
+        </eco:MdRichEditor>
+        <TextBlock x:Name="EditorStatus" Classes="body" TextWrapping="Wrap" Text="Select source text and choose a command; the rendered preview updates immediately." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample CSharpCode="var editor = new MdRichEditor { Adapter = myEditorAdapter };   // IMdRichEditorAdapter" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

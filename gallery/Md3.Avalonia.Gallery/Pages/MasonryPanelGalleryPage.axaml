@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.MasonryPanelGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Masonry panel" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A column-balanced panel for uneven cards. Each tile is a real target, so the layout demonstrates dense dashboard reflow rather than decorative blocks." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <eco:MdMasonryPanel ColumnCount="3" Strategy="Quilted" ColumnSpacing="12" RowSpacing="12">
+          <md:MdCard Height="120" Padding="16" Variant="Filled" Tag="Design review" Click="MasonryCardInvoked"><StackPanel><TextBlock FontWeight="Medium" Text="Design review" /><TextBlock Classes="body" Text="12 comments · open discussion" /></StackPanel></md:MdCard>
+          <md:MdCard Height="72" Padding="16" Variant="Filled" Tag="Android build" Click="MasonryCardInvoked"><TextBlock Text="Android · ready" /></md:MdCard>
+          <md:MdCard Height="164" Padding="16" Variant="Outlined" Tag="Accessibility audit" Click="MasonryCardInvoked"><StackPanel><TextBlock FontWeight="Medium" Text="Accessibility audit" /><TextBlock TextWrapping="Wrap" Text="Keyboard, touch target, contrast and semantics checks. Activate to inspect the checklist." /></StackPanel></md:MdCard>
+          <md:MdCard Height="84" Padding="16" Variant="Filled" Tag="Localization" Click="MasonryCardInvoked"><TextBlock Text="Localization · 2 locales" /></md:MdCard>
+          <md:MdCard Height="112" Padding="16" Variant="Outlined" Tag="Release candidate" Click="MasonryCardInvoked"><TextBlock TextWrapping="Wrap" Text="Release candidate · package audit pending" /></md:MdCard>
+        </eco:MdMasonryPanel>
+        <TextBlock x:Name="MasonryStatus" Classes="body" Text="No project card opened." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdMasonryPanel ColumnCount=&quot;3&quot; Strategy=&quot;Quilted&quot; ColumnSpacing=&quot;12&quot; RowSpacing=&quot;12&quot;&gt;&#10;  &lt;md:MdCard Height=&quot;120&quot;&gt;...&lt;/md:MdCard&gt;&#10;&lt;/eco:MdMasonryPanel&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

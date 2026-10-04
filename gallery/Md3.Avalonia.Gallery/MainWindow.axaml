@@ -154,7 +154,34 @@
             <md:MdButton x:Name="TabNav" Content="Tabs" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTabs" />
             <md:MdButton x:Name="ToolbarNav" Content="Toolbars" Variant="Text" HorizontalContentAlignment="Left" Click="ShowToolbars" />
             <md:MdButton x:Name="TooltipNav" Content="Tooltips" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTooltips" />
-            <md:MdButton x:Name="EcosystemNav" Content="Flutter ecosystem" Variant="Text" HorizontalContentAlignment="Left" Click="ShowEcosystem" />
+            <md:MdButton x:Name="AnimatedTextNav" Content="Animated text" Variant="Text" HorizontalContentAlignment="Left" Click="ShowAnimatedText" />
+            <md:MdButton x:Name="AnimationSequenceNav" Content="Animation sequence" Variant="Text" HorizontalContentAlignment="Left" Click="ShowAnimationSequence" />
+            <md:MdButton x:Name="AsyncSelectNav" Content="Async select" Variant="Text" HorizontalContentAlignment="Left" Click="ShowAsyncSelect" />
+            <md:MdButton x:Name="AvatarNav" Content="Avatar" Variant="Text" HorizontalContentAlignment="Left" Click="ShowAvatar" />
+            <md:MdButton x:Name="BeforeAfterNav" Content="Before and after" Variant="Text" HorizontalContentAlignment="Left" Click="ShowBeforeAfter" />
+            <md:MdButton x:Name="CalendarNav" Content="Calendar" Variant="Text" HorizontalContentAlignment="Left" Click="ShowCalendar" />
+            <md:MdButton x:Name="CascaderNav" Content="Cascader" Variant="Text" HorizontalContentAlignment="Left" Click="ShowCascader" />
+            <md:MdButton x:Name="ChartNav" Content="Chart" Variant="Text" HorizontalContentAlignment="Left" Click="ShowChart" />
+            <md:MdButton x:Name="ChatNav" Content="Chat view" Variant="Text" HorizontalContentAlignment="Left" Click="ShowChatView" />
+            <md:MdButton x:Name="CommandPaletteNav" Content="Command palette" Variant="Text" HorizontalContentAlignment="Left" Click="ShowCommandPalette" />
+            <md:MdButton x:Name="DataGridNav" Content="Data grids" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDataGrid" />
+            <md:MdButton x:Name="DensityNav" Content="Density" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDensity" />
+            <md:MdButton x:Name="HoverCardNav" Content="Hover cards" Variant="Text" HorizontalContentAlignment="Left" Click="ShowHoverCard" />
+            <md:MdButton x:Name="MasonryNav" Content="Masonry panel" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMasonry" />
+            <md:MdButton x:Name="PagedItemsNav" Content="Paged items" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPagedItems" />
+            <md:MdButton x:Name="PinInputNav" Content="PIN input" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPinInput" />
+            <md:MdButton x:Name="PopoverNav" Content="Popover" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPopover" />
+            <md:MdButton x:Name="RatingNav" Content="Rating" Variant="Text" HorizontalContentAlignment="Left" Click="ShowRating" />
+            <md:MdButton x:Name="ResultViewNav" Content="Result view" Variant="Text" HorizontalContentAlignment="Left" Click="ShowResultView" />
+            <md:MdButton x:Name="RichEditorNav" Content="Rich editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowRichEditor" />
+            <md:MdButton x:Name="SkeletonNav" Content="Skeleton" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSkeleton" />
+            <md:MdButton x:Name="SlidableNav" Content="Slidable item" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSlidableItem" />
+            <md:MdButton x:Name="SpinKitNav" Content="Spin kit" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSpinKit" />
+            <md:MdButton x:Name="StaggeredPanelNav" Content="Staggered panel" Variant="Text" HorizontalContentAlignment="Left" Click="ShowStaggeredPanel" />
+            <md:MdButton x:Name="TagInputNav" Content="Tag input" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTagInput" />
+            <md:MdButton x:Name="TimelineNav" Content="Timeline" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTimeline" />
+            <md:MdButton x:Name="TransferNav" Content="Transfer" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTransfer" />
+            <md:MdButton x:Name="TreeViewNav" Content="Tree view" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTreeView" />
             <md:MdButton x:Name="BorderlessWindowNav" Content="Borderless windows" Variant="Text" HorizontalContentAlignment="Left" Click="ShowBorderlessWindows" />
               </StackPanel>
             </md:MdScrollViewer>

@@ -112,8 +112,37 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Toolbars", () => new ToolbarGalleryPage());
         AddPage("Tooltips", () => new TooltipGalleryPage());
 
+        AddSection("Extra controls");
+        AddPage("Animated text", () => new AnimatedTextGalleryPage());
+        AddPage("Animation sequence", () => new AnimationSequenceGalleryPage());
+        AddPage("Async select", () => new AsyncSelectGalleryPage());
+        AddPage("Avatar", () => new AvatarGalleryPage());
+        AddPage("Before and after", () => new BeforeAfterGalleryPage());
+        AddPage("Calendar", () => new CalendarGalleryPage());
+        AddPage("Cascader", () => new CascaderGalleryPage());
+        AddPage("Chart", () => new ChartGalleryPage());
+        AddPage("Chat view", () => new ChatViewGalleryPage());
+        AddPage("Command palette", () => new CommandPaletteGalleryPage());
+        AddPage("Data grids", () => new DataGridGalleryPage());
+        AddPage("Density", () => new DensityGalleryPage());
+        AddPage("Hover cards", () => new HoverCardGalleryPage());
+        AddPage("Masonry panel", () => new MasonryPanelGalleryPage());
+        AddPage("Paged items", () => new PagedItemsGalleryPage());
+        AddPage("PIN input", () => new PinInputGalleryPage());
+        AddPage("Popover", () => new PopoverGalleryPage());
+        AddPage("Rating", () => new RatingGalleryPage());
+        AddPage("Result view", () => new ResultViewGalleryPage());
+        AddPage("Rich editor", () => new RichEditorGalleryPage());
+        AddPage("Skeleton", () => new SkeletonGalleryPage());
+        AddPage("Slidable item", () => new SlidableItemGalleryPage());
+        AddPage("Spin kit", () => new SpinKitGalleryPage());
+        AddPage("Staggered panel", () => new StaggeredPanelGalleryPage());
+        AddPage("Tag input", () => new TagInputGalleryPage());
+        AddPage("Timeline", () => new TimelineGalleryPage());
+        AddPage("Transfer", () => new TransferGalleryPage());
+        AddPage("Tree view", () => new TreeViewGalleryPage());
+
         AddSection("Library");
-        AddPage("Flutter ecosystem", () => new EcosystemGalleryPage());
         // Borderless window/chrome and desktop adapter samples are intentionally desktop-only.
         // Do not expose them from the Android single-view navigation: Android has no native
         // desktop caption, resize frame, or desktop window lifetime to demonstrate.

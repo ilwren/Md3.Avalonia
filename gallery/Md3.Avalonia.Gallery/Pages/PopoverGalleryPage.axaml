@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.PopoverGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Popover" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A popover is a transient anchored surface. It closes on an outside click, Escape, a page scroll, or when another popup opens." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <eco:MdPopover Anchor="Toggle popover" HorizontalAlignment="Left"
+                       PopoverContent="This transient action closes on page scroll, outside click, Escape, or another popup."
+                       Opened="OverlayOpened" Closed="OverlayClosed" />
+        <TextBlock x:Name="OverlayStatus" Classes="body" TextWrapping="Wrap" Text="Open the popover, then scroll to verify it dismisses." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdPopover Anchor=&quot;Options&quot; PopoverContent=&quot;{Binding Details}&quot; Opened=&quot;OnOpened&quot; Closed=&quot;OnClosed&quot; /&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

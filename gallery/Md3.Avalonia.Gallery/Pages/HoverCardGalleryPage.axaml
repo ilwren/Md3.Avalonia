@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.HoverCardGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Hover card" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A hover card opens after a deliberate delay on hover or focus, so a pointer crossing the anchor does not flash it open." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <eco:MdHoverCard Anchor="Hover or focus" HorizontalAlignment="Left"
+                         PopoverContent="Hover cards open after a deliberate delay and never remain over later sections."
+                         Opened="HoverCardOpened" Closed="OverlayClosed" />
+        <TextBlock x:Name="OverlayStatus" Classes="body" TextWrapping="Wrap" Text="Hover or focus the anchor, then move away to dismiss." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdHoverCard Anchor=&quot;Profile&quot; PopoverContent=&quot;{Binding Summary}&quot; Opened=&quot;OnOpened&quot; Closed=&quot;OnClosed&quot; /&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

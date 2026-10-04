@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.AvatarGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Avatar" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="An identity surface. Here each avatar is the actionable target that assigns the review, not decoration beside one." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="body" Text="Assign the review to a teammate; the avatar is the actionable identity, not decoration." />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdButton Tag="Avery Lee" Height="64" ContainerHeight="64" Padding="12,0" Variant="Text" Click="AssignReviewer" Margin="0,0,8,8"><StackPanel Orientation="Horizontal" Spacing="8"><eco:MdAvatar Initials="AL" /><TextBlock VerticalAlignment="Center" Text="Avery" /></StackPanel></md:MdButton>
+          <md:MdButton Tag="Morgan Three" Height="64" ContainerHeight="64" Padding="12,0" Variant="Text" Click="AssignReviewer" Margin="0,0,8,8"><StackPanel Orientation="Horizontal" Spacing="8"><eco:MdAvatar Initials="M3" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" /><TextBlock VerticalAlignment="Center" Text="Morgan" /></StackPanel></md:MdButton>
+          <md:MdButton Tag="Uma Ito" Height="64" ContainerHeight="64" Padding="12,0" Variant="Text" Click="AssignReviewer" Margin="0,0,8,8"><StackPanel Orientation="Horizontal" Spacing="8"><eco:MdAvatar Initials="UI" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" Foreground="{DynamicResource Md.Sys.Color.OnTertiaryContainer.Brush}" /><TextBlock VerticalAlignment="Center" Text="Uma" /></StackPanel></md:MdButton>
+        </WrapPanel>
+        <TextBlock x:Name="ReviewerStatus" Classes="body" Text="No reviewer assigned." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdAvatar Initials=&quot;AL&quot; Background=&quot;{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}&quot; /&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

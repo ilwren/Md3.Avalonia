@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.AsyncSelectGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Async select" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A select whose options are produced by a query. Typing filters; committing a choice reports the selected value." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <eco:MdAsyncSelect x:Name="AsyncSelect" MaxWidth="360" HorizontalAlignment="Left" SelectionCommitted="AsyncSelectionCommitted" />
+        <TextBlock x:Name="AsyncSelectStatus" Classes="body" Text="Type a state name, then choose a visible result." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdAsyncSelect Query=&quot;{Binding Query}&quot; SelectedItem=&quot;{Binding Choice}&quot; /&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

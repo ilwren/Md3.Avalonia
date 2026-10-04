@@ -180,7 +180,9 @@ public sealed class MdEcosystemWaveAndWindowTests
     [AvaloniaFact]
     public void Advanced_Ecosystem_And_Borderless_Gallery_Pages_Render()
     {
-        using var ecosystem = Show(new EcosystemGalleryPage(), 1100, 800);
+        // The combined ecosystem page was split into one page per control; ChatView is the
+        // heaviest of them and keeps this render assertion meaningful.
+        using var ecosystem = Show(new ChatViewGalleryPage(), 1100, 800);
         Dispatcher.UIThread.RunJobs();
         Assert.NotNull(((Scope)ecosystem).Window.CaptureRenderedFrame());
         using var borderless = Show(new BorderlessWindowGalleryPage(), 1100, 800);

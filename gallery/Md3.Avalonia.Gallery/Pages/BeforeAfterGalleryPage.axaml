@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.BeforeAfterGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Before and after" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A draggable divider comparing two layers. Position is bindable, so the comparison can be driven from outside." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <Border Padding="12" Height="220" MaxWidth="420" HorizontalAlignment="Left" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}">
+          <eco:MdBeforeAfter Position="0.55" Before="BEFORE" After="AFTER" />
+        </Border>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdBeforeAfter Position=&quot;0.55&quot; Before=&quot;{Binding Original}&quot; After=&quot;{Binding Processed}&quot; /&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

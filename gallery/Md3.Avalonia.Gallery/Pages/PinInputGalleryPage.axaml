@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.PinInputGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="PIN and OTP input" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A segmented code field. Typing, pasting and the direct APIs all drive the same state, including masking and the error presentation." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Click the segmented field, type or paste six digits, then use the direct APIs to exercise masking, errors and completion." />
+        <eco:MdPinInput x:Name="PinInput" Length="6" Completed="PinCompleted" HorizontalAlignment="Left" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdButton Content="Set demo code" Variant="Tonal" Click="SetPinDemo" Margin="0,0,8,8" />
+          <md:MdButton Content="Clear" Variant="Text" Click="ClearPin" Margin="0,0,8,8" />
+          <md:MdButton Content="Toggle mask" Variant="Outlined" Click="TogglePinMask" Margin="0,0,8,8" />
+          <md:MdButton Content="Toggle error" Variant="Text" Click="TogglePinError" Margin="0,0,8,8" />
+        </WrapPanel>
+        <TextBlock x:Name="PinStatus" Classes="body" Text="Awaiting a six-digit verification code." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdPinInput Length=&quot;6&quot; Code=&quot;{Binding VerificationCode}&quot; CompletedCommand=&quot;{Binding VerifyCommand}&quot; /&gt;"
+                            CSharpCode="pin.SetCode(&quot;273841&quot;);&#10;pin.Clear();" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

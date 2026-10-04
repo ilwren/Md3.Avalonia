@@ -118,6 +118,47 @@ tables, none of which had been on the page since batch 1.
 The two dialog pages keep a local `MdDialogHost` for standalone preview and prefer the shell's
 host when running inside the gallery, the arrangement the parity page used.
 
+### 12 · batch 3 — the ecosystem page is gone
+
+`EcosystemGalleryPage` was the other dumping ground: eight "Wave A…F" sections, twenty-eight
+controls, one 4400-DIP scroll, and headings named after the development phase that produced them
+rather than after anything a reader is looking for. It is now twenty-eight pages:
+
+Popover · Hover cards · Command palette · Density · Slidable item · Data grids · Masonry panel ·
+Paged items · Async select · Calendar · Timeline · Cascader · Transfer · Result view · Chart ·
+Rich editor · Chat view · Before and after · Animated text · Spin kit · Staggered panel ·
+Skeleton · Animation sequence · PIN input · Tree view · Tag input · Avatar · Rating
+
+Two of those are deliberate judgement calls rather than a mechanical one-section-one-page split:
+
+- **`MdDataGrid` and the stock `DataGrid` stay on one page.** Defect #13 put them side by side on
+  purpose, with the "when you need the full spreadsheet control" paragraph between them. Splitting
+  them would have deleted the only place that says which of the two to reach for.
+- **`MdPopover` and `MdHoverCard` are separate pages**, even though they shared a `WrapPanel` and
+  one status line. They are different controls with different dismissal rules, and batch 1 already
+  set the precedent by separating `MdReorderableList` from `MdGridTile`.
+
+Splitting exposed the same class of cross-section coupling as batch 1, in three places:
+
+- The command palette's three commands drove the **skeleton, the animation sequence and the paged
+  items view** — three sections elsewhere on the page. A command palette that can only be
+  demonstrated by scrolling to the thing it secretly moved is not a demonstration. Its page now
+  owns an `MdSkeleton` and three commands that act on its own state.
+- `OverlayStatus` was shared by the popover, the hover card *and* the command palette, so the last
+  thing you touched overwrote the report of the other two. Each page now has its own status line.
+- `CalendarStatus` sat under a `WrapPanel` holding both the calendar and the timeline, implying
+  the timeline wrote to it. It never did — the timeline is static and has no handler at all.
+
+`PagedRecord` and `GridRow`, both private to the old code-behind, moved with their sections
+(`GridRow` to the data-grid page, where both grids use it). `_messages`, `_editorAdapter`, `_tags`
+and `_sortAscending` likewise went with chat, rich editor, tag input and the grid.
+
+The trailing usage block was a single snippet covering seven unrelated controls; each page now
+carries the snippet for its own control, and the page-level `MinHeight="4400"` that sized the old
+scroll is gone. `EcosystemGalleryPage` was deleted rather than left as an empty shell, which is
+what #12 was asking for. `MdEcosystemWaveAndWindowTests` kept its render assertion by pointing at
+`ChatViewGalleryPage`, the heaviest of the twenty-eight.
+
 ## Checked and found correct — no change made
 
 | # | Item | Evidence |

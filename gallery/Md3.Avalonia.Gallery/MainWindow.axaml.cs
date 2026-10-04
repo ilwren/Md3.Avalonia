@@ -46,7 +46,14 @@ public partial class MainWindow : Window
             CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, ColorPickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
             NavigationDrawerNav, AdaptiveNav, SearchNav, SettingsCardNav, SheetNav, SliderNav, AdvancedSelectionNav,
-            SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, EcosystemNav, BorderlessWindowNav,
+            SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, BorderlessWindowNav,
+AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
+            BeforeAfterNav, CalendarNav, CascaderNav, ChartNav,
+            ChatNav, CommandPaletteNav, DataGridNav, DensityNav,
+            HoverCardNav, MasonryNav, PagedItemsNav, PinInputNav,
+            PopoverNav, RatingNav, ResultViewNav, RichEditorNav,
+            SkeletonNav, SlidableNav, SpinKitNav, StaggeredPanelNav,
+            TagInputNav, TimelineNav, TransferNav, TreeViewNav,
             NumericNav, DesktopAdaptersNav, ThemeResourcesNav, SymbolsNav, MotionNav,
             BannerNav, DataTableNav, PaginatedTableNav, DismissibleNav, ExpansionPanelNav,
             GridTileNav, RefreshNav, ReorderableListNav, StepperNav,
@@ -93,7 +100,34 @@ public partial class MainWindow : Window
             Entry("Tabs", "tabs tab view", TabNav, () => new TabGalleryPage()),
             Entry("Toolbars", "toolbar dock floating", ToolbarNav, () => new ToolbarGalleryPage()),
             Entry("Tooltips", "tooltip rich plain", TooltipNav, () => new TooltipGalleryPage()),
-            Entry("Flutter ecosystem", "third party avatar rating breadcrumb clean room chart chat calendar transfer masonry data grid skeleton command palette", EcosystemNav, () => new EcosystemGalleryPage()),
+            Entry("Animated text", "animated text typewriter fade reveal effect duration", AnimatedTextNav, () => new AnimatedTextGalleryPage()),
+            Entry("Animation sequence", "animation sequence stagger item delay replay entrance", AnimationSequenceNav, () => new AnimationSequenceGalleryPage()),
+            Entry("Async select", "async select autocomplete query suggestion remote lookup", AsyncSelectNav, () => new AsyncSelectGalleryPage()),
+            Entry("Avatar", "avatar initials identity profile person picture", AvatarNav, () => new AvatarGalleryPage()),
+            Entry("Before and after", "before after compare divider slider comparison", BeforeAfterNav, () => new BeforeAfterGalleryPage()),
+            Entry("Calendar", "calendar month date range badge selection", CalendarNav, () => new CalendarGalleryPage()),
+            Entry("Cascader", "cascader hierarchy path multi level select tree picker", CascaderNav, () => new CascaderGalleryPage()),
+            Entry("Chart", "chart line bar series axis plot data visualisation visualization", ChartNav, () => new ChartGalleryPage()),
+            Entry("Chat view", "chat message bubble conversation quote retry attachment composer", ChatNav, () => new ChatViewGalleryPage()),
+            Entry("Command palette", "command palette search keyword action launcher", CommandPaletteNav, () => new CommandPaletteGalleryPage()),
+            Entry("Data grids", "data grid table row column sort filter spreadsheet datagrid theme", DataGridNav, () => new DataGridGalleryPage()),
+            Entry("Density", "density compact comfortable spacing scope attached property", DensityNav, () => new DensityGalleryPage()),
+            Entry("Hover cards", "hover card delay focus preview overlay", HoverCardNav, () => new HoverCardGalleryPage()),
+            Entry("Masonry panel", "masonry quilted staggered tile dashboard reflow", MasonryNav, () => new MasonryPanelGalleryPage()),
+            Entry("Paged items", "paging pagination infinite scroll load more async page", PagedItemsNav, () => new PagedItemsGalleryPage()),
+            Entry("PIN input", "pin otp code verification digit mask one time password", PinInputNav, () => new PinInputGalleryPage()),
+            Entry("Popover", "popover transient anchored overlay flyout dismiss", PopoverNav, () => new PopoverGalleryPage()),
+            Entry("Rating", "rating star half precision score review", RatingNav, () => new RatingGalleryPage()),
+            Entry("Result view", "result empty success error state placeholder action", ResultViewNav, () => new ResultViewGalleryPage()),
+            Entry("Rich editor", "rich text editor markdown bold italic toolbar adapter", RichEditorNav, () => new RichEditorGalleryPage()),
+            Entry("Skeleton", "skeleton shimmer placeholder loading", SkeletonNav, () => new SkeletonGalleryPage()),
+            Entry("Slidable item", "slidable swipe action row archive delete", SlidableNav, () => new SlidableItemGalleryPage()),
+            Entry("Spin kit", "spinner loading indeterminate wave bounce busy", SpinKitNav, () => new SpinKitGalleryPage()),
+            Entry("Staggered panel", "staggered entrance animation panel children", StaggeredPanelNav, () => new StaggeredPanelGalleryPage()),
+            Entry("Tag input", "tag chip input suggestion validator token", TagInputNav, () => new TagInputGalleryPage()),
+            Entry("Timeline", "timeline step history activity feed state", TimelineNav, () => new TimelineGalleryPage()),
+            Entry("Transfer", "transfer dual list shuttle move pick", TransferNav, () => new TransferGalleryPage()),
+            Entry("Tree view", "tree hierarchy expand collapse node virtualized", TreeViewNav, () => new TreeViewGalleryPage()),
             Entry("Borderless windows", "custom chrome title bar caption drag resize platform adapter", BorderlessWindowNav, () => new BorderlessWindowGalleryPage()),
             Entry("Numeric input", "numeric number stepper spinner increment decrement quantity", NumericNav, () => new NumericGalleryPage()),
             Entry("Desktop adapters", "scrollbar autocomplete window surface text focus", DesktopAdaptersNav, () => new DesktopAdaptersGalleryPage()),
@@ -188,7 +222,34 @@ public partial class MainWindow : Window
     private void ShowTabs(object? s, RoutedEventArgs e) => Navigate(new TabGalleryPage(), TabNav);
     private void ShowToolbars(object? s, RoutedEventArgs e) => Navigate(new ToolbarGalleryPage(), ToolbarNav);
     private void ShowTooltips(object? s, RoutedEventArgs e) => Navigate(new TooltipGalleryPage(), TooltipNav);
-    private void ShowEcosystem(object? s, RoutedEventArgs e) => Navigate(new EcosystemGalleryPage(), EcosystemNav);
+    private void ShowAnimatedText(object? s, RoutedEventArgs e) => Navigate(new AnimatedTextGalleryPage(), AnimatedTextNav);
+    private void ShowAnimationSequence(object? s, RoutedEventArgs e) => Navigate(new AnimationSequenceGalleryPage(), AnimationSequenceNav);
+    private void ShowAsyncSelect(object? s, RoutedEventArgs e) => Navigate(new AsyncSelectGalleryPage(), AsyncSelectNav);
+    private void ShowAvatar(object? s, RoutedEventArgs e) => Navigate(new AvatarGalleryPage(), AvatarNav);
+    private void ShowBeforeAfter(object? s, RoutedEventArgs e) => Navigate(new BeforeAfterGalleryPage(), BeforeAfterNav);
+    private void ShowCalendar(object? s, RoutedEventArgs e) => Navigate(new CalendarGalleryPage(), CalendarNav);
+    private void ShowCascader(object? s, RoutedEventArgs e) => Navigate(new CascaderGalleryPage(), CascaderNav);
+    private void ShowChart(object? s, RoutedEventArgs e) => Navigate(new ChartGalleryPage(), ChartNav);
+    private void ShowChatView(object? s, RoutedEventArgs e) => Navigate(new ChatViewGalleryPage(), ChatNav);
+    private void ShowCommandPalette(object? s, RoutedEventArgs e) => Navigate(new CommandPaletteGalleryPage(), CommandPaletteNav);
+    private void ShowDataGrid(object? s, RoutedEventArgs e) => Navigate(new DataGridGalleryPage(), DataGridNav);
+    private void ShowDensity(object? s, RoutedEventArgs e) => Navigate(new DensityGalleryPage(), DensityNav);
+    private void ShowHoverCard(object? s, RoutedEventArgs e) => Navigate(new HoverCardGalleryPage(), HoverCardNav);
+    private void ShowMasonry(object? s, RoutedEventArgs e) => Navigate(new MasonryPanelGalleryPage(), MasonryNav);
+    private void ShowPagedItems(object? s, RoutedEventArgs e) => Navigate(new PagedItemsGalleryPage(), PagedItemsNav);
+    private void ShowPinInput(object? s, RoutedEventArgs e) => Navigate(new PinInputGalleryPage(), PinInputNav);
+    private void ShowPopover(object? s, RoutedEventArgs e) => Navigate(new PopoverGalleryPage(), PopoverNav);
+    private void ShowRating(object? s, RoutedEventArgs e) => Navigate(new RatingGalleryPage(), RatingNav);
+    private void ShowResultView(object? s, RoutedEventArgs e) => Navigate(new ResultViewGalleryPage(), ResultViewNav);
+    private void ShowRichEditor(object? s, RoutedEventArgs e) => Navigate(new RichEditorGalleryPage(), RichEditorNav);
+    private void ShowSkeleton(object? s, RoutedEventArgs e) => Navigate(new SkeletonGalleryPage(), SkeletonNav);
+    private void ShowSlidableItem(object? s, RoutedEventArgs e) => Navigate(new SlidableItemGalleryPage(), SlidableNav);
+    private void ShowSpinKit(object? s, RoutedEventArgs e) => Navigate(new SpinKitGalleryPage(), SpinKitNav);
+    private void ShowStaggeredPanel(object? s, RoutedEventArgs e) => Navigate(new StaggeredPanelGalleryPage(), StaggeredPanelNav);
+    private void ShowTagInput(object? s, RoutedEventArgs e) => Navigate(new TagInputGalleryPage(), TagInputNav);
+    private void ShowTimeline(object? s, RoutedEventArgs e) => Navigate(new TimelineGalleryPage(), TimelineNav);
+    private void ShowTransfer(object? s, RoutedEventArgs e) => Navigate(new TransferGalleryPage(), TransferNav);
+    private void ShowTreeView(object? s, RoutedEventArgs e) => Navigate(new TreeViewGalleryPage(), TreeViewNav);
     private void ShowBorderlessWindows(object? s, RoutedEventArgs e) => Navigate(new BorderlessWindowGalleryPage(), BorderlessWindowNav);
     private void ShowNumeric(object? s, RoutedEventArgs e) => Navigate(new NumericGalleryPage(), NumericNav);
     private void ShowDesktopAdapters(object? s, RoutedEventArgs e) => Navigate(new DesktopAdaptersGalleryPage(), DesktopAdaptersNav);

@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.AnimatedTextGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Animated text" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Text that reveals itself. Each effect runs over a fixed duration rather than a per-character tick, so the total time is predictable." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <StackPanel Spacing="12" HorizontalAlignment="Left">
+          <eco:MdAnimatedText Text="Material motion, one character at a time" Effect="Typewriter" Duration="0:0:1.4" />
+          <eco:MdAnimatedText Text="Fade and reveal" Effect="Fade" Duration="0:0:0.8" />
+        </StackPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdAnimatedText Text=&quot;{Binding Headline}&quot; Effect=&quot;Typewriter&quot; Duration=&quot;0:0:1.4&quot; /&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

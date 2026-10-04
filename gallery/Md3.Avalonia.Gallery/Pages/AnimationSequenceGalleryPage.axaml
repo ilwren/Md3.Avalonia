@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.AnimationSequenceGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Animation sequence" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Children enter one after another on a fixed item delay. PlayAsync replays the whole sequence and completes when it finishes." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <md:MdButton Content="Replay sequence" Variant="Tonal" HorizontalAlignment="Left" Click="ReplaySequence" />
+        <eco:MdAnimationSequence x:Name="Sequence" AutoPlay="True" ItemDelay="0:0:0.08" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
+          <Border Width="88" Height="64" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
+          <Border Width="88" Height="64" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
+          <Border Width="88" Height="64" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" />
+        </eco:MdAnimationSequence>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdAnimationSequence AutoPlay=&quot;True&quot; ItemDelay=&quot;0:0:0.08&quot; Orientation=&quot;Horizontal&quot; /&gt;"
+                            CSharpCode="await sequence.PlayAsync();" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

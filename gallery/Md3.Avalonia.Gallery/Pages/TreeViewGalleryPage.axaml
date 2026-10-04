@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.TreeViewGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Tree view" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A virtualized hierarchy with keyboard navigation. Left/Right collapse and expand, Enter invokes, and the direct APIs reveal and select by id." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Expand folders, select rows, use Left/Right/Enter, or switch to RTL to verify mirrored hierarchy navigation." />
+        <eco:MdTreeView x:Name="Tree" Height="280" NodeInvoked="TreeNodeInvoked" ExpansionChanged="TreeExpansionChanged" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdButton Content="Expand all" Variant="Tonal" Click="ExpandTree" Margin="0,0,8,8" />
+          <md:MdButton Content="Collapse all" Variant="Text" Click="CollapseTree" Margin="0,0,8,8" />
+          <md:MdButton Content="Select Android" Variant="Outlined" Click="SelectAndroidNode" Margin="0,0,8,8" />
+          <md:MdButton Content="Toggle RTL" Variant="Text" Click="ToggleTreeRtl" Margin="0,0,8,8" />
+        </WrapPanel>
+        <TextBlock x:Name="TreeStatus" Classes="body" Text="Choose a node; Enter invokes the selected task." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdTreeView Roots=&quot;{Binding ProjectNodes}&quot; SelectedNode=&quot;{Binding SelectedNode}&quot; /&gt;"
+                            CSharpCode="tree.ExpandAll();&#10;tree.SelectById(&quot;android&quot;);" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

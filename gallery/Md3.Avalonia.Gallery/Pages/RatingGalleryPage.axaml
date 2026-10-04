@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.RatingGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Rating" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A star rating with fractional precision. Each half-star is its own target, so the hit test follows the visual rather than the spacing." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="body" Text="Click a specific half-star; spacing does not alter the selected step." />
+        <!-- No explicit Width: the row sizes itself so all five 48-DIP targets stay reachable. -->
+        <eco:MdRating x:Name="Rating" HorizontalAlignment="Left" Value="3.5" Precision="0.5" ValueChanged="RatingChanged" />
+        <TextBlock x:Name="RatingStatus" Classes="body" Text="Rating 3.5 of 5" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdRating Value=&quot;{Binding Score}&quot; Precision=&quot;0.5&quot; /&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

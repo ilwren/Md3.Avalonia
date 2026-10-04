@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.TagInputGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Tag input" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Chips produced from typed text. Enter or comma commits, Backspace removes the last chip from an empty editor, and a validator can reject a tag before it is added." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Type to filter suggestions, press Enter or comma to add, click a suggestion, and use each chip’s remove action. Backspace removes the last chip when the editor is empty." />
+        <eco:MdTagInput x:Name="TagInput" MaximumTags="6" PlaceholderText="Add release capability" TagAdded="TagAdded" TagRemoved="TagRemoved" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdButton Content="Add Localization" Variant="Tonal" Click="AddLocalizationTag" Margin="0,0,8,8" />
+          <md:MdButton Content="Clear tags" Variant="Text" Click="ClearTags" Margin="0,0,8,8" />
+        </WrapPanel>
+        <TextBlock x:Name="TagStatus" Classes="body" Text="2 capabilities selected; add up to 6." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdTagInput TagsSource=&quot;{Binding Tags}&quot; SuggestionsSource=&quot;{Binding Suggestions}&quot;&#10;                TagAddedCommand=&quot;{Binding TagAddedCommand}&quot; /&gt;"
+                            CSharpCode="tags.AddTag(&quot;Localization&quot;);&#10;tags.TagValidator = tag =&gt; tag.Length &lt; 3 ? &quot;Use at least 3 characters&quot; : null;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

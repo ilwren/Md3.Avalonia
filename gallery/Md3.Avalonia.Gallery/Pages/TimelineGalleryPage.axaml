@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.TimelineGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Timeline" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="An ordered sequence of states. Each entry carries a title, a detail line, an optional timestamp, and a completed/active/neutral state." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <eco:MdTimeline x:Name="Timeline" MinWidth="260" HorizontalAlignment="Left" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample CSharpCode="timeline.ItemsSource = new[]&#10;{&#10;    new MdTimelineItem(&quot;Created&quot;, &quot;Draft created&quot;, timestamp, MdTimelineItemState.Completed),&#10;    new MdTimelineItem(&quot;Review&quot;, &quot;Accessibility and visuals&quot;, timestamp, MdTimelineItemState.Active),&#10;    new MdTimelineItem(&quot;Publish&quot;, &quot;Package validation&quot;, null, MdTimelineItemState.Neutral)&#10;};" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

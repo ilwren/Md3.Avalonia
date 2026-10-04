@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.ChartGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Chart" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A provider-neutral chart: it renders the series you give it and reports the hovered point. No chart engine is bundled." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <WrapPanel Orientation="Horizontal">
+          <md:MdButton Content="Line" Variant="Outlined" Tag="Line" Click="ChangeChartKind" Margin="0,0,8,8" />
+          <md:MdButton Content="Bar" Variant="Outlined" Tag="Bar" Click="ChangeChartKind" Margin="0,0,8,8" />
+          <TextBlock x:Name="ChartStatus" VerticalAlignment="Center" Text="Move the pointer across the chart." Margin="8,0,0,8" />
+        </WrapPanel>
+        <eco:MdChart x:Name="Chart" Height="280" XAxisTitle="Month" YAxisTitle="Adoption (%)" AccessibleTitle="Monthly adoption and quality" HoveredPointChanged="ChartPointChanged" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Axes show localized numeric ticks and month labels; grouped bar bands stay completely inside the plot." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdChart Series=&quot;{Binding Series}&quot; Kind=&quot;Line&quot; XAxisTitle=&quot;Month&quot; YAxisTitle=&quot;Adoption (%)&quot; /&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>
