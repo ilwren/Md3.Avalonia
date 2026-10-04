@@ -30,8 +30,15 @@ public sealed class MdBeforeAfter : TemplatedControl
     static MdBeforeAfter()
     {
         AffectsMeasure<MdBeforeAfter>(OrientationProperty, DividerThicknessProperty);
-        PositionProperty.Changed.AddClassHandler<MdBeforeAfter>((control, _) => control.UpdateGeometry());
+        // Raised here rather than from the pointer handler: the event is called PositionChanged,
+        // so the arrow keys and a two-way binding have to raise it too, not just a drag.
+        PositionProperty.Changed.AddClassHandler<MdBeforeAfter>((control, _) =>
+        {
+            control.UpdateGeometry();
+            control.PositionChanged?.Invoke(control, EventArgs.Empty);
+        });
         OrientationProperty.Changed.AddClassHandler<MdBeforeAfter>((control, _) => control.UpdateOrientation());
+        IsInteractiveProperty.Changed.AddClassHandler<MdBeforeAfter>((control, _) => control.UpdateInteractivity());
     }
     public object? Before { get => GetValue(BeforeProperty); set => SetValue(BeforeProperty, value); }
     public object? After { get => GetValue(AfterProperty); set => SetValue(AfterProperty, value); }
@@ -99,15 +106,20 @@ public sealed class MdBeforeAfter : TemplatedControl
     }
     protected override void OnKeyDown(KeyEventArgs e)
     {
+        // IsInteractive used to gate the pointer only, so a comparison meant to be display-only
+        // was still a tab stop whose divider moved under the arrow keys.
+        if (!IsInteractive) { base.OnKeyDown(e); return; }
         var step = e.KeyModifiers.HasFlag(KeyModifiers.Shift) ? .1 : .02;
         if (e.Key is Key.Left or Key.Down) { Position -= step; e.Handled = true; }
         else if (e.Key is Key.Right or Key.Up) { Position += step; e.Handled = true; }
         else base.OnKeyDown(e);
     }
+
+    private void UpdateInteractivity() => SetCurrentValue(FocusableProperty, IsInteractive);
     private void UpdateFromPointer(Point point)
     {
         var value = Orientation == MdComparisonOrientation.Horizontal ? point.X / Math.Max(1, Bounds.Width) : point.Y / Math.Max(1, Bounds.Height);
-        var old = Position; Position = value; if (Math.Abs(old - Position) > double.Epsilon) PositionChanged?.Invoke(this, EventArgs.Empty);
+        Position = value;
     }
 }
 

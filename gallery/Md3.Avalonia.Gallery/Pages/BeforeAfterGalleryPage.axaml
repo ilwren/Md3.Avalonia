@@ -2,25 +2,77 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
              xmlns:eco="using:Md3.Avalonia.Extra.Controls"
-             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.BeforeAfterGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
-        <TextBlock Classes="h1" Text="Before and after" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="A draggable divider comparing two layers. Position is bindable, so the comparison can be driven from outside." />
+        <TextBlock Classes="h1" Text="Image comparison" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="MdBeforeAfter wipes one layer over another along a draggable divider. Both layers take any content, so the same control compares two photos, two renders, or two laid-out panels." />
       </StackPanel>
 
       <StackPanel Spacing="12">
-        <Border Padding="12" Height="220" MaxWidth="420" HorizontalAlignment="Left" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}">
-          <eco:MdBeforeAfter Position="0.55" Before="BEFORE" After="AFTER" />
+        <TextBlock Classes="h2" Text="Two images" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Drag the divider, or focus the comparison and use the arrow keys — Shift for a coarser step." />
+        <Border MaxWidth="640" HorizontalAlignment="Left" CornerRadius="16" ClipToBounds="True">
+          <eco:MdBeforeAfter x:Name="PhotoCompare" Height="358" Position="0.5">
+            <eco:MdBeforeAfter.Before>
+              <Image Source="avares://Md3.Avalonia.Gallery/Assets/Media/compare-before.jpg" Stretch="UniformToFill" />
+            </eco:MdBeforeAfter.Before>
+            <eco:MdBeforeAfter.After>
+              <Image Source="avares://Md3.Avalonia.Gallery/Assets/Media/compare-after.jpg" Stretch="UniformToFill" />
+            </eco:MdBeforeAfter.After>
+          </eco:MdBeforeAfter>
+        </Border>
+        <StackPanel Orientation="Horizontal" Spacing="16" MaxWidth="640" HorizontalAlignment="Left">
+          <TextBlock Classes="body" Opacity="0.78" VerticalAlignment="Center" Text="Ungraded" />
+          <md:MdSlider x:Name="PositionSlider" Width="280" Minimum="0" Maximum="1" VerticalAlignment="Center"
+                       Value="{Binding #PhotoCompare.Position, Mode=TwoWay}" />
+          <TextBlock Classes="body" Opacity="0.78" VerticalAlignment="Center" Text="Graded" />
+          <TextBlock x:Name="PositionValue" Classes="body" VerticalAlignment="Center" />
+        </StackPanel>
+        <TextBlock Classes="body" TextWrapping="Wrap" Opacity="0.78" Text="Position is two-way bindable: the slider and the divider drive each other." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Vertical, with a thicker divider" />
+        <Border MaxWidth="420" HorizontalAlignment="Left" CornerRadius="16" ClipToBounds="True">
+          <eco:MdBeforeAfter Height="236" Position="0.45" Orientation="Vertical" DividerThickness="6"
+                             DividerBrush="{DynamicResource Md.Sys.Color.Tertiary.Brush}">
+            <eco:MdBeforeAfter.Before>
+              <Image Source="avares://Md3.Avalonia.Gallery/Assets/Media/compare-before.jpg" Stretch="UniformToFill" />
+            </eco:MdBeforeAfter.Before>
+            <eco:MdBeforeAfter.After>
+              <Image Source="avares://Md3.Avalonia.Gallery/Assets/Media/compare-after.jpg" Stretch="UniformToFill" />
+            </eco:MdBeforeAfter.After>
+          </eco:MdBeforeAfter>
+        </Border>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Any content, not just images" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="This one is display-only: IsInteractive is false, so it is not a tab stop and neither the pointer nor the arrow keys move it." />
+        <Border MaxWidth="420" HorizontalAlignment="Left" CornerRadius="16" ClipToBounds="True">
+          <eco:MdBeforeAfter Height="140" Position="0.5" IsInteractive="False">
+            <eco:MdBeforeAfter.Before>
+              <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}">
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Light surface" />
+              </Border>
+            </eco:MdBeforeAfter.Before>
+            <eco:MdBeforeAfter.After>
+              <Border Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}">
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"
+                           Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" Text="Primary container" />
+              </Border>
+            </eco:MdBeforeAfter.After>
+          </eco:MdBeforeAfter>
         </Border>
       </StackPanel>
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
-        <gallery:CodeExample XamlCode="&lt;eco:MdBeforeAfter Position=&quot;0.55&quot; Before=&quot;{Binding Original}&quot; After=&quot;{Binding Processed}&quot; /&gt;" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdBeforeAfter Position=&quot;{Binding Wipe, Mode=TwoWay}&quot;&#10;                   Orientation=&quot;Vertical&quot; DividerThickness=&quot;6&quot;&#10;                   DividerBrush=&quot;{DynamicResource Md.Sys.Color.Tertiary.Brush}&quot;&gt;&#10;  &lt;eco:MdBeforeAfter.Before&gt;&#10;    &lt;Image Source=&quot;{Binding Original}&quot; Stretch=&quot;UniformToFill&quot; /&gt;&#10;  &lt;/eco:MdBeforeAfter.Before&gt;&#10;  &lt;eco:MdBeforeAfter.After&gt;&#10;    &lt;Image Source=&quot;{Binding Processed}&quot; Stretch=&quot;UniformToFill&quot; /&gt;&#10;  &lt;/eco:MdBeforeAfter.After&gt;&#10;&lt;/eco:MdBeforeAfter&gt;" CSharpCode="var compare = new MdBeforeAfter&#10;{&#10;    Before = new Image { Source = original, Stretch = Stretch.UniformToFill },&#10;    After = new Image { Source = processed, Stretch = Stretch.UniformToFill },&#10;    Position = 0.5&#10;};&#10;compare.PositionChanged += (_, _) =&gt; Report(compare.Position);" />
       </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>

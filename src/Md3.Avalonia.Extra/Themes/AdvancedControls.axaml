@@ -9,6 +9,9 @@
   <ControlTheme x:Key="{x:Type eco:MdBeforeAfter}" TargetType="eco:MdBeforeAfter">
     <Setter Property="Focusable" Value="True" />
     <Setter Property="ClipToBounds" Value="True" />
+    <!-- A setter, not a literal on the divider: DividerBrush was a public property the template
+         ignored, so setting it did nothing. The default is what the literal used to be. -->
+    <Setter Property="DividerBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
     <Setter Property="Template">
       <ControlTemplate>
         <Grid ClipToBounds="True">
@@ -16,7 +19,8 @@
           <Border x:Name="PART_AfterClip" ClipToBounds="True" Background="Transparent">
             <ContentPresenter Content="{TemplateBinding After}" Width="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}" Height="{Binding Bounds.Height, RelativeSource={RelativeSource TemplatedParent}}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
           </Border>
-          <Border x:Name="PART_Divider" Width="2" Background="{DynamicResource Md.Sys.Color.Primary.Brush}" IsHitTestVisible="False" />
+          <!-- Width and Height are owned by UpdateGeometry, which swaps them with Orientation. -->
+          <Border x:Name="PART_Divider" Background="{TemplateBinding DividerBrush}" IsHitTestVisible="False" />
         </Grid>
       </ControlTemplate>
     </Setter>
