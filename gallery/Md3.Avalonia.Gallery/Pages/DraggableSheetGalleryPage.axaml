@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.DraggableSheetGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Draggable scrollable sheet" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The handle resizes the sheet between its minimum and maximum extent; nested wheel input expands or collapses it at the scroll boundaries." />
+      </StackPanel>
+
+      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
+        <Border Height="420" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="20" ClipToBounds="True">
+          <md:MdDraggableScrollableSheet x:Name="DraggableSheet" MinimumExtent="0.25" InitialExtent="0.5" MaximumExtent="1" Snap="True" ExtentChanged="SheetExtentChanged">
+            <md:MdDraggableScrollableSheet.Header><TextBlock FontWeight="Medium" Text="Drag to resize · scroll after expansion" /></md:MdDraggableScrollableSheet.Header>
+            <StackPanel Margin="16" Spacing="10"><TextBlock TextWrapping="Wrap" Text="The handle resizes the sheet. Nested wheel input expands/collapses at scroll boundaries." /><Border Height="100" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" CornerRadius="12" /><Border Height="100" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" CornerRadius="12" /><Border Height="100" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" CornerRadius="12" /></StackPanel>
+          </md:MdDraggableScrollableSheet>
+        </Border>
+        <TextBlock x:Name="SheetStatus" Classes="body" Text="Extent 50%" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdDraggableScrollableSheet MinimumExtent=&quot;0.25&quot; InitialExtent=&quot;0.5&quot;&#10;                              MaximumExtent=&quot;1&quot; Snap=&quot;True&quot;&#10;                              ExtentChanged=&quot;OnExtentChanged&quot;&gt;&#10;  &lt;md:MdDraggableScrollableSheet.Header&gt;&#10;    &lt;TextBlock Text=&quot;Drag to resize&quot; /&gt;&#10;  &lt;/md:MdDraggableScrollableSheet.Header&gt;&#10;  &lt;StackPanel&gt;...&lt;/StackPanel&gt;&#10;&lt;/md:MdDraggableScrollableSheet&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

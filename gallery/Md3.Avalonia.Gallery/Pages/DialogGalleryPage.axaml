@@ -43,6 +43,32 @@
           </Border>
         </md:MdDialogHost>
       </StackPanel>
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="From a view model, with no control reference" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="This panel's DataContext is a plain view model that was handed an IMdDialogService and nothing else. It names the dialog by model object and awaits the answer; the host resolves the view and the result comes back as a value." />
+        <md:MdDialogHost x:Name="ServiceDialogHost" Height="260">
+          <md:MdDialogHost.DataTemplates>
+            <DataTemplate DataType="{x:Type pages:ConfirmDeleteDialogModel}" x:DataType="pages:ConfirmDeleteDialogModel">
+              <md:MdDialog Headline="{Binding Headline}" Variant="Basic">
+                <TextBlock Width="340" TextWrapping="Wrap" Text="{Binding Message}" />
+                <md:MdDialog.Actions>
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <md:MdButton Content="Keep" Variant="Text" Command="{Binding CancelCommand}" />
+                    <md:MdButton Content="Delete" Variant="Text" Command="{Binding ConfirmCommand}" />
+                  </StackPanel>
+                </md:MdDialog.Actions>
+              </md:MdDialog>
+            </DataTemplate>
+          </md:MdDialogHost.DataTemplates>
+          <Border Padding="24" CornerRadius="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+            <StackPanel x:Name="ServiceDemoRoot" x:DataType="pages:DialogServiceDemoViewModel" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+              <md:MdButton Content="Delete item" Variant="Filled" HorizontalAlignment="Center" Command="{Binding DeleteCommand}" />
+              <TextBlock Classes="body" HorizontalAlignment="Center" Text="{Binding Status}" />
+            </StackPanel>
+          </Border>
+        </md:MdDialogHost>
+      </StackPanel>
+
       <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
         <TextBlock Classes="body" TextWrapping="Wrap" Text="Escape and optional scrim click dismiss the active dialog. Only one modal dialog is active; Dialog stores its current view model and Avalonia selects the matching template. ShowAsync returns the value supplied to Close(result)." />
       </Border>
@@ -50,7 +76,7 @@
         <TextBlock Classes="h2" Text="AXAML and C#" />
         <gallery:CodeExample
           XamlCode="&lt;md:MdDialogHost x:Name=&quot;DialogHost&quot;&gt;&#10;  &lt;md:MdDialogHost.DataTemplates&gt;&#10;    &lt;DataTemplate DataType=&quot;{x:Type vm:DeleteDialogModel}&quot;&gt;&#10;      &lt;md:MdDialog Headline=&quot;Delete item?&quot;&gt;...&lt;/md:MdDialog&gt;&#10;    &lt;/DataTemplate&gt;&#10;    &lt;DataTemplate DataType=&quot;{x:Type vm:RenameDialogModel}&quot;&gt;...&lt;/DataTemplate&gt;&#10;  &lt;/md:MdDialogHost.DataTemplates&gt;&#10;&lt;/md:MdDialogHost&gt;"
-          CSharpCode="var result = await DialogHost.ShowAsync(new DeleteDialogModel(item));&#10;DialogHost.Close(result: true);" />
+          CSharpCode="// view code-behind&#10;var result = await DialogHost.ShowAsync(new DeleteDialogModel(item));&#10;&#10;// view model — inject IMdDialogService, no control reference&#10;var dialogs = new MdDialogService();            // shell: DialogHost.Service = dialogs&#10;if (await _dialogs.ShowAsync&lt;bool&gt;(new ConfirmDeleteDialogModel(item)))&#10;    Items.Remove(item);&#10;&#10;// inside the dialog view model&#10;_dialogs.Close(result: true);" />
       </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>

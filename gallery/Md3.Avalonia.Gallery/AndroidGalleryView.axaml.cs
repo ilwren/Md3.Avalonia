@@ -69,6 +69,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Banner", () => new BannerGalleryPage());
         AddPage("Breadcrumbs", () => new BreadcrumbGalleryPage());
         AddPage("Text fields", () => new TextBoxGalleryPage());
+        AddPage("Keyboard avoidance", () => new KeyboardAvoidanceGalleryPage());
         AddPage("Checkbox", () => new CheckBoxGalleryPage());
         AddPage("Radio buttons", () => new RadioButtonGalleryPage());
         AddPage("Combo box", () => new ComboBoxGalleryPage());
@@ -76,13 +77,17 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Cards", () => new CardGalleryPage());
         AddPage("Chips", () => new ChipGalleryPage());
         AddPage("Date and time pickers", () => new PickerGalleryPage());
+        AddPage("Picker restoration", () => new PickerRestorationGalleryPage());
         AddPage("Color picker", () => new ColorPickerGalleryPage());
         AddPage("Data table", () => new DataTableGalleryPage());
         AddPage("Paginated table", () => new PaginatedDataTableGalleryPage());
         AddPage("Dialogs", () => new DialogGalleryPage());
+        AddPage("Simple dialog", () => new SimpleDialogGalleryPage());
+        AddPage("About and licenses", () => new AboutDialogGalleryPage());
         AddPage("Dismissible", () => new DismissibleGalleryPage());
         AddPage("Divider", () => new DividerGalleryPage());
         AddPage("Expansion panels", () => new ExpansionPanelGalleryPage());
+        AddPage("Form validation", () => new FormValidationGalleryPage());
         AddPage("Grid tiles", () => new GridTileGalleryPage());
         AddPage("Lists", () => new ListGalleryPage());
         AddPage("Loading", () => new LoadingGalleryPage());
@@ -93,9 +98,11 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Navigation bar", () => new NavigationBarGalleryPage());
         AddPage("Navigation drawer", () => new NavigationDrawerGalleryPage());
         AddPage("Adaptive layout", () => new AdaptiveGalleryPage());
+        AddPage("Adaptive controls", () => new AdaptiveControlsGalleryPage());
         AddPage("Search", () => new SearchGalleryPage());
         AddPage("Settings cards", () => new SettingsCardGalleryPage());
         AddPage("Sheets", () => new SheetGalleryPage());
+        AddPage("Draggable sheet", () => new DraggableSheetGalleryPage());
         AddPage("Slider", () => new SliderGalleryPage());
         AddPage("Stepper", () => new StepperGalleryPage());
         AddPage("Segmented and range", () => new AdvancedSelectionGalleryPage());
@@ -106,7 +113,6 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Tooltips", () => new TooltipGalleryPage());
 
         AddSection("Library");
-        AddPage("Flutter parity", () => new FlutterParityGalleryPage());
         AddPage("Flutter ecosystem", () => new EcosystemGalleryPage());
         // Borderless window/chrome and desktop adapter samples are intentionally desktop-only.
         // Do not expose them from the Android single-view navigation: Android has no native
@@ -114,6 +120,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Theme Lab", () => new ThemeResourcesGalleryPage());
         AddPage("Material Symbols", () => new SymbolGalleryPage());
         AddPage("Motion", () => new MotionGalleryPage());
+        AddPage("Focus, shortcut, Hero", () => new FocusShortcutHeroGalleryPage());
     }
 
     private void AddSection(string title)

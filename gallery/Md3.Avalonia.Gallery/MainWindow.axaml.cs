@@ -46,10 +46,12 @@ public partial class MainWindow : Window
             CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, ColorPickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
             NavigationDrawerNav, AdaptiveNav, SearchNav, SettingsCardNav, SheetNav, SliderNav, AdvancedSelectionNav,
-            SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, FlutterParityNav, EcosystemNav, BorderlessWindowNav,
+            SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, EcosystemNav, BorderlessWindowNav,
             NumericNav, DesktopAdaptersNav, ThemeResourcesNav, SymbolsNav, MotionNav,
             BannerNav, DataTableNav, PaginatedTableNav, DismissibleNav, ExpansionPanelNav,
-            GridTileNav, RefreshNav, ReorderableListNav, StepperNav
+            GridTileNav, RefreshNav, ReorderableListNav, StepperNav,
+            FormValidationNav, SimpleDialogNav, AboutDialogNav, PickerRestoreNav,
+            DraggableSheetNav, KeyboardAvoidNav, AdaptiveControlsNav, FocusHeroNav
         ];
         _topNavigationButtons = [GetStartedTopNav, DevelopTopNav, FoundationsTopNav, StylesTopNav, ComponentsTopNav];
         _galleryIndex =
@@ -91,7 +93,6 @@ public partial class MainWindow : Window
             Entry("Tabs", "tabs tab view", TabNav, () => new TabGalleryPage()),
             Entry("Toolbars", "toolbar dock floating", ToolbarNav, () => new ToolbarGalleryPage()),
             Entry("Tooltips", "tooltip rich plain", TooltipNav, () => new TooltipGalleryPage()),
-            Entry("Flutter parity", "form validation simple dialog about licenses restoration draggable sheet keyboard adaptive hero focus shortcut", FlutterParityNav, () => new FlutterParityGalleryPage()),
             Entry("Flutter ecosystem", "third party avatar rating breadcrumb clean room chart chat calendar transfer masonry data grid skeleton command palette", EcosystemNav, () => new EcosystemGalleryPage()),
             Entry("Borderless windows", "custom chrome title bar caption drag resize platform adapter", BorderlessWindowNav, () => new BorderlessWindowGalleryPage()),
             Entry("Numeric input", "numeric number stepper spinner increment decrement quantity", NumericNav, () => new NumericGalleryPage()),
@@ -107,7 +108,15 @@ public partial class MainWindow : Window
             Entry("Grid tiles", "grid tile bar media footer favorite", GridTileNav, () => new GridTileGalleryPage()),
             Entry("Pull to refresh", "refresh indicator pull to refresh swipe reload", RefreshNav, () => new RefreshIndicatorGalleryPage()),
             Entry("Reorderable list", "reorderable list drag reorder move up down", ReorderableListNav, () => new ReorderableListGalleryPage()),
-            Entry("Stepper", "stepper wizard steps flow continue", StepperNav, () => new StepperGalleryPage())
+            Entry("Stepper", "stepper wizard steps flow continue", StepperNav, () => new StepperGalleryPage()),
+            Entry("Form validation", "form validation field required submit autovalidate", FormValidationNav, () => new FormValidationGalleryPage()),
+            Entry("Simple dialog", "simple dialog choice list account modal", SimpleDialogNav, () => new SimpleDialogGalleryPage()),
+            Entry("About and licenses", "about dialog licenses legalese open source", AboutDialogNav, () => new AboutDialogGalleryPage()),
+            Entry("Picker restoration", "restoration restore picker state save process death", PickerRestoreNav, () => new PickerRestorationGalleryPage()),
+            Entry("Draggable sheet", "draggable scrollable sheet extent snap drag", DraggableSheetNav, () => new DraggableSheetGalleryPage()),
+            Entry("Keyboard avoidance", "keyboard avoidance soft inset viewport focus scroll", KeyboardAvoidNav, () => new KeyboardAvoidanceGalleryPage()),
+            Entry("Adaptive controls", "adaptive switch progress cupertino ios platform", AdaptiveControlsNav, () => new AdaptiveControlsGalleryPage()),
+            Entry("Focus, shortcut, Hero", "focus traversal shortcut keybinding hero transition", FocusHeroNav, () => new FocusShortcutHeroGalleryPage())
         ];
 
         ThemeSelector.ItemsSource = new[] { "Light", "Dark", "System" };
@@ -179,7 +188,6 @@ public partial class MainWindow : Window
     private void ShowTabs(object? s, RoutedEventArgs e) => Navigate(new TabGalleryPage(), TabNav);
     private void ShowToolbars(object? s, RoutedEventArgs e) => Navigate(new ToolbarGalleryPage(), ToolbarNav);
     private void ShowTooltips(object? s, RoutedEventArgs e) => Navigate(new TooltipGalleryPage(), TooltipNav);
-    private void ShowFlutterParity(object? s, RoutedEventArgs e) => Navigate(new FlutterParityGalleryPage(), FlutterParityNav);
     private void ShowEcosystem(object? s, RoutedEventArgs e) => Navigate(new EcosystemGalleryPage(), EcosystemNav);
     private void ShowBorderlessWindows(object? s, RoutedEventArgs e) => Navigate(new BorderlessWindowGalleryPage(), BorderlessWindowNav);
     private void ShowNumeric(object? s, RoutedEventArgs e) => Navigate(new NumericGalleryPage(), NumericNav);
@@ -196,6 +204,14 @@ public partial class MainWindow : Window
     private void ShowRefresh(object? s, RoutedEventArgs e) => Navigate(new RefreshIndicatorGalleryPage(), RefreshNav);
     private void ShowReorderableList(object? s, RoutedEventArgs e) => Navigate(new ReorderableListGalleryPage(), ReorderableListNav);
     private void ShowStepper(object? s, RoutedEventArgs e) => Navigate(new StepperGalleryPage(), StepperNav);
+    private void ShowFormValidation(object? s, RoutedEventArgs e) => Navigate(new FormValidationGalleryPage(), FormValidationNav);
+    private void ShowSimpleDialog(object? s, RoutedEventArgs e) => Navigate(new SimpleDialogGalleryPage(), SimpleDialogNav);
+    private void ShowAboutDialog(object? s, RoutedEventArgs e) => Navigate(new AboutDialogGalleryPage(), AboutDialogNav);
+    private void ShowPickerRestore(object? s, RoutedEventArgs e) => Navigate(new PickerRestorationGalleryPage(), PickerRestoreNav);
+    private void ShowDraggableSheet(object? s, RoutedEventArgs e) => Navigate(new DraggableSheetGalleryPage(), DraggableSheetNav);
+    private void ShowKeyboardAvoid(object? s, RoutedEventArgs e) => Navigate(new KeyboardAvoidanceGalleryPage(), KeyboardAvoidNav);
+    private void ShowAdaptiveControls(object? s, RoutedEventArgs e) => Navigate(new AdaptiveControlsGalleryPage(), AdaptiveControlsNav);
+    private void ShowFocusHero(object? s, RoutedEventArgs e) => Navigate(new FocusShortcutHeroGalleryPage(), FocusHeroNav);
 
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {

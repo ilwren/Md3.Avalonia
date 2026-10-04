@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.AdaptiveControlsGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Adaptive controls" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="One task rendered under two platform policies. The switches choose between following the host platform and forcing Cupertino metrics." />
+      </StackPanel>
+
+      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
+        <TextBlock Classes="body" Text="The switches choose the platform policy. Run the same upload to compare Material and Cupertino progress metrics." />
+        <WrapPanel>
+          <md:MdAdaptiveSwitch x:Name="AutomaticAdaptiveSwitch" Content="Follow the current platform" IsChecked="True" Margin="0,0,20,12" Click="AdaptiveControlChanged" />
+          <md:MdAdaptiveSwitch x:Name="CupertinoAdaptiveSwitch" Platform="Cupertino" Content="Preview iOS control metrics" Margin="0,0,20,12" Click="AdaptiveControlChanged" />
+        </WrapPanel>
+        <Border Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="20">
+            <StackPanel VerticalAlignment="Center" Spacing="2">
+              <TextBlock FontWeight="Medium" Text="Upload design tokens" />
+              <TextBlock Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="One task, rendered with two platform policies" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" HorizontalAlignment="Center" Spacing="4">
+              <md:MdAdaptiveProgressIndicator x:Name="MaterialAdaptiveProgress" Platform="Material" Value="0" Size="36" />
+              <TextBlock HorizontalAlignment="Center" FontSize="11" Text="Material" />
+            </StackPanel>
+            <StackPanel Grid.Column="2" HorizontalAlignment="Center" Spacing="4">
+              <md:MdAdaptiveProgressIndicator x:Name="CupertinoAdaptiveProgress" Platform="Cupertino" Value="0" Size="36" />
+              <TextBlock HorizontalAlignment="Center" FontSize="11" Text="Cupertino" />
+            </StackPanel>
+          </Grid>
+        </Border>
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <md:MdButton Content="Run sync comparison" Variant="Outlined" Click="RunAdaptiveSync" />
+          <TextBlock x:Name="AdaptiveStatus" VerticalAlignment="Center" Classes="body" Text="Ready to upload." />
+        </StackPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdAdaptiveSwitch Content=&quot;Follow the current platform&quot; IsChecked=&quot;True&quot; /&gt;&#10;&lt;md:MdAdaptiveSwitch Platform=&quot;Cupertino&quot; Content=&quot;Preview iOS control metrics&quot; /&gt;&#10;&lt;md:MdAdaptiveProgressIndicator Platform=&quot;Material&quot; Value=&quot;0&quot; Size=&quot;36&quot; /&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

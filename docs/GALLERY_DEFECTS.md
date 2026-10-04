@@ -95,15 +95,28 @@ Splitting also surfaced a real cross-section bug: `DismissibleDismissed` wrote i
 `DialogStatus`, the status line of the *simple dialog* section several components further down,
 so dismissing the row appeared to do nothing. Each page now owns its own status line.
 
-What stays on `FlutterParityGalleryPage` is what genuinely spans several controls — form
-validation, the simple/about/licenses dialog flow, picker state restoration, the draggable sheet,
-the keyboard host, and the adaptive/hero/focus/shortcut workflow. Those six share
-`ActiveDialogHost`, `_simpleDialog`, `_licenses` and the hero state, so they move as later
-batches, not this one. The page lost its dev-era "Phase 3 ·" / "Phase 4 ·" heading prefixes and
-the stale `MinHeight="5200"` that sized it for the content it no longer holds.
+The page lost its dev-era "Phase 3 ·" / "Phase 4 ·" heading prefixes and the stale
+`MinHeight="5200"` that sized it for content it no longer held.
 
 One pre-existing gap turned up next door: `NumericNav` was in the gallery index but missing from
 `_navigationButtons`, so its selected state was never cleared when navigating away. Added.
+
+### 12 · batch 2 — the parity page is gone
+
+The six sections left behind shared `ActiveDialogHost`, `_simpleDialog`, `_licenses` and the hero
+state, which is why they moved together rather than piecemeal. Eight more pages, because two of
+those sections were again two demos sharing one container:
+
+Form validation · Simple dialog · About and licenses · Picker restoration ·
+Draggable sheet · Keyboard avoidance · Adaptive controls · Focus, shortcut and Hero
+
+With nothing left on it, `FlutterParityGalleryPage` was deleted rather than kept as an empty
+shell — seventeen components now answer for themselves, which was the point of #12. Its trailing
+usage block was by then describing expansion panels, refresh indicators, steppers and data
+tables, none of which had been on the page since batch 1.
+
+The two dialog pages keep a local `MdDialogHost` for standalone preview and prefer the shell's
+host when running inside the gallery, the arrangement the parity page used.
 
 ## Checked and found correct — no change made
 
@@ -155,8 +168,8 @@ real. Worth a sweep of the Extra controls for missing template/presentation hook
 ## Agreed approach
 
 - **#12 page split**: incremental — pull each component onto its own page as it gets fixed, rather
-  than one big-bang restructure. Batch 1 (nine pages) is done; the remaining `FlutterParity`
-  sections share dialog/hero state and follow in later batches, then `Ecosystem`,
-  `ComponentsOverview`, `DesktopAdapters`, `AdvancedSelection` and `Motion`.
+  than one big-bang restructure. `FlutterParity` is fully split (seventeen pages over two
+  batches) and the page is gone. Still crowded, in descending order: `Ecosystem` (9 sections),
+  `ComponentsOverview` (7), `DesktopAdapters` (5), `AdvancedSelection` (5), `Motion` (4).
 - **#21 / #22**: adapter-based. No third-party dependency in the library; ship the Material UI and
   an adapter seam, and let the gallery demo one implementation. `MdRichEditor` already has one.
