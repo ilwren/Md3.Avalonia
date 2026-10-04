@@ -8,7 +8,12 @@
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdFloatingActionButton">
-        <Grid Background="Transparent">
+        <!-- The small FAB is 40dp, below Material's 48dp pointer-target minimum. The container
+             keeps its specified size and the target grows around it, which is the same shape of
+             fix MdIconButton already uses. A no-op for the 56dp, 80dp and 96dp sizes. -->
+        <Grid MinWidth="{DynamicResource Md.Comp.Fab.Target.Size}"
+              MinHeight="{DynamicResource Md.Comp.Fab.Target.Size}"
+              Background="Transparent">
           <Border x:Name="PART_Container"
                   Width="{TemplateBinding ContainerSize}"
                   Height="{TemplateBinding ContainerSize}"

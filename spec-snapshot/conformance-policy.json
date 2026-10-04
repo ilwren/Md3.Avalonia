@@ -1,6 +1,5 @@
 {
   "schema_version": 1,
-
   "_readme": [
     "Ratchet control for the specification conformance harness (layers L1/L2/L3/L5).",
     "",
@@ -16,16 +15,22 @@
     "A waiver is a deliberate, documented divergence. 'reason' is mandatory and is reproduced in the",
     "generated report so that nobody has to diff this file to understand the divergence."
   ],
-
   "mode": "bootstrap",
-
   "layers": {
-    "L1_tokens":   { "enabled": true },
-    "L2_geometry": { "enabled": true },
-    "L3_visual":   { "enabled": true,  "autoAcceptMissingBaseline": true },
-    "L5_motion":   { "enabled": true }
+    "L1_tokens": {
+      "enabled": true
+    },
+    "L2_geometry": {
+      "enabled": true
+    },
+    "L3_visual": {
+      "enabled": true,
+      "autoAcceptMissingBaseline": true
+    },
+    "L5_motion": {
+      "enabled": true
+    }
   },
-
   "visual": {
     "_readme": [
       "maxChangedPixelRatio is the fraction of pixels allowed to differ by more than perChannelTolerance.",
@@ -36,19 +41,13 @@
     "perChannelTolerance": 12,
     "maxChangedPixelRatio": 0.004
   },
-
   "waivers": [
-    {
-      "id": "shape-large-increased-missing",
-      "layer": "L1_tokens",
-      "keys": ["Md.Sys.Shape.Corner.LargeIncreased", "Md.Sys.Shape.Corner.ExtraLargeIncreased"],
-      "reason": "M3 Expressive added the *Increased shape steps after this library's shape scale was frozen. Tracked for 0.4.0; adding them is additive and cannot break existing consumers.",
-      "expires": "2026-12-31"
-    },
     {
       "id": "combobox-menu-item-72",
       "layer": "L1_tokens",
-      "keys": ["Md.Comp.MenuItem.Container.Height"],
+      "keys": [
+        "Md.Comp.MenuItem.Container.Height"
+      ],
       "reason": "Md.Comp.ComboBox.MenuItem.MinHeight is intentionally 72dp (two-line item with supporting text), which is a documented MdDecision rather than the 48dp single-line menu item.",
       "expires": null
     }

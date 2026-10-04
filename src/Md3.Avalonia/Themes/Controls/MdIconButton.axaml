@@ -3,7 +3,11 @@
                     xmlns:md="using:Md3.Avalonia.Controls">
   <ControlTheme x:Key="{x:Type md:MdIconButton}" TargetType="md:MdIconButton">
     <Setter Property="MinWidth" Value="48"/><Setter Property="MinHeight" Value="48"/><Setter Property="FocusAdorner" Value="{x:Null}"/><Setter Property="BorderThickness" Value="0"/><Setter Property="Cursor" Value="Hand"/><Setter Property="StateLayerBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"/>
-    <Setter Property="Template"><ControlTemplate TargetType="md:MdIconButton"><Grid MinWidth="48" MinHeight="48" Background="Transparent">
+    <!-- The 48dp floor comes from the ControlTheme setters above, so a standalone icon button is
+         unchanged. Template-binding it is what lets a host that embeds an icon button inside a
+         smaller component - the remove affordance of a 32dp chip - lower the floor without
+         retemplating the whole control. -->
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdIconButton"><Grid MinWidth="{TemplateBinding MinWidth}" MinHeight="{TemplateBinding MinHeight}" Background="Transparent">
       <Border x:Name="PART_Container" Width="{TemplateBinding ContainerWidth}" Height="{TemplateBinding ContainerHeight}" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" ClipToBounds="True" CornerRadius="{TemplateBinding ContainerCornerRadius}">
         
         <Grid><Border x:Name="PART_StateLayer" Background="{TemplateBinding StateLayerBrush}" CornerRadius="{TemplateBinding ContainerCornerRadius}" Opacity="0"/><md:MdRipplePresenter RippleBrush="{TemplateBinding StateLayerBrush}" IsCentered="True"/>

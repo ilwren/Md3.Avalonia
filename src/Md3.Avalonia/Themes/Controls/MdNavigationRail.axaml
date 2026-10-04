@@ -47,7 +47,7 @@
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdNavigationRail}" TargetType="md:MdNavigationRail">
-    <Setter Property="Width" Value="96" />
+    <Setter Property="Width" Value="{DynamicResource Md.Comp.NavigationRail.Container.Width}" />
     <Setter Property="Padding" Value="12,20" />
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
     <Setter Property="BorderThickness" Value="0" />

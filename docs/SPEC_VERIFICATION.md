@@ -178,15 +178,37 @@ rather than an oversight.
 
 ### 4.3 Open, and why they are still open
 
+Everything in the first round of open questions has now been answered. What is left:
+
 | Finding | Status |
 | --- | --- |
-| `Md.Comp.NavigationBar.Container.Height` — M3 says 80dp, the theme uses 64dp (80dp only under `:baseline`) | **Deliberate, needs a decision.** Fixing it changes the height of every navigation bar in every consuming app. It is a product call, not a lint fix, so it stays a visible gap rather than being quietly waived. |
-| `Md.Comp.NavigationRail.Container.Width` — M3 says 80dp, the theme uses 96dp | Same. |
-| `MdChip/*/touch-target` — the 32dp chip has no 48dp target | Real and by M3's own guidance a defect, but widening it changes chip layout; recorded rather than changed. |
-| `MdChip/Input/height` — 50dp against a 32dp specification | **Real bug, root cause known.** `Variant = Input` implies `:removable` (`MdChip.cs`), which reveals `PART_RemoveButton`. That is an `MdIconButton`, and both its `ControlTheme` and its template's root `Grid` hardcode a 48dp minimum for a standalone icon button's touch target. Nested in a chip it sets the floor, so the chip measures 48dp plus padding. The fix is to constrain the button to `Md.Comp.Chip.Icon.Size` inside a chip and let the chip body be the touch target, as M3 does — but it changes rendering and the 48dp minimum is load-bearing elsewhere, so it wants a visual review rather than a blind edit. |
-| `Md.Comp.Fab.*` and `Md.Comp.Button.XSmall.Content.Padding` | Medium confidence. The oracle entry is the weaker party here: re-verify the published value before touching rendering. |
-| `Md.Sys.Motion.*` keys are declarative | `MdMotion` resolves only `Md.Sys.Motion.Scheme` at runtime and takes every spring from the compiled constants, so overriding a spring key changes nothing. Recorded as a note by the L5 layer so the catalogue cannot be mistaken for a theming hook. |
-| `Md.Comp.Switch.Handle.Unselected.Size` is declared but unreferenced | The template animates one 24dp handle under `scale(0.667)` instead of swapping two sizes. The token states the specified size; the lint warning is accurate and accepted. |
+| `Md.Comp.Fab.Medium.Shape` 24dp vs 20dp, `Md.Comp.Fab.Large.IconSize` 32dp vs 36dp, `Md.Comp.Button.XSmall.Content.Padding` 16dp vs 12dp | **Medium confidence: the oracle is the weaker party.** These three entries were transcribed by review rather than mapped to a pinned upstream file, so the published value needs re-verifying before any rendering changes. They never fail a build. |
+| `Md.Sys.Motion.*` keys are declarative | `MdMotion` resolves only `Md.Sys.Motion.Scheme` at runtime and takes every spring from the compiled constants, so overriding a spring key changes nothing. Recorded as a note by the L5 layer so the catalogue cannot be mistaken for a theming hook. Making motion genuinely themeable is a behavioural change, not a token change. |
+| `Md.Comp.Switch.Handle.Unselected.Size` and the two `*Increased` shape steps are declared but unreferenced | The switch animates one 24dp handle under `scale(0.667)` rather than swapping two sizes, and nothing uses the new shape steps yet. The lint warnings are accurate and accepted. |
+| 3 L3 goldens have no committed baseline | By design. Candidates are written to `artifacts/spec/baselines-new/`; a human reviews one and copies it into `Spec/baselines/` to arm it. The layer never adopts its own output. |
+
+### 4.4 Second round: conformed to the specification
+
+These were open in 4.3 and have since been resolved rather than waived.
+
+- **Navigation bar 64dp -> 80dp, navigation rail 96dp -> 80dp.** Both now M3's published values. The
+  rail is the more interesting one: its own item draws a 56dp indicator inside 12dp of padding per
+  side, which comes to exactly 80, so the control had been carrying 16dp of slack that nothing in
+  its own template asked for. Verified that no `ComboBox` sits inside a rail or bar, so the
+  containment problem that motivated the original sizes is not affected.
+- **Input chip 50dp -> 32dp.** `Variant = Input` implies `:removable`, revealing `PART_RemoveButton`
+  - an `MdIconButton` whose 48dp standalone target set the floor for the whole chip. The root grid
+  in `MdIconButton`'s template now template-binds its minimum instead of hardcoding 48, so the
+  ControlTheme still gives a standalone icon button its 48dp target while a host that embeds one in
+  something smaller can lower it. Inside a chip the button collapses to the 18dp trailing icon M3
+  specifies, and the chip body is the target.
+- **48dp pointer targets for chips and the small FAB.** Material states the 32dp chip and the 40dp
+  small FAB, and separately states a 48dp minimum target. Both are satisfied the way the
+  specification resolves them: the visual container keeps its size and is centred inside a 48dp
+  transparent region. Neither control looks different; both stop dropping taps near their edges.
+- **`Md.Sys.Shape.Corner.LargeIncreased` (20dp) and `ExtraLargeIncreased` (32dp) added**, and the
+  waiver that covered their absence retired. The only waiver left is the deliberate 72dp ComboBox
+  menu item.
 
 ---
 
