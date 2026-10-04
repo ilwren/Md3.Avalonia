@@ -16,6 +16,7 @@ public partial class FlutterParityGalleryPage : UserControl
     private int _refreshCount;
     private bool _gridTileFavorite;
     private bool _heroExpanded;
+    private bool _heroTransitionRunning;
     private bool _adaptiveSyncRunning;
     private static string L(string english, string chinese) => GalleryLocalization.Choose(english, chinese);
     private MdDialogHost ActiveDialogHost => TopLevel.GetTopLevel(this) is MainWindow main ? main.DialogHost : ParityDialogHost;
@@ -294,21 +295,26 @@ public partial class FlutterParityGalleryPage : UserControl
     private void ExecuteShortcutAction() =>
         AdvancedStatus.Text = L($"Shortcut action ran at {DateTime.Now:HH:mm:ss}.", $"快捷键操作已于 {DateTime.Now:HH:mm:ss} 执行。");
 
-    private void RequestHero(object? sender, RoutedEventArgs e)
+    private async void RequestHero(object? sender, RoutedEventArgs e)
     {
-        if (!_heroExpanded)
-        {
-            HeroDestination.IsVisible = true;
-            HeroSource.RequestTransitionTo(HeroDestination);
-            HeroSource.IsVisible = false;
-        }
-        else
-        {
-            HeroSource.IsVisible = true;
-            HeroDestination.RequestTransitionTo(HeroSource);
-            HeroDestination.IsVisible = false;
-        }
+        // The flight is awaited now, so a second click mid-air would interleave the two toggles.
+        if (_heroTransitionRunning) return;
+        _heroTransitionRunning = true;
+        var source = _heroExpanded ? HeroDestination : HeroSource;
+        var destination = _heroExpanded ? HeroSource : HeroDestination;
+
+        // The destination is hidden until this click, so it has no bounds yet. Starting the
+        // flight in the same pass made MdHero measure and photograph a zero-sized rectangle and
+        // give up, and hiding the source immediately afterwards reflowed the row under a
+        // transition that had already recorded where things were -- hence the fragment of content
+        // visible for the first frames. Reveal, let one layout pass run, fly, and only then hide
+        // the source, which stays in the layout at zero opacity while the flight is in the air.
+        destination.IsVisible = true;
+        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+        await source.TransitionToAsync(destination);
+        source.IsVisible = false;
         _heroExpanded = !_heroExpanded;
+        _heroTransitionRunning = false;
     }
 
     private sealed record PackageRow(string Name, string Platform, int Score);

@@ -10,6 +10,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
@@ -432,7 +433,10 @@ public sealed class MdTransfer : TemplatedControl
     private Point _dragStart;
     private bool _dragMoved;
     private ListBoxItem? _dragContainer;
-    private TranslateTransform? _dragTransform;
+    private Image? _dragGhost;
+    private OverlayLayer? _dragGhostLayer;
+    private RenderTargetBitmap? _dragGhostBitmap;
+    private Vector _dragGhostOffset;
     private int _transferAnimationVersion;
     static MdTransfer()
     {
@@ -621,11 +625,6 @@ public sealed class MdTransfer : TemplatedControl
         _dragStart = e.GetPosition(this);
         _dragMoved = false;
         _dragContainer = row;
-        _dragTransform = row.RenderTransform as TranslateTransform ?? new TranslateTransform();
-        _dragTransform.Transitions = null;
-        row.RenderTransform = _dragTransform;
-        row.RenderTransformOrigin = RelativePoint.TopLeft;
-        row.ZIndex = 2;
         e.Pointer.Capture(this);
     }
 
@@ -641,11 +640,8 @@ public sealed class MdTransfer : TemplatedControl
         PseudoClasses.Set(":dragging", true);
         PseudoClasses.Set(":drag-to-source", !_dragFromSource && overSource);
         PseudoClasses.Set(":drag-to-target", _dragFromSource && overTarget);
-        if (_dragTransform is not null)
-        {
-            _dragTransform.X = position.X - _dragStart.X;
-            _dragTransform.Y = position.Y - _dragStart.Y;
-        }
+        EnsureDragGhost();
+        MoveDragGhost(position);
         e.Handled = true;
     }
 
@@ -685,19 +681,72 @@ public sealed class MdTransfer : TemplatedControl
         if (ReferenceEquals(pointer.Captured, this)) pointer.Capture(null);
     }
 
+    /// <summary>
+    /// Raises a picture of the dragged row into the overlay layer.
+    /// </summary>
+    /// <remarks>
+    /// Translating the row itself kept it inside its own ListBox, so the scroll viewport clipped
+    /// it the moment it moved towards the other list: the row people were dragging slid under its
+    /// siblings and out of sight exactly when they needed to aim it. The overlay layer sits above
+    /// both lists and nothing clips it, so the ghost stays under the pointer the whole way across.
+    /// </remarks>
+    private void EnsureDragGhost()
+    {
+        if (_dragGhost is not null || _dragContainer is null) return;
+        var layer = OverlayLayer.GetOverlayLayer(this);
+        if (layer is null) return;
+        var bounds = _dragContainer.Bounds;
+        if (bounds.Width <= 0 || bounds.Height <= 0) return;
+        if (_dragContainer.TranslatePoint(default, this) is not { } origin) return;
+
+        // Where inside the row the pointer went down, so the ghost keeps the same grip.
+        _dragGhostOffset = _dragStart - origin;
+
+        var scale = TopLevel.GetTopLevel(this)?.RenderScaling ?? 1;
+        var pixelSize = new PixelSize(
+            Math.Max(1, (int)Math.Ceiling(bounds.Width * scale)),
+            Math.Max(1, (int)Math.Ceiling(bounds.Height * scale)));
+        var bitmap = new RenderTargetBitmap(pixelSize, new Vector(96 * scale, 96 * scale));
+        bitmap.Render(_dragContainer);
+
+        _dragGhostBitmap = bitmap;
+        _dragGhost = new Image
+        {
+            Source = bitmap,
+            Width = bounds.Width,
+            Height = bounds.Height,
+            Opacity = 0.85,
+            IsHitTestVisible = false
+        };
+        _dragGhostLayer = layer;
+        layer.Children.Add(_dragGhost);
+
+        // CancelTransferMotion deliberately skips the dragged container, so dimming it here is
+        // not fought by the transfer animation.
+        _dragContainer.Opacity = 0.4;
+    }
+
+    private void MoveDragGhost(Point position)
+    {
+        if (_dragGhost is null || _dragGhostLayer is null) return;
+        if (this.TranslatePoint(position - _dragGhostOffset, _dragGhostLayer) is not { } target) return;
+        Canvas.SetLeft(_dragGhost, target.X);
+        Canvas.SetTop(_dragGhost, target.Y);
+    }
+
     private void FinishDragVisual()
     {
-        if (_dragTransform is not null)
+        if (_dragGhost is not null) _dragGhostLayer?.Children.Remove(_dragGhost);
+        _dragGhost = null;
+        _dragGhostLayer = null;
+        _dragGhostBitmap?.Dispose();
+        _dragGhostBitmap = null;
+        if (_dragContainer is not null)
         {
-            _dragTransform.Transitions = MdMotionTransitions.Collect(
-                MdMotionTransitions.CreateDouble(this, TranslateTransform.XProperty, MdMotionKind.Spatial, MdMotionSpeed.Fast),
-                MdMotionTransitions.CreateDouble(this, TranslateTransform.YProperty, MdMotionKind.Spatial, MdMotionSpeed.Fast));
-            _dragTransform.X = 0;
-            _dragTransform.Y = 0;
+            _dragContainer.Opacity = 1;
+            _dragContainer.ZIndex = 0;
         }
-        if (_dragContainer is not null) _dragContainer.ZIndex = 0;
         _dragContainer = null;
-        _dragTransform = null;
     }
 
     private List<(object? Item, Point Position)> CaptureItemLayout()
