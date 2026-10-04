@@ -49,6 +49,11 @@ public sealed class MdBorderlessWindowTemplateTests
         try
         {
             Dispatcher.UIThread.RunJobs();
+            // Re-apply the native-frame state after the window is attached so the pseudo-class
+            // style is deterministic across headless and desktop-window initialization paths.
+            window.PreserveNativeBorder = false;
+            window.PreserveNativeBorder = true;
+            Dispatcher.UIThread.RunJobs();
             var frame = window.GetVisualDescendants().OfType<Border>()
                 .Single(control => control.Name == "PART_WindowFrame");
             var titleBar = window.GetVisualDescendants().OfType<MdWindowTitleBar>()
