@@ -165,17 +165,13 @@
           <ContentPresenter Name="PART_ContentPresenter"
                             Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
                             HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
-          <!-- The pair is centred on the text field's 56 DIP input row rather than pushed down by
-               a hand-tuned top margin, which left it 8 DIP low. Pinning the host to the top keeps
-               it on the input row when supporting text adds height underneath. -->
-          <Border Name="PART_SpinnerHost"
-                  Height="{DynamicResource Md.Comp.TextField.Container.MinHeight}"
-                  VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,8,0"
-                  Background="Transparent" ZIndex="2"
-                  IsVisible="{TemplateBinding ShowButtonSpinner}">
+          <!-- 15 = the 8 DIP of label space above the text field's PART_Container, plus the
+               (56 - 42) / 2 that centres the pair on the 56 DIP input row. Centring the panel on
+               the spinner itself instead puts it 8 DIP too high; the offset is not decoration. -->
           <StackPanel Name="PART_SpinnerPanel" Width="32" Height="42"
-                      VerticalAlignment="Center"
-                      Background="Transparent" Spacing="2">
+                      Margin="0,15,8,0" VerticalAlignment="Top" HorizontalAlignment="Right"
+                      Background="Transparent" Spacing="2" ZIndex="2"
+                      IsVisible="{TemplateBinding ShowButtonSpinner}">
             <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}"
                           HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
               <Path Width="12" Height="12" Data="{StaticResource Md.Numeric.Plus}" Stretch="Uniform"
@@ -192,12 +188,11 @@
                     Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
             </RepeatButton>
           </StackPanel>
-          </Border>
         </Grid>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^[ButtonSpinnerLocation=Left] /template/ Border#PART_SpinnerHost">
-      <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="Margin" Value="8,0,0,0" />
+    <Style Selector="^[ButtonSpinnerLocation=Left] /template/ StackPanel#PART_SpinnerPanel">
+      <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="Margin" Value="8,15,0,0" />
     </Style>
   </ControlTheme>
 
