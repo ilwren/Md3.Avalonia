@@ -390,3 +390,28 @@ That clears the last structural suspect inside the control. What headless still 
 is the desktop `PopupRoot`: it is a separate top level with its own hit-test tree, and the
 rounded-corner and transparency defects already found on desktop were invisible here for the
 same reason. Confirming or clearing this one needs a desktop run, not another headless test.
+
+### Review 14 item 1 - time picker
+
+**Wheel regression: fixed.** `HandleWheel` was gated on `IsOpen`, which killed scroll-to-adjust
+on the closed anchor field. The only wheel coverage opened the popup first, so it asserted the
+one state where the gesture still worked and the regression went straight through. Restoring it
+unconditionally would be worse than the bug - a hover-only wheel handler rewrites the time
+whenever someone scrolls a page containing a picker - so focus is the gate: unfocused the event
+stays unhandled and scrolls the page, focused it adjusts. The anchor renders a single run of
+text, so hour and minute are split down its middle.
+
+**Popup offset: not reproduced, now pinned.**
+`Picker_Popup_Surfaces_Line_Up_With_The_Bottom_Left_Of_Their_Anchor` measures both picker
+surfaces against their anchor and both land within 1 dip, so the bleed margin and its
+cancelling negative offset agree.
+
+Worth recording, because it cost a round: the first version of that test made the picker the
+window's only content. The anchor stretched to the full 900x760, leaving no room below it, and
+the popup was clamped into a corner - reported as a 516 dip horizontal offset that was entirely
+an artefact of the harness. Pickers have to be laid out at natural size before their placement
+means anything.
+
+What remains untested is the desktop path. Headless hosts popups in `OverlayPopupHost` inside
+the window; desktop uses a separate `PopupRoot` window with its own placement and clamping. The
+offset the review reports may well live there, and it cannot be measured from here.
