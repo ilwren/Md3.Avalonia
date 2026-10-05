@@ -368,3 +368,25 @@ focus reaches the scope, so a surface that simply needed a layout pass recovers.
   ship the Material UI and an adapter seam, and let the gallery demo one implementation.
   `MdRichEditor` has `IMdRichEditorAdapter` plus a markdown adapter over `TextBox`; `MdBeforeAfter`
   needed no adapter at all, since both layers are plain content slots.
+
+### Defect 9 - docked date picker, review 15 round
+
+Every "click" in the picker tests raised `Button.ClickEvent` directly. That skips hit testing
+entirely, so all fifteen of them prove a handler is wired and none of them can see a pointer
+failing to reach a control. `Gallery_Docked_Picker_Commits_Today_From_A_Real_Pointer_Click`
+now drives `window.MouseDown`/`MouseUp` at the button's translated centre instead.
+
+Measured, not assumed:
+
+- With the entrance animation settled, hit testing reaches `PART_TodayButton` and a real
+  pointer click commits today's date. The commit path is sound at pointer level.
+- Straight after `IsOpen`, `PART_Surface` is at Opacity 0.101, and after 120 render-timer
+  ticks it is still only 0.364 - the animation clock runs on wall time, so frames do not
+  fast-forward it. Clicking in that window misses the button and lands on the page content
+  underneath it.
+- The surface does reach Opacity 1, so it is not being left invisible and unhittable.
+
+That clears the last structural suspect inside the control. What headless still cannot model
+is the desktop `PopupRoot`: it is a separate top level with its own hit-test tree, and the
+rounded-corner and transparency defects already found on desktop were invisible here for the
+same reason. Confirming or clearing this one needs a desktop run, not another headless test.
