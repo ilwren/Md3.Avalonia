@@ -26,7 +26,7 @@ public sealed record MdCascaderItem(object? Value, string Label, IReadOnlyList<M
 }
 
 /// <summary>Hierarchical single-path selection with keyboard traversal and MVVM-friendly selected path.</summary>
-[PseudoClasses(":open", ":closed", ":present", ":has-value", ":reduced-motion", ":no-motion")]
+[PseudoClasses(":open", ":closed", ":present", ":has-value", ":has-label", ":reduced-motion", ":no-motion")]
 public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwner
 {
     public static readonly StyledProperty<IEnumerable<MdCascaderItem>?> ItemsSourceProperty = AvaloniaProperty.Register<MdCascader, IEnumerable<MdCascaderItem>?>(nameof(ItemsSource));
@@ -55,6 +55,7 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
     {
         ItemsSourceProperty.Changed.AddClassHandler<MdCascader>((control, _) => control.Reset());
         IsDropDownOpenProperty.Changed.AddClassHandler<MdCascader>((control, _) => control.UpdateOpenState());
+        LabelProperty.Changed.AddClassHandler<MdCascader>((control, _) => control.UpdateDisplayText());
         PlaceholderTextProperty.Changed.AddClassHandler<MdCascader>((control, _) => control.UpdateDisplayText());
         PathSeparatorProperty.Changed.AddClassHandler<MdCascader>((control, _) => control.UpdateDisplayText());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdCascader>((control, _) => control.UpdateMotion());
@@ -243,6 +244,9 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
         AutomationProperties.SetName(this, Label ?? MdLocalization.GetString("HierarchySelector", this));
         AutomationProperties.SetHelpText(this, value);
         PseudoClasses.Set(":has-value", SelectedPath.Count > 0);
+        // The floating label overhangs the anchor's top edge, so the template only reserves room
+        // for it while there is one to show.
+        PseudoClasses.Set(":has-label", !string.IsNullOrEmpty(Label));
     }
 
     void IMdPopupPresenceOwner.ClosePopupImmediately() => _presence.Initialize(false);

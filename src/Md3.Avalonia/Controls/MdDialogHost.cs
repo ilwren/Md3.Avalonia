@@ -107,6 +107,16 @@ public sealed class MdDialogHost : ContentControl, IMdDialogService
     public void Show(object dialog) => (Service ?? _localService).Show(dialog);
 
     /// <inheritdoc />
+    public Task<object?> ReplaceAsync(object dialog, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(dialog);
+        return (Service ?? _localService).ReplaceAsync(dialog, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public void Replace(object dialog) => (Service ?? _localService).Replace(dialog);
+
+    /// <inheritdoc />
     public void Close(object? result = null)
     {
         // Carry the result through the IsOpen handler, which is also where a dismissal that did

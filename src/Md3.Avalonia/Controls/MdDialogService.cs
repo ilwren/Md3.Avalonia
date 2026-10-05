@@ -43,6 +43,32 @@ public sealed class MdDialogService : IMdDialogService
     public void Show(object dialog) => _ = ShowAsync(dialog);
 
     /// <inheritdoc />
+    public Task<object?> ReplaceAsync(object dialog, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(dialog);
+        var request = new Request(dialog);
+        bool displacing;
+        lock (_gate)
+        {
+            // Head of the queue, so the close below hands the host this request and not whatever
+            // was already waiting.
+            _pending.Insert(0, request);
+            displacing = _current is not null;
+        }
+
+        if (cancellationToken.CanBeCanceled)
+            request.Cancellation = cancellationToken.Register(() => Cancel(request));
+
+        // Closing completes the displayed request, which pumps the queue and picks this one up.
+        if (displacing) Close();
+        Pump();
+        return request.Completion.Task;
+    }
+
+    /// <inheritdoc />
+    public void Replace(object dialog) => _ = ReplaceAsync(dialog);
+
+    /// <inheritdoc />
     public void Close(object? result = null) => OnUiThread(host => host.Close(result));
 
     internal void Attach(MdDialogHost host)

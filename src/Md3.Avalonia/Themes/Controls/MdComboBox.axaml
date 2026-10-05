@@ -299,16 +299,18 @@
 
             <Popup x:Name="PART_Popup"
                    MinWidth="{Binding Bounds.Width, ElementName=PART_Container}"
-                   MaxHeight="{TemplateBinding MaxDropDownHeight}"
                    IsLightDismissEnabled="True"
                    OverlayDismissEventPassThrough="True"
                    IsOpen="{TemplateBinding IsPopupOpen}"
                    Placement="BottomEdgeAlignedLeft"
                    PlacementTarget="{Binding #PART_Container}"
-                   VerticalOffset="0"
+                   VerticalOffset="-14"
                    InheritsTransform="True"
                      WindowManagerAddShadowHint="False">
+              <Popup.Styles><Style Selector="PopupRoot"><Setter Property="Background" Value="Transparent" /><Setter Property="TransparencyLevelHint" Value="Transparent" /><Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /></Style></Popup.Styles>
               <Border x:Name="PART_MenuSurface"
+                      Margin="0,14,0,16"
+                      MaxHeight="{TemplateBinding MaxDropDownHeight}"
                       HorizontalAlignment="Stretch"
                       Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
                       BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}"

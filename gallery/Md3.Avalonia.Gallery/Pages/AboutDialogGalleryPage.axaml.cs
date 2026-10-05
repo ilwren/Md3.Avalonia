@@ -22,7 +22,14 @@ public partial class AboutDialogGalleryPage : UserControl
         ];
     }
 
-    private void OpenAboutDialog(object? sender, RoutedEventArgs e)
+    private void OpenAboutDialog(object? sender, RoutedEventArgs e) => ShowAboutDialog(replace: false);
+
+    // "Back to about" is pressed from inside the license dialog, so it has to swap the displayed
+    // surface. Showing would queue the about box behind the license list and reveal it only once
+    // the user closed that - which reads as the Close button opening a dialog.
+    private void BackToAboutDialog(object? sender, RoutedEventArgs e) => ShowAboutDialog(replace: true);
+
+    private void ShowAboutDialog(bool replace)
     {
         var showLicenses = new MdButton { Content = L("View licenses", "查看许可证"), Variant = MdButtonVariant.Text, Size = MdButtonSize.ExtraSmall };
         showLicenses.Click += ShowLicenseList;
@@ -38,7 +45,8 @@ public partial class AboutDialogGalleryPage : UserControl
             Legalese = L("Apache-2.0 licensed Material control library.", "采用 Apache-2.0 许可证的 Material 控件库。"),
             Content = actions
         };
-        _ = ActiveDialogHost.ShowAsync(about);
+        var host = ActiveDialogHost;
+        _ = replace ? host.ReplaceAsync(about) : host.ShowAsync(about);
         LicenseStatus.Text = L("About dialog opened; choose View licenses or Close.", "“关于”对话框已打开；请选择“查看许可证”或“关闭”。");
     }
 
@@ -46,7 +54,7 @@ public partial class AboutDialogGalleryPage : UserControl
     {
         var page = new MdLicensePage { Licenses = _licenses, FilterLabel = L("Filter packages", "筛选包"), Width = 760, Height = 440 };
         var back = new MdButton { Content = L("Back to about", "返回关于"), Variant = MdButtonVariant.Text, Size = MdButtonSize.ExtraSmall };
-        back.Click += OpenAboutDialog;
+        back.Click += BackToAboutDialog;
         var close = new MdButton { Content = L("Close", "关闭"), Variant = MdButtonVariant.Text, Size = MdButtonSize.ExtraSmall };
         close.Click += (_, _) => ActiveDialogHost.Close();
         var actions = new StackPanel { Orientation = global::Avalonia.Layout.Orientation.Horizontal, Spacing = 8 };
@@ -60,7 +68,7 @@ public partial class AboutDialogGalleryPage : UserControl
             MinWidth = 820,
             MaxWidth = 900
         };
-        _ = ActiveDialogHost.ShowAsync(dialog);
+        _ = ActiveDialogHost.ReplaceAsync(dialog);
         LicenseStatus.Text = L("License dialog opened; select a package or return to About.", "许可证对话框已打开；请选择包或返回“关于”。");
     }
 }

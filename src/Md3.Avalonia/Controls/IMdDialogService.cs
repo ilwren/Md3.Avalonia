@@ -22,6 +22,21 @@ public interface IMdDialogService
     /// <summary>Shows a dialog without waiting for its result.</summary>
     void Show(object dialog);
 
+    /// <summary>
+    /// Swaps the displayed dialog for <paramref name="dialog"/>, completing the one it replaces
+    /// with null. Use this for a step inside one flow — an about box opening its license list, a
+    /// wizard advancing a page — where <see cref="ShowAsync"/> would queue the new dialog behind
+    /// the old one and only reveal it once the user closed what they were looking at.
+    /// </summary>
+    /// <remarks>
+    /// The replacement jumps ahead of anything already queued, so it is displayed next even when
+    /// other requests are waiting. With nothing displayed this behaves like <see cref="ShowAsync"/>.
+    /// </remarks>
+    Task<object?> ReplaceAsync(object dialog, CancellationToken cancellationToken = default);
+
+    /// <summary>Replaces the displayed dialog without waiting for the new one's result.</summary>
+    void Replace(object dialog);
+
     /// <summary>Closes the displayed dialog, completing its pending <see cref="ShowAsync"/> with <paramref name="result"/>.</summary>
     void Close(object? result = null);
 }
