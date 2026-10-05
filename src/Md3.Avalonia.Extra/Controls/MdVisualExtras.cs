@@ -115,27 +115,33 @@ public sealed class MdBeforeAfter : TemplatedControl
         // control, every reachable pixel is on the same side of the divider, and the offset the
         // press picks up is both one-directional and as large as half the handle. Holding on to
         // it for the rest of the drag is the gap between cursor and handle in the report.
-        var point = e.GetPosition(this);
-        SnapTo(point);
-        BeginDrag(point);
+        BeginDrag(e.GetPosition(this));
         e.Pointer.Capture(this);
         e.Handled = true;
-    }
-
-    private void SnapTo(Point point)
-    {
-        var extent = Orientation == MdComparisonOrientation.Horizontal
-            ? Math.Max(1, Bounds.Width)
-            : Math.Max(1, Bounds.Height);
-        var along = Orientation == MdComparisonOrientation.Horizontal ? point.X : point.Y;
-        Position = Math.Clamp(along / extent, 0, 1);
     }
 
     private void BeginDrag(Point origin)
     {
         _dragging = true;
+
         // Track the delta rather than the absolute pointer: grabbing the handle off-centre must
         // not snap the divider under the cursor.
+        //
+        // That only holds where the grab could have landed either side of centre. At an extreme
+        // half the handle is clipped outside the control, so every reachable pixel is on the
+        // same side of the divider and the offset the press picks up is one-directional and as
+        // large as half the handle - kept for the whole drag, it is the gap between cursor and
+        // handle in the report. Allow no more offset than the divider's own distance to the
+        // nearer edge, which is zero exactly where the handle is clipped.
+        var extent = Orientation == MdComparisonOrientation.Horizontal
+            ? Math.Max(1, Bounds.Width)
+            : Math.Max(1, Bounds.Height);
+        var along = Orientation == MdComparisonOrientation.Horizontal ? origin.X : origin.Y;
+        var divider = Math.Clamp(Position, 0, 1) * extent;
+        var reach = Math.Min(divider, extent - divider);
+        var offset = Math.Clamp(along - divider, -reach, reach);
+        Position = Math.Clamp((along - offset) / extent, 0, 1);
+
         _dragOrigin = origin;
         _dragStartPosition = Math.Clamp(Position, 0, 1);
         PseudoClasses.Set(":dragging", true);
@@ -166,7 +172,6 @@ public sealed class MdBeforeAfter : TemplatedControl
             // there, so the pointer cannot reach its centre. Keeping that offset left the
             // divider trailing the cursor by up to the full 22 dip tolerance for the whole
             // drag, which is what the comparison slider was reported for.
-            SnapTo(point);
             BeginDrag(point);
             e.Pointer.Capture(this);
             e.Handled = true;
