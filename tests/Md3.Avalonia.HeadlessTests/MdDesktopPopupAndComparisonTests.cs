@@ -479,7 +479,10 @@ public sealed class MdDesktopPopupAndComparisonTests
                 open(picker);
                 Dispatcher.UIThread.RunJobs();
 
-                var surface = Descendant<Border>(picker, "PART_Surface");
+                // The surface is the popup's child, not a visual descendant of the picker.
+                var popup = Descendant<Popup>(picker, "PART_Popup");
+                var surface = Assert.IsAssignableFrom<Border>(popup.Child);
+                Assert.Equal("PART_Surface", surface.Name);
                 PointerInput.AssertReachable(surface);
 
                 var anchor = Descendant<Button>(picker, "PART_AnchorButton");
