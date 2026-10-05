@@ -10,7 +10,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap" Text="Two linked date fields that validate against each other, with localized month and weekday names from the active gallery language." />
       </StackPanel>
 
-      <StackPanel Width="720" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="720" HorizontalAlignment="Stretch" Spacing="12">
         <md:MdDateRangePicker x:Name="RangePicker" StartLabel="Start date" EndLabel="End date" />
         <TextBlock x:Name="RangeValue" Classes="body" Opacity="0.78" />
       </StackPanel>

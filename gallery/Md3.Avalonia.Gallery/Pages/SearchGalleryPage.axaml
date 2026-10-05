@@ -6,11 +6,11 @@
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Spacing="28">
       <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Search"/><TextBlock Classes="body" Text="Search bars accept a query; search views expand the field into suggestions or results."/></StackPanel>
-      <StackPanel Width="680" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="680" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="h2" Text="Search bar"/>
         <md:MdSearchBar PlaceholderText="Search destinations" Text="Material" SearchSubmitted="OnSearchSubmitted"/>
       </StackPanel>
-      <StackPanel Width="680" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="680" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="h2" Text="Expanded search view"/>
         <md:MdButton Width="190" HorizontalAlignment="Left" Content="Open search · Ctrl+K" Variant="Outlined" Click="OpenExpandedSearch" />
         <md:MdSearchView x:Name="ExpandedSearchView" IsOpen="False">

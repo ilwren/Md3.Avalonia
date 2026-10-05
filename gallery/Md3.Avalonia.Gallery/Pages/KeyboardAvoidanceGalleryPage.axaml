@@ -10,7 +10,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap" Text="The host pads its viewport by the virtual keyboard inset and scrolls the focused text control into the space that is left." />
       </StackPanel>
 
-      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="body" Text="Simulate a virtual keyboard inset to verify that the host automatically adjusts viewport bottom padding and scrolls focused text controls into view." />
         <StackPanel Orientation="Horizontal" Spacing="8">
           <md:MdButton Content="Toggle virtual keyboard" Variant="Outlined" Click="ToggleVirtualKeyboard" />

@@ -10,7 +10,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap" Text="Expansion panels edit lightweight settings in place. AllowMultiple decides whether opening one closes the others." />
       </StackPanel>
 
-      <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="12">
         <md:MdExpansionPanelList AllowMultiple="False">
           <md:MdExpansionPanel Header="Account details" IsExpanded="True">
             <TextBlock TextWrapping="Wrap" Text="Edit lightweight settings without navigating away from the current page." />

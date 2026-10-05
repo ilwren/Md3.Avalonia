@@ -10,7 +10,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap" Text="A data table that pages its rows, reporting the page index and first row index as the user moves through them." />
       </StackPanel>
 
-      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
         <md:MdPaginatedDataTable x:Name="PagedTable" Height="310" RowsPerPage="3" PageChanged="PagedTableChanged">
           <md:MdPaginatedDataTable.Header>
             <Grid ColumnDefinitions="2*,*,*"><TextBlock FontWeight="Medium" Text="Package" /><TextBlock Grid.Column="1" FontWeight="Medium" Text="Platform" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" FontWeight="Medium" Text="Score" /></Grid>

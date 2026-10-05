@@ -12,7 +12,7 @@
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Navigation rail" />
-        <Border Width="720" Height="380" HorizontalAlignment="Left" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24" ClipToBounds="True">
+        <Border MaxWidth="720" Height="380" HorizontalAlignment="Stretch" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24" ClipToBounds="True">
           <Grid ColumnDefinitions="Auto,*">
             <md:MdNavigationRail x:Name="DemoRail" SelectedIndex="0" SelectionChanged="RailSelectionChanged">
               <md:MdNavigationRail.Header><md:MdFloatingActionButton Icon="{x:Static md:MdSymbols.Add}" Size="Small" /></md:MdNavigationRail.Header>

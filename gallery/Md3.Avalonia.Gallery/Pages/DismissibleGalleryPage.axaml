@@ -10,7 +10,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap" Text="Swipe a row either way to dismiss it, with a different background behind each direction. Restore puts it back." />
       </StackPanel>
 
-      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
         <md:MdDismissible x:Name="DismissibleDemo" Height="72" Dismissed="DismissibleDismissed">
           <md:MdDismissible.BackgroundContent><Border Width="180" Padding="20" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"><TextBlock VerticalAlignment="Center" Text="Archive" /></Border></md:MdDismissible.BackgroundContent>
           <md:MdDismissible.SecondaryBackgroundContent><Border Width="180" Padding="20" Background="{DynamicResource Md.Sys.Color.Error.Brush}"><TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Text="Delete" /></Border></md:MdDismissible.SecondaryBackgroundContent>

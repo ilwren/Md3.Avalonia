@@ -10,7 +10,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap" Text="A focus traversal group cycles with Tab, a shortcut scope binds Ctrl+Shift+S while the group holds focus, and MdHero flies an element between two positions." />
       </StackPanel>
 
-      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="body" Text="Use the focus controls, press Ctrl+Shift+S while this group is focused, or run the same command directly." />
         <md:MdFocusTraversalGroup x:Name="DemoFocusGroup" Cycle="True">
           <md:MdShortcutScope x:Name="ShortcutScope">

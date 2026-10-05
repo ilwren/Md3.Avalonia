@@ -7,7 +7,7 @@
     <StackPanel Spacing="28">
       <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Snackbar"/><TextBlock Classes="body" Text="Snackbars briefly report an app process and may offer one action or a close affordance."/></StackPanel>
       <md:MdButton Width="180" HorizontalAlignment="Left" Content="Queue from service" Variant="Filled" Click="ShowSnackbar"/>
-      <Border Width="760" Height="300" HorizontalAlignment="Left" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24">
+      <Border MaxWidth="760" Height="300" HorizontalAlignment="Stretch" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24">
         <md:MdSnackbarHost x:Name="DemoSnackbarHost">
           <TextBlock x:Name="SnackbarResult" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" Text="Draft moved to archive"/>
         </md:MdSnackbarHost>

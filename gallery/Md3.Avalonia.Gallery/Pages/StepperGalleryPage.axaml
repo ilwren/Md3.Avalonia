@@ -10,7 +10,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap" Text="A stepper walks through an ordered flow, reporting the active step and when the last one is confirmed." />
       </StackPanel>
 
-      <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="12">
         <md:MdStepper x:Name="DemoStepper" ActiveStepChanged="StepperChanged" ContinueRequested="StepperContinue">
           <md:MdStep Header="Choose a plan" Subtitle="Select the deployment tier" State="Complete">
             <md:MdComboBox x:Name="PlanBox" Width="280" HorizontalAlignment="Left" Label="Plan" SelectedIndex="0" />

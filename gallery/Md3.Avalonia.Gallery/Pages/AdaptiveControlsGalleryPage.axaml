@@ -10,7 +10,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap" Text="One task rendered under two platform policies. The switches choose between following the host platform and forcing Cupertino metrics." />
       </StackPanel>
 
-      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="body" Text="The switches choose the platform policy. Run the same upload to compare Material and Cupertino progress metrics." />
         <WrapPanel>
           <md:MdAdaptiveSwitch x:Name="AutomaticAdaptiveSwitch" Content="Follow the current platform" IsChecked="True" Margin="0,0,20,12" Click="AdaptiveControlChanged" />

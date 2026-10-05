@@ -11,7 +11,7 @@
       </StackPanel>
 
       <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
-      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
         <md:MdForm x:Name="AccountForm" AutovalidateMode="OnUserInteraction" Submitted="FormSubmitted">
           <StackPanel Spacing="12">
             <md:MdFormField x:Name="NameField" IsRequired="True" SupportingText="Required display name">

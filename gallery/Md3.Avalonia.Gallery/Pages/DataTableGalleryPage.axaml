@@ -10,7 +10,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap" Text="A Material data table with sortable column headers. Sorting is reported to the host, which owns the ordering of ItemsSource." />
       </StackPanel>
 
-      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
         <md:MdDataTable x:Name="DemoTable" Height="280" IsStriped="True" SortRequested="TableSortRequested">
           <md:MdDataTable.Header>
             <Grid ColumnDefinitions="2*,*,*">

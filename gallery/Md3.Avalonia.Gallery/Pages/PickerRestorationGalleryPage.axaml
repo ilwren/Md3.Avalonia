@@ -10,7 +10,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap" Text="A provider-agnostic store keeps picker values across a teardown, so a process death or a navigation away can be recovered from." />
       </StackPanel>
 
-      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
         <StackPanel Orientation="Horizontal" Spacing="12"><md:MdDatePicker x:Name="RestorableDate" Width="280" SelectedDate="2026-09-24" /><md:MdTimePicker x:Name="RestorableTime" Width="280" SelectedTime="10:15" /></StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="8"><md:MdButton Content="Save state" Variant="Outlined" Click="SavePickerState" /><md:MdButton Content="Clear values" Variant="Text" Click="ClearPickerValues" /><md:MdButton Content="Restore state" Variant="Text" Click="RestorePickerState" /></StackPanel>
         <TextBlock x:Name="RestorationStatus" Classes="body" Text="State is held by a provider-agnostic store." />

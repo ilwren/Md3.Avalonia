@@ -10,7 +10,7 @@
         <TextBlock Classes="body" Text="Tabs organize peer content across screens and views while retaining native selection and keyboard navigation." />
       </StackPanel>
 
-      <StackPanel Width="720" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="720" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="h2" Text="Primary tabs" />
         <md:MdTabs x:Name="PrimaryTabs" SelectedIndex="0" SelectionChanged="PrimarySelectionChanged">
           <md:MdTabItem Content="Flights"><md:MdTabItem.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Language}" /></md:MdTabItem.Icon></md:MdTabItem>
@@ -22,7 +22,7 @@
         </Border>
       </StackPanel>
 
-      <StackPanel Width="720" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="720" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="h2" Text="Secondary tabs with a content area" />
         <TextBlock Classes="body" Text="MdTabs is the bar on its own; MdTabsView holds the pages and follows it." />
         <md:MdTabs x:Name="SecondaryTabs" Variant="Secondary" SelectedIndex="0">
@@ -43,7 +43,7 @@
         </md:MdTabsView>
       </StackPanel>
 
-      <StackPanel Width="720" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="720" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="h2" Text="Scrollable and inline icon" />
         <md:MdTabs IsScrollable="True" SelectedIndex="1">
           <md:MdTabItem Content="Today" Icon="{x:Static md:MdSymbols.Today}" IsIconInline="True" />
@@ -54,7 +54,7 @@
         </md:MdTabs>
       </StackPanel>
 
-      <StackPanel Width="720" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="720" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="h2" Text="Tab view" />
         <StackPanel Orientation="Horizontal" Spacing="8"><md:MdButton Content="Rapid-switch 100×" Variant="Outlined" Click="StressTabSwitch" /><TextBlock x:Name="TabStressStatus" VerticalAlignment="Center" Classes="body" Text="Ready" /></StackPanel>
         <md:MdTabView x:Name="DemoTabView" Height="220" SelectedIndex="0">

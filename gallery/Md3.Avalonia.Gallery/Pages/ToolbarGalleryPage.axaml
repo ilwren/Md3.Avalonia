@@ -12,7 +12,7 @@
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Floating · standard" />
-        <Border Width="720" Height="128" HorizontalAlignment="Left" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24">
+        <Border MaxWidth="720" Height="128" HorizontalAlignment="Stretch" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24">
           <md:MdToolbar HorizontalAlignment="Center" VerticalAlignment="Center">
             <md:MdIconButton Icon="{x:Static md:MdSymbols.Edit}" />
             <md:MdIconButton Icon="{x:Static md:MdSymbols.ContentCopy}" />
@@ -24,7 +24,7 @@
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Floating · vibrant with primary action" />
-        <Border Width="720" Height="128" HorizontalAlignment="Left" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24">
+        <Border MaxWidth="720" Height="128" HorizontalAlignment="Stretch" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24">
           <md:MdToolbar Variant="Vibrant" HorizontalAlignment="Center" VerticalAlignment="Center">
             <md:MdIconButton Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" Icon="{x:Static md:MdSymbols.Check}" />
             <md:MdIconButton Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" Icon="{x:Static md:MdSymbols.Edit}" />
@@ -34,7 +34,7 @@
         </Border>
       </StackPanel>
 
-      <StackPanel Width="720" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="720" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="h2" Text="Docked" />
         <md:MdToolbar Mode="Docked" HorizontalAlignment="Stretch">
           <md:MdToolbar.LeadingContent><md:MdIconButton Icon="{x:Static md:MdSymbols.Close}" /></md:MdToolbar.LeadingContent>
@@ -47,7 +47,7 @@
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Click-triggered floating toolbar" />
-        <Border Width="720" Height="160" HorizontalAlignment="Left"
+        <Border MaxWidth="720" Height="160" HorizontalAlignment="Stretch"
                 Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="24">
           <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
             <TextBlock Classes="body" Text="Select content, then open the contextual toolbar." />

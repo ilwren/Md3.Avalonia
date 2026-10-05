@@ -11,7 +11,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap" Text="An about dialog carries application identity and leads into a searchable license list, which comes back to it." />
       </StackPanel>
 
-      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="body" Text="Open application details, then continue into a searchable license task and return." />
         <md:MdButton Width="140" HorizontalAlignment="Left" Content="About this app" Variant="Outlined" Click="OpenAboutDialog" />
         <TextBlock x:Name="LicenseStatus" Classes="body" Text="About dialog is closed." />

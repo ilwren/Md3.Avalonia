@@ -10,7 +10,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap" Text="The handle resizes the sheet between its minimum and maximum extent; nested wheel input expands or collapses it at the scroll boundaries." />
       </StackPanel>
 
-      <StackPanel Width="820" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
         <Border Height="420" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="20" ClipToBounds="True">
           <md:MdDraggableScrollableSheet x:Name="DraggableSheet" MinimumExtent="0.25" InitialExtent="0.5" MaximumExtent="1" Snap="True" ExtentChanged="SheetExtentChanged">
             <md:MdDraggableScrollableSheet.Header><TextBlock FontWeight="Medium" Text="Drag to resize · scroll after expansion" /></md:MdDraggableScrollableSheet.Header>

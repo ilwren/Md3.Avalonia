@@ -10,7 +10,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap" Text="Pull the list down, or call BeginRefresh, and the host completes the gesture when its work is done." />
       </StackPanel>
 
-      <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="12">
         <md:MdButton Width="150" HorizontalAlignment="Left" Content="Simulate refresh" Variant="Outlined" Click="StartRefresh" />
         <md:MdRefreshIndicator x:Name="DemoRefresh" Height="240" RefreshRequested="RefreshRequested">
           <md:MdScrollViewer Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" VerticalScrollBarVisibility="Auto">
