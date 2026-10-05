@@ -12,6 +12,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Extra.Controls;
+using Md3.Avalonia.Gallery.Pages;
 using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
@@ -523,6 +524,51 @@ public sealed class MdDesktopPopupAndComparisonTests
             }
             finally { window.Close(); }
         }
+    }
+
+    [AvaloniaFact]
+    public void Cascader_Dropdown_Lands_Below_Its_Anchor_And_Fits_On_The_Real_Page()
+    {
+        // Measured on the real page, because the reported truncation is about where the dropdown
+        // lands in a scrolling page rather than about the control in isolation.
+        var page = new CascaderGalleryPage();
+        var window = new Window { Width = 1200, Height = 800, Content = page };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var cascader = page.GetVisualDescendants().OfType<MdCascader>().First();
+            cascader.IsDropDownOpen = true;
+            Dispatcher.UIThread.RunJobs();
+
+            var popup = Descendant<Popup>(cascader, "PART_Popup");
+            var surface = Assert.IsAssignableFrom<Border>(popup.Child);
+            PointerInput.AssertReachable(surface);
+
+            var anchor = Descendant<Button>(cascader, "PART_Anchor");
+            var anchorBottomLeft = anchor
+                .TranslatePoint(new Point(0, anchor.Bounds.Height), window)!.Value;
+            var topLeft = surface.TranslatePoint(default, window)!.Value;
+            var chain = string.Join(" < ", surface.GetSelfAndVisualAncestors().OfType<Visual>()
+                .Select(v => $"{v.GetType().Name}[{v.Bounds.X:0.#},{v.Bounds.Y:0.#} " +
+                             $"{v.Bounds.Width:0.#}x{v.Bounds.Height:0.#}]"));
+
+            Assert.True(Math.Abs(topLeft.X - anchorBottomLeft.X) <= 1,
+                $"dropdown is offset horizontally by {topLeft.X - anchorBottomLeft.X:0.##} dip " +
+                $"(surface {topLeft.X:0.##}, anchor {anchorBottomLeft.X:0.##}); chain: {chain}");
+
+            Assert.True(topLeft.Y >= -0.5,
+                $"dropdown top is cut off above the window edge at y={topLeft.Y:0.##}; chain: {chain}");
+
+            Assert.True(Math.Abs(topLeft.Y - anchorBottomLeft.Y) <= 1,
+                $"dropdown is offset vertically by {topLeft.Y - anchorBottomLeft.Y:0.##} dip " +
+                $"(surface {topLeft.Y:0.##}, anchor bottom {anchorBottomLeft.Y:0.##}); chain: {chain}");
+
+            Assert.True(topLeft.Y + surface.Bounds.Height <= window.Height + 0.5,
+                $"dropdown runs {topLeft.Y + surface.Bounds.Height - window.Height:0.##} dip past " +
+                $"the bottom of the window; chain: {chain}");
+        }
+        finally { window.Close(); }
     }
 
     private static IEnumerable<string> PseudoClassNames(StyledElement element) =>
