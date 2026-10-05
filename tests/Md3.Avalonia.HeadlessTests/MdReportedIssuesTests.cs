@@ -55,6 +55,13 @@ public sealed class MdReportedIssuesTests
         {
             var view = new AndroidGalleryView();
             using var host = Show(view, width, 760);
+            // The destinations live in the navigation drawer, which starts closed and fully
+            // transparent. The synthetic click this replaced skipped straight past that, so it
+            // was navigating in a way no user can. Open the drawer the way a user would first.
+            var drawer = view.GetVisualDescendants().OfType<MdNavigationDrawer>().Single();
+            drawer.Show();
+            Dispatcher.UIThread.RunJobs();
+
             var destination = view.GetVisualDescendants().OfType<MdButton>()
                 .Single(button => Equals(button.Content, "Segmented buttons"));
             PointerInput.Click(destination);
