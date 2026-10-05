@@ -347,7 +347,15 @@ public sealed class MdDesktopPopupAndComparisonTests
                 window.MouseDown(start, MouseButton.Left, RawInputModifiers.None);
                 Dispatcher.UIThread.RunJobs();
                 Assert.Contains(":dragging", PseudoClassNames(control));
-                Assert.Equal(0, control.Position, 3);
+
+                // The press snaps the divider under the pointer. Making the press a grab was
+                // the first half of this fix; keeping the press offset for the rest of the drag
+                // was the other half of the same report, because at an edge the only reachable
+                // press is beside the clipped handle.
+                var pressOffset = orientation == MdComparisonOrientation.Horizontal
+                    ? 4d / control.Bounds.Width
+                    : 4d / control.Bounds.Height;
+                Assert.Equal(pressOffset, control.Position, 3);
 
                 var travel = orientation == MdComparisonOrientation.Horizontal
                     ? new Vector(80, 0)
@@ -355,8 +363,8 @@ public sealed class MdDesktopPopupAndComparisonTests
                 window.MouseMove(start + travel, RawInputModifiers.None);
                 Dispatcher.UIThread.RunJobs();
                 var expected = orientation == MdComparisonOrientation.Horizontal
-                    ? 80d / control.Bounds.Width
-                    : 40d / control.Bounds.Height;
+                    ? 84d / control.Bounds.Width
+                    : 44d / control.Bounds.Height;
                 Assert.Equal(expected, control.Position, 3);
 
                 window.MouseUp(start + travel, MouseButton.Left, RawInputModifiers.None);
