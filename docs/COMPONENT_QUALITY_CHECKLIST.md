@@ -121,3 +121,29 @@ Check both before calling a corner defect fixed:
 - [ ] Is the host window or `PopupRoot` transparent, with a non-white fallback?
 - [ ] Verified on a desktop run, not only headless — neither failure mode is visible headless,
       because headless composites everything into one surface.
+
+## Pointer reachability
+
+`RaiseEvent(new RoutedEventArgs(Button.ClickEvent))` skips hit testing. It proves a handler is
+wired and nothing else: it cannot see an occluding layer, a transparent ancestor, a control
+clipped out of its container, or a render transform that moves the pixels away from the
+coordinates a pointer is given. Every "it does not respond to clicks" report lives in that
+blind spot, so a green suite built on synthetic clicks is not evidence that a control is
+clickable.
+
+Use `PointerInput.Click` when the claim under test is that a user can operate the control -
+anything layered over other content (a clear button over a text box's caret and selection
+layers), small targets (an expander arrow), overlay content (snackbar actions), and popup
+content. Keep a synthetic click only when the assertion is about wiring rather than
+reachability, and say so in a comment at the call site.
+
+`PointerInput` settles animation before clicking. The animation clock runs on wall time, so
+forcing render-timer ticks does not fast-forward it: a popup surface measured straight after
+opening sat at Opacity 0.101, and was still at 0.364 after 120 forced ticks. A click fired in
+that window misses and lands on whatever is underneath, which looks exactly like a product
+defect and is not one.
+
+Two tests were found asserting things no user could do, both hidden by synthetic clicks:
+the context-toolbar test never showed its page, so nothing was laid out; the Android gallery
+test clicked a destination inside a closed navigation drawer, and then one scrolled far below
+the viewport.
