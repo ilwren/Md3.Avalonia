@@ -6,6 +6,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -471,7 +472,22 @@ public sealed class MdDesktopPopupAndComparisonTests
                          c => ((MdDatePicker)c).IsOpen = true),
                  })
         {
-            var window = new Window { Width = 900, Height = 760, Content = picker };
+            // Give the picker its natural size near the top left, the way a page lays one out.
+            // Making it the window's only content stretches the anchor to the full 900x760, which
+            // leaves no room below it and forces the popup into a corner - an artefact of the
+            // harness that looks exactly like a placement bug.
+            var window = new Window
+            {
+                Width = 900,
+                Height = 760,
+                Content = new StackPanel
+                {
+                    Margin = new Thickness(24),
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    Children = { picker },
+                },
+            };
             window.Show();
             try
             {
