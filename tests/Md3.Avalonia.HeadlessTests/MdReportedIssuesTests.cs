@@ -90,9 +90,15 @@ public sealed class MdReportedIssuesTests
 
             host.Window.Width = 900;
             Dispatcher.UIThread.RunJobs();
-            // Two authored groups plus the one inside the page's CodeExample tab strip.
-            Assert.Equal(new[] { 480d, 560d, double.NaN }, groups.Select(group => group.Width).ToArray());
-            Assert.All(groups.Take(2), group => Assert.Equal(HorizontalAlignment.Left, group.HorizontalAlignment));
+            // The two authored groups used to be pinned at Width 480 and 560, which is exactly
+            // what stopped the page reflowing into a narrow window. They now carry the same
+            // numbers as a cap and stretch into whatever they are given below it.
+            Assert.All(groups, group => Assert.True(double.IsNaN(group.Width),
+                $"{group.Name} still has a fixed width of {group.Width}"));
+            Assert.Equal(new[] { 480d, 560d }, groups.Take(2).Select(group => group.MaxWidth).ToArray());
+            Assert.All(groups.Take(2), group =>
+                Assert.True(group.Bounds.Width <= group.MaxWidth + 1,
+                    $"{group.Bounds.Width} exceeds the {group.MaxWidth} cap"));
         }
     }
 
