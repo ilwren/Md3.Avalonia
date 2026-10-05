@@ -6,12 +6,14 @@ using Avalonia.Controls.Templates;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Extra.Controls;
+using Md3.Avalonia.Gallery;
 using Md3.Avalonia.Gallery.Pages;
 using Xunit;
 
@@ -531,13 +533,21 @@ public sealed class MdDesktopPopupAndComparisonTests
     {
         // Measured on the real page, because the reported truncation is about where the dropdown
         // lands in a scrolling page rather than about the control in isolation.
-        var page = new CascaderGalleryPage();
-        var window = new Window { Width = 1200, Height = 800, Content = page };
+        // Hosted in MainWindow rather than shown bare: the navigation rail is what pushes the
+        // page off the left edge, and a popup clamped against the window edge loses the negative
+        // offset that cancels its bleed margin. Showing the page on its own puts the anchor at
+        // x=0 and manufactures exactly that clamp.
+        var window = new MainWindow { Width = 1400, Height = 900 };
         window.Show();
         try
         {
             Dispatcher.UIThread.RunJobs();
-            var cascader = page.GetVisualDescendants().OfType<MdCascader>().First();
+            window.GetVisualDescendants().OfType<MdButton>()
+                .Single(button => button.Name == "CascaderNav")
+                .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+
+            var cascader = window.GetVisualDescendants().OfType<MdCascader>().First();
             cascader.IsDropDownOpen = true;
             Dispatcher.UIThread.RunJobs();
 
