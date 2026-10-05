@@ -225,6 +225,26 @@ Commits `f2d00e4`, `ef308b5`. Building the demo found three defects in the contr
 | `PositionChanged` was silent for the keyboard and for bindings | It was raised from the pointer handler rather than from the property | Raised from the `PositionProperty` class handler, so every path reports |
 | `IsInteractive="False"` was still a tab stop whose divider moved | The flag gated the pointer only | It also sets a `:non-interactive` pseudo-class the theme keys `Focusable` off, and the key handler returns early. `SetCurrentValue(FocusableProperty, …)` was tried first and lost to the theme setter the moment the theme was applied on attach |
 
+**Reopened in review 13, and the reporter was right.** Fixing the demo and the three defects above
+left the comparison itself wrong. The revealed layer is sized to the whole control and placed in a
+clip border that is only `Position` wide; with no alignment of its own, a child that has an explicit
+size is *centred* in the space it is given, so the after image slid sideways as the divider moved and
+the two layers compared different parts of the picture. It is only invisible at `Position = 0.5`,
+which is where the demo opens.
+
+Measured against HandyControl's `CompareSlider`, the control this was asked to behave like:
+
+| | HandyControl `CompareSlider` | `MdBeforeAfter` before | `MdBeforeAfter` now |
+|---|---|---|---|
+| Layer registration | `ContentPresenter` per side, one `HorizontalAlignment="Left"`, one `"Right"`, each the full `ActualWidth` and clipped by its `RepeatButton` | full size, centred in the clip — drifts | pinned to the clip origin |
+| What you drag | a `Thumb` — 30px grip with left/right chevrons that spread on press | nothing; there was no handle at all | a 40dp Material handle with elevation, a state layer and spreading chevrons |
+| Click on the content | `Slider.DecreaseLarge` / `IncreaseLarge` on the track — pages one step toward the click | teleported the divider onto the pointer | steps one tenth toward the pointer |
+| Keyboard | `Slider` arrow keys | arrows, Shift for a coarse step | unchanged |
+
+`CompareSlider` is literally `public class CompareSlider : Slider`, so its whole interaction model is
+the `Slider` one: a grab handle plus a track that pages. That is what was adopted; the styling is
+Material rather than HandyControl's white circle with a dashed hairline.
+
 ## Checked and found correct — no change made
 
 | # | Item | Evidence |
@@ -265,6 +285,7 @@ pins the half that was never covered — docked commits, dial does not — so th
 | # | Item | Finding |
 |---|------|---------|
 | 26 | Borderless window corners missing | Depends on OS-level window shaping (transparency hints, DWM rounded corners, the platform adapters) — not observable or testable headless. Needs a desktop run to diagnose rather than a guess. |
+| 9 | Carousel / date picker / time picker still wrong on Windows | **Reopened in review 13.** The rule in the earlier entry still holds and the logic is platform-neutral, so the earlier conclusion was not wrong — it was incomplete. A popup is a real window on desktop and is sized to its child's layout box, while Android renders popups into the `TopLevel` overlay where nothing clips them; that difference is the one thing in these controls that is genuinely desktop-only. Two consequences were found and fixed in review 13: the elevation shadow and the `translate(0,-8)` entrance both drew outside the popup window and were clipped, and four popups never set the transparent `PopupRoot` style, so the popup window painted an opaque rectangle behind the rounded surface. Whether that accounts for the whole report is **unconfirmed** — the symptom was given as "still not fixed" rather than described, and headless tests share the Android overlay path, so they cannot reproduce a `PopupRoot` defect. |
 
 ## P0 mobile platform gaps
 
