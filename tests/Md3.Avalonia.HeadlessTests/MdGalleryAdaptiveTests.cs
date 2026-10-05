@@ -5,6 +5,7 @@ using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Presenters;
 using Avalonia.VisualTree;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
@@ -19,6 +20,11 @@ public sealed class MdGalleryAdaptiveTests
     // A desktop window dragged narrow. Pages that demand more than this have a fixed-width
     // element in them and will clip or push their content off screen rather than reflow.
     private const double NarrowWidth = 480;
+
+    // Popup content is placed in an overlay, so its edge translated into the page is not a
+    // page-layout measurement at all.
+    private static bool IsInsidePopup(Control control) =>
+        control.GetSelfAndVisualAncestors().Any(visual => visual is PopupRoot or OverlayPopupHost);
 
     private static bool IsHorizontallyScrollable(Control control) =>
         control.GetSelfAndVisualAncestors().OfType<ScrollViewer>().Any(viewer =>
@@ -68,7 +74,9 @@ public sealed class MdGalleryAdaptiveTests
                 // right edge, with nothing horizontally scrollable to reach it.
                 var worst = page.GetVisualDescendants()
                     .OfType<Control>()
-                    .Where(control => control.Bounds.Width > 0 && !IsHorizontallyScrollable(control))
+                    .Where(control => control.Bounds.Width > 0
+                                      && !IsHorizontallyScrollable(control)
+                                      && !IsInsidePopup(control))
                     .Select(control => new
                     {
                         Control = control,

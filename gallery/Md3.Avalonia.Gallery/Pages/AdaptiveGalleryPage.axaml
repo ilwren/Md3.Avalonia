@@ -37,7 +37,7 @@
           <md:MdButton Content="Expanded · 1040" Tag="1040" Variant="Outlined" Click="SetSuiteWidth" />
         </StackPanel>
         <TextBlock x:Name="SuiteStatus" Classes="body" Text="Medium viewport · navigation rail · Home destination." />
-        <md:MdNavigationSuite x:Name="DemoSuite" Width="760" Height="360" HorizontalAlignment="Left"
+        <md:MdNavigationSuite x:Name="DemoSuite" MaxWidth="760" Height="360" HorizontalAlignment="Stretch"
                               Mode="Auto" RailBreakpoint="600" DrawerBreakpoint="1000">
           <md:MdNavigationSuite.NavigationBar>
             <md:MdNavigationBar SelectedIndex="0" SelectionChanged="SuiteDestinationChanged">
@@ -74,7 +74,7 @@
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Material scaffold" />
-        <md:MdScaffold Width="800" Height="420" HorizontalAlignment="Left">
+        <md:MdScaffold MaxWidth="800" Height="420" HorizontalAlignment="Stretch">
           <md:MdScaffold.TopBar><md:MdTopAppBar Title="Inbox" Variant="Small" /></md:MdScaffold.TopBar>
           <md:MdScaffold.Navigation><md:MdNavigationRail SelectedIndex="0"><md:MdNavigationRailItem Icon="{x:Static md:MdSymbols.Mail}" Label="Inbox" /><md:MdNavigationRailItem Icon="{x:Static md:MdSymbols.Star}" Label="Starred" /></md:MdNavigationRail></md:MdScaffold.Navigation>
           <md:MdScaffold.FloatingActionButton><md:MdFloatingActionButton Icon="{x:Static md:MdSymbols.Edit}" /></md:MdScaffold.FloatingActionButton>

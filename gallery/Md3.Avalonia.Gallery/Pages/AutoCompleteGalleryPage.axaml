@@ -11,7 +11,7 @@
       </StackPanel>
 
       <StackPanel Spacing="12">
-        <md:MdAutoCompleteBox x:Name="TechnologyAutoComplete" Width="320" HorizontalAlignment="Left"
+        <md:MdAutoCompleteBox x:Name="TechnologyAutoComplete" MaxWidth="320" HorizontalAlignment="Stretch"
                               Label="Technology" PlaceholderText="Start typing"
                               SupportingText="Native filtering and keyboard selection"
                               FilterMode="ContainsOrdinal" IsTextCompletionEnabled="True" />

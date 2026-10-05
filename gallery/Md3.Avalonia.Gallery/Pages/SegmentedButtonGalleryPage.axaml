@@ -12,7 +12,7 @@
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Single selection" />
-        <md:MdSegmentedButtonGroup Width="480" HorizontalAlignment="Left" SelectedIndex="0">
+        <md:MdSegmentedButtonGroup MaxWidth="480" HorizontalAlignment="Stretch" SelectedIndex="0">
           <md:MdSegmentedButton Content="Day" Value="day" />
           <md:MdSegmentedButton Content="Week" Value="week" />
           <md:MdSegmentedButton Content="Month" Value="month" />
@@ -21,7 +21,7 @@
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Multiple selection" />
-        <md:MdSegmentedButtonGroup Width="560" HorizontalAlignment="Left" AllowMultiple="True">
+        <md:MdSegmentedButtonGroup MaxWidth="560" HorizontalAlignment="Stretch" AllowMultiple="True">
           <md:MdSegmentedButton Content="Bold"><md:MdSegmentedButton.Icon><TextBlock FontWeight="Bold" Text="B" /></md:MdSegmentedButton.Icon></md:MdSegmentedButton>
           <md:MdSegmentedButton Content="Italic"><md:MdSegmentedButton.Icon><TextBlock FontStyle="Italic" Text="I" /></md:MdSegmentedButton.Icon></md:MdSegmentedButton>
           <md:MdSegmentedButton Content="Underline"><md:MdSegmentedButton.Icon><TextBlock TextDecorations="Underline" Text="U" /></md:MdSegmentedButton.Icon></md:MdSegmentedButton>

@@ -14,7 +14,7 @@
             <DataTemplate DataType="{x:Type pages:DiscardDraftDialogModel}" x:DataType="pages:DiscardDraftDialogModel">
               <md:MdDialog Headline="{Binding Headline}" Variant="Basic">
                 <md:MdDialog.Icon><md:MdIcon Glyph="{x:Static md:MdSymbols.Warning}" Size="24"/></md:MdDialog.Icon>
-                <TextBlock Width="340" TextWrapping="Wrap" Text="{Binding Message}" />
+                <TextBlock MaxWidth="340" TextWrapping="Wrap" Text="{Binding Message}" />
                 <md:MdDialog.Actions>
                   <StackPanel Orientation="Horizontal" Spacing="8">
                     <md:MdButton Content="Cancel" Variant="Text" Click="CloseDialog" />
@@ -50,7 +50,7 @@
           <md:MdDialogHost.DataTemplates>
             <DataTemplate DataType="{x:Type pages:ConfirmDeleteDialogModel}" x:DataType="pages:ConfirmDeleteDialogModel">
               <md:MdDialog Headline="{Binding Headline}" Variant="Basic">
-                <TextBlock Width="340" TextWrapping="Wrap" Text="{Binding Message}" />
+                <TextBlock MaxWidth="340" TextWrapping="Wrap" Text="{Binding Message}" />
                 <md:MdDialog.Actions>
                   <StackPanel Orientation="Horizontal" Spacing="8">
                     <md:MdButton Content="Keep" Variant="Text" Command="{Binding CancelCommand}" />

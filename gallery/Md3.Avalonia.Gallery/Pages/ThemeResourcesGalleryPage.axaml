@@ -62,14 +62,14 @@
             </WrapPanel>
             <WrapPanel Orientation="Horizontal">
               <md:MdTextBox Width="260" Label="Text field" Text="Dynamic color" Margin="0,0,14,12"/>
-              <md:MdSearchBar Width="320" PlaceholderText="Search components" Margin="0,0,14,12"/>
+              <md:MdSearchBar MaxWidth="320" PlaceholderText="Search components" Margin="0,0,14,12"/>
             </WrapPanel>
             <WrapPanel Orientation="Horizontal">
               <md:MdAssistChip Content="Assist" Margin="0,0,10,10"/>
               <md:MdFilterChip Content="Selected filter" IsChecked="True" Margin="0,0,10,10"/>
               <md:MdInputChip Content="Input" Margin="0,0,10,10"/>
             </WrapPanel>
-            <md:MdCard Width="520" HorizontalAlignment="Left" Padding="20">
+            <md:MdCard MaxWidth="520" HorizontalAlignment="Stretch" Padding="20">
               <StackPanel Spacing="8"><TextBlock FontSize="20" FontWeight="Medium" Text="Live component surface"/><TextBlock Classes="body" TextWrapping="Wrap" Text="Color roles, corner scale, typography and motion update without replacing control templates."/><md:MdLinearProgressIndicator Value="68"/></StackPanel>
             </md:MdCard>
           </StackPanel>

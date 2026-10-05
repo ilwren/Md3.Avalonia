@@ -14,7 +14,7 @@
         <TextBlock Classes="h2" Text="Surfaces" />
         <WrapPanel Orientation="Horizontal">
           <md:MdTooltip Margin="0,0,24,0" Content="Add to favorites" IsOpen="True" />
-          <md:MdTooltip Width="312" Variant="Rich" Title="Keyboard shortcuts" Content="Use Command K to open search from anywhere in the application." IsOpen="True">
+          <md:MdTooltip MaxWidth="312" Variant="Rich" Title="Keyboard shortcuts" Content="Use Command K to open search from anywhere in the application." IsOpen="True">
             <md:MdTooltip.ActionContent><md:MdButton Content="View shortcuts" Variant="Text" /></md:MdTooltip.ActionContent>
           </md:MdTooltip>
         </WrapPanel>

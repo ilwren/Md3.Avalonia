@@ -13,7 +13,7 @@
       </StackPanel>
 
       <StackPanel Spacing="12">
-        <eco:MdCalendar x:Name="Calendar" Width="320" HorizontalAlignment="Left" DateInvoked="CalendarDateInvoked" />
+        <eco:MdCalendar x:Name="Calendar" MaxWidth="320" HorizontalAlignment="Stretch" DateInvoked="CalendarDateInvoked" />
         <TextBlock x:Name="CalendarStatus" Classes="body" Text="Select a calendar date." />
       </StackPanel>
 
