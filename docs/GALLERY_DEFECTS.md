@@ -437,3 +437,33 @@ shift, and on desktop the clamp is against the screen rather than the window.
 Worth fixing properly: the compensation should not depend on the popup being free to move
 outside its anchor. That is a change across all eleven popups that share the pattern and wants
 desktop verification, so it is recorded rather than attempted blind.
+
+### Review 14 item 6 - gallery itself
+
+**Empty Usage: fixed.** `CodeExample.EffectiveCSharp` stood in `// Add the equivalent
+direct-control C# here.` whenever a page supplied only AXAML, which is thirty-two of them, so
+every one had a C# tab you could open and find an instruction to the authors. Seven pages had
+the mirror problem with a blank AXAML tab. A language with no content now hides its tab, and
+when only one remains the picker goes away and the caption names it.
+
+**Translation: 366 strings added, 198 long sentences outstanding.** The gallery localises by
+looking the rendered English up in a dictionary and leaving it alone when there is no entry, so
+a missing key is invisible until someone switches to Chinese. 649 distinct strings had no
+entry. The 366 that should be translated now are; what remains is body copy, plus 82 strings
+that are correctly left alone - proper nouns, brand names, times, colour codes and shortcuts.
+
+**Adaptive layout: 34 pages failing, 29 fixed.** `Every_Gallery_Page_Fits_A_Narrow_Window`
+arranges each page in a 480 dip window and flags content placed past the right edge with
+nothing horizontally scrollable to reach it. The common cause was a content column declared
+`Width="820"` (or 760, or 720) pinned left, which cannot shrink; fifty rewrites to `MaxWidth`
+plus stretch cleared twenty-nine pages.
+
+Two measurement traps cost a round each and are worth remembering. `DesiredSize` is useless for
+this: measuring inside a 480 dip window clamps it to 480, so the first version of the test
+passed for every page whether it reflowed or not. And a `Popup`'s edge translated into the page
+is not a page-layout measurement, since its content lives in an overlay.
+
+Five pages still do not reflow and are listed by name in the test rather than waved through
+with a tolerance: BeforeAfter (22 dip), DateRangePicker (20), PickerRestoration and
+RadioButton (horizontal rows that do not wrap), Switch (4). The test fails if a new page
+regresses and also if a listed one is fixed without being taken off the list.
