@@ -18,6 +18,14 @@ using Md3.Avalonia.Localization;
 namespace Md3.Avalonia.Extra.Controls;
 
 /// <summary>Layout strategy for a breadcrumb path when it exceeds the available width.</summary>
+/// <summary>Shape language for the trail. <see cref="MdBreadcrumbVariant.Powerline"/> draws
+/// interlocking chevron segments instead of text separated by a glyph.</summary>
+public enum MdBreadcrumbVariant
+{
+    Standard,
+    Powerline
+}
+
 public enum MdBreadcrumbOverflowBehavior
 {
     /// <summary>Continue the path on a new visual line.</summary>
@@ -61,7 +69,7 @@ public class MdBreadcrumbItem : AvaloniaObject
 /// A desktop and touch breadcrumb path supporting rich item models, icons, custom separators,
 /// overflow collapsing, MVVM commands, and direct selection APIs aligned with Flutter ecosystem patterns.
 /// </summary>
-[PseudoClasses(":wrap-overflow", ":scroll-overflow", ":collapse-overflow")]
+[PseudoClasses(":wrap-overflow", ":scroll-overflow", ":collapse-overflow", ":powerline")]
 public sealed class MdBreadcrumb : ListBox
 {
     private bool _invoking;
@@ -84,6 +92,8 @@ public sealed class MdBreadcrumb : ListBox
         AvaloniaProperty.Register<MdBreadcrumb, object?>(nameof(OverflowContent), "…");
     public static readonly StyledProperty<MdBreadcrumbOverflowBehavior> OverflowBehaviorProperty =
         AvaloniaProperty.Register<MdBreadcrumb, MdBreadcrumbOverflowBehavior>(nameof(OverflowBehavior));
+    public static readonly StyledProperty<MdBreadcrumbVariant> VariantProperty =
+        AvaloniaProperty.Register<MdBreadcrumb, MdBreadcrumbVariant>(nameof(Variant));
     public static readonly StyledProperty<bool> ShowTrailingSeparatorProperty =
         AvaloniaProperty.Register<MdBreadcrumb, bool>(nameof(ShowTrailingSeparator));
     public static readonly DirectProperty<MdBreadcrumb, bool> IsOverflowExpandedProperty =
@@ -91,6 +101,7 @@ public sealed class MdBreadcrumb : ListBox
 
     static MdBreadcrumb()
     {
+        VariantProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.UpdateVariantPseudoClasses());
         SeparatorProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.UpdateItemContainers());
         SeparatorTemplateProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.UpdateItemContainers());
         MaxDisplayedItemsProperty.Changed.AddClassHandler<MdBreadcrumb>((breadcrumb, _) => breadcrumb.ResetOverflow());
@@ -111,6 +122,7 @@ public sealed class MdBreadcrumb : ListBox
         AutomationProperties.SetName(this, MdLocalization.GetString("Breadcrumb", this));
         SelectionChanged += OnSelectionChanged;
         LayoutUpdated += (_, _) => UpdateOverflowOnly();
+        UpdateVariantPseudoClasses();
         UpdateOverflowPseudoClasses();
     }
 
@@ -122,6 +134,8 @@ public sealed class MdBreadcrumb : ListBox
     public int ItemsAfterCollapse { get => GetValue(ItemsAfterCollapseProperty); set => SetValue(ItemsAfterCollapseProperty, value); }
     public object? OverflowContent { get => GetValue(OverflowContentProperty); set => SetValue(OverflowContentProperty, value); }
     public MdBreadcrumbOverflowBehavior OverflowBehavior { get => GetValue(OverflowBehaviorProperty); set => SetValue(OverflowBehaviorProperty, value); }
+    /// <summary>Shape language for the trail. Powerline draws interlocking chevron segments.</summary>
+    public MdBreadcrumbVariant Variant { get => GetValue(VariantProperty); set => SetValue(VariantProperty, value); }
     public bool ShowTrailingSeparator { get => GetValue(ShowTrailingSeparatorProperty); set => SetValue(ShowTrailingSeparatorProperty, value); }
     public bool IsOverflowExpanded
     {
@@ -294,6 +308,9 @@ public sealed class MdBreadcrumb : ListBox
         }
         if (!current) RaiseItemInvoked(item);
     }
+
+    private void UpdateVariantPseudoClasses() =>
+        PseudoClasses.Set(":powerline", Variant == MdBreadcrumbVariant.Powerline);
 
     private void UpdateOverflowPseudoClasses()
     {

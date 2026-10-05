@@ -1,7 +1,9 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -56,6 +58,41 @@ public sealed class MdGalleryPickerPageTests
                 .Select(t => t.Text).FirstOrDefault(t => t == picker.DisplayText);
             Assert.True(shown is not null,
                 $"the anchor field still reads '{seededText}' while DisplayText is '{picker.DisplayText}'");
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Gallery_Docked_Picker_Commits_Today_From_A_Real_Pointer_Click()
+    {
+        // Every other picker test in this repository "clicks" with
+        // RaiseEvent(new RoutedEventArgs(Button.ClickEvent)), which skips hit testing entirely.
+        // That proves the handler is wired and proves nothing about whether a pointer can reach
+        // the button - so anything covering the popup content, or any transform that moves the
+        // hit geometry away from the pixels, passes all of them. This one drives the mouse.
+        var page = new PickerGalleryPage();
+        var window = new Window { Width = 1000, Height = 800, Content = page };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var picker = DockedPicker(page);
+            picker.IsOpen = true;
+            Dispatcher.UIThread.RunJobs();
+
+            var today = InPopup<Button>(picker, "PART_TodayButton");
+            Assert.True(today.Bounds.Width > 0 && today.Bounds.Height > 0,
+                "the Today button never got a size, so nothing could be clicked");
+
+            var centre = today.TranslatePoint(
+                new Point(today.Bounds.Width / 2, today.Bounds.Height / 2), window);
+            Assert.NotNull(centre);
+
+            window.MouseDown(centre!.Value, MouseButton.Left, RawInputModifiers.None);
+            window.MouseUp(centre.Value, MouseButton.Left, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(DateTimeOffset.Now.Date, picker.SelectedDate!.Value.Date);
         }
         finally { window.Close(); }
     }
