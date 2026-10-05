@@ -88,11 +88,23 @@ public sealed class MdGalleryPickerPageTests
                 new Point(today.Bounds.Width / 2, today.Bounds.Height / 2), window);
             Assert.NotNull(centre);
 
-            window.MouseDown(centre!.Value, MouseButton.Left, RawInputModifiers.None);
+            var surface = InPopup<Border>(picker, "PART_Surface");
+            var underCursor = window.GetVisualsAt(centre!.Value).ToList();
+            var reached = underCursor.Any(v => ReferenceEquals(v, today) ||
+                                               today.GetSelfAndVisualDescendants().Contains(v));
+
+            window.MouseDown(centre.Value, MouseButton.Left, RawInputModifiers.None);
             window.MouseUp(centre.Value, MouseButton.Left, RawInputModifiers.None);
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Equal(DateTimeOffset.Now.Date, picker.SelectedDate!.Value.Date);
+            // Report the whole scene on failure: whether hit testing reaches the button at all,
+            // what the surface's opacity and transform actually are, and whether the click fell
+            // outside and light-dismissed the popup. Guessing has cost four rounds already.
+            Assert.True(reached && picker.SelectedDate!.Value.Date == DateTimeOffset.Now.Date,
+                $"hit-test reached Today: {reached}; still open: {picker.IsOpen}; " +
+                $"surface opacity {surface.Opacity}, transform {surface.RenderTransform}; " +
+                $"SelectedDate {picker.SelectedDate:yyyy-MM-dd}; " +
+                $"topmost at cursor: {string.Join(" / ", underCursor.Take(4).Select(v => v.GetType().Name + "#" + (v as StyledElement)?.Name))}");
         }
         finally { window.Close(); }
     }
