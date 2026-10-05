@@ -87,7 +87,7 @@ public sealed class MdGalleryPickerPageTests
             // The popup is NOT part of the window's hit-test tree, even headless: translating to
             // the window lands on whatever page content sits underneath, so the click has to be
             // delivered to the popup's own root.
-            var root = Assert.IsAssignableFrom<TopLevel>(today.GetVisualRoot());
+            var root = Assert.IsAssignableFrom<TopLevel>(today.GetVisualAncestors().OfType<TopLevel>().First());
             var centre = today.TranslatePoint(
                 new Point(today.Bounds.Width / 2, today.Bounds.Height / 2), root);
             Assert.NotNull(centre);
