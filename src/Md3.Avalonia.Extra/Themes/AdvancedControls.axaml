@@ -383,7 +383,7 @@
                carries that bleed as margin and the offsets here cancel it, so the dropdown lands
                where it did before with its top edge and shadow intact. -->
           <Popup Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}"
-                 Placement="Bottom" PlacementTarget="{Binding #PART_Anchor}"
+                 Placement="BottomEdgeAlignedLeft" PlacementTarget="{Binding #PART_Anchor}"
                  HorizontalOffset="-12" VerticalOffset="-14"
                  IsLightDismissEnabled="True" WindowManagerAddShadowHint="False">
             <Popup.Styles><Style Selector="PopupRoot"><Setter Property="Background" Value="Transparent" /><Setter Property="TransparencyLevelHint" Value="Transparent" /><Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /></Style></Popup.Styles>

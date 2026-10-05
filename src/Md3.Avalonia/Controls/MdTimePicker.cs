@@ -97,6 +97,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private MdTextBox? _minuteInput;
     private MdTimeDial? _clockFace;
     private Popup? _popup;
+    private InputElement? _popupSurface;
     private Border? _surface;
     private Control? _dialPanel;
     private Control? _inputPanel;
@@ -229,6 +230,12 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     {
         DetachHandlers();
         if (_popup is not null) _popup.Closed -= OnPopupClosed;
+        if (_popupSurface is not null)
+        {
+            _popupSurface.RemoveHandler(PointerWheelChangedEvent, OnPopupSurfaceWheel);
+            _popupSurface.RemoveHandler(KeyDownEvent, OnPopupSurfaceKeyDown);
+            _popupSurface = null;
+        }
         base.OnApplyTemplate(e);
         _anchorButton = e.NameScope.Find<Button>("PART_AnchorButton");
         _hourUpButton = e.NameScope.Find<Button>("PART_HourUpButton");
@@ -249,6 +256,13 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         _dialPanel = e.NameScope.Find<Control>("PART_DialPanel");
         _inputPanel = e.NameScope.Find<Control>("PART_InputPanel");
         if (_popup is not null) _popup.Closed += OnPopupClosed;
+        _popupSurface = _popup?.Child as InputElement;
+        if (_popupSurface is not null)
+        {
+            // handledEventsToo: the dial and the spin buttons mark their own input handled.
+            _popupSurface.AddHandler(PointerWheelChangedEvent, OnPopupSurfaceWheel, handledEventsToo: false);
+            _popupSurface.AddHandler(KeyDownEvent, OnPopupSurfaceKeyDown, handledEventsToo: false);
+        }
 
         if (_anchorButton is not null) _anchorButton.Click += OnAnchorClick;
         if (_hourUpButton is not null) _hourUpButton.Click += OnHourUp;
@@ -276,6 +290,17 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
 
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
+        HandleWheel(e);
+        if (!e.Handled) base.OnPointerWheelChanged(e);
+    }
+
+    // On desktop the popup is a separate PopupRoot window, so a wheel or key event raised inside
+    // it never reaches this control: the route ends at the popup root. Android renders popups
+    // into the TopLevel overlay, where the same event bubbles straight here - which is why the
+    // scroll-to-adjust gesture worked there and was dead on Windows. The popup surface forwards
+    // into the same handlers.
+    private void HandleWheel(PointerWheelEventArgs e)
+    {
         if (IsOpen && Math.Abs(e.Delta.Y) > 0)
         {
             var source = e.Source as Visual;
@@ -284,12 +309,16 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
             SetPart(Hour + (overHour ? delta : 0),
                 Minute + (overHour ? 0 : delta * Math.Max(1, MinuteStep)));
             e.Handled = true;
-            return;
         }
-        base.OnPointerWheelChanged(e);
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
+    {
+        HandleKeyDown(e);
+        if (!e.Handled) base.OnKeyDown(e);
+    }
+
+    private void HandleKeyDown(KeyEventArgs e)
     {
         if (IsOpen && (e.Key == Key.Up || e.Key == Key.Down))
         {
@@ -314,10 +343,12 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
             _commitOnClose = true;
             SetCurrentValue(IsOpenProperty, false);
             e.Handled = true;
-            return;
         }
-        base.OnKeyDown(e);
     }
+
+    private void OnPopupSurfaceWheel(object? sender, PointerWheelEventArgs e) => HandleWheel(e);
+
+    private void OnPopupSurfaceKeyDown(object? sender, KeyEventArgs e) => HandleKeyDown(e);
 
     private void DetachHandlers()
     {

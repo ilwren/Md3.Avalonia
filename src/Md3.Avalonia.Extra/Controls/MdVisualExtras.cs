@@ -28,6 +28,7 @@ public sealed class MdBeforeAfter : TemplatedControl
     private Border? _divider;
     private Control? _thumb;
     private bool _dragging;
+    private const double GrabTolerance = 22;
     private Point _dragOrigin;
     private double _dragStartPosition;
 
@@ -126,13 +127,28 @@ public sealed class MdBeforeAfter : TemplatedControl
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         if (!IsInteractive || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) { base.OnPointerPressed(e); return; }
-        // A press that did not land on the handle nudges the divider one step toward the pointer,
-        // the same "page towards the click" the track of a slider gives you.
         var point = e.GetPosition(this);
-        var target = Orientation == MdComparisonOrientation.Horizontal
-            ? point.X / Math.Max(1, Bounds.Width)
-            : point.Y / Math.Max(1, Bounds.Height);
+        var extent = Orientation == MdComparisonOrientation.Horizontal
+            ? Math.Max(1, Bounds.Width)
+            : Math.Max(1, Bounds.Height);
+        var offset = Orientation == MdComparisonOrientation.Horizontal ? point.X : point.Y;
+        var target = offset / extent;
         var current = Math.Clamp(Position, 0, 1);
+
+        // The handle is drawn straddling the divider, so at the extremes half of it falls outside
+        // the control and is clipped away: a press aimed at it misses the visual and used to fall
+        // through to the track-step branch below, which shoved the divider away from the cursor.
+        // Anything landing within the handle's grab radius of the divider is a grab, clipped or not.
+        if (Math.Abs(offset - (current * extent)) <= GrabTolerance)
+        {
+            BeginDrag(point);
+            e.Pointer.Capture(this);
+            e.Handled = true;
+            return;
+        }
+
+        // A press further out nudges the divider one step toward the pointer, the same
+        // "page towards the click" the track of a slider gives you.
         if (Math.Abs(target - current) > double.Epsilon)
             Position = target > current
                 ? Math.Min(current + TrackStep, target)

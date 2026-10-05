@@ -318,6 +318,89 @@ public sealed class MdDesktopPopupAndComparisonTests
         finally { window.Close(); }
     }
 
+    [AvaloniaFact]
+    public void Comparison_Grabs_The_Divider_When_It_Sits_At_An_Edge()
+    {
+        // The handle straddles the divider, so at position 0 (and 1) half of it falls outside the
+        // control and is clipped away. A press aimed at it missed the visual and fell through to
+        // the track-step branch, which shoved the divider away from the cursor instead of
+        // grabbing it - the "pointer drifts far from the handle" report for top/left slider.
+        foreach (var orientation in new[] { MdComparisonOrientation.Horizontal, MdComparisonOrientation.Vertical })
+        {
+            var control = CreateComparison();
+            control.Orientation = orientation;
+            control.Position = 0;
+            var window = new Window { Width = 480, Height = 300, Content = control };
+            window.Show();
+            try
+            {
+                Dispatcher.UIThread.RunJobs();
+                var origin = control.TranslatePoint(new Point(0, 0), window);
+                Assert.NotNull(origin);
+                var start = origin!.Value + new Vector(4, 4);
+
+                window.MouseDown(start, MouseButton.Left, RawInputModifiers.None);
+                Dispatcher.UIThread.RunJobs();
+                Assert.Contains(":dragging", PseudoClassNames(control));
+                Assert.Equal(0, control.Position, 3);
+
+                var travel = orientation == MdComparisonOrientation.Horizontal
+                    ? new Vector(80, 0)
+                    : new Vector(0, 40);
+                window.MouseMove(start + travel, MouseButton.Left, RawInputModifiers.None);
+                Dispatcher.UIThread.RunJobs();
+                var expected = orientation == MdComparisonOrientation.Horizontal
+                    ? 80d / control.Bounds.Width
+                    : 40d / control.Bounds.Height;
+                Assert.Equal(expected, control.Position, 3);
+
+                window.MouseUp(start + travel, MouseButton.Left, RawInputModifiers.None);
+                Dispatcher.UIThread.RunJobs();
+                Assert.DoesNotContain(":dragging", PseudoClassNames(control));
+            }
+            finally { window.Close(); }
+        }
+    }
+
+    [AvaloniaFact]
+    public void Time_Picker_Popup_Surface_Forwards_Wheel_And_Keys_To_The_Control()
+    {
+        // On desktop the popup lives in its own PopupRoot window, so an event raised inside it
+        // never reaches the picker: the route ends at the popup root. The control-level
+        // OnPointerWheelChanged override was therefore dead on Windows while it kept working on
+        // Android, where popups render into the TopLevel overlay. The surface has to forward.
+        var picker = new MdTimePicker { Hour = 10, Minute = 30, MinuteStep = 5 };
+        var window = new Window { Width = 480, Height = 640, Content = picker };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            picker.IsOpen = true;
+            Dispatcher.UIThread.RunJobs();
+
+            var popup = Descendant<Popup>(picker, "PART_Popup");
+            var surface = Assert.IsAssignableFrom<InputElement>(popup.Child);
+
+            surface.RaiseEvent(new PointerWheelEventArgs(
+                surface, new Pointer(0, PointerType.Mouse, true), surface, default,
+                0, new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.Other),
+                KeyModifiers.None, new Vector(0, 1))
+            { RoutedEvent = InputElement.PointerWheelChangedEvent });
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(35, picker.Minute);
+
+            surface.RaiseEvent(new KeyEventArgs
+            {
+                RoutedEvent = InputElement.KeyDownEvent,
+                Key = Key.Escape,
+                Source = surface,
+            });
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(picker.IsOpen, "Escape inside the popup has to reach the picker and close it.");
+        }
+        finally { window.Close(); }
+    }
+
     private static IEnumerable<string> PseudoClassNames(StyledElement element) =>
         ((IEnumerable<string>)element.Classes).Where(c => c.StartsWith(':'));
 }
