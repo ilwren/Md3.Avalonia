@@ -96,3 +96,28 @@ Run this checklist after **every new component or component-template change**. A
 - [ ] Pack all three libraries independently and inspect dependency metadata.
 - [ ] If Android workload is available, build the Android Gallery; otherwise record it as an explicit unverified platform gate.
 - [ ] Immediately after every build, test, or pack command, delete generated `bin`, `obj`, `TestResults`, DLL/PDB, packages, downloaded fonts, and temporary assets before continuing; repeat the gate before delivery.
+
+## Rounded corners (recurring — seen on the data table, then again on the borderless window)
+
+A corner radius that looks right in the designer and square at runtime has two distinct causes.
+They need different fixes, and checking for one does not cover the other.
+
+**1. A child paints over the corner.** The rounded `Border` is correct, but its content has its
+own `Background` and no clip, so it fills the square bounds and the radius is hidden underneath.
+`Grid.ClipToBounds` does not round anything — only a `Border` with the matching `CornerRadius`
+clips to a rounded shape. Fix: `ClipToBounds="True"` on the rounding `Border`.
+
+**2. The surface behind the control is square.** The control rounds itself correctly, but it sits
+on an opaque square window or popup surface that shows through at the corners — a rounded card
+floating inside a square frame. No amount of clipping inside the control helps, because the thing
+showing through is not the control. Fix: make the host surface transparent
+(`Background="Transparent"` plus `TransparencyLevelHint="Transparent"`, with
+`TransparencyBackgroundFallback` set to the surface brush so platforms that refuse transparency
+degrade to the old opaque look rather than to white).
+
+Check both before calling a corner defect fixed:
+
+- [ ] Does the rounding `Border` have `ClipToBounds="True"` if any descendant sets `Background`?
+- [ ] Is the host window or `PopupRoot` transparent, with a non-white fallback?
+- [ ] Verified on a desktop run, not only headless — neither failure mode is visible headless,
+      because headless composites everything into one surface.

@@ -355,6 +355,15 @@
                 BasedOn="{StaticResource {x:Type md:MdWindow}}">
     <Setter Property="UseLayoutRounding" Value="True" />
     <Setter Property="WindowDecorationsTheme" Value="{StaticResource MdBorderlessWindowDrawnDecorationsTheme}" />
+    <!-- PART_WindowFrame below rounds its own corners, but the window's client area was still
+         painted opaque and square behind it, so the OS surface showed through at every corner:
+         a rounded card floating inside a square window. The corner radius has to be cut out of
+         the window itself, which means the window stops painting a background and asks the
+         compositor for a transparent surface. The fallback keeps the old opaque look on
+         platforms that refuse transparency rather than dropping to white. -->
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="TransparencyLevelHint" Value="Transparent" />
+    <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdBorderlessWindow">
         <Grid Background="Transparent">
