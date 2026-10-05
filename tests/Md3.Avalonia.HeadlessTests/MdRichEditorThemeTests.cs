@@ -32,11 +32,12 @@ public sealed class MdRichEditorThemeTests
             Assert.NotNull(editor.CaretBrush);
             Assert.Equal(16d, editor.DefaultFontSize);
 
-            var selection = (IBrush?)window.FindResource("Md.Sys.Color.SecondaryContainer.Brush");
-            var caret = (IBrush?)window.FindResource("Md.Sys.Color.Primary.Brush");
-            Assert.NotNull(selection);
-            Assert.Equal(selection!.ToString(), editor.SelectionBrush!.ToString());
-            Assert.Equal(caret!.ToString(), editor.CaretBrush!.ToString());
+            Assert.True(window.TryFindResource("Md.Sys.Color.SecondaryContainer.Brush", out var selectionToken));
+            Assert.True(window.TryFindResource("Md.Sys.Color.Primary.Brush", out var caretToken));
+            var selection = Assert.IsAssignableFrom<IBrush>(selectionToken);
+            var caret = Assert.IsAssignableFrom<IBrush>(caretToken);
+            Assert.Equal(selection.ToString(), editor.SelectionBrush!.ToString());
+            Assert.Equal(caret.ToString(), editor.CaretBrush!.ToString());
         }
         finally { window.Close(); }
     }
