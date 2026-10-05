@@ -141,6 +141,14 @@ public sealed class MdBeforeAfter : TemplatedControl
         // Anything landing within the handle's grab radius of the divider is a grab, clipped or not.
         if (Math.Abs(offset - (current * extent)) <= GrabTolerance)
         {
+            // Snap the divider under the pointer before tracking it. Preserving the grab offset
+            // is right when the handle itself is pressed - OnThumbPressed still does that - but
+            // a press on the track within the grab radius is not a grab of the handle, and at
+            // the extremes it is the only press available: half the handle is clipped away
+            // there, so the pointer cannot reach its centre. Keeping that offset left the
+            // divider trailing the cursor by up to the full 22 dip tolerance for the whole
+            // drag, which is what the comparison slider was reported for.
+            Position = Math.Clamp(target, 0, 1);
             BeginDrag(point);
             e.Pointer.Capture(this);
             e.Handled = true;
