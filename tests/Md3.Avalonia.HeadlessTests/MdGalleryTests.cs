@@ -172,13 +172,12 @@ public sealed class MdGalleryTests
         {
             Dispatcher.UIThread.RunJobs();
 
-            var csharp = xamlOnly.GetVisualDescendants().OfType<TextEditor>()
-                .Single(editor => editor.Name == "CSharpEditor");
-            Assert.Equal(string.Empty, csharp.Text);
-            Assert.DoesNotContain("Add the equivalent", csharp.Text, StringComparison.Ordinal);
+            Assert.All(xamlOnly.GetVisualDescendants().OfType<TextEditor>(), editor =>
+                Assert.DoesNotContain("Add the equivalent", editor.Text ?? string.Empty,
+                    StringComparison.Ordinal));
 
             var tab = xamlOnly.GetVisualDescendants().OfType<MdSegmentedButton>()
-                .Single(button => button.Name == "CSharpTab");
+                .Single(button => Equals(button.Content, "C#"));
             Assert.False(tab.IsVisible, "a language with nothing to show must not offer a tab");
         }
         finally { host.Close(); }

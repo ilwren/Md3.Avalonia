@@ -78,7 +78,9 @@ public sealed class MdReportedIssuesTests
             var page = view.GetVisualDescendants().OfType<SegmentedButtonGalleryPage>().Single();
             var groups = page.GetVisualDescendants().OfType<MdSegmentedButtonGroup>().ToArray();
             Assert.NotEmpty(groups);
-            Assert.All(groups, group =>
+            // The CodeExample tab strip hides itself when a page supplies only one language,
+            // and a hidden control has no width to constrain.
+            Assert.All(groups.Where(group => group.IsEffectivelyVisible), group =>
             {
                 Assert.True(double.IsNaN(group.Width));
                 Assert.InRange(group.Bounds.Width, 1, Math.Max(1, pageHost.Bounds.Width - 32));
