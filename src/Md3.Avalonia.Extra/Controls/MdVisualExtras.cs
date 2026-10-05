@@ -108,9 +108,27 @@ public sealed class MdBeforeAfter : TemplatedControl
     private void OnThumbPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!IsInteractive || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
-        BeginDrag(e.GetPosition(this));
+
+        // Snap here too, not just on a track press. Keeping the grab offset reads fine in the
+        // middle of the track, where the handle is whole and a press can land either side of
+        // its centre. At an extreme it does not: half the handle is clipped outside the
+        // control, every reachable pixel is on the same side of the divider, and the offset the
+        // press picks up is both one-directional and as large as half the handle. Holding on to
+        // it for the rest of the drag is the gap between cursor and handle in the report.
+        var point = e.GetPosition(this);
+        SnapTo(point);
+        BeginDrag(point);
         e.Pointer.Capture(this);
         e.Handled = true;
+    }
+
+    private void SnapTo(Point point)
+    {
+        var extent = Orientation == MdComparisonOrientation.Horizontal
+            ? Math.Max(1, Bounds.Width)
+            : Math.Max(1, Bounds.Height);
+        var along = Orientation == MdComparisonOrientation.Horizontal ? point.X : point.Y;
+        Position = Math.Clamp(along / extent, 0, 1);
     }
 
     private void BeginDrag(Point origin)
@@ -148,7 +166,7 @@ public sealed class MdBeforeAfter : TemplatedControl
             // there, so the pointer cannot reach its centre. Keeping that offset left the
             // divider trailing the cursor by up to the full 22 dip tolerance for the whole
             // drag, which is what the comparison slider was reported for.
-            Position = Math.Clamp(target, 0, 1);
+            SnapTo(point);
             BeginDrag(point);
             e.Pointer.Capture(this);
             e.Handled = true;
