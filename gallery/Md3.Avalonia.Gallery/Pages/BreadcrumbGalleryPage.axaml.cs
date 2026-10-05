@@ -25,6 +25,7 @@ public partial class BreadcrumbGalleryPage : UserControl
         ResetIconPath();
         IconBreadcrumb.ItemsSource = _iconPath;
         DeepBreadcrumb.ItemsSource = new[] { "Root", "usr", "local", "share", "fonts", "MaterialSymbols.ttf" };
+        PowerlineBreadcrumb.ItemsSource = new[] { "kg@KW", "~/iterm-test", "master" };
     }
 
     private void OnBreadcrumbItemInvoked(object? sender, object? item)
@@ -50,6 +51,11 @@ public partial class BreadcrumbGalleryPage : UserControl
         foreach (var entry in _iconPath) entry.IsCurrent = false;
         _iconPath[^1].IsCurrent = true;
         BreadcrumbStatus.Text = $"Selected path item: {model.Label}";
+    }
+
+    private void OnPowerlineBreadcrumbInvoked(object? sender, object? item)
+    {
+        PowerlineStatus.Text = $"Selected {item}.";
     }
 
     private void OnDeepBreadcrumbInvoked(object? sender, object? item)
