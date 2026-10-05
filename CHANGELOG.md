@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.4.0-preview.1] - 2026-10-05
 
 ### Added
 
@@ -20,7 +20,7 @@
   Avalonia's own `DataGrid`. It is the only package that depends on `Avalonia.Controls.DataGrid`.
   Add `MaterialDataGridTheme` after `MaterialTheme`; it replaces the control's Fluent theme and,
   like the rest of the library, does not require Avalonia's `FluentTheme`.
-- **Trimming support.** All four packages declare `IsTrimmable` and build with the IL2xxx
+- **Trimming support.** All five packages declare `IsTrimmable` and build with the IL2xxx
   analyzer enabled. `MdThemeJson` moved to a source-generated serializer context, and every
   control that takes a string property path gained a reflection-free delegate:
   `MdDataGridColumn.ValueSelector` / `.ValueParser` / `.ValueSetter`,
@@ -83,6 +83,8 @@
   assembly when they are not set, and collapses the icon, version and copyright rows when empty.
 
 - CI jobs are bounded by a timeout; a deadlocked test previously held a runner for six hours.
+
+For details, see [`docs/RELEASE_NOTES_0.4.0-preview.1.md`](docs/RELEASE_NOTES_0.4.0-preview.1.md).
 
 ## [0.3.5-preview.1] - 2026-10-04
 
