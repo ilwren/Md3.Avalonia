@@ -176,9 +176,12 @@ public sealed class MdGalleryTests
                 Assert.DoesNotContain("Add the equivalent", editor.Text ?? string.Empty,
                     StringComparison.Ordinal));
 
-            var tab = xamlOnly.GetVisualDescendants().OfType<MdSegmentedButton>()
-                .Single(button => Equals(button.Content, "C#"));
-            Assert.False(tab.IsVisible, "a language with nothing to show must not offer a tab");
+            // The tab strip itself goes away when only one language has content. Asserting on
+            // the buttons inside it does not work: a hidden host is never measured, so the
+            // group never realises its containers.
+            var strip = xamlOnly.GetVisualDescendants().OfType<Border>()
+                .Single(border => border.Name == "LanguageTabsHost");
+            Assert.False(strip.IsVisible, "one language is not a choice, so do not offer a picker");
         }
         finally { host.Close(); }
     }
