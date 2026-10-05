@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -452,6 +453,51 @@ public sealed class MdDesktopPopupAndComparisonTests
             Assert.Equal(12, picker.Hour);
         }
         finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Picker_Popup_Surfaces_Line_Up_With_The_Bottom_Left_Of_Their_Anchor()
+    {
+        // Both picker popups pad their surface to leave room for the shadow and the entrance
+        // translate, because a popup window is sized to its child's layout box and anything
+        // painted outside it is clipped. That padding has to be cancelled by an equal negative
+        // offset on the Popup, or the whole surface sits low and to the right of its anchor.
+        // Measuring the surface against the anchor is what pins the two numbers together.
+        foreach (var (name, picker, open) in new (string, Control, Action<Control>)[]
+                 {
+                     ("MdTimePicker", new MdTimePicker { Hour = 10, Minute = 30 },
+                         c => ((MdTimePicker)c).IsOpen = true),
+                     ("MdDatePicker", new MdDatePicker(),
+                         c => ((MdDatePicker)c).IsOpen = true),
+                 })
+        {
+            var window = new Window { Width = 900, Height = 760, Content = picker };
+            window.Show();
+            try
+            {
+                Dispatcher.UIThread.RunJobs();
+                open(picker);
+                Dispatcher.UIThread.RunJobs();
+
+                var surface = Descendant<Border>(picker, "PART_Surface");
+                PointerInput.AssertReachable(surface);
+
+                var anchor = Descendant<Button>(picker, "PART_AnchorButton");
+                var anchorBottomLeft = anchor
+                    .TranslatePoint(new Point(0, anchor.Bounds.Height), window)!.Value;
+                var surfaceTopLeft = surface.TranslatePoint(default, window)!.Value;
+
+                Assert.True(Math.Abs(surfaceTopLeft.X - anchorBottomLeft.X) <= 1,
+                    $"{name} popup is offset horizontally by " +
+                    $"{surfaceTopLeft.X - anchorBottomLeft.X:0.##} dip: surface starts at " +
+                    $"{surfaceTopLeft.X:0.##}, anchor at {anchorBottomLeft.X:0.##}");
+                Assert.True(Math.Abs(surfaceTopLeft.Y - anchorBottomLeft.Y) <= 1,
+                    $"{name} popup is offset vertically by " +
+                    $"{surfaceTopLeft.Y - anchorBottomLeft.Y:0.##} dip: surface starts at " +
+                    $"{surfaceTopLeft.Y:0.##}, anchor bottom at {anchorBottomLeft.Y:0.##}");
+            }
+            finally { window.Close(); }
+        }
     }
 
     private static IEnumerable<string> PseudoClassNames(StyledElement element) =>
