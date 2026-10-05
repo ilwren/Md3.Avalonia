@@ -490,10 +490,16 @@ public sealed class MdDesktopPopupAndComparisonTests
                     .TranslatePoint(new Point(0, anchor.Bounds.Height), window)!.Value;
                 var surfaceTopLeft = surface.TranslatePoint(default, window)!.Value;
 
+                var chain = string.Join(" < ", surface.GetSelfAndVisualAncestors()
+                    .OfType<Visual>()
+                    .Select(v => $"{v.GetType().Name}[{v.Bounds.X:0.#},{v.Bounds.Y:0.#} " +
+                                 $"{v.Bounds.Width:0.#}x{v.Bounds.Height:0.#}]"));
+
                 Assert.True(Math.Abs(surfaceTopLeft.X - anchorBottomLeft.X) <= 1,
                     $"{name} popup is offset horizontally by " +
                     $"{surfaceTopLeft.X - anchorBottomLeft.X:0.##} dip: surface starts at " +
-                    $"{surfaceTopLeft.X:0.##}, anchor at {anchorBottomLeft.X:0.##}");
+                    $"{surfaceTopLeft.X:0.##}, anchor at {anchorBottomLeft.X:0.##}, " +
+                    $"anchor box {anchor.Bounds}; chain: {chain}");
                 Assert.True(Math.Abs(surfaceTopLeft.Y - anchorBottomLeft.Y) <= 1,
                     $"{name} popup is offset vertically by " +
                     $"{surfaceTopLeft.Y - anchorBottomLeft.Y:0.##} dip: surface starts at " +
