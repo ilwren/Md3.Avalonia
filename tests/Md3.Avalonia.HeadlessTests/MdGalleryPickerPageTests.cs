@@ -83,10 +83,17 @@ public sealed class MdGalleryPickerPageTests
             var picker = DockedPicker(page);
             picker.IsOpen = true;
             Dispatcher.UIThread.RunJobs();
-            AvaloniaHeadlessPlatform.ForceRenderTimerTick(120);
-            Dispatcher.UIThread.RunJobs();
-
+            // The animation clock runs on wall time, so ticking frames does not fast-forward it
+            // (120 ticks only got the surface to Opacity 0.364). Wait it out instead.
             var surface = InPopup<Border>(picker, "PART_Surface");
+            var settleDeadline = DateTime.UtcNow.AddSeconds(5);
+            while (surface.Opacity < 1 && DateTime.UtcNow < settleDeadline)
+            {
+                Thread.Sleep(25);
+                AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+                Dispatcher.UIThread.RunJobs();
+            }
+
             Assert.Equal(1d, surface.Opacity);
 
             var today = InPopup<Button>(picker, "PART_TodayButton");
