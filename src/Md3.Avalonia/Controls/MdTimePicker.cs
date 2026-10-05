@@ -93,7 +93,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private Control? _minuteDialHost;
     private Button? _cancelButton;
     private Button? _confirmButton;
-    private TextBlock? _displayText;
+    private TextBlock? _displayTextBlock;
     private MdTextBox? _hourInput;
     private MdTextBox? _minuteInput;
     private MdTimeDial? _clockFace;
@@ -249,7 +249,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         _minuteDialHost = e.NameScope.Find<Control>("PART_MinuteDialHost");
         _cancelButton = e.NameScope.Find<Button>("PART_CancelButton");
         _confirmButton = e.NameScope.Find<Button>("PART_ConfirmButton");
-        _displayText = e.NameScope.Find<TextBlock>("PART_DisplayText");
+        _displayTextBlock = e.NameScope.Find<TextBlock>("PART_DisplayText");
         _hourInput = e.NameScope.Find<MdTextBox>("PART_HourInput");
         _minuteInput = e.NameScope.Find<MdTextBox>("PART_MinuteInput");
         _clockFace = e.NameScope.Find<MdTimeDial>("PART_ClockFace");
@@ -327,7 +327,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
 
         // The anchor renders one run of text, so there is no hour element to hit: split it down
         // the middle instead, left for hours and right for minutes.
-        var overHourSegment = _displayText is { Bounds.Width: > 0 } text &&
+        var overHourSegment = _displayTextBlock is { Bounds.Width: > 0 } text &&
                               e.GetPosition(text).X < text.Bounds.Width / 2;
         SetPart(Hour + (overHourSegment ? delta : 0),
             Minute + (overHourSegment ? 0 : delta * Math.Max(1, MinuteStep)));
