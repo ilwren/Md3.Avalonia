@@ -84,17 +84,21 @@ public sealed class MdGalleryPickerPageTests
             Assert.True(today.Bounds.Width > 0 && today.Bounds.Height > 0,
                 "the Today button never got a size, so nothing could be clicked");
 
+            // The popup is NOT part of the window's hit-test tree, even headless: translating to
+            // the window lands on whatever page content sits underneath, so the click has to be
+            // delivered to the popup's own root.
+            var root = Assert.IsAssignableFrom<TopLevel>(today.GetVisualRoot());
             var centre = today.TranslatePoint(
-                new Point(today.Bounds.Width / 2, today.Bounds.Height / 2), window);
+                new Point(today.Bounds.Width / 2, today.Bounds.Height / 2), root);
             Assert.NotNull(centre);
 
             var surface = InPopup<Border>(picker, "PART_Surface");
-            var underCursor = window.GetVisualsAt(centre!.Value).ToList();
+            var underCursor = root.GetVisualsAt(centre!.Value).ToList();
             var reached = underCursor.Any(v => ReferenceEquals(v, today) ||
                                                today.GetSelfAndVisualDescendants().Contains(v));
 
-            window.MouseDown(centre.Value, MouseButton.Left, RawInputModifiers.None);
-            window.MouseUp(centre.Value, MouseButton.Left, RawInputModifiers.None);
+            root.MouseDown(centre.Value, MouseButton.Left, RawInputModifiers.None);
+            root.MouseUp(centre.Value, MouseButton.Left, RawInputModifiers.None);
             Dispatcher.UIThread.RunJobs();
 
             // Report the whole scene on failure: whether hit testing reaches the button at all,
