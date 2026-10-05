@@ -64,6 +64,12 @@ public sealed class MdReportedIssuesTests
 
             var destination = view.GetVisualDescendants().OfType<MdButton>()
                 .Single(button => Equals(button.Content, "Segmented buttons"));
+
+            // The drawer list is far longer than the viewport - this destination sits at
+            // y=2982 in a 760 dip window - so scroll it in the way a user would before
+            // expecting a pointer to land on it.
+            destination.BringIntoView();
+            Dispatcher.UIThread.RunJobs();
             PointerInput.Click(destination);
             Dispatcher.UIThread.RunJobs();
 
