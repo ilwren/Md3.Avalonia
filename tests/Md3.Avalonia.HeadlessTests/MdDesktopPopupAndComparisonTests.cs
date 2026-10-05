@@ -347,7 +347,7 @@ public sealed class MdDesktopPopupAndComparisonTests
                 var travel = orientation == MdComparisonOrientation.Horizontal
                     ? new Vector(80, 0)
                     : new Vector(0, 40);
-                window.MouseMove(start + travel, MouseButton.Left, RawInputModifiers.None);
+                window.MouseMove(start + travel, RawInputModifiers.None);
                 Dispatcher.UIThread.RunJobs();
                 var expected = orientation == MdComparisonOrientation.Horizontal
                     ? 80d / control.Bounds.Width
