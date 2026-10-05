@@ -1,0 +1,50 @@
+<!--
+  Material Design 3 theme for the AvaloniaRichEditor control library.
+
+  Unlike Md3.Avalonia.DataGrid, this theme does NOT replace control templates. DataGrid has to:
+  it finds its pieces by PART_ name, so the Material theme is a derivative of the upstream
+  Fluent template with the names preserved. AvaloniaRichEditor instead renders its document
+  itself on Avalonia's TextLayout engine, and its public API exposes appearance as properties.
+  Styling those properties - rather than copying a template this repository does not own - keeps
+  the skin working across upstream releases instead of silently drifting from them, and keeps
+  MIT-licensed markup out of this Apache-2.0 repository.
+
+  Because these are Style setters rather than a ControlTheme, they layer on top of the control's
+  built-in theme. An application can still override any of them locally.
+-->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:rte="using:AvaloniaRichEditor.Controls">
+
+  <!-- The editing surface reads as an M3 filled text field at rest: a low-emphasis container,
+       hairline outline, and the 12 DIP corner the rest of the library uses for input surfaces. -->
+  <Style Selector="rte|RichEditor">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="Padding" Value="16" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyLarge.Size}" />
+    <!-- Selection uses the secondary container rather than a transparent primary wash: the
+         editor paints selection behind glyphs it does not re-tint, so a tonal container keeps
+         the text contrast M3 asks for instead of muddying it. -->
+    <Setter Property="SelectionBrush" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
+    <Setter Property="CaretBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+  </Style>
+
+  <!-- The toolbar sits directly above the surface, so it takes the plain surface role to read as
+       one component rather than a second card stacked on the first. -->
+  <Style Selector="rte|RichEditorToolbar">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+  </Style>
+
+  <!-- RichEditorView is the batteries-included host: editor, toolbar and status bar. Only the
+       chrome around them is themed here; the editor inside picks up the rule above. -->
+  <Style Selector="rte|RichEditorView">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+  </Style>
+
+</Styles>
