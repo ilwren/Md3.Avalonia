@@ -103,6 +103,52 @@ public sealed class MdDesktopPickerAndCarouselTests
         public int Unrelated => 1;
     }
 
+    [AvaloniaFact]
+    public void Docked_Date_Picker_Shows_The_Picked_Day_In_Its_Own_Field()
+    {
+        // Reported in review 14: pick a day, the popup closes, "but the control itself shows
+        // nothing" - and reopening still offers the previously chosen day. That says the internal
+        // value moved while the field text did not. The earlier coverage used Modal mode with no
+        // seeded value and asserted SelectedDate, so neither the Docked path nor the field text
+        // was ever executed. The gallery seeds SelectedDate as a local value from XAML, which is
+        // reproduced here because SetCurrentValue and a local value interact.
+        var picker = new MdDatePicker
+        {
+            Label = "Docked date",
+            Mode = MdDatePickerMode.Docked,
+            SelectedDate = new DateTimeOffset(new DateTime(2026, 9, 22)),
+        };
+        var window = new Window { Width = 900, Height = 700, Content = picker };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var seeded = picker.DisplayText;
+            picker.IsOpen = true;
+            Dispatcher.UIThread.RunJobs();
+
+            var day = PopupContent(picker).OfType<Button>()
+                .Where(b => b.DataContext?.GetType().Name.Contains("Day", StringComparison.Ordinal) == true)
+                .FirstOrDefault(b => b.DataContext?.ToString() != picker.SelectedDate?.Day.ToString());
+            Assert.NotNull(day);
+
+            RaiseClick(day!);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(picker.IsOpen, "a docked picker commits as you pick and closes itself");
+            Assert.NotEqual(new DateTimeOffset(new DateTime(2026, 9, 22)), picker.SelectedDate);
+            Assert.NotEqual(seeded, picker.DisplayText);
+
+            // The field is what the user actually looks at, so assert the rendered text and not
+            // just the property behind it.
+            var shown = picker.GetVisualDescendants().OfType<TextBlock>()
+                .Select(t => t.Text).FirstOrDefault(t => t == picker.DisplayText);
+            Assert.True(shown is not null,
+                $"the anchor field still reads '{seeded}' while DisplayText is '{picker.DisplayText}'");
+        }
+        finally { window.Close(); }
+    }
+
     private static void RaiseClick(Button button) =>
         button.RaiseEvent(new global::Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
 
