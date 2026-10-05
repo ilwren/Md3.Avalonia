@@ -467,3 +467,25 @@ Five pages still do not reflow and are listed by name in the test rather than wa
 with a tolerance: BeforeAfter (22 dip), DateRangePicker (20), PickerRestoration and
 RadioButton (horizontal rows that do not wrap), Switch (4). The test fails if a new page
 regresses and also if a listed one is fixed without being taken off the list.
+
+### Review 14 item 5 - image comparison drag offset
+
+**Fixed, and reproduced first.** `Divider_Tracks_The_Pointer_When_Dragged_From_The_Start_Edge`
+drives a real pointer from an edge and measures the gap between cursor and divider at four
+points along the drag. It reported the divider trailing by 18 dip before the fix.
+
+The handle straddles the divider, so at position 0 or 1 half of it is clipped outside the
+control. Every pixel of it a pointer can reach is therefore on the same side of the divider,
+and the press picks up an offset that is both one-directional and as large as half the handle.
+Drag tracking is deliberately delta-based so that an off-centre grab does not snap the divider
+under the cursor - correct in the middle of the track - so that offset was kept for the whole
+drag.
+
+The fix caps the preserved offset at the divider's distance to the nearer edge. Mid-track that
+is most of the control and the offset survives untouched; at an extreme it is zero and the grab
+collapses to a snap. One rule, and it keeps the feel the earlier work deliberately built.
+
+Worth noting how it was found: the first attempt snapped only a track press, and the real
+pointer immediately showed that was half the problem - at 18 dip from the edge the press was
+landing on the clipped handle, not the track. A synthetic event could not have told the two
+apart, because neither one does any hit testing.
