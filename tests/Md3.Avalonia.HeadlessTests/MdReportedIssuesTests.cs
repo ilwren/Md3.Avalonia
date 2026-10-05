@@ -33,6 +33,8 @@ public sealed class MdReportedIssuesTests
         try
         {
             Dispatcher.UIThread.RunJobs();
+            // Synthetic on purpose: the assertion below is about which destination ends up
+            // active, not about whether the rail button is reachable.
             var carouselDestination = window.GetVisualDescendants().OfType<MdButton>()
                 .Single(button => button.Name == "CarouselNav");
             carouselDestination.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
@@ -55,7 +57,7 @@ public sealed class MdReportedIssuesTests
             using var host = Show(view, width, 760);
             var destination = view.GetVisualDescendants().OfType<MdButton>()
                 .Single(button => Equals(button.Content, "Segmented buttons"));
-            destination.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            PointerInput.Click(destination);
             Dispatcher.UIThread.RunJobs();
 
             var pageHost = view.GetVisualDescendants().OfType<ContentControl>()
@@ -364,14 +366,14 @@ public sealed class MdReportedIssuesTests
         var tree = new MdTreeView { Roots = new[] { root }, Width = 420, Height = 220 };
         using var host = Show(tree, 480, 280);
         var toggle = tree.GetVisualDescendants().OfType<ToggleButton>().Single();
-        toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        PointerInput.Click(toggle);
         Dispatcher.UIThread.RunJobs();
         Assert.True(root.IsExpanded);
         Assert.Equal(2, tree.VisibleRows.Count);
         Assert.False(tree.ShowGuides);
 
         toggle = tree.GetVisualDescendants().OfType<ToggleButton>().First();
-        toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        PointerInput.Click(toggle);
         Assert.False(root.IsExpanded);
     }
 

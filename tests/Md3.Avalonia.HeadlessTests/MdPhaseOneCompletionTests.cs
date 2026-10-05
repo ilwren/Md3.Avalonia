@@ -117,6 +117,8 @@ public sealed class MdPhaseOneCompletionTests
         gallery.Show();
         try
         {
+            // Synthetic on purpose: this test is about the scroll extent of the page that
+            // opens, not about reaching the rail button that opens it.
             var navigation = gallery.GetVisualDescendants().OfType<MdButton>()
                 .Single(button => button.Name == "DataGridNav");
             navigation.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));

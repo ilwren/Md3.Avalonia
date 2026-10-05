@@ -25,7 +25,7 @@ public sealed class MdNewComponentTests
         var clear = clearField.GetVisualDescendants().OfType<MdIconButton>()
             .Single(control => control.Name == "PART_ClearButton");
         Assert.True(clear.IsVisible);
-        clear.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        PointerInput.Click(clear);
         Assert.Equal(string.Empty, clearField.Text);
 
         Assert.Equal('●', passwordField.PasswordChar);

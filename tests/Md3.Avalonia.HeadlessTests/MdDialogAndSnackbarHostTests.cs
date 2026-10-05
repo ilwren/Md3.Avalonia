@@ -87,7 +87,7 @@ public sealed class MdDialogAndSnackbarHostTests
 
             var action = snackbar.GetVisualDescendants().OfType<MdButton>()
                 .Single(button => button.Name == "PART_ActionButton");
-            action.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            PointerInput.Click(action);
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(MdSnackbarResult.ActionInvoked, await secondResult);
