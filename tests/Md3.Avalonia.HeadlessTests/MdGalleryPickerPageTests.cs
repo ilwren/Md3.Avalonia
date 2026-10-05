@@ -63,24 +63,17 @@ public sealed class MdGalleryPickerPageTests
     }
 
     [AvaloniaFact]
-    public void Pointer_Input_Cannot_Be_Delivered_Into_A_Picker_Popup_Headless()
+    public void Gallery_Docked_Picker_Commits_Today_From_A_Real_Pointer_Click()
     {
-        // Every "click" in this repository's picker tests raises Button.ClickEvent directly,
-        // which skips hit testing: they prove a handler is wired and say nothing about whether a
-        // pointer can reach the control. Driving the real mouse instead was supposed to close
-        // that gap, and this records why it cannot be closed here.
+        // Every other "click" in this repository raises Button.ClickEvent directly, which skips
+        // hit testing: those tests prove a handler is wired and say nothing about whether a
+        // pointer can actually reach the control. This one drives the real mouse.
         //
-        // Translating a point inside the open popup into the window and clicking it lands on
-        // whatever page content sits underneath - in this page, the AvaloniaEdit code sample -
-        // because the popup content is not reachable by hit testing from the window root. So
-        // pointer-level coverage of anything inside a popup is impossible in this harness, and a
-        // green suite is not evidence that a popup is clickable. That has to come from a desktop
-        // run. Asserting it keeps anyone (including a future me) from writing a pointer test for
-        // popup content and trusting the result.
-        //
-        // What this run did establish, against the review-14 report: the surface animates up
-        // from Opacity 0 and settles at 1, so the entrance animation is not leaving an invisible
-        // and therefore unhittable surface behind.
+        // Pumping the render timer first matters. Straight after IsOpen the surface is still
+        // mid-entrance - measured at Opacity 0.101 - and a click at that moment misses the
+        // button and lands on the page content underneath. Settling the animation is what makes
+        // this deterministic, and it also rules the animation out as the cause of the reported
+        // defect: once settled the surface is fully opaque and hit testable.
         var page = new PickerGalleryPage();
         var window = new Window { Width = 1000, Height = 800, Content = page };
         window.Show();
@@ -90,24 +83,32 @@ public sealed class MdGalleryPickerPageTests
             var picker = DockedPicker(page);
             picker.IsOpen = true;
             Dispatcher.UIThread.RunJobs();
+            AvaloniaHeadlessPlatform.ForceRenderTimerTick(120);
+            Dispatcher.UIThread.RunJobs();
 
-            // Measured mid-transition at 0.101 and at 1 once the animation settles, so this
-            // asserts the fact that matters - the surface is animating up from zero rather than
-            // stuck invisible - without pinning a frame-dependent value.
             var surface = InPopup<Border>(picker, "PART_Surface");
-            Assert.True(surface.Opacity > 0, "entrance animation left the surface fully transparent");
+            Assert.Equal(1d, surface.Opacity);
 
             var today = InPopup<Button>(picker, "PART_TodayButton");
+            Assert.True(today.Bounds.Width > 0 && today.Bounds.Height > 0, "Today button has no layout box");
+
             var centre = today.TranslatePoint(
                 new Point(today.Bounds.Width / 2, today.Bounds.Height / 2), window);
             Assert.NotNull(centre);
 
-            var reached = window.GetVisualsAt(centre!.Value)
-                .Any(v => ReferenceEquals(v, today) || today.GetSelfAndVisualDescendants().Contains(v));
-            Assert.False(reached,
-                "Hit testing now reaches popup content from the window. If this ever starts " +
-                "passing, replace every synthetic Button.ClickEvent in the picker tests with a " +
-                "real pointer click - the synthetic ones cannot see anything that blocks input.");
+            var underCursor = window.GetVisualsAt(centre!.Value).ToList();
+            Assert.True(
+                underCursor.Any(v => ReferenceEquals(v, today) || today.GetSelfAndVisualDescendants().Contains(v)),
+                $"pointer cannot reach the Today button; topmost at cursor: " +
+                string.Join(" / ", underCursor.Take(4).Select(v => v.GetType().Name)));
+
+            window.MouseDown(centre.Value, MouseButton.Left, RawInputModifiers.None);
+            window.MouseUp(centre.Value, MouseButton.Left, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(picker.SelectedDate!.Value.Date == DateTimeOffset.Now.Date,
+                $"a real pointer click on Today left the field on {picker.SelectedDate:yyyy-MM-dd}; " +
+                $"popup still open: {picker.IsOpen}");
         }
         finally { window.Close(); }
     }
