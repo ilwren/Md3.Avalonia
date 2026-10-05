@@ -32,7 +32,10 @@
          the text contrast M3 asks for instead of muddying it. -->
     <Setter Property="SelectionBrush" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
     <Setter Property="CaretBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
-    <Setter Property="DefaultFontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyLarge.Size}" />
+    <!-- DefaultFontSize is in POINTS, not DIP - upstream defaults it to 10pt. The M3 Body Large
+         token is 16 DIP, which is 12pt (16 * 72 / 96). Binding the DIP token straight in would
+         render a third too large, so the conversion is done here rather than hidden in a token. -->
+    <Setter Property="DefaultFontSize" Value="12" />
   </Style>
 
   <!-- The toolbar sits directly above the surface, so it takes the plain surface role to read as

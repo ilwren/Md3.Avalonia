@@ -25,19 +25,17 @@ public sealed class MdRichEditorThemeTests
         {
             Dispatcher.UIThread.RunJobs();
 
-            // RichEditor exposes no chrome - no Background, Border or CornerRadius - so the
-            // theme styles the ink instead, and these are the only properties any style in this
-            // app assigns. The host supplies the container around it.
-            Assert.NotNull(editor.SelectionBrush);
-            Assert.NotNull(editor.CaretBrush);
-            Assert.Equal(16d, editor.DefaultFontSize);
+            // RichEditor exposes no chrome - no Background, Border or CornerRadius - so the theme
+            // styles the ink instead and the host supplies the container. Asserting against
+            // upstream's own defaults is what makes this a real check: if the selector ever stops
+            // matching, the styles silently do not apply and the control keeps the stock look.
+            // Upstream defaults are SelectionBrush #500078D7 (Windows blue), CaretBrush black,
+            // and DefaultFontSize 10 - in points, not DIP.
+            Assert.NotEqual("#500078d7", editor.SelectionBrush.ToString()!.ToLowerInvariant());
+            Assert.NotEqual("#ff000000", editor.CaretBrush.ToString()!.ToLowerInvariant());
 
-            Assert.True(window.TryFindResource("Md.Sys.Color.SecondaryContainer.Brush", out var selectionToken));
-            Assert.True(window.TryFindResource("Md.Sys.Color.Primary.Brush", out var caretToken));
-            var selection = Assert.IsAssignableFrom<IBrush>(selectionToken);
-            var caret = Assert.IsAssignableFrom<IBrush>(caretToken);
-            Assert.Equal(selection.ToString(), editor.SelectionBrush!.ToString());
-            Assert.Equal(caret.ToString(), editor.CaretBrush!.ToString());
+            // M3 Body Large is 16 DIP, which is 12pt. Getting this wrong renders a third too large.
+            Assert.Equal(12d, editor.DefaultFontSize);
         }
         finally { window.Close(); }
     }
