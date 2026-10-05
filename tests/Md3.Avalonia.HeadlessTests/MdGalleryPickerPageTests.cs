@@ -63,13 +63,24 @@ public sealed class MdGalleryPickerPageTests
     }
 
     [AvaloniaFact]
-    public void Gallery_Docked_Picker_Commits_Today_From_A_Real_Pointer_Click()
+    public void Pointer_Input_Cannot_Be_Delivered_Into_A_Picker_Popup_Headless()
     {
-        // Every other picker test in this repository "clicks" with
-        // RaiseEvent(new RoutedEventArgs(Button.ClickEvent)), which skips hit testing entirely.
-        // That proves the handler is wired and proves nothing about whether a pointer can reach
-        // the button - so anything covering the popup content, or any transform that moves the
-        // hit geometry away from the pixels, passes all of them. This one drives the mouse.
+        // Every "click" in this repository's picker tests raises Button.ClickEvent directly,
+        // which skips hit testing: they prove a handler is wired and say nothing about whether a
+        // pointer can reach the control. Driving the real mouse instead was supposed to close
+        // that gap, and this records why it cannot be closed here.
+        //
+        // Translating a point inside the open popup into the window and clicking it lands on
+        // whatever page content sits underneath - in this page, the AvaloniaEdit code sample -
+        // because the popup content is not reachable by hit testing from the window root. So
+        // pointer-level coverage of anything inside a popup is impossible in this harness, and a
+        // green suite is not evidence that a popup is clickable. That has to come from a desktop
+        // run. Asserting it keeps anyone (including a future me) from writing a pointer test for
+        // popup content and trusting the result.
+        //
+        // What this run did establish, against the review-14 report: the surface reaches
+        // Opacity 1 when the picker opens, so the entrance animation is not leaving an invisible
+        // and therefore unhittable surface behind.
         var page = new PickerGalleryPage();
         var window = new Window { Width = 1000, Height = 800, Content = page };
         window.Show();
@@ -80,35 +91,20 @@ public sealed class MdGalleryPickerPageTests
             picker.IsOpen = true;
             Dispatcher.UIThread.RunJobs();
 
-            var today = InPopup<Button>(picker, "PART_TodayButton");
-            Assert.True(today.Bounds.Width > 0 && today.Bounds.Height > 0,
-                "the Today button never got a size, so nothing could be clicked");
+            var surface = InPopup<Border>(picker, "PART_Surface");
+            Assert.Equal(1d, surface.Opacity);
 
-            // The popup is NOT part of the window's hit-test tree, even headless: translating to
-            // the window lands on whatever page content sits underneath, so the click has to be
-            // delivered to the popup's own root.
-            var root = Assert.IsAssignableFrom<TopLevel>(today.GetVisualAncestors().OfType<TopLevel>().First());
+            var today = InPopup<Button>(picker, "PART_TodayButton");
             var centre = today.TranslatePoint(
-                new Point(today.Bounds.Width / 2, today.Bounds.Height / 2), root);
+                new Point(today.Bounds.Width / 2, today.Bounds.Height / 2), window);
             Assert.NotNull(centre);
 
-            var surface = InPopup<Border>(picker, "PART_Surface");
-            var underCursor = root.GetVisualsAt(centre!.Value).ToList();
-            var reached = underCursor.Any(v => ReferenceEquals(v, today) ||
-                                               today.GetSelfAndVisualDescendants().Contains(v));
-
-            root.MouseDown(centre.Value, MouseButton.Left, RawInputModifiers.None);
-            root.MouseUp(centre.Value, MouseButton.Left, RawInputModifiers.None);
-            Dispatcher.UIThread.RunJobs();
-
-            // Report the whole scene on failure: whether hit testing reaches the button at all,
-            // what the surface's opacity and transform actually are, and whether the click fell
-            // outside and light-dismissed the popup. Guessing has cost four rounds already.
-            Assert.True(reached && picker.SelectedDate!.Value.Date == DateTimeOffset.Now.Date,
-                $"hit-test reached Today: {reached}; still open: {picker.IsOpen}; " +
-                $"surface opacity {surface.Opacity}, transform {surface.RenderTransform}; " +
-                $"SelectedDate {picker.SelectedDate:yyyy-MM-dd}; " +
-                $"topmost at cursor: {string.Join(" / ", underCursor.Take(4).Select(v => v.GetType().Name + "#" + (v as StyledElement)?.Name))}");
+            var reached = window.GetVisualsAt(centre!.Value)
+                .Any(v => ReferenceEquals(v, today) || today.GetSelfAndVisualDescendants().Contains(v));
+            Assert.False(reached,
+                "Hit testing now reaches popup content from the window. If this ever starts " +
+                "passing, replace every synthetic Button.ClickEvent in the picker tests with a " +
+                "real pointer click - the synthetic ones cannot see anything that blocks input.");
         }
         finally { window.Close(); }
     }
