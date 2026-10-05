@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.VisualTree;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Md3.Avalonia.Gallery.Pages;
@@ -17,6 +19,10 @@ public sealed class MdGalleryAdaptiveTests
     // A desktop window dragged narrow. Pages that demand more than this have a fixed-width
     // element in them and will clip or push their content off screen rather than reflow.
     private const double NarrowWidth = 480;
+
+    private static bool IsHorizontallyScrollable(Control control) =>
+        control.GetSelfAndVisualAncestors().OfType<ScrollViewer>().Any(viewer =>
+            viewer.HorizontalScrollBarVisibility != ScrollBarVisibility.Disabled);
 
     [AvaloniaFact]
     public void Every_Gallery_Page_Fits_A_Narrow_Window()
@@ -56,10 +62,25 @@ public sealed class MdGalleryAdaptiveTests
                 window.Arrange(new Rect(0, 0, NarrowWidth, 900));
                 Dispatcher.UIThread.RunJobs();
 
-                var demanded = page.DesiredSize.Width;
-                if (demanded > NarrowWidth + 1)
+                // DesiredSize is useless here: measuring inside a 480 dip window clamps it to
+                // 480, so asserting on it passes for every page whether it reflows or not.
+                // What actually shows a page failing to adapt is content arranged past the
+                // right edge, with nothing horizontally scrollable to reach it.
+                var worst = page.GetVisualDescendants()
+                    .OfType<Control>()
+                    .Where(control => control.Bounds.Width > 0 && !IsHorizontallyScrollable(control))
+                    .Select(control => new
+                    {
+                        Control = control,
+                        Right = control.TranslatePoint(new Point(control.Bounds.Width, 0), page)?.X ?? 0,
+                    })
+                    .Where(item => item.Right > NarrowWidth + 1)
+                    .OrderByDescending(item => item.Right)
+                    .FirstOrDefault();
+
+                if (worst is not null)
                 {
-                    tooWide.Add($"{type.Name} wants {demanded:0}");
+                    tooWide.Add($"{type.Name} ({worst.Control.GetType().Name} reaches {worst.Right:0})");
                 }
             }
             finally { window.Close(); }
