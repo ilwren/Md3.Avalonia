@@ -46,7 +46,8 @@
                 <ContentPresenter Content="{TemplateBinding Label}"
                                   FontSize="12"
                                   Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-                <TextBlock FontSize="16"
+                <TextBlock x:Name="PART_DisplayText"
+                           FontSize="16"
                            Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
                            Text="{TemplateBinding DisplayText}" />
               </StackPanel>

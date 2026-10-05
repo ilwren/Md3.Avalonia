@@ -93,6 +93,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private Control? _minuteDialHost;
     private Button? _cancelButton;
     private Button? _confirmButton;
+    private TextBlock? _displayText;
     private MdTextBox? _hourInput;
     private MdTextBox? _minuteInput;
     private MdTimeDial? _clockFace;
@@ -248,6 +249,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         _minuteDialHost = e.NameScope.Find<Control>("PART_MinuteDialHost");
         _cancelButton = e.NameScope.Find<Button>("PART_CancelButton");
         _confirmButton = e.NameScope.Find<Button>("PART_ConfirmButton");
+        _displayText = e.NameScope.Find<TextBlock>("PART_DisplayText");
         _hourInput = e.NameScope.Find<MdTextBox>("PART_HourInput");
         _minuteInput = e.NameScope.Find<MdTextBox>("PART_MinuteInput");
         _clockFace = e.NameScope.Find<MdTimeDial>("PART_ClockFace");
@@ -301,15 +303,35 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     // into the same handlers.
     private void HandleWheel(PointerWheelEventArgs e)
     {
-        if (IsOpen && Math.Abs(e.Delta.Y) > 0)
+        if (Math.Abs(e.Delta.Y) <= 0) return;
+        var delta = e.Delta.Y > 0 ? 1 : -1;
+
+        if (IsOpen)
         {
             var source = e.Source as Visual;
             var overHour = IsWithin(source, _hourDialHost) || _hourInput?.IsKeyboardFocusWithin == true;
-            var delta = e.Delta.Y > 0 ? 1 : -1;
             SetPart(Hour + (overHour ? delta : 0),
                 Minute + (overHour ? 0 : delta * Math.Max(1, MinuteStep)));
             e.Handled = true;
+            return;
         }
+
+        // Closed, with the pointer over the anchor field. Gating this on IsOpen killed the
+        // scroll-to-adjust gesture on the field itself, which is where people reach for it.
+        //
+        // Focus is what makes it safe to restore. A wheel handler that fires on hover alone
+        // silently rewrites the time whenever someone scrolls a page that happens to have a
+        // picker in it, and leaving the event unhandled is exactly what lets that scroll pass
+        // through to the page.
+        if (!IsKeyboardFocusWithin) return;
+
+        // The anchor renders one run of text, so there is no hour element to hit: split it down
+        // the middle instead, left for hours and right for minutes.
+        var overHourSegment = _displayText is { Bounds.Width: > 0 } text &&
+                              e.GetPosition(text).X < text.Bounds.Width / 2;
+        SetPart(Hour + (overHourSegment ? delta : 0),
+            Minute + (overHourSegment ? 0 : delta * Math.Max(1, MinuteStep)));
+        e.Handled = true;
     }
 
     protected override void OnKeyDown(KeyEventArgs e)

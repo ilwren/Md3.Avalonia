@@ -401,6 +401,59 @@ public sealed class MdDesktopPopupAndComparisonTests
         finally { window.Close(); }
     }
 
+    [AvaloniaFact]
+    public void Time_Picker_Field_Adjusts_On_The_Wheel_Once_Focused_And_Lets_The_Page_Scroll_Otherwise()
+    {
+        // The scroll-to-adjust gesture on the closed field was lost when the wheel handler was
+        // gated on IsOpen. Nothing caught it because the only wheel coverage opened the popup
+        // first, so it asserted the one state where the gesture still worked.
+        var picker = new MdTimePicker { Hour = 10, Minute = 30, MinuteStep = 5 };
+        var window = new Window { Width = 480, Height = 640, Content = picker };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(picker.IsOpen);
+
+            var text = Descendant<TextBlock>(picker, "PART_DisplayText");
+            Point At(double fraction) => text
+                .TranslatePoint(new Point(text.Bounds.Width * fraction, text.Bounds.Height / 2), window)!
+                .Value;
+
+            // Unfocused the wheel has to pass straight through, or scrolling any page with a
+            // picker on it would silently rewrite the time.
+            window.MouseWheel(At(0.75), new Vector(0, 1), RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(10, picker.Hour);
+            Assert.Equal(30, picker.Minute);
+
+            Descendant<Button>(picker, "PART_AnchorButton").Focus();
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(picker.IsKeyboardFocusWithin);
+
+            // Right of centre is the minute segment, and it steps by MinuteStep.
+            window.MouseWheel(At(0.75), new Vector(0, 1), RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(35, picker.Minute);
+            Assert.Equal(10, picker.Hour);
+
+            // Left of centre is the hour segment.
+            window.MouseWheel(At(0.1), new Vector(0, 1), RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(11, picker.Hour);
+            Assert.Equal(35, picker.Minute);
+
+            // Minutes carry into the hour rather than wrapping on their own.
+            picker.Minute = 55;
+            Dispatcher.UIThread.RunJobs();
+            window.MouseWheel(At(0.75), new Vector(0, 1), RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(0, picker.Minute);
+            Assert.Equal(12, picker.Hour);
+        }
+        finally { window.Close(); }
+    }
+
     private static IEnumerable<string> PseudoClassNames(StyledElement element) =>
         ((IEnumerable<string>)element.Classes).Where(c => c.StartsWith(':'));
 }
