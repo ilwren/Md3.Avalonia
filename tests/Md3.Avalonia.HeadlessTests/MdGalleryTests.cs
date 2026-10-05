@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -6,7 +8,9 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
+using AvaloniaEdit;
 using Md3.Avalonia.Gallery;
+using Md3.Avalonia.Gallery.Components;
 using Md3.Avalonia.Gallery.Pages;
 using Xunit;
 
@@ -153,5 +157,30 @@ public sealed class MdGalleryTests
         {
             gallery.Close();
         }
+    }
+
+    [AvaloniaFact]
+    public void Code_Examples_Never_Show_A_Placeholder_Where_A_Sample_Belongs()
+    {
+        // Thirty-two pages supply only AXAML. The component used to stand in a TODO comment for
+        // the missing C#, so every one of them had a tab you could click into and find nothing
+        // but an instruction to the authors - which is what the review reported as empty Usage.
+        var xamlOnly = new CodeExample { XamlCode = "<md:MdButton Content=\"Send\" />" };
+        var host = new Window { Width = 800, Height = 600, Content = xamlOnly };
+        host.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+
+            var csharp = xamlOnly.GetVisualDescendants().OfType<TextEditor>()
+                .Single(editor => editor.Name == "CSharpEditor");
+            Assert.Equal(string.Empty, csharp.Text);
+            Assert.DoesNotContain("Add the equivalent", csharp.Text, StringComparison.Ordinal);
+
+            var tab = xamlOnly.GetVisualDescendants().OfType<MdSegmentedButton>()
+                .Single(button => button.Name == "CSharpTab");
+            Assert.False(tab.IsVisible, "a language with nothing to show must not offer a tab");
+        }
+        finally { host.Close(); }
     }
 }

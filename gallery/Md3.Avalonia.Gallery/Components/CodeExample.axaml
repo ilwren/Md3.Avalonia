@@ -17,7 +17,7 @@
           ClipToBounds="True">
     <Grid RowDefinitions="64,Auto">
       <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="12,0">
-        <Border Grid.Column="0"
+        <Border Grid.Column="0" x:Name="LanguageTabsHost"
                 Width="148" Height="34"
                 HorizontalAlignment="Left" VerticalAlignment="Center"
                 Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
@@ -36,6 +36,7 @@
                    VerticalAlignment="Center"
                    FontSize="12"
                    Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                   x:Name="SourceLabel"
                    Text="Source example" />
         <md:MdIconButton Grid.Column="2"
                          Icon="{x:Static md:MdSymbols.ContentCopy}"

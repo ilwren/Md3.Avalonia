@@ -415,3 +415,25 @@ means anything.
 What remains untested is the desktop path. Headless hosts popups in `OverlayPopupHost` inside
 the window; desktop uses a separate `PopupRoot` window with its own placement and clamping. The
 offset the review reports may well live there, and it cannot be measured from here.
+
+### Review 14 item 3 - cascader dropdown
+
+Measured inside `MainWindow`, the dropdown lands within 1 dip of its anchor's bottom-left, its
+top is not cut off, and it fits the window. Not reproduced here.
+
+The measurement did expose a real fragility in the bleed scheme every popup in this repository
+uses. The surface carries `Margin="12,14,12,16"` so the shadow and entrance translate are not
+clipped by the popup window, and the Popup cancels it with `HorizontalOffset="-12"
+VerticalOffset="-14"`. That cancellation only holds while the popup is free to sit 12 dip left
+and 14 dip above its anchor. Clamp it against an edge and the negative offset is silently
+dropped while the margin stays, turning the bleed into a visible offset of exactly that size.
+
+Shown bare in a window the cascader's anchor sits at x=0, the host clamps to x=0, and the
+dropdown lands 12 dip right of its anchor - measured, with `OverlayPopupHost[0,114]`. The
+navigation rail is what keeps that from happening in the real gallery. Anything that puts a
+picker or dropdown within 12 dip of a window edge, or 14 dip of its top, will show the same
+shift, and on desktop the clamp is against the screen rather than the window.
+
+Worth fixing properly: the compensation should not depend on the popup being free to move
+outside its anchor. That is a change across all eleven popups that share the pattern and wants
+desktop verification, so it is recorded rather than attempted blind.
