@@ -23,14 +23,22 @@ public partial class PickerGalleryPage : UserControl
 
     private static void Track(MdDatePicker picker, TextBlock readout, string mode)
     {
+        // Two values, not one. If the field above keeps showing its seeded date while these move,
+        // the selection committed and the template is not refreshing; if these do not move either,
+        // the click never reached the picker. One screenshot tells the two apart - which matters
+        // because the headless suite always takes the overlay popup path and can see neither.
         void Update() => readout.Text = picker.SelectedDate is { } value
-            ? L($"SelectedDate = {value:yyyy-MM-dd} ({mode})", $"SelectedDate = {value:yyyy-MM-dd}（{mode}）")
-            : L($"SelectedDate = null ({mode})", $"SelectedDate = null（{mode}）");
+            ? L($"SelectedDate = {value:yyyy-MM-dd} · field shows \"{picker.DisplayText}\" ({mode})",
+                $"SelectedDate = {value:yyyy-MM-dd} · 字段显示 \"{picker.DisplayText}\"（{mode}）")
+            : L($"SelectedDate = null · field shows \"{picker.DisplayText}\" ({mode})",
+                $"SelectedDate = null · 字段显示 \"{picker.DisplayText}\"（{mode}）");
 
         Update();
         picker.PropertyChanged += (_, e) =>
         {
-            if (e.Property == MdDatePicker.SelectedDateProperty) Update();
+            if (e.Property == MdDatePicker.SelectedDateProperty ||
+                e.Property == MdDatePicker.DisplayTextProperty ||
+                e.Property == MdDatePicker.IsOpenProperty) Update();
         };
     }
 
