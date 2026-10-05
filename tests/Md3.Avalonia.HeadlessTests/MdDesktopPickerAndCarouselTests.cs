@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Presenters;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -74,8 +75,10 @@ public sealed class MdDesktopPickerAndCarouselTests
     {
         // These used {Binding}, which resolves against whatever DataContext the page happens to
         // have, while the time picker next to it used {TemplateBinding}.
-        var picker = new MdDatePicker { ConfirmText = "Use this", CancelText = "Never mind" };
-        var window = new Window { Width = 900, Height = 700, Content = picker, DataContext = new { Unrelated = 1 } };
+        // ConfirmText/CancelText are read-only and come from localization, so the assertion is
+        // that the buttons show the control's values and not the page's DataContext.
+        var picker = new MdDatePicker();
+        var window = new Window { Width = 900, Height = 700, Content = picker, DataContext = new UnrelatedPageModel() };
         window.Show();
         try
         {
@@ -87,10 +90,17 @@ public sealed class MdDesktopPickerAndCarouselTests
                 .Where(b => b.Name is "PART_ConfirmButton" or "PART_CancelButton")
                 .Select(b => b.Content as string)
                 .ToArray();
-            Assert.Contains("Use this", labels);
-            Assert.Contains("Never mind", labels);
+            Assert.Contains(picker.ConfirmText, labels);
+            Assert.Contains(picker.CancelText, labels);
+            Assert.All(labels, label => Assert.False(string.IsNullOrEmpty(label)));
         }
         finally { window.Close(); }
+    }
+
+    private sealed class UnrelatedPageModel
+    {
+        // Deliberately carries neither ConfirmText nor CancelText.
+        public int Unrelated => 1;
     }
 
     private static void RaiseClick(Button button) =>
