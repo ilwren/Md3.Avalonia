@@ -534,6 +534,7 @@ missing from this document.
 |---|---|
 | `MdAnimatedTextEffect` | `Typewriter` · `Fade` · `Pop` · `None` |
 | `MdAsyncRequestState` | `Idle` · `Loading` · `Data` · `Empty` · `Error` · `Completed` |
+| `MdBreadcrumbVariant` | `Standard` · `Powerline` |
 | `MdBreadcrumbOverflowBehavior` | `Wrap` · `Scroll` · `Collapse` |
 | `MdCalendarSelectionMode` | `Single` · `Range` · `Multiple` |
 | `MdChartKind` | `Line` · `Area` · `Bar` |
