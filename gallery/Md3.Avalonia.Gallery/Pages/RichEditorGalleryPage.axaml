@@ -4,12 +4,28 @@
              xmlns:eco="using:Md3.Avalonia.Extra.Controls"
              xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             xmlns:rte="using:AvaloniaRichEditor.Controls"
              x:Class="Md3.Avalonia.Gallery.Pages.RichEditorGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Rich editor" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="MdRichEditor supplies the Material command surface and leaves the document to an adapter, so no editor engine is pulled into the library. This page uses the bundled TextBox adapter." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Two routes to rich text. Md3.Avalonia.RichEditor is an opt-in package that skins the AvaloniaRichEditor control library with Material tokens; MdRichEditor is the engine-free command surface in the core library, which leaves the document to an adapter." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="AvaloniaRichEditor, themed" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A real editing engine: inline formatting, tables, images, page view, HTML/JSON/RTF round-trip. The Material theme sets its surface, outline, shape, type scale, selection and caret from the same tokens as the rest of the library and leaves the control's own template alone, so it keeps working across upstream releases." />
+        <Border CornerRadius="12" ClipToBounds="True">
+          <rte:RichEditor x:Name="ThemedRichEditor" Height="260" />
+        </Border>
+        <TextBlock Classes="body" Opacity="0.78" TextWrapping="Wrap" Text="Usage: install Md3.Avalonia.RichEditor, then add &lt;themes:MaterialRichEditorTheme /&gt; to Application.Styles after MaterialTheme. The package carries the AvaloniaRichEditor dependency so the core packages do not." />
+        <gallery:CodeExample CSharpCode="// Application.axaml&#10;// &lt;themes:MaterialTheme /&gt;&#10;// &lt;themes:MaterialRichEditorTheme /&gt;&#10;&#10;editor.LoadHtml(&quot;&lt;p&gt;Hello &lt;b&gt;world&lt;/b&gt;&lt;/p&gt;&quot;);&#10;string html = editor.ToHtml();" />
+      </StackPanel>
+
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h2" Text="MdRichEditor command surface" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="For hosts that already own an editing engine. This instance uses the bundled TextBox adapter." />
       </StackPanel>
 
       <StackPanel Spacing="12">
