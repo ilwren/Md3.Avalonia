@@ -16,7 +16,9 @@
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="AvaloniaRichEditor, themed" />
         <TextBlock Classes="body" TextWrapping="Wrap" Text="A real editing engine: inline formatting, tables, images, page view, HTML/JSON/RTF round-trip. The Material theme sets its surface, outline, shape, type scale, selection and caret from the same tokens as the rest of the library and leaves the control's own template alone, so it keeps working across upstream releases." />
-        <Border CornerRadius="12" ClipToBounds="True">
+        <Border CornerRadius="12" ClipToBounds="True" Padding="16"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
           <rte:RichEditor x:Name="ThemedRichEditor" Height="260" />
         </Border>
         <TextBlock Classes="body" Opacity="0.78" TextWrapping="Wrap" Text="Usage: install Md3.Avalonia.RichEditor, then add &lt;themes:MaterialRichEditorTheme /&gt; to Application.Styles after MaterialTheme. The package carries the AvaloniaRichEditor dependency so the core packages do not." />

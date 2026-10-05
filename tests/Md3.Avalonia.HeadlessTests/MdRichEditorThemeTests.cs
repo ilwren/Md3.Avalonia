@@ -25,16 +25,18 @@ public sealed class MdRichEditorThemeTests
         {
             Dispatcher.UIThread.RunJobs();
 
-            // The stock control leaves these unset or Fluent-coloured; the Material theme is the
-            // only thing in this app that assigns them.
-            Assert.NotNull(editor.Background);
+            // RichEditor exposes no chrome - no Background, Border or CornerRadius - so the
+            // theme styles the ink instead, and these are the only properties any style in this
+            // app assigns. The host supplies the container around it.
+            Assert.NotNull(editor.SelectionBrush);
             Assert.NotNull(editor.CaretBrush);
-            Assert.Equal(new Avalonia.CornerRadius(12), editor.CornerRadius);
-            Assert.Equal(new Avalonia.Thickness(16), editor.Padding);
+            Assert.Equal(16d, editor.DefaultFontSize);
 
-            var expected = (IBrush?)window.FindResource("Md.Sys.Color.SurfaceContainerLow.Brush");
-            Assert.NotNull(expected);
-            Assert.Equal(expected!.ToString(), editor.Background!.ToString());
+            var selection = (IBrush?)window.FindResource("Md.Sys.Color.SecondaryContainer.Brush");
+            var caret = (IBrush?)window.FindResource("Md.Sys.Color.Primary.Brush");
+            Assert.NotNull(selection);
+            Assert.Equal(selection!.ToString(), editor.SelectionBrush!.ToString());
+            Assert.Equal(caret!.ToString(), editor.CaretBrush!.ToString());
         }
         finally { window.Close(); }
     }
