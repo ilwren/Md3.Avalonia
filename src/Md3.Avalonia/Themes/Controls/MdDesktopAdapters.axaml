@@ -367,9 +367,13 @@
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdBorderlessWindow">
         <Grid Background="Transparent">
+          <!-- Not {TemplateBinding Background}: the setter above makes that Transparent so the
+               compositor can cut the corners, so binding to it left the rounded frame painting
+               nothing at all. TransparencyBackgroundFallback is this window's opaque colour,
+               it is themed to the Material surface, and callers can still override it. -->
           <Border x:Name="PART_WindowFrame"
                   Margin="1"
-                  Background="{TemplateBinding Background}"
+                  Background="{TemplateBinding TransparencyBackgroundFallback}"
                   BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
                   BorderThickness="1"
                   CornerRadius="9"
