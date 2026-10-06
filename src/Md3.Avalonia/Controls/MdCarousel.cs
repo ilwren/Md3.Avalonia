@@ -313,9 +313,7 @@ public sealed class MdCarousel : ListBox
         {
             var gap = Math.Max(0, ItemSpacing);
             var medium = (large + small) / 2;
-            // Hero exists to privilege a single item, so it tapers early however wide the window.
-            var ceiling = Variant == MdCarouselVariant.Hero ? 2 : 24;
-            for (var n = 1; n <= Math.Min(ItemCount, ceiling); n++)
+            for (var n = 1; n <= Math.Min(ItemCount, 24); n++)
             {
                 var width = n * large + (n - 1) * gap;
                 var rest = ItemCount - n;
@@ -339,13 +337,22 @@ public sealed class MdCarousel : ListBox
         var (large, small, largeCount) = GetArrangement();
         if (index < 0 || Variant == MdCarouselVariant.Uncontained) return large;
 
-        var distance = Math.Abs(index - _layoutAnchorIndex);
-        if (distance < largeCount) return large;
+        // Center-aligned is symmetric about the focal item by definition.
+        if (Variant == MdCarouselVariant.CenterAligned)
+            return index == _layoutAnchorIndex ? large : small;
+
+        // Material tapers from the focal item towards the trailing edge, so measure forward from
+        // the anchor rather than symmetrically. A symmetric window hands out 2 * largeCount - 1
+        // large items and overflows the very arrangement the count was solved for. Items behind
+        // the anchor are already scrolled past; keeping them at the large extent is what lets
+        // ScrollToSelected's running total agree with where they actually landed.
+        var offset = index - _layoutAnchorIndex;
+        if (offset < largeCount) return large;
         return Variant switch
         {
             // Material Components Android derives the medium keyline from the midpoint between
             // the current small and large arrangement sizes.
-            MdCarouselVariant.MultiBrowse when distance == largeCount => (large + small) / 2,
+            MdCarouselVariant.MultiBrowse when offset == largeCount => (large + small) / 2,
             MdCarouselVariant.MultiBrowse => small,
             MdCarouselVariant.Hero => small,
             MdCarouselVariant.CenterAligned => small,
