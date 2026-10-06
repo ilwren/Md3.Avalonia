@@ -42,6 +42,22 @@ jobs:
           if [ -f /tmp/aot-out/Md3.Avalonia.Gallery.Desktop.dll ]; then
             echo "managed assembly still present - this was not an AOT publish"; exit 1
           fi
+      - name: Start the native binary and see if it survives
+        run: |
+          sudo apt-get install -y xvfb libx11-6 libice6 libsm6 libfontconfig1 >/dev/null
+          set +e
+          xvfb-run -a timeout 25 /tmp/aot-out/Md3.Avalonia.Gallery.Desktop > /tmp/run.log 2>&1
+          CODE=$?
+          set -e
+          echo "### Runtime smoke" >> $GITHUB_STEP_SUMMARY
+          echo "    exit code $CODE (124 = still running when the timeout fired, which is a pass)" >> $GITHUB_STEP_SUMMARY
+          tail -20 /tmp/run.log | sed 's/^/    /' >> $GITHUB_STEP_SUMMARY
+          # ILC compiling the app says nothing about reflection that is missing at runtime,
+          # which is how AOT normally fails. A window that is still up after 25 seconds has
+          # loaded the themes, the XAML and the icon font.
+          if [ "$CODE" != "124" ]; then
+            echo "the AOT binary exited on its own with $CODE:"; cat /tmp/run.log; exit 1
+          fi
       - name: Count trim and AOT diagnostics
         if: always()
         run: |
