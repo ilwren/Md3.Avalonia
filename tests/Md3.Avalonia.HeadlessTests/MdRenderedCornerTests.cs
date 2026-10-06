@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
+using Avalonia.Layout;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -47,12 +48,14 @@ public sealed class MdRenderedCornerTests
     [AvaloniaFact]
     public void The_Borderless_Chrome_Preview_Card_Has_Rounded_Corners()
     {
-        var page = new BorderlessWindowGalleryPage();
+        // The page declares MinHeight 1200. In a shorter window it is centred, which puts the
+        // card at a negative offset and makes every sample meaningless.
+        var page = new BorderlessWindowGalleryPage { VerticalAlignment = VerticalAlignment.Top };
         // A colour nothing in the theme uses, so "the card did not cover this pixel" is unambiguous.
         var window = new Window
         {
             Width = 900,
-            Height = 700,
+            Height = 1400,
             Background = new SolidColorBrush(Color.FromRgb(255, 0, 255)),
             Content = page,
         };
@@ -66,6 +69,7 @@ public sealed class MdRenderedCornerTests
                 .First(b => Math.Abs(b.CornerRadius.TopLeft - 16) < 0.01 && b.BorderThickness.Top > 0);
             var origin = card.TranslatePoint(default, window);
             Assert.NotNull(origin);
+            Assert.True(origin!.Value.Y > 10, $"the card sits at y={origin.Value.Y:0.#}, so there is no room above it to sample the window brush");
 
             var pixels = ReadPixels(window, out var size);
             uint At(double x, double y)
@@ -77,7 +81,7 @@ public sealed class MdRenderedCornerTests
                 return pixels[py * size.Width + px];
             }
 
-            var left = origin!.Value.X;
+            var left = origin.Value.X;
             var top = origin.Value.Y;
             var right = left + card.Bounds.Width;
             var bottom = top + card.Bounds.Height;
