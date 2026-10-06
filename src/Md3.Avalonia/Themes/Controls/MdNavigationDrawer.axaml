@@ -2,6 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:md="using:Md3.Avalonia.Controls">
   <ControlTheme x:Key="{x:Type md:MdNavigationDrawer}" TargetType="md:MdNavigationDrawer">
+    <!-- The 360dp default also lives on DrawerWidthProperty; the setter is what makes it
+         retargetable by a consumer theme without subclassing. -->
+    <Setter Property="DrawerWidth" Value="{DynamicResource Md.Comp.NavigationDrawer.Container.Width}" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="VerticalContentAlignment" Value="Stretch" />
     <Setter Property="Template">

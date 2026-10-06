@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.ReorderableListGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Reorderable list" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Rows can be dragged, moved with Ctrl+Up and Ctrl+Down, or moved through the direct API. Every move reports where the item came from and went." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="body" Text="Drag a row or use Ctrl+Up / Ctrl+Down. Buttons exercise the direct API." />
+        <md:MdReorderableList x:Name="ReorderList" Height="220" SelectionMode="Single" SelectedIndex="0"
+                                ReorderCompleted="ReorderCompleted">
+          <TextBlock Text="Design tokens" /><TextBlock Text="Core controls" /><TextBlock Text="Gallery" /><TextBlock Text="Android validation" />
+        </md:MdReorderableList>
+        <StackPanel Orientation="Horizontal" Spacing="8"><md:MdButton Content="Move up" Variant="Outlined" Click="MoveReorderUp" /><md:MdButton Content="Move down" Variant="Outlined" Click="MoveReorderDown" /></StackPanel>
+        <TextBlock x:Name="ReorderStatus" Classes="body" Text="Selected: Design tokens · position 1 of 4" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdReorderableList SelectionMode=&quot;Single&quot; ReorderCompleted=&quot;OnReorderCompleted&quot;&gt;&#10;  &lt;TextBlock Text=&quot;Design tokens&quot; /&gt;&#10;  &lt;TextBlock Text=&quot;Component themes&quot; /&gt;&#10;&lt;/md:MdReorderableList&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

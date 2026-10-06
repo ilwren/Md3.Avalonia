@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.AboutDialogGalleryPage">
+  <Grid>
+  <md:MdScrollViewer x:Name="StandalonePageScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="About and licenses" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="An about dialog carries application identity and leads into a searchable license list, which comes back to it." />
+      </StackPanel>
+
+      <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
+        <TextBlock Classes="body" Text="Open application details, then continue into a searchable license task and return." />
+        <md:MdButton Width="140" HorizontalAlignment="Left" Content="About this app" Variant="Outlined" Click="OpenAboutDialog" />
+        <TextBlock x:Name="LicenseStatus" Classes="body" Text="About dialog is closed." />
+      </StackPanel>
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample CSharpCode="var about = new MdAboutDialog { ApplicationName = &quot;Md3.Avalonia&quot;, ApplicationVersion = &quot;Preview&quot; };&#10;_ = DialogHost.ShowAsync(about);&#10;&#10;var page = new MdLicensePage { Licenses = licenses, FilterLabel = &quot;Filter packages&quot; };&#10;_ = DialogHost.ShowAsync(new MdDialog { Headline = &quot;Open source licenses&quot;, Content = page });" />
+      </StackPanel>
+
+    </StackPanel>
+  </md:MdScrollViewer>
+  <md:MdDialogHost x:Name="LocalDialogHost" ZIndex="20" />
+  </Grid>
+</UserControl>

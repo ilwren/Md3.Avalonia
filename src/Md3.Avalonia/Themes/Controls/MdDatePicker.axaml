@@ -77,8 +77,13 @@
                  OverlayDismissEventPassThrough="True"
                  Placement="BottomEdgeAlignedLeft"
                  PlacementTarget="{Binding #PART_AnchorButton}"
+                 HorizontalOffset="-12" VerticalOffset="-14"
                  WindowManagerAddShadowHint="False">
+            <!-- Without this the popup window paints its own opaque background behind the rounded
+                 surface on desktop; Android renders popups into the TopLevel overlay and never showed it. -->
+            <Popup.Styles><Style Selector="PopupRoot"><Setter Property="Background" Value="Transparent" /><Setter Property="TransparencyLevelHint" Value="Transparent" /><Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /></Style></Popup.Styles>
             <Border x:Name="PART_Surface"
+                    Margin="12,14,12,16"
                     Width="360"
                     MaxHeight="568"
                     Padding="12"
@@ -183,8 +188,8 @@
                               Orientation="Horizontal"
                               Spacing="8"
                               IsVisible="False">
-                    <md:MdButton x:Name="PART_CancelButton" Content="{Binding CancelText}" Size="ExtraSmall" Variant="Text" />
-                    <md:MdButton x:Name="PART_ConfirmButton" Content="{Binding ConfirmText}" Size="ExtraSmall" Variant="Text" />
+                    <md:MdButton x:Name="PART_CancelButton" Content="{TemplateBinding CancelText}" Size="ExtraSmall" Variant="Text" />
+                    <md:MdButton x:Name="PART_ConfirmButton" Content="{TemplateBinding ConfirmText}" Size="ExtraSmall" Variant="Text" />
                   </StackPanel>
                 </Grid>
               </StackPanel>

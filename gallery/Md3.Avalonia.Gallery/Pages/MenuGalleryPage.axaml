@@ -30,7 +30,7 @@
       <TextBlock x:Name="MenuResult" Classes="body" Text="Choose a menu action." />
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Right-click menu" />
-        <Border x:Name="ContextMenuTarget" Width="520" Height="112" HorizontalAlignment="Left"
+        <Border x:Name="ContextMenuTarget" MaxWidth="520" Height="112" HorizontalAlignment="Stretch"
                 PointerPressed="OpenContextMenu"
                 Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20">
           <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="Right-click this surface" />

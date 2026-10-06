@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.SurfaceGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Surfaces and type scale" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="MdSurface paints a semantic container role with optional elevation; MdText picks a role from the M3 type scale. Both follow the active theme rather than hard-coded colours or font sizes." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <WrapPanel>
+          <md:MdSurface Width="210" Height="120" Margin="0,0,12,12" Padding="20" Variant="ContainerLow">
+            <StackPanel Spacing="8"><md:MdText StyleRole="TitleMedium" Text="Container low" /><md:MdText StyleRole="BodyMedium" TextWrapping="Wrap" Text="Theme-aware color roles and shape." /></StackPanel>
+          </md:MdSurface>
+          <md:MdSurface Width="210" Height="120" Margin="0,0,12,12" Padding="20" Variant="ContainerHigh" Elevation="{DynamicResource Md.Sys.Elevation.Level2}">
+            <StackPanel Spacing="8"><md:MdText StyleRole="TitleMedium" Text="Container high" /><md:MdText StyleRole="BodyMedium" TextWrapping="Wrap" Text="Optional semantic elevation." /></StackPanel>
+          </md:MdSurface>
+          <md:MdSurface Width="210" Height="120" Padding="20" Variant="Inverse">
+            <StackPanel Spacing="8"><md:MdText StyleRole="TitleMedium" Foreground="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" Text="Inverse" /><md:MdText StyleRole="BodyMedium" Foreground="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" Text="Inverse surface roles." /></StackPanel>
+          </md:MdSurface>
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdSurface Variant=&quot;ContainerHigh&quot; Elevation=&quot;{DynamicResource Md.Sys.Elevation.Level2}&quot;&gt;&#10;  &lt;md:MdText StyleRole=&quot;TitleMedium&quot; Text=&quot;Heading&quot; /&gt;&#10;&lt;/md:MdSurface&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

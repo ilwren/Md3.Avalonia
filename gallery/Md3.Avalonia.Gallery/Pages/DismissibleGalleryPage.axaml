@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.DismissibleGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Dismissible" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Swipe a row either way to dismiss it, with a different background behind each direction. Restore puts it back." />
+      </StackPanel>
+
+      <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
+        <md:MdDismissible x:Name="DismissibleDemo" Height="72" Dismissed="DismissibleDismissed">
+          <md:MdDismissible.BackgroundContent><Border Width="180" Padding="20" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"><TextBlock VerticalAlignment="Center" Text="Archive" /></Border></md:MdDismissible.BackgroundContent>
+          <md:MdDismissible.SecondaryBackgroundContent><Border Width="180" Padding="20" Background="{DynamicResource Md.Sys.Color.Error.Brush}"><TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Text="Delete" /></Border></md:MdDismissible.SecondaryBackgroundContent>
+          <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"><TextBlock VerticalAlignment="Center" Text="Swipe this notification in either direction" /></Border>
+        </md:MdDismissible>
+        <md:MdButton Width="110" HorizontalAlignment="Left" Content="Restore" Variant="Text" Click="RestoreDismissible" />
+        <TextBlock x:Name="DismissibleStatus" Classes="body" Text="Swipe the row, or press Restore." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdDismissible Dismissed=&quot;OnDismissed&quot;&gt;&#10;  &lt;md:MdDismissible.BackgroundContent&gt;&#10;    &lt;Border Background=&quot;{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}&quot; /&gt;&#10;  &lt;/md:MdDismissible.BackgroundContent&gt;&#10;  &lt;md:MdDismissible.SecondaryBackgroundContent&gt;&#10;    &lt;Border Background=&quot;{DynamicResource Md.Sys.Color.Error.Brush}&quot; /&gt;&#10;  &lt;/md:MdDismissible.SecondaryBackgroundContent&gt;&#10;  &lt;Border&gt;&lt;TextBlock Text=&quot;Swipe me in either direction&quot; /&gt;&lt;/Border&gt;&#10;&lt;/md:MdDismissible&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

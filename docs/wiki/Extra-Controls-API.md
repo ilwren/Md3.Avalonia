@@ -48,12 +48,15 @@ Material Design 3 and Flutter do not define a first-party ColorPicker component.
 
 ---
 
-## 2. Experimental motion API shells
+## 2. Motion transitions
 
-> `MdContainerTransform`, `MdSharedAxis`, `MdFadeThrough`, and `MdAnimatedVisibility` are
-> marked with `MdExperimentalAttribute`. They currently render content and expose preview state;
-> they do not implement retained outgoing content or complete Material transition choreography and
-> are excluded from parity/compliance claims.
+> `MdContainerTransform`, `MdSharedAxis`, `MdFadeThrough`, and `MdAnimatedVisibility` run real
+> Material choreography driven from the motion tokens, and no longer carry
+> `MdExperimentalAttribute`. Two helpers back them: `MdRevealHost` grants its child layout space
+> along one axis so a reveal clips rather than squashes, and `MdMorphPanel` reports a size
+> interpolated between two children so a container transform can grow from one to the other.
+> Known limit: a `Control` assigned to `Content` has exactly one parent, so `MdFadeThrough` and
+> `MdSharedAxis` skip its outgoing phase and animate the entrance only.
 
 ### `MdContainerTransform` (experimental state shell)
 Switches preview content and corner-radius state. Synchronized source/destination bounds, elevation,

@@ -13,10 +13,14 @@
 
       <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="h2" Text="Interactive breadcrumb" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Clicking a parent segment navigates to it and drops everything below, which is what a breadcrumb is for. The trailing segment is the current location: it has no hover state and no hand cursor." />
         <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
           <extra:MdBreadcrumb x:Name="DemoBreadcrumb" Separator="›" ItemInvoked="OnBreadcrumbItemInvoked" />
         </Border>
-        <TextBlock x:Name="BreadcrumbStatus" Classes="body" Text="Click any breadcrumb segment to navigate." />
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <md:MdButton Content="Reset path" Variant="Outlined" Click="OnResetPath" />
+          <TextBlock x:Name="BreadcrumbStatus" VerticalAlignment="Center" Classes="body" Text="Click any breadcrumb segment to navigate to it." />
+        </StackPanel>
       </StackPanel>
 
       <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="12">
@@ -34,6 +38,17 @@
                               ItemsBeforeCollapse="1" ItemsAfterCollapse="2"
                               ItemInvoked="OnDeepBreadcrumbInvoked" />
         </Border>
+      </StackPanel>
+
+      <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="12">
+        <TextBlock Classes="h2" Text="Powerline variant" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Set Variant to Powerline for the interlocking wedge segments used by terminal prompts. Each segment ends in an arrow that slots into the notch of the next one, so the strip reads as one continuous ribbon. Colours stay on Material 3 roles rather than terminal ANSI colours, and the selected segment takes the primary role." />
+        <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
+          <extra:MdBreadcrumb x:Name="PowerlineBreadcrumb" Variant="Powerline"
+                              HorizontalAlignment="Left"
+                              ItemInvoked="OnPowerlineBreadcrumbInvoked" />
+        </Border>
+        <TextBlock x:Name="PowerlineStatus" Classes="body" Text="Click any segment to select it." />
       </StackPanel>
 
       <StackPanel Spacing="10">

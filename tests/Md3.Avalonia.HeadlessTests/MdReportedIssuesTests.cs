@@ -33,6 +33,8 @@ public sealed class MdReportedIssuesTests
         try
         {
             Dispatcher.UIThread.RunJobs();
+            // Synthetic on purpose: the assertion below is about which destination ends up
+            // active, not about whether the rail button is reachable.
             var carouselDestination = window.GetVisualDescendants().OfType<MdButton>()
                 .Single(button => button.Name == "CarouselNav");
             carouselDestination.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
@@ -53,17 +55,32 @@ public sealed class MdReportedIssuesTests
         {
             var view = new AndroidGalleryView();
             using var host = Show(view, width, 760);
+            // The destinations live in the navigation drawer, which starts closed and fully
+            // transparent. The synthetic click this replaced skipped straight past that, so it
+            // was navigating in a way no user can. Open the drawer the way a user would first.
+            var drawer = view.GetVisualDescendants().OfType<MdNavigationDrawer>().Single();
+            drawer.Show();
+            Dispatcher.UIThread.RunJobs();
+
             var destination = view.GetVisualDescendants().OfType<MdButton>()
-                .Single(button => Equals(button.Content, "Segmented and range"));
-            destination.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                .Single(button => Equals(button.Content, "Segmented buttons"));
+
+            // The drawer list is far longer than the viewport - this destination sits at
+            // y=2982 in a 760 dip window - so scroll it in the way a user would before
+            // expecting a pointer to land on it.
+            destination.BringIntoView();
+            Dispatcher.UIThread.RunJobs();
+            PointerInput.Click(destination);
             Dispatcher.UIThread.RunJobs();
 
             var pageHost = view.GetVisualDescendants().OfType<ContentControl>()
                 .Single(control => control.Name == "MobilePageHost");
-            var page = view.GetVisualDescendants().OfType<AdvancedSelectionGalleryPage>().Single();
+            var page = view.GetVisualDescendants().OfType<SegmentedButtonGalleryPage>().Single();
             var groups = page.GetVisualDescendants().OfType<MdSegmentedButtonGroup>().ToArray();
             Assert.NotEmpty(groups);
-            Assert.All(groups, group =>
+            // The CodeExample tab strip hides itself when a page supplies only one language,
+            // and a hidden control has no width to constrain.
+            Assert.All(groups.Where(group => group.IsEffectivelyVisible), group =>
             {
                 Assert.True(double.IsNaN(group.Width));
                 Assert.InRange(group.Bounds.Width, 1, Math.Max(1, pageHost.Bounds.Width - 32));
@@ -73,8 +90,15 @@ public sealed class MdReportedIssuesTests
 
             host.Window.Width = 900;
             Dispatcher.UIThread.RunJobs();
-            Assert.Equal(new[] { 480d, 560d, double.NaN }, groups.Select(group => group.Width).ToArray());
-            Assert.All(groups.Take(2), group => Assert.Equal(HorizontalAlignment.Left, group.HorizontalAlignment));
+            // The two authored groups used to be pinned at Width 480 and 560, which is exactly
+            // what stopped the page reflowing into a narrow window. They now carry the same
+            // numbers as a cap and stretch into whatever they are given below it.
+            Assert.All(groups, group => Assert.True(double.IsNaN(group.Width),
+                $"{group.Name} still has a fixed width of {group.Width}"));
+            Assert.Equal(new[] { 480d, 560d }, groups.Take(2).Select(group => group.MaxWidth).ToArray());
+            Assert.All(groups.Take(2), group =>
+                Assert.True(group.Bounds.Width <= group.MaxWidth + 1,
+                    $"{group.Bounds.Width} exceeds the {group.MaxWidth} cap"));
         }
     }
 
@@ -363,14 +387,14 @@ public sealed class MdReportedIssuesTests
         var tree = new MdTreeView { Roots = new[] { root }, Width = 420, Height = 220 };
         using var host = Show(tree, 480, 280);
         var toggle = tree.GetVisualDescendants().OfType<ToggleButton>().Single();
-        toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        PointerInput.Click(toggle);
         Dispatcher.UIThread.RunJobs();
         Assert.True(root.IsExpanded);
         Assert.Equal(2, tree.VisibleRows.Count);
         Assert.False(tree.ShowGuides);
 
         toggle = tree.GetVisualDescendants().OfType<ToggleButton>().First();
-        toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        PointerInput.Click(toggle);
         Assert.False(root.IsExpanded);
     }
 
@@ -623,6 +647,117 @@ public sealed class MdReportedIssuesTests
             Assert.True(window.TemplateSettings.IsClientAreaExtended);
         }
         finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Simple_Dialog_Selecting_An_Item_Does_Not_Also_Report_A_Dismissal()
+    {
+        // Reported from the gallery: clicking an account answered "selection cancelled". Choosing
+        // an item closed the dialog through Dismiss(), so ItemSelected and Dismissed both fired
+        // for one click and the cancel listener, running second, overwrote the selection.
+        var dialog = new MdSimpleDialog
+        {
+            ItemsSource = new[] { "material@example.com", "avalonia@example.com" },
+            IsOpen = true
+        };
+
+        object? selected = null;
+        var dismissals = 0;
+        dialog.ItemSelected += (_, item) => selected = item;
+        dialog.Dismissed += (_, _) => dismissals++;
+
+        using var host = Show(dialog, 600, 400);
+        Dispatcher.UIThread.RunJobs();
+
+        var items = dialog.GetVisualDescendants().OfType<SelectingItemsControl>().First(c => c.Name == "PART_ItemsHost");
+        items.SelectedIndex = 1;
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal("avalonia@example.com", selected);
+        Assert.Equal(0, dismissals);
+        Assert.False(dialog.IsOpen);
+
+        // Cancelling still reports exactly one dismissal.
+        dialog.Show();
+        dialog.Dismiss();
+        Assert.Equal(1, dismissals);
+    }
+
+    [AvaloniaFact]
+    public void Simple_Dialog_Options_Run_Edge_To_Edge_With_M3_Spacing()
+    {
+        // The other half of the same report: the options were inset by the surface's own 24 of
+        // padding, so a row's hover and selection layers stopped short of the dialog edge and the
+        // title/option rhythm was a flat 12 everywhere. M3 composes it the way Flutter's
+        // SimpleDialog does - title padded 24/24/24/0, content 0/12/0/16, option 24/8 - which puts
+        // 20 between the title and the first option and 24 under the last, with the option's own
+        // padding supplying the side inset so its state layer spans the full width.
+        var dialog = new MdSimpleDialog
+        {
+            Title = "Set backup account",
+            ItemsSource = new[] { "material@example.com", "avalonia@example.com" },
+            IsOpen = true
+        };
+        using var host = Show(dialog, 700, 520);
+        Dispatcher.UIThread.RunJobs();
+
+        var surface = dialog.GetVisualDescendants().OfType<Border>().Single(b => b.Name == "PART_Surface");
+        var items = dialog.GetVisualDescendants().OfType<SelectingItemsControl>().Single(c => c.Name == "PART_ItemsHost");
+        var option = items.GetVisualDescendants().OfType<ListBoxItem>().First();
+
+        Assert.Equal(new Thickness(24, 8), option.Padding);
+        Assert.Equal(new CornerRadius(0), option.CornerRadius);
+
+        // Full bleed: the row starts at the surface's edge and is as wide as it is.
+        var offset = option.TranslatePoint(default, surface);
+        Assert.NotNull(offset);
+        Assert.Equal(0d, offset!.Value.X, 1);
+        Assert.Equal(surface.Bounds.Width, option.Bounds.Width, 1);
+
+        // And the title collapses when there is none instead of leaving its 24/24 behind.
+        var untitled = new MdSimpleDialog { ItemsSource = new[] { "One" }, IsOpen = true };
+        using var untitledHost = Show(untitled, 700, 520);
+        Dispatcher.UIThread.RunJobs();
+        var title = untitled.GetVisualDescendants().OfType<ContentPresenter>().Single(p => p.Name == "PART_Title");
+        Assert.False(title.IsVisible);
+    }
+
+    [AvaloniaFact]
+    public void Expanded_Search_Reopens_When_The_Header_Is_Typed_In_Again()
+    {
+        // Reported from the gallery: choose a result, clear the field, type again, and the
+        // suggestions never came back. Committing a result writes the chosen text into the header
+        // and closes the view, and nothing reopened it, so the filter ran against a hidden list.
+        // The header presenter stays visible while the view is closed, so typing in it must bring
+        // the results back.
+        var header = new MdSearchBar();
+        var view = new MdSearchView
+        {
+            Header = header,
+            Content = new TextBlock { Text = "results" },
+            IsOpen = true
+        };
+
+        using var host = Show(view, 800, 600);
+        Dispatcher.UIThread.RunJobs();
+
+        view.CommitResult("MdSearchView.cs", "MdSearchView.cs");
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(view.IsOpen, "committing a result closes the view and must not reopen it");
+
+        header.Focus();
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(header.IsKeyboardFocusWithin, "the header stays visible while the view is closed, so it must be focusable");
+
+        // Clearing the field on its own leaves the view closed.
+        header.Text = string.Empty;
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(view.IsOpen, "clearing the field alone must not expand the view");
+
+        // Typing brings the result list back.
+        header.Text = "search";
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(view.IsOpen);
     }
 
     private static Scope Show(Control content, double width, double height)

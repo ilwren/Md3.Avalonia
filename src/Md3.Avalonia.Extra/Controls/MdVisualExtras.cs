@@ -14,7 +14,7 @@ namespace Md3.Avalonia.Extra.Controls;
 public enum MdComparisonOrientation { Horizontal, Vertical }
 
 /// <summary>Reveals two pieces of content through a draggable before/after divider.</summary>
-[PseudoClasses(":dragging", ":horizontal", ":vertical")]
+[PseudoClasses(":dragging", ":horizontal", ":vertical", ":non-interactive")]
 public sealed class MdBeforeAfter : TemplatedControl
 {
     public static readonly StyledProperty<object?> BeforeProperty = AvaloniaProperty.Register<MdBeforeAfter, object?>(nameof(Before));
@@ -26,12 +26,26 @@ public sealed class MdBeforeAfter : TemplatedControl
     public static readonly StyledProperty<bool> IsInteractiveProperty = AvaloniaProperty.Register<MdBeforeAfter, bool>(nameof(IsInteractive), true);
     private Border? _afterClip;
     private Border? _divider;
+    private Control? _thumb;
     private bool _dragging;
+    private const double GrabTolerance = 22;
+    private Point _dragOrigin;
+    private double _dragStartPosition;
+
+    /// <summary>How far a click on the image away from the handle nudges the divider.</summary>
+    private const double TrackStep = .1;
     static MdBeforeAfter()
     {
         AffectsMeasure<MdBeforeAfter>(OrientationProperty, DividerThicknessProperty);
-        PositionProperty.Changed.AddClassHandler<MdBeforeAfter>((control, _) => control.UpdateGeometry());
+        // Raised here rather than from the pointer handler: the event is called PositionChanged,
+        // so the arrow keys and a two-way binding have to raise it too, not just a drag.
+        PositionProperty.Changed.AddClassHandler<MdBeforeAfter>((control, _) =>
+        {
+            control.UpdateGeometry();
+            control.PositionChanged?.Invoke(control, EventArgs.Empty);
+        });
         OrientationProperty.Changed.AddClassHandler<MdBeforeAfter>((control, _) => control.UpdateOrientation());
+        IsInteractiveProperty.Changed.AddClassHandler<MdBeforeAfter>((control, _) => control.UpdateInteractivity());
     }
     public object? Before { get => GetValue(BeforeProperty); set => SetValue(BeforeProperty, value); }
     public object? After { get => GetValue(AfterProperty); set => SetValue(AfterProperty, value); }
@@ -44,8 +58,12 @@ public sealed class MdBeforeAfter : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
+        if (_thumb is not null) _thumb.PointerPressed -= OnThumbPressed;
         _afterClip = e.NameScope.Find<Border>("PART_AfterClip");
         _divider = e.NameScope.Find<Border>("PART_Divider");
+        _thumb = e.NameScope.Find<Control>("PART_Thumb");
+        if (_thumb is not null) _thumb.PointerPressed += OnThumbPressed;
+        UpdateInteractivity();
         UpdateOrientation();
         UpdateGeometry();
     }
@@ -72,6 +90,7 @@ public sealed class MdBeforeAfter : TemplatedControl
             _afterClip.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left;
             _afterClip.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Stretch;
             if (_divider is not null) { _divider.Width = DividerThickness; _divider.Height = double.NaN; _divider.Margin = new Thickness(Bounds.Width * position - DividerThickness / 2, 0, 0, 0); _divider.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left; }
+            if (_thumb is not null) { _thumb.Margin = new Thickness(Bounds.Width * position - ThumbExtent(_thumb.Width, _thumb.Bounds.Width) / 2, 0, 0, 0); _thumb.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left; _thumb.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center; }
         }
         else
         {
@@ -80,16 +99,106 @@ public sealed class MdBeforeAfter : TemplatedControl
             _afterClip.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Stretch;
             _afterClip.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top;
             if (_divider is not null) { _divider.Height = DividerThickness; _divider.Width = double.NaN; _divider.Margin = new Thickness(0, Bounds.Height * position - DividerThickness / 2, 0, 0); _divider.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top; }
+            if (_thumb is not null) { _thumb.Margin = new Thickness(0, Bounds.Height * position - ThumbExtent(_thumb.Height, _thumb.Bounds.Height) / 2, 0, 0); _thumb.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Center; _thumb.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top; }
         }
     }
+    // The handle is the drag target, as in the comparison sliders this control is modelled on.
+    // Pressing the image itself used to teleport the divider to the pointer, which made the
+    // image unclickable and hid the fact that the divider was draggable at all.
+    private void OnThumbPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!IsInteractive || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
+
+        // Snap here too, not just on a track press. Keeping the grab offset reads fine in the
+        // middle of the track, where the handle is whole and a press can land either side of
+        // its centre. At an extreme it does not: half the handle is clipped outside the
+        // control, every reachable pixel is on the same side of the divider, and the offset the
+        // press picks up is both one-directional and as large as half the handle. Holding on to
+        // it for the rest of the drag is the gap between cursor and handle in the report.
+        BeginDrag(e.GetPosition(this));
+        e.Pointer.Capture(this);
+        e.Handled = true;
+    }
+
+    private void BeginDrag(Point origin)
+    {
+        _dragging = true;
+
+        // Track the delta rather than the absolute pointer: grabbing the handle off-centre must
+        // not snap the divider under the cursor.
+        //
+        // That only holds where the grab could have landed either side of centre. At an extreme
+        // half the handle is clipped outside the control, so every reachable pixel is on the
+        // same side of the divider and the offset the press picks up is one-directional and as
+        // large as half the handle - kept for the whole drag, it is the gap between cursor and
+        // handle in the report. Allow no more offset than the divider's own distance to the
+        // nearer edge, which is zero exactly where the handle is clipped.
+        var extent = Orientation == MdComparisonOrientation.Horizontal
+            ? Math.Max(1, Bounds.Width)
+            : Math.Max(1, Bounds.Height);
+        var along = Orientation == MdComparisonOrientation.Horizontal ? origin.X : origin.Y;
+        var divider = Math.Clamp(Position, 0, 1) * extent;
+        var reach = Math.Min(divider, extent - divider);
+        var offset = Math.Clamp(along - divider, -reach, reach);
+        Position = Math.Clamp((along - offset) / extent, 0, 1);
+
+        _dragOrigin = origin;
+        _dragStartPosition = Math.Clamp(Position, 0, 1);
+        PseudoClasses.Set(":dragging", true);
+        if (Focusable) Focus();
+    }
+
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         if (!IsInteractive || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) { base.OnPointerPressed(e); return; }
-        _dragging = true; PseudoClasses.Set(":dragging", true); e.Pointer.Capture(this); UpdateFromPointer(e.GetPosition(this)); e.Handled = true;
+        var point = e.GetPosition(this);
+        var extent = Orientation == MdComparisonOrientation.Horizontal
+            ? Math.Max(1, Bounds.Width)
+            : Math.Max(1, Bounds.Height);
+        var offset = Orientation == MdComparisonOrientation.Horizontal ? point.X : point.Y;
+        var target = offset / extent;
+        var current = Math.Clamp(Position, 0, 1);
+
+        // The handle is drawn straddling the divider, so at the extremes half of it falls outside
+        // the control and is clipped away: a press aimed at it misses the visual and used to fall
+        // through to the track-step branch below, which shoved the divider away from the cursor.
+        // Anything landing within the handle's grab radius of the divider is a grab, clipped or not.
+        if (Math.Abs(offset - (current * extent)) <= GrabTolerance)
+        {
+            // Snap the divider under the pointer before tracking it. Preserving the grab offset
+            // is right when the handle itself is pressed - OnThumbPressed still does that - but
+            // a press on the track within the grab radius is not a grab of the handle, and at
+            // the extremes it is the only press available: half the handle is clipped away
+            // there, so the pointer cannot reach its centre. Keeping that offset left the
+            // divider trailing the cursor by up to the full 22 dip tolerance for the whole
+            // drag, which is what the comparison slider was reported for.
+            BeginDrag(point);
+            e.Pointer.Capture(this);
+            e.Handled = true;
+            return;
+        }
+
+        // A press further out nudges the divider one step toward the pointer, the same
+        // "page towards the click" the track of a slider gives you.
+        if (Math.Abs(target - current) > double.Epsilon)
+            Position = target > current
+                ? Math.Min(current + TrackStep, target)
+                : Math.Max(current - TrackStep, target);
+        if (Focusable) Focus();
+        e.Handled = true;
     }
+
     protected override void OnPointerMoved(PointerEventArgs e)
     {
-        if (_dragging) { UpdateFromPointer(e.GetPosition(this)); e.Handled = true; }
+        if (_dragging)
+        {
+            var point = e.GetPosition(this);
+            var delta = Orientation == MdComparisonOrientation.Horizontal
+                ? (point.X - _dragOrigin.X) / Math.Max(1, Bounds.Width)
+                : (point.Y - _dragOrigin.Y) / Math.Max(1, Bounds.Height);
+            Position = _dragStartPosition + delta;
+            e.Handled = true;
+        }
         base.OnPointerMoved(e);
     }
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
@@ -99,16 +208,23 @@ public sealed class MdBeforeAfter : TemplatedControl
     }
     protected override void OnKeyDown(KeyEventArgs e)
     {
+        // IsInteractive used to gate the pointer only, so a comparison meant to be display-only
+        // was still a tab stop whose divider moved under the arrow keys.
+        if (!IsInteractive) { base.OnKeyDown(e); return; }
         var step = e.KeyModifiers.HasFlag(KeyModifiers.Shift) ? .1 : .02;
         if (e.Key is Key.Left or Key.Down) { Position -= step; e.Handled = true; }
         else if (e.Key is Key.Right or Key.Up) { Position += step; e.Handled = true; }
         else base.OnKeyDown(e);
     }
-    private void UpdateFromPointer(Point point)
-    {
-        var value = Orientation == MdComparisonOrientation.Horizontal ? point.X / Math.Max(1, Bounds.Width) : point.Y / Math.Max(1, Bounds.Height);
-        var old = Position; Position = value; if (Math.Abs(old - Position) > double.Epsilon) PositionChanged?.Invoke(this, EventArgs.Empty);
-    }
+
+    // A pseudo-class, not SetCurrentValue on Focusable: SetCurrentValue does not establish a
+    // local value, so the theme's Focusable setter wins back the moment the theme is applied on
+    // attach. The theme keys the override off this instead.
+    // The template gives the handle an explicit size; Bounds is still zero on the first arrange,
+    // which would park it half a handle off the divider until something invalidated layout again.
+    private static double ThumbExtent(double declared, double measured) => double.IsNaN(declared) ? measured : declared;
+
+    private void UpdateInteractivity() => PseudoClasses.Set(":non-interactive", !IsInteractive);
 }
 
 public enum MdAnimatedTextEffect { Typewriter, Fade, Pop, None }

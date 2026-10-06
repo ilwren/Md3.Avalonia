@@ -261,6 +261,31 @@ public sealed class MdAcceptanceRegressionTests
     }
 
     [AvaloniaFact]
+    public void Docked_Date_Picker_Commits_Immediately_While_Dialogs_Stay_Provisional()
+    {
+        // Defect #9 was "the picker doesn't apply the selection". It applies, but only where M3
+        // says it should: the docked date picker writes straight through, and every picker that
+        // opens as a dialog holds the value back until it is confirmed. The gallery page shows no
+        // bound value, which is why both outcomes looked identical to the reporter.
+        var original = new DateTimeOffset(2026, 9, 23, 0, 0, 0, TimeSpan.Zero);
+        var picked = original.AddDays(4);
+
+        var docked = new MdDatePicker { Mode = MdDatePickerMode.Docked, SelectedDate = original };
+        docked.IsOpen = true;
+        docked.SelectedDate = picked;
+        docked.IsOpen = false;
+        Assert.Equal(picked, docked.SelectedDate);
+
+        // The time picker has no docked variant, so dial mode is provisional too - a difference
+        // between the two controls that is deliberate, not an oversight.
+        var dial = new MdTimePicker { Mode = MdTimePickerMode.Dial, SelectedTime = new TimeSpan(9, 15, 0) };
+        dial.IsOpen = true;
+        dial.SelectedTime = new TimeSpan(14, 42, 0);
+        dial.IsOpen = false;
+        Assert.Equal(new TimeSpan(9, 15, 0), dial.SelectedTime);
+    }
+
+    [AvaloniaFact]
     public void Search_Escape_Dismisses_Expanded_View_And_Enter_Submits()
     {
         var submitted = string.Empty;
@@ -335,7 +360,7 @@ public sealed class MdAcceptanceRegressionTests
             Assert.Equal(snackbar.Foreground, action.Foreground);
             Assert.Equal(snackbar.Foreground, dismiss.Foreground);
 
-            action.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            PointerInput.Click(action);
             Assert.True(actionInvoked);
             Assert.False(snackbar.IsOpen);
         }
@@ -351,6 +376,7 @@ public sealed class MdAcceptanceRegressionTests
         // Keep the page unattached because Avalonia.Headless intentionally has no native popup
         // implementation. This still exercises the click handlers and public popup state.
         var page = new ToolbarGalleryPage();
+        using var toolbarHost = Show(page);
         var trigger = page.GetLogicalDescendants().OfType<MdButton>()
             .Single(button => button.Name == "ContextToolbarTrigger");
         var popup = page.GetLogicalDescendants().OfType<MdDropdownMenu>()
@@ -360,9 +386,9 @@ public sealed class MdAcceptanceRegressionTests
         var status = page.GetLogicalDescendants().OfType<TextBlock>()
             .Single(text => text.Name == "ContextToolbarStatus");
 
-        trigger.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        PointerInput.Click(trigger);
         Assert.True(popup.IsOpen);
-        edit.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        PointerInput.Click(edit);
         Assert.False(popup.IsOpen);
         Assert.Equal("Edit selected.", status.Text);
     }
@@ -379,7 +405,7 @@ public sealed class MdAcceptanceRegressionTests
         Assert.True(editor.ShowClearButton);
         var clear = editor.GetVisualDescendants().OfType<MdIconButton>()
             .Single(button => button.Name == "PART_ClearButton");
-        clear.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        PointerInput.Click(clear);
         Dispatcher.UIThread.RunJobs();
         Assert.Equal(string.Empty, editor.Text);
         Assert.Equal(string.Empty, autocomplete.Text);
@@ -422,6 +448,9 @@ public sealed class MdAcceptanceRegressionTests
         {
             Dispatcher.UIThread.RunJobs();
             var host = gallery.GetVisualDescendants().OfType<ContentControl>().Single(control => control.Name == "PageHost");
+            // Synthetic on purpose: this asserts navigation wiring, not reachability. A rail
+            // destination can legitimately be scrolled out of view, so a real pointer here
+            // would measure the scroll position rather than the thing under test.
             var getStarted = gallery.GetVisualDescendants().OfType<MdButton>().Single(button => button.Name == "GetStartedTopNav");
             getStarted.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Dispatcher.UIThread.RunJobs();

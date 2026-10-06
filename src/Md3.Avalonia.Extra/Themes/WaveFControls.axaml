@@ -60,9 +60,12 @@
     <Setter Property="Template">
       <ControlTemplate TargetType="ToggleButton">
         <Border x:Name="PART_Surface" Background="{TemplateBinding Background}" CornerRadius="20" ClipToBounds="True">
-          <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+          <Grid>
+            <!-- The state layer has to fill the 40 DIP circle. It used to sit inside a centred
+                 grid, so it was sized by the 16 DIP glyph and painted a small square instead. -->
+            <Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                    CornerRadius="20" IsHitTestVisible="False" Opacity="0" />
             <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-            <Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsHitTestVisible="False" Opacity="0" />
           </Grid>
         </Border>
       </ControlTemplate>
@@ -114,13 +117,11 @@
                   Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round"
                   RenderTransformOrigin="50%,50%">
               <Path.RenderTransform>
-                <RotateTransform Angle="{Binding ExpansionAngle}">
-                  <RotateTransform.Transitions>
-                    <Transitions>
-                      <DoubleTransition Property="Angle" Duration="0:0:0.2" Easing="0.05, 0.7, 0.1, 1.0" />
-                    </Transitions>
-                  </RotateTransform.Transitions>
-                </RotateTransform>
+                <!-- No transition on Angle. Expanding a node rebuilds the whole flattened row
+                     list, so every container rebinds to a different row: an animated Angle made
+                     unrelated chevrons rotate at the same time, which read as one click toggling
+                     several nodes. The rotation is now instant and strictly per node. -->
+                <RotateTransform Angle="{Binding ExpansionAngle}" />
               </Path.RenderTransform>
             </Path>
           </ToggleButton>

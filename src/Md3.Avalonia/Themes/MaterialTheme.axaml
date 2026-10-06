@@ -14,6 +14,7 @@
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/ComboBoxTokens.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/ActionButtonTokens.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/ToolbarTokens.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/ContainmentTokens.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdTopLevel.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdFoundation.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdDesktopAdapters.axaml" />
@@ -55,6 +56,7 @@
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdRangeSlider.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdDateRangePicker.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdTabView.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdTabsView.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdMenuAnchor.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdScaffold.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdFlutterParity.axaml" />

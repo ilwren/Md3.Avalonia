@@ -10,10 +10,93 @@ on:
       - main
   workflow_dispatch:
 
+# A new push makes the previous run's answer irrelevant. Cancelling it frees the runner
+# immediately instead of letting two builds of the same branch compete for it.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: 'true'
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 'true'
+  # The terminal logger spends real time redrawing progress that nobody watches in CI.
+  DOTNET_CLI_UI_LANGUAGE: en
+  MSBUILDTERMINALLOGGER: 'off'
+
+# Least privilege, declared rather than inherited: the conformance publisher needs to write a
+# pull request comment, and relying on the repository-wide default would make this workflow's
+# behaviour depend on a setting that is not in the repository.
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
+  # ---------------------------------------------------------------------------------------------
+  # Pure Python, no SDK, no restore: finishes in seconds and fails the run before a two-minute
+  # build starts. Every check here is one that used to be either invisible or buried at the end.
+  # ---------------------------------------------------------------------------------------------
+  static-checks:
+    name: Static checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify embedded official fonts
+        run: |
+          mkdir -p src/Md3.Avalonia.Icons/Assets/Fonts
+          python3 scripts/verify-fonts.py
+
+      - name: Lint design tokens
+        run: python3 scripts/lint-design-tokens.py --github --summary
+
+      - name: Check API documentation coverage
+        # docs/API.md drifted into documenting properties that did not exist and omitting
+        # 80 public types. This is static, so it costs nothing to hold the line.
+        run: python3 scripts/check-api-doc-coverage.py
+
+      - name: Check the specification oracle against pinned upstream sources
+        # Network-dependent and advisory by design: upstream moving is a re-baselining
+        # decision for a human, not a build failure. --soft keeps it off the critical path.
+        continue-on-error: true
+        run: python3 scripts/sync-spec-tokens.py --soft
+
+      - name: Publish static analysis report
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/publish-conformance.py
+
+      - name: Upload static analysis reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-checks
+          path: artifacts/spec/
+          if-no-files-found: ignore
+
+  # ---------------------------------------------------------------------------------------------
+  # One restore, one build graph, one test run.
+  #
+  # Deliberately NOT here any more:
+  #   * NuGet packaging  -> .github/workflows/build-nuget.yml already runs `scripts/build-nuget.sh`
+  #                         on push to main/arena/** and on every PR to main, from a clean tree.
+  #                         Running it twice per commit cost a full extra rebuild of all four
+  #                         packaged projects for an identical answer.
+  #   * Multi-OS gallery -> .github/workflows/build-gallery.yml covers Linux, Windows and macOS on
+  #                         the same triggers. The Linux Desktop head is still built below because
+  #                         it is nearly free once the shared graph is compiled, and it is what
+  #                         produces the inline compiler annotations.
+  # ---------------------------------------------------------------------------------------------
   build-and-test:
     name: Build & Test
+    needs: static-checks
     runs-on: ubuntu-latest
+    # The suite runs in well under two minutes. A generous margin still catches a deadlocked
+    # test quickly instead of letting it occupy a runner all day.
+    timeout-minutes: 8
 
     steps:
       - name: Checkout repository
@@ -24,42 +107,73 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Verify embedded official fonts
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('Directory.Packages.props', '**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      # Restoring both heads once up front lets every later command run --no-restore. The old
+      # pipeline restored the same graph three separate times.
+      - name: Restore
         run: |
-          mkdir -p src/Md3.Avalonia.Icons/Assets/Fonts
-          python3 scripts/verify-fonts.py
+          dotnet restore gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj
+          dotnet restore tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj
 
       - name: Build Gallery Desktop
         shell: bash
         run: |
-          set +e
-          set -o pipefail
-          dotnet build gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj -c Release 2>&1 | tee gallery-build.log
-          status=${PIPESTATUS[0]}
-          if [ "$status" -ne 0 ]; then
-            grep -E 'error (CS|AVLN|MSB)[0-9]+|: error :' gallery-build.log | head -50 | while IFS= read -r line; do
-              line=${line//'%'/'%25'}
-              line=${line//$'\r'/'%0D'}
-              line=${line//$'\n'/'%0A'}
-              echo "::error title=.NET build failed::$line"
-            done
-          fi
-          exit "$status"
+          scripts/ci-build.sh \
+            gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj \
+            "Gallery Desktop"
 
-      - name: Run Headless Tests
-        run: dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --logger "trx;LogFileName=results.trx" --logger "console;verbosity=normal"
+      - name: Build tests
+        shell: bash
+        run: |
+          scripts/ci-build.sh \
+            tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
+            "Headless tests"
 
-      - name: Summarize Headless Test Results
-        if: always()
+      - name: Run headless tests
+        id: tests
+        env:
+          # Documentation preview bitmaps are asset generation, not verification. They are
+          # produced only on main, where the artefact is actually published.
+          MD3_WRITE_PREVIEWS: ${{ github.ref == 'refs/heads/main' && '1' || '0' }}
+        run: |
+          dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
+            -c Release --no-build --no-restore \
+            --logger "trx;LogFileName=results.trx" \
+            --logger "console;verbosity=normal"
+
+      # Only meaningful once the test runner actually produced a .trx. Running it after a
+      # compile failure would add a second red step that says nothing about the real cause.
+      - name: Summarize headless test results
+        if: always() && steps.tests.outcome != 'skipped'
         run: python3 scripts/report-test-results.py
 
-      - name: Upload Headless Test Evidence
+      - name: Publish specification conformance reports
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/publish-conformance.py
+
+      - name: Upload test and conformance evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: headless-test-results
-          path: '**/results.trx'
+          path: |
+            **/results.trx
+            artifacts/spec/
           if-no-files-found: warn
 
-      - name: Verify NuGet Packaging
-        run: bash scripts/build-nuget.sh
+      - name: Upload documentation previews
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-previews
+          path: tests/Md3.Avalonia.HeadlessTests/bin/Release/net10.0/*.png
+          if-no-files-found: ignore

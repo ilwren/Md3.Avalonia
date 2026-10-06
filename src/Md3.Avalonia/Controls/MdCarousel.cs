@@ -42,6 +42,19 @@ public sealed class MdCarousel : ListBox
     public static readonly StyledProperty<MdCarouselController?> ControllerProperty =
         AvaloniaProperty.Register<MdCarousel, MdCarouselController?>(nameof(Controller));
 
+    /// <summary>
+    /// Width the item template lays its content out at, regardless of how far the item itself has
+    /// been squeezed by the keyline arrangement. Material shrinks a carousel item by *masking* it,
+    /// not by reflowing what is inside: a 56 DIP small item still shows the left edge of a full
+    /// card. Laying the content out at the small extent instead collapses labels to an ellipsis,
+    /// or wraps them one character per line.
+    /// </summary>
+    public static readonly AttachedProperty<double> ContentExtentProperty =
+        AvaloniaProperty.RegisterAttached<MdCarousel, Control, double>("ContentExtent", double.NaN);
+
+    public static double GetContentExtent(Control control) => control.GetValue(ContentExtentProperty);
+    public static void SetContentExtent(Control control, double value) => control.SetValue(ContentExtentProperty, value);
+
     private readonly DispatcherTimer _autoPlayTimer = new();
     private readonly DispatcherTimer _wheelSnapTimer = new();
     private readonly DispatcherTimer _settleCleanupTimer = new();
@@ -237,6 +250,7 @@ public sealed class MdCarousel : ListBox
             MdMotionTransitions.CreateDouble(this, WidthProperty, MdMotionKind.Spatial));
         container.SetCurrentValue(WidthProperty, GetTargetWidth(index));
         container.SetCurrentValue(HeightProperty, ItemHeight);
+        SetContentExtent(container, GetArrangement().Large);
         container.SetCurrentValue(MarginProperty, FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft
             ? new Thickness(ItemSpacing, 0, 0, 0)
             : new Thickness(0, 0, ItemSpacing, 0));
@@ -250,10 +264,11 @@ public sealed class MdCarousel : ListBox
         }
     }
 
-    private double GetTargetWidth(int index)
+    /// <summary>The keyline extents, and how many large items the viewport has room for.</summary>
+    private (double Large, double Small, int LargeCount) GetArrangement()
     {
         var preferredLarge = Math.Max(0, ItemWidth);
-        if (index < 0 || Variant == MdCarouselVariant.Uncontained) return preferredLarge;
+        if (Variant == MdCarouselVariant.Uncontained) return (preferredLarge, preferredLarge, Math.Max(1, ItemCount));
 
         var preferredSmall = Math.Min(preferredLarge, Math.Clamp(SmallItemWidth, 40, 56));
         var viewport = GetLayoutViewportWidth();
@@ -289,13 +304,55 @@ public sealed class MdCarousel : ListBox
             small = Math.Min(small, large);
         }
 
-        var distance = Math.Abs(index - _layoutAnchorIndex);
-        if (distance == 0) return large;
+        // One large item and one medium one is a phone arrangement. Applied to a desktop-width
+        // carousel it left everything past the second item collapsed to the 56 DIP small keyline
+        // and well over half the viewport empty. Material tiles as many large items as fit and
+        // tapers only at the trailing edge, so count them instead of assuming one.
+        var largeCount = 1;
+        if (viewport > 0 && large > 0 && Variant != MdCarouselVariant.CenterAligned)
+        {
+            var gap = Math.Max(0, ItemSpacing);
+            var medium = (large + small) / 2;
+            for (var n = 1; n <= Math.Min(ItemCount, 24); n++)
+            {
+                var width = n * large + (n - 1) * gap;
+                var rest = ItemCount - n;
+                if (rest > 0)
+                {
+                    width += gap + (Variant == MdCarouselVariant.MultiBrowse && rest > 1
+                        ? medium + gap + small
+                        : small);
+                }
+
+                if (width > viewport) break;
+                largeCount = n;
+            }
+        }
+
+        return (large, small, largeCount);
+    }
+
+    private double GetTargetWidth(int index)
+    {
+        var (large, small, largeCount) = GetArrangement();
+        if (index < 0 || Variant == MdCarouselVariant.Uncontained) return large;
+
+        // Center-aligned is symmetric about the focal item by definition.
+        if (Variant == MdCarouselVariant.CenterAligned)
+            return index == _layoutAnchorIndex ? large : small;
+
+        // Material tapers from the focal item towards the trailing edge, so measure forward from
+        // the anchor rather than symmetrically. A symmetric window hands out 2 * largeCount - 1
+        // large items and overflows the very arrangement the count was solved for. Items behind
+        // the anchor are already scrolled past; keeping them at the large extent is what lets
+        // ScrollToSelected's running total agree with where they actually landed.
+        var offset = index - _layoutAnchorIndex;
+        if (offset < largeCount) return large;
         return Variant switch
         {
             // Material Components Android derives the medium keyline from the midpoint between
             // the current small and large arrangement sizes.
-            MdCarouselVariant.MultiBrowse when distance == 1 => (large + small) / 2,
+            MdCarouselVariant.MultiBrowse when offset == largeCount => (large + small) / 2,
             MdCarouselVariant.MultiBrowse => small,
             MdCarouselVariant.Hero => small,
             MdCarouselVariant.CenterAligned => small,

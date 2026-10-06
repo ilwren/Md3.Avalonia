@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "_readme": [
+    "Ratchet control for the specification conformance harness (layers L1/L2/L3/L5).",
+    "",
+    "mode = bootstrap  -> every gap is written to artifacts/spec/*.md and the job SUMMARY, but the",
+    "                     test suite still passes. Use this while the gap list is being triaged.",
+    "mode = enforce    -> gaps whose oracle entry has confidence=high fail the test run unless they",
+    "                     are listed in waivers[]. confidence=medium gaps stay advisory in both modes.",
+    "",
+    "The intended workflow is one-directional: read artifacts/spec/gap-report.md, fix or waive every",
+    "high-confidence entry, then flip mode to enforce. Flipping back to bootstrap is a regression and",
+    "should be called out in review.",
+    "",
+    "A waiver is a deliberate, documented divergence. 'reason' is mandatory and is reproduced in the",
+    "generated report so that nobody has to diff this file to understand the divergence."
+  ],
+  "mode": "enforce",
+  "layers": {
+    "L1_tokens": {
+      "enabled": true
+    },
+    "L2_geometry": {
+      "enabled": true
+    },
+    "L3_visual": {
+      "enabled": true,
+      "autoAcceptMissingBaseline": true
+    },
+    "L5_motion": {
+      "enabled": true
+    }
+  },
+  "visual": {
+    "_readme": [
+      "maxChangedPixelRatio is the fraction of pixels allowed to differ by more than perChannelTolerance.",
+      "Text rasterisation differs between Linux/macOS/Windows Skia builds, so golden comparison is only",
+      "enforced on the baselineOs runner; elsewhere the diff is reported, never failed."
+    ],
+    "baselineOs": "Linux",
+    "perChannelTolerance": 12,
+    "maxChangedPixelRatio": 0.004
+  },
+  "waivers": [
+    {
+      "id": "combobox-menu-item-72",
+      "layer": "L1_tokens",
+      "keys": [
+        "Md.Comp.MenuItem.Container.Height"
+      ],
+      "reason": "Md.Comp.ComboBox.MenuItem.MinHeight is intentionally 72dp (two-line item with supporting text), which is a documented MdDecision rather than the 48dp single-line menu item.",
+      "expires": null
+    }
+  ]
+}

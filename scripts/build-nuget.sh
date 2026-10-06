@@ -4,12 +4,20 @@ set -Eeuo pipefail
 usage() {
   cat <<'EOF'
 Build the release NuGet packages for Md3.Avalonia, Md3.Avalonia.Icons,
-Md3.Avalonia.Icons.Lite, and Md3.Avalonia.Extra.
+Md3.Avalonia.Icons.Lite, Md3.Avalonia.Extra, Md3.Avalonia.DataGrid and
+Md3.Avalonia.RichEditor.
 
 Usage:
   scripts/build-nuget.sh [--output /absolute/or/relative/path]
                          [--configuration Release]
                          [--no-restore]
+                         [--keep-intermediate]
+
+By default the script deletes bin/ and obj/ for the six packaged projects before and
+after packing, so a release artifact can never pick up a stale intermediate. Pass
+--keep-intermediate when a CI job has already produced the same configuration and the
+run is a packaging *check* rather than a release build; that reuses the existing
+compilation instead of paying for a second full rebuild.
 
 The repository includes the pinned official Material Symbols Rounded fonts.
 Their provenance and checksums are verified before packaging.
@@ -22,6 +30,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONFIGURATION="Release"
 OUTPUT="$ROOT/artifacts/nuget"
 RESTORE=1
+KEEP_INTERMEDIATE=0
 
 while (($#)); do
   case "$1" in
@@ -33,6 +42,8 @@ while (($#)); do
       CONFIGURATION="$2"; shift 2 ;;
     --no-restore)
       RESTORE=0; shift ;;
+    --keep-intermediate)
+      KEEP_INTERMEDIATE=1; shift ;;
     -h|--help)
       usage; exit 0 ;;
     *)
@@ -57,6 +68,8 @@ PROJECTS=(
   "$ROOT/src/Md3.Avalonia.Icons/Md3.Avalonia.Icons.csproj"
   "$ROOT/src/Md3.Avalonia.Icons.Lite/Md3.Avalonia.Icons.Lite.csproj"
   "$ROOT/src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj"
+  "$ROOT/src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj"
+  "$ROOT/src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj"
 )
 
 if command -v python3 >/dev/null 2>&1; then
@@ -69,10 +82,16 @@ else
 fi
 
 cleanup_intermediate() {
+  # Must return 0 on every path: this runs both directly and from the EXIT trap under `set -e`.
+  if ((KEEP_INTERMEDIATE)); then
+    return 0
+  fi
   find "$ROOT/src/Md3.Avalonia" \
        "$ROOT/src/Md3.Avalonia.Icons" \
        "$ROOT/src/Md3.Avalonia.Icons.Lite" \
        "$ROOT/src/Md3.Avalonia.Extra" \
+       "$ROOT/src/Md3.Avalonia.DataGrid" \
+       "$ROOT/src/Md3.Avalonia.RichEditor" \
        -type d \( -name bin -o -name obj \) -prune -exec rm -rf {} + 2>/dev/null || true
 }
 trap cleanup_intermediate EXIT
@@ -95,7 +114,7 @@ done
 
 VERSION="$(sed -n 's:.*<Version>\([^<]*\)</Version>.*:\1:p' "${PROJECTS[0]}" | head -1)"
 [[ -n "$VERSION" ]] || { echo "error: package version is missing" >&2; exit 1; }
-PACKAGE_IDS=(Md3.Avalonia Md3.Avalonia.Icons Md3.Avalonia.Icons.Lite Md3.Avalonia.Extra)
+PACKAGE_IDS=(Md3.Avalonia Md3.Avalonia.Icons Md3.Avalonia.Icons.Lite Md3.Avalonia.Extra Md3.Avalonia.DataGrid Md3.Avalonia.RichEditor)
 for package_id in "${PACKAGE_IDS[@]}"; do
   for extension in nupkg snupkg; do
     package="$OUTPUT/$package_id.$VERSION.$extension"
@@ -103,9 +122,12 @@ for package_id in "${PACKAGE_IDS[@]}"; do
   done
 done
 
+# Derived rather than written down, so adding a package cannot leave this behind: one .nupkg
+# and one .snupkg each.
+EXPECTED_COUNT=$((${#PACKAGE_IDS[@]} * 2))
 PACKAGE_COUNT="$(find "$OUTPUT" -maxdepth 1 -type f \( -name '*.nupkg' -o -name '*.snupkg' \) | wc -l | tr -d '[:space:]')"
-if ((PACKAGE_COUNT != 8)); then
-  echo "error: expected exactly 8 package files for version $VERSION, found $PACKAGE_COUNT in $OUTPUT" >&2
+if ((PACKAGE_COUNT != EXPECTED_COUNT)); then
+  echo "error: expected exactly $EXPECTED_COUNT package files for version $VERSION, found $PACKAGE_COUNT in $OUTPUT" >&2
   exit 1
 fi
 

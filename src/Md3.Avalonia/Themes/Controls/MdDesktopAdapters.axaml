@@ -165,6 +165,9 @@
           <ContentPresenter Name="PART_ContentPresenter"
                             Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
                             HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+          <!-- 15 = the 8 DIP of label space above the text field's PART_Container, plus the
+               (56 - 42) / 2 that centres the pair on the 56 DIP input row. Centring the panel on
+               the spinner itself instead puts it 8 DIP too high; the offset is not decoration. -->
           <StackPanel Name="PART_SpinnerPanel" Width="32" Height="42"
                       Margin="0,15,8,0" VerticalAlignment="Top" HorizontalAlignment="Right"
                       Background="Transparent" Spacing="2" ZIndex="2"
@@ -177,7 +180,10 @@
             </RepeatButton>
             <RepeatButton Name="PART_DecreaseButton" Theme="{StaticResource MdNumericSpinnerButtonTheme}"
                           HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
-              <Path Width="12" Height="12" Data="{StaticResource Md.Numeric.Minus}" Stretch="Uniform"
+              <!-- Height matches the bar's own 12x2 ink. Declaring 12x12 like the plus made
+                   Stretch="Uniform" scale by 1 and seat the geometry at the top of the box, so
+                   the minus rode about 5 DIP above the centre of its target. -->
+              <Path Width="12" Height="2" Data="{StaticResource Md.Numeric.Minus}" Stretch="Uniform"
                     HorizontalAlignment="Center" VerticalAlignment="Center"
                     Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
             </RepeatButton>
@@ -349,12 +355,25 @@
                 BasedOn="{StaticResource {x:Type md:MdWindow}}">
     <Setter Property="UseLayoutRounding" Value="True" />
     <Setter Property="WindowDecorationsTheme" Value="{StaticResource MdBorderlessWindowDrawnDecorationsTheme}" />
+    <!-- PART_WindowFrame below rounds its own corners, but the window's client area was still
+         painted opaque and square behind it, so the OS surface showed through at every corner:
+         a rounded card floating inside a square window. The corner radius has to be cut out of
+         the window itself, which means the window stops painting a background and asks the
+         compositor for a transparent surface. The fallback keeps the old opaque look on
+         platforms that refuse transparency rather than dropping to white. -->
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="TransparencyLevelHint" Value="Transparent" />
+    <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdBorderlessWindow">
         <Grid Background="Transparent">
+          <!-- Not {TemplateBinding Background}: the setter above makes that Transparent so the
+               compositor can cut the corners, so binding to it left the rounded frame painting
+               nothing at all. TransparencyBackgroundFallback is this window's opaque colour,
+               it is themed to the Material surface, and callers can still override it. -->
           <Border x:Name="PART_WindowFrame"
                   Margin="1"
-                  Background="{TemplateBinding Background}"
+                  Background="{TemplateBinding TransparencyBackgroundFallback}"
                   BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
                   BorderThickness="1"
                   CornerRadius="9"

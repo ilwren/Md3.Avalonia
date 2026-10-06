@@ -22,6 +22,9 @@
   <CornerRadius x:Key="Md.Sys.Shape.Corner.None">0</CornerRadius><CornerRadius x:Key="Md.Sys.Shape.Corner.ExtraSmall">4</CornerRadius>
   <CornerRadius x:Key="Md.Sys.Shape.Corner.Small">8</CornerRadius><CornerRadius x:Key="Md.Sys.Shape.Corner.Medium">12</CornerRadius>
   <CornerRadius x:Key="Md.Sys.Shape.Corner.Large">16</CornerRadius><CornerRadius x:Key="Md.Sys.Shape.Corner.ExtraLarge">28</CornerRadius>
+  <!-- The two steps M3 Expressive added after this scale was first frozen. Purely additive:
+       nothing references them yet, and no existing corner value changes. -->
+  <CornerRadius x:Key="Md.Sys.Shape.Corner.LargeIncreased">20</CornerRadius><CornerRadius x:Key="Md.Sys.Shape.Corner.ExtraLargeIncreased">32</CornerRadius>
   <CornerRadius x:Key="Md.Sys.Shape.Corner.Full">999</CornerRadius><x:Double x:Key="Md.Sys.Shape.Scale">1</x:Double>
 
   <x:Double x:Key="Md.Sys.Spacing.0">0</x:Double><x:Double x:Key="Md.Sys.Spacing.1">4</x:Double><x:Double x:Key="Md.Sys.Spacing.2">8</x:Double>

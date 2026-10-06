@@ -14,14 +14,15 @@
                  Placement="{TemplateBinding Placement}"
                  PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                  WindowManagerAddShadowHint="False">
+            <Popup.Styles><Style Selector="PopupRoot"><Setter Property="Background" Value="Transparent" /><Setter Property="TransparencyLevelHint" Value="Transparent" /><Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /></Style></Popup.Styles>
             <Border x:Name="PART_MenuSurface"
                     Padding="0"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
                     BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}"
-                    CornerRadius="4"
+                    CornerRadius="{DynamicResource Md.Comp.Menu.Container.Shape}"
                     ClipToBounds="True"
                     Opacity="0"
-                    RenderTransform="scale(0.8) translate(0px,-8px)"
+                    RenderTransform="scale(0.8)"
                     RenderTransformOrigin="0%,0%">
               <ContentPresenter Content="{TemplateBinding Menu}" />
             </Border>
@@ -41,7 +42,7 @@
       <ControlTemplate TargetType="md:MdSubMenuItem">
         <Grid>
           <Border x:Name="PART_Row" MinHeight="48" Padding="12,0"
-                  Background="{TemplateBinding Background}" CornerRadius="4" ClipToBounds="True">
+                  Background="{TemplateBinding Background}" CornerRadius="{DynamicResource Md.Comp.Menu.Container.Shape}" ClipToBounds="True">
             <Grid>
               <Grid ColumnDefinitions="Auto,*,Auto">
                 <ContentPresenter x:Name="PART_Leading" Content="{TemplateBinding LeadingContent}" />

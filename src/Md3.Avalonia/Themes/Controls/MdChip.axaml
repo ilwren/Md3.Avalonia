@@ -2,17 +2,23 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:md="using:Md3.Avalonia.Controls">
   <ControlTheme x:Key="{x:Type md:MdChip}" TargetType="md:MdChip">
-    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="MinHeight" Value="{DynamicResource Md.Comp.Chip.Container.Height}" />
     <Setter Property="Padding" Value="12,0" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Outline.Brush}" />
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Md.Comp.Chip.Container.Shape}" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdChip">
+        <!-- Material specifies a 32dp chip and, separately, a 48dp minimum pointer target. Both
+             are satisfied by keeping the container at 32dp and centring it in a 48dp transparent
+             region, which is how the specification itself resolves the two numbers. The chip
+             still looks 32dp tall; it just stops dropping taps near its edge. -->
+        <Grid MinHeight="{DynamicResource Md.Comp.Chip.Target.Height}" Background="Transparent">
         <Border x:Name="PART_Container"
+                VerticalAlignment="Center"
                 MinHeight="{TemplateBinding MinHeight}"
                 Background="{TemplateBinding Background}"
                 BorderBrush="{TemplateBinding BorderBrush}"
@@ -23,7 +29,7 @@
             <Grid Margin="{TemplateBinding Padding}" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
               <Grid x:Name="PART_LeadingHost" Grid.Column="0" IsVisible="False">
                 <ContentPresenter x:Name="PART_LeadingIcon"
-                                  Width="18" Height="18"
+                                  Width="{DynamicResource Md.Comp.Chip.Icon.Size}" Height="{DynamicResource Md.Comp.Chip.Icon.Size}"
                                   Content="{TemplateBinding LeadingIcon}"
                                   Foreground="{TemplateBinding Foreground}"
                                   IsVisible="False" />
@@ -43,7 +49,7 @@
                                 Foreground="{TemplateBinding Foreground}" />
               <Grid x:Name="PART_TrailingHost" Grid.Column="2" IsVisible="False">
                 <ContentPresenter x:Name="PART_TrailingIcon"
-                                  Width="18" Height="18"
+                                  Width="{DynamicResource Md.Comp.Chip.Icon.Size}" Height="{DynamicResource Md.Comp.Chip.Icon.Size}"
                                   Content="{TemplateBinding TrailingIcon}"
                                   Foreground="{TemplateBinding Foreground}"
                                   IsVisible="False" />
@@ -61,6 +67,7 @@
             <md:MdRipplePresenter RippleBrush="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
           </Grid>
         </Border>
+        </Grid>
       </ControlTemplate>
     </Setter>
     <Style Selector="^:assist">
@@ -86,6 +93,15 @@
     </Style>
     <Style Selector="^:removable /template/ md|MdIconButton#PART_RemoveButton">
       <Setter Property="IsVisible" Value="True" />
+      <!-- MdIconButton defaults to a standalone 48dp target. Nested here it set the floor for
+           the whole chip, which is why an input chip measured 50dp against a 32dp specification.
+           Inside a chip the chip body is the target, so the button collapses to the 18dp trailing
+           icon M3 specifies. -->
+      <Setter Property="MinWidth" Value="{DynamicResource Md.Comp.Chip.Icon.Size}" />
+      <Setter Property="MinHeight" Value="{DynamicResource Md.Comp.Chip.Icon.Size}" />
+      <Setter Property="ContainerWidth" Value="{DynamicResource Md.Comp.Chip.Icon.Size}" />
+      <Setter Property="ContainerHeight" Value="{DynamicResource Md.Comp.Chip.Icon.Size}" />
+      <Setter Property="IconSize" Value="{DynamicResource Md.Comp.Chip.Icon.Size}" />
     </Style>
     <Style Selector="^:filter:checked">
       <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />

@@ -16,7 +16,13 @@
                 CornerRadius="{TemplateBinding CornerRadius}"
                 ClipToBounds="True">
           <Grid>
-            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+            <!-- Width is the carousel's large keyline extent, not this item's. Material masks a
+                 shrinking carousel item; it does not reflow its content. Letting the presenter
+                 take the small extent is what collapsed labels to "…" and wrapped hero side
+                 items one character per line. NaN outside a carousel, so this is inert then. -->
+            <ContentPresenter x:Name="PART_ContentHost"
+                              Width="{TemplateBinding (md:MdCarousel.ContentExtent)}"
+                              HorizontalAlignment="Left"
                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                               Content="{TemplateBinding Content}"
                               ContentTemplate="{TemplateBinding ContentTemplate}"

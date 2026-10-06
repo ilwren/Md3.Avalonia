@@ -6,6 +6,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Md3.Avalonia.Controls;
 using Md3.Avalonia.Extra.Infrastructure;
 using Md3.Avalonia.Motion;
 
@@ -27,6 +28,7 @@ public class MdPopover : TemplatedControl
 
     private readonly MdFocusReturnScope _focusReturn = new();
     private readonly MdPresenceController _popupPresence;
+    private readonly MdBackScope _backScope;
     private Button? _anchorButton;
     private InputElement? _popoverInput;
     private ScrollViewer? _ownerScrollViewer;
@@ -43,6 +45,7 @@ public class MdPopover : TemplatedControl
 
     public MdPopover()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _popupPresence = new MdPresenceController(SetPopupPresence);
         _popupPresence.Initialize(IsOpen);
         UpdateState();
@@ -162,12 +165,23 @@ public class MdPopover : TemplatedControl
         else
         {
             UpdateState();
+            EcosystemPopupCoordinator.Close(this);
             _popupPresence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
             DetachPopoverInput();
             if (RestoreFocusOnClose) _focusReturn.Restore();
             Closed?.Invoke(this, EventArgs.Empty);
         }
         UpdateSurfaceHitTesting();
+        _backScope.Update(IsOpen);
+    }
+
+    // Android sends a back request where desktop sends Escape. Without this the gesture falls
+    // through to the platform and pops the activity while the surface is still open.
+    private bool OnBackRequested()
+    {
+        if (!IsOpen) return false;
+        Dismiss();
+        return true;
     }
 
     private void SetPopupPresence(bool value)
@@ -231,17 +245,37 @@ public class MdPopover : TemplatedControl
 
     private void UpdateState() { PseudoClasses.Set(":open", IsOpen); PseudoClasses.Set(":closed", !IsOpen); }
 
+    /// <summary>
+    /// Tracks the one popover that is currently open, so opening a second one closes the first.
+    /// </summary>
     private static class EcosystemPopupCoordinator
     {
         private static WeakReference<MdPopover>? _open;
+        private static int _openThreadId;
+
         public static void Open(MdPopover current)
         {
-            if (_open?.TryGetTarget(out var previous) == true && !ReferenceEquals(previous, current))
+            // Only reach into the previous popover from the thread that opened it. Avalonia
+            // permits more than one UI thread, and a popover owned by another one cannot be
+            // touched from here: Dismiss would throw before this popover ever opened.
+            if (_open?.TryGetTarget(out var previous) == true && !ReferenceEquals(previous, current) &&
+                _openThreadId == Environment.CurrentManagedThreadId)
             {
                 previous.Dismiss();
                 previous.ClosePopupImmediately();
             }
             _open = new WeakReference<MdPopover>(current);
+            _openThreadId = Environment.CurrentManagedThreadId;
+        }
+
+        /// <summary>
+        /// Deregisters a popover as it closes. Without this a closed popover stays on record as
+        /// "the open one" for as long as it is alive, and the next popover to open anywhere in
+        /// the process re-dismisses a surface that is already gone.
+        /// </summary>
+        public static void Close(MdPopover current)
+        {
+            if (IsCurrent(current)) _open = null;
         }
 
         public static bool IsCurrent(MdPopover candidate) =>

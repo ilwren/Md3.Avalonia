@@ -18,7 +18,7 @@
           <TextBlock Classes="h2" Text="Spring physics comparison" />
           <md:MdButton Grid.Column="1" Content="Play motion" Variant="Filled" Click="PlayMotion" />
         </Grid>
-        <Grid Width="520" HorizontalAlignment="Left" ColumnDefinitions="140,*,56" ColumnSpacing="12">
+        <Grid MaxWidth="520" HorizontalAlignment="Stretch" ColumnDefinitions="140,*,56" ColumnSpacing="12">
           <TextBlock VerticalAlignment="Center" Text="Playback speed" />
           <md:MdSlider x:Name="MotionSpeedSlider" Grid.Column="1" Minimum="0.5" Maximum="2" Value="1"
                        SmallChange="0.1" TickFrequency="0.25" IsSnapToTickEnabled="True"

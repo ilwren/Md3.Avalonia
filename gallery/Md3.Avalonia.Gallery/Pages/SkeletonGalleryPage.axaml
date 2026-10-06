@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.SkeletonGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Skeleton" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A shimmering placeholder that occupies the same space as the content it stands in for, so nothing jumps when loading finishes." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <md:MdButton Content="Toggle loading" Variant="Tonal" HorizontalAlignment="Left" Click="ToggleSkeleton" />
+        <eco:MdSkeleton x:Name="Skeleton" Height="72" IsLoading="True">
+          <Border Padding="16" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}">
+            <TextBlock Text="Loaded content" />
+          </Border>
+        </eco:MdSkeleton>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdSkeleton IsLoading=&quot;{Binding IsBusy}&quot;&gt;&#10;  &lt;Border&gt;...&lt;/Border&gt;&#10;&lt;/eco:MdSkeleton&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

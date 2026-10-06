@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -272,6 +273,92 @@ public sealed class MdParityHardeningTests
         Assert.Equal(root.Bounds.Width, state.Bounds.Width, precision: 3);
         Assert.Equal(root.Bounds.Height, state.Bounds.Height, precision: 3);
     }
+
+    [AvaloniaFact]
+    public void A_Form_Field_With_No_Supporting_Text_Reserves_No_Row_For_It()
+    {
+        var field = new MdFormField { Content = new MdTextBox { Label = "Name" } };
+        using var host = Show(field, 420, 220);
+
+        var supporting = Named<ContentPresenter>(field, "PART_Supporting");
+        Assert.False(supporting.IsVisible);
+        Assert.Equal(0, supporting.Bounds.Height);
+
+        field.SupportingText = "We never share this.";
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(supporting.IsVisible);
+        Assert.True(supporting.Bounds.Height > 0);
+    }
+
+    [AvaloniaFact]
+    public void A_Form_Field_Error_Replaces_Its_Supporting_Text_Rather_Than_Stacking()
+    {
+        var field = new MdFormField
+        {
+            IsRequired = true,
+            Value = string.Empty,
+            SupportingText = "We never share this.",
+            Content = new MdTextBox { Label = "Email" }
+        };
+        using var host = Show(field, 420, 240);
+
+        var supporting = Named<ContentPresenter>(field, "PART_Supporting");
+        var error = Named<TextBlock>(field, "PART_Error");
+        Assert.True(supporting.IsVisible);
+        Assert.False(error.IsVisible);
+
+        field.Validate();
+        Dispatcher.UIThread.RunJobs();
+
+        // M3 swaps the line; showing both says the same thing twice and shifts the layout.
+        Assert.True(error.IsVisible);
+        Assert.False(supporting.IsVisible);
+    }
+
+    [AvaloniaFact]
+    public void A_Form_Field_Indents_Both_Lines_To_The_Field_Edge()
+    {
+        var field = new MdFormField
+        {
+            SupportingText = "Helper",
+            Content = new MdTextBox { Label = "Name" }
+        };
+        using var host = Show(field, 420, 220);
+
+        // 16 DIP is the text field's inner edge, shared through the supporting-row token.
+        var expected = new Thickness(16, 4, 16, 0);
+        Assert.Equal(expected, Named<ContentPresenter>(field, "PART_Supporting").Margin);
+        Assert.Equal(expected, Named<TextBlock>(field, "PART_Error").Margin);
+    }
+
+    [AvaloniaFact]
+    public void A_Dropdown_Form_Field_Shows_One_Supporting_Line_Not_Two()
+    {
+        var field = new MdDropdownFormField
+        {
+            Label = "Country",
+            SupportingText = "Where you file taxes.",
+            ItemsSource = new[] { "Japan", "Peru" }
+        };
+        using var host = Show(field, 420, 240);
+
+        // The combo box owns the supporting and error rows; the form field must not add a
+        // second, unindented pair of its own.
+        Assert.DoesNotContain(field.GetVisualDescendants().OfType<ContentPresenter>(),
+            presenter => presenter.Name == "PART_Supporting");
+
+        var editor = Named<MdComboBox>(field, "PART_Editor");
+        Assert.Equal("Where you file taxes.", editor.SupportingText);
+
+        field.IsRequired = true;
+        field.Validate();
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(editor.IsError);
+        Assert.Equal(field.ErrorText, editor.ErrorText);
+    }
+
+    private static T Named<T>(Visual root, string name) where T : Visual =>
+        root.GetVisualDescendants().OfType<T>().Single(control => control.Name == name);
 
     private static Scope Show(Control content, double width, double height)
     {

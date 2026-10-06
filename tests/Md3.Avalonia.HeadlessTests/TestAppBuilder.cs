@@ -14,6 +14,8 @@ public sealed class TestApplication : Application
     {
         Styles.Add(new MaterialTheme());
         Styles.Add(new EcosystemTheme());
+        Styles.Add(new MaterialDataGridTheme());
+        Styles.Add(new MaterialRichEditorTheme());
     }
 }
 

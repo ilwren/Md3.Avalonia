@@ -23,6 +23,29 @@ public sealed class MdDataGridColumn : AvaloniaObject
     public GridLength Width { get => GetValue(WidthProperty); set => SetValue(WidthProperty, value); }
     public double MinimumWidth { get => GetValue(MinimumWidthProperty); set => SetValue(MinimumWidthProperty, value); }
     public bool IsEditable { get => GetValue(IsEditableProperty); set => SetValue(IsEditableProperty, value); }
+
+    /// <summary>
+    /// Reads the cell value without reflection. When set, <see cref="PropertyName"/> is used only
+    /// as the column key for sorting, and the model's properties no longer have to survive
+    /// trimming. Prefer this in a trimmed or size-sensitive application.
+    /// </summary>
+    public Func<object?, object?>? ValueSelector { get; set; }
+
+    /// <summary>
+    /// Writes an edited value back without reflection. Pair it with <see cref="ValueParser"/>
+    /// when the column is not a string column.
+    /// </summary>
+    public Action<object, object?>? ValueSetter { get; set; }
+
+    /// <summary>
+    /// Converts edited text to the model's value. When null the value is converted with the
+    /// target type's <see cref="System.ComponentModel.TypeConverter"/>, which needs reflection.
+    /// Return null to reject the edit.
+    /// </summary>
+    public Func<string?, object?>? ValueParser { get; set; }
+
+    internal object? Read(object? item) =>
+        ValueSelector is { } selector ? selector(item) : MdMemberAccess.GetValue(item, PropertyName);
 }
 
 public sealed class MdDataGridCellEditEventArgs(object item, MdDataGridColumn column, object? oldValue, object? newValue) : EventArgs
@@ -94,25 +117,50 @@ public sealed class MdDataGrid : ListBox
         var selection = SelectedItems;
         var rows = selectedOnly && selection is { Count: > 0 } ? selection.Cast<object?>() : (ItemsSource ?? Array.Empty<object>()).Cast<object?>();
         var header = string.Join('\t', Columns.Select(column => column.Header?.ToString() ?? column.PropertyName));
-        var values = rows.Select(item => string.Join('\t', Columns.Select(column => GetValue(item, column.PropertyName)?.ToString() ?? string.Empty)));
+        var values = rows.Select(item => string.Join('\t', Columns.Select(column => column.Read(item)?.ToString() ?? string.Empty)));
         return string.Join(Environment.NewLine, new[] { header }.Concat(values));
     }
     internal bool CommitEdit(object item, MdDataGridColumn column, string? text)
     {
-        var property = item.GetType().GetProperty(column.PropertyName, BindingFlags.Instance | BindingFlags.Public);
-        if (property?.CanWrite != true) return false;
-        var oldValue = property.GetValue(item);
+        var oldValue = column.Read(item);
         object? value;
-        try
+
+        if (column.ValueSetter is { } setter)
         {
-            var targetType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
-            value = targetType == typeof(string) ? text : TypeDescriptor.GetConverter(targetType).ConvertFromInvariantString(text ?? string.Empty);
+            // Fully reflection-free: the column knows how to parse and how to store.
+            if (column.ValueParser is { } parser)
+            {
+                value = parser(text);
+                if (value is null && !string.IsNullOrEmpty(text)) return false;
+            }
+            else
+            {
+                value = text;
+            }
+
+            var directArgs = new MdDataGridCellEditEventArgs(item, column, oldValue, value);
+            CellEditCommitting?.Invoke(this, directArgs);
+            if (directArgs.Cancel) return false;
+            setter(item, value);
+            return true;
         }
-        catch { return false; }
+
+        var accessor = MdMemberAccess.ForInstance(item, column.PropertyName);
+        if (accessor?.CanWrite != true) return false;
+        if (column.ValueParser is { } reflectionParser)
+        {
+            value = reflectionParser(text);
+            if (value is null && !string.IsNullOrEmpty(text)) return false;
+        }
+        else if (!MdMemberAccess.TryConvert(text, accessor.MemberType, out value))
+        {
+            return false;
+        }
+
         var args = new MdDataGridCellEditEventArgs(item, column, oldValue, value);
         CellEditCommitting?.Invoke(this, args);
         if (args.Cancel) return false;
-        property.SetValue(item, value);
+        accessor.Set(item, value);
         return true;
     }
 
@@ -140,13 +188,13 @@ public sealed class MdDataGrid : ListBox
         if (!string.IsNullOrWhiteSpace(FilterText))
         {
             var text = FilterText.Trim();
-            query = query.Where(item => Columns.Any(column => GetValue(item, column.PropertyName)?.ToString()?.Contains(text, StringComparison.OrdinalIgnoreCase) == true));
+            query = query.Where(item => Columns.Any(column => column.Read(item)?.ToString()?.Contains(text, StringComparison.OrdinalIgnoreCase) == true));
         }
         if (!string.IsNullOrWhiteSpace(SortColumn) && SortDirection is { } direction)
         {
             query = direction == ListSortDirection.Ascending
-                ? query.OrderBy(item => GetValue(item, SortColumn!), ObjectValueComparer.Instance)
-                : query.OrderByDescending(item => GetValue(item, SortColumn!), ObjectValueComparer.Instance);
+                ? query.OrderBy(item => ReadSortKey(item), ObjectValueComparer.Instance)
+                : query.OrderByDescending(item => ReadSortKey(item), ObjectValueComparer.Instance);
         }
         var selection = (SelectedItems ?? Array.Empty<object>()).Cast<object?>().ToHashSet();
         var view = query.ToArray();
@@ -157,7 +205,15 @@ public sealed class MdDataGrid : ListBox
         ViewChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    internal static object? GetValue(object? item, string propertyName) => item?.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public)?.GetValue(item);
+    // Sorting is keyed by column name, so honour that column's selector when it has one rather
+    // than falling back to reflection for the one read that happens most often.
+    private object? ReadSortKey(object? item)
+    {
+        var column = Columns.FirstOrDefault(candidate => candidate.PropertyName == SortColumn);
+        return column is not null ? column.Read(item) : MdMemberAccess.GetValue(item, SortColumn);
+    }
+
+    internal static object? GetValue(object? item, string propertyName) => MdMemberAccess.GetValue(item, propertyName);
     private sealed class ObjectValueComparer : IComparer<object?>
     {
         public static ObjectValueComparer Instance { get; } = new();
@@ -232,7 +288,7 @@ internal sealed class MdDataGridRowPresenter : Grid
             var column = Owner.Columns[index];
             ColumnDefinitions.Add(new ColumnDefinition(column.Width.Value, column.Width.GridUnitType) { MinWidth = column.MinimumWidth });
             Control cell;
-            var value = MdDataGrid.GetValue(Item, column.PropertyName);
+            var value = column.Read(Item);
             if (column.IsEditable)
             {
                 var editor = new TextBox { Text = value?.ToString(), Margin = new Thickness(8, 4), Background = null, BorderThickness = new Thickness(0) };

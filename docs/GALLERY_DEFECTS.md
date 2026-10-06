@@ -1,0 +1,561 @@
+# Gallery defect review — tracker
+
+Source: the 2026-10-04 review of the gallery and component library. Numbering follows the
+reported list. This file records the **root cause** for anything diagnosed, so the next pass does
+not repeat the search.
+
+Verification note: the development sandbox has no .NET SDK. Everything here is verified by
+compilation and headless tests in CI, not by looking at the running app. Items marked *visual*
+need confirmation on a real desktop run.
+
+## Fixed
+
+| # | Symptom | Root cause | Commit |
+|---|---------|-----------|--------|
+| 1 | Breadcrumb: the overlay covers the trail and no segment responds to a click | The ellipsis overflow popup was anchored to the whole control rather than to its own button, so it painted across the trail, and the segments were `TextBlock`s with no input surface. Both theme copies carried the same template and had to move together. | `8680142` |
+| 2 | Carousel: the caption text overflows and collides with the next item | Items were measured against the viewport instead of against the slot they actually occupy. Added a `ContentExtent` attached property and `GetArrangement()` so the item knows its own width before its text wraps. | `8680142` |
+| 5 | Segmented button: in the usage sample the selected item's label sits off-centre | Only the icon slot collapsed when an item had no icon, so a selected item reserved space for a check mark its neighbours did not. Keyed on a new `^:selected:has-selected-icon` state so the reservation matches what is drawn. | `8680142` |
+| 7 | Settings expander: the header's padding does not match the cards around it | `Padding` was consumed by the inner `PART_ContentArea` (`16,8`) while the header's own root `Grid` ignored it, so the two surfaces indented differently. The ToggleButton root now takes `Padding` and the content area drops to `0,4`. | `8680142` |
+| 27 | Container transform and animated visibility do not animate; they snap | The four motion controls toggled `IsVisible`, which is not a transition. Rebuilt on two new primitives: `MdRevealHost` yields layout space and clips as a fraction, `MdMorphPanel` interpolates between two children's measured extents. Shared axis now slides 30 DIP, fade-through scales from 0.92, container transform cross-fades 30/70 while its corner radius travels. Content that is already a `Control` is not re-parented, so it animates in place without an exit cross-fade. | `8680142` |
+| 3 | Nav bar / rail: the pressed overlay has square corners over a rounded indicator | The ripple sat in a `Grid` with `ClipToBounds`, and a Grid clips to a **rectangle**. Now clipped by a `Border` carrying the pill's corner radius. Rail had the same template. | `0e30402` |
+| 4 | Expanded search: after choosing a result, clearing and retyping never reopens the list | `MdSearchView` only hooked `KeyDown`; nothing watched the text. `CommitResult` writes the chosen text and dismisses, so only a host `Show()` could reopen it. Now reopens on header `TextChanged`, guarded by focus and by the committed text. | `6ec505a`, `bb36f45` |
+| 6 | `FontSize` on a settings card / group / expander title does nothing | The templates wrote `FontSize="16"/"14"` **directly on the presenters**. A literal inside a template outranks any value from outside. Moved to `ControlTheme` setters + `{TemplateBinding FontSize}`; defaults unchanged, now overridable. | `0e30402` |
+| 11 | Rich tooltip disappears before it can be reached (same on focus) | `HideDelay` is 100 ms for every variant. A rich tooltip is interactive, so the pointer must cross the gap to reach it; the timer expired mid-flight. Leaving now starts a variant-aware countdown with a 600 ms bridge for rich tooltips. | `ecc3d5f` |
+| 14 | Simple dialog: clicking an item reports "cancelled" | Selection closed the dialog via `Dismiss()`, so one click raised **both** `ItemSelected` and `Dismissed`, and the cancel listener ran second and overwrote the result. A choice is no longer a dismissal. *(The styling half of this item is still open.)* | `ecc3d5f` |
+| 16 | "Move avatar": a fragment of the content shows for a few frames | The page revealed the destination hero and started the flight **in the same pass**, so `MdHero` measured a hero with no layout yet, photographed a zero-sized rectangle and abandoned the transition — then the source was hidden immediately, reflowing the row under a transition that had already recorded the geometry. Now: reveal, let one layout pass run, await the flight, then hide the source. | `6189b95` |
+| 18 | Load next page gives only a text message | Two causes. `MdPagedItemsView` had **no `ItemTemplate`**, so records rendered as bare `ToString` text, indistinguishable from the status label. And the demo provider returned synchronously, so the view went `Loading → Data` inside one dispatcher pass and the progress indicator was switched on and off before it could be painted. | `6189b95` |
+| 17 | "Swipe this row" shows wrong colours at all four corners | `PART_Foreground` was rounded to 12 but the archive/delete layers behind it were **square**, and the clipping container was a `Grid` — rectangular clip. The primary and error containers showed through outside the foreground's rounded corners. One rounded `Border` now clips the whole row. | `bf55924` |
+| 20 | Dragging a row between the transfer lists hides the row | The drag translated the **real `ListBoxItem`**, which stays inside its own `ListBox`, so the scroll viewport clipped it the moment it moved toward the other list. A picture of the row now rides in the overlay layer, which nothing clips. | `6189b95` |
+| 28 | Numeric `−` is not centred in its target | The glyph `M3 8H15V10H3Z` is **12 wide by 2 tall**, but the `Path` declared a 12×12 box. `Stretch="Uniform"` scales by 1 and seats the geometry at the **top** of the box, so only the `+` — whose ink really is 12×12 — came out centred. This is also what made the pair look badly aligned. The numeric control also gained **its own gallery page**. | `bf55924` |
+| 23① | Tree expander's hover area is a small square, not a full circle | `PART_State` was inside a centred grid, so it was sized by the 16 DIP chevron, and it had no `CornerRadius`. It now fills the 40 DIP circle. | `ecc3d5f` |
+| 23② | Expanding one node rotates other nodes' chevrons | `Rebuild()` replaces the whole flattened row list, so every container rebinds to a different row — and the 0.2 s transition on the chevron's `Angle` animated each one to its new value. Rotation is now instant. | `ecc3d5f` |
+| 24①② | Rating is cut off **and** can only be lowered, never raised | One cause. The gallery pinned `Width="176"` while the natural row is `5 × 48 + 4 × 4 = 256`: trailing stars were clipped away, and the positions still reachable were mapped against the unclipped 256 scale, so every visible star reported a lower value than it drew. Render and hit testing now share one `GetMetrics(arrangedWidth)`. | `0e30402` |
+| 25 | Redundant breadcrumb under the rating | Removed; `MdBreadcrumb` already has its own page. | `0e30402` |
+
+Regression tests added: `Rating_Arranged_Narrower_Than_Its_Natural_Row_Still_Reaches_Both_Ends`,
+`Simple_Dialog_Selecting_An_Item_Does_Not_Also_Report_A_Dismissal`,
+`Expanded_Search_Reopens_When_The_Header_Is_Typed_In_Again`.
+
+`Rating_Hit_Test_Quantizes_Inside_Each_Star_And_Ignores_Spacing` was corrected: it used a 260 DIP
+window for a row needing 288, so it pinned the overflow behaviour that caused #24.
+
+19, 15 and 10 were fixed after that table was written.
+
+**19 selection rendering** turned out to be four faults in one slot of `MdFormField`. The
+supporting presenter had no visibility binding, so a field with nothing to say still reserved a
+row; neither the supporting nor the error line was indented, while `MdTextBox` and `MdComboBox`
+both indent to 16 DIP through `Md.Comp.TextField.Supporting.Row.Margin`; error and supporting
+showed at the same time, where M3 has the error replace the supporting text; and
+`MdDropdownFormField` added its own pair on top of the two `MdComboBox` already draws, so the
+dropdown showed the supporting line twice, one copy unindented. The dropdown now forwards
+`SupportingText` and `ErrorText` into the combo box that was already rendering them correctly.
+
+**15 AboutDialog auto-fill** — the dialog made the application restate its own name, version and
+copyright, all of which the entry assembly declares. Unset properties now fall back to
+`AssemblyTitle`/`AssemblyProduct`, the informational version with SourceLink's `+sha` stripped,
+and `AssemblyCopyright`, read through new `EffectiveApplicationName`/`EffectiveApplicationVersion`/
+`EffectiveLegalese` properties so an explicit value is never overwritten. Absent icon, version and
+legalese rows collapse.
+
+**10 tabs have no content host** — correct as far as it went: `MdTabs` is a bar and `MdTabItem`'s
+`Content` is its label, so pages had nowhere to go without hand-wiring `SelectionChanged`. Rather
+than fold content into the bar, which Material places in app bars away from the pages, the missing
+half is now `MdTabsView`: children are the pages, matched to the bar by position, with selection
+synchronised both ways. Same split as Flutter's `TabBar`/`TabBarView`.
+
+**13 `MdDataGrid` is not a drop-in for `DataGrid`** — true, and growing it into one was the
+wrong answer: Avalonia already ships that control, and a rename would not have changed what
+`MdDataGrid` can do. The decision taken was to theme the real thing. `Md3.Avalonia.DataGrid` is
+a new opt-in package carrying the `Avalonia.Controls.DataGrid` dependency alone, so the other
+four packages stay clean, and `MdDataGrid` keeps its job as a Material data table. The gallery
+now shows both, one above the other, with the boundary written between them.
+
+The theme is derived from the DataGrid package's own Fluent theme rather than hand-written,
+because the control finds its parts by name and a fresh template would have drifted. Two things
+had to change beyond colour: `MaterialTheme` is standalone and the app loads no `FluentTheme`,
+so every `System*` brush and the Fluent-derived cell editor theme would have failed to resolve
+and rendered an invisible grid.
+
+### 12 · one page per component — batch 1 of the incremental split
+
+`FlutterParityGalleryPage` carried eighteen unrelated components in one 305-line scroll, which is
+the worst instance of the problem: nothing on it could be found, linked to, or reviewed on its own.
+The eight most loosely coupled sections now have their own pages, nine in total because
+`MdReorderableList` and `MdGridTile` were sharing a single two-column section:
+
+Banner · Expansion panels · Data table · Paginated table · Stepper · Pull to refresh ·
+Reorderable list · Grid tiles · Dismissible
+
+Each one is a normal gallery page — h1, a description, the live demo, and a usage snippet checked
+against the real API rather than copied from the old page. Four of the snippets were wrong before
+they were checked: the data table one referenced an `MdDataColumn` type that does not exist, and
+the stepper one used `StepChanged` and `Title` instead of `ActiveStepChanged` and `Header`.
+
+Splitting also surfaced a real cross-section bug: `DismissibleDismissed` wrote its status into
+`DialogStatus`, the status line of the *simple dialog* section several components further down,
+so dismissing the row appeared to do nothing. Each page now owns its own status line.
+
+The page lost its dev-era "Phase 3 ·" / "Phase 4 ·" heading prefixes and the stale
+`MinHeight="5200"` that sized it for content it no longer held.
+
+One pre-existing gap turned up next door: `NumericNav` was in the gallery index but missing from
+`_navigationButtons`, so its selected state was never cleared when navigating away. Added.
+
+### 12 · batch 2 — the parity page is gone
+
+The six sections left behind shared `ActiveDialogHost`, `_simpleDialog`, `_licenses` and the hero
+state, which is why they moved together rather than piecemeal. Eight more pages, because two of
+those sections were again two demos sharing one container:
+
+Form validation · Simple dialog · About and licenses · Picker restoration ·
+Draggable sheet · Keyboard avoidance · Adaptive controls · Focus, shortcut and Hero
+
+With nothing left on it, `FlutterParityGalleryPage` was deleted rather than kept as an empty
+shell — seventeen components now answer for themselves, which was the point of #12. Its trailing
+usage block was by then describing expansion panels, refresh indicators, steppers and data
+tables, none of which had been on the page since batch 1.
+
+The two dialog pages keep a local `MdDialogHost` for standalone preview and prefer the shell's
+host when running inside the gallery, the arrangement the parity page used.
+
+### 12 · batch 3 — the ecosystem page is gone
+
+`EcosystemGalleryPage` was the other dumping ground: eight "Wave A…F" sections, twenty-eight
+controls, one 4400-DIP scroll, and headings named after the development phase that produced them
+rather than after anything a reader is looking for. It is now twenty-eight pages:
+
+Popover · Hover cards · Command palette · Density · Slidable item · Data grids · Masonry panel ·
+Paged items · Async select · Calendar · Timeline · Cascader · Transfer · Result view · Chart ·
+Rich editor · Chat view · Before and after · Animated text · Spin kit · Staggered panel ·
+Skeleton · Animation sequence · PIN input · Tree view · Tag input · Avatar · Rating
+
+Two of those are deliberate judgement calls rather than a mechanical one-section-one-page split:
+
+- **`MdDataGrid` and the stock `DataGrid` stay on one page.** Defect #13 put them side by side on
+  purpose, with the "when you need the full spreadsheet control" paragraph between them. Splitting
+  them would have deleted the only place that says which of the two to reach for.
+- **`MdPopover` and `MdHoverCard` are separate pages**, even though they shared a `WrapPanel` and
+  one status line. They are different controls with different dismissal rules, and batch 1 already
+  set the precedent by separating `MdReorderableList` from `MdGridTile`.
+
+Splitting exposed the same class of cross-section coupling as batch 1, in three places:
+
+- The command palette's three commands drove the **skeleton, the animation sequence and the paged
+  items view** — three sections elsewhere on the page. A command palette that can only be
+  demonstrated by scrolling to the thing it secretly moved is not a demonstration. Its page now
+  owns an `MdSkeleton` and three commands that act on its own state.
+- `OverlayStatus` was shared by the popover, the hover card *and* the command palette, so the last
+  thing you touched overwrote the report of the other two. Each page now has its own status line.
+- `CalendarStatus` sat under a `WrapPanel` holding both the calendar and the timeline, implying
+  the timeline wrote to it. It never did — the timeline is static and has no handler at all.
+
+`PagedRecord` and `GridRow`, both private to the old code-behind, moved with their sections
+(`GridRow` to the data-grid page, where both grids use it). `_messages`, `_editorAdapter`, `_tags`
+and `_sortAscending` likewise went with chat, rich editor, tag input and the grid.
+
+The trailing usage block was a single snippet covering seven unrelated controls; each page now
+carries the snippet for its own control, and the page-level `MinHeight="4400"` that sized the old
+scroll is gone. `EcosystemGalleryPage` was deleted rather than left as an empty shell, which is
+what #12 was asking for. `MdEcosystemWaveAndWindowTests` kept its render assertion by pointing at
+`ChatViewGalleryPage`, the heaviest of the twenty-eight.
+
+### 12 · batch 4 — the last two crowded pages, and what stays whole
+
+`DesktopAdaptersGalleryPage` grouped four unrelated controls under "they are desktop-ish", and
+`AdvancedSelectionGalleryPage` ("Segmented & range") grouped three. Seven more pages:
+
+Autocomplete · Surfaces and type scale · Responsive content · Scrolling surface ·
+Segmented buttons · Range slider · Date range picker
+
+Single and multiple selection stayed on one page: they are the same `MdSegmentedButtonGroup` with
+`AllowMultiple` flipped, so separating them would describe one control twice. The desktop-adapters
+usage snippet was stale — it still showed `MdNumericBox`, which had already moved to its own page.
+
+Two pages were examined and deliberately **not** split:
+
+- **`MotionGalleryPage`** is a topic page, not a dumping ground. Spring schemes, container
+  transform and animated visibility are three views of one subject — the M3 motion system — and
+  the spring comparison only means anything next to the transitions it parameterises.
+- **`ComponentsOverviewGalleryPage`** has no demos at all; it is the category index behind the
+  "Components" tab. Splitting an index is meaningless.
+
+#### The overview index had dead links
+
+The overview links to pages *by title*, through `MainWindow.NavigateToIndexedPage`. Nothing checked
+those titles, so the splits rotted it silently: **"Flutter parity" and "Flutter ecosystem" were
+still listed after both pages had been deleted**, and clicking them did nothing at all. It was also
+badly incomplete — 35 of what are now 93 pages.
+
+It is now generated from the gallery index itself, grouped into nine categories (the six M3
+categories plus Data, Motion and style, and Sample apps), with every indexed page appearing exactly
+once. `MdGalleryIndexTests` makes the rot a build failure:
+
+- every overview link resolves through `NavigateToIndexedPage`, and
+- every indexed page is linked from the overview, so a new page cannot be added without appearing
+  there.
+
+One more pre-existing gap closed on the way: `NumericGalleryPage` was in the desktop index but
+missing from the Android single-view shell, so numeric input was unreachable on Android.
+
+#### Where #12 ended up
+
+| Batch | Page removed | Pages created |
+|---|---|---|
+| 1 | — (`FlutterParityGalleryPage` thinned) | 9 |
+| 2 | `FlutterParityGalleryPage` | 8 |
+| 3 | `EcosystemGalleryPage` | 28 |
+| 4 | `DesktopAdaptersGalleryPage`, `AdvancedSelectionGalleryPage` | 7 |
+
+Fifty-two components that could only be reached by scrolling a shared page now have their own
+page, nav entry, search keywords and usage snippet. The gallery went from 48 pages to 97.
+
+### 22 · image comparison — the control was fine, the page compared two words
+
+`MdBeforeAfter` wiped its divider between the strings `"BEFORE"` and `"AFTER"`. Nothing about that
+reads as an image comparison, which is why it was reported as missing. The page now compares two
+grades of one photograph — ungraded and graded, pixel-aligned — with a slider bound to `Position`
+beside it, a vertical example with a thicker divider, and a non-image example to show both layers
+take arbitrary content.
+
+Commits `f2d00e4`, `ef308b5`. Building the demo found three defects in the control itself:
+
+| Defect | Cause | Fix |
+|--------|-------|-----|
+| `DividerBrush` did nothing | The template painted the divider with a literal `Md.Sys.Color.Primary.Brush`, which outranks any value from outside — defect 6's trap again | Moved to a `ControlTheme` setter with the old literal as the default; the template uses `{TemplateBinding DividerBrush}` |
+| `PositionChanged` was silent for the keyboard and for bindings | It was raised from the pointer handler rather than from the property | Raised from the `PositionProperty` class handler, so every path reports |
+| `IsInteractive="False"` was still a tab stop whose divider moved | The flag gated the pointer only | It also sets a `:non-interactive` pseudo-class the theme keys `Focusable` off, and the key handler returns early. `SetCurrentValue(FocusableProperty, …)` was tried first and lost to the theme setter the moment the theme was applied on attach |
+
+**Reopened in review 13, and the reporter was right.** Fixing the demo and the three defects above
+left the comparison itself wrong. The revealed layer is sized to the whole control and placed in a
+clip border that is only `Position` wide; with no alignment of its own, a child that has an explicit
+size is *centred* in the space it is given, so the after image slid sideways as the divider moved and
+the two layers compared different parts of the picture. It is only invisible at `Position = 0.5`,
+which is where the demo opens.
+
+Measured against HandyControl's `CompareSlider`, the control this was asked to behave like:
+
+| | HandyControl `CompareSlider` | `MdBeforeAfter` before | `MdBeforeAfter` now |
+|---|---|---|---|
+| Layer registration | `ContentPresenter` per side, one `HorizontalAlignment="Left"`, one `"Right"`, each the full `ActualWidth` and clipped by its `RepeatButton` | full size, centred in the clip — drifts | pinned to the clip origin |
+| What you drag | a `Thumb` — 30px grip with left/right chevrons that spread on press | nothing; there was no handle at all | a 40dp Material handle with elevation, a state layer and spreading chevrons |
+| Click on the content | `Slider.DecreaseLarge` / `IncreaseLarge` on the track — pages one step toward the click | teleported the divider onto the pointer | steps one tenth toward the pointer |
+| Keyboard | `Slider` arrow keys | arrows, Shift for a coarse step | unchanged |
+
+`CompareSlider` is literally `public class CompareSlider : Slider`, so its whole interaction model is
+the `Slider` one: a grab handle plus a track that pages. That is what was adopted; the styling is
+Material rather than HandyControl's white circle with a dashed hairline.
+
+## Checked and found correct — no change made
+
+| # | Item | Evidence |
+|---|------|----------|
+| 8 | Slider's water-drop is dark in light mode | This is correct M3. material-components-android's `Slider.md` lists the value label's style as `@style/Widget.Material3.Tooltip` and notes "The value label is a Tooltip"; independently spec-sourced M3 implementations record the value indicator as `inverseSurface` / `inverseOnSurface`. Dark in light mode is the intent, exactly like a tooltip or snackbar. |
+| 21 | Rich text editing is missing | Already shipped under the agreed approach. `MdRichEditor` supplies the Material toolbar, command descriptors, glyphs, shortcuts and toggle state; `IMdRichEditorAdapter` / `IMdRichEditorStateAdapter` are the seam; `MdTextBoxRichEditorAdapter` is a working markdown implementation over a plain `TextBox` with undo/redo, selection wrapping, line prefixing and a live preview, and the gallery page demos it. No editor engine is pulled into the library, which was the point. |
+| 28b | Numeric `+`/`−` pair sits too low | **I changed this and was wrong.** The hand-tuned 15 DIP top margin looked like 8 too much, since the input row is 56 and the panel 42 (centring at 7). The regression test reported a button origin of −1 relative to `PART_Container`, which proves the container starts 8 DIP down, under the label: 15 = 8 + 7, already centred. Reverted, with the arithmetic now written into the template. |
+
+### 9 · pickers "don't apply the selection" — the rule was right, the page hid it
+
+The reported symptom could not be reproduced as a bug, and the behaviour behind it is pinned by a
+test that predates the report. What the page was missing is any way to see which rule applied.
+
+Read out of the controls themselves, the commit rule is not symmetric, and the asymmetry is
+deliberate:
+
+| Picker | Mode | On dismiss without confirming |
+|--------|------|-------------------------------|
+| `MdDatePicker` | `Docked` | keeps the new value — writes straight through |
+| `MdDatePicker` | `Modal` | restores the value held at open |
+| `MdTimePicker` | `Dial` | restores the value held at open |
+| `MdTimePicker` | `Input` | restores the value held at open |
+
+`MdDatePicker` guards its rollback with `Mode == MdDatePickerMode.Modal`; `MdTimePicker` has no
+such guard because M3 gives the time picker no docked variant — every time picker is a dialog, so
+every time picker is provisional until OK. A reporter who tried the dial picker, picked a time and
+pressed Escape saw "it didn't apply" and was seeing the spec.
+
+The real defect was observability: the five pickers on `PickerGalleryPage` and the range picker had
+no value displayed anywhere, so a committed selection and a rolled-back one looked identical. Each
+picker now prints its live bound value next to it and labels its own commit rule, and the page
+leads with a panel stating the rule. `Docked_Date_Picker_Commits_Immediately_While_Dialogs_Stay_Provisional`
+pins the half that was never covered — docked commits, dial does not — so the asymmetry cannot be
+"tidied up" by accident later.
+
+## Diagnosed, not yet fixed
+
+| # | Item | Finding |
+|---|------|---------|
+| 26 | Borderless window corners missing | **Reproduced and fixed.** The theme deliberately sets the window `Background` to `Transparent` so the compositor can cut the rounded corners out of the client area, and leaves `PART_WindowFrame` to draw the rounded surface - but that border bound its own `Background` straight back to `{TemplateBinding Background}`, so it painted nothing. With transparency the surface colour simply vanished; without it `TransparencyBackgroundFallback` filled the whole **square** window, which is the square-cornered screenshot. The frame now paints `TransparencyBackgroundFallback`, which is this window's opaque colour, is themed to the Material surface, and stays overridable. Pinned by `MdRenderedCornerTests.The_Borderless_Window_Frame_Paints_A_Surface_Of_Its_Own`. |
+| 9 | Carousel / date picker / time picker still wrong on Windows | **Still open after review 14.** One cause found and fixed at `3afe888` (time picker wheel/keys were control-level overrides that desktop's `PopupRoot` route never reaches) and one at `63c6a8b` (popups did not follow a scrolling page, so they were dismissed instead). **The docked date picker is not explained.** Reported behaviour: the field never leaves its seeded `2026-09-22` - not on picking a day, not on Today, not after a light dismiss. Ruled out by reading code: `OnDayClick` has no toggle-to-null, `OnToday` does call `SelectDate`, `Mode` defaults to `Docked` so the Modal rollback in `OnOpenStateChanged` cannot fire, and the anchor's `{TemplateBinding DisplayText}` is driven by `SelectedDateProperty.Changed -> UpdateDisplayText`. Ruled out by test: `MdGalleryPickerPageTests` instantiates the **real gallery page**, presses the **real Today button** in the popup and asserts both `SelectedDate` and the rendered field text - it passes, as does dismissing an open popup unused. Four hypotheses have now failed, so the next step is measurement, not another fix: the gallery readout prints `DisplayText` beside `SelectedDate` as of `efcabaf`+, which splits 'commit worked, template stale' from 'click never arrived' in one screenshot. |
+| 9a | *(same report, mechanism found and fixed)* | The rule in the earlier entry still holds and the logic is platform-neutral, so the earlier conclusion was not wrong — it was incomplete. A popup is a real window on desktop and is sized to its child's layout box, while Android renders popups into the `TopLevel` overlay where nothing clips them; that difference is the one thing in these controls that is genuinely desktop-only. Two consequences were found and fixed in review 13: the elevation shadow and the `translate(0,-8)` entrance both drew outside the popup window and were clipped, and four popups never set the transparent `PopupRoot` style, so the popup window painted an opaque rectangle behind the rounded surface. Whether that accounts for the whole report is **unconfirmed** — the symptom was given as "still not fixed" rather than described, and headless tests share the Android overlay path, so they cannot reproduce a `PopupRoot` defect. |
+
+| 22b | Comparison slider drifts from the cursor when the divider sits at an edge | **Fixed at `3afe888`.** The handle is drawn straddling the divider, so at position 0 or 1 half of it falls outside the control and is clipped away. A press aimed at it missed the visual and fell through to the track-step branch, which pushed the divider *away* from the cursor. A press within the handle's grab radius is now treated as a grab regardless of what is visible. Covered by `Comparison_Grabs_The_Divider_When_It_Sits_At_An_Edge` for both orientations. Lesson recorded: a fix verified only at the default value is not verified — #22 passed at `Position=0.5` and broke at the extremes. |
+| 27 | Cascader dropdown opens left of its field | **Fixed at `3afe888`.** The popup carried no `Placement`, so it fell back to `PlacementMode.Bottom`, which centres horizontally rather than aligning edges — a dropdown wider than its anchor spills to the left. Now `BottomEdgeAlignedLeft`, matching every other dropdown in the library. The separate report that the first column's top row is clipped is **not yet explained** and stays open. |
+| 28 | Rich editor is the in-house TextBox adapter, not `AvaloniaRichEditor` | Not started. Taking a third-party dependency needs a licence and maintenance check, an entry in `Directory.Packages.props` under central package management, and a decision on whether it ships inside `Md3.Avalonia.Extra` or as a new opt-in package. Not a defect fix — a scope decision. |
+| 29 | Gallery: controls that do not follow the window size, empty Usage sections, untranslated strings | Not started. Needs a sweep of all 48 pages rather than a patch. |
+
+## P0 mobile platform gaps
+
+Not gallery defects — these came out of the component audit and block Android use outright.
+
+| # | Gap | Resolution | Commit |
+|---|-----|-----------|--------|
+| P0-1 | 23 `Key.Escape` dismissals across 18 files, and nothing listening to `TopLevel.BackRequested`. On Android the system back button and the predictive back gesture could not close a single modal surface; back popped the activity instead. | `MdBackNavigation` keeps a per-`TopLevel` handler stack (`ConditionalWeakTable`, so nothing is kept alive) and offers a back request to the most recently registered surface first, marking the routed event handled once one consumes it. `MdBackScope` registers a surface only while it is both open and attached. Wired into `MdDialogHost`, `MdSheetHost`, `MdNavigationDrawer`, `MdSearchView`, `MdMenuAnchor`, `MdFabMenu`, `MdDatePicker`, `MdTimePicker`, and in a second pass `MdSimpleDialog`, `MdCommandPalette`, `MdPopover`, `MdCascader`, `MdAsyncSelect` — each dismissing exactly where it dismisses on Escape, so a non-modal sheet still lets the request fall through. | `26eb03d`, `edf46b3` |
+| P0-2 | No use of `IInsetsManager` anywhere. Avalonia's automatic root padding is all-or-nothing, so a top app bar could not paint behind the status bar and a bottom bar could not paint behind the gesture handle. | `MdSafeArea` insets per edge, with a `MinimumPadding` floor and a settable `SafeAreaPadding` so a layout can be previewed and tested without a device. Edge-to-edge is `TopLevel.AutoSafeAreaPadding="False"` plus this control on the parts that must stay clear. | `26eb03d` |
+
+Both are covered by `tests/Md3.Avalonia.HeadlessTests/MdMobilePlatformTests.cs` (26 tests). Gesture
+animation on a real device and cutout geometry still need manual sign-off.
+
+The second pass came from auditing every `Key.Escape` site rather than the eight surfaces the
+first pass listed. The rule applied: a back handler belongs on something that floats **over** the
+page and whose Escape dismisses the whole surface. That caught five more — the simple dialog, the
+command palette, the popover, and the cascader and async-select drop-downs. It deliberately left
+out `MdSearchBar` (Escape clears the text), `MdSwipeAction` and `MdChatView` (Escape cancels an
+edit or a selection), `MdSubMenuItem` and `MdMenu` (the owning `MdMenuAnchor` already registers,
+and a second handler would just double-unwind), and `MdTooltipHost` — a tooltip is transient, not
+a place the user navigated to, and consuming back to close one would swallow a gesture the user
+meant for the page.
+
+### Found while doing this
+
+- **A modal surface opened before it is attached deadlocks the UI thread.** With `IsOpen = true`
+  set in an object initializer, `MdModalFocusController` arms a focus redirect that re-posts
+  itself, and `Dispatcher.RunJobs()` never drains — the headless suite ran 45 minutes against a
+  1m48s baseline instead of failing. Every existing test happens to open these surfaces after the
+  window is shown, which is why it had never been hit. Worth fixing in the controller: the
+  redirect should give up rather than re-arm when the scope cannot take focus.
+- **CI had no job timeouts**, so that deadlock would have held a runner for GitHub's six-hour
+  default. Both jobs are now bounded (`timeout-minutes: 8` / `10`).
+
+## API gaps found while fixing
+
+`MdPagedItemsView` gained `ItemTemplate`; without it a consumer could not style loaded rows at
+all. That is the same shape of problem as #13 — these controls expose too little to be used for
+real. Worth a sweep of the Extra controls for missing template/presentation hooks.
+
+**`MdPopover` leaked its "currently open" registration.** `EcosystemPopupCoordinator` recorded the
+open popover in a static weak reference but never cleared it on close, so a *closed* popover stayed
+on record for as long as it was alive. The next popover to open anywhere in the process reached
+back into it — `Dismiss()` then `ClosePopupImmediately()` — cutting an exit animation short at
+best, and throwing `InvalidOperationException: the calling thread cannot access this object` at
+worst, because Avalonia allows more than one UI thread and the stale popover belonged to another
+one. Found when the page split changed allocation timing enough to keep the stale object alive
+across headless test sessions. The coordinator now deregisters on close and only reaches into a
+previous popover from the thread that opened it; `Ecosystem_Popover_Deregisters_Itself_When_It_Closes`
+covers it.
+
+**`MdModalFocusController` could spin the UI thread forever.** When a modal surface took focus
+away from its scope, the controller posted a job to pull focus back. The guard flag that stopped
+it arming a second job was cleared *at the start* of that job rather than after the focus attempt
+had run — so the attempt's own focus traffic armed the next redirect, which armed the next.
+`Dispatcher.RunJobs()` drains until the queue is empty, and this queue refilled itself as fast as
+it drained. It never threw; the headless suite just ran for 45 minutes against a 1m48s baseline.
+A scope that cannot accept focus at all — most often one whose `IsOpen` was set in an object
+initializer, before attachment — made it permanent.
+
+The flag now clears in a `finally` after the attempt, and three consecutive attempts that fail to
+land focus inside the scope stop the redirect for good. Giving up on focus is not giving up on
+modality: containment, isolation and Escape all still work, and the counter resets as soon as
+focus reaches the scope, so a surface that simply needed a layout pass recovers.
+`MdModalFocusControllerTests` asserts the guard positively through an `internal`
+`HasAbandonedFocusRedirect` rather than inferring it from the suite not hanging.
+
+## Agreed approach
+
+- **#12 page split**: done over four batches. Fifty-two components moved onto their own page, the
+  three accumulator pages are gone, and the gallery went 48 → 97 pages. What stays whole and why
+  is recorded in the batch sections above.
+- **#21 / #22**: adapter-based, and both now closed. No third-party dependency in the library:
+  ship the Material UI and an adapter seam, and let the gallery demo one implementation.
+  `MdRichEditor` has `IMdRichEditorAdapter` plus a markdown adapter over `TextBox`; `MdBeforeAfter`
+  needed no adapter at all, since both layers are plain content slots.
+
+### Defect 9 - docked date picker, review 15 round
+
+Every "click" in the picker tests raised `Button.ClickEvent` directly. That skips hit testing
+entirely, so all fifteen of them prove a handler is wired and none of them can see a pointer
+failing to reach a control. `Gallery_Docked_Picker_Commits_Today_From_A_Real_Pointer_Click`
+now drives `window.MouseDown`/`MouseUp` at the button's translated centre instead.
+
+Measured, not assumed:
+
+- With the entrance animation settled, hit testing reaches `PART_TodayButton` and a real
+  pointer click commits today's date. The commit path is sound at pointer level.
+- Straight after `IsOpen`, `PART_Surface` is at Opacity 0.101, and after 120 render-timer
+  ticks it is still only 0.364 - the animation clock runs on wall time, so frames do not
+  fast-forward it. Clicking in that window misses the button and lands on the page content
+  underneath it.
+- The surface does reach Opacity 1, so it is not being left invisible and unhittable.
+
+That clears the last structural suspect inside the control. What headless still cannot model
+is the desktop `PopupRoot`: it is a separate top level with its own hit-test tree, and the
+rounded-corner and transparency defects already found on desktop were invisible here for the
+same reason. Confirming or clearing this one needs a desktop run, not another headless test.
+
+### Review 14 item 1 - time picker
+
+**Wheel regression: fixed.** `HandleWheel` was gated on `IsOpen`, which killed scroll-to-adjust
+on the closed anchor field. The only wheel coverage opened the popup first, so it asserted the
+one state where the gesture still worked and the regression went straight through. Restoring it
+unconditionally would be worse than the bug - a hover-only wheel handler rewrites the time
+whenever someone scrolls a page containing a picker - so focus is the gate: unfocused the event
+stays unhandled and scrolls the page, focused it adjusts. The anchor renders a single run of
+text, so hour and minute are split down its middle.
+
+**Popup offset: not reproduced, now pinned.**
+`Picker_Popup_Surfaces_Line_Up_With_The_Bottom_Left_Of_Their_Anchor` measures both picker
+surfaces against their anchor and both land within 1 dip, so the bleed margin and its
+cancelling negative offset agree.
+
+Worth recording, because it cost a round: the first version of that test made the picker the
+window's only content. The anchor stretched to the full 900x760, leaving no room below it, and
+the popup was clamped into a corner - reported as a 516 dip horizontal offset that was entirely
+an artefact of the harness. Pickers have to be laid out at natural size before their placement
+means anything.
+
+What remains untested is the desktop path. Headless hosts popups in `OverlayPopupHost` inside
+the window; desktop uses a separate `PopupRoot` window with its own placement and clamping. The
+offset the review reports may well live there, and it cannot be measured from here.
+
+### Review 14 item 3 - cascader dropdown
+
+Measured inside `MainWindow`, the dropdown lands within 1 dip of its anchor's bottom-left, its
+top is not cut off, and it fits the window. Not reproduced here.
+
+The measurement did expose a real fragility in the bleed scheme every popup in this repository
+uses. The surface carries `Margin="12,14,12,16"` so the shadow and entrance translate are not
+clipped by the popup window, and the Popup cancels it with `HorizontalOffset="-12"
+VerticalOffset="-14"`. That cancellation only holds while the popup is free to sit 12 dip left
+and 14 dip above its anchor. Clamp it against an edge and the negative offset is silently
+dropped while the margin stays, turning the bleed into a visible offset of exactly that size.
+
+Shown bare in a window the cascader's anchor sits at x=0, the host clamps to x=0, and the
+dropdown lands 12 dip right of its anchor - measured, with `OverlayPopupHost[0,114]`. The
+navigation rail is what keeps that from happening in the real gallery. Anything that puts a
+picker or dropdown within 12 dip of a window edge, or 14 dip of its top, will show the same
+shift, and on desktop the clamp is against the screen rather than the window.
+
+Worth fixing properly: the compensation should not depend on the popup being free to move
+outside its anchor. That is a change across all eleven popups that share the pattern and wants
+desktop verification, so it is recorded rather than attempted blind.
+
+### Review 14 item 6 - gallery itself
+
+**Empty Usage: fixed.** `CodeExample.EffectiveCSharp` stood in `// Add the equivalent
+direct-control C# here.` whenever a page supplied only AXAML, which is thirty-two of them, so
+every one had a C# tab you could open and find an instruction to the authors. Seven pages had
+the mirror problem with a blank AXAML tab. A language with no content now hides its tab, and
+when only one remains the picker goes away and the caption names it.
+
+**Translation: 366 strings added, 198 long sentences outstanding.** The gallery localises by
+looking the rendered English up in a dictionary and leaving it alone when there is no entry, so
+a missing key is invisible until someone switches to Chinese. 649 distinct strings had no
+entry. The 366 that should be translated now are; what remains is body copy, plus 82 strings
+that are correctly left alone - proper nouns, brand names, times, colour codes and shortcuts.
+
+**Adaptive layout: 34 pages failing, 29 fixed.** `Every_Gallery_Page_Fits_A_Narrow_Window`
+arranges each page in a 480 dip window and flags content placed past the right edge with
+nothing horizontally scrollable to reach it. The common cause was a content column declared
+`Width="820"` (or 760, or 720) pinned left, which cannot shrink; fifty rewrites to `MaxWidth`
+plus stretch cleared twenty-nine pages.
+
+Two measurement traps cost a round each and are worth remembering. `DesiredSize` is useless for
+this: measuring inside a 480 dip window clamps it to 480, so the first version of the test
+passed for every page whether it reflowed or not. And a `Popup`'s edge translated into the page
+is not a page-layout measurement, since its content lives in an overlay.
+
+Five pages still do not reflow and are listed by name in the test rather than waved through
+with a tolerance: BeforeAfter (22 dip), DateRangePicker (20), PickerRestoration and
+RadioButton (horizontal rows that do not wrap), Switch (4). The test fails if a new page
+regresses and also if a listed one is fixed without being taken off the list.
+
+### Review 14 item 5 - image comparison drag offset
+
+**Fixed, and reproduced first.** `Divider_Tracks_The_Pointer_When_Dragged_From_The_Start_Edge`
+drives a real pointer from an edge and measures the gap between cursor and divider at four
+points along the drag. It reported the divider trailing by 18 dip before the fix.
+
+The handle straddles the divider, so at position 0 or 1 half of it is clipped outside the
+control. Every pixel of it a pointer can reach is therefore on the same side of the divider,
+and the press picks up an offset that is both one-directional and as large as half the handle.
+Drag tracking is deliberately delta-based so that an off-centre grab does not snap the divider
+under the cursor - correct in the middle of the track - so that offset was kept for the whole
+drag.
+
+The fix caps the preserved offset at the divider's distance to the nearer edge. Mid-track that
+is most of the control and the offset survives untouched; at an extreme it is zero and the grab
+collapses to a snap. One rule, and it keeps the feel the earlier work deliberately built.
+
+Worth noting how it was found: the first attempt snapped only a track press, and the real
+pointer immediately showed that was half the problem - at 18 dip from the edge the press was
+landing on the clipped handle, not the track. A synthetic event could not have told the two
+apart, because neither one does any hit testing.
+
+### Review 14 item 6 - carousel
+
+**Reproduced and fixed, after first being wrongly cleared.** What follows is the failed first
+pass, kept because the mistake in it is the reusable part.
+
+The arrangement only ever produced one large item and one medium one, at every window size.
+Rendering the real gallery page at a 1188 dip viewport and reading the pixels along a scanline
+through each carousel showed what that costs:
+
+    MultiBrowse  280 | 8 | 168 | 8 | 56 | 8 | 56 | ---- 605 dip of empty track ----
+    Hero         360 | 8 |  56 | 8 | 56 | ---- 701 dip of empty track ----
+
+Four items occupying 584 dip of 1188, everything past the second one collapsed to the 56 dip
+small keyline. Correct on a phone, which is the only width the rule was ever written for.
+
+`GetArrangement` now solves for how many large items the viewport has room for alongside the
+trailing taper, and `GetTargetWidth` measures **forward** from the focal item instead of
+symmetrically - a symmetric window hands out `2 * largeCount - 1` large items and overflows the
+arrangement the count was just solved for. At `largeCount == 1` the new rule is identical to the
+old one, so narrow viewports are untouched.
+
+**Why the first pass cleared this wrongly:** `MdCarouselArrangementTests` asserted the keylines
+*fit* the viewport, `<=`. They always did. The defect was that they did not *fill* it, and a
+one-sided bound cannot see that. The companion test now asserts coverage.
+
+The symptom was never written down - defect 9's title names the carousel but its body is
+entirely about the pickers - so this was found by measuring the invariant the arrangement exists
+to satisfy, not by reproducing a report.
+
+Two existing tests encoded the old arithmetic and were updated rather than relaxed:
+`MdNewComponentTests` expected the second of two items to be 118 dip in an 800 dip window, which
+is the defect itself; `MdMotionLifecycleTests` needed a viewport that still produces a
+large/medium/small taper, so its keyline was widened rather than its window narrowed - narrowing
+realised fewer containers and changed what the test measured. It also held a captured container
+array across a selection change, so it was asserting against a recycled container; it re-queries
+now.
+
+---
+
+#### Superseded first pass
+
+Not reproduced, and worth saying plainly: **the carousel symptom is not written down anywhere.**
+Defect 9's title names the carousel but its body is entirely about the pickers, so there is no
+description of what the carousel does wrong to test against.
+
+Rather than guess, `MdCarouselArrangementTests` asserts the invariant the multi-browse
+arrangement exists to satisfy - a large, a medium and a small keyline plus their spacing fit
+across the viewport, which is what keeps the preview item visible. It holds at 360, 480, 720
+and 1100 dip.
+
+The mechanism that looked most likely beforehand does not fire: the arrangement is recomputed
+from `OnSizeChanged`, which triggers on the carousel's own width, while `GetLayoutViewportWidth`
+prefers the scroll viewer's `Viewport.Width`. If those disagreed on a pass, nothing would
+correct it. They do not disagree here.
+
+To get further this one needs the symptom: what is wrong on screen, at what window width, and
+with which variant.
+
+### AOT
+
+**Supported, and now declared.** All six packages carry `IsAotCompatible` and the IL3xxx
+analyzers report nothing. `.github/workflows/aot-probe.yml` publishes the desktop gallery with
+`PublishAot=true`, and rather than trusting a green step it asserts the output is a native ELF
+executable with no managed assembly beside it, then runs that binary under xvfb for 25 seconds.
+Compiling proves little on its own - native AOT fails at runtime, on reflection that is not
+there - so the smoke run is the part that matters: the window stays up, which means the themes,
+the compiled XAML and the icon font all resolved.
+
+Not covered: Windows and macOS publishes, and Android, which uses a different runtime model.

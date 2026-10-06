@@ -38,6 +38,7 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
     public static readonly DirectProperty<MdAsyncSelect, string> SearchErrorTextProperty = AvaloniaProperty.RegisterDirect<MdAsyncSelect, string>(nameof(SearchErrorText), control => control.SearchErrorText);
     private readonly DispatcherTimer _timer = new();
     private readonly MdPresenceController _popupPresence;
+    private readonly MdBackScope _backScope;
     private IReadOnlyList<object?> _results = Array.Empty<object?>();
     private MdAsyncRequestState _state;
     private Exception? _error;
@@ -68,6 +69,7 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
     }
     public MdAsyncSelect()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _popupPresence = new MdPresenceController(control => SetPopupPresence(control));
         _popupPresence.Initialize(IsDropDownOpen);
         _timer.Tick += async (_, _) => { _timer.Stop(); await SearchAsync(); };
@@ -256,7 +258,17 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
         var values = (ItemsSource ?? Array.Empty<object>()).Cast<object?>().Where(item => string.IsNullOrEmpty(query) || GetDisplay(item).Contains(query, StringComparison.OrdinalIgnoreCase)).ToArray();
         SetAndRaise(ResultsProperty, ref _results, values); State = values.Length == 0 ? MdAsyncRequestState.Empty : MdAsyncRequestState.Data;
     }
-    private string GetDisplay(object? item) => string.IsNullOrWhiteSpace(DisplayMemberPath) ? item?.ToString() ?? string.Empty : item?.GetType().GetProperty(DisplayMemberPath)?.GetValue(item)?.ToString() ?? string.Empty;
+    /// <summary>
+    /// Produces an item's display text without reflection. When set it takes precedence over
+    /// <see cref="DisplayMemberPath"/>, and the item type's properties no longer have to survive
+    /// trimming.
+    /// </summary>
+    public Func<object?, string?>? DisplaySelector { get; set; }
+
+    private string GetDisplay(object? item) =>
+        DisplaySelector is { } selector
+            ? selector(item) ?? string.Empty
+            : MdMemberAccess.GetText(item, DisplayMemberPath);
 
     void IMdPopupPresenceOwner.ClosePopupImmediately() => _popupPresence.Initialize(false);
 
@@ -298,6 +310,16 @@ public sealed class MdAsyncSelect : TemplatedControl, IMdPopupOwner, IMdPopupPre
             PseudoClasses.Set(":closed", true);
             _popupPresence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
         }
+        _backScope.Update(IsDropDownOpen);
+    }
+
+    // Android sends a back request where desktop sends Escape. Without this the gesture falls
+    // through to the platform and pops the activity while the surface is still open.
+    private bool OnBackRequested()
+    {
+        if (!IsDropDownOpen) return false;
+        SetCurrentValue(IsDropDownOpenProperty, false);
+        return true;
     }
 
     private void SetPopupPresence(bool value)

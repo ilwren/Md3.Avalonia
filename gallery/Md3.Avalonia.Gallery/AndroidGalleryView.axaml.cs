@@ -66,8 +66,11 @@ public partial class AndroidGalleryView : UserControl
         AddPage("FABs", () => new FabGalleryPage());
         AddPage("App bars", () => new AppBarGalleryPage());
         AddPage("Badges", () => new BadgeGalleryPage());
+        AddPage("Banner", () => new BannerGalleryPage());
         AddPage("Breadcrumbs", () => new BreadcrumbGalleryPage());
         AddPage("Text fields", () => new TextBoxGalleryPage());
+        AddPage("Numeric input", () => new NumericGalleryPage());
+        AddPage("Keyboard avoidance", () => new KeyboardAvoidanceGalleryPage());
         AddPage("Checkbox", () => new CheckBoxGalleryPage());
         AddPage("Radio buttons", () => new RadioButtonGalleryPage());
         AddPage("Combo box", () => new ComboBoxGalleryPage());
@@ -75,36 +78,85 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Cards", () => new CardGalleryPage());
         AddPage("Chips", () => new ChipGalleryPage());
         AddPage("Date and time pickers", () => new PickerGalleryPage());
+        AddPage("Picker restoration", () => new PickerRestorationGalleryPage());
         AddPage("Color picker", () => new ColorPickerGalleryPage());
+        AddPage("Data table", () => new DataTableGalleryPage());
+        AddPage("Paginated table", () => new PaginatedDataTableGalleryPage());
         AddPage("Dialogs", () => new DialogGalleryPage());
+        AddPage("Simple dialog", () => new SimpleDialogGalleryPage());
+        AddPage("About and licenses", () => new AboutDialogGalleryPage());
+        AddPage("Dismissible", () => new DismissibleGalleryPage());
         AddPage("Divider", () => new DividerGalleryPage());
+        AddPage("Expansion panels", () => new ExpansionPanelGalleryPage());
+        AddPage("Form validation", () => new FormValidationGalleryPage());
+        AddPage("Grid tiles", () => new GridTileGalleryPage());
         AddPage("Lists", () => new ListGalleryPage());
         AddPage("Loading", () => new LoadingGalleryPage());
         AddPage("Progress", () => new ProgressGalleryPage());
+        AddPage("Pull to refresh", () => new RefreshIndicatorGalleryPage());
+        AddPage("Reorderable list", () => new ReorderableListGalleryPage());
         AddPage("Menus", () => new MenuGalleryPage());
         AddPage("Navigation bar", () => new NavigationBarGalleryPage());
         AddPage("Navigation drawer", () => new NavigationDrawerGalleryPage());
         AddPage("Adaptive layout", () => new AdaptiveGalleryPage());
+        AddPage("Adaptive controls", () => new AdaptiveControlsGalleryPage());
         AddPage("Search", () => new SearchGalleryPage());
         AddPage("Settings cards", () => new SettingsCardGalleryPage());
         AddPage("Sheets", () => new SheetGalleryPage());
+        AddPage("Draggable sheet", () => new DraggableSheetGalleryPage());
         AddPage("Slider", () => new SliderGalleryPage());
-        AddPage("Segmented and range", () => new AdvancedSelectionGalleryPage());
+        AddPage("Stepper", () => new StepperGalleryPage());
+        AddPage("Segmented buttons", () => new SegmentedButtonGalleryPage());
+        AddPage("Range slider", () => new RangeSliderGalleryPage());
+        AddPage("Date range picker", () => new DateRangePickerGalleryPage());
+        AddPage("Autocomplete", () => new AutoCompleteGalleryPage());
+        AddPage("Surfaces and type scale", () => new SurfaceGalleryPage());
+        AddPage("Responsive content", () => new ResponsiveContentGalleryPage());
+        AddPage("Scrolling surface", () => new ScrollViewerGalleryPage());
         AddPage("Snackbar", () => new SnackbarGalleryPage());
         AddPage("Switch", () => new SwitchGalleryPage());
         AddPage("Tabs", () => new TabGalleryPage());
         AddPage("Toolbars", () => new ToolbarGalleryPage());
         AddPage("Tooltips", () => new TooltipGalleryPage());
 
+        AddSection("Extra controls");
+        AddPage("Animated text", () => new AnimatedTextGalleryPage());
+        AddPage("Animation sequence", () => new AnimationSequenceGalleryPage());
+        AddPage("Async select", () => new AsyncSelectGalleryPage());
+        AddPage("Avatar", () => new AvatarGalleryPage());
+        AddPage("Before and after", () => new BeforeAfterGalleryPage());
+        AddPage("Calendar", () => new CalendarGalleryPage());
+        AddPage("Cascader", () => new CascaderGalleryPage());
+        AddPage("Chart", () => new ChartGalleryPage());
+        AddPage("Chat view", () => new ChatViewGalleryPage());
+        AddPage("Command palette", () => new CommandPaletteGalleryPage());
+        AddPage("Data grids", () => new DataGridGalleryPage());
+        AddPage("Density", () => new DensityGalleryPage());
+        AddPage("Hover cards", () => new HoverCardGalleryPage());
+        AddPage("Masonry panel", () => new MasonryPanelGalleryPage());
+        AddPage("Paged items", () => new PagedItemsGalleryPage());
+        AddPage("PIN input", () => new PinInputGalleryPage());
+        AddPage("Popover", () => new PopoverGalleryPage());
+        AddPage("Rating", () => new RatingGalleryPage());
+        AddPage("Result view", () => new ResultViewGalleryPage());
+        AddPage("Rich editor", () => new RichEditorGalleryPage());
+        AddPage("Skeleton", () => new SkeletonGalleryPage());
+        AddPage("Slidable item", () => new SlidableItemGalleryPage());
+        AddPage("Spin kit", () => new SpinKitGalleryPage());
+        AddPage("Staggered panel", () => new StaggeredPanelGalleryPage());
+        AddPage("Tag input", () => new TagInputGalleryPage());
+        AddPage("Timeline", () => new TimelineGalleryPage());
+        AddPage("Transfer", () => new TransferGalleryPage());
+        AddPage("Tree view", () => new TreeViewGalleryPage());
+
         AddSection("Library");
-        AddPage("Flutter parity", () => new FlutterParityGalleryPage());
-        AddPage("Flutter ecosystem", () => new EcosystemGalleryPage());
         // Borderless window/chrome and desktop adapter samples are intentionally desktop-only.
         // Do not expose them from the Android single-view navigation: Android has no native
         // desktop caption, resize frame, or desktop window lifetime to demonstrate.
         AddPage("Theme Lab", () => new ThemeResourcesGalleryPage());
         AddPage("Material Symbols", () => new SymbolGalleryPage());
         AddPage("Motion", () => new MotionGalleryPage());
+        AddPage("Focus, shortcut, Hero", () => new FocusShortcutHeroGalleryPage());
     }
 
     private void AddSection(string title)

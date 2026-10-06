@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.SlidableItemGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Slidable item" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A list row that reveals actions when swiped either way. Ctrl+Left, Ctrl+Right and Escape drive it from the keyboard." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <eco:MdSlidableItem x:Name="Slidable" StartActions="Archive" EndActions="Delete">
+          <Grid ColumnDefinitions="*,Auto" MinHeight="64" Margin="16,0">
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock Text="Swipe this row horizontally" FontWeight="SemiBold" />
+              <TextBlock Text="Ctrl+Left, Ctrl+Right and Escape also work" Opacity=".7" />
+            </StackPanel>
+            <md:MdButton Grid.Column="1" Content="Close" Variant="Text" Click="CloseSlidable" />
+          </Grid>
+        </eco:MdSlidableItem>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdSlidableItem StartActions=&quot;Archive&quot; EndActions=&quot;Delete&quot;&gt;&#10;  &lt;Grid&gt;...&lt;/Grid&gt;&#10;&lt;/eco:MdSlidableItem&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

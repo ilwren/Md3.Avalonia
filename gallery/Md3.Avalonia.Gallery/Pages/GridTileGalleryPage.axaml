@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.GridTileGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="GridTile and GridTileBar" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A tile presents a media item with a footer bar that can carry its own title, subtitle and trailing action." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="body" Text="Open the project tile or use its trailing favorite action." />
+        <md:MdGridTile x:Name="AuroraTile" Height="220" AutomationProperties.Name="Open Aurora project" Click="OpenGridTile">
+          <Border Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"><StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"><md:MdIcon Glyph="{x:Static md:MdSymbols.Image}" Size="64" /><TextBlock Text="Project preview" /></StackPanel></Border>
+          <md:MdGridTile.Footer>
+            <md:MdGridTileBar Title="Aurora dashboard" Subtitle="Last edited 2 minutes ago" IsInteractive="True" Invoked="GridTileBarInvoked">
+              <md:MdGridTileBar.Trailing><md:MdIconButton Icon="{x:Static md:MdSymbols.Favorite}" ToolTip.Tip="Toggle favorite" Click="ToggleGridTileFavorite" /></md:MdGridTileBar.Trailing>
+            </md:MdGridTileBar>
+          </md:MdGridTile.Footer>
+        </md:MdGridTile>
+        <TextBlock x:Name="GridTileStatus" Classes="body" Text="No project action yet." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdGridTile Click=&quot;OnOpen&quot;&gt;&#10;  &lt;Border Background=&quot;{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}&quot; /&gt;&#10;  &lt;md:MdGridTile.Footer&gt;&#10;    &lt;md:MdGridTileBar Title=&quot;Aurora dashboard&quot; Subtitle=&quot;Last edited 2 minutes ago&quot;&#10;                      IsInteractive=&quot;True&quot; Invoked=&quot;OnFooterInvoked&quot; /&gt;&#10;  &lt;/md:MdGridTile.Footer&gt;&#10;&lt;/md:MdGridTile&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

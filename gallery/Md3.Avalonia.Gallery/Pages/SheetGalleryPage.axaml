@@ -7,7 +7,7 @@
     <StackPanel Spacing="28">
       <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Sheets"/><TextBlock Classes="body" Text="Bottom and side sheets present supplementary content while preserving the current context."/></StackPanel>
       <StackPanel Orientation="Horizontal" Spacing="8"><md:MdButton Content="Bottom sheet" Variant="Filled" Click="ShowBottom"/><md:MdButton Content="Left side sheet" Variant="Tonal" Click="ShowLeft"/><md:MdButton Content="Right side sheet" Variant="Outlined" Click="ShowRight"/></StackPanel>
-      <md:MdSheetHost x:Name="DemoSheet" Width="800" Height="420" HorizontalAlignment="Left">
+      <md:MdSheetHost x:Name="DemoSheet" MaxWidth="800" Height="420" HorizontalAlignment="Stretch">
         <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="24"><StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"><md:MdIcon Glyph="{x:Static md:MdSymbols.Photo}" Size="48"/><TextBlock FontSize="22" Text="Page content"/></StackPanel></Border>
         <md:MdSheetHost.SheetContent>
           <StackPanel Spacing="16"><TextBlock FontSize="24" Text="Add to collection"/><TextBlock TextWrapping="Wrap" Text="Sheets keep an interaction in context and can be dismissed with Escape or the scrim."/><md:MdButton HorizontalAlignment="Right" Content="Done" Variant="Filled" Click="CloseSheet"/></StackPanel>

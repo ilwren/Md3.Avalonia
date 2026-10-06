@@ -7,7 +7,7 @@
     <StackPanel Spacing="28">
       <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Navigation drawer"/><TextBlock Classes="body" Text="Standard and modal drawers expose top-level destinations on larger or temporarily constrained layouts."/></StackPanel>
       <StackPanel Orientation="Horizontal" Spacing="8"><md:MdButton Content="Standard" Variant="Tonal" Click="ShowStandard"/><md:MdButton Content="Modal" Variant="Filled" Click="ShowModal"/><md:MdButton Content="Close" Variant="Text" Click="CloseDrawer"/></StackPanel>
-      <md:MdNavigationDrawer x:Name="DemoDrawer" Width="800" Height="400" HorizontalAlignment="Left" DrawerWidth="300" IsOpen="True">
+      <md:MdNavigationDrawer x:Name="DemoDrawer" MaxWidth="800" Height="400" HorizontalAlignment="Stretch" DrawerWidth="300" IsOpen="True">
         <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"><StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8"><md:MdIcon Glyph="{x:Static md:MdSymbols.Photo}" Size="48"/><TextBlock FontSize="22" Text="Main content"/></StackPanel></Border>
         <md:MdNavigationDrawer.DrawerContent>
           <StackPanel Spacing="12">

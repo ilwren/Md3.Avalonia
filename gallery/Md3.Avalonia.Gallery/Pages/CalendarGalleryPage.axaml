@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.CalendarGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Calendar" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A month calendar with single or range selection and a badge provider for marking dates that carry something." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <eco:MdCalendar x:Name="Calendar" MaxWidth="320" HorizontalAlignment="Stretch" DateInvoked="CalendarDateInvoked" />
+        <TextBlock x:Name="CalendarStatus" Classes="body" Text="Select a calendar date." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdCalendar SelectionMode=&quot;Range&quot; SelectedDate=&quot;{Binding From}&quot; RangeEnd=&quot;{Binding To}&quot; /&gt;"
+                            CSharpCode="calendar.BadgeProvider = date =&gt; HasEvents(date) ? &quot;•&quot; : null;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

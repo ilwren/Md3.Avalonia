@@ -10,7 +10,7 @@
         <TextBlock Classes="body" Text="Android Material 3 preference cards for building system-like settings, account preferences, and configuration dashboards with leading badge icons and trailing switches/actions." />
       </StackPanel>
 
-      <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="h2" Text="Settings group with interactive cards" />
         <md:MdSettingsGroup Header="NETWORK &amp; INTERNET">
           <md:MdSettingsCard Header="Wi-Fi" Description="Connected to Studio_5GHz"
@@ -54,7 +54,7 @@
         <TextBlock x:Name="CardStatus" Classes="body" Text="Click a settings card to trigger its preference action." />
       </StackPanel>
 
-      <StackPanel Width="760" HorizontalAlignment="Left" Spacing="12">
+      <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="h2" Text="Expandable settings card" />
         <md:MdSettingsExpander Header="Advanced network settings"
                                Description="Private DNS, proxy and VPN configuration"

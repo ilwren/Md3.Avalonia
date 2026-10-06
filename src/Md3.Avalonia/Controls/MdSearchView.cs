@@ -39,6 +39,9 @@ public sealed class MdSearchView : ContentControl
 
     private readonly MdPresenceController _presence;
     private InputElement? _headerInput;
+    private TextBox? _headerTextBox;
+    private bool _suppressAutoOpen;
+    private string? _committedHeaderText;
     private TopLevel? _topLevel;
     private ContentPresenter? _results;
     private Control? _focusBeforeOpen;
@@ -50,8 +53,13 @@ public sealed class MdSearchView : ContentControl
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdSearchView>((view, _) => view.UpdateMotion());
     }
 
+    // Android has no Escape key. The system back gesture arrives as TopLevel.BackRequested and
+    // has to dismiss this surface, or it is unreachable by the one gesture phone users rely on.
+    private readonly MdBackScope _backScope;
+
     public MdSearchView()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _presence = new MdPresenceController(value => PseudoClasses.Set(":present", value));
         _presence.Initialize(IsOpen);
         UpdateVisualState();
@@ -77,16 +85,49 @@ public sealed class MdSearchView : ContentControl
 
     public void Dismiss() => SetCurrentValue(IsOpenProperty, false);
 
+    private void OnHeaderTextChanged(object? sender, TextChangedEventArgs e)
+    {
+        // Typing in the header has to bring the view back. Committing a result writes the chosen
+        // text into the search bar and then closes the view, and nothing reopened it afterwards:
+        // clearing the field and typing again filtered a result list nobody could see, so the
+        // suggestions appeared to be gone for good. Only the user's own typing counts, hence the
+        // focus check, and an empty field stays closed so clearing alone does not expand it.
+        if (_suppressAutoOpen || IsOpen) return;
+        if (sender is not TextBox { Text.Length: > 0 } header || !header.IsKeyboardFocusWithin) return;
+
+        // The text a commit just wrote is not the user typing. A flag held only for the duration
+        // of CommitResult is not enough: the header's TextChanged can arrive on a later dispatcher
+        // pass, once the flag is already cleared, which reopened the view the commit had closed.
+        // Comparing against the committed text is state, not timing, so it holds whenever the
+        // event lands and stops applying the moment the user actually edits the field.
+        if (string.Equals(header.Text, _committedHeaderText, StringComparison.Ordinal)) return;
+        Show();
+    }
+
     /// <summary>
     /// Commits a result through one binding/command/event path, updates a search-bar header,
     /// and optionally closes the expanded view.
     /// </summary>
     public void CommitResult(object? result, string? displayText = null)
     {
+        _suppressAutoOpen = true;
+        try
+        {
+            CommitResultCore(result, displayText);
+        }
+        finally
+        {
+            _suppressAutoOpen = false;
+        }
+    }
+
+    private void CommitResultCore(object? result, string? displayText)
+    {
         SetCurrentValue(SelectedResultProperty, result);
         displayText ??= ResolveDisplayText(result);
         if (Header is MdSearchBar searchBar && displayText is not null)
         {
+            _committedHeaderText = displayText;
             searchBar.SetCurrentValue(TextBox.TextProperty, displayText);
             searchBar.CaretIndex = displayText.Length;
             searchBar.SelectionStart = displayText.Length;
@@ -120,10 +161,15 @@ public sealed class MdSearchView : ContentControl
     {
         if (_headerInput is not null)
             _headerInput.RemoveHandler(InputElement.KeyDownEvent, OnHeaderPreviewKeyDown);
+        if (_headerTextBox is not null)
+            _headerTextBox.TextChanged -= OnHeaderTextChanged;
         base.OnApplyTemplate(e);
         _headerInput = Header as InputElement;
         _headerInput?.AddHandler(InputElement.KeyDownEvent, OnHeaderPreviewKeyDown,
             RoutingStrategies.Tunnel, handledEventsToo: true);
+        _headerTextBox = Header as TextBox;
+        if (_headerTextBox is not null)
+            _headerTextBox.TextChanged += OnHeaderTextChanged;
         _results = e.NameScope.Find<ContentPresenter>("PART_Results");
         UpdateMotion();
     }
@@ -206,16 +252,24 @@ public sealed class MdSearchView : ContentControl
     private bool IsWithinSearchView(Visual source) =>
         ReferenceEquals(source, this) || source.GetVisualAncestors().Contains(this);
 
-    private string? ResolveDisplayText(object? result)
+    /// <summary>
+    /// Produces a result's display text without reflection. When set it takes precedence over
+    /// <see cref="ResultDisplayMemberPath"/>, and the result type's properties no longer have to
+    /// survive trimming.
+    /// </summary>
+    public Func<object?, string?>? ResultDisplaySelector { get; set; }
+
+    internal string? ResolveDisplayText(object? result)
     {
         if (result is null) return null;
+        if (ResultDisplaySelector is { } selector) return selector(result);
         if (string.IsNullOrWhiteSpace(ResultDisplayMemberPath)) return result.ToString();
-        return result.GetType().GetProperty(ResultDisplayMemberPath,
-            BindingFlags.Instance | BindingFlags.Public)?.GetValue(result)?.ToString();
+        return MdMemberAccess.GetValue(result, ResultDisplayMemberPath)?.ToString();
     }
 
     private void UpdateVisualState()
     {
+        _backScope.Update(IsOpen);
         if (IsOpen)
         {
             if (!_wasOpen) CaptureFocusBeforeOpen();
@@ -248,10 +302,17 @@ public sealed class MdSearchView : ContentControl
         if (!IsOpen)
             _presence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Default, MdMotionSpeed.Slow));
     }
+
+    private bool OnBackRequested()
+    {
+        if (!IsOpen) return false;
+        Dismiss();
+        return true;
+    }
+
 }
 
 public sealed class MdSearchResultCommittedEventArgs(object? result, string? displayText) : EventArgs
 {
     public object? Result { get; } = result;
-    public string? DisplayText { get; } = displayText;
-}
+    public string? DisplayText { get; } = displayText;}

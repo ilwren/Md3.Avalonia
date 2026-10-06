@@ -21,6 +21,15 @@ internal sealed class MdModalFocusController
     private bool _scopeFocusable;
     private bool _active;
     private bool _redirectPending;
+    private int _failedRedirects;
+    private bool _redirectAbandoned;
+
+    /// <summary>
+    /// How many times in a row a redirect may fail to put focus inside the scope before the
+    /// controller stops re-arming. Three leaves room for a surface that needs a layout pass
+    /// before anything in it is focusable, without letting the dispatcher queue feed itself.
+    /// </summary>
+    private const int MaxFailedRedirects = 3;
 
     public MdModalFocusController(Control owner)
     {
@@ -28,6 +37,13 @@ internal sealed class MdModalFocusController
     }
 
     public bool IsActive => _active;
+
+    /// <summary>
+    /// True once the controller has stopped pulling focus back into the scope because the scope
+    /// refuses it. Exposed so a test can prove the guard engaged rather than infer it from the
+    /// suite not hanging.
+    /// </summary>
+    public bool HasAbandonedFocusRedirect => _redirectAbandoned;
 
     public void Update(bool active, Control? scope, Control? background = null, Control? initialFocus = null)
     {
@@ -61,6 +77,8 @@ internal sealed class MdModalFocusController
         _topLevel?.AddHandler(InputElement.GotFocusEvent, OnTopLevelGotFocus,
             RoutingStrategies.Bubble, handledEventsToo: true);
         _active = true;
+        _failedRedirects = 0;
+        _redirectAbandoned = false;
         FocusInitial(initialFocus);
     }
 
@@ -90,6 +108,8 @@ internal sealed class MdModalFocusController
         var restoreTarget = restoreFocus ? _focusBeforeOpen : null;
         _active = false;
         _redirectPending = false;
+        _failedRedirects = 0;
+        _redirectAbandoned = false;
         _scope = null;
         _background = null;
         _topLevel = null;
@@ -101,13 +121,30 @@ internal sealed class MdModalFocusController
 
     private void OnTopLevelGotFocus(object? sender, FocusChangedEventArgs e)
     {
-        if (!_active || _scope is null || e.Source is not Visual source || IsWithin(source, _scope)) return;
-        if (_redirectPending) return;
+        if (!_active || _scope is null || e.Source is not Visual source) return;
+        if (IsWithin(source, _scope))
+        {
+            // Containment is working again, so a scope that was briefly unfocusable — one still
+            // waiting for its first layout pass, say — gets its redirects back.
+            _failedRedirects = 0;
+            _redirectAbandoned = false;
+            return;
+        }
+
+        // The redirect stays pending until the focus attempt itself has run. Clearing it when
+        // this Input-priority job ran, as it used to, let the attempt's own focus traffic arm a
+        // second redirect, which armed a third: Dispatcher.RunJobs() then never drained because
+        // the queue kept refilling itself.
+        if (_redirectPending || _redirectAbandoned) return;
         _redirectPending = true;
         Dispatcher.UIThread.Post(() =>
         {
-            _redirectPending = false;
-            if (_active) FocusInitial(null);
+            if (!_active)
+            {
+                _redirectPending = false;
+                return;
+            }
+            FocusInitial(null, isRedirect: true);
         }, DispatcherPriority.Input);
     }
 
@@ -142,20 +179,49 @@ internal sealed class MdModalFocusController
         control.SetCurrentValue(AutomationProperties.AccessibilityViewProperty, AccessibilityView.Raw);
     }
 
-    private void FocusInitial(Control? preferred)
+    private void FocusInitial(Control? preferred, bool isRedirect = false)
     {
         var scope = _scope;
-        if (scope is null) return;
+        if (scope is null)
+        {
+            if (isRedirect) _redirectPending = false;
+            return;
+        }
+
         Dispatcher.UIThread.Post(() =>
         {
-            if (!_active || !ReferenceEquals(scope, _scope)) return;
-            if (preferred is not null && IsWithin(preferred, scope) && CanFocus(preferred) && preferred.Focus()) return;
-            var target = scope.GetVisualDescendants().OfType<Control>()
-                .Where(CanFocus)
-                .OrderBy(KeyboardNavigation.GetTabIndex)
-                .FirstOrDefault();
-            if (target?.Focus(NavigationMethod.Tab) != true) scope.Focus(NavigationMethod.Tab);
+            try
+            {
+                if (!_active || !ReferenceEquals(scope, _scope)) return;
+                if (preferred is not null && IsWithin(preferred, scope) && CanFocus(preferred) && preferred.Focus()) return;
+                var target = scope.GetVisualDescendants().OfType<Control>()
+                    .Where(CanFocus)
+                    .OrderBy(KeyboardNavigation.GetTabIndex)
+                    .FirstOrDefault();
+                if (target?.Focus(NavigationMethod.Tab) != true) scope.Focus(NavigationMethod.Tab);
+            }
+            finally
+            {
+                if (isRedirect) CompleteRedirect(scope);
+            }
         }, DispatcherPriority.Loaded);
+    }
+
+    private void CompleteRedirect(Control scope)
+    {
+        _redirectPending = false;
+        if (!_active || !ReferenceEquals(scope, _scope)) return;
+        if (ContainsFocus(scope))
+        {
+            _failedRedirects = 0;
+            return;
+        }
+
+        // Nothing in the scope would take focus. A modal opened before it was attached, an empty
+        // scope, or one whose only focusable children are disabled all land here, and re-arming
+        // would keep the dispatcher busy forever without ever succeeding. Give up instead; the
+        // scope still has its containment, isolation and Escape handling.
+        if (++_failedRedirects >= MaxFailedRedirects) _redirectAbandoned = true;
     }
 
     private static bool ContainsFocus(Control scope) =>

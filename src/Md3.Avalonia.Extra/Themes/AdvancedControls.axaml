@@ -9,17 +9,59 @@
   <ControlTheme x:Key="{x:Type eco:MdBeforeAfter}" TargetType="eco:MdBeforeAfter">
     <Setter Property="Focusable" Value="True" />
     <Setter Property="ClipToBounds" Value="True" />
+    <!-- A setter, not a literal on the divider: DividerBrush was a public property the template
+         ignored, so setting it did nothing. The default is what the literal used to be. -->
+    <Setter Property="DividerBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Grid ClipToBounds="True">
+        <Grid ClipToBounds="True" Background="Transparent">
           <ContentPresenter Content="{TemplateBinding Before}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
           <Border x:Name="PART_AfterClip" ClipToBounds="True" Background="Transparent">
-            <ContentPresenter Content="{TemplateBinding After}" Width="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}" Height="{Binding Bounds.Height, RelativeSource={RelativeSource TemplatedParent}}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
+            <!-- Laid out at the full control size and pinned to the clip's own origin. Leaving it
+                 to stretch centres a child that has an explicit size, which slid the after image
+                 under the window as the divider moved and compared the wrong pixels. -->
+            <ContentPresenter Content="{TemplateBinding After}"
+                              Width="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
+                              Height="{Binding Bounds.Height, RelativeSource={RelativeSource TemplatedParent}}"
+                              HorizontalAlignment="Left" VerticalAlignment="Top"
+                              HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
           </Border>
-          <Border x:Name="PART_Divider" Width="2" Background="{DynamicResource Md.Sys.Color.Primary.Brush}" IsHitTestVisible="False" />
+          <!-- Width and Height are owned by UpdateGeometry, which swaps them with Orientation. -->
+          <Border x:Name="PART_Divider" Background="{TemplateBinding DividerBrush}" IsHitTestVisible="False" />
+          <!-- The grab handle. Margin is owned by UpdateGeometry. -->
+          <Border x:Name="PART_Thumb" Width="40" Height="40" CornerRadius="20"
+                  Background="{DynamicResource Md.Sys.Color.Surface.Brush}"
+                  BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1"
+                  BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}"
+                  Cursor="SizeWestEast" RenderTransform="scale(1)" RenderTransformOrigin="50%,50%">
+            <Grid x:Name="PART_ThumbGlyphs" RenderTransform="rotate(0deg)" RenderTransformOrigin="50%,50%">
+              <Border x:Name="PART_ThumbState" CornerRadius="20" Background="{TemplateBinding DividerBrush}" Opacity="0" />
+              <Path x:Name="PART_ChevronLeft" Width="7" Height="12" HorizontalAlignment="Center" Margin="-16,0,0,0"
+                    Data="M7,0 L1,6 L7,12" Stretch="Uniform"
+                    Stroke="{TemplateBinding DividerBrush}" StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round"
+                    RenderTransform="translate(0px,0px)" />
+              <Path x:Name="PART_ChevronRight" Width="7" Height="12" HorizontalAlignment="Center" Margin="16,0,0,0"
+                    Data="M0,0 L6,6 L0,12" Stretch="Uniform"
+                    Stroke="{TemplateBinding DividerBrush}" StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round"
+                    RenderTransform="translate(0px,0px)" />
+            </Grid>
+          </Border>
         </Grid>
       </ControlTemplate>
     </Setter>
+    <!-- A display-only comparison is not a tab stop, and shows no grab affordance. -->
+    <Style Selector="^:non-interactive"><Setter Property="Focusable" Value="False" /></Style>
+    <Style Selector="^:non-interactive /template/ Border#PART_Thumb"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:vertical /template/ Border#PART_Thumb"><Setter Property="Cursor" Value="SizeNorthSouth" /></Style>
+    <Style Selector="^:vertical /template/ Grid#PART_ThumbGlyphs"><Setter Property="RenderTransform" Value="rotate(90deg)" /></Style>
+    <Style Selector="^ /template/ Border#PART_Thumb:pointerover"><Setter Property="BoxShadow" Value="{DynamicResource Md.Sys.Elevation.Level3}" /></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_ThumbState"><Setter Property="Opacity" Value="0.08" /></Style>
+    <!-- Pressed: the chevrons spread outwards, the Material read of "this is what you are holding". -->
+    <Style Selector="^:dragging /template/ Border#PART_Thumb"><Setter Property="RenderTransform" Value="scale(1.1)" /></Style>
+    <Style Selector="^:dragging /template/ Border#PART_ThumbState"><Setter Property="Opacity" Value="0.12" /></Style>
+    <Style Selector="^:dragging /template/ Path#PART_ChevronLeft"><Setter Property="RenderTransform" Value="translate(-2px,0px)" /></Style>
+    <Style Selector="^:dragging /template/ Path#PART_ChevronRight"><Setter Property="RenderTransform" Value="translate(2px,0px)" /></Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_Thumb"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="3" /></Style>
   </ControlTheme>
   <ControlTheme x:Key="{x:Type eco:MdAnimatedText}" TargetType="eco:MdAnimatedText">
     <Setter Property="Template"><ControlTemplate><TextBlock x:Name="PART_Text" TextWrapping="Wrap" /></ControlTemplate></Setter>
@@ -92,7 +134,7 @@
             <Border x:Name="PART_Surface" Classes="eco-popover-surface" Margin="0,4,0,0" Padding="16,12" MinWidth="160" MaxWidth="400"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="12"
                     BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}" Opacity="0"
-                    RenderTransform="scale(0.8) translate(0px,-8px)" RenderTransformOrigin="0%,0%">
+                    RenderTransform="scale(0.8)" RenderTransformOrigin="0%,0%">
               <ContentPresenter Content="{TemplateBinding PopoverContent}" />
             </Border>
           </Popup>
@@ -150,7 +192,11 @@
     <Setter Property="ClipToBounds" Value="True" /><Setter Property="Focusable" Value="True" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Grid ClipToBounds="True">
+        <!-- One rounded clip for the whole row. The action layers behind the foreground used to
+             be square while PART_Foreground was rounded, and a Grid's ClipToBounds is
+             rectangular, so the archive and delete colours showed through at all four corners. -->
+        <Border CornerRadius="12" ClipToBounds="True">
+        <Grid>
           <Border HorizontalAlignment="Left" Width="{TemplateBinding ActionExtent}" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"><ContentPresenter x:Name="PART_StartActions" Content="{TemplateBinding StartActions}" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="{TemplateBinding RevealProgress}" RenderTransform="scale(0.8)" RenderTransformOrigin="50%,50%" /></Border>
           <Border HorizontalAlignment="Right" Width="{TemplateBinding ActionExtent}" Background="{DynamicResource Md.Sys.Color.ErrorContainer.Brush}"><ContentPresenter x:Name="PART_EndActions" Content="{TemplateBinding EndActions}" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="{TemplateBinding RevealProgress}" RenderTransform="scale(0.8)" RenderTransformOrigin="50%,50%" /></Border>
           <Border x:Name="PART_Foreground" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="12">
@@ -158,6 +204,7 @@
             <ContentPresenter Content="{TemplateBinding Content}" Padding="{TemplateBinding Padding}" />
           </Border>
         </Grid>
+        </Border>
       </ControlTemplate>
     </Setter>
     <Style Selector="^:start-open /template/ ContentPresenter#PART_StartActions"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
@@ -170,7 +217,7 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Grid RowDefinitions="*,Auto">
-          <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding Items}" />
+          <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding Items}" ItemTemplate="{TemplateBinding ItemTemplate}" />
           <StackPanel Grid.Row="1" HorizontalAlignment="Center" Margin="8">
             <md:MdLinearProgressIndicator Classes="eco-loading" IsVisible="False" IsIndeterminate="True" Width="120" />
             <StackPanel Classes="eco-error" IsVisible="False" HorizontalAlignment="Center"><ContentPresenter Content="{TemplateBinding ErrorContent}" /><md:MdButton Name="PART_RetryButton" Content="Retry" Variant="Text" HorizontalAlignment="Center" Margin="0,8,0,0" /></StackPanel>
@@ -210,9 +257,9 @@
       <ControlTemplate>
         <Grid>
           <md:MdTextBox Name="PART_Query" Text="{TemplateBinding Query, Mode=TwoWay}" Label="{TemplateBinding SearchText}" ShowClearButton="True" Variant="Outlined" />
-          <Popup Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}" Placement="BottomEdgeAlignedLeft" PlacementTarget="{Binding #PART_Query}" IsLightDismissEnabled="True" WindowManagerAddShadowHint="False">
+          <Popup Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}" Placement="BottomEdgeAlignedLeft" PlacementTarget="{Binding #PART_Query}" HorizontalOffset="-12" VerticalOffset="-14" IsLightDismissEnabled="True" WindowManagerAddShadowHint="False">
             <Popup.Styles><Style Selector="PopupRoot"><Setter Property="Background" Value="Transparent" /><Setter Property="TransparencyLevelHint" Value="Transparent" /><Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /></Style></Popup.Styles>
-            <Border Name="PART_Surface" MinWidth="260" MaxHeight="320" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="0,0,12,12" Padding="4" Opacity="0" RenderTransform="scale(0.96) translate(0px,-8px)" RenderTransformOrigin="50%,0%">
+            <Border Name="PART_Surface" Margin="12,14,12,16" MinWidth="260" MaxHeight="320" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="0,0,12,12" Padding="4" Opacity="0" RenderTransform="scale(0.96) translate(0px,-8px)" RenderTransformOrigin="50%,0%">
               <Grid>
                 <ListBox Name="PART_Results" Theme="{StaticResource EcoListTheme}" ItemContainerTheme="{StaticResource EcoListItemTheme}" ItemsSource="{TemplateBinding Results}" Background="Transparent" />
                 <md:MdLinearProgressIndicator Classes="eco-loading" IsVisible="False" IsIndeterminate="True" VerticalAlignment="Top" />
@@ -313,7 +360,11 @@
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdCascader">
         <Grid>
-          <Grid>
+          <!-- PART_Fields reserves the room the floating label overhangs into. Without it the
+               label is laid out above the control's own box and the top of the glyphs is cut off
+               by whatever clips the parent. The :has-label style below drops the reserve when
+               there is no label to show. -->
+          <Grid Name="PART_Fields">
             <Button Name="PART_Anchor" Theme="{StaticResource EcoCascaderAnchorTheme}">
               <Grid ColumnDefinitions="*,48">
                 <TextBlock VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Text="{TemplateBinding DisplayText}" />
@@ -322,16 +373,21 @@
                 </Viewbox>
               </Grid>
             </Button>
-            <Border Margin="12,-7,0,0" Padding="4,0" HorizontalAlignment="Left" VerticalAlignment="Top"
+            <Border Name="PART_Label" Margin="12,-7,0,0" Padding="4,0" HorizontalAlignment="Left" VerticalAlignment="Top"
                     Background="{DynamicResource Md.Sys.Color.Surface.Brush}" IsHitTestVisible="False">
               <TextBlock FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{TemplateBinding Label}" />
             </Border>
           </Grid>
+          <!-- A popup window is sized to its child's layout box, so the elevation shadow and the
+               entrance offset below would be clipped by the window edge on desktop. The surface
+               carries that bleed as margin and the offsets here cancel it, so the dropdown lands
+               where it did before with its top edge and shadow intact. -->
           <Popup Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}"
-                 Placement="Bottom" PlacementTarget="{Binding #PART_Anchor}"
+                 Placement="BottomEdgeAlignedLeft" PlacementTarget="{Binding #PART_Anchor}"
+                 HorizontalOffset="-12" VerticalOffset="-14"
                  IsLightDismissEnabled="True" WindowManagerAddShadowHint="False">
             <Popup.Styles><Style Selector="PopupRoot"><Setter Property="Background" Value="Transparent" /><Setter Property="TransparencyLevelHint" Value="Transparent" /><Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /></Style></Popup.Styles>
-            <Border Name="PART_Surface" Padding="4"
+            <Border Name="PART_Surface" Margin="12,14,12,16" Padding="4"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
                     BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1"
                     CornerRadius="12" BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}" ClipToBounds="True"
@@ -351,6 +407,9 @@
         </Grid>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^ /template/ Border#PART_Label"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:has-label /template/ Border#PART_Label"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:has-label /template/ Grid#PART_Fields"><Setter Property="Margin" Value="0,8,0,0" /></Style>
     <Style Selector="^:present /template/ Border#PART_Surface"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:open /template/ Border#PART_Surface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
     <Style Selector="^:open /template/ Path#PART_Arrow"><Setter Property="RenderTransform" Value="rotate(180deg)" /></Style>
@@ -983,13 +1042,22 @@
     </Setter>
   </ControlTheme>
 
-  <!-- Experimental motion shells: these themes guarantee content rendering only. They are not
-       counted as completed Material transitions until outgoing-content lifecycle and interruption
-       behavior are implemented. -->
+  <!-- Material transitions. The control code drives opacity, transform, bounds and shape through
+       the motion tokens, so these templates only have to name the parts and give them their
+       resting values. Both presenters stay mounted: the outgoing one is what makes the exit
+       phase visible, and the container transform needs both measured to morph between them. -->
   <ControlTheme x:Key="{x:Type eco:MdSharedAxis}" TargetType="eco:MdSharedAxis">
+    <Setter Property="ClipToBounds" Value="True" />
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdSharedAxis">
-        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+        <Panel>
+          <ContentPresenter x:Name="PART_OutgoingContent" IsVisible="False" Opacity="0"
+                            IsHitTestVisible="False" RenderTransformOrigin="50%,50%" />
+          <ContentPresenter x:Name="PART_Content"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            RenderTransformOrigin="50%,50%" />
+        </Panel>
       </ControlTemplate>
     </Setter>
   </ControlTheme>
@@ -997,7 +1065,14 @@
   <ControlTheme x:Key="{x:Type eco:MdFadeThrough}" TargetType="eco:MdFadeThrough">
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdFadeThrough">
-        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+        <Panel>
+          <ContentPresenter x:Name="PART_OutgoingContent" IsVisible="False" Opacity="0"
+                            IsHitTestVisible="False" RenderTransformOrigin="50%,50%" />
+          <ContentPresenter x:Name="PART_Content"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            RenderTransformOrigin="50%,50%" />
+        </Panel>
       </ControlTemplate>
     </Setter>
   </ControlTheme>
@@ -1005,33 +1080,37 @@
   <ControlTheme x:Key="{x:Type eco:MdAnimatedVisibility}" TargetType="eco:MdAnimatedVisibility">
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdAnimatedVisibility">
-        <ContentPresenter x:Name="PART_Content" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+        <eco:MdRevealHost x:Name="PART_Reveal">
+          <ContentPresenter x:Name="PART_Content"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            RenderTransformOrigin="50%,50%" />
+        </eco:MdRevealHost>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:hidden /template/ ContentPresenter#PART_Content"><Setter Property="IsVisible" Value="False" /></Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type eco:MdContainerTransform}" TargetType="eco:MdContainerTransform">
     <Setter Property="ContainerBackground" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdContainerTransform">
-        <Border Background="{TemplateBinding ContainerBackground}"
+        <Border x:Name="PART_Container"
+                Background="{TemplateBinding ContainerBackground}"
                 CornerRadius="{TemplateBinding ClosedCornerRadius}"
                 BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}"
                 ClipToBounds="True">
-          <Panel>
-            <ContentPresenter Name="PART_ClosedContent"
+          <!-- Child order is the morph order: index 0 is the closed extent, index 1 the open one. -->
+          <eco:MdMorphPanel x:Name="PART_Morph">
+            <ContentPresenter x:Name="PART_ClosedContent"
                               Content="{TemplateBinding ClosedContent}"
-                              IsVisible="True" />
-            <ContentPresenter Name="PART_OpenContent"
+                              Opacity="1" />
+            <ContentPresenter x:Name="PART_OpenContent"
                               Content="{TemplateBinding OpenContent}"
-                              IsVisible="False" />
-          </Panel>
+                              Opacity="0"
+                              IsHitTestVisible="False" />
+          </eco:MdMorphPanel>
         </Border>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:expanded /template/ ContentPresenter#PART_ClosedContent"><Setter Property="IsVisible" Value="False" /></Style>
-    <Style Selector="^:expanded /template/ ContentPresenter#PART_OpenContent"><Setter Property="IsVisible" Value="True" /></Style>
-    <Style Selector="^:expanded /template/ Border"><Setter Property="CornerRadius" Value="{Binding OpenCornerRadius, RelativeSource={RelativeSource TemplatedParent}}" /></Style>
   </ControlTheme>
 </ResourceDictionary>

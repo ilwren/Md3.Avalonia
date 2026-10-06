@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.SegmentedButtonGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Segmented buttons" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="One group, two modes. Single selection behaves like a radio set; AllowMultiple turns the same group into independent toggles." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Single selection" />
+        <md:MdSegmentedButtonGroup MaxWidth="480" HorizontalAlignment="Stretch" SelectedIndex="0">
+          <md:MdSegmentedButton Content="Day" Value="day" />
+          <md:MdSegmentedButton Content="Week" Value="week" />
+          <md:MdSegmentedButton Content="Month" Value="month" />
+        </md:MdSegmentedButtonGroup>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Multiple selection" />
+        <md:MdSegmentedButtonGroup MaxWidth="560" HorizontalAlignment="Stretch" AllowMultiple="True">
+          <md:MdSegmentedButton Content="Bold"><md:MdSegmentedButton.Icon><TextBlock FontWeight="Bold" Text="B" /></md:MdSegmentedButton.Icon></md:MdSegmentedButton>
+          <md:MdSegmentedButton Content="Italic"><md:MdSegmentedButton.Icon><TextBlock FontStyle="Italic" Text="I" /></md:MdSegmentedButton.Icon></md:MdSegmentedButton>
+          <md:MdSegmentedButton Content="Underline"><md:MdSegmentedButton.Icon><TextBlock TextDecorations="Underline" Text="U" /></md:MdSegmentedButton.Icon></md:MdSegmentedButton>
+        </md:MdSegmentedButtonGroup>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdSegmentedButtonGroup SelectedItem=&quot;{Binding Period}&quot;&gt;&#10;  &lt;md:MdSegmentedButton Content=&quot;Day&quot; Value=&quot;day&quot; /&gt;&#10;  &lt;md:MdSegmentedButton Content=&quot;Week&quot; Value=&quot;week&quot; /&gt;&#10;&lt;/md:MdSegmentedButtonGroup&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

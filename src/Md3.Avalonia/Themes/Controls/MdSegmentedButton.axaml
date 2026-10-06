@@ -33,8 +33,12 @@
         </Border>
       </ControlTemplate>
     </Setter>
+    <!-- The icon slot only occupies layout when something is actually drawn in it. SelectedIcon
+         defaults to the Material checkmark, so keying the slot on :has-selected-icon kept a
+         permanent 18+8 DIP gutter and pushed every unselected label off centre. Material 3 centres
+         an unselected label and brings the checkmark in on selection. -->
     <Style Selector="^:has-icon /template/ Grid#PART_IconHost"><Setter Property="IsVisible" Value="True" /></Style>
-    <Style Selector="^:has-selected-icon /template/ Grid#PART_IconHost"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:selected:has-selected-icon /template/ Grid#PART_IconHost"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:has-icon /template/ md|MdSymbolPresenter#PART_Icon"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:has-selected-icon /template/ md|MdSymbolPresenter#PART_SelectedIcon"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:selected:has-selected-icon /template/ md|MdSymbolPresenter#PART_SelectedIcon"><Setter Property="Opacity" Value="1" /></Style>

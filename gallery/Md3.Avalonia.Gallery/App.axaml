@@ -7,5 +7,7 @@
   <Application.Styles>
     <themes:MaterialTheme />
     <extraThemes:ExtraTheme />
+    <themes:MaterialDataGridTheme />
+    <themes:MaterialRichEditorTheme />
   </Application.Styles>
 </Application>

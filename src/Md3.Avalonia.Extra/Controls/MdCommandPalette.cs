@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
@@ -9,14 +10,22 @@ using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Md3.Avalonia.Controls;
 using Md3.Avalonia.Extra.Infrastructure;
 using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Extra.Controls;
 
+/// <summary>One entry in a command palette.</summary>
+/// <remarks>
+/// The palette's item theme binds <see cref="Title"/> and <see cref="IsEnabled"/> by name from
+/// XAML, which a trimmer cannot see. <see cref="MdCommandPalette"/> roots this type's public
+/// properties so those two bindings keep working in a trimmed application.
+/// </remarks>
 public sealed record MdCommandItem(string Title, ICommand Command, object? Parameter = null, string? Description = null, string? Keywords = null, KeyGesture? Gesture = null)
 {
+    /// <summary>Whether <see cref="Command"/> can run with <see cref="Parameter"/> right now.</summary>
     public bool IsEnabled => Command.CanExecute(Parameter);
 }
 
@@ -41,6 +50,7 @@ public sealed class MdCommandPalette : TemplatedControl
     private Border? _surface;
     private TopLevel? _topLevel;
     private readonly MdPresenceController _presence;
+    private readonly MdBackScope _backScope;
     private readonly MdFocusReturnScope _focusReturn = new();
     private readonly HashSet<ICommand> _observedCommands = [];
     private string _accessibleName = string.Empty;
@@ -48,6 +58,10 @@ public sealed class MdCommandPalette : TemplatedControl
     private string _emptyText = string.Empty;
     private int _resultsVersion;
 
+    // EcoCommandPaletteItemTheme binds Title and IsEnabled by name, which only exists in XAML.
+    // Rooting them here ties their survival to the control that needs them, so a trimmed app
+    // that never uses the palette still drops both.
+    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicProperties, typeof(MdCommandItem))]
     static MdCommandPalette()
     {
         ItemsSourceProperty.Changed.AddClassHandler<MdCommandPalette>((control, _) => control.Refresh());
@@ -58,6 +72,7 @@ public sealed class MdCommandPalette : TemplatedControl
     }
     public MdCommandPalette()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _presence = new MdPresenceController(present => PseudoClasses.Set(":present", present));
         _presence.Initialize(IsOpen);
         UpdateLocalizedText();
@@ -213,6 +228,16 @@ public sealed class MdCommandPalette : TemplatedControl
             _focusReturn.Restore();
         }
         UpdateHitTesting();
+        _backScope.Update(IsOpen);
+    }
+
+    // The palette is a modal surface, so Android's back gesture has to close it the way Escape
+    // does on desktop - otherwise back pops the whole activity out from under an open palette.
+    private bool OnBackRequested()
+    {
+        if (!IsOpen) return false;
+        Dismiss();
+        return true;
     }
 
     private void UpdateMotion()

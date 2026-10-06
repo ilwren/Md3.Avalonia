@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.Reflection;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Automation;
@@ -77,6 +78,7 @@ public sealed class MdFormSubmittedEventArgs(bool isValid) : EventArgs { public 
 
 /// <summary>A validation/decorator field. Set <see cref="Validator"/> for direct use or bind ErrorText from a view model.</summary>
 [PseudoClasses(":valid", ":invalid", ":touched")]
+[PseudoClasses(":valid", ":invalid", ":touched", ":has-supporting-text")]
 public class MdFormField : ContentControl
 {
     public static readonly StyledProperty<object?> ValueProperty = AvaloniaProperty.Register<MdFormField, object?>(nameof(Value), defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
@@ -94,7 +96,7 @@ public class MdFormField : ContentControl
     {
         ValueProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.OnValueChanged());
         ErrorTextProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.UpdateValidity());
-        SupportingTextProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.UpdateAccessibility());
+        SupportingTextProperty.Changed.AddClassHandler<MdFormField>((field, _) => { field.UpdatePseudoClasses(); field.UpdateAccessibility(); });
         IsRequiredProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.UpdateAccessibility());
         IsTouchedProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.UpdatePseudoClasses());
         MdLocalization.CultureProperty.Changed.AddClassHandler<MdFormField>((field, _) => field.UpdateAccessibility());
@@ -185,6 +187,9 @@ public class MdFormField : ContentControl
         PseudoClasses.Set(":valid", IsValid);
         PseudoClasses.Set(":invalid", !IsValid);
         PseudoClasses.Set(":touched", IsTouched);
+        // Without this the supporting line is an empty presenter that still takes a row, so a
+        // field with nothing to say sits lower than its neighbours.
+        PseudoClasses.Set(":has-supporting-text", SupportingText is not null);
     }
 }
 
@@ -228,6 +233,7 @@ public sealed class MdSimpleDialog : TemplatedControl
     private Border? _surface;
     private readonly MdPresenceController _presence;
     private readonly MdModalFocusController _modalFocus;
+    private readonly MdBackScope _backScope;
     private object? _defaultCancelText = "Cancel";
 
     static MdSimpleDialog()
@@ -240,6 +246,7 @@ public sealed class MdSimpleDialog : TemplatedControl
     public MdSimpleDialog()
     {
         _modalFocus = new MdModalFocusController(this);
+        _backScope = new MdBackScope(this, OnBackRequested);
         _presence = new MdPresenceController(SetPresence);
         _presence.Initialize(IsOpen);
         PseudoClasses.Set(":open", IsOpen);
@@ -264,11 +271,18 @@ public sealed class MdSimpleDialog : TemplatedControl
     }
 
     public void Show() => SetCurrentValue(IsOpenProperty, true);
-    public void Dismiss()
+
+    /// <summary>Closes the dialog without a choice and raises <see cref="Dismissed"/>.</summary>
+    public void Dismiss() => Close(notifyDismissed: true);
+
+    // Choosing an item closes the dialog too, but a choice is not a dismissal. Raising both
+    // events for one click forced every listener to handle two contradictory outcomes, and the
+    // cancel branch -- running second -- overwrote the selection that had just been reported.
+    private void Close(bool notifyDismissed)
     {
         var wasOpen = IsOpen;
         SetCurrentValue(IsOpenProperty, false);
-        if (wasOpen) Dismissed?.Invoke(this, EventArgs.Empty);
+        if (wasOpen && notifyDismissed) Dismissed?.Invoke(this, EventArgs.Empty);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -330,6 +344,16 @@ public sealed class MdSimpleDialog : TemplatedControl
         }
         UpdateHitTesting();
         UpdateModalFocus();
+        _backScope.Update(IsOpen);
+    }
+
+    // Android has no Escape key. A back request on an open dialog is a cancellation, so it goes
+    // through Dismiss() and reports exactly one dismissal, same as the cancel button.
+    private bool OnBackRequested()
+    {
+        if (!IsOpen) return false;
+        Dismiss();
+        return true;
     }
 
     private void UpdateModalFocus()
@@ -382,13 +406,19 @@ public sealed class MdSimpleDialog : TemplatedControl
         SetCurrentValue(SelectedItemProperty, selected);
         if (SelectionCommand?.CanExecute(selected) == true) SelectionCommand.Execute(selected);
         ItemSelected?.Invoke(this, selected);
-        Dismiss();
+        Close(notifyDismissed: false);
     }
 }
 
 public sealed record MdLicenseEntry(string Package, string License, string Text, Uri? ProjectUrl = null);
 
 /// <summary>A Material about surface with application metadata and a license-page hook.</summary>
+/// <remarks>
+/// Anything left unset is read from the entry assembly, so the common case needs no properties at
+/// all. Explicit values always win; the resolved text is exposed through the
+/// <c>Effective…</c> properties the control template binds to.
+/// </remarks>
+[PseudoClasses(":has-icon", ":has-version", ":has-legalese")]
 public sealed class MdAboutDialog : ContentControl
 {
     public static readonly StyledProperty<object?> ApplicationIconProperty = AvaloniaProperty.Register<MdAboutDialog, object?>(nameof(ApplicationIcon));
@@ -396,13 +426,89 @@ public sealed class MdAboutDialog : ContentControl
     public static readonly StyledProperty<string?> ApplicationVersionProperty = AvaloniaProperty.Register<MdAboutDialog, string?>(nameof(ApplicationVersion));
     public static readonly StyledProperty<string?> LegaleseProperty = AvaloniaProperty.Register<MdAboutDialog, string?>(nameof(Legalese));
     public static readonly StyledProperty<IEnumerable<MdLicenseEntry>?> LicensesProperty = AvaloniaProperty.Register<MdAboutDialog, IEnumerable<MdLicenseEntry>?>(nameof(Licenses));
+    public static readonly DirectProperty<MdAboutDialog, string?> EffectiveApplicationNameProperty = AvaloniaProperty.RegisterDirect<MdAboutDialog, string?>(nameof(EffectiveApplicationName), dialog => dialog.EffectiveApplicationName);
+    public static readonly DirectProperty<MdAboutDialog, string?> EffectiveApplicationVersionProperty = AvaloniaProperty.RegisterDirect<MdAboutDialog, string?>(nameof(EffectiveApplicationVersion), dialog => dialog.EffectiveApplicationVersion);
+    public static readonly DirectProperty<MdAboutDialog, string?> EffectiveLegaleseProperty = AvaloniaProperty.RegisterDirect<MdAboutDialog, string?>(nameof(EffectiveLegalese), dialog => dialog.EffectiveLegalese);
+
+    private static readonly Lazy<EntryMetadata> AssemblyMetadata = new(EntryMetadata.Read, isThreadSafe: true);
+    private string? _effectiveApplicationName;
+    private string? _effectiveApplicationVersion;
+    private string? _effectiveLegalese;
+
+    static MdAboutDialog()
+    {
+        ApplicationNameProperty.Changed.AddClassHandler<MdAboutDialog>((dialog, _) => dialog.UpdateEffectiveMetadata());
+        ApplicationVersionProperty.Changed.AddClassHandler<MdAboutDialog>((dialog, _) => dialog.UpdateEffectiveMetadata());
+        LegaleseProperty.Changed.AddClassHandler<MdAboutDialog>((dialog, _) => dialog.UpdateEffectiveMetadata());
+        ApplicationIconProperty.Changed.AddClassHandler<MdAboutDialog>((dialog, _) => dialog.UpdateEffectiveMetadata());
+    }
+
+    public MdAboutDialog() => UpdateEffectiveMetadata();
+
     public object? ApplicationIcon { get => GetValue(ApplicationIconProperty); set => SetValue(ApplicationIconProperty, value); }
+
+    /// <summary>The application name to show, or <see langword="null"/> to use the entry assembly's title.</summary>
     public string? ApplicationName { get => GetValue(ApplicationNameProperty); set => SetValue(ApplicationNameProperty, value); }
+
+    /// <summary>The version to show, or <see langword="null"/> to use the entry assembly's informational version.</summary>
     public string? ApplicationVersion { get => GetValue(ApplicationVersionProperty); set => SetValue(ApplicationVersionProperty, value); }
+
+    /// <summary>The copyright line to show, or <see langword="null"/> to use the entry assembly's copyright attribute.</summary>
     public string? Legalese { get => GetValue(LegaleseProperty); set => SetValue(LegaleseProperty, value); }
+
     public IEnumerable<MdLicenseEntry>? Licenses { get => GetValue(LicensesProperty); set => SetValue(LicensesProperty, value); }
+
+    /// <summary><see cref="ApplicationName"/> if set, otherwise the name read from the entry assembly.</summary>
+    public string? EffectiveApplicationName { get => _effectiveApplicationName; private set => SetAndRaise(EffectiveApplicationNameProperty, ref _effectiveApplicationName, value); }
+
+    /// <summary><see cref="ApplicationVersion"/> if set, otherwise the version read from the entry assembly.</summary>
+    public string? EffectiveApplicationVersion { get => _effectiveApplicationVersion; private set => SetAndRaise(EffectiveApplicationVersionProperty, ref _effectiveApplicationVersion, value); }
+
+    /// <summary><see cref="Legalese"/> if set, otherwise the copyright read from the entry assembly.</summary>
+    public string? EffectiveLegalese { get => _effectiveLegalese; private set => SetAndRaise(EffectiveLegaleseProperty, ref _effectiveLegalese, value); }
+
     public event EventHandler? LicensesRequested;
     public void ShowLicenses() => LicensesRequested?.Invoke(this, EventArgs.Empty);
+
+    private void UpdateEffectiveMetadata()
+    {
+        var metadata = AssemblyMetadata.Value;
+        EffectiveApplicationName = Prefer(ApplicationName, metadata.Name);
+        EffectiveApplicationVersion = Prefer(ApplicationVersion, metadata.Version);
+        EffectiveLegalese = Prefer(Legalese, metadata.Legalese);
+
+        // An absent line must not leave a gap behind: the template's spacing applies per row.
+        PseudoClasses.Set(":has-icon", ApplicationIcon is not null);
+        PseudoClasses.Set(":has-version", !string.IsNullOrWhiteSpace(EffectiveApplicationVersion));
+        PseudoClasses.Set(":has-legalese", !string.IsNullOrWhiteSpace(EffectiveLegalese));
+    }
+
+    private static string? Prefer(string? explicitValue, string? inferred) =>
+        string.IsNullOrWhiteSpace(explicitValue) ? inferred : explicitValue;
+
+    private sealed record EntryMetadata(string? Name, string? Version, string? Legalese)
+    {
+        // Assembly-level attributes survive trimming, so this needs no annotation: the attribute
+        // types are named here and nothing is looked up by string.
+        internal static EntryMetadata Read()
+        {
+            var assembly = Assembly.GetEntryAssembly();
+            if (assembly is null) return new EntryMetadata(null, null, null);
+
+            var name = Trimmed(assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title)
+                ?? Trimmed(assembly.GetCustomAttribute<AssemblyProductAttribute>()?.Product)
+                ?? Trimmed(assembly.GetName().Name);
+            var version = Trimmed(assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion)
+                ?? Trimmed(assembly.GetName().Version?.ToString());
+            // SourceLink appends "+<commit sha>" to the informational version; that is build
+            // provenance, not something to show a user.
+            if (version is not null && version.IndexOf('+') is var plus && plus >= 0) version = Trimmed(version[..plus]);
+            return new EntryMetadata(name, version, Trimmed(assembly.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright));
+        }
+
+        private static string? Trimmed(string? value) =>
+            string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+    }
 }
 
 /// <summary>A searchable, selectable license list suitable for dialog or routed-page presentation.</summary>

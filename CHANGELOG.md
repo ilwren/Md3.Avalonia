@@ -1,24 +1,205 @@
 # Changelog
 
-## [3.1.0-preview.1] - 2026-10-04
+## [0.4.1-preview.1] - 2026-10-06
+
+### Added
+
+- **`Md3.Avalonia.RichEditor`**, an opt-in Material Design 3 theme for the
+  [AvaloniaRichEditor](https://github.com/centwon/AvaloniaRichEditor) control. It is the only
+  package that pulls in that dependency, bringing the set to six packages.
+- **Native AOT.** All six packages declare `IsAotCompatible` and build with the IL3xxx analyzers
+  on alongside the existing IL2xxx trimming ones. `.github/workflows/aot-probe.yml` publishes the
+  desktop gallery with `PublishAot=true` and does not accept a green step as the answer: it
+  asserts the output is a native ELF executable with no managed assembly beside it, then runs that
+  binary under xvfb. Native AOT fails at runtime on reflection that was trimmed away, not at
+  compile time, so the smoke run is the part that carries the claim.
+- `MdBreadcrumb` gains a `Powerline` variant.
+- [`docs/DIALOG_SERVICE.md`](docs/DIALOG_SERVICE.md): how to show dialogs from a view model
+  through `IMdDialogService`, including the composition-root wiring.
+
+### Fixed
+
+- **The carousel ignored how wide it was.** The arrangement produced one large item and one medium
+  one at every window size, so from the third item on everything collapsed to the 56 DIP small
+  keyline: four items covering 584 DIP of an 1188 DIP track, with the rest empty. Correct on a
+  phone, which is the only width the rule was written for. `MdCarousel` now solves for how many
+  large items the viewport has room for, and tapers **forward** from the focal item rather than
+  symmetrically - a symmetric window hands out `2 * largeCount - 1` large items and overflows the
+  arrangement it just solved. At a count of one the result is identical to before, so narrow
+  layouts are untouched.
+- **Borderless windows had square corners.** The theme makes the window itself transparent so the
+  compositor can cut the rounded corners out of the client area, and leaves `PART_WindowFrame` to
+  draw the rounded surface - but that border bound its `Background` straight back to the window's,
+  which is the transparent one, so it painted nothing. Where transparency was refused the opaque
+  square `TransparencyBackgroundFallback` filled the whole window instead, which is the square
+  corner that was reported. The frame now paints `TransparencyBackgroundFallback`, which is this
+  window's opaque colour and stays overridable.
+- **`MdBeforeAfter` drifted away from the pointer** when the divider was grabbed at the very start
+  or end. The handle straddles the divider, so at those positions half of it is clipped outside the
+  control and every pixel the pointer can reach lies on the same side, making the grab offset
+  one-directional and as large as half a handle. Dragging is delta-based on purpose, so that offset
+  survived the whole gesture. The preserved offset is now clamped to the divider's distance from
+  the nearer edge: mid-track grabs behave exactly as before, and the ends collapse to a snap.
+- **Wheel and key input never reached a picker popup on desktop.** The popup is a separate
+  `PopupRoot` there, so events raised inside it end at that root instead of bubbling to the
+  control; Android renders popups into the `TopLevel` overlay, which is why scroll-to-adjust
+  worked there and was dead on Windows. The popup surface now forwards into the same handlers, and
+  `MdTimePicker` picks the hour or minute column from whichever the pointer is over.
+- Desktop popups are dismissed when the page behind them scrolls, rather than staying put while
+  their anchor moves away.
+- The cascader dropdown aligns with its anchor's left edge instead of centring on it.
+
+### Gallery
+
+- Usage sections no longer show placeholder code. 32 pages carried XAML only and 7 carried C#
+  only, and the absent tab rendered as an empty box; the missing tab is now hidden.
+- 29 of the 34 pages that overflowed a 480 DIP window now reflow, by replacing fixed `Width` with
+  `MaxWidth` in about 50 places. The five that still do not are pinned in the test with a
+  two-way assertion, so they cannot be quietly forgotten or quietly fixed.
+- 366 Chinese strings added to the localisation table.
+
+### Testing
+
+- Rendered pixels are now actually read. `UseHeadlessDrawing=false` means these tests run real
+  Skia, but every one of the thirty-odd `CaptureRenderedFrame()` calls asserted only that the
+  frame was not null. Corner rounding had been written off as untestable headless on that basis;
+  it is not, and that is how the borderless window defect above was found.
+
+## [0.4.0-preview.1] - 2026-10-05
+
+### Added
+
+- **Android system back.** `MdBackNavigation` routes `TopLevel.BackRequested` to the top-most
+  open Material surface, newest first, and marks the event handled so the activity is not popped
+  behind it. `MdDialogHost`, `MdSheetHost`, `MdNavigationDrawer`, `MdSearchView`, `MdMenuAnchor`,
+  `MdFabMenu`, `MdDatePicker` and `MdTimePicker` opt in automatically; `MdBackScope` lets any
+  other surface join.
+- **Safe area insets.** `MdSafeArea` insets content past the status bar, a display cutout, the
+  navigation bar and the gesture handle, with per-edge control (`MdSafeAreaEdges`), a
+  `MinimumPadding` floor and a settable `SafeAreaPadding` for previewing a layout without a
+  device.
+- `MdRevealHost` and `MdMorphPanel`, the layout primitives behind the rebuilt motion controls.
+- `MdTabsView`, the content area for an `MdTabs` bar. Children are the pages, matched to the
+  bar's tabs by position, with selection kept in step in both directions.
+- **`Md3.Avalonia.DataGrid`**, a new opt-in package with a Material Design 3 theme for
+  Avalonia's own `DataGrid`. It is the only package that depends on `Avalonia.Controls.DataGrid`.
+  Add `MaterialDataGridTheme` after `MaterialTheme`; it replaces the control's Fluent theme and,
+  like the rest of the library, does not require Avalonia's `FluentTheme`.
+- **Trimming support.** All five packages declare `IsTrimmable` and build with the IL2xxx
+  analyzer enabled. `MdThemeJson` moved to a source-generated serializer context, and every
+  control that takes a string property path gained a reflection-free delegate:
+  `MdDataGridColumn.ValueSelector` / `.ValueParser` / `.ValueSetter`,
+  `MdAsyncSelect.DisplaySelector`, `MdSearchView.ResultDisplaySelector`.
+
+### Changed
+
+- **Gallery: one page per component.** Five pages that each held a scroll of unrelated controls —
+  `FlutterParityGalleryPage`, `EcosystemGalleryPage`, `DesktopAdaptersGalleryPage` and
+  `AdvancedSelectionGalleryPage` — were split into 52 pages, one per component, each with its own
+  nav entry, search keywords and usage snippet checked against the real API. The gallery went from
+  48 to 97 pages. `MotionGalleryPage` and the components overview were kept whole: one is a topic
+  page, the other is the category index.
+- **Gallery: the components overview is generated from the gallery index.** It had accumulated
+  links to two deleted pages and covered only a third of the gallery. `MdGalleryIndexTests` now
+  fails the build if a link stops resolving or a page is missing from the index.
+
+
+- The four motion controls (`MdSharedAxis`, `MdFadeThrough`, `MdContainerTransform`,
+  `MdAnimatedVisibility`) now animate rather than toggling `IsVisible`, and are no longer marked
+  experimental.
+- Gallery fixes: breadcrumb overflow anchoring and clickable segments, carousel item measurement,
+  segmented-button icon reservation, settings-expander header padding.
+
+### Fixed
+- `MdBeforeAfter`: `DividerBrush` is honoured instead of being overridden by a literal in the
+  template, `PositionChanged` is raised for keyboard and binding changes rather than only for
+  pointer drags, and `IsInteractive="False"` now makes the control a non-tab-stop that ignores the
+  arrow keys as well as the pointer. The gallery page compares two photographs instead of the
+  words "BEFORE" and "AFTER" (gallery defect 22).
+- Simple dialog options run edge to edge with the M3 spacing (title 24/24/24/0, content
+  0/12/0/16, option 24/8). The surface's own padding used to inset the list, so a row's hover and
+  selection layers stopped short of the dialog edge. `MdFlutterListItemTheme` now takes its corner
+  radius from a setter rather than a literal in the template, so it can be squared off; defaults
+  are unchanged.
+- Five more surfaces answer the Android back gesture: `MdSimpleDialog`, `MdCommandPalette`,
+  `MdPopover`, `MdCascader` and `MdAsyncSelect`. Each handled Escape but never registered with
+  `MdBackNavigation`, so on Android back popped the activity out from under an open surface.
+  `MdSimpleDialog` reports exactly one dismissal for a back request, like its cancel button.
+- The picker gallery pages print their bound values. `MdDatePicker` in `Docked` mode commits as you
+  pick while modal date pickers and both time-picker modes stay provisional until confirmed; with
+  no value shown anywhere, the two outcomes were indistinguishable and read as "the picker doesn't
+  apply the selection" (gallery defect 9). Behaviour is unchanged and now pinned in both
+  directions.
+- `MdModalFocusController` no longer re-arms its focus redirect from inside the redirect itself. The
+  pending-redirect guard is now cleared after the focus attempt rather than before it, and three
+  consecutive attempts that cannot land focus inside the modal scope stop the redirect — a scope
+  that is unfocusable (typically one opened before it was attached) used to keep the dispatcher
+  queue refilling itself, so `Dispatcher.RunJobs()` never returned. Containment, isolation and
+  Escape are unaffected, and the counter resets once focus reaches the scope.
+- `MdPopover` deregisters from the open-popover coordinator when it closes. A closed popover used
+  to stay on record as the open one for as long as it was alive, so the next popover to open
+  anywhere in the process reached back into it and cut its exit animation short — and threw a
+  cross-thread `InvalidOperationException` when that stale popover belonged to another UI thread.
+- `MdFormField` supporting and error text: the supporting line no longer reserves a row when
+  empty, both lines indent to the field's inner edge, the error replaces the supporting text
+  instead of stacking under it, and `MdDropdownFormField` no longer draws a second supporting
+  line on top of the one `MdComboBox` already renders.
+- `MdAboutDialog` now fills `ApplicationName`, `ApplicationVersion` and `Legalese` from the entry
+  assembly when they are not set, and collapses the icon, version and copyright rows when empty.
+
+- CI jobs are bounded by a timeout; a deadlocked test previously held a runner for six hours.
+
+For details, see [`docs/RELEASE_NOTES_0.4.0-preview.1.md`](docs/RELEASE_NOTES_0.4.0-preview.1.md).
+
+## [0.3.5-preview.1] - 2026-10-04
+
+Previously numbered `3.1.0-preview.1`, which was a typo for `0.3.1-preview.1`. The packages
+were never tagged or published under it, so this entry is renumbered in place rather than
+leaving a version that reads as a major release.
 
 ### Added
 
 - `MdBorderlessWindow` now inherits `Window.Icon` into the Material title bar by default.
 - Added independent title-bar icon visibility and caption-button state controls.
+- `MdPagedItemsView.ItemTemplate`, so loaded records can be presented as something other than
+  their `ToString()`.
+- A dedicated "Numeric input" Gallery page covering the stepper variants, a suppressed stepper,
+  fractional steps and read-only values.
 
 ### Changed
 
 - Preserved native Windows DWM minimize, maximize, and restore animations.
 - Unified the title bar with the window `Surface` and removed the visible divider line.
 - Updated desktop and Android Gallery behavior and release documentation.
+- The transfer control drags a picture of the row in the overlay layer instead of translating
+  the row itself.
 
 ### Fixed
 
 - Prevented native and Material window frames from being rendered as a double border.
 - Corrected headless template expectations for native-frame behavior.
+- A row dragged between the transfer lists is no longer clipped away by its own scroll viewport.
+- `MdHero` flights started from a just-revealed destination now measure it after layout instead
+  of photographing a zero-sized rectangle and abandoning the transition.
+- `MdSlidableItem` clips its swipe actions to the row's rounded shape, so the action colours no
+  longer show through at the four corners.
+- The numeric stepper's minus glyph is centred in its target; its 12x2 ink had been declared in
+  a 12x12 box, which seated it at the top.
+- Expanded search reopens its result list when the header is typed in again after a commit.
+- `MdSimpleDialog` no longer reports a dismissal when an item is chosen.
+- Rating, breadcrumb and tree-view rendering and hit-testing defects from the Gallery review.
 
-For details, see [`docs/RELEASE_NOTES_3.1.0-preview.1.md`](docs/RELEASE_NOTES_3.1.0-preview.1.md).
+### Documentation
+
+- Corrected `docs/API.md`: the `MdPagedItemsView` and `MdResultView` samples used properties
+  that do not exist, `MdRangeSlider` is `LowerValue`/`UpperValue` rather than
+  `StartValue`/`EndValue`, and the search controls expose `Text`/`SearchSubmitted`/
+  `ResultCommitted` rather than `Query`/`SearchResultCommitted`.
+- Corrected the borderless-window icon default in both `README.md` and `docs/API.md`: a
+  borderless window shows its icon by default, which both documents had stated backwards.
+- Refreshed the token-dictionary listing in `README.md`, which named 7 of the 11 dictionaries.
+
+For details, see [`docs/RELEASE_NOTES_0.3.5-preview.1.md`](docs/RELEASE_NOTES_0.3.5-preview.1.md).
 
 All notable changes follow Keep a Changelog. The project intends to use Semantic Versioning after the preview cycle.
 

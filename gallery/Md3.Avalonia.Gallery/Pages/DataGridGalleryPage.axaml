@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.DataGridGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Data grids" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Two different answers to tabular data. MdDataGrid is a Material table with filtering, sorting and editable cells; the stock Avalonia DataGrid wearing the Md3.Avalonia.DataGrid theme is the full spreadsheet control." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h3" Text="MdDataGrid · Material table" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdTextBox Width="300" MaxWidth="360" Label="Filter people by name or team" ShowClearButton="True" Variant="Outlined" TextChanged="GridFilterChanged" Margin="0,0,12,8" />
+          <md:MdButton Content="Sort name" Variant="Outlined" Click="SortGrid" Margin="0,0,8,8" />
+          <md:MdButton Content="Preview copied rows" Variant="Text" Click="PreviewGridClipboard" Margin="0,0,8,8" />
+        </WrapPanel>
+        <eco:MdDataGrid x:Name="EnterpriseGrid" Height="240" />
+        <TextBlock x:Name="GridStatus" Classes="body" Text="Virtualized rows, sortable columns, editable score cells." TextWrapping="Wrap" />
+        <TextBlock Classes="h3" Margin="0,12,0,0" Text="Avalonia DataGrid · Material themed" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="When you need the full spreadsheet control — column resizing and reordering, frozen columns, grouping, auto-generated columns — use Avalonia's own DataGrid with the opt-in Md3.Avalonia.DataGrid theme package. This one is the stock control; only the theme is ours." />
+        <DataGrid x:Name="ThemedDataGrid" Height="240" AutoGenerateColumns="False" CanUserResizeColumns="True" CanUserReorderColumns="True" CanUserSortColumns="True" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;themes:MaterialTheme /&gt;&#10;&lt;themes:MaterialDataGridTheme /&gt;   &lt;!-- opt-in package, after MaterialTheme --&gt;"
+                            CSharpCode="grid.Columns.Add(new MdDataGridColumn { Header = &quot;Name&quot;, PropertyName = nameof(Row.Name), IsEditable = true });&#10;grid.DataSource = rows;&#10;grid.SortBy(nameof(Row.Name), ListSortDirection.Ascending);" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

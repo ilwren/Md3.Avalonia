@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -198,6 +199,68 @@ public sealed class MdPackagingAndAdvancedParityTests
             Assert.DoesNotContain(tabs.GetVisualDescendants(), control => control is TransitioningContentControl);
         }
         finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void About_Dialog_Fills_Itself_In_From_The_Entry_Assembly()
+    {
+        var dialog = new MdAboutDialog();
+        using var host = Show(dialog, 620, 360);
+
+        // Nothing was set, so the common case must still name the application.
+        Assert.False(string.IsNullOrWhiteSpace(dialog.EffectiveApplicationName));
+        Assert.Null(dialog.ApplicationName);
+
+        // Whatever the host assembly declares, the version line never shows raw SourceLink
+        // provenance: "1.2.3+<sha>" is a version plus a commit, not a version.
+        Assert.DoesNotContain('+', dialog.EffectiveApplicationVersion ?? string.Empty);
+    }
+
+    [AvaloniaFact]
+    public void About_Dialog_Prefers_What_The_Application_Sets()
+    {
+        var dialog = new MdAboutDialog();
+        using var host = Show(dialog, 620, 360);
+        var inferred = dialog.EffectiveApplicationName;
+
+        dialog.ApplicationName = "Ledger";
+        dialog.ApplicationVersion = "4.2.0";
+        dialog.Legalese = "Copyright the Ledger authors.";
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal("Ledger", dialog.EffectiveApplicationName);
+        Assert.Equal("4.2.0", dialog.EffectiveApplicationVersion);
+        Assert.Equal("Copyright the Ledger authors.", dialog.EffectiveLegalese);
+
+        // Clearing hands the field back to the assembly rather than blanking the dialog, and a
+        // whitespace value counts as unset for the same reason.
+        dialog.ApplicationName = "   ";
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(inferred, dialog.EffectiveApplicationName);
+    }
+
+    [AvaloniaFact]
+    public void About_Dialog_Collapses_The_Lines_It_Has_Nothing_For()
+    {
+        var dialog = new MdAboutDialog { Legalese = "Copyright the Ledger authors." };
+        using var host = Show(dialog, 620, 360);
+
+        var icon = dialog.GetVisualDescendants().OfType<ContentPresenter>().Single(part => part.Name == "PART_Icon");
+        var layout = dialog.GetVisualDescendants().OfType<Grid>().Single(part => part.Name == "PART_Layout");
+        var legalese = dialog.GetVisualDescendants().OfType<TextBlock>().Single(part => part.Name == "PART_Legalese");
+        var version = dialog.GetVisualDescendants().OfType<TextBlock>().Single(part => part.Name == "PART_Version");
+
+        // No icon means no icon column and no 20 DIP gutter leading nowhere.
+        Assert.False(icon.IsVisible);
+        Assert.Equal(0, layout.ColumnSpacing);
+
+        dialog.ApplicationIcon = new Border { Width = 48, Height = 48 };
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(icon.IsVisible);
+        Assert.Equal(20, layout.ColumnSpacing);
+
+        // Each optional line is shown exactly when there is text behind it.
+        Assert.True(legalese.IsVisible);
+        Assert.Equal(!string.IsNullOrWhiteSpace(dialog.EffectiveApplicationVersion), version.IsVisible);
     }
 
     private static IDisposable Show(Control content, double width = 800, double height = 600)

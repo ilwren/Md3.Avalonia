@@ -7,6 +7,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -329,6 +330,26 @@ public sealed class MdMotionLifecycleTests
     }
 
     [AvaloniaFact]
+    public void Ecosystem_Popover_Deregisters_Itself_When_It_Closes()
+    {
+        // A closed popover used to stay on record as "the open one" for as long as it was alive,
+        // so the next popover to open anywhere in the process reached back into it and cut its
+        // exit animation short. Worse, that reference outlived the UI thread that created it.
+        var stale = new MdPopover { Anchor = "Stale", PopoverContent = "Closed" };
+        stale.Show();
+        stale.Dismiss();
+        Assert.True(stale.IsPopupOpen);
+
+        var fresh = new MdPopover { Anchor = "Fresh", PopoverContent = "Open" };
+        fresh.Show();
+        Assert.True(fresh.IsOpen);
+        Assert.True(stale.IsPopupOpen);
+
+        MdMotion.SetScheme(stale, MdMotionScheme.None);
+        MdMotion.SetScheme(fresh, MdMotionScheme.None);
+    }
+
+    [AvaloniaFact]
     public void Simple_Dialog_Keeps_Surface_Present_Through_Exit()
     {
         var dialog = new MdSimpleDialog { Title = "Choose", ItemsSource = new[] { "One", "Two" }, IsOpen = true };
@@ -385,7 +406,10 @@ public sealed class MdMotionLifecycleTests
         {
             Width = 720,
             Height = 220,
-            ItemWidth = 240,
+            // 300 rather than 240 so this viewport still produces a one-large taper, which is
+            // the large/medium/small arrangement this test is about. Narrowing the window
+            // instead would have realised fewer containers and changed what is being measured.
+            ItemWidth = 300,
             ItemHeight = 200,
             Variant = MdCarouselVariant.MultiBrowse,
             ItemsSource = new[] { "One", "Two", "Three", "Four", "Five" },
@@ -395,22 +419,27 @@ public sealed class MdMotionLifecycleTests
         using var scope = Show(carousel, 760, 280);
         Dispatcher.UIThread.RunJobs();
 
-        var items = carousel.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
+        // Re-queried at every step rather than captured once: changing the selection re-runs the
+        // arrangement, and a container that gets recycled out keeps whatever Transitions it last
+        // had. Asserting against that stale reference tests nothing the user can see.
+        ListBoxItem[] Realized() => carousel.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
+
+        var items = Realized();
         Assert.True(items.Length >= 3);
-        Assert.Contains(items, item => Math.Abs(item.Width - 240) < 0.01);
-        Assert.Contains(items, item => Math.Abs(item.Width - 148) < 0.01);
+        Assert.Contains(items, item => Math.Abs(item.Width - 300) < 0.01);
+        Assert.Contains(items, item => Math.Abs(item.Width - 178) < 0.01);
         Assert.Contains(items, item => Math.Abs(item.Width - 56) < 0.01);
-        Assert.All(items, item => Assert.Null(item.Transitions));
+        Assert.All(Realized(), item => Assert.Null(item.Transitions));
 
         MdMotion.SetScheme(carousel, MdMotionScheme.Standard);
         carousel.SelectedIndex = 3;
         Dispatcher.UIThread.RunJobs();
-        Assert.All(items, item => Assert.Single(item.Transitions!));
+        Assert.All(Realized(), item => Assert.Single(item.Transitions!));
         var scroll = carousel.GetVisualDescendants().OfType<ScrollViewer>().First();
         Assert.Single(scroll.Transitions!);
 
         MdMotion.SetScheme(carousel, MdMotionScheme.Reduced);
-        Assert.All(items, item => Assert.Null(item.Transitions));
+        Assert.All(Realized(), item => Assert.Null(item.Transitions));
         Assert.Null(scroll.Transitions);
     }
 
@@ -1183,6 +1212,216 @@ public sealed class MdMotionLifecycleTests
         var visibleAfterDetach = fab.AreItemsVisible;
         await Task.Delay(MdMotion.Resolve(MdMotionScheme.Standard, MdMotionKind.Effects, MdMotionSpeed.Fast).Duration + TimeSpan.FromMilliseconds(40));
         Assert.Equal(visibleAfterDetach, fab.AreItemsVisible);
+    }
+
+    // #27: the four motion types used to be pure IsVisible switches with no transitions at all.
+    // These pin the behaviour that replaced them, so a future refactor cannot quietly regress to
+    // a snap. Animated properties are read only through schemes where motion is disabled; while a
+    // transition is running the getter returns the in-flight value, which is not assertable.
+
+    [AvaloniaFact]
+    public void Reveal_Host_Clips_Its_Child_Rather_Than_Squashing_It()
+    {
+        var child = new Border { Width = 200, Height = 100 };
+        // Top-left aligned so the host's bounds report the extent it asked for rather than the
+        // window's: the whole point of the control is the size it requests.
+        var host = new MdRevealHost
+        {
+            Child = child,
+            Fraction = 0.25,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top
+        };
+        using var scope = Show(host);
+
+        Assert.Equal(25d, host.Bounds.Height, 1);
+        // The child keeps the height it measured; the host simply shows a quarter of it.
+        Assert.Equal(100d, child.Bounds.Height, 1);
+        Assert.Equal(200d, child.Bounds.Width, 1);
+
+        host.Fraction = 1d;
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(100d, host.Bounds.Height, 1);
+    }
+
+    [AvaloniaFact]
+    public void Container_Transform_Morphs_Its_Bounds_And_Shape_Between_The_Two_Contents()
+    {
+        var transform = new MdContainerTransform
+        {
+            ClosedContent = new Border { Width = 120, Height = 60 },
+            OpenContent = new Border { Width = 320, Height = 200 },
+            ClosedCornerRadius = new CornerRadius(16),
+            OpenCornerRadius = new CornerRadius(28),
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top
+        };
+        MdMotion.SetScheme(transform, MdMotionScheme.None);
+        using var scope = Show(transform);
+
+        var morph = Part<MdMorphPanel>(transform, "PART_Morph");
+        var container = Part<Border>(transform, "PART_Container");
+        var closed = Part<ContentPresenter>(transform, "PART_ClosedContent");
+        var open = Part<ContentPresenter>(transform, "PART_OpenContent");
+
+        // The old template stacked both presenters in a Panel, so the collapsed card was always
+        // as large as the open one. The morph panel reports the closed extent at progress 0.
+        Assert.Equal(0d, morph.Progress);
+        Assert.Equal(60d, morph.Bounds.Height, 1);
+        Assert.Equal(new CornerRadius(16), container.CornerRadius);
+        Assert.Equal(1d, closed.Opacity);
+        Assert.Equal(0d, open.Opacity);
+
+        transform.Toggle();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(1d, morph.Progress);
+        Assert.Equal(200d, morph.Bounds.Height, 1);
+        Assert.Equal(new CornerRadius(28), container.CornerRadius);
+        Assert.Equal(0d, closed.Opacity);
+        Assert.Equal(1d, open.Opacity);
+        Assert.False(closed.IsHitTestVisible);
+        Assert.True(open.IsHitTestVisible);
+    }
+
+    [AvaloniaFact]
+    public void Container_Transform_Holds_The_Incoming_Fade_Behind_The_Outgoing_One()
+    {
+        var transform = new MdContainerTransform
+        {
+            ClosedContent = new Border { Width = 120, Height = 60 },
+            OpenContent = new Border { Width = 320, Height = 200 },
+            Duration = TimeSpan.FromMilliseconds(300)
+        };
+        using var scope = Show(transform);
+
+        transform.IsExpanded = true;
+        Dispatcher.UIThread.RunJobs();
+
+        var closed = Part<ContentPresenter>(transform, "PART_ClosedContent");
+        var open = Part<ContentPresenter>(transform, "PART_OpenContent");
+        var exit = Assert.IsType<DoubleTransition>(Assert.Single(closed.Transitions!));
+        var enter = Assert.IsType<DoubleTransition>(Assert.Single(open.Transitions!));
+
+        // Material splits a container transform 30/70: the outgoing content clears before the
+        // incoming one starts, so the surface never shows both at full strength.
+        Assert.Equal(TimeSpan.Zero, exit.Delay);
+        Assert.Equal(TimeSpan.FromMilliseconds(90), exit.Duration);
+        Assert.Equal(TimeSpan.FromMilliseconds(90), enter.Delay);
+        Assert.Equal(TimeSpan.FromMilliseconds(210), enter.Duration);
+        Assert.NotNull(Part<MdMorphPanel>(transform, "PART_Morph").Transitions);
+        Assert.NotNull(Part<Border>(transform, "PART_Container").Transitions);
+    }
+
+    [AvaloniaFact]
+    public void Animated_Visibility_Animates_Out_Instead_Of_Snapping()
+    {
+        var av = new MdAnimatedVisibility
+        {
+            Transition = MdVisibilityTransition.ExpandVertical,
+            Duration = TimeSpan.FromMilliseconds(250),
+            Content = new Border { Width = 200, Height = 80 }
+        };
+        using var scope = Show(av);
+        var reveal = Part<MdRevealHost>(av, "PART_Reveal");
+
+        Assert.True(av.IsContentPresent);
+        Assert.Equal(MdRevealAxis.Vertical, reveal.Axis);
+
+        av.IsContentVisible = false;
+        Dispatcher.UIThread.RunJobs();
+
+        // Still mounted: the exit has to be visible, which is the whole point of the control.
+        Assert.True(av.IsContentPresent);
+        Assert.NotNull(reveal.Transitions);
+        Assert.Contains(reveal.Transitions!, transition =>
+            transition is DoubleTransition { Property: var property } && property == MdRevealHost.FractionProperty);
+    }
+
+    [AvaloniaFact]
+    public void Animated_Visibility_Settles_Immediately_When_Motion_Is_Off()
+    {
+        var av = new MdAnimatedVisibility
+        {
+            Transition = MdVisibilityTransition.ExpandHorizontal,
+            Content = new Border { Width = 200, Height = 80 }
+        };
+        MdMotion.SetScheme(av, MdMotionScheme.None);
+        using var scope = Show(av);
+
+        var reveal = Part<MdRevealHost>(av, "PART_Reveal");
+        Assert.Equal(MdRevealAxis.Horizontal, reveal.Axis);
+        Assert.Equal(1d, reveal.Fraction);
+
+        av.IsContentVisible = false;
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Null(reveal.Transitions);
+        Assert.Equal(0d, reveal.Fraction);
+        Assert.False(av.IsContentPresent);
+    }
+
+    [AvaloniaFact]
+    public void Fade_Through_Keeps_The_Outgoing_Value_Mounted_While_It_Phases_Out()
+    {
+        var fade = new MdFadeThrough { Content = "first" };
+        using var scope = Show(fade);
+
+        var outgoing = Part<ContentPresenter>(fade, "PART_OutgoingContent");
+        Assert.False(outgoing.IsVisible);
+
+        fade.Content = "second";
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(fade.IsTransitioning);
+        Assert.True(outgoing.IsVisible);
+        Assert.False(outgoing.IsHitTestVisible);
+        Assert.Equal("first", outgoing.Content);
+        Assert.NotNull(outgoing.Transitions);
+
+        // The incoming phase waits out the exit rather than overlapping it.
+        var primary = Part<ContentPresenter>(fade, "PART_Content");
+        var enter = Assert.Single(primary.Transitions!.OfType<DoubleTransition>());
+        Assert.True(enter.Delay > TimeSpan.Zero);
+    }
+
+    [AvaloniaFact]
+    public void Fade_Through_Still_Animates_Control_Content_Without_Reparenting_It()
+    {
+        // A visual has exactly one parent, so a Control that is already mounted in the primary
+        // presenter cannot also be shown by the outgoing one. The entrance must still animate.
+        var first = new TextBlock { Text = "first" };
+        var fade = new MdFadeThrough { Content = first };
+        using var scope = Show(fade);
+
+        fade.Content = new TextBlock { Text = "second" };
+        Dispatcher.UIThread.RunJobs();
+
+        var outgoing = Part<ContentPresenter>(fade, "PART_OutgoingContent");
+        Assert.False(outgoing.IsVisible);
+        Assert.Null(outgoing.Content);
+        Assert.False(fade.IsTransitioning);
+
+        var primary = Part<ContentPresenter>(fade, "PART_Content");
+        Assert.NotNull(primary.Transitions);
+        Assert.Equal("second", Assert.IsType<TextBlock>(primary.Content).Text);
+    }
+
+    [AvaloniaFact]
+    public void Shared_Axis_Phases_The_Two_Values_In_Opposite_Directions()
+    {
+        var shared = new MdSharedAxis { Axis = MdSharedAxisKind.X, Forward = true, Content = "page one" };
+        using var scope = Show(shared);
+
+        shared.Content = "page two";
+        Dispatcher.UIThread.RunJobs();
+
+        var outgoing = Part<ContentPresenter>(shared, "PART_OutgoingContent");
+        Assert.True(shared.IsTransitioning);
+        Assert.True(outgoing.IsVisible);
+        Assert.Equal("page one", outgoing.Content);
+        Assert.NotNull(outgoing.Transitions);
+        Assert.Contains(outgoing.Transitions!, transition => transition is TransformOperationsTransition);
     }
 
     private static T Part<T>(Control owner, string name) where T : Control =>

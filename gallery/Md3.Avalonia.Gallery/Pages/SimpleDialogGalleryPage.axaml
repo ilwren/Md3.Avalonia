@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.SimpleDialogGalleryPage">
+  <Grid>
+  <md:MdScrollViewer x:Name="StandalonePageScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Simple dialog" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A simple dialog offers a short list of choices and nothing else — no text body, no action buttons beyond cancelling." />
+      </StackPanel>
+
+      <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
+        <TextBlock Classes="body" Text="A modal account task blocks the page until an option or Cancel is chosen." />
+        <md:MdButton Width="150" HorizontalAlignment="Left" Content="Choose account" Variant="Outlined" Click="OpenSimpleDialog" />
+        <TextBlock x:Name="DialogStatus" Classes="body" Text="No account selected." />
+      </StackPanel>
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample CSharpCode="var dialog = new MdSimpleDialog { Title = &quot;Set backup account&quot;, ItemsSource = accounts };&#10;dialog.ItemSelected += (_, item) =&gt; DialogHost.Close(item);&#10;var chosen = await DialogHost.ShowAsync(dialog);" />
+      </StackPanel>
+
+    </StackPanel>
+  </md:MdScrollViewer>
+  <md:MdDialogHost x:Name="LocalDialogHost" ZIndex="20" />
+  </Grid>
+</UserControl>

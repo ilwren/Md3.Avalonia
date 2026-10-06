@@ -19,6 +19,7 @@ def main():
 
     failed = 0
     passed = 0
+    failures = []
     for result in results:
         outcome = result.get('outcome')
         test_name = result.get('testName')
@@ -39,6 +40,7 @@ def main():
             escaped_msg = annotation.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
             print(f"::error title=Headless test failed::{escaped_msg}")
             print(f"FAILED TEST: {test_name}\nMESSAGE:\n{msg}\nSTACK:\n{stack}\n" + "="*60)
+            failures.append((test_name, msg))
         elif outcome == 'Passed':
             passed += 1
 
@@ -49,6 +51,13 @@ def main():
             stream.write("## Headless test results\n\n")
             stream.write(f"- Passed: **{passed}**\n")
             stream.write(f"- Failed: **{failed}**\n")
+            # GitHub caps annotations at ten per level per step, so the summary carries the
+            # full list; otherwise a broad regression hides most of its own evidence.
+            if failures:
+                stream.write("\n<details><summary>Failure detail</summary>\n\n")
+                for name, message in failures:
+                    stream.write(f"**{name}**\n\n```\n{message}\n```\n\n")
+                stream.write("</details>\n")
     if failed > 0:
         sys.exit(1)
 

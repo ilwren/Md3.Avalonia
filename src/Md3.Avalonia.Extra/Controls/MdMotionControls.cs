@@ -1,8 +1,12 @@
 using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
 using Avalonia.Media;
+using Avalonia.Media.Transformation;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
@@ -176,9 +180,109 @@ public sealed class MdAnimationSequence : StackPanel
 
 public enum MdSharedAxisKind { X, Y, Z }
 
-/// <summary>Preview shell for a future shared-axis content transition.</summary>
-/// <remarks>The current preview exposes direction state and renders content, but does not yet retain outgoing content or provide the full Material shared-axis choreography.</remarks>
-[MdExperimental("Shared-axis outgoing-content lifecycle and choreography are not implemented yet.")]
+/// <summary>Axis an <see cref="MdRevealHost"/> grows and shrinks along.</summary>
+public enum MdRevealAxis { Vertical, Horizontal, Both }
+
+/// <summary>
+/// Reveals its child by progressively granting it layout space along one axis while the child
+/// keeps its full measured extent. Material expands and collapses a surface by clipping it, not
+/// by squashing it, so text inside never reflows mid-transition. Animate <see cref="Fraction"/>.
+/// </summary>
+public sealed class MdRevealHost : Decorator
+{
+    public static readonly StyledProperty<double> FractionProperty =
+        AvaloniaProperty.Register<MdRevealHost, double>(nameof(Fraction), 1d);
+
+    public static readonly StyledProperty<MdRevealAxis> AxisProperty =
+        AvaloniaProperty.Register<MdRevealHost, MdRevealAxis>(nameof(Axis), MdRevealAxis.Vertical);
+
+    static MdRevealHost() => AffectsMeasure<MdRevealHost>(FractionProperty, AxisProperty);
+
+    public MdRevealHost() => ClipToBounds = true;
+
+    /// <summary>Revealed portion of the child's measured extent, from 0 to 1.</summary>
+    public double Fraction { get => GetValue(FractionProperty); set => SetValue(FractionProperty, value); }
+
+    /// <summary>Axis the reveal runs along.</summary>
+    public MdRevealAxis Axis { get => GetValue(AxisProperty); set => SetValue(AxisProperty, value); }
+
+    private bool RevealsWidth => Axis is MdRevealAxis.Horizontal or MdRevealAxis.Both;
+    private bool RevealsHeight => Axis is MdRevealAxis.Vertical or MdRevealAxis.Both;
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        if (Child is not { } child) return default;
+        child.Measure(new Size(
+            RevealsWidth ? double.PositiveInfinity : availableSize.Width,
+            RevealsHeight ? double.PositiveInfinity : availableSize.Height));
+        var desired = child.DesiredSize;
+        var fraction = Math.Clamp(Fraction, 0d, 1d);
+        return new Size(
+            RevealsWidth ? desired.Width * fraction : desired.Width,
+            RevealsHeight ? desired.Height * fraction : desired.Height);
+    }
+
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        if (Child is not { } child) return finalSize;
+        var desired = child.DesiredSize;
+        child.Arrange(new Rect(0, 0,
+            RevealsWidth ? Math.Max(finalSize.Width, desired.Width) : finalSize.Width,
+            RevealsHeight ? Math.Max(finalSize.Height, desired.Height) : finalSize.Height));
+        return finalSize;
+    }
+}
+
+/// <summary>
+/// Stacks two children and reports a size interpolated between their measured extents. This is
+/// the bounds half of a Material container transform: the surface grows from the source's size
+/// to the destination's size while the two are cross-faded. Animate <see cref="Progress"/>.
+/// </summary>
+public sealed class MdMorphPanel : Panel
+{
+    public static readonly StyledProperty<double> ProgressProperty =
+        AvaloniaProperty.Register<MdMorphPanel, double>(nameof(Progress));
+
+    static MdMorphPanel() => AffectsMeasure<MdMorphPanel>(ProgressProperty);
+
+    public MdMorphPanel() => ClipToBounds = true;
+
+    /// <summary>Position between the first child's extent (0) and the second child's extent (1).</summary>
+    public double Progress { get => GetValue(ProgressProperty); set => SetValue(ProgressProperty, value); }
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        foreach (var child in Children) child.Measure(availableSize);
+        if (Children.Count == 0) return default;
+        if (Children.Count == 1) return Children[0].DesiredSize;
+
+        var from = Children[0].DesiredSize;
+        var to = Children[1].DesiredSize;
+        var progress = Math.Clamp(Progress, 0d, 1d);
+        return new Size(
+            from.Width + (to.Width - from.Width) * progress,
+            from.Height + (to.Height - from.Height) * progress);
+    }
+
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        foreach (var child in Children)
+        {
+            var desired = child.DesiredSize;
+            child.Arrange(new Rect(0, 0,
+                Math.Max(finalSize.Width, desired.Width),
+                Math.Max(finalSize.Height, desired.Height)));
+        }
+
+        return finalSize;
+    }
+}
+
+/// <summary>
+/// Shared-axis content transition. Replacing <see cref="ContentControl.Content"/> slides and
+/// fades the outgoing content out along <see cref="Axis"/> while the incoming content arrives
+/// from the opposite side, which is the Material shared-axis choreography.
+/// </summary>
 [PseudoClasses(":x-axis", ":y-axis", ":z-axis", ":forward", ":backward")]
 public class MdSharedAxis : ContentControl
 {
@@ -191,17 +295,53 @@ public class MdSharedAxis : ContentControl
     public static readonly StyledProperty<TimeSpan> DurationProperty =
         AvaloniaProperty.Register<MdSharedAxis, TimeSpan>(nameof(Duration), TimeSpan.FromMilliseconds(300));
 
+    /// <summary>Travel distance of the slide, in DIP.</summary>
+    public const double SlideDistance = 30d;
+
+    private readonly MdContentPhaser _phaser;
+
     static MdSharedAxis()
     {
         AxisProperty.Changed.AddClassHandler<MdSharedAxis>((control, _) => control.UpdatePseudoClasses());
         ForwardProperty.Changed.AddClassHandler<MdSharedAxis>((control, _) => control.UpdatePseudoClasses());
     }
 
-    public MdSharedAxis() => UpdatePseudoClasses();
+    public MdSharedAxis()
+    {
+        _phaser = new MdContentPhaser(this, OutgoingTransform, IncomingTransform);
+        UpdatePseudoClasses();
+    }
 
     public MdSharedAxisKind Axis { get => GetValue(AxisProperty); set => SetValue(AxisProperty, value); }
     public bool Forward { get => GetValue(ForwardProperty); set => SetValue(ForwardProperty, value); }
     public TimeSpan Duration { get => GetValue(DurationProperty); set => SetValue(DurationProperty, value); }
+
+    /// <summary>True while the outgoing content is still mounted for its exit phase.</summary>
+    public bool IsTransitioning => _phaser.IsTransitioning;
+
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        base.OnApplyTemplate(e);
+        _phaser.Attach(e.NameScope);
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == ContentProperty) _phaser.Swap(change.OldValue, change.NewValue, Duration);
+        else if (change.Property == ContentTemplateProperty) _phaser.SetTemplate(ContentTemplate);
+    }
+
+    private ITransform OutgoingTransform() => Shift(Forward ? -SlideDistance : SlideDistance, outgoing: true);
+    private ITransform IncomingTransform() => Shift(Forward ? SlideDistance : -SlideDistance, outgoing: false);
+
+    private ITransform Shift(double offset, bool outgoing) => Axis switch
+    {
+        MdSharedAxisKind.X => MdContentPhaser.Translate(offset, 0),
+        MdSharedAxisKind.Y => MdContentPhaser.Translate(0, offset),
+        // The Z axis scales through the surface instead of sliding across it.
+        _ => MdContentPhaser.Scale(outgoing ? 1.1 : 0.8)
+    };
 
     private void UpdatePseudoClasses()
     {
@@ -213,20 +353,45 @@ public class MdSharedAxis : ContentControl
     }
 }
 
-/// <summary>Preview shell for a future fade-through content transition.</summary>
-/// <remarks>The current preview renders its current content only; it does not retain and phase outgoing content.</remarks>
-[MdExperimental("Fade-through outgoing-content lifecycle and phased opacity are not implemented yet.")]
+/// <summary>
+/// Fade-through content transition. The outgoing content fades out over the first 30% of
+/// <see cref="Duration"/>; the incoming content then fades and scales in over the remaining 70%,
+/// which is Material's fade-through timing for unrelated content.
+/// </summary>
 public class MdFadeThrough : ContentControl
 {
     public static readonly StyledProperty<TimeSpan> DurationProperty =
         AvaloniaProperty.Register<MdFadeThrough, TimeSpan>(nameof(Duration), TimeSpan.FromMilliseconds(240));
 
+    private readonly MdContentPhaser _phaser;
+
+    public MdFadeThrough() =>
+        _phaser = new MdContentPhaser(this, () => MdContentPhaser.Scale(1d), () => MdContentPhaser.Scale(0.92));
+
     public TimeSpan Duration { get => GetValue(DurationProperty); set => SetValue(DurationProperty, value); }
+
+    /// <summary>True while the outgoing content is still mounted for its exit phase.</summary>
+    public bool IsTransitioning => _phaser.IsTransitioning;
+
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        base.OnApplyTemplate(e);
+        _phaser.Attach(e.NameScope);
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == ContentProperty) _phaser.Swap(change.OldValue, change.NewValue, Duration);
+        else if (change.Property == ContentTemplateProperty) _phaser.SetTemplate(ContentTemplate);
+    }
 }
 
-/// <summary>Preview shell for an open-container transition surface.</summary>
-/// <remarks>The current preview switches content and shape state; synchronized source/destination bounds, elevation and interruption velocity are not implemented.</remarks>
-[MdExperimental("Full container bounds/elevation morph and interruption handling are not implemented yet.")]
+/// <summary>
+/// An open-container transition surface. Expanding morphs the container's bounds and corner
+/// radius from the closed content's geometry to the open content's, cross-fading the two on
+/// Material's 30/70 split. The outgoing content stays mounted until its fade completes.
+/// </summary>
 [PseudoClasses(":expanded", ":collapsed")]
 public class MdContainerTransform : TemplatedControl
 {
@@ -251,12 +416,18 @@ public class MdContainerTransform : TemplatedControl
     public static readonly StyledProperty<TimeSpan> DurationProperty =
         AvaloniaProperty.Register<MdContainerTransform, TimeSpan>(nameof(Duration), TimeSpan.FromMilliseconds(350));
 
+    private Border? _container;
+    private MdMorphPanel? _morph;
+    private ContentPresenter? _closed;
+    private ContentPresenter? _open;
+
     static MdContainerTransform()
     {
-        IsExpandedProperty.Changed.AddClassHandler<MdContainerTransform>((ct, _) => ct.UpdateState());
+        IsExpandedProperty.Changed.AddClassHandler<MdContainerTransform>((ct, _) => ct.UpdateState(animate: true));
+        DurationProperty.Changed.AddClassHandler<MdContainerTransform>((ct, _) => ct.UpdateState(animate: false));
     }
 
-    public MdContainerTransform() => UpdateState();
+    public MdContainerTransform() => UpdateState(animate: false);
 
     public bool IsExpanded { get => GetValue(IsExpandedProperty); set => SetValue(IsExpandedProperty, value); }
     public object? ClosedContent { get => GetValue(ClosedContentProperty); set => SetValue(ClosedContentProperty, value); }
@@ -268,10 +439,49 @@ public class MdContainerTransform : TemplatedControl
 
     public void Toggle() => IsExpanded = !IsExpanded;
 
-    private void UpdateState()
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        base.OnApplyTemplate(e);
+        _container = e.NameScope.Find<Border>("PART_Container");
+        _morph = e.NameScope.Find<MdMorphPanel>("PART_Morph");
+        _closed = e.NameScope.Find<ContentPresenter>("PART_ClosedContent");
+        _open = e.NameScope.Find<ContentPresenter>("PART_OpenContent");
+        UpdateState(animate: false);
+    }
+
+    private void UpdateState(bool animate)
     {
         PseudoClasses.Set(":expanded", IsExpanded);
         PseudoClasses.Set(":collapsed", !IsExpanded);
+        if (_container is null || _morph is null || _closed is null || _open is null) return;
+
+        var spec = MdMotion.Resolve(this, MdMotionKind.Spatial, MdMotionSpeed.Default);
+        var total = animate && spec.IsEnabled && Duration > TimeSpan.Zero ? Duration : TimeSpan.Zero;
+        var (exit, enter) = MdContentPhaser.SplitPhases(total);
+
+        _container.Transitions = total > TimeSpan.Zero
+            ? MdMotionTransitions.Collect(new CornerRadiusTransition
+            {
+                Property = Border.CornerRadiusProperty,
+                Duration = total,
+                Easing = spec.CreateEasing()
+            })
+            : null;
+        _morph.Transitions = total > TimeSpan.Zero
+            ? MdMotionTransitions.Collect(new DoubleTransition
+            {
+                Property = MdMorphPanel.ProgressProperty,
+                Duration = total,
+                Easing = spec.CreateEasing()
+            })
+            : null;
+
+        var incoming = IsExpanded ? _open : _closed;
+        var outgoing = IsExpanded ? _closed : _open;
+        MdContentPhaser.ApplyCrossFade(incoming, outgoing, exit, enter, spec);
+
+        _container.CornerRadius = IsExpanded ? OpenCornerRadius : ClosedCornerRadius;
+        _morph.Progress = IsExpanded ? 1d : 0d;
     }
 }
 
@@ -284,9 +494,11 @@ public enum MdVisibilityTransition
     SlideAndFade
 }
 
-/// <summary>Preview state host for future enter/exit visibility transitions.</summary>
-/// <remarks>The current preview exposes visible/hidden state but does not guarantee retained exit content.</remarks>
-[MdExperimental("Retained exit lifecycle and transition-specific choreography are not implemented yet.")]
+/// <summary>
+/// Animates its content in and out. Expanding transitions clip the content as the host grows, so
+/// nothing reflows; the others fade, scale or slide. The content stays mounted for the whole exit
+/// phase, so hiding never snaps.
+/// </summary>
 [PseudoClasses(":visible", ":hidden")]
 public class MdAnimatedVisibility : ContentControl
 {
@@ -299,21 +511,272 @@ public class MdAnimatedVisibility : ContentControl
     public static readonly StyledProperty<TimeSpan> DurationProperty =
         AvaloniaProperty.Register<MdAnimatedVisibility, TimeSpan>(nameof(Duration), TimeSpan.FromMilliseconds(250));
 
+    /// <summary>Travel distance of the slide-and-fade transition, in DIP.</summary>
+    public const double SlideDistance = 16d;
+
+    private readonly MdPresenceController _presence;
+    private MdRevealHost? _reveal;
+    private ContentPresenter? _content;
+
     static MdAnimatedVisibility()
     {
-        IsContentVisibleProperty.Changed.AddClassHandler<MdAnimatedVisibility>((av, _) => av.UpdateState());
+        IsContentVisibleProperty.Changed.AddClassHandler<MdAnimatedVisibility>((av, _) => av.UpdateState(animate: true));
+        TransitionProperty.Changed.AddClassHandler<MdAnimatedVisibility>((av, _) => av.UpdateState(animate: false));
     }
 
-    public MdAnimatedVisibility() => UpdateState();
+    public MdAnimatedVisibility()
+    {
+        _presence = new MdPresenceController(present =>
+        {
+            if (_reveal is not null) _reveal.IsVisible = present;
+        });
+        _presence.Initialize(IsContentVisible);
+        UpdateState(animate: false);
+    }
 
     public bool IsContentVisible { get => GetValue(IsContentVisibleProperty); set => SetValue(IsContentVisibleProperty, value); }
     public MdVisibilityTransition Transition { get => GetValue(TransitionProperty); set => SetValue(TransitionProperty, value); }
     public TimeSpan Duration { get => GetValue(DurationProperty); set => SetValue(DurationProperty, value); }
 
-    private void UpdateState()
+    /// <summary>True while hidden content is still mounted for its exit transition.</summary>
+    public bool IsContentPresent => _presence.IsPresent;
+
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        base.OnApplyTemplate(e);
+        _reveal = e.NameScope.Find<MdRevealHost>("PART_Reveal");
+        _content = e.NameScope.Find<ContentPresenter>("PART_Content");
+        _presence.Initialize(IsContentVisible);
+        UpdateState(animate: false);
+    }
+
+    protected override void OnDetachedFromVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        _presence.Stop();
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    private bool UsesReveal => Transition is MdVisibilityTransition.ExpandVertical or MdVisibilityTransition.ExpandHorizontal;
+
+    private void UpdateState(bool animate)
     {
         PseudoClasses.Set(":visible", IsContentVisible);
         PseudoClasses.Set(":hidden", !IsContentVisible);
+        if (_reveal is null || _content is null) return;
+
+        var spec = MdMotion.Resolve(this, MdMotionKind.Spatial, MdMotionSpeed.Default);
+        var duration = animate && spec.IsEnabled && Duration > TimeSpan.Zero ? Duration : TimeSpan.Zero;
+
+        _reveal.Axis = Transition == MdVisibilityTransition.ExpandHorizontal
+            ? MdRevealAxis.Horizontal
+            : MdRevealAxis.Vertical;
+        _reveal.Transitions = duration > TimeSpan.Zero && UsesReveal
+            ? MdMotionTransitions.Collect(new DoubleTransition
+            {
+                Property = MdRevealHost.FractionProperty,
+                Duration = duration,
+                Easing = spec.CreateEasing()
+            })
+            : null;
+        _content.Transitions = duration > TimeSpan.Zero
+            ? MdMotionTransitions.Collect(
+                new DoubleTransition { Property = OpacityProperty, Duration = duration, Easing = spec.CreateEasing() },
+                new TransformOperationsTransition { Property = RenderTransformProperty, Duration = duration, Easing = spec.CreateEasing() })
+            : null;
+
+        // Presence is kept for the whole exit so the content is still mounted while it animates
+        // away. Without it the host would collapse on the first frame and nothing would be seen.
+        _presence.Update(IsContentVisible, duration);
+        if (IsContentVisible) _reveal.IsVisible = true;
+
+        _reveal.Fraction = !UsesReveal || IsContentVisible ? 1d : 0d;
+        _content.Opacity = IsContentVisible ? 1d : 0d;
+        _content.IsHitTestVisible = IsContentVisible;
+        _content.RenderTransform = HiddenOffset(IsContentVisible);
     }
+
+    private ITransform HiddenOffset(bool visible) => Transition switch
+    {
+        MdVisibilityTransition.Scale => MdContentPhaser.Scale(visible ? 1d : 0.8d),
+        MdVisibilityTransition.SlideAndFade => MdContentPhaser.Translate(0, visible ? 0d : SlideDistance),
+        _ => MdContentPhaser.Scale(1d)
+    };
 }
 
+/// <summary>
+/// Drives a two-presenter content swap: the outgoing value is moved into a retained presenter and
+/// phased out while the incoming value phases in. Material splits the two phases 30/70 so the
+/// surface is never showing two things at full strength at once.
+/// </summary>
+internal sealed class MdContentPhaser
+{
+    private readonly ContentControl _owner;
+    private readonly Func<ITransform> _outgoingTransform;
+    private readonly Func<ITransform> _incomingTransform;
+    private readonly MdPresenceController _presence;
+    private ContentPresenter? _primary;
+    private ContentPresenter? _outgoing;
+
+    internal MdContentPhaser(ContentControl owner, Func<ITransform> outgoingTransform, Func<ITransform> incomingTransform)
+    {
+        _owner = owner;
+        _outgoingTransform = outgoingTransform;
+        _incomingTransform = incomingTransform;
+        _presence = new MdPresenceController(present =>
+        {
+            if (_outgoing is null) return;
+            _outgoing.IsVisible = present;
+            if (!present)
+            {
+                _outgoing.Content = null;
+                _outgoing.UpdateChild();
+            }
+        });
+    }
+
+    internal bool IsTransitioning => _presence.IsPresent;
+
+    /// <summary>Material's fade-through split: 30% for the exit, 70% for the entrance.</summary>
+    internal static (TimeSpan Exit, TimeSpan Enter) SplitPhases(TimeSpan total) => total <= TimeSpan.Zero
+        ? (TimeSpan.Zero, TimeSpan.Zero)
+        : (TimeSpan.FromMilliseconds(total.TotalMilliseconds * 0.3),
+           TimeSpan.FromMilliseconds(total.TotalMilliseconds * 0.7));
+
+    internal static TransformOperations Translate(double x, double y)
+    {
+        var builder = new TransformOperations.Builder(1);
+        builder.AppendTranslate(x, y);
+        return builder.Build();
+    }
+
+    internal static TransformOperations Scale(double scale)
+    {
+        var builder = new TransformOperations.Builder(1);
+        builder.AppendScale(scale, scale);
+        return builder.Build();
+    }
+
+    internal static void ApplyCrossFade(
+        ContentPresenter incoming,
+        ContentPresenter outgoing,
+        TimeSpan exit,
+        TimeSpan enter,
+        MdMotionSpec spec)
+    {
+        incoming.Transitions = enter > TimeSpan.Zero
+            ? MdMotionTransitions.Collect(new DoubleTransition
+            {
+                Property = Visual.OpacityProperty,
+                Duration = enter,
+                Delay = exit,
+                Easing = spec.CreateEasing()
+            })
+            : null;
+        outgoing.Transitions = exit > TimeSpan.Zero
+            ? MdMotionTransitions.Collect(new DoubleTransition
+            {
+                Property = Visual.OpacityProperty,
+                Duration = exit,
+                Easing = spec.CreateEasing()
+            })
+            : null;
+
+        incoming.IsVisible = true;
+        outgoing.IsVisible = true;
+        incoming.IsHitTestVisible = true;
+        outgoing.IsHitTestVisible = false;
+        incoming.Opacity = 1d;
+        outgoing.Opacity = 0d;
+    }
+
+    internal void Attach(INameScope nameScope)
+    {
+        _primary = nameScope.Find<ContentPresenter>("PART_Content");
+        _outgoing = nameScope.Find<ContentPresenter>("PART_OutgoingContent");
+        if (_primary is null) return;
+
+        _primary.Opacity = 1d;
+        _primary.RenderTransform = MdContentPhaser.Scale(1d);
+        if (_outgoing is not null)
+        {
+            _outgoing.ContentTemplate = _owner.ContentTemplate;
+            _outgoing.IsVisible = false;
+            _outgoing.Opacity = 0d;
+        }
+
+        _presence.Initialize(false);
+    }
+
+    internal void SetTemplate(IDataTemplate? template)
+    {
+        if (_outgoing is not null) _outgoing.ContentTemplate = template;
+    }
+
+    internal void Swap(object? oldContent, object? newContent, TimeSpan duration)
+    {
+        _ = newContent;
+        if (_primary is null) return;
+
+        var spec = MdMotion.Resolve(_owner, MdMotionKind.Effects, MdMotionSpeed.Default);
+        var total = spec.IsEnabled && duration > TimeSpan.Zero ? duration : TimeSpan.Zero;
+        var (exit, enter) = SplitPhases(total);
+
+        if (total <= TimeSpan.Zero)
+        {
+            _primary.Transitions = null;
+            _primary.Opacity = 1d;
+            _primary.RenderTransform = Scale(1d);
+            _presence.Update(false, TimeSpan.Zero);
+            return;
+        }
+
+        PhaseOutgoing(oldContent, exit, spec);
+
+        // Jump the incoming content to its entry pose with no transition attached, then install
+        // the delayed transition and set the resting pose. Assigning both in one pass would make
+        // the presenter animate *from* wherever it happened to be.
+        _primary.Transitions = null;
+        _primary.Opacity = 0d;
+        _primary.RenderTransform = _incomingTransform();
+        _primary.Transitions = MdMotionTransitions.Collect(
+            new DoubleTransition { Property = Visual.OpacityProperty, Duration = enter, Delay = exit, Easing = spec.CreateEasing() },
+            new TransformOperationsTransition { Property = Visual.RenderTransformProperty, Duration = enter, Delay = exit, Easing = spec.CreateEasing() });
+        _primary.Opacity = 1d;
+        _primary.RenderTransform = Scale(1d);
+    }
+
+    /// <summary>
+    /// Shows the previous value in the retained presenter for its exit phase.
+    /// </summary>
+    /// <remarks>
+    /// Only values the outgoing presenter can realise independently are retained. A Control is
+    /// already mounted in the primary presenter and a visual may have exactly one parent, so
+    /// moving it would mean reparenting a live element mid-transition. The incoming phase still
+    /// runs for Control content; what is skipped is the overlap, not the animation.
+    /// </remarks>
+    private void PhaseOutgoing(object? oldContent, TimeSpan exit, MdMotionSpec spec)
+    {
+        if (_outgoing is null || oldContent is null || oldContent is Control || exit <= TimeSpan.Zero)
+        {
+            _presence.Update(false, TimeSpan.Zero);
+            return;
+        }
+
+        _outgoing.ContentTemplate = _owner.ContentTemplate;
+        _outgoing.Content = oldContent;
+        _outgoing.UpdateChild();
+        _outgoing.IsVisible = true;
+        _outgoing.IsHitTestVisible = false;
+        _outgoing.Transitions = null;
+        _outgoing.Opacity = 1d;
+        _outgoing.RenderTransform = Scale(1d);
+        _outgoing.Transitions = MdMotionTransitions.Collect(
+            new DoubleTransition { Property = Visual.OpacityProperty, Duration = exit, Easing = spec.CreateEasing() },
+            new TransformOperationsTransition { Property = Visual.RenderTransformProperty, Duration = exit, Easing = spec.CreateEasing() });
+        _outgoing.Opacity = 0d;
+        _outgoing.RenderTransform = _outgoingTransform();
+        _presence.Update(true, exit);
+        _presence.Update(false, exit);
+    }
+
+}

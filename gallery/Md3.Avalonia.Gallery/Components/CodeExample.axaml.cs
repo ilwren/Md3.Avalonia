@@ -81,9 +81,16 @@ public partial class CodeExample : UserControl
         ? XamlCode
         : Language.Contains("C#", StringComparison.OrdinalIgnoreCase) ? string.Empty : Code;
 
+    // No placeholder. Thirty-two pages supply only AXAML, and standing in a "add the C# here"
+    // comment meant every one of them showed a TODO where a sample belongs - which is what the
+    // review saw as empty Usage content. A language with nothing to show hides its tab instead.
     private string EffectiveCSharp => !string.IsNullOrWhiteSpace(CSharpCode)
         ? CSharpCode
-        : Language.Contains("C#", StringComparison.OrdinalIgnoreCase) ? Code : "// Add the equivalent direct-control C# here.";
+        : Language.Contains("C#", StringComparison.OrdinalIgnoreCase) ? Code : string.Empty;
+
+    private bool HasXaml => !string.IsNullOrWhiteSpace(EffectiveXaml);
+
+    private bool HasCSharp => !string.IsNullOrWhiteSpace(EffectiveCSharp);
 
     private void UpdateEditors()
     {
@@ -94,6 +101,27 @@ public partial class CodeExample : UserControl
 
         XamlEditor.Text = EffectiveXaml;
         CSharpEditor.Text = EffectiveCSharp;
+
+        var hasXaml = HasXaml;
+        var hasCSharp = HasCSharp;
+
+        if (XamlTab is not null) XamlTab.IsVisible = hasXaml;
+        if (CSharpTab is not null) CSharpTab.IsVisible = hasCSharp;
+
+        // One language is not a choice, so the picker goes away and the caption names it.
+        if (LanguageTabsHost is not null) LanguageTabsHost.IsVisible = hasXaml && hasCSharp;
+        if (SourceLabel is not null)
+        {
+            SourceLabel.Text = (hasXaml, hasCSharp) switch
+            {
+                (true, false) => "Source example - AXAML",
+                (false, true) => "Source example - C#",
+                _ => "Source example",
+            };
+        }
+
+        if (!hasCSharp) SetLanguage(false);
+        else if (!hasXaml) SetLanguage(true);
     }
 
     private void UpdateEditorTheme()

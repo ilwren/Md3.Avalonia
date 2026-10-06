@@ -56,8 +56,13 @@ public class MdFabMenu : ItemsControl
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdFabMenu>((menu, _) => menu.UpdateMotion());
     }
 
+    // Android has no Escape key. The system back gesture arrives as TopLevel.BackRequested and
+    // has to dismiss this surface, or it is unreachable by the one gesture phone users rely on.
+    private readonly MdBackScope _backScope;
+
     public MdFabMenu()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _closeTimer = new DispatcherTimer();
         _closeTimer.Tick += (_, _) => FinishClosing();
         UpdateColorPseudoClasses();
@@ -163,6 +168,7 @@ public class MdFabMenu : ItemsControl
 
     private void UpdateOpenState()
     {
+        _backScope.Update(IsOpen);
         _closeTimer.Stop();
         _openFrameCancellation?.Cancel();
         _openFrameCancellation?.Dispose();
@@ -390,6 +396,14 @@ public class MdFabMenu : ItemsControl
         var y = ExpansionDirection == MdFabMenuExpansionDirection.Down ? 0d : 1d;
         _menuItems.RenderTransformOrigin = new RelativePoint(x, y, RelativeUnit.Relative);
     }
+
+    private bool OnBackRequested()
+    {
+        if (!IsOpen) return false;
+        Dismiss();
+        return true;
+    }
+
 }
 
 internal sealed class MdFabMenuAutomationPeer(MdFabMenu owner)

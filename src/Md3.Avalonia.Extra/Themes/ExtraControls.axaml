@@ -25,20 +25,24 @@
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
     <Setter Property="FontSize" Value="14" />
+    <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Template">
       <ControlTemplate TargetType="ListBoxItem">
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="4">
           <Border x:Name="PART_ItemSurface"
                   Background="{TemplateBinding Background}"
-                  CornerRadius="16"
-                  Padding="{TemplateBinding Padding}">
+                  CornerRadius="16">
             <Grid VerticalAlignment="Center">
+              <!-- The state layer is a sibling of the padded content rather than its child. As a
+                   child it was laid out inside Padding, so hover and press painted a lozenge
+                   inset by 8 DIP on every side instead of the rounded chip the pointer is over. -->
               <Border x:Name="PART_StateLayer"
                       Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
                       CornerRadius="16"
                       Opacity="0"
                       IsHitTestVisible="False" />
-              <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center"
+                          Margin="{TemplateBinding Padding}">
                 <Viewbox x:Name="PART_IconHost" Width="18" Height="18" VerticalAlignment="Center" IsVisible="False">
                   <md:MdSymbolPresenter x:Name="PART_IconPresenter" Foreground="{TemplateBinding Foreground}" />
                 </Viewbox>
@@ -67,7 +71,75 @@
     <Style Selector="^.current"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
     <Style Selector="^.has-icon /template/ Viewbox#PART_IconHost"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
+    <!-- The current location is a label, not a link. It gets no pointer feedback and no hand
+         cursor, which is what tells the user which segments are actually navigable. -->
+    <Style Selector="^.current"><Setter Property="Cursor" Value="Arrow" /></Style>
+    <Style Selector="^.current /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0" /></Style>
   </ControlTheme>
+  <!-- Powerline breadcrumb: interlocking chevron segments instead of text with a separator glyph.
+
+       Each segment is three pieces in a row - a notch, the body, and a point - and consecutive
+       segments overlap by exactly the chevron depth, so one segment's point lands inside the
+       next one's notch. The two shapes are complementary, which is what makes z-order irrelevant:
+       whichever paints last, the seam is identical. That matters because a ListBox gives no
+       stable way to say "draw earlier items on top".
+
+       The pieces keep a fixed width and stretch only vertically, so the chevron angle stays
+       constant no matter how long the label is; stretching one Path across the whole segment
+       would flatten the arrow on long crumbs and sharpen it on short ones.
+
+       Colour follows M3 roles rather than a terminal palette: ancestors sit on a surface
+       container and the current crumb - the ListBox's selected item - takes the primary role. -->
+  <ControlTheme x:Key="MdBreadcrumbPowerlineItemTheme" TargetType="ListBoxItem">
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Margin" Value="-14,0,0,0" />
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ListBoxItem">
+        <Grid ColumnDefinitions="14,*,14" Background="Transparent">
+          <!-- Notch: the body colour with a chevron bitten out of the left edge. -->
+          <Path x:Name="PART_Notch" Grid.Column="0" Stretch="Fill" Stroke="{x:Null}"
+                Fill="{Binding $parent[ListBoxItem].Background}"
+                Data="M 0,0 L 1,0 L 1,1 L 0,1 L 1,0.5 Z" />
+          <Border x:Name="PART_Body" Grid.Column="1"
+                  Background="{Binding $parent[ListBoxItem].Background}"
+                  Padding="4,5,8,5">
+            <ContentPresenter x:Name="PART_ContentPresenter"
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Foreground="{TemplateBinding Foreground}"
+                              FontSize="{DynamicResource Md.Sys.TypeScale.LabelLarge.Size}" />
+          </Border>
+          <!-- Point: the chevron that fills the next segment's notch. -->
+          <Path x:Name="PART_Point" Grid.Column="2" Stretch="Fill" Stroke="{x:Null}"
+                Fill="{Binding $parent[ListBoxItem].Background}"
+                Data="M 0,0 L 1,0.5 L 0,1 Z" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+    <Style Selector="^:pointerover">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    </Style>
+    <Style Selector="^:selected">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" />
+    </Style>
+    <!-- The first crumb has nothing to interlock with, so it keeps a flat left edge and sits
+         flush with the control's own padding instead of being pulled back under a predecessor. -->
+    <Style Selector="^:nth-child(1)">
+      <Setter Property="Margin" Value="0" />
+    </Style>
+    <Style Selector="^:nth-child(1) /template/ Path#PART_Notch">
+      <Setter Property="Data" Value="M 0,0 L 1,0 L 1,1 L 0,1 Z" />
+    </Style>
+  </ControlTheme>
+
   <ControlTheme x:Key="{x:Type eco:MdBreadcrumb}" TargetType="eco:MdBreadcrumb">
     <Setter Property="SelectionMode" Value="Single" />
     <Setter Property="Background" Value="Transparent" />
@@ -90,6 +162,11 @@
         </Border>
       </ControlTemplate>
     </Setter>
+    <!-- Segments must butt up against each other, so the powerline variant never wraps. -->
+    <Style Selector="^:powerline">
+      <Setter Property="ItemContainerTheme" Value="{StaticResource MdBreadcrumbPowerlineItemTheme}" />
+      <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></Setter>
+    </Style>
     <Style Selector="^:scroll-overflow">
       <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></Setter>
     </Style>

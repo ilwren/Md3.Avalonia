@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.CommandPaletteGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Command palette" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A searchable list of application commands. Each item carries a title, a description and keywords, and runs an ICommand." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <md:MdButton Content="Open command palette" Variant="Filled" HorizontalAlignment="Left" Click="OpenCommandPalette" />
+        <eco:MdSkeleton x:Name="DemoSkeleton" Height="72" IsLoading="False">
+          <Border Padding="16" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}">
+            <TextBlock Text="A command can act on anything the page owns." />
+          </Border>
+        </eco:MdSkeleton>
+        <TextBlock x:Name="PaletteStatus" Classes="body" TextWrapping="Wrap" Text="Open the palette and run a command, or filter by keyword." />
+        <eco:MdCommandPalette x:Name="CommandPalette" CommandInvoked="CommandPaletteInvoked" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample CSharpCode="palette.ItemsSource = new[]&#10;{&#10;    new MdCommandItem(&quot;Toggle loading&quot;, new RelayCommand(Toggle),&#10;                      Description: &quot;Switch the placeholder state&quot;, Keywords: &quot;loading shimmer&quot;)&#10;};&#10;palette.Show();" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

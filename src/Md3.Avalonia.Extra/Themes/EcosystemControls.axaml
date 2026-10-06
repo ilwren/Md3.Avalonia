@@ -25,20 +25,24 @@
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
     <Setter Property="FontSize" Value="14" />
+    <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Template">
       <ControlTemplate TargetType="ListBoxItem">
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="4">
           <Border x:Name="PART_ItemSurface"
                   Background="{TemplateBinding Background}"
-                  CornerRadius="16"
-                  Padding="{TemplateBinding Padding}">
+                  CornerRadius="16">
             <Grid VerticalAlignment="Center">
+              <!-- The state layer is a sibling of the padded content rather than its child. As a
+                   child it was laid out inside Padding, so hover and press painted a lozenge
+                   inset by 8 DIP on every side instead of the rounded chip the pointer is over. -->
               <Border x:Name="PART_StateLayer"
                       Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
                       CornerRadius="16"
                       Opacity="0"
                       IsHitTestVisible="False" />
-              <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center"
+                          Margin="{TemplateBinding Padding}">
                 <Viewbox x:Name="PART_IconHost" Width="18" Height="18" VerticalAlignment="Center" IsVisible="False">
                   <md:MdSymbolPresenter x:Name="PART_IconPresenter" Foreground="{TemplateBinding Foreground}" />
                 </Viewbox>
@@ -67,6 +71,10 @@
     <Style Selector="^.current"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
     <Style Selector="^.has-icon /template/ Viewbox#PART_IconHost"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
+    <!-- The current location is a label, not a link. It gets no pointer feedback and no hand
+         cursor, which is what tells the user which segments are actually navigable. -->
+    <Style Selector="^.current"><Setter Property="Cursor" Value="Arrow" /></Style>
+    <Style Selector="^.current /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0" /></Style>
   </ControlTheme>
   <ControlTheme x:Key="{x:Type eco:MdBreadcrumb}" TargetType="eco:MdBreadcrumb">
     <Setter Property="SelectionMode" Value="Single" />

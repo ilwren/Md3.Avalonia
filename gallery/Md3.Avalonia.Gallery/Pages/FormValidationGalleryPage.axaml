@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.FormValidationGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Form validation" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="MdForm validates its fields together and reports one result. Autovalidate decides whether errors appear as the user types or only on submit." />
+      </StackPanel>
+
+      <Border Classes="gallery-section" Padding="24" Margin="0,0,16,16">
+      <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
+        <md:MdForm x:Name="AccountForm" AutovalidateMode="OnUserInteraction" Submitted="FormSubmitted">
+          <StackPanel Spacing="12">
+            <md:MdFormField x:Name="NameField" IsRequired="True" SupportingText="Required display name">
+              <md:MdTextBox Label="Display name" TextChanged="FormNameChanged" />
+            </md:MdFormField>
+            <md:MdDropdownFormField x:Name="RoleField" Label="Role" IsRequired="True" SupportingText="Choose one role" />
+            <md:MdButton Width="120" HorizontalAlignment="Left" Content="Validate" Click="ValidateForm" />
+          </StackPanel>
+        </md:MdForm>
+        <TextBlock x:Name="FormStatus" Classes="body" Text="Validation has not run." />
+      </StackPanel>
+      </Border>
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdForm AutovalidateMode=&quot;OnUserInteraction&quot; Submitted=&quot;OnSubmitted&quot;&gt;&#10;  &lt;md:MdFormField IsRequired=&quot;True&quot; SupportingText=&quot;Required display name&quot;&gt;&#10;    &lt;md:MdTextBox Label=&quot;Display name&quot; /&gt;&#10;  &lt;/md:MdFormField&gt;&#10;  &lt;md:MdDropdownFormField Label=&quot;Role&quot; IsRequired=&quot;True&quot; /&gt;&#10;&lt;/md:MdForm&gt;"
+                            CSharpCode="AccountForm.Submit();   // raises Submitted with e.IsValid" />
+      </StackPanel>
+
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

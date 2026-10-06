@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.TransferGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Transfer" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Two lists and the moves between them. Rows can be dragged across one or several at a time, or moved with the arrow actions." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <eco:MdTransfer x:Name="Transfer" SelectionChanged="TransferSelectionChanged" />
+        <TextBlock x:Name="TransferStatus" Classes="body" TextWrapping="Wrap" Text="2 capabilities selected. Drag one or several rows across, or use the arrow actions." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdTransfer ItemsSource=&quot;{Binding All}&quot; SelectedItems=&quot;{Binding Chosen}&quot; /&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

@@ -93,10 +93,12 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private Control? _minuteDialHost;
     private Button? _cancelButton;
     private Button? _confirmButton;
+    private TextBlock? _displayTextBlock;
     private MdTextBox? _hourInput;
     private MdTextBox? _minuteInput;
     private MdTimeDial? _clockFace;
     private Popup? _popup;
+    private InputElement? _popupSurface;
     private Border? _surface;
     private Control? _dialPanel;
     private Control? _inputPanel;
@@ -117,8 +119,13 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdTimePicker>((picker, _) => picker.UpdateMotion());
     }
 
+    // Android has no Escape key. The system back gesture arrives as TopLevel.BackRequested and
+    // has to dismiss this surface, or it is unreachable by the one gesture phone users rely on.
+    private readonly MdBackScope _backScope;
+
     public MdTimePicker()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _popupPresence = new MdPresenceController(SetPopupPresence);
         _popupPresence.Initialize(IsOpen);
         UpdateLocalizedText();
@@ -224,6 +231,12 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     {
         DetachHandlers();
         if (_popup is not null) _popup.Closed -= OnPopupClosed;
+        if (_popupSurface is not null)
+        {
+            _popupSurface.RemoveHandler(PointerWheelChangedEvent, OnPopupSurfaceWheel);
+            _popupSurface.RemoveHandler(KeyDownEvent, OnPopupSurfaceKeyDown);
+            _popupSurface = null;
+        }
         base.OnApplyTemplate(e);
         _anchorButton = e.NameScope.Find<Button>("PART_AnchorButton");
         _hourUpButton = e.NameScope.Find<Button>("PART_HourUpButton");
@@ -236,6 +249,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         _minuteDialHost = e.NameScope.Find<Control>("PART_MinuteDialHost");
         _cancelButton = e.NameScope.Find<Button>("PART_CancelButton");
         _confirmButton = e.NameScope.Find<Button>("PART_ConfirmButton");
+        _displayTextBlock = e.NameScope.Find<TextBlock>("PART_DisplayText");
         _hourInput = e.NameScope.Find<MdTextBox>("PART_HourInput");
         _minuteInput = e.NameScope.Find<MdTextBox>("PART_MinuteInput");
         _clockFace = e.NameScope.Find<MdTimeDial>("PART_ClockFace");
@@ -244,6 +258,13 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         _dialPanel = e.NameScope.Find<Control>("PART_DialPanel");
         _inputPanel = e.NameScope.Find<Control>("PART_InputPanel");
         if (_popup is not null) _popup.Closed += OnPopupClosed;
+        _popupSurface = _popup?.Child as InputElement;
+        if (_popupSurface is not null)
+        {
+            // handledEventsToo: the dial and the spin buttons mark their own input handled.
+            _popupSurface.AddHandler(PointerWheelChangedEvent, OnPopupSurfaceWheel, handledEventsToo: false);
+            _popupSurface.AddHandler(KeyDownEvent, OnPopupSurfaceKeyDown, handledEventsToo: false);
+        }
 
         if (_anchorButton is not null) _anchorButton.Click += OnAnchorClick;
         if (_hourUpButton is not null) _hourUpButton.Click += OnHourUp;
@@ -271,20 +292,55 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
 
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
-        if (IsOpen && Math.Abs(e.Delta.Y) > 0)
+        HandleWheel(e);
+        if (!e.Handled) base.OnPointerWheelChanged(e);
+    }
+
+    // On desktop the popup is a separate PopupRoot window, so a wheel or key event raised inside
+    // it never reaches this control: the route ends at the popup root. Android renders popups
+    // into the TopLevel overlay, where the same event bubbles straight here - which is why the
+    // scroll-to-adjust gesture worked there and was dead on Windows. The popup surface forwards
+    // into the same handlers.
+    private void HandleWheel(PointerWheelEventArgs e)
+    {
+        if (Math.Abs(e.Delta.Y) <= 0) return;
+        var delta = e.Delta.Y > 0 ? 1 : -1;
+
+        if (IsOpen)
         {
             var source = e.Source as Visual;
             var overHour = IsWithin(source, _hourDialHost) || _hourInput?.IsKeyboardFocusWithin == true;
-            var delta = e.Delta.Y > 0 ? 1 : -1;
             SetPart(Hour + (overHour ? delta : 0),
                 Minute + (overHour ? 0 : delta * Math.Max(1, MinuteStep)));
             e.Handled = true;
             return;
         }
-        base.OnPointerWheelChanged(e);
+
+        // Closed, with the pointer over the anchor field. Gating this on IsOpen killed the
+        // scroll-to-adjust gesture on the field itself, which is where people reach for it.
+        //
+        // Focus is what makes it safe to restore. A wheel handler that fires on hover alone
+        // silently rewrites the time whenever someone scrolls a page that happens to have a
+        // picker in it, and leaving the event unhandled is exactly what lets that scroll pass
+        // through to the page.
+        if (!IsKeyboardFocusWithin) return;
+
+        // The anchor renders one run of text, so there is no hour element to hit: split it down
+        // the middle instead, left for hours and right for minutes.
+        var overHourSegment = _displayTextBlock is { Bounds.Width: > 0 } text &&
+                              e.GetPosition(text).X < text.Bounds.Width / 2;
+        SetPart(Hour + (overHourSegment ? delta : 0),
+            Minute + (overHourSegment ? 0 : delta * Math.Max(1, MinuteStep)));
+        e.Handled = true;
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
+    {
+        HandleKeyDown(e);
+        if (!e.Handled) base.OnKeyDown(e);
+    }
+
+    private void HandleKeyDown(KeyEventArgs e)
     {
         if (IsOpen && (e.Key == Key.Up || e.Key == Key.Down))
         {
@@ -309,10 +365,12 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
             _commitOnClose = true;
             SetCurrentValue(IsOpenProperty, false);
             e.Handled = true;
-            return;
         }
-        base.OnKeyDown(e);
     }
+
+    private void OnPopupSurfaceWheel(object? sender, PointerWheelEventArgs e) => HandleWheel(e);
+
+    private void OnPopupSurfaceKeyDown(object? sender, KeyEventArgs e) => HandleKeyDown(e);
 
     private void DetachHandlers()
     {
@@ -355,6 +413,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
 
     private void OnOpenStateChanged()
     {
+        _backScope.Update(IsOpen);
         if (IsOpen)
         {
             _popupPresence.Update(true, TimeSpan.Zero);
@@ -532,5 +591,12 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         PseudoClasses.Set(":has-value", SelectedTime is not null);
         PseudoClasses.Set(":hour-dial", ActiveDialPart == MdTimeDialPart.Hour);
         PseudoClasses.Set(":minute-dial", ActiveDialPart == MdTimeDialPart.Minute);
+    }
+
+    private bool OnBackRequested()
+    {
+        if (!IsOpen) return false;
+        CancelSelection();
+        return true;
     }
 }

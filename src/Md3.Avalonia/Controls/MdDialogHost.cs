@@ -14,14 +14,20 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>
 /// Hosts one active Material dialog without a platform-specific window. Declare multiple
-/// type-matched dialog views in the inherited <c>DataTemplates</c> collection, assign a view model to
-/// <see cref="Dialog"/>, and use <see cref="ShowAsync(object, CancellationToken)"/> from direct code.
+/// type-matched dialog views in the inherited <c>DataTemplates</c> collection, then drive the host
+/// whichever way suits the caller — all three reach the same surface:
+/// <list type="bullet">
+/// <item><description>view code-behind: <see cref="ShowAsync(object, CancellationToken)"/> and <see cref="Close"/>;</description></item>
+/// <item><description>a view model holding no control reference: an <see cref="IMdDialogService"/>
+/// assigned to <see cref="Service"/>;</description></item>
+/// <item><description>pure bindings: two-way <see cref="IsOpen"/> with <see cref="Dialog"/>.</description></item>
+/// </list>
 /// </summary>
 [TemplatePart("PART_Scrim", typeof(Control))]
 [TemplatePart("PART_Overlay", typeof(Control))]
 [TemplatePart("PART_DialogPresenter", typeof(ContentPresenter))]
 [PseudoClasses(":open", ":closed", ":present", ":full-screen-dialog", ":reduced-motion", ":no-motion")]
-public sealed class MdDialogHost : ContentControl
+public sealed class MdDialogHost : ContentControl, IMdDialogService
 {
     public static readonly StyledProperty<object?> DialogProperty =
         AvaloniaProperty.Register<MdDialogHost, object?>(nameof(Dialog));
@@ -32,10 +38,13 @@ public sealed class MdDialogHost : ContentControl
             defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
     public static readonly StyledProperty<bool> DismissOnScrimClickProperty =
         AvaloniaProperty.Register<MdDialogHost, bool>(nameof(DismissOnScrimClick), true);
+    public static readonly StyledProperty<MdDialogService?> ServiceProperty =
+        AvaloniaProperty.Register<MdDialogHost, MdDialogService?>(nameof(Service));
 
     private readonly MdPresenceController _presence;
-    private TaskCompletionSource<object?>? _completion;
-    private CancellationTokenRegistration _cancellationRegistration;
+    private readonly MdDialogService _localService = new();
+    private MdDialogService? _connectedService;
+    private MdDialogService.Request? _activeRequest;
     private readonly MdModalFocusController _modalFocus;
     private Control? _scrim;
     private Control? _overlay;
@@ -44,6 +53,7 @@ public sealed class MdDialogHost : ContentControl
     private MdDialog? _displayedDialog;
     private int _openStateVersion;
     private bool _isAttached;
+    private object? _closeResult;
 
     static MdDialogHost()
     {
@@ -51,10 +61,16 @@ public sealed class MdDialogHost : ContentControl
         DialogProperty.Changed.AddClassHandler<MdDialogHost>((host, _) => host.ScheduleDialogStateUpdate());
         DialogTemplateProperty.Changed.AddClassHandler<MdDialogHost>((host, _) => host.ScheduleDialogStateUpdate());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdDialogHost>((host, _) => host.UpdateMotion());
+        ServiceProperty.Changed.AddClassHandler<MdDialogHost>((host, _) => host.ConnectService());
     }
+
+    // Android has no Escape key. The system back gesture arrives as TopLevel.BackRequested and
+    // has to dismiss this surface, or it is unreachable by the one gesture phone users rely on.
+    private readonly MdBackScope _backScope;
 
     public MdDialogHost()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _modalFocus = new MdModalFocusController(this);
         _presence = new MdPresenceController(value => PseudoClasses.Set(":present", value));
         _presence.Initialize(IsOpen);
@@ -70,28 +86,99 @@ public sealed class MdDialogHost : ContentControl
     public bool IsOpen { get => GetValue(IsOpenProperty); set => SetValue(IsOpenProperty, value); }
     public bool DismissOnScrimClick { get => GetValue(DismissOnScrimClickProperty); set => SetValue(DismissOnScrimClickProperty, value); }
 
+    /// <summary>
+    /// The shared service view models show dialogs through. Leave null and the host uses a private
+    /// one, so code-behind and bindings work with no setup.
+    /// </summary>
+    public MdDialogService? Service
+    {
+        get => GetValue(ServiceProperty);
+        set => SetValue(ServiceProperty, value);
+    }
+
+    /// <inheritdoc />
     public Task<object?> ShowAsync(object dialog, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(dialog);
-        if (_completion is not null) Close();
-
-        SetCurrentValue(DialogProperty, dialog);
-        _completion = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
-        _cancellationRegistration.Dispose();
-        if (cancellationToken.CanBeCanceled)
-            _cancellationRegistration = cancellationToken.Register(() => Close());
-        SetCurrentValue(IsOpenProperty, true);
-        return _completion.Task;
+        return (Service ?? _localService).ShowAsync(dialog, cancellationToken);
     }
 
+    /// <inheritdoc />
+    public void Show(object dialog) => (Service ?? _localService).Show(dialog);
+
+    /// <inheritdoc />
+    public Task<object?> ReplaceAsync(object dialog, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(dialog);
+        return (Service ?? _localService).ReplaceAsync(dialog, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public void Replace(object dialog) => (Service ?? _localService).Replace(dialog);
+
+    /// <inheritdoc />
     public void Close(object? result = null)
     {
-        // Complete first: the IsOpen=false handler treats an external/MVVM closure as a null result.
-        _completion?.TrySetResult(result);
-        _completion = null;
-        _cancellationRegistration.Dispose();
-        _cancellationRegistration = default;
+        // Carry the result through the IsOpen handler, which is also where a dismissal that did
+        // not come through this method (scrim, Escape, back gesture, a binding) is completed.
+        _closeResult = result;
         SetCurrentValue(IsOpenProperty, false);
+        _closeResult = null;
+    }
+
+    /// <summary>Displays the next queued request. Called by the service, never directly.</summary>
+    internal void TryShowNext(MdDialogService service)
+    {
+        if (!_isAttached || !ReferenceEquals(_connectedService, service) ||
+            _activeRequest is not null || IsOpen)
+            return;
+
+        // Opening before the template exists would hand the modal focus scope an empty presenter
+        // and trap the focus walk. OnApplyTemplate pumps the service once there is somewhere to go.
+        if (_dialogPresenter is null) return;
+
+        if (service.AcquireCurrent(this) is not { } request) return;
+        _activeRequest = request;
+        SetCurrentValue(DialogProperty, request.Dialog);
+        SetCurrentValue(IsOpenProperty, true);
+    }
+
+    internal void ReleaseService(MdDialogService service)
+    {
+        if (!ReferenceEquals(_connectedService, service)) return;
+        CompleteActiveRequest(null);
+        service.Detach(this);
+        _connectedService = null;
+    }
+
+    private void ConnectService()
+    {
+        var service = Service ?? _localService;
+        if (ReferenceEquals(_connectedService, service))
+        {
+            if (_isAttached) service.Attach(this);
+            return;
+        }
+
+        DisconnectService();
+        _connectedService = service;
+        if (_isAttached) service.Attach(this);
+    }
+
+    private void DisconnectService()
+    {
+        if (_connectedService is null) return;
+        CompleteActiveRequest(null);
+        _connectedService.Detach(this);
+        _connectedService = null;
+    }
+
+    /// <summary>Hands the result back to whoever awaited it, whatever closed the dialog.</summary>
+    private void CompleteActiveRequest(object? result)
+    {
+        if (_activeRequest is not { } request) return;
+        _activeRequest = null;
+        _connectedService?.Complete(this, request, result);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -106,6 +193,7 @@ public sealed class MdDialogHost : ContentControl
         UpdateMotion();
         ScheduleDialogStateUpdate();
         UpdateModalFocus();
+        _connectedService?.Pump();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -114,6 +202,13 @@ public sealed class MdDialogHost : ContentControl
         ++_openStateVersion;
         _presence.Stop();
         _modalFocus.Deactivate();
+        // A detached host cannot display anything. Release the service so a host attached later
+        // picks the queue up, and never leave an awaiting caller hanging on this one.
+        if (_connectedService is { } service)
+        {
+            CompleteActiveRequest(null);
+            service.Detach(this);
+        }
         base.OnDetachedFromVisualTree(e);
     }
 
@@ -121,6 +216,7 @@ public sealed class MdDialogHost : ContentControl
     {
         base.OnAttachedToVisualTree(e);
         _isAttached = true;
+        ConnectService();
         UpdateOpenState();
     }
 
@@ -174,6 +270,7 @@ public sealed class MdDialogHost : ContentControl
 
     private void UpdateOpenState()
     {
+        _backScope.Update(IsOpen);
         var version = ++_openStateVersion;
         ConfigureTransitions(IsOpen ? MdMotionSpeed.Default : MdMotionSpeed.Fast);
         if (IsOpen)
@@ -206,12 +303,12 @@ public sealed class MdDialogHost : ContentControl
 
         UpdateDialogState();
         UpdateModalFocus();
-        if (!IsOpen && _completion is not null)
+        if (!IsOpen)
         {
-            _completion.TrySetResult(null);
-            _completion = null;
-            _cancellationRegistration.Dispose();
-            _cancellationRegistration = default;
+            // _closeResult is set only by Close(result); every other route here — scrim, Escape,
+            // the back gesture, a view model clearing a bound IsOpen — means a null result.
+            CompleteActiveRequest(_closeResult);
+            _connectedService?.Pump();
         }
     }
 
@@ -252,5 +349,12 @@ public sealed class MdDialogHost : ContentControl
                 MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects, speed),
                 MdMotionTransitions.CreateTransform(this, RenderTransformProperty, speed));
         }
+    }
+
+    private bool OnBackRequested()
+    {
+        if (!IsOpen) return false;
+        Close();
+        return true;
     }
 }

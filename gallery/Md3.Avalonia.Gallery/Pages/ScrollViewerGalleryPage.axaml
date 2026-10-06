@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.ScrollViewerGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Scrolling surface" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="MdScrollViewer is the Material scrolling surface used by every page in this gallery. It themes the scrollbar and overscroll without restyling Avalonia's ScrollViewer globally." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <md:MdScrollViewer Height="180" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Spacing="8">
+            <md:MdSurface Padding="14" Variant="ContainerLow" Content="Scrollable item 1" />
+            <md:MdSurface Padding="14" Variant="ContainerLow" Content="Scrollable item 2" />
+            <md:MdSurface Padding="14" Variant="ContainerLow" Content="Scrollable item 3" />
+            <md:MdSurface Padding="14" Variant="ContainerLow" Content="Scrollable item 4" />
+            <md:MdSurface Padding="14" Variant="ContainerLow" Content="Scrollable item 5" />
+            <md:MdSurface Padding="14" Variant="ContainerLow" Content="Scrollable item 6" />
+          </StackPanel>
+        </md:MdScrollViewer>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdScrollViewer VerticalScrollBarVisibility=&quot;Auto&quot; HorizontalScrollBarVisibility=&quot;Disabled&quot;&gt;&#10;  &lt;StackPanel&gt;...&lt;/StackPanel&gt;&#10;&lt;/md:MdScrollViewer&gt;"
+                            CSharpCode="var scroll = new MdScrollViewer { Content = longContent };" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

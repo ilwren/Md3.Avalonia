@@ -60,8 +60,13 @@ public sealed class MdSheetHost : ContentControl
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdSheetHost>((host, _) => host.UpdateMotion());
     }
 
+    // Android has no Escape key. The system back gesture arrives as TopLevel.BackRequested and
+    // has to dismiss this surface, or it is unreachable by the one gesture phone users rely on.
+    private readonly MdBackScope _backScope;
+
     public MdSheetHost()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _modalFocus = new MdModalFocusController(this);
         _presence = new MdPresenceController(value => PseudoClasses.Set(":present", value));
         _presence.Initialize(IsOpen);
@@ -238,6 +243,7 @@ public sealed class MdSheetHost : ContentControl
 
     private void UpdateVisualState()
     {
+        _backScope.Update(IsModal && IsOpen);
         var speed = IsOpen ? MdMotionSpeed.Default : MdMotionSpeed.Fast;
         ConfigureTransitions(speed);
         if (IsOpen)
@@ -330,5 +336,12 @@ public sealed class MdSheetHost : ContentControl
             _ => 0
         };
         _motionTransform.Y = resolvedPlacement == MdSheetPlacement.Bottom ? extent : 0;
+    }
+
+    private bool OnBackRequested()
+    {
+        if (!IsModal || !IsOpen) return false;
+        Dismiss();
+        return true;
     }
 }

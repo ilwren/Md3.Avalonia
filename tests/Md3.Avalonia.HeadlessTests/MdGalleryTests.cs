@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -6,7 +8,9 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
+using AvaloniaEdit;
 using Md3.Avalonia.Gallery;
+using Md3.Avalonia.Gallery.Components;
 using Md3.Avalonia.Gallery.Pages;
 using Xunit;
 
@@ -52,14 +56,63 @@ public sealed class MdGalleryTests
             new TabGalleryPage(),
             new ToolbarGalleryPage(),
             new TooltipGalleryPage(),
-            new FlutterParityGalleryPage(),
-            new AdvancedSelectionGalleryPage(),
+            new FormValidationGalleryPage(),
+            new SimpleDialogGalleryPage(),
+            new AboutDialogGalleryPage(),
+            new PickerRestorationGalleryPage(),
+            new DraggableSheetGalleryPage(),
+            new KeyboardAvoidanceGalleryPage(),
+            new AdaptiveControlsGalleryPage(),
+            new FocusShortcutHeroGalleryPage(),
+            new BannerGalleryPage(),
+            new ExpansionPanelGalleryPage(),
+            new DataTableGalleryPage(),
+            new StepperGalleryPage(),
+            new RefreshIndicatorGalleryPage(),
+            new PaginatedDataTableGalleryPage(),
+            new ReorderableListGalleryPage(),
+            new GridTileGalleryPage(),
+            new DismissibleGalleryPage(),
+            new SegmentedButtonGalleryPage(),
+            new RangeSliderGalleryPage(),
+            new DateRangePickerGalleryPage(),
+            new AutoCompleteGalleryPage(),
+            new SurfaceGalleryPage(),
+            new ResponsiveContentGalleryPage(),
+            new ScrollViewerGalleryPage(),
             new AdaptiveGalleryPage(),
-            new DesktopAdaptersGalleryPage(),
             new ThemeResourcesGalleryPage(),
             new SymbolGalleryPage(),
             new MotionGalleryPage(),
-            new ColorPickerGalleryPage()
+            new ColorPickerGalleryPage(),
+            new PopoverGalleryPage(),
+            new HoverCardGalleryPage(),
+            new CommandPaletteGalleryPage(),
+            new DensityGalleryPage(),
+            new SlidableItemGalleryPage(),
+            new DataGridGalleryPage(),
+            new MasonryPanelGalleryPage(),
+            new PagedItemsGalleryPage(),
+            new AsyncSelectGalleryPage(),
+            new CalendarGalleryPage(),
+            new TimelineGalleryPage(),
+            new CascaderGalleryPage(),
+            new TransferGalleryPage(),
+            new ResultViewGalleryPage(),
+            new ChartGalleryPage(),
+            new RichEditorGalleryPage(),
+            new ChatViewGalleryPage(),
+            new BeforeAfterGalleryPage(),
+            new AnimatedTextGalleryPage(),
+            new SpinKitGalleryPage(),
+            new StaggeredPanelGalleryPage(),
+            new SkeletonGalleryPage(),
+            new AnimationSequenceGalleryPage(),
+            new PinInputGalleryPage(),
+            new TreeViewGalleryPage(),
+            new TagInputGalleryPage(),
+            new AvatarGalleryPage(),
+            new RatingGalleryPage()
         ];
 
         foreach (var page in pages)
@@ -76,9 +129,7 @@ public sealed class MdGalleryTests
                 Assert.True(page.Bounds.Width > 0);
                 var pageFrame = host.CaptureRenderedFrame();
                 Assert.NotNull(pageFrame);
-                var pagePath = Path.Combine(AppContext.BaseDirectory, $"{page.GetType().Name}.png");
-                using var pageStream = File.Create(pagePath);
-                pageFrame.Save(pageStream, new PngBitmapEncoderOptions());
+                MdPreviewAssets.Save(pageFrame, $"{page.GetType().Name}.png");
             }
             finally
             {
@@ -92,11 +143,7 @@ public sealed class MdGalleryTests
         {
             var frame = gallery.CaptureRenderedFrame();
             Assert.NotNull(frame);
-            var path = Path.Combine(AppContext.BaseDirectory, "MdGalleryPreview.png");
-            using (var stream = File.Create(path))
-            {
-                frame.Save(stream, new PngBitmapEncoderOptions());
-            }
+            MdPreviewAssets.Save(frame, "MdGalleryPreview.png");
 
             var themeSelector = gallery.GetVisualDescendants().OfType<MdComboBox>()
                 .Single(control => control.Name == "ThemeSelector");
@@ -104,13 +151,38 @@ public sealed class MdGalleryTests
             Dispatcher.UIThread.RunJobs();
             var darkFrame = gallery.CaptureRenderedFrame();
             Assert.NotNull(darkFrame);
-            var darkPath = Path.Combine(AppContext.BaseDirectory, "MdGalleryDarkPreview.png");
-            using var darkStream = File.Create(darkPath);
-            darkFrame.Save(darkStream, new PngBitmapEncoderOptions());
+            MdPreviewAssets.Save(darkFrame, "MdGalleryDarkPreview.png");
         }
         finally
         {
             gallery.Close();
         }
+    }
+
+    [AvaloniaFact]
+    public void Code_Examples_Never_Show_A_Placeholder_Where_A_Sample_Belongs()
+    {
+        // Thirty-two pages supply only AXAML. The component used to stand in a TODO comment for
+        // the missing C#, so every one of them had a tab you could click into and find nothing
+        // but an instruction to the authors - which is what the review reported as empty Usage.
+        var xamlOnly = new CodeExample { XamlCode = "<md:MdButton Content=\"Send\" />" };
+        var host = new Window { Width = 800, Height = 600, Content = xamlOnly };
+        host.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.All(xamlOnly.GetVisualDescendants().OfType<TextEditor>(), editor =>
+                Assert.DoesNotContain("Add the equivalent", editor.Text ?? string.Empty,
+                    StringComparison.Ordinal));
+
+            // The tab strip itself goes away when only one language has content. Asserting on
+            // the buttons inside it does not work: a hidden host is never measured, so the
+            // group never realises its containers.
+            var strip = xamlOnly.GetVisualDescendants().OfType<Border>()
+                .Single(border => border.Name == "LanguageTabsHost");
+            Assert.False(strip.IsVisible, "one language is not a choice, so do not offer a picker");
+        }
+        finally { host.Close(); }
     }
 }

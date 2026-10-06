@@ -96,3 +96,73 @@ Run this checklist after **every new component or component-template change**. A
 - [ ] Pack all three libraries independently and inspect dependency metadata.
 - [ ] If Android workload is available, build the Android Gallery; otherwise record it as an explicit unverified platform gate.
 - [ ] Immediately after every build, test, or pack command, delete generated `bin`, `obj`, `TestResults`, DLL/PDB, packages, downloaded fonts, and temporary assets before continuing; repeat the gate before delivery.
+
+## Rounded corners (recurring — seen on the data table, then again on the borderless window)
+
+A corner radius that looks right in the designer and square at runtime has two distinct causes.
+They need different fixes, and checking for one does not cover the other.
+
+**1. A child paints over the corner.** The rounded `Border` is correct, but its content has its
+own `Background` and no clip, so it fills the square bounds and the radius is hidden underneath.
+`Grid.ClipToBounds` does not round anything — only a `Border` with the matching `CornerRadius`
+clips to a rounded shape. Fix: `ClipToBounds="True"` on the rounding `Border`.
+
+**2. The surface behind the control is square.** The control rounds itself correctly, but it sits
+on an opaque square window or popup surface that shows through at the corners — a rounded card
+floating inside a square frame. No amount of clipping inside the control helps, because the thing
+showing through is not the control. Fix: make the host surface transparent
+(`Background="Transparent"` plus `TransparencyLevelHint="Transparent"`, with
+`TransparencyBackgroundFallback` set to the surface brush so platforms that refuse transparency
+degrade to the old opaque look rather than to white).
+
+Check both before calling a corner defect fixed:
+
+- [ ] Does the rounding `Border` have `ClipToBounds="True"` if any descendant sets `Background`?
+- [ ] Is the host window or `PopupRoot` transparent, with a non-white fallback?
+- [ ] Verified on a desktop run, not only headless — neither failure mode is visible headless,
+      because headless composites everything into one surface.
+
+## Pointer reachability
+
+`RaiseEvent(new RoutedEventArgs(Button.ClickEvent))` skips hit testing. It proves a handler is
+wired and nothing else: it cannot see an occluding layer, a transparent ancestor, a control
+clipped out of its container, or a render transform that moves the pixels away from the
+coordinates a pointer is given. Every "it does not respond to clicks" report lives in that
+blind spot, so a green suite built on synthetic clicks is not evidence that a control is
+clickable.
+
+Use `PointerInput.Click` when the claim under test is that a user can operate the control -
+anything layered over other content (a clear button over a text box's caret and selection
+layers), small targets (an expander arrow), overlay content (snackbar actions), and popup
+content. Keep a synthetic click only when the assertion is about wiring rather than
+reachability, and say so in a comment at the call site.
+
+`PointerInput` settles animation before clicking. The animation clock runs on wall time, so
+forcing render-timer ticks does not fast-forward it: a popup surface measured straight after
+opening sat at Opacity 0.101, and was still at 0.364 after 120 forced ticks. A click fired in
+that window misses and lands on whatever is underneath, which looks exactly like a product
+defect and is not one.
+
+Two tests were found asserting things no user could do, both hidden by synthetic clicks:
+the context-toolbar test never showed its page, so nothing was laid out; the Android gallery
+test clicked a destination inside a closed navigation drawer, and then one scrolled far below
+the viewport.
+
+## Rendered pixels are testable, and were not being tested
+
+`UseHeadlessDrawing=false` means these tests run the real Skia renderer, so
+`window.CaptureRenderedFrame()` returns actual pixels. Thirty-odd tests here call it and then
+assert `NotNull`, or save a PNG nobody diffs. Until `MdRenderedCornerTests` **no test in this
+repository had ever read a single pixel**, which is why corner rounding, transparency and
+overdraw were written off as "desktop only, not observable headless". They are observable.
+
+To sample: `CopyPixels` into a pinned `uint[]`, index `y * width + x`. Give the window a
+background colour the theme never uses, so "nothing painted here" is unambiguous.
+
+Two cautions, both already paid for:
+
+- Pin the page with `VerticalAlignment.Top`. Gallery pages declare a tall `MinHeight`; in a
+  shorter window they get centred, the content lands at a negative offset, and every sample
+  reads somewhere meaningless.
+- Sample a point that must be painted as well as one that must not. Otherwise a control that
+  failed to render at all passes the test.

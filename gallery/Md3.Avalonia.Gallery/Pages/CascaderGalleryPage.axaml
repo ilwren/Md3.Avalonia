@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.CascaderGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Cascader" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A cascading picker for a hierarchy. The selection is reported as the full path from root to leaf, not just the leaf." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <eco:MdCascader x:Name="Cascader" MaxWidth="520" HorizontalAlignment="Left" SelectionChanged="CascaderSelectionChanged" />
+        <TextBlock x:Name="CascaderStatus" Classes="body" Text="Open the hierarchy and choose a leaf destination." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdCascader ItemsSource=&quot;{Binding Tree}&quot; SelectionChanged=&quot;OnPathChanged&quot; /&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

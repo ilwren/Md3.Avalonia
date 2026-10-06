@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.DensityGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Density" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Density is an attached property, so a compact scope applies to one subtree and leaves the rest of the page at the default spacing." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Both rows contain the same controls. Only the second is inside a compact scope." />
+        <Border Padding="12" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}">
+          <StackPanel Spacing="8">
+            <TextBlock FontWeight="Medium" Text="Default density" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <md:MdButton Content="Confirm" Variant="Filled" />
+              <md:MdButton Content="Cancel" Variant="Text" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <Border Padding="12" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" infra:MdDensity.Mode="Compact">
+          <StackPanel Spacing="8">
+            <TextBlock FontWeight="Medium" Text="Compact density, scoped to this row only" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <md:MdButton Content="Confirm" Variant="Filled" />
+              <md:MdButton Content="Cancel" Variant="Text" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;Border infra:MdDensity.Mode=&quot;Compact&quot;&gt;&#10;  &lt;StackPanel&gt;...&lt;/StackPanel&gt;&#10;&lt;/Border&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

@@ -6,13 +6,13 @@
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Spacing="28">
       <StackPanel Spacing="8"><TextBlock Classes="h1" Text="Switch"/><TextBlock Classes="body" Text="Switches immediately toggle a single setting on or off."/></StackPanel>
-      <StackPanel Width="520" HorizontalAlignment="Left" Spacing="8">
+      <StackPanel MaxWidth="520" HorizontalAlignment="Stretch" Spacing="8">
         <md:MdSwitch Content="Wi-Fi" IsChecked="True"/><md:MdDivider/>
         <md:MdSwitch Content="Bluetooth"/><md:MdDivider/>
         <md:MdSwitch Content="Show status icons" ShowIcons="True" IsChecked="True"/><md:MdDivider/>
         <md:MdSwitch Content="Disabled setting" IsEnabled="False"/>
       </StackPanel>
-      <Border Width="520" HorizontalAlignment="Left" Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20"><TextBlock Classes="body" TextWrapping="Wrap" Text="MdSwitch derives from ToggleButton, so IsChecked, Command, keyboard input, focus and automation remain available for MVVM and direct control usage."/></Border>
+      <Border MaxWidth="520" HorizontalAlignment="Stretch" Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20"><TextBlock Classes="body" TextWrapping="Wrap" Text="MdSwitch derives from ToggleButton, so IsChecked, Command, keyboard input, focus and automation remain available for MVVM and direct control usage."/></Border>
       <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdSwitch Content=&quot;Wi-Fi&quot;&#10;             IsChecked=&quot;{Binding IsWifiEnabled}&quot;&#10;             Command=&quot;{Binding ToggleWifiCommand}&quot; /&gt;" CSharpCode="var toggle = new MdSwitch { Content = &quot;Wi-Fi&quot;, IsChecked = true };&#10;toggle.IsCheckedChanged += (_, _) =&gt; Save(toggle.IsChecked);"/></StackPanel>
     </StackPanel>
   </md:MdScrollViewer>

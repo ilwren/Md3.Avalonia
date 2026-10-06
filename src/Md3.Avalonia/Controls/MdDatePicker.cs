@@ -123,8 +123,13 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdDatePicker>((picker, _) => picker.UpdateMotion());
     }
 
+    // Android has no Escape key. The system back gesture arrives as TopLevel.BackRequested and
+    // has to dismiss this surface, or it is unreachable by the one gesture phone users rely on.
+    private readonly MdBackScope _backScope;
+
     public MdDatePicker()
     {
+        _backScope = new MdBackScope(this, OnBackRequested);
         _popupPresence = new MdPresenceController(SetPopupPresence);
         _monthCompletion.Tick += (_, _) => CompleteMonthTransition();
         _popupPresence.Initialize(IsOpen);
@@ -271,7 +276,7 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         if (e.Key == Key.Escape && IsOpen)
         {
             SetCurrentValue(IsOpenProperty, false);
-            _anchorButton?.Focus();
+        _anchorButton?.Focus();
             e.Handled = true;
             return;
         }
@@ -410,6 +415,7 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
 
     private void OnOpenStateChanged()
     {
+        _backScope.Update(IsOpen);
         if (IsOpen)
         {
             _popupPresence.Update(true, TimeSpan.Zero);
@@ -645,5 +651,13 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
                 isToday,
                 enabled));
         }
+    }
+
+    private bool OnBackRequested()
+    {
+        if (!IsOpen) return false;
+        SetCurrentValue(IsOpenProperty, false);
+        _anchorButton?.Focus();
+        return true;
     }
 }
