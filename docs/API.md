@@ -235,7 +235,7 @@ The host can be driven three ways, and they interoperate — pick per call site 
 | View model | inject `IMdDialogService`; `await _dialogs.ShowAsync(model)` | awaited return value |
 | Bindings only | two-way `IsOpen` with `Dialog` | view model state, no await |
 
-For the view-model route, place one `MdDialogHost` in the application shell, assign a shared `MdDialogService` to its `Service` property, and inject that same instance as `IMdDialogService` — the same arrangement `MdSnackbarService` uses. `MdDialogServiceExtensions.ShowAsync<TResult>` returns a typed result, or `default` when the dialog was dismissed without one:
+For the view-model route, place one `MdDialogHost` in the application shell, assign a shared `MdDialogService` to its `Service` property, and inject that same instance as `IMdDialogService` (step-by-step walkthrough: [Dialog service](DIALOG_SERVICE.md)) — the same arrangement `MdSnackbarService` uses. `MdDialogServiceExtensions.ShowAsync<TResult>` returns a typed result, or `default` when the dialog was dismissed without one:
 
 ```csharp
 // App composition
