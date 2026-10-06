@@ -419,22 +419,27 @@ public sealed class MdMotionLifecycleTests
         using var scope = Show(carousel, 760, 280);
         Dispatcher.UIThread.RunJobs();
 
-        var items = carousel.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
+        // Re-queried at every step rather than captured once: changing the selection re-runs the
+        // arrangement, and a container that gets recycled out keeps whatever Transitions it last
+        // had. Asserting against that stale reference tests nothing the user can see.
+        ListBoxItem[] Realized() => carousel.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
+
+        var items = Realized();
         Assert.True(items.Length >= 3);
         Assert.Contains(items, item => Math.Abs(item.Width - 300) < 0.01);
         Assert.Contains(items, item => Math.Abs(item.Width - 178) < 0.01);
         Assert.Contains(items, item => Math.Abs(item.Width - 56) < 0.01);
-        Assert.All(items, item => Assert.Null(item.Transitions));
+        Assert.All(Realized(), item => Assert.Null(item.Transitions));
 
         MdMotion.SetScheme(carousel, MdMotionScheme.Standard);
         carousel.SelectedIndex = 3;
         Dispatcher.UIThread.RunJobs();
-        Assert.All(items, item => Assert.Single(item.Transitions!));
+        Assert.All(Realized(), item => Assert.Single(item.Transitions!));
         var scroll = carousel.GetVisualDescendants().OfType<ScrollViewer>().First();
         Assert.Single(scroll.Transitions!);
 
         MdMotion.SetScheme(carousel, MdMotionScheme.Reduced);
-        Assert.All(items, item => Assert.Null(item.Transitions));
+        Assert.All(Realized(), item => Assert.Null(item.Transitions));
         Assert.Null(scroll.Transitions);
     }
 
