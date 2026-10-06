@@ -10,6 +10,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Md3.Avalonia.Controls;
 using Md3.Avalonia.Gallery.Pages;
 using Xunit;
 
@@ -43,6 +44,36 @@ public sealed class MdRenderedCornerTests
         }
 
         return pixels;
+    }
+
+    [AvaloniaFact]
+    public void The_Borderless_Window_Frame_Paints_A_Surface_Of_Its_Own()
+    {
+        var window = new MdBorderlessWindow { Width = 600, Height = 400 };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+
+            // The theme makes the window itself transparent on purpose, so the compositor can
+            // cut the rounded corners out of the client area.
+            var windowBrush = Assert.IsAssignableFrom<ISolidColorBrush>(window.Background);
+            Assert.Equal(0, windowBrush.Color.A);
+
+            var frame = window.GetVisualDescendants().OfType<Border>()
+                .First(b => b.Name == "PART_WindowFrame");
+            var frameBrush = Assert.IsAssignableFrom<ISolidColorBrush>(frame.Background);
+            Assert.True(frameBrush.Color.A > 0,
+                "PART_WindowFrame is the thing that draws the rounded surface, but it binds its " +
+                "Background to the window's, which the same theme sets to Transparent so the " +
+                "corners can be cut out. So it paints nothing. On a platform that refuses " +
+                "transparency the opaque square TransparencyBackgroundFallback shows instead, " +
+                "which is the reported square-cornered window.");
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
