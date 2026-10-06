@@ -1,11 +1,12 @@
-# Md3.Avalonia 0.4.1 release notes
+# Md3.Avalonia 0.4.1-preview.1 release notes
 
 发布日期：2026-10-06
 
 这是一个**缺陷修复版本**。重点是上一轮 Gallery 实跑评审中反馈的四类桌面端显示问题，以及新增一个
 opt-in 的富文本主题包和已验证的原生 AOT 支持。
 
-> 版本号从 `0.4.0-preview.1` 进到 `0.4.1`：没有破坏性改动，公共 API 面只做了加法。
+> 版本号从 `0.4.0-preview.1` 进到 `0.4.1-preview.1`：没有破坏性改动，公共 API 面只做了加法，
+> 所以走 patch 位。**仍为预览版**——API 在首个稳定版前仍可能做保持兼容的打磨。
 
 ## 修复
 
@@ -86,7 +87,7 @@ surface，调用方仍可覆盖。
 无破坏性改动，直接改版本号即可：
 
 ```xml
-<PackageReference Include="Md3.Avalonia" Version="0.4.1" />
+<PackageReference Include="Md3.Avalonia" Version="0.4.1-preview.1" />
 ```
 
 如果你显式依赖 carousel 的 item 宽度（例如写死了「第二项是中号」这类假设），注意宽窗口下现在会铺出更多
