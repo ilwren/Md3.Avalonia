@@ -492,6 +492,45 @@ apart, because neither one does any hit testing.
 
 ### Review 14 item 6 - carousel
 
+**Reproduced and fixed, after first being wrongly cleared.** What follows is the failed first
+pass, kept because the mistake in it is the reusable part.
+
+The arrangement only ever produced one large item and one medium one, at every window size.
+Rendering the real gallery page at a 1188 dip viewport and reading the pixels along a scanline
+through each carousel showed what that costs:
+
+    MultiBrowse  280 | 8 | 168 | 8 | 56 | 8 | 56 | ---- 605 dip of empty track ----
+    Hero         360 | 8 |  56 | 8 | 56 | ---- 701 dip of empty track ----
+
+Four items occupying 584 dip of 1188, everything past the second one collapsed to the 56 dip
+small keyline. Correct on a phone, which is the only width the rule was ever written for.
+
+`GetArrangement` now solves for how many large items the viewport has room for alongside the
+trailing taper, and `GetTargetWidth` measures **forward** from the focal item instead of
+symmetrically - a symmetric window hands out `2 * largeCount - 1` large items and overflows the
+arrangement the count was just solved for. At `largeCount == 1` the new rule is identical to the
+old one, so narrow viewports are untouched.
+
+**Why the first pass cleared this wrongly:** `MdCarouselArrangementTests` asserted the keylines
+*fit* the viewport, `<=`. They always did. The defect was that they did not *fill* it, and a
+one-sided bound cannot see that. The companion test now asserts coverage.
+
+The symptom was never written down - defect 9's title names the carousel but its body is
+entirely about the pickers - so this was found by measuring the invariant the arrangement exists
+to satisfy, not by reproducing a report.
+
+Two existing tests encoded the old arithmetic and were updated rather than relaxed:
+`MdNewComponentTests` expected the second of two items to be 118 dip in an 800 dip window, which
+is the defect itself; `MdMotionLifecycleTests` needed a viewport that still produces a
+large/medium/small taper, so its keyline was widened rather than its window narrowed - narrowing
+realised fewer containers and changed what the test measured. It also held a captured container
+array across a selection change, so it was asserting against a recycled container; it re-queries
+now.
+
+---
+
+#### Superseded first pass
+
 Not reproduced, and worth saying plainly: **the carousel symptom is not written down anywhere.**
 Defect 9's title names the carousel but its body is entirely about the pickers, so there is no
 description of what the carousel does wrong to test against.
