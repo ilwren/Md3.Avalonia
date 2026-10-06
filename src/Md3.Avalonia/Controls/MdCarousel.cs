@@ -264,11 +264,11 @@ public sealed class MdCarousel : ListBox
         }
     }
 
-    /// <summary>The large and small keyline extents for the current viewport and variant.</summary>
-    private (double Large, double Small) GetArrangement()
+    /// <summary>The keyline extents, and how many large items the viewport has room for.</summary>
+    private (double Large, double Small, int LargeCount) GetArrangement()
     {
         var preferredLarge = Math.Max(0, ItemWidth);
-        if (Variant == MdCarouselVariant.Uncontained) return (preferredLarge, preferredLarge);
+        if (Variant == MdCarouselVariant.Uncontained) return (preferredLarge, preferredLarge, Math.Max(1, ItemCount));
 
         var preferredSmall = Math.Min(preferredLarge, Math.Clamp(SmallItemWidth, 40, 56));
         var viewport = GetLayoutViewportWidth();
@@ -304,21 +304,48 @@ public sealed class MdCarousel : ListBox
             small = Math.Min(small, large);
         }
 
-        return (large, small);
+        // One large item and one medium one is a phone arrangement. Applied to a desktop-width
+        // carousel it left everything past the second item collapsed to the 56 DIP small keyline
+        // and well over half the viewport empty. Material tiles as many large items as fit and
+        // tapers only at the trailing edge, so count them instead of assuming one.
+        var largeCount = 1;
+        if (viewport > 0 && large > 0 && Variant != MdCarouselVariant.CenterAligned)
+        {
+            var gap = Math.Max(0, ItemSpacing);
+            var medium = (large + small) / 2;
+            // Hero exists to privilege a single item, so it tapers early however wide the window.
+            var ceiling = Variant == MdCarouselVariant.Hero ? 2 : 24;
+            for (var n = 1; n <= Math.Min(ItemCount, ceiling); n++)
+            {
+                var width = n * large + (n - 1) * gap;
+                var rest = ItemCount - n;
+                if (rest > 0)
+                {
+                    width += gap + (Variant == MdCarouselVariant.MultiBrowse && rest > 1
+                        ? medium + gap + small
+                        : small);
+                }
+
+                if (width > viewport) break;
+                largeCount = n;
+            }
+        }
+
+        return (large, small, largeCount);
     }
 
     private double GetTargetWidth(int index)
     {
-        var (large, small) = GetArrangement();
+        var (large, small, largeCount) = GetArrangement();
         if (index < 0 || Variant == MdCarouselVariant.Uncontained) return large;
 
         var distance = Math.Abs(index - _layoutAnchorIndex);
-        if (distance == 0) return large;
+        if (distance < largeCount) return large;
         return Variant switch
         {
             // Material Components Android derives the medium keyline from the midpoint between
             // the current small and large arrangement sizes.
-            MdCarouselVariant.MultiBrowse when distance == 1 => (large + small) / 2,
+            MdCarouselVariant.MultiBrowse when distance == largeCount => (large + small) / 2,
             MdCarouselVariant.MultiBrowse => small,
             MdCarouselVariant.Hero => small,
             MdCarouselVariant.CenterAligned => small,

@@ -13,6 +13,45 @@ namespace Md3.Avalonia.HeadlessTests;
 public sealed class MdCarouselArrangementTests
 {
     [AvaloniaFact]
+    public void A_Wide_Carousel_Fills_Its_Viewport_Instead_Of_Tapering_Immediately()
+    {
+        // Fitting is not enough: the arrangement only ever produced one large item and one
+        // medium one, so on a desktop-width carousel everything from the third item on was a
+        // 56 dip sliver and more than half the track was empty.
+        foreach (var variant in new[] { MdCarouselVariant.MultiBrowse, MdCarouselVariant.Hero })
+        {
+            var carousel = new MdCarousel
+            {
+                Variant = variant,
+                ItemWidth = 280,
+                SmallItemWidth = 56,
+                ItemSpacing = 8,
+                ItemHeight = 160,
+                ItemsSource = Enumerable.Range(0, 8).Select(i => $"Item {i}").ToArray(),
+            };
+            var window = new Window { Width = 1200, Height = 400, Content = carousel };
+            window.Show();
+            try
+            {
+                Dispatcher.UIThread.RunJobs();
+                var viewport = carousel.Bounds.Width - carousel.Padding.Left - carousel.Padding.Right;
+                Assert.True(viewport > 600, $"{variant}: carousel never got a width");
+
+                var widths = Enumerable.Range(0, 8)
+                    .Select(i => (carousel.ContainerFromIndex(i) as Control)?.Bounds.Width ?? 0)
+                    .ToArray();
+                var content = widths.Sum() + 7 * carousel.ItemSpacing;
+                var covered = Math.Min(content, viewport) / viewport;
+                Assert.True(covered >= 0.85,
+                    $"{variant}: the items cover {covered:P0} of a {viewport:0} dip viewport " +
+                    $"({content:0.#} dip of content). Widths: " +
+                    string.Join(", ", widths.Select(w => w.ToString("0.#"))));
+            }
+            finally { window.Close(); }
+        }
+    }
+
+    [AvaloniaFact]
     public void Multi_Browse_Keylines_Fit_The_Viewport_They_Were_Sized_Against()
     {
         // The whole point of the multi-browse arrangement is that a large, a medium and a small
