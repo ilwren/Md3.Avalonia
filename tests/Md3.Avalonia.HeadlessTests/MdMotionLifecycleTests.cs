@@ -404,24 +404,25 @@ public sealed class MdMotionLifecycleTests
     {
         var carousel = new MdCarousel
         {
-            // Narrow on purpose: a large/medium/small taper is what a phone-width viewport
-            // produces. At 720 there is room for several large items and no small one.
-            Width = 460,
+            Width = 720,
             Height = 220,
-            ItemWidth = 240,
+            // 300 rather than 240 so this viewport still produces a one-large taper, which is
+            // the large/medium/small arrangement this test is about. Narrowing the window
+            // instead would have realised fewer containers and changed what is being measured.
+            ItemWidth = 300,
             ItemHeight = 200,
             Variant = MdCarouselVariant.MultiBrowse,
             ItemsSource = new[] { "One", "Two", "Three", "Four", "Five" },
             SelectedIndex = 2
         };
         MdMotion.SetScheme(carousel, MdMotionScheme.None);
-        using var scope = Show(carousel, 500, 280);
+        using var scope = Show(carousel, 760, 280);
         Dispatcher.UIThread.RunJobs();
 
         var items = carousel.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
         Assert.True(items.Length >= 3);
-        Assert.Contains(items, item => Math.Abs(item.Width - 240) < 0.01);
-        Assert.Contains(items, item => Math.Abs(item.Width - 148) < 0.01);
+        Assert.Contains(items, item => Math.Abs(item.Width - 300) < 0.01);
+        Assert.Contains(items, item => Math.Abs(item.Width - 178) < 0.01);
         Assert.Contains(items, item => Math.Abs(item.Width - 56) < 0.01);
         Assert.All(items, item => Assert.Null(item.Transitions));
 
