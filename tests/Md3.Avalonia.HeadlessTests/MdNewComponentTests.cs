@@ -60,8 +60,11 @@ public sealed class MdNewComponentTests
 
         var containers = carousel.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
         Assert.Equal(2, containers.Length);
+        // Both full width: two items have room to sit side by side here. The 118 this used to
+        // expect was the medium keyline, handed out because the arrangement tapered after one
+        // item no matter how much room there was.
         Assert.Equal(180, containers[0].Width);
-        Assert.Equal(118, containers[1].Width);
+        Assert.Equal(180, containers[1].Width);
         Assert.All(containers, item => Assert.Equal(120, item.Height));
     }
 

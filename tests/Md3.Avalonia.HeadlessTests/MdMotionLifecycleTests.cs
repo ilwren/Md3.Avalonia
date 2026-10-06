@@ -404,7 +404,9 @@ public sealed class MdMotionLifecycleTests
     {
         var carousel = new MdCarousel
         {
-            Width = 720,
+            // Narrow on purpose: a large/medium/small taper is what a phone-width viewport
+            // produces. At 720 there is room for several large items and no small one.
+            Width = 460,
             Height = 220,
             ItemWidth = 240,
             ItemHeight = 200,
@@ -413,7 +415,7 @@ public sealed class MdMotionLifecycleTests
             SelectedIndex = 2
         };
         MdMotion.SetScheme(carousel, MdMotionScheme.None);
-        using var scope = Show(carousel, 760, 280);
+        using var scope = Show(carousel, 500, 280);
         Dispatcher.UIThread.RunJobs();
 
         var items = carousel.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
