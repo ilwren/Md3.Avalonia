@@ -489,3 +489,34 @@ Worth noting how it was found: the first attempt snapped only a track press, and
 pointer immediately showed that was half the problem - at 18 dip from the edge the press was
 landing on the clipped handle, not the track. A synthetic event could not have told the two
 apart, because neither one does any hit testing.
+
+### Review 14 item 6 - carousel
+
+Not reproduced, and worth saying plainly: **the carousel symptom is not written down anywhere.**
+Defect 9's title names the carousel but its body is entirely about the pickers, so there is no
+description of what the carousel does wrong to test against.
+
+Rather than guess, `MdCarouselArrangementTests` asserts the invariant the multi-browse
+arrangement exists to satisfy - a large, a medium and a small keyline plus their spacing fit
+across the viewport, which is what keeps the preview item visible. It holds at 360, 480, 720
+and 1100 dip.
+
+The mechanism that looked most likely beforehand does not fire: the arrangement is recomputed
+from `OnSizeChanged`, which triggers on the carousel's own width, while `GetLayoutViewportWidth`
+prefers the scroll viewer's `Viewport.Width`. If those disagreed on a pass, nothing would
+correct it. They do not disagree here.
+
+To get further this one needs the symptom: what is wrong on screen, at what window width, and
+with which variant.
+
+### AOT
+
+**Supported, and now declared.** All six packages carry `IsAotCompatible` and the IL3xxx
+analyzers report nothing. `.github/workflows/aot-probe.yml` publishes the desktop gallery with
+`PublishAot=true`, and rather than trusting a green step it asserts the output is a native ELF
+executable with no managed assembly beside it, then runs that binary under xvfb for 25 seconds.
+Compiling proves little on its own - native AOT fails at runtime, on reflection that is not
+there - so the smoke run is the part that matters: the window stays up, which means the themes,
+the compiled XAML and the icon font all resolved.
+
+Not covered: Windows and macOS publishes, and Android, which uses a different runtime model.
