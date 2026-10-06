@@ -5,7 +5,7 @@
     <AssemblyName>Md3.Avalonia</AssemblyName>
     <Description>Material Design 3 and Material 3 Expressive controls, dynamic HCT theming, motion, localization and desktop adapters for Avalonia 12.</Description>
     <PackageId>Md3.Avalonia</PackageId>
-    <Version>0.4.0-preview.1</Version>
+    <Version>0.4.1</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;material-design;material-3;controls;android;desktop;hct;mvvm</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

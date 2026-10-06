@@ -1,19 +1,19 @@
 # Md3.Avalonia public API overview
 
-This document is the public entry point for the `0.4.0-preview.1` API. Preview APIs may still receive compatibility-preserving refinements before the first stable release. The NuGet package also emits `Md3.Avalonia.xml` from the source XML comments for IDE IntelliSense and API documentation generation.
+This document is the public entry point for the `0.4.1` API. Preview APIs may still receive compatibility-preserving refinements before the first stable release. The NuGet package also emits `Md3.Avalonia.xml` from the source XML comments for IDE IntelliSense and API documentation generation.
 
 ## Install and register
 
 ```xml
-<PackageReference Include="Md3.Avalonia" Version="0.4.0-preview.1" />
+<PackageReference Include="Md3.Avalonia" Version="0.4.1" />
 <!-- Optional symbol providers (choose one): -->
-<PackageReference Include="Md3.Avalonia.Icons" Version="0.4.0-preview.1" />
-<PackageReference Include="Md3.Avalonia.Icons.Lite" Version="0.4.0-preview.1" />
+<PackageReference Include="Md3.Avalonia.Icons" Version="0.4.1" />
+<PackageReference Include="Md3.Avalonia.Icons.Lite" Version="0.4.1" />
 <!-- Optional clean-room third-party Flutter patterns (depends on core): -->
-<PackageReference Include="Md3.Avalonia.Extra" Version="0.4.0-preview.1" />
+<PackageReference Include="Md3.Avalonia.Extra" Version="0.4.1" />
 <!-- Optional Material theme for Avalonia's own DataGrid; the only package that pulls in
      Avalonia.Controls.DataGrid: -->
-<PackageReference Include="Md3.Avalonia.DataGrid" Version="0.4.0-preview.1" />
+<PackageReference Include="Md3.Avalonia.DataGrid" Version="0.4.1" />
 ```
 
 ```xml

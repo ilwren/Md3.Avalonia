@@ -7,7 +7,7 @@
     <AssemblyName>Md3.Avalonia.DataGrid</AssemblyName>
     <Description>Material Design 3 theme for Avalonia's DataGrid. Opt-in package: it carries the Avalonia.Controls.DataGrid dependency so the core Material packages do not have to.</Description>
     <PackageId>Md3.Avalonia.DataGrid</PackageId>
-    <Version>0.4.0-preview.1</Version>
+    <Version>0.4.1</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;datagrid;table;controls;theme;material-design-3</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

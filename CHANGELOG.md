@@ -1,5 +1,70 @@
 # Changelog
 
+## [0.4.1] - 2026-10-06
+
+### Added
+
+- **`Md3.Avalonia.RichEditor`**, an opt-in Material Design 3 theme for the
+  [AvaloniaRichEditor](https://github.com/centwon/AvaloniaRichEditor) control. It is the only
+  package that pulls in that dependency, bringing the set to six packages.
+- **Native AOT.** All six packages declare `IsAotCompatible` and build with the IL3xxx analyzers
+  on alongside the existing IL2xxx trimming ones. `.github/workflows/aot-probe.yml` publishes the
+  desktop gallery with `PublishAot=true` and does not accept a green step as the answer: it
+  asserts the output is a native ELF executable with no managed assembly beside it, then runs that
+  binary under xvfb. Native AOT fails at runtime on reflection that was trimmed away, not at
+  compile time, so the smoke run is the part that carries the claim.
+- `MdBreadcrumb` gains a `Powerline` variant.
+- [`docs/DIALOG_SERVICE.md`](docs/DIALOG_SERVICE.md): how to show dialogs from a view model
+  through `IMdDialogService`, including the composition-root wiring.
+
+### Fixed
+
+- **The carousel ignored how wide it was.** The arrangement produced one large item and one medium
+  one at every window size, so from the third item on everything collapsed to the 56 DIP small
+  keyline: four items covering 584 DIP of an 1188 DIP track, with the rest empty. Correct on a
+  phone, which is the only width the rule was written for. `MdCarousel` now solves for how many
+  large items the viewport has room for, and tapers **forward** from the focal item rather than
+  symmetrically - a symmetric window hands out `2 * largeCount - 1` large items and overflows the
+  arrangement it just solved. At a count of one the result is identical to before, so narrow
+  layouts are untouched.
+- **Borderless windows had square corners.** The theme makes the window itself transparent so the
+  compositor can cut the rounded corners out of the client area, and leaves `PART_WindowFrame` to
+  draw the rounded surface - but that border bound its `Background` straight back to the window's,
+  which is the transparent one, so it painted nothing. Where transparency was refused the opaque
+  square `TransparencyBackgroundFallback` filled the whole window instead, which is the square
+  corner that was reported. The frame now paints `TransparencyBackgroundFallback`, which is this
+  window's opaque colour and stays overridable.
+- **`MdBeforeAfter` drifted away from the pointer** when the divider was grabbed at the very start
+  or end. The handle straddles the divider, so at those positions half of it is clipped outside the
+  control and every pixel the pointer can reach lies on the same side, making the grab offset
+  one-directional and as large as half a handle. Dragging is delta-based on purpose, so that offset
+  survived the whole gesture. The preserved offset is now clamped to the divider's distance from
+  the nearer edge: mid-track grabs behave exactly as before, and the ends collapse to a snap.
+- **Wheel and key input never reached a picker popup on desktop.** The popup is a separate
+  `PopupRoot` there, so events raised inside it end at that root instead of bubbling to the
+  control; Android renders popups into the `TopLevel` overlay, which is why scroll-to-adjust
+  worked there and was dead on Windows. The popup surface now forwards into the same handlers, and
+  `MdTimePicker` picks the hour or minute column from whichever the pointer is over.
+- Desktop popups are dismissed when the page behind them scrolls, rather than staying put while
+  their anchor moves away.
+- The cascader dropdown aligns with its anchor's left edge instead of centring on it.
+
+### Gallery
+
+- Usage sections no longer show placeholder code. 32 pages carried XAML only and 7 carried C#
+  only, and the absent tab rendered as an empty box; the missing tab is now hidden.
+- 29 of the 34 pages that overflowed a 480 DIP window now reflow, by replacing fixed `Width` with
+  `MaxWidth` in about 50 places. The five that still do not are pinned in the test with a
+  two-way assertion, so they cannot be quietly forgotten or quietly fixed.
+- 366 Chinese strings added to the localisation table.
+
+### Testing
+
+- Rendered pixels are now actually read. `UseHeadlessDrawing=false` means these tests run real
+  Skia, but every one of the thirty-odd `CaptureRenderedFrame()` calls asserted only that the
+  frame was not null. Corner rounding had been written off as untestable headless on that basis;
+  it is not, and that is how the borderless window defect above was found.
+
 ## [0.4.0-preview.1] - 2026-10-05
 
 ### Added
