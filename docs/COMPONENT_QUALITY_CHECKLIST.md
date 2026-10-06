@@ -147,3 +147,22 @@ Two tests were found asserting things no user could do, both hidden by synthetic
 the context-toolbar test never showed its page, so nothing was laid out; the Android gallery
 test clicked a destination inside a closed navigation drawer, and then one scrolled far below
 the viewport.
+
+## Rendered pixels are testable, and were not being tested
+
+`UseHeadlessDrawing=false` means these tests run the real Skia renderer, so
+`window.CaptureRenderedFrame()` returns actual pixels. Thirty-odd tests here call it and then
+assert `NotNull`, or save a PNG nobody diffs. Until `MdRenderedCornerTests` **no test in this
+repository had ever read a single pixel**, which is why corner rounding, transparency and
+overdraw were written off as "desktop only, not observable headless". They are observable.
+
+To sample: `CopyPixels` into a pinned `uint[]`, index `y * width + x`. Give the window a
+background colour the theme never uses, so "nothing painted here" is unambiguous.
+
+Two cautions, both already paid for:
+
+- Pin the page with `VerticalAlignment.Top`. Gallery pages declare a tall `MinHeight`; in a
+  shorter window they get centred, the content lands at a negative offset, and every sample
+  reads somewhere meaningless.
+- Sample a point that must be painted as well as one that must not. Otherwise a control that
+  failed to render at all passes the test.
