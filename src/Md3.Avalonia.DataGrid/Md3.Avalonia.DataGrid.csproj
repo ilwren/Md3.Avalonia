@@ -21,6 +21,7 @@
     <!-- Declares the assembly safe to trim and turns the IL2xxx analyzer on, so a new
          reflective call fails the build instead of silently breaking a trimmed app. -->
     <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
   </PropertyGroup>
   <ItemGroup>
