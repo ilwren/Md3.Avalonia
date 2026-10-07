@@ -188,6 +188,7 @@
             <md:MdButton x:Name="TransferNav" Content="Transfer" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTransfer" />
             <md:MdButton x:Name="TreeViewNav" Content="Tree view" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTreeView" />
             <md:MdButton x:Name="BorderlessWindowNav" Content="Borderless windows" Variant="Text" HorizontalContentAlignment="Left" Click="ShowBorderlessWindows" />
+            <md:MdButton x:Name="TrayIconNav" Content="Tray icon" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTrayIcon" />
               </StackPanel>
             </md:MdScrollViewer>
           </Border>

@@ -64,6 +64,7 @@ public sealed class MdGalleryTests
             new KeyboardAvoidanceGalleryPage(),
             new AdaptiveControlsGalleryPage(),
             new FocusShortcutHeroGalleryPage(),
+            new TrayIconGalleryPage(),
             new BannerGalleryPage(),
             new ExpansionPanelGalleryPage(),
             new DataTableGalleryPage(),

@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.TrayIconGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel MaxWidth="1040" Spacing="28">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Tray icon" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="The notification area is desktop chrome: the operating system draws the icon and the menu, so Material owns the naming, defaults, lifetime and a replaceable platform adapter instead of a styled surface." />
+      </StackPanel>
+
+      <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+        <Border Padding="20" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}">
+          <StackPanel Spacing="8">
+            <TextBlock Classes="h3" Text="Platform" />
+            <TextBlock x:Name="PlatformStatus" TextWrapping="Wrap" />
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="1" Padding="20" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}">
+          <StackPanel Spacing="8">
+            <TextBlock Classes="h3" Text="Menu ownership" />
+            <TextBlock TextWrapping="Wrap"
+                       Text="Entries are native menu items, so commands, gestures, check and radio state, enabled state and submenus behave exactly as the platform menu bridge defines them." />
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Live demo" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="The icon is rasterised from a Material Symbols glyph at run time, because the platform takes a bitmap rather than a vector. Switch it on, then use the notification area: every entry reports back into this page." />
+        <Border Padding="20" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+          <StackPanel Spacing="16">
+            <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+              <Border Width="40" Height="40" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.Primary.Brush}">
+                <md:MdIcon Glyph="{x:Static md:MdSymbols.Notifications}" Size="22"
+                           Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" />
+              </Border>
+              <StackPanel Spacing="2">
+                <TextBlock Classes="h3" Text="Material Gallery" />
+                <TextBlock x:Name="DemoStatus" TextWrapping="Wrap" />
+              </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <md:MdSwitch x:Name="DemoSwitch" Content="Show tray icon" Click="TrayDemoToggled" />
+              <md:MdButton Content="Open" Variant="Text" Click="RaiseDemoEntry" />
+            </StackPanel>
+            <StackPanel Spacing="6">
+              <TextBlock Classes="h3" Text="Last activation" />
+              <TextBlock x:Name="ActivationLog" TextWrapping="Wrap" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Menu model" />
+        <Border Padding="20" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+          <md:MdList>
+            <md:MdListItem Headline="Command entry" SupportingText="Header, Command, CommandParameter and Gesture" />
+            <md:MdListItem Headline="Checkable entry" SupportingText="IsChecked with ToggleType = CheckBox" />
+            <md:MdListItem Headline="Radio entries" SupportingText="ToggleType = Radio, usually inside a submenu" />
+            <md:MdListItem Headline="Submenu" SupportingText="MdTrayMenuItem.Items creates the nested NativeMenu on demand" />
+            <md:MdListItem Headline="Separator" SupportingText="MdTrayMenuItemSeparator, or Avalonia's NativeMenuItemSeparator" />
+          </md:MdList>
+        </Border>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;Application xmlns:md=&quot;using:Md3.Avalonia.Controls&quot;&#10;            xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;&#10;            x:CompileBindings=&quot;False&quot;&gt;&#10;  &lt;md:MdTrayIcon.Icons&gt;&#10;    &lt;md:MdTrayIcons&gt;&#10;      &lt;md:MdTrayIcon x:Name=&quot;Tray&quot; ToolTipText=&quot;Material Gallery&quot; Icon=&quot;{Binding TrayIcon}&quot;&#10;                   Command=&quot;{Binding OpenCommand}&quot;&gt;&#10;        &lt;md:MdTrayMenuItem Header=&quot;Open&quot; Command=&quot;{Binding OpenCommand}&quot; Gesture=&quot;Ctrl+O&quot; /&gt;&#10;        &lt;md:MdTrayMenuItem Header=&quot;Start minimized&quot; ToggleType=&quot;CheckBox&quot; IsChecked=&quot;{Binding StartMinimized}&quot; /&gt;&#10;        &lt;md:MdTrayMenuItem Header=&quot;Theme&quot;&gt;&#10;          &lt;md:MdTrayMenuItem Header=&quot;Light&quot; ToggleType=&quot;Radio&quot; IsChecked=&quot;{Binding IsLight}&quot; /&gt;&#10;          &lt;md:MdTrayMenuItem Header=&quot;Dark&quot; ToggleType=&quot;Radio&quot; IsChecked=&quot;{Binding IsDark}&quot; /&gt;&#10;        &lt;/md:MdTrayMenuItem&gt;&#10;        &lt;md:MdTrayMenuItemSeparator /&gt;&#10;        &lt;md:MdTrayMenuItem Header=&quot;Quit&quot; Command=&quot;{Binding QuitCommand}&quot; /&gt;&#10;      &lt;/md:MdTrayIcon&gt;&#10;    &lt;/md:MdTrayIcons&gt;&#10;  &lt;/md:MdTrayIcon.Icons&gt;&#10;&lt;/Application&gt;"
+                             CSharpCode="// The notification area takes a bitmap, so rasterise the Material symbol.&#10;var surface = new Border { Width = 32, Height = 32, CornerRadius = new CornerRadius(10), Background = primaryBrush, Child = glyph };&#10;surface.Measure(new Size(32, 32));&#10;surface.Arrange(new Rect(0, 0, 32, 32));&#10;var bitmap = new RenderTargetBitmap(new PixelSize(32, 32), new Vector(96, 96));&#10;bitmap.Render(surface);&#10;&#10;var tray = new MdTrayIcon&#10;{&#10;    Icon = new WindowIcon(bitmap),&#10;    ToolTipText = &quot;Material Gallery&quot;,&#10;    Command = showWindowCommand&#10;};&#10;tray.Items.Add(new MdTrayMenuItem(&quot;Open&quot;) { Command = showWindowCommand, Gesture = new KeyGesture(Key.O, KeyModifiers.Control) });&#10;var theme = new MdTrayMenuItem(&quot;Theme&quot;);&#10;theme.Items.Add(new MdTrayMenuItem(&quot;Light&quot;) { ToggleType = MenuItemToggleType.Radio, IsChecked = true });&#10;tray.Items.Add(theme);&#10;tray.Items.Add(new MdTrayMenuItemSeparator());&#10;tray.Items.Add(new MdTrayMenuItem(&quot;Quit&quot;) { Command = quitCommand });&#10;&#10;// Register it once so the icon is removed when the application shuts down.&#10;MdTrayIcon.SetIcons(Application.Current!, new MdTrayIcons { tray });" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

@@ -150,9 +150,10 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Tree view", () => new TreeViewGalleryPage());
 
         AddSection("Library");
-        // Borderless window/chrome and desktop adapter samples are intentionally desktop-only.
-        // Do not expose them from the Android single-view navigation: Android has no native
-        // desktop caption, resize frame, or desktop window lifetime to demonstrate.
+        // Borderless window/chrome, desktop adapter and notification-area samples are intentionally
+        // desktop-only. Do not expose them from the Android single-view navigation: Android has no
+        // native desktop caption, resize frame, desktop window lifetime, or notification area to
+        // demonstrate (the tray adapter resolves to a no-op here).
         AddPage("Theme Lab", () => new ThemeResourcesGalleryPage());
         AddPage("Material Symbols", () => new SymbolGalleryPage());
         AddPage("Motion", () => new MotionGalleryPage());
