@@ -75,14 +75,90 @@ jobs:
       # The README claims a native-AOT publish with zero IL diagnostics, so the count is asserted
       # here instead of being left as a number in a log nobody opens. Every ILxxxx diagnostic is a
       # code path that exists only at run time on some input the probe did not happen to take.
+      #
+      # The diagnostics are re-emitted as workflow annotations, not just printed: a warning that
+      # names a file and a line lands on the run page and in the API, so the person fixing it can
+      # see which call site is meant without downloading the publish log.
       - name: Count trim and AOT diagnostics
         if: always()
         run: |
-          echo "### Diagnostics" >> $GITHUB_STEP_SUMMARY
-          if grep -qoE 'IL[0-9]{4}' /tmp/aot.log; then
-            grep -oE 'IL[0-9]{4}' /tmp/aot.log | sort | uniq -c | sort -rn | sed 's/^/    /' >> $GITHUB_STEP_SUMMARY
-            echo "DIAGNOSTICS FOUND:"; grep -oE 'IL[0-9]{4}' /tmp/aot.log | sort | uniq -c | sort -rn
-            echo "the count has to be zero: fix the call site or annotate it with a justification" >&2
-            exit 1
-          fi
-          echo "    none" >> $GITHUB_STEP_SUMMARY
+          python3 - <<'PY'
+          import os, pathlib, re, sys
+
+          summary = os.environ.get("GITHUB_STEP_SUMMARY")
+
+          def report(text):
+              print(text)
+              if summary:
+                  with open(summary, "a", encoding="utf-8") as handle:
+                      handle.write(text + "\n")
+
+          report("### Diagnostics")
+          log_path = pathlib.Path("/tmp/aot.log")
+          if not log_path.exists():
+              report("    no publish log; the build failed before the compiler ran")
+              sys.exit(0)
+
+          log = log_path.read_text(encoding="utf-8", errors="ignore")
+          # MSBuild attributes a diagnostic to a call site when it can ("file(line,col): warning
+          # IL2026: message"); ILC reports some of its own with the code alone. Both count, and a
+          # bare line that is the body of an attributed one must not be counted twice.
+          attributed = re.compile(
+              r"^\s*(?P<file>[^()\n]+?)\((?P<line>\d+),(?P<col>\d+)\):\s*(?P<level>warning|error)\s+"
+              r"(?P<code>IL\d{4}):\s*(?P<message>[^\n]*)", re.M)
+          bare = re.compile(r"^\s*(?P<level>warning|error)\s+(?P<code>IL\d{4}):\s*(?P<message>[^\n]*)", re.M)
+
+          entries = [
+              {"code": hit.group("code"), "file": hit.group("file").strip(), "line": hit.group("line"),
+               "col": hit.group("col"), "message": hit.group("message").strip()}
+              for hit in attributed.finditer(log)
+          ]
+          spans = [hit.span() for hit in attributed.finditer(log)]
+          entries += [
+              {"code": hit.group("code"), "file": None, "line": None, "col": None,
+               "message": hit.group("message").strip()}
+              for hit in bare.finditer(log)
+              if not any(start <= hit.start() < end for start, end in spans)
+          ]
+
+          if not entries:
+              report("    none")
+              sys.exit(0)
+
+          report(f"    {len(entries)} diagnostic line(s), the count has to be zero")
+          counts = {}
+          for entry in entries:
+              counts[entry["code"]] = counts.get(entry["code"], 0) + 1
+          for code, count in sorted(counts.items(), key=lambda item: (-item[1], item[0])):
+              report(f"    {code}: {count}")
+
+          # An annotation has to name a repository-relative path, and MSBuild prints absolute ones.
+          workspace = os.environ.get("GITHUB_WORKSPACE", "").rstrip("/")
+
+          def relative(path):
+              if workspace and path.startswith(workspace + "/"):
+                  return path[len(workspace) + 1:]
+              return path
+
+          # One annotation per code and file, so the API and the run page both name the call sites.
+          seen, emitted = set(), 0
+          for entry in entries:
+              key = (entry["code"], entry["file"])
+              if key in seen:
+                  continue
+              seen.add(key)
+              message = entry["message"][:300]
+              if entry["file"]:
+                  file = relative(entry["file"])
+                  report(f"    {file}({entry['line']}): {entry['code']}: {message}")
+                  print(f"::warning file={file},line={entry['line']},col={entry['col']}::"
+                        f"{entry['code']}: {message}")
+              else:
+                  report(f"    {entry['code']}: {message}")
+                  print(f"::warning::{entry['code']}: {message}")
+              emitted += 1
+              if emitted >= 10:
+                  break
+
+          sys.exit(1)
+          PY
