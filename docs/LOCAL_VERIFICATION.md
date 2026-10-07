@@ -1,8 +1,8 @@
 # 本地验证速查
 
 ## 拉取
-    git fetch origin && git checkout arena/01a104af-md3-avalonia
-    # 或者，带 PR 上下文： gh pr checkout 4
+    git fetch origin && git checkout main
+    # 或者，带 PR 上下文： gh pr checkout <PR 编号>
 
 ## 1. 静态层：不需要 .NET SDK，约 0.1 秒
     python3 scripts/lint-design-tokens.py      # 令牌 lint，报告写到 artifacts/spec/token-lint.md

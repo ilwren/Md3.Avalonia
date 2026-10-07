@@ -1,7 +1,7 @@
 # UI parity audit — Material Design 3 and Flutter Material
 
 **Audit date:** 2026-09-27  
-**Scope:** `Md3.Avalonia`, `Md3.Avalonia.Icons`, `Md3.Avalonia.Ecosystem`, Gallery shell and all Gallery component destinations  
+**Scope:** `Md3.Avalonia`, `Md3.Avalonia.Icons`, `Md3.Avalonia.Extra`, Gallery shell and all Gallery component destinations  
 **Baseline:** current Material Design 3 component site and Flutter 3.47 Material catalog/API
 
 ## 1. Executive conclusion

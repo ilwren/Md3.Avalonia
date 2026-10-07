@@ -4,15 +4,15 @@
 
 | Area | Baseline | Status |
 |---|---|---|
-| .NET | .NET 8 and .NET 10 (`net8.0;net10.0`) | Both assets shipped by the three release packages |
+| .NET | .NET 10 (`net10.0`) | Single target, shipped by all six release packages |
 | Avalonia | 12.1.2 | Build and headless-test baseline |
 | Windows | x64/ARM64 hosts supported by Avalonia 12 | Library-compatible; device sign-off external |
 | macOS | x64/Apple Silicon hosts supported by Avalonia 12 | Library-compatible; VoiceOver sign-off external |
 | Linux | x64/ARM64 hosts supported by Avalonia 12 | Headless Linux tested; Orca sign-off external |
-| Android | `net8.0-android`, API 21 host project; release target API 26+ | Source host supplied; emulator/device sign-off external |
+| Android | `net10.0-android`, API 23 host project; release target API 26+ | Source host supplied; emulator/device sign-off external |
 | iOS/browser | Not a preview-release target | No support commitment |
 
-The runtime library references only `Avalonia` and `MaterialColorUtilities`. It does not reference Avalonia Desktop, Win32, X11, macOS, or a desktop-only theme package.
+The core runtime library references only `Avalonia` and `MaterialColorUtilities`. It does not reference Avalonia Desktop, Win32, X11, macOS, or a desktop-only theme package. Two of the six packages add one dependency each, and neither is required by the others: `Md3.Avalonia.DataGrid` references `Avalonia.Controls.DataGrid` for the theme it ships, and `Md3.Avalonia.RichEditor` references `AvaloniaRichEditor`.
 
 ## Versioning
 
@@ -23,11 +23,11 @@ The runtime library references only `Avalonia` and `MaterialColorUtilities`. It 
 
 ## Android boundary
 
-`samples/Md3.Avalonia.Gallery.Android` is deliberately kept outside the desktop solution so developers without the Android workload can build the library and desktop Gallery. Validate it with an installed .NET Android workload:
+`gallery/Md3.Avalonia.Gallery.Android` is deliberately kept outside the desktop solution so developers without the Android workload can build the library and desktop Gallery. Validate it with an installed .NET Android workload:
 
 ```bash
 dotnet workload install android
-dotnet build samples/Md3.Avalonia.Gallery.Android -c Release
+dotnet build gallery/Md3.Avalonia.Gallery.Android -c Release
 ```
 
 The host uses `ISingleViewApplicationLifetime` and `AndroidGalleryView`. Popup templates do not force `OverlayLayer`, preserving Avalonia's Android fallback behavior.
