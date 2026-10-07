@@ -52,6 +52,7 @@ All component themes are scoped to `Md*` types. Registering `MaterialTheme` does
 - `MdAboutDialog` fills itself in from the entry assembly when `ApplicationName`, `ApplicationVersion` or `Legalese` are left unset, matching Flutter's `showAboutDialog`. The resolved text is readable through `EffectiveApplicationName`, `EffectiveApplicationVersion` and `EffectiveLegalese`; explicit values always win, and a blank string counts as unset. The icon, version and copyright lines collapse when empty.
 - Foundations and desktop adapters: `MdScrollViewer`, `MdScrollBar`, five-breakpoint/input-aware `MdAdaptiveLayout`, `MdSurface`, `MdText`, `MdStateLayer`, `MdFocusRing`, `MdWindow`, `MdIcon`, `MdSymbolPresenter`.
 - Borderless/chromeless windows: `MdBorderlessWindow`, `MdWindowTitleBar`, `MdCaptionButton`/`MdWindowCaptionButton`, `MdWindowDragRegion`, `MdWindowResizeGrip`, `IMdWindowPlatformAdapter`, named platform adapters and `MdWindowPlatformAdapterResolver`. The caption shows the window icon by default (`ShowIcon`) and has no separator line; visibility and enabled state are independently configurable through `ShowMinimizeButton`/`ShowMaximizeButton`/`ShowCloseButton` and `IsMinimizeButtonEnabled`/`IsMaximizeButtonEnabled`/`IsCloseButtonEnabled`.
+- Notification area: `MdTrayIcon`, `MdTrayIcons`, `MdTrayMenuItem`, `MdTrayMenuItemSeparator`, `IMdTrayIconPlatformAdapter`, `MdAvaloniaTrayIconPlatformAdapter`, `MdNoOpTrayIconPlatformAdapter` and `MdTrayIconPlatformAdapterResolver`. The operating system draws the icon and the menu, so the API owns naming, defaults, lifetime and the platform seam instead of a styled surface.
 
 - Optional Icons package: `MdExternalMaterialSymbols`, `MdSymbols` and the `Md.Icon.*` resource injection contract.
 - Optional Ecosystem foundations: `MdDensity`, `MdAsyncRequestState`, `MdPageRequest`, `MdPageResult<T>`, `IMdPageProvider<T>`, `MdShortcutBinding`, `MdOverlayPlacement`, `MdFocusReturnScope`.
@@ -85,8 +86,9 @@ The following catalog covers the public control surface shipped by the core pack
 | **Lists and interaction patterns** | `MdReorderableList`, `MdDismissible`, `MdStepper`, `MdStep`, `MdHero`, `MdFocusTraversalGroup`, `MdShortcutScope` |
 | **Foundations and icons** | `MdText`, `MdIcon`, `MdSymbolPresenter`, `MdStateLayer`, `MdRipplePresenter`, `MdFocusRing`, `MdScrollViewer`, `MdScrollBar`, `MdSliderThumb`, `MdWindow` |
 | **Window chrome** | `MdBorderlessWindow`, `MdWindowTitleBar`, `MdCaptionButton`, `MdWindowCaptionButton`, `MdWindowDragRegion`, `MdWindowResizeGrip`, `IMdWindowPlatformAdapter`, `MdWindowPlatformAdapterResolver`, `MdWindowsWindowPlatformAdapter`, `MdMacOsWindowPlatformAdapter`, `MdLinuxWindowPlatformAdapter`, `MdAvaloniaWindowPlatformAdapter`, `MdAndroidWindowPlatformAdapter` |
+| **Notification area** | `MdTrayIcon`, `MdTrayIcons`, `MdTrayMenuItem`, `MdTrayMenuItemSeparator`, `IMdTrayIconPlatformAdapter`, `MdAvaloniaTrayIconPlatformAdapter`, `MdNoOpTrayIconPlatformAdapter`, `MdTrayIconPlatformAdapterResolver` |
 
-Most core controls expose styled properties, bindable `Items`/`ItemsSource` where applicable, routed events, commands, and native Avalonia automation peers. Variant and option enums are part of the public API and should be preferred over string values. All 79 of them are listed with their members under [Enumerations](#enumerations).
+Most core controls expose styled properties, bindable `Items`/`ItemsSource` where applicable, routed events, commands, and native Avalonia automation peers. Variant and option enums are part of the public API and should be preferred over string values. All 82 of them are listed with their members under [Enumerations](#enumerations).
 
 ### Core control quick reference
 
@@ -297,6 +299,55 @@ The optional `Md3.Avalonia.Extra` package contains visual and ecosystem controls
 
 The Windows adapter preserves native caption style bits when `PreserveNativeBorder=true`, while the Material template owns the title bar surface. Android uses a safe no-op adapter; desktop-only Gallery pages are not registered in `AndroidGalleryView`.
 
+## Notification area (tray icon)
+
+The notification area is desktop chrome: the operating system draws both the icon and its menu, so no Material surface can be styled there. `MdTrayIcon` therefore owns the naming, defaults, lifetime, menu model and the replaceable platform seam, and hands the platform a native `WindowIcon` plus a native `NativeMenu`.
+
+```xml
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             x:CompileBindings="False">
+  <md:MdTrayIcon.Icons>
+    <md:MdTrayIcons>
+      <md:MdTrayIcon ToolTipText="Material Gallery" Icon="{Binding TrayIcon}" Command="{Binding OpenCommand}">
+        <md:MdTrayMenuItem Header="Open" Command="{Binding OpenCommand}" Gesture="Ctrl+O" />
+        <md:MdTrayMenuItem Header="Start minimized" ToggleType="CheckBox" IsChecked="{Binding StartMinimized}" />
+        <md:MdTrayMenuItem Header="Theme">
+          <md:MdTrayMenuItem Header="Light" ToggleType="Radio" IsChecked="{Binding IsLight}" />
+          <md:MdTrayMenuItem Header="Dark" ToggleType="Radio" IsChecked="{Binding IsDark}" />
+        </md:MdTrayMenuItem>
+        <md:MdTrayMenuItemSeparator />
+        <md:MdTrayMenuItem Header="Quit" Command="{Binding QuitCommand}" />
+      </md:MdTrayIcon>
+    </md:MdTrayIcons>
+  </md:MdTrayIcon.Icons>
+</Application>
+```
+
+Compiled bindings are off in that snippet because they need an `x:DataType` in scope and an
+`Application` has none; a window or view with an `x:DataType` can leave them on.
+
+| Type | Role |
+|---|---|
+| `MdTrayIcon` | The icon itself: `Icon` (`WindowIcon`, a bitmap or file - the platform does not accept vector or font glyphs), `ToolTipText`, `IsVisible`, `Command`/`CommandParameter`, content property `Items`, `Clicked`, `MenuRefreshRequested`, `Show`/`Hide`/`Activate`/`Dispose`. |
+| `MdTrayIcons` | The icon set owned by an `Application`; assigned through the attached `MdTrayIcon.Icons` property and disposed when the UI thread shuts down. |
+| `MdTrayMenuItem` | A `NativeMenuItem` with the same properties plus a content property `Items` that creates the submenu on demand and removes it again when the last child is removed. |
+| `MdTrayMenuItemSeparator` | A separator for `MdTrayIcon.Items`. |
+| `IMdTrayIconPlatformAdapter` | The platform seam: `Platform`, `IsSupported`, `SetIcon`, `SetToolTipText`, `SetVisible`, `SetMenu` and `Clicked`. |
+| `MdAvaloniaTrayIconPlatformAdapter` | Default desktop adapter over Avalonia's `TrayIcon`, which owns the Win32, freedesktop/DBus and macOS status-item implementations. |
+| `MdNoOpTrayIconPlatformAdapter` | What Android, the browser and unknown hosts resolve, so shared code keeps one tray model everywhere. |
+| `MdTrayIconPlatformAdapterResolver` | `CurrentPlatform` (operating-system family), `IsSupported` (platform family owns a notification area) and `Resolve()`. |
+
+Behaviour worth knowing before shipping a tray icon:
+
+- **Attachment is deferred.** Constructing `MdTrayIcon` puts nothing in the notification area; the first property assignment, menu entry, `Show()` or injected `PlatformAdapter` attaches it. The Gallery sample builds the model in a data template without creating a platform handle on every row.
+- **`IsSupported` on the adapter is a live probe.** `MdAvaloniaTrayIconPlatformAdapter.IsSupported` requires the windowing platform to have supplied an implementation (`TrayIcon.NativeMenuExporter`), so headless hosts and the X11 XEmbed fallback report `false` instead of promising an icon that never appears. `MdTrayIconPlatformAdapterResolver.IsSupported` reports the platform-family answer and creates nothing.
+- **One parent per entry.** Avalonia's `NativeMenu` rejects an entry that already has a parent, so the exported menu is rebuilt as a fresh `NativeMenu` and the previous menu releases its entries first. Reuse the same `MdTrayMenuItem` objects across rebuilds and remove an entry from `Items` before adding it to a second icon.
+- **Clicks are not portable.** `Clicked` and `Command` fire on Win32 and on some Linux desktops; Avalonia documents `TrayIcon.Clicked` as unsupported on macOS, so anything that must work everywhere belongs in the menu as well.
+- **Linux depends on the desktop.** Freedesktop/DBus status notifiers work on GNOME and KDE; when none is available Avalonia falls back to an unimplemented XEmbed path that logs once and does nothing. `IsSupported` returning `true` still means "this platform family can host a tray icon", not "one is visible right now".
+- **No Material styling.** Menu appearance, hover, checked marks and separators are platform-drawn. `MdTrayMenuItem` deliberately mirrors `NativeMenuItem` instead of inventing a parallel themable model.
+
 ## Mobile platform integration
 
 ### System back gesture
@@ -413,9 +464,9 @@ scrollbars, and a cell editor that no longer derives from Fluent's `TextBox` the
 
 ## Trimming
 
-All five packages set `IsTrimmable`, so an application that publishes with
-`PublishTrimmed=true` can trim them, and they build with the IL2xxx analyzer on, so a new
-reflective call fails the build rather than breaking a trimmed app quietly.
+All six packages set `IsTrimmable` and `IsAotCompatible`, so an application that publishes with
+`PublishTrimmed=true` or `PublishAot=true` can trim them, and they build with the IL2xxx/IL3xxx
+analyzers on, so a new reflective call fails the build rather than breaking a trimmed app quietly.
 
 Two things in a UI library genuinely need reflection, and both are handled:
 
@@ -455,7 +506,11 @@ properties elsewhere in XAML. The selector exists so that is a choice rather tha
 discovered by assembly probing, which is annotated and degrades to the zero-width fallback glyphs
 when neither package is present.
 
-AOT is a separate question and is not claimed: these packages do not set `IsAotCompatible`.
+A native-AOT publish of the whole desktop Gallery is exercised by
+`.github/workflows/aot-probe.yml`: it publishes with `PublishAot=true`, fails when the publish
+emits any ILxxxx diagnostic, proves the output is a native binary rather than a managed assembly,
+and starts it under Xvfb so a reflection target that only exists at build time fails the probe
+instead of the user's first launch.
 
 ## Enumerations
 
@@ -463,7 +518,7 @@ Every public enumeration, with its members in declaration order. Generated from 
 held in place by `python3 scripts/check-api-doc-coverage.py`, which fails when a public type is
 missing from this document.
 
-### Core (`Md3.Avalonia`) — 60 enumerations
+### Core (`Md3.Avalonia`) — 61 enumerations
 
 | Enum | Members |
 |---|---|
@@ -525,10 +580,11 @@ missing from this document.
 | `MdToolbarVariant` | `Standard` · `Vibrant` |
 | `MdTooltipVariant` | `Plain` · `Rich` |
 | `MdTopAppBarVariant` | `Small` · `MediumFlexible` · `LargeFlexible` |
+| `MdTrayPlatform` | `Unknown` · `Windows` · `MacOS` · `Linux` · `Android` · `Browser` |
 | `MdWindowCapabilities` | `None` · `Move` · `Resize` · `Minimize` · `Maximize` · `Close` · `SystemMenu` · `All` |
 | `MdWindowPlatform` | `Unknown` · `Windows` · `MacOS` · `Linux` · `Android` |
 
-### Optional (`Md3.Avalonia.Extra`) — 19 enumerations
+### Optional (`Md3.Avalonia.Extra`) — 21 enumerations
 
 | Enum | Members |
 |---|---|

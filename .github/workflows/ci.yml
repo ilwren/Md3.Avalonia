@@ -83,7 +83,7 @@ jobs:
   # Deliberately NOT here any more:
   #   * NuGet packaging  -> .github/workflows/build-nuget.yml already runs `scripts/build-nuget.sh`
   #                         on push to main/arena/** and on every PR to main, from a clean tree.
-  #                         Running it twice per commit cost a full extra rebuild of all four
+  #                         Running it twice per commit cost a full extra rebuild of all six
   #                         packaged projects for an identical answer.
   #   * Multi-OS gallery -> .github/workflows/build-gallery.yml covers Linux, Windows and macOS on
   #                         the same triggers. The Linux Desktop head is still built below because

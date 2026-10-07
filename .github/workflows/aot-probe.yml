@@ -3,8 +3,15 @@ name: AOT probe
 on:
   workflow_dispatch:
   push:
-    branches: [arena/01a104af-md3-avalonia]
-    paths: ['.github/workflows/aot-probe.yml']
+    # The probe is the only place the desktop gallery is actually compiled to native code, so it
+    # follows the two inputs that can break that: the gallery itself and the library it consumes.
+    branches: [main, 'arena/**']
+    paths:
+      - '.github/workflows/aot-probe.yml'
+      - 'gallery/**'
+      - 'src/**'
+      - 'Directory.Build.props'
+      - 'Directory.Packages.props'
 
 jobs:
   publish-aot:
@@ -17,8 +24,15 @@ jobs:
           dotnet-version: '10.0.x'
       - name: Install the native toolchain ILC links against
         run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
+      # TreatWarningsAsErrors stays off until the publish is clean: one run then reports both the
+      # IL diagnostics and whether the produced binary still survives startup, and a build that
+      # dies at the first analyzer warning would hide the second answer. This flag is the last
+      # thing to remove, not the first.
       - name: Publish the desktop gallery with native AOT
         run: |
+          # Without pipefail the `tee` would swallow a failing publish: the pipeline's exit status
+          # is tee's, and a build error would only surface two steps later as a missing binary.
+          set -o pipefail
           dotnet publish gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj \
             -c Release -r linux-x64 \
             -p:PublishAot=true \
@@ -58,6 +72,9 @@ jobs:
           if [ "$CODE" != "124" ]; then
             echo "the AOT binary exited on its own with $CODE:"; cat /tmp/run.log; exit 1
           fi
+      # The README claims a native-AOT publish with zero IL diagnostics, so the count is asserted
+      # here instead of being left as a number in a log nobody opens. Every ILxxxx diagnostic is a
+      # code path that exists only at run time on some input the probe did not happen to take.
       - name: Count trim and AOT diagnostics
         if: always()
         run: |
@@ -65,6 +82,7 @@ jobs:
           if grep -qoE 'IL[0-9]{4}' /tmp/aot.log; then
             grep -oE 'IL[0-9]{4}' /tmp/aot.log | sort | uniq -c | sort -rn | sed 's/^/    /' >> $GITHUB_STEP_SUMMARY
             echo "DIAGNOSTICS FOUND:"; grep -oE 'IL[0-9]{4}' /tmp/aot.log | sort | uniq -c | sort -rn
-          else
-            echo "    none" >> $GITHUB_STEP_SUMMARY
+            echo "the count has to be zero: fix the call site or annotate it with a justification" >&2
+            exit 1
           fi
+          echo "    none" >> $GITHUB_STEP_SUMMARY
