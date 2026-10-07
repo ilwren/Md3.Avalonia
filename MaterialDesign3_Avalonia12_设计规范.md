@@ -92,7 +92,7 @@ Material 官网是持续更新的网站，浏览器和 Avalonia 的文字光栅�
 ### 4.1 首版范围
 
 - Avalonia 12.x；所有 Avalonia 包必须锁定同一补丁版本。
-- 核心控件库与桌面 Gallery 均面向 `net10.0`；核心库不得引用桌面专属 API。
+- 核心控件库面向 `net8.0` 与 `net10.0`，桌面 Gallery 面向 `net10.0`；核心库不得引用桌面专属 API。
 - Tier 1：Windows、macOS、Linux 桌面以及 Android。
 - Android 宿主面向 `net10.0-android`，宿主最低 API 23、发布目标 API 26 及以上，覆盖 ARM64、触摸、软键盘、返回键、生命周期恢复、深浅主题和安全区域。
 - Tier 2：iOS、Browser/WASM 的编译和基础交互验证。

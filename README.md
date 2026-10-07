@@ -137,7 +137,7 @@
 
 ## 共用基础
 
-- Avalonia **12.1.2**；当前仓库和预览包以 `net10.0` / `net10.0-android` 为 CI 验证基线；
+- Avalonia **12.1.2**；类库支持 `net8.0` 与 `net10.0`（见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)），gallery 及其 Android 宿主按 `net10.0` / `net10.0-android` 构建，CI 验证基线为 .NET 10；
 - Light、Dark、System 主题和 `DynamicResource` tokens；
 - `MaterialColorUtilities` HCT 任意 seed color 生成器，TonalSpot/Neutral/Vibrant/Expressive/Monochrome/Fidelity 六种 scheme、Standard/Medium/High contrast、49 个标准/固定/surface-container 色彩角色；
 - `MdThemeManager`、`MdThemeJson` 与对比度诊断，支持 motion、font、shape 和主题 JSON round-trip；System/Component token 分层；
