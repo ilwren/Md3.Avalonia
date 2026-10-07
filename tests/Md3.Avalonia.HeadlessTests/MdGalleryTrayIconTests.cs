@@ -1,3 +1,4 @@
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
@@ -57,17 +58,34 @@ public sealed class MdGalleryTrayIconTests
             Assert.True(system.IsChecked);
             dark.Command!.Execute(null);
             Assert.Equal(ThemeVariant.Dark, Application.Current!.RequestedThemeVariant);
-            trayIcon.SyncThemeChecks();
+            trayIcon.RefreshMenu();
             Assert.True(dark.IsChecked);
             Assert.False(system.IsChecked);
 
             light.Command!.Execute(null);
             Assert.Equal(ThemeVariant.Light, Application.Current!.RequestedThemeVariant);
-            trayIcon.SyncThemeChecks();
+            trayIcon.RefreshMenu();
             Assert.True(light.IsChecked);
             Assert.False(dark.IsChecked);
 
             Assert.NotNull(Entry(tray, "Quit").Command);
+
+            // The menu is native, so nothing walks it for translations: the refresh is the only
+            // place the gallery's language choice can reach it.
+            var previousCulture = CultureInfo.CurrentUICulture;
+            try
+            {
+                CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("zh-CN");
+                trayIcon.RefreshMenu();
+                Assert.Equal("退出", Entry(tray, "退出").Header);
+                Assert.Equal("隐藏窗口", Entry(tray, "隐藏窗口").Header);
+            }
+            finally
+            {
+                CultureInfo.CurrentUICulture = previousCulture;
+                trayIcon.RefreshMenu();
+            }
+            Assert.Equal("Quit", Entry(tray, "Quit").Header);
         }
         finally
         {

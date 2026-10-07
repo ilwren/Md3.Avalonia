@@ -23,20 +23,29 @@ namespace Md3.Avalonia.Gallery;
 internal sealed class GalleryTrayIcon : IDisposable
 {
     private readonly MdTrayIcon _tray;
+    private readonly MdTrayMenuItem _open;
+    private readonly MdTrayMenuItem _hide;
+    private readonly MdTrayMenuItem _theme;
     private readonly MdTrayMenuItem _light;
     private readonly MdTrayMenuItem _dark;
     private readonly MdTrayMenuItem _system;
+    private readonly MdTrayMenuItem _quit;
     private readonly RenderTargetBitmap? _iconBitmap;
     private MdTrayIcons? _registered;
 
     private GalleryTrayIcon(MdTrayIcon tray, RenderTargetBitmap? iconBitmap,
-        MdTrayMenuItem light, MdTrayMenuItem dark, MdTrayMenuItem system)
+        MdTrayMenuItem open, MdTrayMenuItem hide, MdTrayMenuItem theme,
+        MdTrayMenuItem light, MdTrayMenuItem dark, MdTrayMenuItem system, MdTrayMenuItem quit)
     {
         _tray = tray;
         _iconBitmap = iconBitmap;
+        _open = open;
+        _hide = hide;
+        _theme = theme;
         _light = light;
         _dark = dark;
         _system = system;
+        _quit = quit;
     }
 
     /// <summary>
@@ -71,20 +80,20 @@ internal sealed class GalleryTrayIcon : IDisposable
         theme.Items.Add(dark);
         theme.Items.Add(system);
 
+        var quit = new MdTrayMenuItem("Quit") { Command = new GalleryCommand(_ => Quit()) };
+
         tray.Items.Add(open);
         tray.Items.Add(hide);
         tray.Items.Add(theme);
         tray.Items.Add(new MdTrayMenuItemSeparator());
-        tray.Items.Add(new MdTrayMenuItem("Quit")
-        {
-            Command = new GalleryCommand(_ => Quit())
-        });
+        tray.Items.Add(quit);
 
-        var instance = new GalleryTrayIcon(tray, iconBitmap, light, dark, system);
-        // The theme a menu shows has to be read when the menu opens: the app's own theme selector
-        // changes it too, and a check mark written once would go stale.
-        tray.MenuRefreshRequested += (_, _) => instance.SyncThemeChecks();
-        instance.SyncThemeChecks();
+        var instance = new GalleryTrayIcon(tray, iconBitmap, open, hide, theme, light, dark, system, quit);
+        // Both the text and the check marks are read when the platform asks for the menu rather
+        // than written once: the gallery's own language selector and theme selector change the
+        // same state this menu describes.
+        tray.MenuRefreshRequested += (_, _) => instance.RefreshMenu();
+        instance.RefreshMenu();
 
         var registered = new MdTrayIcons { tray };
         MdTrayIcon.SetIcons(application, registered);
@@ -95,8 +104,21 @@ internal sealed class GalleryTrayIcon : IDisposable
     /// <summary>The icon itself, for a host or a test that wants to inspect the exported menu.</summary>
     internal MdTrayIcon Tray => _tray;
 
-    internal void SyncThemeChecks()
+    /// <summary>
+    /// Re-reads the menu text and the theme check marks from the application. The menu is a native
+    /// one, so nothing walks it for translations and nothing observes the theme for it: the
+    /// platform's own refresh request is the only moment this can be brought up to date.
+    /// </summary>
+    internal void RefreshMenu()
     {
+        _open.Header = GalleryLocalization.Choose("Open Material Gallery", "打开 Material Gallery");
+        _hide.Header = GalleryLocalization.Choose("Hide window", "隐藏窗口");
+        _theme.Header = GalleryLocalization.Choose("Theme", "主题");
+        _light.Header = GalleryLocalization.Choose("Light", "浅色");
+        _dark.Header = GalleryLocalization.Choose("Dark", "深色");
+        _system.Header = GalleryLocalization.Choose("System", "跟随系统");
+        _quit.Header = GalleryLocalization.Choose("Quit", "退出");
+
         var current = Application.Current?.RequestedThemeVariant;
         _light.IsChecked = current == ThemeVariant.Light;
         _dark.IsChecked = current == ThemeVariant.Dark;
