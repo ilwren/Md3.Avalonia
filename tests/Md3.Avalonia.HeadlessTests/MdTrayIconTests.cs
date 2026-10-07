@@ -1,4 +1,5 @@
 using System.Windows.Input;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -115,13 +116,13 @@ public sealed class MdTrayIconTests
         Assert.Null(menu.Items[0].Parent);
         Assert.Equal(MenuItemToggleType.Radio, light.ToggleType);
         Assert.True(light.IsChecked);
-        Assert.Equal("-", menu.Items[2].Header);
+        Assert.Equal("-", ((NativeMenuItem)menu.Items[2]).Header);
         Assert.False(((NativeMenuItem)menu.Items[3]).IsEnabled);
 
         var submenu = Assert.IsType<NativeMenu>(theme.Menu);
         Assert.Equal(2, submenu.Items.Count);
         Assert.Same(light, submenu.Items[0]);
-        Assert.Equal("Light", submenu.Items[0].Header);
+        Assert.Equal("Light", ((NativeMenuItem)submenu.Items[0]).Header);
         Assert.Same(theme, submenu.Parent);
     }
 
