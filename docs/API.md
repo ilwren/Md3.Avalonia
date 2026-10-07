@@ -347,6 +347,7 @@ Behaviour worth knowing before shipping a tray icon:
 - **Clicks are not portable.** `Clicked` and `Command` fire on Win32 and on some Linux desktops; Avalonia documents `TrayIcon.Clicked` as unsupported on macOS, so anything that must work everywhere belongs in the menu as well.
 - **Linux depends on the desktop.** Freedesktop/DBus status notifiers work on GNOME and KDE; when none is available Avalonia falls back to an unimplemented XEmbed path that logs once and does nothing. `IsSupported` returning `true` still means "this platform family can host a tray icon", not "one is visible right now".
 - **No Material styling.** Menu appearance, hover, checked marks and separators are platform-drawn. `MdTrayMenuItem` deliberately mirrors `NativeMenuItem` instead of inventing a parallel themable model.
+- **A real consumer ships with the repository.** The desktop Gallery keeps its own icon through this API: the menu opens or hides the shell, switches Light/Dark/System and quits, and the theme check marks are re-read when the platform asks for a refresh, which is what `MenuRefreshRequested` is for.
 
 ## Mobile platform integration
 

@@ -1,10 +1,7 @@
-using System;
-using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Md3.Avalonia.Controls;
 
@@ -112,41 +109,15 @@ public partial class TrayIconGalleryPage : UserControl
     }
 
     /// <summary>
-    /// The platform takes a bitmap, so the Material glyph is rasterised. The icon family is read
-    /// from the resource the optional icon package injects; without that package the surface still
-    /// renders as a valid solid tile rather than a look-alike glyph.
+    /// The platform takes a bitmap, so the Material glyph is rasterised. The same helper the
+    /// desktop shell uses for its own tray icon builds it, so the sample cannot drift away from
+    /// what the application actually ships.
     /// </summary>
     private WindowIcon? CreateIcon()
     {
-        var glyph = new MdIcon
-        {
-            Glyph = MdSymbols.Notifications,
-            Size = 22,
-            Foreground = Brushes.White
-        };
-
-        var surface = new Border
-        {
-            Width = 32,
-            Height = 32,
-            CornerRadius = new CornerRadius(10),
-            Background = this.FindResource("Md.Sys.Color.Primary.Brush") as IBrush
-        };
-        // MdIcon normally resolves the symbol family when it enters a visual tree. The tile is
-        // rendered off-screen, so the resource is applied directly when the icon package is present.
-        if (this.FindResource("Md.Sys.Typeface.Symbols.Rounded") is FontFamily family)
-        {
-            glyph.FontFamily = family;
-            surface.Child = glyph;
-        }
-
-        surface.Measure(new Size(32, 32));
-        surface.Arrange(new Rect(0, 0, 32, 32));
-
         _iconBitmap?.Dispose();
-        _iconBitmap = new RenderTargetBitmap(new PixelSize(32, 32), new Vector(96, 96));
-        _iconBitmap.Render(surface);
-        return new WindowIcon(_iconBitmap);
+        _iconBitmap = TrayIconArt.Create(Application.Current!, MdSymbols.Notifications);
+        return _iconBitmap is null ? null : new WindowIcon(_iconBitmap);
     }
 
     private void Report(string message)
@@ -155,18 +126,5 @@ public partial class TrayIconGalleryPage : UserControl
         ActivationLog.Text = GalleryLocalization.Choose(
             $"{message} · {_activations} activation(s) this session.",
             $"{message} · 本次会话 {_activations} 次激活。");
-    }
-
-    private sealed class GalleryCommand(Action<object?> execute) : ICommand
-    {
-        public event EventHandler? CanExecuteChanged
-        {
-            add { }
-            remove { }
-        }
-
-        public bool CanExecute(object? parameter) => true;
-
-        public void Execute(object? parameter) => execute(parameter);
     }
 }

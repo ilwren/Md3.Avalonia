@@ -361,7 +361,8 @@ await snackbarService.ShowAsync(new MdSnackbarMessage("Draft archived")
 - 菜单条目就是 Avalonia 的 `NativeMenuItem`：命令、`CommandParameter`、`Gesture`、`ToggleType`、`IsChecked`、`IsEnabled` 和子菜单与平台菜单桥完全一致，`MdTrayMenuItem.Items` 按需创建子菜单；
 - 延迟挂载：`new MdTrayIcon()` 不会创建平台句柄，首次赋值属性、添加条目、调用 `Show()` 或注入 `PlatformAdapter` 时才挂载；注册到 `MdTrayIcon.SetIcons(Application.Current!, icons)` 后随 UI 线程退出释放；
 - `IsSupported` 是实时能力探测（`TrayIcon.NativeMenuExporter` 是否存在），所以无头宿主、浏览器、Android 和没有 DBus 的 X11 回退都会如实报告 `false` 而不会假装有图标；
-- macOS 不上报 `Clicked`，需要全局可用的功能必须同时放进菜单。
+- macOS 不上报 `Clicked`，需要全局可用的功能必须同时放进菜单；
+- 桌面 Gallery 自己就用了这套 API：托盘菜单提供打开/隐藏窗口、Light/Dark/System 主题与退出，主题勾选在菜单打开时从 `Application.RequestedThemeVariant` 读回，图标由 Material Symbol 运行时栅格化。
 
 ```xml
 <Application xmlns:md="using:Md3.Avalonia.Controls">
