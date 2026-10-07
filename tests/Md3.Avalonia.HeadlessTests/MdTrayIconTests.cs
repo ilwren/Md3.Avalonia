@@ -113,7 +113,9 @@ public sealed class MdTrayIconTests
         Assert.Same(menu, adapter.Menu);
         Assert.Equal(4, menu.Items.Count);
         Assert.Same(open, menu.Items[0]);
-        Assert.Null(menu.Items[0].Parent);
+        // The entry belongs to the menu that is currently exported, and to no other one: the
+        // previous menu released it when the rebuild cleared it.
+        Assert.Same(menu, menu.Items[0].Parent);
         Assert.Equal(MenuItemToggleType.Radio, light.ToggleType);
         Assert.True(light.IsChecked);
         Assert.Equal("-", ((NativeMenuItem)menu.Items[2]).Header);

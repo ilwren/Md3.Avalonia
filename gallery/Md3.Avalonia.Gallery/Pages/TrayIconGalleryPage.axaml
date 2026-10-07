@@ -33,20 +33,23 @@
                    Text="The icon is rasterised from a Material Symbols glyph at run time, because the platform takes a bitmap rather than a vector. Switch it on, then use the notification area: every entry reports back into this page." />
         <Border Padding="20" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
           <StackPanel Spacing="16">
-            <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
-              <Border Width="40" Height="40" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.Primary.Brush}">
+            <!-- A grid rather than a horizontal StackPanel: a StackPanel measures its children with
+                 an unbounded width, so the status text would keep its single-line width and push the
+                 page past a narrow window instead of wrapping. -->
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
+              <Border Width="40" Height="40" VerticalAlignment="Center" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.Primary.Brush}">
                 <md:MdIcon Glyph="{x:Static md:MdSymbols.Notifications}" Size="22"
                            Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" />
               </Border>
-              <StackPanel Spacing="2">
+              <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
                 <TextBlock Classes="h3" Text="Material Gallery" />
                 <TextBlock x:Name="DemoStatus" TextWrapping="Wrap" />
               </StackPanel>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="12">
-              <md:MdSwitch x:Name="DemoSwitch" Content="Show tray icon" Click="TrayDemoToggled" />
-              <md:MdButton Content="Open" Variant="Text" Click="RaiseDemoEntry" />
-            </StackPanel>
+            </Grid>
+            <WrapPanel Orientation="Horizontal">
+              <md:MdSwitch x:Name="DemoSwitch" Content="Show tray icon" Click="TrayDemoToggled" Margin="0,0,12,8" />
+              <md:MdButton Content="Open" Variant="Text" Click="RaiseDemoEntry" Margin="0,0,0,8" />
+            </WrapPanel>
             <StackPanel Spacing="6">
               <TextBlock Classes="h3" Text="Last activation" />
               <TextBlock x:Name="ActivationLog" TextWrapping="Wrap" />
