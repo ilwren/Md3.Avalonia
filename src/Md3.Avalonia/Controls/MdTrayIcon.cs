@@ -192,8 +192,9 @@ public static class MdTrayIconPlatformAdapterResolver
 /// <remarks>
 /// Attachment is deferred until the icon is actually used - a property is assigned, an entry is
 /// added, <see cref="Show"/> is called, or an adapter is injected - so holding one in a view model
-/// or a data template does not create a platform handle. Register the instance in
-/// <see cref="Icons"/> on the <see cref="Application"/> to have it disposed at shutdown. On Windows
+/// or a data template does not create a platform handle. Register the instance in the
+/// <see cref="IconsProperty"/> collection on the <see cref="Application"/> (see
+/// <see cref="SetIcons"/>) to have it disposed at shutdown. On Windows
 /// the tray menu is drawn by Avalonia's own managed popup rather than by the system, so a host can
 /// restyle it there; that is a per-platform detail this API does not promise.
 /// </remarks>
