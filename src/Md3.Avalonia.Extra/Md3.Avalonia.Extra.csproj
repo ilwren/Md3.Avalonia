@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>$(Md3LibraryTargetFrameworks)</TargetFrameworks>
     <RootNamespace>Md3.Avalonia.Extra</RootNamespace>
     <AssemblyName>Md3.Avalonia.Extra</AssemblyName>
     <Description>Extended Material Design 3 components and advanced UX widgets for Avalonia, inspired by popular open-source Flutter ecosystem widgets.</Description>

@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>$(Md3LibraryTargetFrameworks)</TargetFrameworks>
     <RootNamespace>Md3.Avalonia</RootNamespace>
     <AssemblyName>Md3.Avalonia</AssemblyName>
     <Description>Material Design 3 and Material 3 Expressive controls, dynamic HCT theming, motion, localization and desktop adapters for Avalonia 12.</Description>

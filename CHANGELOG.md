@@ -1,5 +1,19 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- **The five Material packages ship `net8.0` and `net10.0` again.** `Md3.Avalonia`,
+  `Md3.Avalonia.Icons`, `Md3.Avalonia.Icons.Lite`, `Md3.Avalonia.Extra` and
+  `Md3.Avalonia.DataGrid` now build and pack both target frameworks, so an application that has
+  not moved to .NET 10 can consume them; Avalonia 12.1.2 itself ships legacy `net8.0` assets.
+  `Md3.Avalonia.RichEditor` stays `net10.0`-only because the upstream `AvaloniaRichEditor` it
+  themes does. Trim and AOT analyzers run for both frameworks, so both assets carry the same
+  guarantees. The framework list lives in `Directory.Build.props`, and
+  `scripts/verify-package-assets.py` fails the packaging job if a package does not carry exactly
+  the expected `lib/` asset set — a green pack step no longer implies the right frameworks inside.
+
 ## [0.4.1-preview.1] - 2026-10-06
 
 ### Added

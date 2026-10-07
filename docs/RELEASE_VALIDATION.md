@@ -11,7 +11,7 @@ Automated baseline date: 2026-10-05
 | Restore | `dotnet restore Md3.Avalonia.sln` | Success |
 | Release compile | CI `Build Gallery Desktop` plus multi-platform Gallery workflow | 0 warnings, 0 errors for .NET 10 release projects |
 | Tests | `dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release` | 0 failed; no unexplained skipped tests |
-| Package | `bash scripts/build-nuget.sh` for Core, Icons, Icons.Lite, Extra, DataGrid and RichEditor | `.nupkg` and `.snupkg`; `0.4.1-preview.1` metadata/readme/notices/XML docs and one-way dependencies present |
+| Package | `bash scripts/build-nuget.sh` for Core, Icons, Icons.Lite, Extra, DataGrid and RichEditor | `.nupkg` and `.snupkg`; `0.4.1-preview.1` metadata/readme/notices/XML docs and one-way dependencies present; `lib/net8.0` + `lib/net10.0` assets for the five Material packages and `lib/net10.0` for RichEditor, asserted by `scripts/verify-package-assets.py` |
 | Immediate artifact cleanup | after every build/test/pack, scan and remove `bin`, `obj`, `TestResults`, DLL/PDB and packages before continuing | No generated workspace artifacts |
 | Dynamic color | golden seed vectors, arbitrary seed/variant, contrast pairs, JSON round-trip | Pass |
 | Trim analysis | CI `Build tests` with `EnableTrimAnalyzer` on all six packages | 0 IL2xxx warnings; every suppression carries a written justification |

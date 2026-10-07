@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>$(Md3LibraryTargetFrameworks)</TargetFrameworks>
     <RootNamespace>Md3.Avalonia.Icons</RootNamespace>
     <AssemblyName>Md3.Avalonia.Icons</AssemblyName>
     <Description>Full Material Symbols font and glyph catalog with embedded font for Md3.Avalonia.</Description>

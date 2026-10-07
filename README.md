@@ -137,7 +137,7 @@
 
 ## 共用基础
 
-- Avalonia **12.1.2**；类库支持 `net8.0` 与 `net10.0`（见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)），gallery 及其 Android 宿主按 `net10.0` / `net10.0-android` 构建，CI 验证基线为 .NET 10；
+- Avalonia **12.1.2**；六个包里有五个（Core、Icons、Icons.Lite、Extra、DataGrid）同时打包 `net8.0` 与 `net10.0`，`RichEditor` 因上游 `AvaloniaRichEditor` 仅 `net10.0` 而单目标；gallery 及其 Android 宿主按 `net10.0` / `net10.0-android` 构建，CI 验证基线为 .NET 10（见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)）；
 - Light、Dark、System 主题和 `DynamicResource` tokens；
 - `MaterialColorUtilities` HCT 任意 seed color 生成器，TonalSpot/Neutral/Vibrant/Expressive/Monochrome/Fidelity 六种 scheme、Standard/Medium/High contrast、49 个标准/固定/surface-container 色彩角色；
 - `MdThemeManager`、`MdThemeJson` 与对比度诊断，支持 motion、font、shape 和主题 JSON round-trip；System/Component token 分层；
@@ -162,7 +162,7 @@ python3 scripts/verify-fonts.py
 
 验证器会核对完整字体与 Lite 子集 checksum、真实 variable-font tables 和 glyph 数量，拒绝缺失、占位矩形或被替换的二进制。Apache-2.0 字体许可证同时打入两个 Icons 包。
 
-打包脚本要求 .NET 10 SDK，依次打包 Core、Icons、Icons.Lite 与 Extra，并在 `artifacts/nuget` 生成四个 `.nupkg` 和四个 `.snupkg`。Bash 使用 `--output`，PowerShell 使用 `-Output` 修改输出目录。
+打包脚本要求 .NET 10 SDK，依次打包 Core、Icons、Icons.Lite、Extra、DataGrid 与 RichEditor，并在 `artifacts/nuget` 生成六个 `.nupkg` 和六个 `.snupkg`；随后 `scripts/verify-package-assets.py` 会打开每个包核对 `lib/` 下的目标框架资产（五个包为 `net8.0` + `net10.0`，RichEditor 为 `net10.0`），缺一个就失败。Bash 使用 `--output`，PowerShell 使用 `-Output` 修改输出目录。
 
 同时引用 Core 与 Icons 后不需要手动调用 `ConfigureFonts`：`MdSymbols` 和核心 `MdSymbolPresenter` 会自动发现 Icons provider、注册程序集内嵌字体，验证 internal family、typeface 和官方 `search` glyph，再注入核心 `Md.Icon.*` resources。验证失败时 symbol glyph 保持隐藏，不使用 Unicode 仿制图标。
 

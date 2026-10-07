@@ -9,7 +9,9 @@
     python3 scripts/verify-fonts.py            # 字体 SHA / 表 / 字形门禁
     python3 scripts/sync-spec-tokens.py --offline   # 只校验映射表自洽（去掉 --offline 会联网对拍 androidx）
 
-## 2. 构建 + 全量测试：需要 .NET 10 SDK（TFM net10.0，仓库无 global.json，任意 10.x 均可）
+## 2. 构建 + 全量测试：需要 .NET 10 SDK（仓库无 global.json，任意 10.x 均可）
+    说明：类库为 `net8.0;net10.0` 双目标，首次还原会从 NuGet 拉取 .NET 8 targeting pack；
+    `tests/`、`gallery/` 与示例宿主仍是 `net10.0`。RichEditor 为 `net10.0` 单目标（上游限制）。
     dotnet restore tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj
     dotnet test    tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release
 

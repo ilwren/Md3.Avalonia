@@ -10,6 +10,7 @@ on:
       - '.github/workflows/aot-probe.yml'
       - 'gallery/**'
       - 'src/**'
+      - 'src/**'
       - 'Directory.Build.props'
       - 'Directory.Packages.props'
 
