@@ -119,22 +119,37 @@ class Verification:
             )
 
     def verify_claim_boundaries(self) -> None:
+        # The parity document has to keep the vocabulary that separates full parity from subsets
+        # and API shells.
         required = {
             "docs/FLUTTER_PARITY_STATUS.md": ["API shell", "Experimental", "Implemented subset"],
+        }
+        # And an API that finished its choreography must not still announce itself as a preview
+        # shell. The four shared-axis transitions carried MdExperimental while they were state
+        # shells; the marker came off with the real transitions, so the claim to guard is now the
+        # absence, not the presence.
+        forbidden = {
             "src/Md3.Avalonia.Extra/Controls/MdMotionControls.cs": ["MdExperimental("],
         }
-        missing: list[str] = []
+        problems: list[str] = []
         for relative, markers in required.items():
             path = ROOT / relative
             text = path.read_text(encoding="utf-8") if path.exists() else ""
             for marker in markers:
                 if marker not in text:
-                    missing.append(f"{relative}: missing {marker!r}")
+                    problems.append(f"{relative}: missing {marker!r}")
+        for relative, markers in forbidden.items():
+            path = ROOT / relative
+            text = path.read_text(encoding="utf-8") if path.exists() else ""
+            for marker in markers:
+                if marker in text:
+                    problems.append(f"{relative}: still claims {marker!r}")
         self.record(
             "parity-claim-boundaries",
-            "failed" if missing else "passed",
-            "; ".join(missing) if missing else "Parity subsets, API shells, and experimental motion APIs are explicitly separated.",
-            list(required),
+            "failed" if problems else "passed",
+            "; ".join(problems) if problems
+            else "Parity subsets and API shells are separated, and completed motion APIs no longer claim to be experimental.",
+            list(required) + list(forbidden),
         )
 
     def run_dotnet_tests(self, source_only: bool) -> None:

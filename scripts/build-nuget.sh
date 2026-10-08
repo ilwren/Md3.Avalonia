@@ -131,6 +131,26 @@ if ((PACKAGE_COUNT != EXPECTED_COUNT)); then
   exit 1
 fi
 
+# The five Material packages ship $(Md3LibraryTargetFrameworks) assets; Md3.Avalonia.RichEditor is
+# deliberately net10.0-only because its upstream AvaloniaRichEditor dependency is. This is stated
+# here as well as in the csproj files because this is the check that actually inspects the packed
+# archives: a package that silently loses a target framework fails here instead of shipping.
+EXPECTED_TFMS=(
+  "Md3.Avalonia=net8.0,net10.0"
+  "Md3.Avalonia.Icons=net8.0,net10.0"
+  "Md3.Avalonia.Icons.Lite=net8.0,net10.0"
+  "Md3.Avalonia.Extra=net8.0,net10.0"
+  "Md3.Avalonia.DataGrid=net8.0,net10.0"
+  "Md3.Avalonia.RichEditor=net10.0"
+)
+ASSET_ARGS=()
+for expected in "${EXPECTED_TFMS[@]}"; do ASSET_ARGS+=(--expect "$expected"); done
+if command -v python3 >/dev/null 2>&1; then
+  python3 "$ROOT/scripts/verify-package-assets.py" --dir "$OUTPUT" --version "$VERSION" "${ASSET_ARGS[@]}"
+else
+  python "$ROOT/scripts/verify-package-assets.py" --dir "$OUTPUT" --version "$VERSION" "${ASSET_ARGS[@]}"
+fi
+
 printf '\nBuilt packages (%s):\n' "$SDK_VERSION"
 find "$OUTPUT" -maxdepth 1 -type f \( -name '*.nupkg' -o -name '*.snupkg' \) -print \
   | while IFS= read -r package; do printf '  %s\n' "$(basename "$package")"; done \

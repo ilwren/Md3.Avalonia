@@ -6,5 +6,12 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <Deterministic>true</Deterministic>
+    <!-- Target frameworks for the six library packages. Kept here so the policy has exactly one
+         definition: every library csproj writes $(Md3LibraryTargetFrameworks), and
+         scripts/verify-package-assets.py fails the packaging job if a package does not carry
+         exactly these assets in lib/. Md3.Avalonia.RichEditor is the deliberate exception and
+         uses net10.0 directly: its upstream AvaloniaRichEditor dependency ships net10.0 only.
+         Applications in this repository (Gallery, hosts, tests) are net10.0. -->
+    <Md3LibraryTargetFrameworks>net8.0;net10.0</Md3LibraryTargetFrameworks>
   </PropertyGroup>
 </Project>

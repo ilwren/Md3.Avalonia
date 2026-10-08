@@ -20,9 +20,13 @@ public partial class DataGridGalleryPage : UserControl
         EnterpriseGrid.DataSource = Rows();
 
         // The stock Avalonia control, wearing the Material theme from Md3.Avalonia.DataGrid.
-        ThemedDataGrid.Columns.Add(new DataGridTextColumn { Header = L("Name", "姓名"), Binding = new Binding(nameof(GridRow.Name)), Width = new DataGridLength(2, DataGridLengthUnitType.Star) });
-        ThemedDataGrid.Columns.Add(new DataGridTextColumn { Header = L("Team", "团队"), Binding = new Binding(nameof(GridRow.Team)), Width = new DataGridLength(1, DataGridLengthUnitType.Star) });
-        ThemedDataGrid.Columns.Add(new DataGridTextColumn { Header = L("Score", "分数"), Binding = new Binding(nameof(GridRow.Score)), Width = new DataGridLength(96) });
+        // CompiledBinding.Create instead of new Binding(path): a string path is resolved by
+        // reflection, which is precisely what a native-AOT publish cannot compile (IL2026 and
+        // IL3050 at this call site). The lambda builds the same binding from a member expression
+        // the compiler can see, so the column works in a trimmed or AOT-published app.
+        ThemedDataGrid.Columns.Add(new DataGridTextColumn { Header = L("Name", "姓名"), Binding = CompiledBinding.Create<GridRow, string>(row => row.Name), Width = new DataGridLength(2, DataGridLengthUnitType.Star) });
+        ThemedDataGrid.Columns.Add(new DataGridTextColumn { Header = L("Team", "团队"), Binding = CompiledBinding.Create<GridRow, string>(row => row.Team), Width = new DataGridLength(1, DataGridLengthUnitType.Star) });
+        ThemedDataGrid.Columns.Add(new DataGridTextColumn { Header = L("Score", "分数"), Binding = CompiledBinding.Create<GridRow, int>(row => row.Score), Width = new DataGridLength(96) });
         ThemedDataGrid.ItemsSource = Rows();
 
         GridRow[] Rows() =>

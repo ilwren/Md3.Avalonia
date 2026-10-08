@@ -20,7 +20,16 @@ public partial class ChartGalleryPage : UserControl
 
     private void ChangeChartKind(object? sender, RoutedEventArgs e)
     {
-        if (sender is Button { Tag: string tag } && Enum.TryParse<MdChartKind>(tag, out var kind)) Chart.Kind = kind;
+        // A switch rather than Enum.TryParse: the gallery is published with native AOT, where a
+        // generic enum parser needs reflection the trimmer has to warn about.
+        if (sender is Button { Tag: string tag })
+            Chart.Kind = tag switch
+            {
+                "Line" => MdChartKind.Line,
+                "Area" => MdChartKind.Area,
+                "Bar" => MdChartKind.Bar,
+                _ => Chart.Kind
+            };
     }
 
     private void ChartPointChanged(object? sender, MdChartPoint? point) => ChartStatus.Text = point is null

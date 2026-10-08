@@ -21,8 +21,12 @@ public partial class MainWindow : Window
     private readonly MdButton[] _topNavigationButtons;
     private readonly GalleryIndexEntry[] _galleryIndex;
     private readonly Dictionary<Control, ResponsiveSizeState> _responsiveSizeStates = [];
+    // The factory that rebuilds the active page after a culture change. Keyed by the navigation
+    // button that opened it so a rebuild never needs Type/Activator reflection, which native AOT
+    // cannot compile (the trimmer rejects unbounded Activator.CreateInstance(Type) calls).
+    private readonly Dictionary<MdButton, Func<Control>> _pageFactories = [];
     private CultureInfo _culture = CultureInfo.GetCultureInfo("en-US");
-    private Type? _currentPageType;
+    private Func<Control>? _currentPageFactory;
     private MdButton? _currentNavigationButton;
     private MdButton? _currentTopNavigationButton;
     private bool _usesModalNavigation;
@@ -46,7 +50,7 @@ public partial class MainWindow : Window
             CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, ColorPickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
             NavigationDrawerNav, AdaptiveNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
-            SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, BorderlessWindowNav,
+            SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, BorderlessWindowNav, TrayIconNav,
 AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             BeforeAfterNav, CalendarNav, CascaderNav, ChartNav,
             ChatNav, CommandPaletteNav, DataGridNav, DensityNav,
@@ -137,6 +141,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Transfer", "transfer dual list shuttle move pick", TransferNav, () => new TransferGalleryPage()),
             Entry("Tree view", "tree hierarchy expand collapse node virtualized", TreeViewNav, () => new TreeViewGalleryPage()),
             Entry("Borderless windows", "custom chrome title bar caption drag resize platform adapter", BorderlessWindowNav, () => new BorderlessWindowGalleryPage()),
+            Entry("Tray icon", "tray icon notification area status menu native command tooltip", TrayIconNav, () => new TrayIconGalleryPage()),
             Entry("Numeric input", "numeric number stepper spinner increment decrement quantity", NumericNav, () => new NumericGalleryPage()),
             Entry("Theme Lab", "theme color seed hct contrast json shape font", ThemeResourcesNav, () => new ThemeResourcesGalleryPage()),
             Entry("Material Symbols", "icons glyph copy symbols", SymbolsNav, () => new SymbolGalleryPage()),
@@ -160,6 +165,13 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Focus, shortcut, Hero", "focus traversal shortcut keybinding hero transition", FocusHeroNav, () => new FocusShortcutHeroGalleryPage())
         ];
 
+        foreach (var entry in _galleryIndex) _pageFactories[entry.Button] = entry.Factory;
+        // The shell tabs are not index entries, so register their rebuild factories explicitly.
+        _pageFactories[ComponentsOverviewNav] = () => new ComponentsOverviewGalleryPage();
+        _pageFactories[GetStartedTopNav] = () => new GettingStartedGalleryPage();
+        _pageFactories[DevelopTopNav] = () => new DeveloperGalleryPage();
+        _pageFactories[StylesTopNav] = () => new StylesGalleryPage();
+
         ThemeSelector.ItemsSource = new[] { "Light", "Dark", "System" };
         ThemeSelector.SelectedIndex = 2;
         LanguageSelector.ItemsSource = new[] { "English", "简体中文" };
@@ -182,6 +194,18 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
     /// by title, so a test compares the two lists and fails the build if a link goes stale.
     /// </summary>
     public IReadOnlyList<string> IndexedPageTitles => _galleryIndex.Select(entry => entry.Title).ToArray();
+
+    /// <summary>The page currently shown in the shell.</summary>
+    internal Control? CurrentPage => PageHost.Content as Control;
+
+    /// <summary>
+    /// The factory that would rebuild <see cref="CurrentPage"/> after a culture change, or
+    /// <see langword="null"/> when the page has no registered factory.
+    /// </summary>
+    internal Func<Control>? CurrentPageFactory => _currentPageFactory;
+
+    /// <summary>Every destination button in the navigation pane, in declaration order.</summary>
+    internal IReadOnlyList<MdButton> NavigationButtons => _navigationButtons;
 
     internal bool NavigateToIndexedPage(string title)
     {
@@ -270,6 +294,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
     private void ShowTransfer(object? s, RoutedEventArgs e) => Navigate(new TransferGalleryPage(), TransferNav);
     private void ShowTreeView(object? s, RoutedEventArgs e) => Navigate(new TreeViewGalleryPage(), TreeViewNav);
     private void ShowBorderlessWindows(object? s, RoutedEventArgs e) => Navigate(new BorderlessWindowGalleryPage(), BorderlessWindowNav);
+    private void ShowTrayIcon(object? s, RoutedEventArgs e) => Navigate(new TrayIconGalleryPage(), TrayIconNav);
     private void ShowNumeric(object? s, RoutedEventArgs e) => Navigate(new NumericGalleryPage(), NumericNav);
     private void ShowThemeResources(object? s, RoutedEventArgs e) => Navigate(new ThemeResourcesGalleryPage(), ThemeResourcesNav);
     private void ShowSymbols(object? s, RoutedEventArgs e) => Navigate(new SymbolGalleryPage(), SymbolsNav);
@@ -465,7 +490,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             : ReferenceEquals(selected, ThemeResourcesNav) || ReferenceEquals(selected, SymbolsNav) || ReferenceEquals(selected, MotionNav)
                 ? FoundationsTopNav
                 : ComponentsTopNav;
-        _currentPageType = page.GetType();
+        _currentPageFactory = ResolvePageFactory(selected, selectedTopNavigation);
         _currentNavigationButton = selected;
         // The M3 site has hierarchical primary and contextual navigation, but only the actual
         // destination receives an active indicator. A contextual leaf therefore clears the
@@ -484,6 +509,23 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             // lower priority so every page opens at its title rather than retaining the old anchor.
             Dispatcher.UIThread.Post(PageScroll.ScrollToHome, DispatcherPriority.Background);
         }, DispatcherPriority.Loaded);
+    }
+
+    /// <summary>
+    /// Resolves the factory that rebuilds a page for the destination that opened it. The gallery
+    /// used to remember the page <see cref="Type"/> and recreate it with
+    /// <c>Activator.CreateInstance(Type)</c>, which the trimmer cannot compile for native AOT; the
+    /// button-keyed factory table keeps the same behaviour without reflection.
+    /// </summary>
+    private Func<Control>? ResolvePageFactory(MdButton? selected, MdButton? selectedTopNavigation)
+    {
+        if (selected is not null && _pageFactories.TryGetValue(selected, out var factory)) return factory;
+        // Shell destinations such as Get started and Styles have no contextual button, so the
+        // category rail identifies them instead. Only consult it when there is no leaf button.
+        if (selected is null && selectedTopNavigation is not null &&
+            _pageFactories.TryGetValue(selectedTopNavigation, out var topFactory))
+            return topFactory;
+        return null;
     }
 
     private void GallerySearchTextChanged(object? sender, TextChangedEventArgs e)
@@ -567,8 +609,10 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
         // Recreate the active page after changing CurrentUICulture. This updates data-bound
         // option collections and runtime-created content that are not present in the visual tree
         // when the localization walker runs (closed popups, dialog pages, and virtualized rows).
-        if (_currentPageType is { } pageType && Activator.CreateInstance(pageType) is Control localizedPage)
-            Navigate(localizedPage, _currentNavigationButton, _currentTopNavigationButton);
+        // The factory comes from the destination that opened the page instead of Activator, which
+        // native AOT cannot compile.
+        if (_currentPageFactory is { } factory)
+            Navigate(factory(), _currentNavigationButton, _currentTopNavigationButton);
         else if (PageHost.Content is Control page)
             GalleryLocalization.Apply(page, _culture);
     }

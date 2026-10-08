@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>$(Md3LibraryTargetFrameworks)</TargetFrameworks>
     <!-- Deliberately not Md3.Avalonia.DataGrid: a namespace by that name shadows the
          DataGrid type for every file under Md3.Avalonia.*, this repository included. -->
     <RootNamespace>Md3.Avalonia.Themes</RootNamespace>

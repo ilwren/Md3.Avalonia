@@ -1,4 +1,5 @@
-# Build the release NuGet packages for Md3.Avalonia, Md3.Avalonia.Icons, Md3.Avalonia.Icons.Lite, Md3.Avalonia.Extra
+# Build the release NuGet packages for Md3.Avalonia, Md3.Avalonia.Icons, Md3.Avalonia.Icons.Lite,
+# Md3.Avalonia.Extra, Md3.Avalonia.DataGrid and Md3.Avalonia.RichEditor.
 [CmdletBinding()]
 param(
     [string]$Output = "$PSScriptRoot/../artifacts/nuget",
@@ -14,7 +15,9 @@ $projects = @(
     (Join-Path $root "src/Md3.Avalonia/Md3.Avalonia.csproj"),
     (Join-Path $root "src/Md3.Avalonia.Icons/Md3.Avalonia.Icons.csproj"),
     (Join-Path $root "src/Md3.Avalonia.Icons.Lite/Md3.Avalonia.Icons.Lite.csproj"),
-    (Join-Path $root "src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj")
+    (Join-Path $root "src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj")
 )
 
 $python = Get-Command python3 -ErrorAction SilentlyContinue
@@ -34,5 +37,22 @@ foreach ($proj in $projects) {
     dotnet build $proj -c $Configuration --no-restore --nologo
     dotnet pack $proj -c $Configuration --no-build --no-restore --nologo -o $outputDir
 }
+
+# The five Material packages ship net8.0 and net10.0 assets; Md3.Avalonia.RichEditor is
+# net10.0-only because its upstream AvaloniaRichEditor dependency is. Same check as
+# scripts/build-nuget.sh: a package that loses a target framework fails here, not in the field.
+$version = (Select-String -Path $projects[0] -Pattern '<Version>([^<]+)</Version>').Matches[0].Groups[1].Value
+$expectations = @(
+    "Md3.Avalonia=net8.0,net10.0",
+    "Md3.Avalonia.Icons=net8.0,net10.0",
+    "Md3.Avalonia.Icons.Lite=net8.0,net10.0",
+    "Md3.Avalonia.Extra=net8.0,net10.0",
+    "Md3.Avalonia.DataGrid=net8.0,net10.0",
+    "Md3.Avalonia.RichEditor=net10.0"
+)
+$assetArgs = @("--dir", $outputDir, "--version", $version)
+foreach ($expectation in $expectations) { $assetArgs += @("--expect", $expectation) }
+& $python.Source (Join-Path $root "scripts/verify-package-assets.py") @assetArgs
+if ($LASTEXITCODE -ne 0) { throw "Packed packages do not carry the expected target framework assets." }
 
 Write-Host "Built packages in $outputDir" -ForegroundColor Green

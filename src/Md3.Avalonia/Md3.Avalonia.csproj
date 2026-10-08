@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>$(Md3LibraryTargetFrameworks)</TargetFrameworks>
     <RootNamespace>Md3.Avalonia</RootNamespace>
     <AssemblyName>Md3.Avalonia</AssemblyName>
     <Description>Material Design 3 and Material 3 Expressive controls, dynamic HCT theming, motion, localization and desktop adapters for Avalonia 12.</Description>
@@ -10,7 +10,7 @@
     <PackageTags>avalonia;material-design;material-3;controls;android;desktop;hct;mvvm</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>0.3.0 preview: Android single-view popup hosting and complete Gallery navigation; audited accessibility, RTL, motion, responsive and localization fixes; configurable FAB menus and color-picker panels.</PackageReleaseNotes>
+    <PackageReleaseNotes>0.4.1-preview.1: opt-in Md3.Avalonia.RichEditor theme package; native-AOT verified desktop gallery with zero trim/IL diagnostics; wide-window carousel layout; rounded borderless-window corners; comparison-drag and picker-popup input fixes. Full notes: docs/RELEASE_NOTES_0.4.1-preview.1.md.</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
