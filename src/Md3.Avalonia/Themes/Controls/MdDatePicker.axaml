@@ -1,6 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:md="using:Md3.Avalonia.Controls">
+                    xmlns:md="using:Md3.Avalonia.Controls"
+                    xmlns:sys="using:System">
   <!-- The Gallery and consuming apps do not need Avalonia's FluentTheme. Picker collection
        hosts therefore carry a complete, local ItemsControl template instead of relying on a
        global native-control theme that can render as an empty popup. -->
@@ -124,7 +125,9 @@
                     <ItemsPanelTemplate><UniformGrid Columns="7" Rows="1" /></ItemsPanelTemplate>
                   </ItemsControl.ItemsPanel>
                   <ItemsControl.ItemTemplate>
-                    <DataTemplate x:CompileBindings="False"><TextBlock HorizontalAlignment="Center" Text="{Binding}" /></DataTemplate>
+                    <!-- Weekday labels are bare strings: x:DataType is the start type the
+                         pathless binding needs to compile. -->
+                    <DataTemplate x:DataType="sys:String"><TextBlock HorizontalAlignment="Center" Text="{Binding}" /></DataTemplate>
                   </ItemsControl.ItemTemplate>
                 </ItemsControl>
                 <Grid MinHeight="288" ClipToBounds="True">

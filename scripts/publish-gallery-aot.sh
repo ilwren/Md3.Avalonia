@@ -214,7 +214,7 @@ summary_block() {
     if ((${#DIAGNOSTICS[@]})); then
       {
         echo '```'
-        printf '%s\n' "${DIAGNOSTICS[@]:0:20}"
+        printf '%s\n' "${DIAGNOSTICS[@]}"
         echo '```'
         echo
       } >>"$GITHUB_STEP_SUMMARY"
@@ -225,27 +225,35 @@ summary_block
 
 if ((${#DIAGNOSTICS[@]})); then
   printf '\nTrim/AOT diagnostics found (the count has to be zero):\n'
-  printf '  %s\n' "${DIAGNOSTICS[@]:0:20}"
+  printf '  %s\n' "${DIAGNOSTICS[@]}"
   # Re-emitted as annotations as well: a warning that names a file and a line lands on the
   # run page and in the API, so the person fixing it sees which call site is meant without
-  # downloading the publish log. One annotation per file and code, ten at most.
+  # downloading the publish log. The runner keeps ten workflow-command annotations per step,
+  # so a longer list gets one extra annotation carrying the remainder: the publish log is not
+  # always reachable, the Checks API is.
   if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
     emitted=0
     while IFS= read -r line; do
       [[ -z "$line" ]] && continue
-      if [[ "$line" =~ ^(.*)\(([0-9]+),([0-9]+)\):\ (warning|error)\ (IL[0-9]{4}):\ (.*)$ ]]; then
+      if [[ "$line" =~ ^(.+)\(([0-9]+)(,([0-9]+))?\):[[:space:]]+.*(warning|error)[[:space:]]+(IL[0-9]{4}):[[:space:]]*(.*)$ ]]; then
         file="${BASH_REMATCH[1]}"
         [[ "$file" == "$ROOT"/* ]] && file="${file#"$ROOT"/}"
         file="${file//%/%25}"; file="${file//$'\r'/%0D}"; file="${file//$'\n'/%0A}"
-        code="${BASH_REMATCH[5]}"
-        message="${BASH_REMATCH[6]//%/%25}"; message="${message//$'\r'/%0D}"; message="${message//$'\n'/%0A}"
-        echo "::warning file=$file,line=${BASH_REMATCH[2]},col=${BASH_REMATCH[3]}::$code: ${message:0:300}"
+        code="${BASH_REMATCH[6]}"
+        message="${BASH_REMATCH[7]//%/%25}"; message="${message//$'\r'/%0D}"; message="${message//$'\n'/%0A}"
+        echo "::warning file=$file,line=${BASH_REMATCH[2]},col=${BASH_REMATCH[4]:-1}::$code: ${message:0:300}"
       else
         echo "::warning::${line:0:300}"
       fi
       emitted=$((emitted + 1))
       ((emitted >= 10)) && break
     done < <(printf '%s\n' "${DIAGNOSTICS[@]}")
+
+    if ((${#DIAGNOSTICS[@]} > emitted)); then
+      rest="$(printf '%s | ' "${DIAGNOSTICS[@]:emitted}")"
+      rest="${rest//%/%25}"; rest="${rest//$'\r'/%0D}"; rest="${rest//$'\n'/%0A}"
+      echo "::error::$((${#DIAGNOSTICS[@]} - emitted)) more of ${#DIAGNOSTICS[@]} IL diagnostics: ${rest:0:60000}"
+    fi
   fi
   if ((ALLOW_DIAGNOSTICS)); then
     echo

@@ -502,10 +502,12 @@ Keeping `PropertyName` on its own is fine as long as the application preserves i
 with `[DynamicallyAccessedMembers]`, a `TrimmerRootDescriptor`, or simply by binding to the same
 properties elsewhere in XAML. The selector exists so that is a choice rather than a trap.
 
-`MdCommandItem` is bound by name from a control theme, which no analyzer can see;
-`MdCommandPalette` roots its properties, so no action is needed. The optional icon packages are
-discovered by assembly probing, which is annotated and degrades to the zero-width fallback glyphs
-when neither package is present.
+`MdCommandItem` is bound from the palette's own item theme, and those two bindings pick up a
+`DataType` from the binding expression, so they compile instead of resolving `Title` and
+`IsEnabled` by name. `MdCommandPalette` roots the item's public properties anyway, so an
+application that replaces the item theme with a reflection binding keeps working. The optional
+icon packages are discovered by assembly probing, which is annotated and degrades to the
+zero-width fallback glyphs when neither package is present.
 
 A native-AOT publish of the whole desktop Gallery is exercised by
 `.github/workflows/aot-probe.yml`: it publishes with `PublishAot=true`, fails when the publish

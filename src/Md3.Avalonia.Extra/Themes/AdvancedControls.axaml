@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:eco="using:Md3.Avalonia.Extra.Controls"
                     xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
-                    xmlns:md="using:Md3.Avalonia.Controls">
+                    xmlns:md="using:Md3.Avalonia.Controls"
+                    xmlns:sys="using:System">
 
   <!-- Ecosystem controls are self-contained: these scoped collection templates avoid any
        dependency on Avalonia's global FluentTheme. -->
@@ -93,8 +94,10 @@
   <ControlTheme x:Key="EcoCommandPaletteItemTheme" TargetType="ListBoxItem" BasedOn="{StaticResource EcoListItemTheme}">
     <Setter Property="MinHeight" Value="60" /><Setter Property="Padding" Value="16,8" />
     <Setter Property="CornerRadius" Value="16" />
-    <Setter Property="IsEnabled" Value="{ReflectionBinding IsEnabled}" />
-    <Setter Property="AutomationProperties.Name" Value="{ReflectionBinding Title}" />
+    <!-- DataType makes both setters compiled bindings: the analyzer cannot see a theme setter
+         binding, and the item type is the one thing the theme knows for certain. -->
+    <Setter Property="IsEnabled" Value="{Binding IsEnabled, DataType={x:Type eco:MdCommandItem}}" />
+    <Setter Property="AutomationProperties.Name" Value="{Binding Title, DataType={x:Type eco:MdCommandItem}}" />
   </ControlTheme>
   <!-- Chat selection belongs to the bubble, never the full-width row. -->
   <ControlTheme x:Key="EcoChatListItemTheme" TargetType="ListBoxItem">
@@ -292,7 +295,9 @@
             </Grid>
             <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding WeekdayLabels}">
               <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="7" Rows="1" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-              <ItemsControl.ItemTemplate><DataTemplate x:CompileBindings="False"><TextBlock Text="{Binding}" FontSize="11" HorizontalAlignment="Center" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /></DataTemplate></ItemsControl.ItemTemplate>
+              <!-- Weekday labels are bare strings: x:DataType gives the pathless binding its
+                   start type so it compiles to the item itself instead of reflecting. -->
+              <ItemsControl.ItemTemplate><DataTemplate x:DataType="sys:String"><TextBlock Text="{Binding}" FontSize="11" HorizontalAlignment="Center" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /></DataTemplate></ItemsControl.ItemTemplate>
             </ItemsControl>
             <ListBox Name="PART_Days" Theme="{StaticResource EcoListTheme}" ItemContainerTheme="{StaticResource EcoCalendarListItemTheme}"
                      ItemsSource="{TemplateBinding VisibleDays}" Background="Transparent" SelectionMode="Single">
@@ -741,7 +746,9 @@
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate TargetType="Button">
-        <Grid Background="Transparent">
+        <!-- The swatch button is created per colour, so the data context here is that
+             colour; declaring it lets the two selection comparisons compile. -->
+        <Grid Background="Transparent" x:DataType="Color">
           <Border x:Name="PART_FocusRing"
                   Width="46" Height="46" CornerRadius="15"
                   BorderBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
@@ -752,7 +759,7 @@
                   BorderThickness="3">
             <Border.IsVisible>
               <MultiBinding Converter="{x:Static eco:MdColorConverters.ColorsEqual}">
-                <ReflectionBinding />
+                <CompiledBinding />
                 <Binding Path="SelectedColor" RelativeSource="{RelativeSource AncestorType=eco:MdColorPicker}" />
               </MultiBinding>
             </Border.IsVisible>
@@ -771,7 +778,7 @@
                                 HorizontalAlignment="Center" VerticalAlignment="Center">
                 <ContentPresenter.IsVisible>
                   <MultiBinding Converter="{x:Static eco:MdColorConverters.ColorsEqual}">
-                    <ReflectionBinding />
+                    <CompiledBinding />
                     <Binding Path="SelectedColor" RelativeSource="{RelativeSource AncestorType=eco:MdColorPicker}" />
                   </MultiBinding>
                 </ContentPresenter.IsVisible>

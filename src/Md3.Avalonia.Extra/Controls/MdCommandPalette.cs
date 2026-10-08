@@ -19,9 +19,10 @@ namespace Md3.Avalonia.Extra.Controls;
 
 /// <summary>One entry in a command palette.</summary>
 /// <remarks>
-/// The palette's item theme binds <see cref="Title"/> and <see cref="IsEnabled"/> by name from
-/// XAML, which a trimmer cannot see. <see cref="MdCommandPalette"/> roots this type's public
-/// properties so those two bindings keep working in a trimmed application.
+/// The palette's own item theme binds <see cref="Title"/> and <see cref="IsEnabled"/> with a
+/// data type on the binding, so they compile instead of reflecting by name. The palette roots
+/// this type's public properties as well, so an application that replaces the item theme with a
+/// reflection binding keeps working in a trimmed application.
 /// </remarks>
 public sealed record MdCommandItem(string Title, ICommand Command, object? Parameter = null, string? Description = null, string? Keywords = null, KeyGesture? Gesture = null)
 {
@@ -58,9 +59,9 @@ public sealed class MdCommandPalette : TemplatedControl
     private string _emptyText = string.Empty;
     private int _resultsVersion;
 
-    // EcoCommandPaletteItemTheme binds Title and IsEnabled by name, which only exists in XAML.
-    // Rooting them here ties their survival to the control that needs them, so a trimmed app
-    // that never uses the palette still drops both.
+    // A replaced item theme can still bind Title and IsEnabled by name, which only exists in
+    // XAML. Rooting them here ties their survival to the control that needs them, so a trimmed
+    // app that never uses the palette still drops both.
     [DynamicDependency(DynamicallyAccessedMemberTypes.PublicProperties, typeof(MdCommandItem))]
     static MdCommandPalette()
     {

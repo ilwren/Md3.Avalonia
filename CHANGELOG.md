@@ -26,6 +26,12 @@
 
 ### Changed
 
+- **The last reflection bindings in the shipped theme files are compiled bindings now.** The
+  palette's item theme passes `DataType` in the two setter bindings, the calendar and date-picker
+  weekday templates and the tag-input suggestion template declare their `sys:String` items, and
+  the colour swatch template declares its `Color` data context and compiles the two selection
+  comparisons. A native-AOT publish of the Gallery therefore reports no IL20xx/IL30xx diagnostics
+  from the theme files either, which is what lets the probe's count stay at zero.
 - **The Gallery shell no longer rebuilds pages through reflection.** Language changes resolved the
   page type with `Activator.CreateInstance`, which is exactly the call native AOT cannot keep; a
   factory table keyed by the navigation entry rebuilds the current page directly, `MdChart` reads

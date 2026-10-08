@@ -1,7 +1,8 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:eco="using:Md3.Avalonia.Extra.Controls"
-                    xmlns:md="using:Md3.Avalonia.Controls">
+                    xmlns:md="using:Md3.Avalonia.Controls"
+                    xmlns:sys="using:System">
 
   <!-- PIN/OTP: one real editor behind animated, Material-token-driven segmented cells. -->
   <ControlTheme x:Key="{x:Type eco:MdPinInput}" TargetType="eco:MdPinInput">
@@ -173,7 +174,9 @@
                         ItemsSource="{TemplateBinding FilteredSuggestions}" Margin="4,2,4,0">
             <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
-              <DataTemplate x:CompileBindings="False"><md:MdSuggestionChip x:Name="PART_Suggestion" Content="{Binding}" Margin="4" /></DataTemplate>
+              <!-- Suggestions are bare strings, so the pathless binding needs only the start
+                   type to compile to the item itself. -->
+              <DataTemplate x:DataType="sys:String"><md:MdSuggestionChip x:Name="PART_Suggestion" Content="{Binding}" Margin="4" /></DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
         </StackPanel>
