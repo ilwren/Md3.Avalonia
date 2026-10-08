@@ -9,7 +9,7 @@
 - 每个交互控件使用独立的 `Md*` CLR 类型和 scoped `ControlTheme`；不全局覆盖 Avalonia 原生控件；
 - 核心包不依赖 Fluent/Simple theme，尽量复用 Avalonia 原生行为、绑定、键盘和选择模型；
 - Material 颜色、字体、形状、状态层、阴影和 motion 通过 token 与 `DynamicResource` 消费；
-- Core、Icons、Icons.Lite、Extra、DataGrid 五个包可以独立发布；Extra 和图表能力不强制绑定第三方 vendor；
+- Core、Icons、Icons.Lite、Extra、DataGrid、RichEditor 六个包可以独立发布；Extra 和图表能力不强制绑定第三方 vendor；
 - RTL、现有 accessibility 和多平台适配代码会持续保留；当前开发优先级暂不把完整 RTL/多语种布局和屏幕阅读器人工验收作为预览版阻塞项。
 
 | Dark components and app bar | Dark outlined fields |
@@ -84,6 +84,7 @@
 - `MdAdaptiveLayout`：按可配置 600/840/1200/1600 DIP breakpoint 选择 Compact/Medium/Expanded/Large/ExtraLarge 内容，并公开 portrait/landscape 与 Touch/Pointer/Keyboard input mode；
 - `MdSurface`、`MdText`、`MdFocusRing`、`MdStateLayer`、`MdWindow`：可选的语义表面、完整 M3 type scale 与桌面基础适配类型；
 - `MdBorderlessWindow`、`MdWindowTitleBar`、`MdCaptionButton`、`MdWindowResizeGrip` 与可替换平台 adapter：扩展客户区的 Material caption，同时保留平台边框、四角、阴影和 resize frame；Android 使用 safe no-op。
+- `MdTrayIcon`、`MdTrayIcons`、`MdTrayMenuItem`、`MdTrayMenuItemSeparator` 与可替换平台 adapter：通知区图标与原生菜单（命令、快捷键、勾选/单选、子菜单），延迟到首次使用时才创建平台句柄；Android、浏览器与无头宿主解析为 no-op adapter，共享代码无需分支。
 
 ### Carousel、Card、Chips 与 Pickers
 
@@ -136,7 +137,7 @@
 
 ## 共用基础
 
-- Avalonia **12.1.2**；当前仓库和预览包以 `net10.0` / `net10.0-android` 为 CI 验证基线；
+- Avalonia **12.1.2**；六个包里有五个（Core、Icons、Icons.Lite、Extra、DataGrid）同时打包 `net8.0` 与 `net10.0`，`RichEditor` 因上游 `AvaloniaRichEditor` 仅 `net10.0` 而单目标；gallery 及其 Android 宿主按 `net10.0` / `net10.0-android` 构建，CI 验证基线为 .NET 10（见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)）；
 - Light、Dark、System 主题和 `DynamicResource` tokens；
 - `MaterialColorUtilities` HCT 任意 seed color 生成器，TonalSpot/Neutral/Vibrant/Expressive/Monochrome/Fidelity 六种 scheme、Standard/Medium/High contrast、49 个标准/固定/surface-container 色彩角色；
 - `MdThemeManager`、`MdThemeJson` 与对比度诊断，支持 motion、font、shape 和主题 JSON round-trip；System/Component token 分层；
@@ -145,7 +146,7 @@
 - 核心 `Md3.Avalonia` 控件库不依赖 `Avalonia.Themes.Fluent` 或 `Avalonia.Themes.Simple`；Gallery 仅在 `CodeExample` 内局部加载 Fluent resources，作为 AvaloniaEdit 原生内部 template parts 的资源依赖，不会覆盖应用或控件库的原生控件；
 - 核心程序集不引用 Desktop、Win32、X11 或 macOS 专属程序集，可由 Android 宿主引用；当前 Android Gallery 的 CI target 为 `net10.0-android`；
 - Gallery 使用官网式顶部导航、真实 `MdNavigationDrawer` 左侧组件栏、中央文档与右侧动态目录；按 Compact `<600`、Medium `600–839`、Expanded `840–1199`、Large `1200–1599`、Extra-large `>=1600` 五档切换一至三栏，compact/medium 使用 modal drawer 并自动收缩过宽示例；Android bottom destinations 会切换真实页面；
-- shell 由单一 `MdScrollViewer` 持有有限 viewport，导航时解包页面预览用根 ScrollViewer，避免嵌套无限测量，并已用真实 wheel input 验证 Offset 变化；Gallery 现为 97 个页面、每个组件独立成页（见 `docs/GALLERY_DEFECTS.md` 的 #12），Components 概览页由 gallery index 生成并有测试钉死不会出现死链；
+- shell 由单一 `MdScrollViewer` 持有有限 viewport，导航时解包页面预览用根 ScrollViewer，避免嵌套无限测量，并已用真实 wheel input 验证 Offset 变化；Gallery 现为 98 个页面、每个组件独立成页（见 `docs/GALLERY_DEFECTS.md` 的 #12），Components 概览页由 gallery index 生成并有测试钉死不会出现死链；
 - 每个组件页使用 AvaloniaEdit 提供具备 Light/Dark 语法高亮、选择、滚动和一键复制能力的 AXAML/C# 示例；示例语言使用单选 Material segmented button group 切换；Symbols 页面虚拟化浏览并点击复制官方 catalog 中的全部图标；
 - Avalonia Headless + Skia 行为、输入、主题隔离、布局和渲染测试。
 
@@ -161,7 +162,7 @@ python3 scripts/verify-fonts.py
 
 验证器会核对完整字体与 Lite 子集 checksum、真实 variable-font tables 和 glyph 数量，拒绝缺失、占位矩形或被替换的二进制。Apache-2.0 字体许可证同时打入两个 Icons 包。
 
-打包脚本要求 .NET 10 SDK，依次打包 Core、Icons、Icons.Lite 与 Extra，并在 `artifacts/nuget` 生成四个 `.nupkg` 和四个 `.snupkg`。Bash 使用 `--output`，PowerShell 使用 `-Output` 修改输出目录。
+打包脚本要求 .NET 10 SDK，依次打包 Core、Icons、Icons.Lite、Extra、DataGrid 与 RichEditor，并在 `artifacts/nuget` 生成六个 `.nupkg` 和六个 `.snupkg`；随后 `scripts/verify-package-assets.py` 会打开每个包核对 `lib/` 下的目标框架资产（五个包为 `net8.0` + `net10.0`，RichEditor 为 `net10.0`），缺一个就失败。Bash 使用 `--output`，PowerShell 使用 `-Output` 修改输出目录。
 
 同时引用 Core 与 Icons 后不需要手动调用 `ConfigureFonts`：`MdSymbols` 和核心 `MdSymbolPresenter` 会自动发现 Icons provider、注册程序集内嵌字体，验证 internal family、typeface 和官方 `search` glyph，再注入核心 `Md.Icon.*` resources。验证失败时 symbol glyph 保持隐藏，不使用 Unicode 仿制图标。
 
@@ -352,6 +353,32 @@ await snackbarService.ShowAsync(new MdSnackbarMessage("Draft archived")
 
 更换平台行为时注入 `IMdWindowPlatformAdapter`。完整 API 和限制见 [`docs/BORDERLESS_WINDOW_PLAN.md`](docs/BORDERLESS_WINDOW_PLAN.md)。
 
+## 通知区（托盘图标）
+
+`MdTrayIcon` 提供通知区图标与原生菜单。图标和菜单由操作系统绘制，因此这里不提供可样式化的 Material 表面，而是由库负责命名、默认值、生命周期和可替换的平台 adapter：
+
+- 图标是 `WindowIcon`（位图或文件），平台不接受矢量或字体字形，所以 Material Symbols 需要先在运行时栅格化；
+- 菜单条目就是 Avalonia 的 `NativeMenuItem`：命令、`CommandParameter`、`Gesture`、`ToggleType`、`IsChecked`、`IsEnabled` 和子菜单与平台菜单桥完全一致，`MdTrayMenuItem.Items` 按需创建子菜单；
+- 延迟挂载：`new MdTrayIcon()` 不会创建平台句柄，首次赋值属性、添加条目、调用 `Show()` 或注入 `PlatformAdapter` 时才挂载；注册到 `MdTrayIcon.SetIcons(Application.Current!, icons)` 后随 UI 线程退出释放；
+- `IsSupported` 是实时能力探测（`TrayIcon.NativeMenuExporter` 是否存在），所以无头宿主、浏览器、Android 和没有 DBus 的 X11 回退都会如实报告 `false` 而不会假装有图标；
+- macOS 不上报 `Clicked`，需要全局可用的功能必须同时放进菜单；
+- 桌面 Gallery 自己就用了这套 API：托盘菜单提供打开/隐藏窗口、Light/Dark/System 主题与退出，主题勾选在菜单打开时从 `Application.RequestedThemeVariant` 读回，图标由 Material Symbol 运行时栅格化。
+
+```xml
+<Application xmlns:md="using:Md3.Avalonia.Controls">
+  <md:MdTrayIcon.Icons>
+    <md:MdTrayIcons>
+      <md:MdTrayIcon ToolTipText="Material Gallery" Icon="{Binding TrayIcon}" Command="{Binding OpenCommand}">
+        <md:MdTrayMenuItem Header="Open" Command="{Binding OpenCommand}" Gesture="Ctrl+O" />
+        <md:MdTrayMenuItem Header="Quit" Command="{Binding QuitCommand}" />
+      </md:MdTrayIcon>
+    </md:MdTrayIcons>
+  </md:MdTrayIcon.Icons>
+</Application>
+```
+
+完整类型表与各平台限制见 [`docs/API.md` 的通知区一节](docs/API.md#notification-area-tray-icon)。
+
 ## Android 约束
 
 - Android 为 Tier 1；`gallery/Md3.Avalonia.Gallery.Android` 提供 `net10.0-android` single-view 宿主（最低 API 23，正式发布验证目标 API 26+）；
@@ -360,7 +387,7 @@ await snackbarService.ShowAsync(new MdSnackbarMessage("Draft archived")
 - TextBox/可编辑 ComboBox 保留原生 IME 和软键盘链路；
 - Popup 继续由 Avalonia 原生 popup/fallback 宿主处理可用空间、light-dismiss 与返回键；模板不强制 OverlayLayer，避免无可用 overlay 的 Android/headless host 卡死或崩溃；
 - 小尺寸按钮仍保留至少 48 DIP 的 interaction target；
-- Android Gallery 源码宿主已加入且独立于 desktop solution；Android 导航隐藏不适用移动端的 Borderless windows 页面；ARM64、旋转、生命周期和真机/模拟器人工矩阵仍须在具备 Android workload/设备的环境按 `docs/RELEASE_VALIDATION.md` 签署。
+- Android Gallery 源码宿主已加入且独立于 desktop solution；Android 导航隐藏不适用移动端的 Borderless windows 页面与通知区示例页，通知区 API 在 Android、浏览器与无头宿主解析为 no-op adapter（`IsSupported` 如实返回 `false`），共享代码无需分支；ARM64、旋转、生命周期和真机/模拟器人工矩阵仍须在具备 Android workload/设备的环境按 `docs/RELEASE_VALIDATION.md` 签署。
 
 ## 构建与测试
 
@@ -370,9 +397,15 @@ scripts/build-nuget.sh
 
 dotnet build Md3.Avalonia.sln -c Release
 dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --no-build
+
+# 原生 AOT 发布桌面 Gallery（需要 .NET 10 SDK + clang/zlib1g-dev）
+scripts/publish-gallery-aot.sh --rid linux-x64
+powershell -File scripts/publish-gallery-aot.ps1 -Rid win-x64 -Smoke
 ```
 
-当前发布门禁会构建五个包并严格检查五个 `.nupkg`、五个 `.snupkg`、统一版本和已内嵌官方字体。仓库不保留普通构建产物。测试覆盖 Light/Dark Gallery screenshots、任意 HCT seed golden vectors、49 roles、三档 contrast、主题 JSON round-trip、五档 breakpoint、搜索索引、LTR/RTL 渲染、CommunityToolkit.Mvvm、Automation/live-region、虚拟化和主题生命周期、AvaloniaEdit 双语言编辑器、真实 ScrollViewer extent/viewport/wheel offset、Autocomplete/Numeric input、adaptive breakpoints、Flexible NavigationBar、official chip/item 类型、popup 非强制 OverlayLayer、Tabs/Toolbars/Tooltips、Menus/Drawer/Rail/Search/Sheets/Slider/Snackbar/Switch 的渲染与直接 API，以及 Dialog、Lists、contained Loading/Progress、popup 互斥、文化日期网格、一分钟 TimePicker、state layer、buttons、fields、Carousel/Card/Chips、AppBar、Symbols、Radio、Badge、ripple/motion。
+`scripts/publish-gallery-aot.sh`（Windows/macOS 用等价的 `publish-gallery-aot.ps1`，或 `.cmd` 转发）既是本地入口，也是 CI `AOT probe` 调用的唯一入口。它做四件事，缺一都不算通过：用 `PublishAot=true` 发布桌面 Gallery；断言产物是原生可执行文件且旁边没有托管 `.dll`（静默回退成框架依赖应用是绿色构建最容易掩盖的失败）；统计发布日志里的 ILxxxx 裁剪/AOT 诊断并要求为 0（`--allow-diagnostics` 只用于人工摸底，CI 不传）；在有显示环境时真实启动产物，超时前仍在运行（退出码 124）才算通过 —— ILC 能编译不代表运行期反射没被裁掉，最后这一步才是结论。日志写到 `artifacts/aot/`，默认清理 `bin`/`obj`。
+
+当前发布门禁会构建六个包并严格检查六个 `.nupkg`、六个 `.snupkg`、统一版本和已内嵌官方字体。仓库不保留普通构建产物。测试覆盖 Light/Dark Gallery screenshots、任意 HCT seed golden vectors、49 roles、三档 contrast、主题 JSON round-trip、五档 breakpoint、搜索索引、LTR/RTL 渲染、CommunityToolkit.Mvvm、Automation/live-region、虚拟化和主题生命周期、AvaloniaEdit 双语言编辑器、真实 ScrollViewer extent/viewport/wheel offset、Autocomplete/Numeric input、adaptive breakpoints、Flexible NavigationBar、official chip/item 类型、popup 非强制 OverlayLayer、Tabs/Toolbars/Tooltips、Menus/Drawer/Rail/Search/Sheets/Slider/Snackbar/Switch 的渲染与直接 API，以及 Dialog、Lists、contained Loading/Progress、popup 互斥、文化日期网格、一分钟 TimePicker、state layer、buttons、fields、Carousel/Card/Chips、AppBar、Symbols、Radio、Badge、ripple/motion。
 
 每一次 build、test 或 pack 命令结束后必须立即清理编译产物，再继续后续实现或验证。Workspace 不交付 `bin/`、`obj/`、`TestResults/`、DLL、PDB、NuGet、APK 或 AAB；`docs/*.png` 是保留的文档参考图。
 
@@ -382,7 +415,7 @@ dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -
 - HCT dynamic theme、49 个当前 Material role、Theme Lab 与 JSON round-trip 已完成；`MdTextBox.IsPassword` 已覆盖密码输入与 reveal 行为；
 - Android 系统返回键／预测性返回已接入（`MdBackNavigation`，覆盖 dialog、sheet、drawer、search、menu、FAB menu 与两个 picker），安全区内缩已提供按边控制（`MdSafeArea`）；两者的 headless 行为有回归测试，真机手势动画与挖孔几何仍需人工验收；
 - Android Gallery 源码宿主已提供，但当前环境未安装 Android workload，也没有 ARM64 设备，因此 APK、旋转、生命周期、真机/模拟器矩阵不得视为已签署；
-- 六个包均已声明 `IsTrimmable` + `IsAotCompatible` 并开启 IL2xxx/IL3xxx 分析器；主题 JSON 走源生成序列化，`MdDataGrid`/`MdAsyncSelect`/`MdSearchView` 的字符串属性路径均提供了免反射的 selector 委托（见 [API 参考的 Trimming 一节](docs/API.md#trimming)）。**原生 AOT 已验证可用**：`.github/workflows/aot-probe.yml` 用 `PublishAot=true` 发布桌面 Gallery，断言产物是原生 ELF（无托管 dll 残留）、IL 诊断为零，并在 xvfb 下实际启动该二进制确认运行时未因缺反射元数据而崩溃；
+- 六个包均已声明 `IsTrimmable` + `IsAotCompatible` 并开启 IL2xxx/IL3xxx 分析器；主题 JSON 走源生成序列化，`MdDataGrid`/`MdAsyncSelect`/`MdSearchView` 的字符串属性路径均提供了免反射的 selector 委托（见 [API 参考的 Trimming 一节](docs/API.md#trimming)）。**Gallery 本身也已按 AOT 适配并验证可用**：语言切换重建页面改用按导航条目索引的工厂表（原来是 `Activator.CreateInstance(pageType)`）、`MdChart` 的类型解析用 `switch` 取代 `Enum.TryParse`、DataGrid 示例列用 `CompiledBinding.Create` 取代字符串属性路径绑定；`.github/workflows/aot-probe.yml` 调用 `scripts/publish-gallery-aot.sh`，用 `PublishAot=true` 发布桌面 Gallery，断言产物是原生 ELF（无托管 dll 残留）、IL 诊断为零，并在 xvfb 下实际启动该二进制确认运行时未因缺反射元数据而崩溃；
 - Narrator、VoiceOver 和 Orca 必须由具备对应 OS/辅助技术的人员按发布清单人工验收；
 - 完整 Material Symbols Rounded variable TTF 与真实 Lite 子集已提交并自动打包；CI 以固定 upstream commit、SHA-256、variable tables 和 glyph 数量阻止占位或替代字体混入发布。
 

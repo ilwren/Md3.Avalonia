@@ -1,6 +1,6 @@
 # Multi-Platform Development
 
-Md3.Avalonia targets **.NET 10.0** and runs seamlessly across Desktop (Windows, macOS, Linux) and Mobile (Android, iOS).
+Md3.Avalonia's library packages target **.NET 8.0 and .NET 10.0** (`Md3.Avalonia.RichEditor` is `net10.0`-only) and run seamlessly across Desktop (Windows, macOS, Linux) and Mobile (Android, iOS). The Gallery and hosts in this repository target **.NET 10.0**.
 
 ---
 

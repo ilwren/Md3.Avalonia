@@ -1,7 +1,7 @@
 # 动画缺口与无边框窗口差距审计
 
 日期：2026-09-26  
-范围：`Md3.Avalonia`、`Md3.Avalonia.Ecosystem`、Gallery、现有 Headless tests；对照当前 Material 3 Motion 指南、Flutter `master` 中相关 Material/Widgets 源码，以及 FluentAvalonia `master` 的 AppWindow/Win32 windowing 源码。
+范围：`Md3.Avalonia`、`Md3.Avalonia.Extra`、Gallery、现有 Headless tests；对照当前 Material 3 Motion 指南、Flutter `master` 中相关 Material/Widgets 源码，以及 FluentAvalonia `master` 的 AppWindow/Win32 windowing 源码。
 
 > 本文是只读分析，不把尚未在桌面或 Android 真机验证的行为标为完成。
 

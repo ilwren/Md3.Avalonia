@@ -1,5 +1,44 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- **Notification area (tray icon).** `MdTrayIcon`, `MdTrayIcons`, `MdTrayMenuItem` and
+  `MdTrayMenuItemSeparator` give a desktop application a real icon with a native menu: commands,
+  gestures, check/radio items, submenus, tooltips and click handling. The icon and the menu are
+  platform-drawn, so the package owns the naming, defaults, lifetime and a replaceable platform
+  adapter instead of a styled surface: attachment is deferred until the first property, entry,
+  `Show()` or injected adapter, `SetIcons` releases the handles when the UI thread shuts down, and
+  Android, the browser and headless hosts resolve to a no-op adapter rather than pretending. The
+  desktop Gallery uses the API for open/hide, Light/Dark/System and quit, and a Gallery page
+  documents the model. See [`docs/API.md`](docs/API.md#notification-area-tray-icon).
+- **`scripts/publish-gallery-aot.sh` (with a `publish-gallery-aot.ps1`/`.cmd` twin)** publishes the
+  desktop Gallery with `PublishAot=true` and then checks what the publish produced: a native
+  executable with no managed assembly beside it, zero ILxxxx trim/AOT diagnostics, and a binary
+  that is still running after a 25 s display timeout. `dotnet publish` succeeding is the one
+  signal that cannot be trusted here, because native AOT fails at run time on reflection that was
+  trimmed away, not at compile time. Diagnostics are re-emitted as workflow annotations, and
+  `AOT probe` now calls the same script a developer runs locally.
+
+### Changed
+
+- **The Gallery shell no longer rebuilds pages through reflection.** Language changes resolved the
+  page type with `Activator.CreateInstance`, which is exactly the call native AOT cannot keep; a
+  factory table keyed by the navigation entry rebuilds the current page directly, `MdChart` reads
+  its `Kind` with a `switch` instead of `Enum.TryParse`, and the DataGrid sample columns use
+  `CompiledBinding.Create` instead of string property paths. The Gallery is part of the AOT probe
+  result now, not just the library.
+- **The five Material packages ship `net8.0` and `net10.0` again.** `Md3.Avalonia`,
+  `Md3.Avalonia.Icons`, `Md3.Avalonia.Icons.Lite`, `Md3.Avalonia.Extra` and
+  `Md3.Avalonia.DataGrid` now build and pack both target frameworks, so an application that has
+  not moved to .NET 10 can consume them; Avalonia 12.1.2 itself ships legacy `net8.0` assets.
+  `Md3.Avalonia.RichEditor` stays `net10.0`-only because the upstream `AvaloniaRichEditor` it
+  themes does. Trim and AOT analyzers run for both frameworks, so both assets carry the same
+  guarantees. The framework list lives in `Directory.Build.props`, and
+  `scripts/verify-package-assets.py` fails the packaging job if a package does not carry exactly
+  the expected `lib/` asset set — a green pack step no longer implies the right frameworks inside.
+
 ## [0.4.1-preview.1] - 2026-10-06
 
 ### Added

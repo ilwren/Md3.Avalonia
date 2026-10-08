@@ -2,7 +2,7 @@
 
 Status: **the documented Waves A–F scope is implemented** (hardened 2026-09-26). This is an Avalonia-native, provider-neutral subset; it is not a claim of API or feature completeness against every referenced Flutter package.
 
-This document is the implementation ledger for `Md3.Avalonia.Ecosystem`. It records behavior studied from public documentation, not copied implementation. The package depends on `Md3.Avalonia` and Avalonia only; it never requires `Md3.Avalonia.Icons`. Applications can inject their own glyphs, fonts, data engines and providers.
+This document is the implementation ledger for `Md3.Avalonia.Extra` (published as `Md3.Avalonia.Ecosystem` before the rename; the old namespaces remain as aliases). It records behavior studied from public documentation, not copied implementation. The package depends on `Md3.Avalonia` and Avalonia only; it never requires `Md3.Avalonia.Icons`. Applications can inject their own glyphs, fonts, data engines and providers.
 
 ## Mandatory clean-room gate
 
@@ -88,7 +88,7 @@ Only the public behavior listed above was reviewed. The Avalonia API, implementa
 
 - `EcosystemGalleryPage` provides live interaction for every wave, Light/Dark theme inheritance and selectable/copyable XAML/C# usage.
 - `MdEcosystemWaveAndWindowTests` and `MdEcosystemWaveFTests` cover public state machines, providers, direct APIs, binding-friendly collections, RTL, rendering and Gallery construction.
-- Current hardened baseline (2026-09-26): solution Release build with zero warnings/errors and 170/170 headless tests passing. The added tests exercise real pointer search commit, reorder-handle drag, data-grid header sorting, chat bubble hit testing, state-layer geometry/pressed state, keyboard form input and Tab focus cycling; native popup-host and Android checks remain separate release gates.
+- Current hardened baseline (2026-10-07): solution Release build with zero warnings/errors and 402/402 headless tests passing. The added tests exercise real pointer search commit, reorder-handle drag, data-grid header sorting, chat bubble hit testing, state-layer geometry/pressed state, keyboard form input and Tab focus cycling; native popup-host and Android checks remain separate release gates.
 
 ## Acceptance and future compatibility
 

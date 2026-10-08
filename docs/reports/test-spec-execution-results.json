@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-10-02T09:01:58.559253+00:00",
+  "generated_at": "2026-10-08T06:45:05.299187+00:00",
   "purpose": "repository verification evidence; not a Material or Flutter certification",
   "summary": {
     "passed": 4,
@@ -9,7 +9,7 @@
     "all_runner_checks_completed": false,
     "material_or_flutter_compliance_claim": false
   },
-  "elapsed_seconds": 0.011,
+  "elapsed_seconds": 0.018,
   "results": [
     {
       "check": "pinned-spec-baseline",
@@ -22,7 +22,7 @@
     {
       "check": "traceable-requirement-matrix",
       "status": "passed",
-      "message": "Validated 12 uniquely identified requirements; statuses: {'not_run': 10, 'failed': 0, 'excluded': 2, 'passed': 0}. Matrix status is not test execution.",
+      "message": "Validated 12 uniquely identified requirements; statuses: {'not_run': 11, 'passed': 0, 'failed': 0, 'excluded': 1}. Matrix status is not test execution.",
       "evidence": [
         "docs/spec-test-matrix.json"
       ]
@@ -30,7 +30,7 @@
     {
       "check": "axaml-well-formedness",
       "status": "passed",
-      "message": "Parsed 60 AXAML files as XML. This does not prove Avalonia XAML compilation.",
+      "message": "Parsed 67 AXAML files as XML. This does not prove Avalonia XAML compilation.",
       "evidence": [
         "src/**/*.axaml",
         "tests/**/*.axaml"
@@ -39,7 +39,7 @@
     {
       "check": "parity-claim-boundaries",
       "status": "passed",
-      "message": "Parity subsets, API shells, and experimental motion APIs are explicitly separated.",
+      "message": "Parity subsets and API shells are separated, and completed motion APIs no longer claim to be experimental.",
       "evidence": [
         "docs/FLUTTER_PARITY_STATUS.md",
         "src/Md3.Avalonia.Extra/Controls/MdMotionControls.cs"

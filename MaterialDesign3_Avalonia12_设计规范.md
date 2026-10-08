@@ -33,7 +33,7 @@
 - Gallery 中所有面向用户的交互控件必须使用 `Md*` 控件；`Grid`、`Panel`、`Border`、`Path` 等纯布局/绘图原语可以直接使用 Avalonia 类型。
 - 颜色、字体、圆角、间距、阴影、状态层和动画不得散落硬编码在模板中，必须来自设计令牌。
 - 所有会在运行时变化的主题资源必须通过 `DynamicResource` 消费。
-- 控件库必须可被 `net8.0-android` Avalonia 应用引用并在 Android 真机/模拟器上运行，不得在核心控件中引入仅桌面可用的 API。
+- 控件库必须可被 `net10.0-android` Avalonia 应用引用并在 Android 真机/模拟器上运行，不得在核心控件中引入仅桌面可用的 API。
 - 工作区只交付源码、设计文档、必要的规范快照与经审批的参考图；不得交付 `bin/`、`obj/`、`TestResults/`、`artifacts/`、`.nupkg`、DLL、PDB 等编译或测试产物。
 
 ### 2.2 设计档位
@@ -92,9 +92,9 @@ Material 官网是持续更新的网站，浏览器和 Avalonia 的文字光栅�
 ### 4.1 首版范围
 
 - Avalonia 12.x；所有 Avalonia 包必须锁定同一补丁版本。
-- 核心控件库面向 `net8.0`，不得引用桌面专属 API；桌面 Gallery 面向 `net10.0`。
+- 核心控件库面向 `net8.0` 与 `net10.0`，桌面 Gallery 面向 `net10.0`；核心库不得引用桌面专属 API。
 - Tier 1：Windows、macOS、Linux 桌面以及 Android。
-- Android 宿主面向 `net8.0-android`，至少覆盖 Android 8.0（API 26）及以上、ARM64、触摸、软键盘、返回键、生命周期恢复、深浅主题和安全区域。
+- Android 宿主面向 `net10.0-android`，宿主最低 API 23、发布目标 API 26 及以上，覆盖 ARM64、触摸、软键盘、返回键、生命周期恢复、深浅主题和安全区域。
 - Tier 2：iOS、Browser/WASM 的编译和基础交互验证。
 - Light、Dark、System 三种主题模式。
 - 任意 seed color 生成完整亮/暗配色，不限于 M3 预设紫色。
@@ -123,7 +123,7 @@ Material 官网是持续更新的网站，浏览器和 Avalonia 的文字光栅�
 | R5 | MVVM 友好且支持直接操作 | 标准 `ICommand`、双向绑定、事件、方法、服务接口 |
 | R6 | 完整资源字典、字体、主题色、字体图标、任意强调色 | 三层令牌、HCT 主题生成、字体与 Material Symbols 包 |
 | R7 | 深浅模式 | `ThemeVariant`、Light/Dark 字典、System 跟随与局部作用域 |
-| R8 | 控件库可在 Android 运行 | Android 列为 Tier 1；提供 `net8.0-android` 宿主、触摸/软键盘/生命周期真机测试 |
+| R8 | 控件库可在 Android 运行 | Android 列为 Tier 1；提供 `net10.0-android` 宿主、触摸/软键盘/生命周期真机测试 |
 | R9 | Workspace 不提供编译产物 | 只交付源码与必要文档；构建验证后清理所有 `bin/obj/TestResults/artifacts` 等产物 |
 
 ---
@@ -1035,7 +1035,7 @@ Contrast: Standard / Medium / High
 
 ### 21.6 Android 验证
 
-- `net8.0-android` Debug/Release 编译检查；
+- `net10.0-android` Debug/Release 编译检查；
 - Android API 26 与当前目标 API 模拟器冒烟测试；
 - ARM64 真机触摸、长按、拖拽、返回键和屏幕旋转；
 - `MdTextBox` 的软键盘、IME composing、selection、复制粘贴与焦点切换；
@@ -1102,7 +1102,7 @@ AvaloniaCompatibility: >= 12.0 < 13.0
 
 - 官网式 shell 已实现五档 breakpoint：Compact `<600`、Medium `600–839`、Expanded `840–1199`、Large `1200–1599`、Extra-large `>=1600`；compact/medium 使用 modal navigation，Large/Extra-large 显示三栏且正文限制阅读宽度；
 - 保持 shell 单一有限 viewport 滚动模型，并提供当前页面标题自动生成的可跳转右侧目录；
-- 35 个全组件页面、Desktop adapters、Material Symbols、Motion 与 AXAML/C# 双页签代码编辑器已接入；
+- 94 个页面（每个组件一页，含桌面专属示例与 shell 页面）、Desktop adapters（含 `MdBorderlessWindow` 与通知区 `MdTrayIcon`，Android/浏览器/无头宿主解析为 no-op）、Material Symbols、Motion 与 AXAML/C# 双页签代码编辑器已接入；
 - Gallery 顶部搜索已建立组件标题/关键字索引，可实时筛选并在提交时导航；
 - Theme Lab 已实现任意 seed color、六种 scheme variant、三档 contrast、Light/Dark/System、motion、Brand/Plain、shape scale、49 role 预览、对比度诊断以及 JSON 文本/文件导入导出；
 - Headless 覆盖五档响应式行为、搜索索引、页面渲染与真实滚动。
@@ -1112,7 +1112,8 @@ AvaloniaCompatibility: >= 12.0 < 13.0
 - 已增加 HCT golden vectors、主题 JSON round-trip、49 role/contrast、LTR/RTL、Light/Dark、三档 contrast、五种参考宽度渲染矩阵；
 - `MdList` / `MdCarousel` 改用 `VirtualizingStackPanel` 并增加大型数据集有界实现测试；重复主题替换和 attach/detach 生命周期纳入测试；
 - 原生基类 AutomationPeer 继续复用；Loading 使用 ProgressBar automation，Snackbar 使用 polite LiveSetting，ripple/state/focus 装饰层退出 automation control/content view；CommunityToolkit.Mvvm 双向绑定和 RelayCommand 已自动验证；
-- 已加入 `samples/Md3.Avalonia.Gallery.Android` single-view host、Gallery Android view 与 Android 生命周期分支；该工程刻意不加入 desktop solution；
+- 已加入 `gallery/Md3.Avalonia.Gallery.Android` single-view host、Gallery Android view 与 Android 生命周期分支；该工程刻意不加入 desktop solution；
+- 桌面 Gallery 已通过原生 AOT 发布门禁：`scripts/publish-gallery-aot.sh`（`AOT probe` 调用）断言产物为原生可执行文件、旁边无托管 dll、ILxxxx 诊断为零，并在 xvfb 下真实启动；shell 重建页面不再使用反射；
 - NuGet metadata、XML docs、API 入口、Apache-2.0、第三方声明、CHANGELOG、兼容策略和发布验证清单已补齐；
 - 当前环境无法替代 Android ARM64 真机、Narrator、VoiceOver、Orca 人工验收，因此这些项目保留在 `docs/RELEASE_VALIDATION.md` 等待外部签署，不伪造完成结论。
 
@@ -1142,7 +1143,7 @@ AvaloniaCompatibility: >= 12.0 < 13.0
 - [x] Gallery 不直接使用 Avalonia 原生交互控件冒充 Material 控件；
 - [x] 完整 Light/Dark/System 和任意 seed color 生效；
 - [x] 颜色、字体、形状、间距、阴影、状态和 motion 资源字典齐全；
-- [ ] Material Symbols 字体图标可直接使用；**按明确要求临时移除 TTF；强类型 fallback、codepoint map 与许可仍在。此项是显式预发布例外。**
+- [x] Material Symbols 字体图标可直接使用；完整官方 variable TTF、codepoints 与许可已随 `Md3.Avalonia.Icons` 交付，`scripts/verify-fonts.py` 在 CI 校验 SHA-256、字表与字形（full 6646 / lite 66）；
 - [x] CommunityToolkit.Mvvm 示例和直接操作示例均通过；
 - [x] 所有控件通过可自动执行的基础键盘与 Automation 测试；屏幕阅读器人工巡检见外部签署项；
 - [x] 自动视觉渲染矩阵无未审批差异；人工 OS/设备矩阵仍按发布记录签署；

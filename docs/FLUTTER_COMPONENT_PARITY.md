@@ -15,7 +15,7 @@ The goal is behavioral/API parity where that behavior fits Avalonia, not a Dart 
 |---|---|---|
 | `Md3.Avalonia` | Official Flutter Material-aligned controls, Material tokens, motion, localization, and platform-neutral infrastructure | Does not reference a concrete icon/font provider |
 | `Md3.Avalonia.Icons` | Optional Material Symbols catalog, checked-in complete official variable TTF, codepoints, license, and `Md.Icon.*` injection | Standalone optional provider; no manual font download |
-| `Md3.Avalonia.Ecosystem` | Clean-room controls based on audited third-party Flutter interaction documentation | References `Md3.Avalonia`; does not reference Icons |
+| `Md3.Avalonia.Extra` | Clean-room controls based on audited third-party Flutter interaction documentation (also carries the older `Md3.Avalonia.Ecosystem` namespaces as aliases) | References `Md3.Avalonia`; does not reference Icons |
 
 Core icon slots resolve `Md.Sys.Typeface.Symbols.Rounded` and `Md.Icon.*`. Core supplies visually empty fallbacks; when referenced, the optional Icons package is discovered automatically on first symbol use and injects its verified Material Symbols resources. Applications can still replace every token with their own icon font or objects.
 
@@ -133,7 +133,7 @@ The repeated visual/interaction verification gate is maintained in [`COMPONENT_Q
 
 ## Third-party ecosystem implementation waves
 
-Status: **Waves A–F complete.** The separate `Md3.Avalonia.Ecosystem` package has an opt-in `EcosystemTheme`, depends on core, and never depends on Material Symbols. The complete control/API matrix, clean-room gate, frozen baselines and acceptance obligations are maintained in [`FLUTTER_ECOSYSTEM_RESEARCH_PLAN.md`](FLUTTER_ECOSYSTEM_RESEARCH_PLAN.md).
+Status: **Waves A–F complete.** The separate `Md3.Avalonia.Extra` package has an opt-in `EcosystemTheme` (the styles entry keeps its original name), depends on core, and never depends on Material Symbols. The complete control/API matrix, clean-room gate, frozen baselines and acceptance obligations are maintained in [`FLUTTER_ECOSYSTEM_RESEARCH_PLAN.md`](FLUTTER_ECOSYSTEM_RESEARCH_PLAN.md).
 
 - **Wave A:** overlay/focus/shortcut/async/density contracts, avatar/rating/breadcrumb, popover, hover card and command palette.
 - **Wave B:** slidable, incremental paging, masonry/quilted/woven layout, five-breakpoint adaptive input state and virtualized editable data grid.

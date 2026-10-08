@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "baseline": "spec-baseline-manifest.json",
-  "updated_at": "2026-10-02",
+  "updated_at": "2026-10-07",
   "status_definitions": {
     "not_run": "Implementation and/or test exists, but no result from the current revision has been recorded.",
     "passed": "The named automated evidence passed on the named platform for the current revision.",
@@ -175,16 +175,16 @@
     {
       "id": "EXTRA-MOTION-001",
       "component": "MdSharedAxis, MdFadeThrough, MdContainerTransform, MdAnimatedVisibility",
-      "variant": "Preview shells",
+      "variant": "Material shared-axis transition family",
       "platforms": [
         "all"
       ],
       "source": "https://m3.material.io/styles/motion/overview",
-      "assertion": "Incomplete choreography is marked experimental and excluded from parity claims.",
+      "assertion": "The four shared-axis-family transitions carry real choreography, and none of them still claims to be an experimental preview shell.",
       "automated_evidence": [
-        "MdP0AccessibilityAndKeyboardTests.Incomplete_Motion_APIs_Are_Explicitly_Experimental"
+        "MdP0AccessibilityAndKeyboardTests.Completed_Motion_APIs_No_Longer_Claim_To_Be_Experimental"
       ],
-      "verification_status": "excluded"
+      "verification_status": "not_run"
     },
     {
       "id": "FLUTTER-PARITY-001",

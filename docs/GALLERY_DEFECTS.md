@@ -8,6 +8,9 @@ Verification note: the development sandbox has no .NET SDK. Everything here is v
 compilation and headless tests in CI, not by looking at the running app. Items marked *visual*
 need confirmation on a real desktop run.
 
+See also: `docs/GALLERY_M3_DIVERGENCE_AUDIT_2026-10-07.md` for the 2026-10-07 gallery-vs-Material-Design
+walkthrough (shell-level findings G-01…G-15 and the regression tests they still need).
+
 ## Fixed
 
 | # | Symptom | Root cause | Commit |
@@ -67,7 +70,7 @@ synchronised both ways. Same split as Flutter's `TabBar`/`TabBarView`.
 wrong answer: Avalonia already ships that control, and a rename would not have changed what
 `MdDataGrid` can do. The decision taken was to theme the real thing. `Md3.Avalonia.DataGrid` is
 a new opt-in package carrying the `Avalonia.Controls.DataGrid` dependency alone, so the other
-four packages stay clean, and `MdDataGrid` keeps its job as a Material data table. The gallery
+five packages stay clean, and `MdDataGrid` keeps its job as a Material data table. The gallery
 now shows both, one above the other, with the boundary written between them.
 
 The theme is derived from the DataGrid package's own Fluent theme rather than hand-written,
