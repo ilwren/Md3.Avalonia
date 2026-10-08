@@ -16,6 +16,7 @@ Automated baseline date: 2026-10-05
 | Dynamic color | golden seed vectors, arbitrary seed/variant, contrast pairs, JSON round-trip | Pass |
 | Trim analysis | CI `Build tests` with `EnableTrimAnalyzer` on all six packages | 0 IL2xxx warnings; every suppression carries a written justification |
 | Native AOT | CI `AOT probe` → `scripts/publish-gallery-aot.sh --rid linux-x64` (the same entry point a developer runs locally) publishes the desktop Gallery with `PublishAot=true` | Native ELF with no managed assembly beside it, zero ILxxxx diagnostics, and the binary still running after a 25 s Xvfb smoke test |
+| Native AOT, third-party aggregates | `NoWarn=IL2104;IL3053` in `gallery/Md3.Avalonia.Gallery.Desktop` | The only assembly-level aggregates come from `Avalonia.Controls.DataGrid` 12.1.2 (an unannotated dependency the opt-in theme package wraps); the six `Md3.Avalonia.*` packages set `IsAotCompatible`, so their diagnostics stay individual and are never single-warned |
 | Trim escape hatches | `MdTrimmingTests` | Selector delegates on `MdDataGrid`, `MdAsyncSelect` and `MdSearchView` return without reflection; `IsTrimmable` present on shipped assemblies |
 | Responsive Gallery | 599/600/839/840/1199/1200/1599/1600 boundary behavior | Pass |
 | Visual directions/themes | LTR/RTL, Light/Dark, Standard/Medium/High | Render without exception |

@@ -6,6 +6,13 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Native AOT reports assembly-level IL2104/IL3053 aggregates for referenced assemblies that do
+         not declare AOT compatibility. The only one in this app is Avalonia.Controls.DataGrid 12.1.2,
+         which the Gallery demos through the opt-in Md3.Avalonia.DataGrid theme package; the detail
+         warnings live inside that package and are not ours to fix. Our own six packages declare
+         IsAotCompatible, so ILC is told not to single-warn them: their diagnostics stay individual
+         (IL2026/IL3050/...) and still fail scripts/publish-gallery-aot.sh. -->
+    <NoWarn>$(NoWarn);IL2104;IL3053</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

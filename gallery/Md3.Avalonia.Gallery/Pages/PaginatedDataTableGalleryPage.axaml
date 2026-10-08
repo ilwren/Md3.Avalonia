@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             xmlns:pages="using:Md3.Avalonia.Gallery.Pages"
              x:Class="Md3.Avalonia.Gallery.Pages.PaginatedDataTableGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Spacing="28" Margin="0,0,12,24">
@@ -16,7 +17,7 @@
             <Grid ColumnDefinitions="2*,*,*"><TextBlock FontWeight="Medium" Text="Package" /><TextBlock Grid.Column="1" FontWeight="Medium" Text="Platform" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" FontWeight="Medium" Text="Score" /></Grid>
           </md:MdPaginatedDataTable.Header>
           <md:MdPaginatedDataTable.ItemTemplate>
-            <DataTemplate x:CompileBindings="False">
+            <DataTemplate x:DataType="pages:PackageRow">
               <Grid Margin="4" ColumnDefinitions="2*,*,*"><TextBlock Text="{Binding Name}" /><TextBlock Grid.Column="1" Text="{Binding Platform}" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="{Binding Score}" /></Grid>
             </DataTemplate>
           </md:MdPaginatedDataTable.ItemTemplate>

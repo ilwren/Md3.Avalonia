@@ -41,6 +41,7 @@ public partial class PagedItemsGalleryPage : UserControl
 
     private void PagesRefreshed(object? sender, EventArgs e) =>
         PagingStatus.Text = L("Existing pages cleared; loading page 1…", "已清除现有页面；正在加载第 1 页…");
-
-    private sealed record PagedRecord(string Title, string Detail);
 }
+
+/// <summary>Row model for the PagedItemsGalleryPage.axaml sample; public so the template can compile its bindings.</summary>
+public sealed record PagedRecord(string Title, string Detail);

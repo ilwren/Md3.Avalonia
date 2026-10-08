@@ -97,5 +97,7 @@ public partial class SearchGalleryPage : UserControl
         }
     }
 
-    private sealed record SearchResult(string Name, string Category);
 }
+
+/// <summary>Row model for the SearchGalleryPage.axaml sample; public so the template can compile its bindings.</summary>
+public sealed record SearchResult(string Name, string Category);

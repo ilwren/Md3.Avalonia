@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             xmlns:pages="using:Md3.Avalonia.Gallery.Pages"
              x:Class="Md3.Avalonia.Gallery.Pages.SearchGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Spacing="28">
@@ -21,7 +22,7 @@
           <Grid>
             <md:MdList x:Name="ExpandedSearchResults" SelectionChanged="OnExpandedResultSelected">
               <md:MdList.ItemTemplate>
-                <DataTemplate x:CompileBindings="False">
+                <DataTemplate x:DataType="pages:SearchResult">
                   <StackPanel Margin="4" Spacing="2">
                     <TextBlock FontWeight="Medium" Text="{Binding Name}" />
                     <TextBlock FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{Binding Category}" />

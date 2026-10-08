@@ -19,7 +19,10 @@
   that is still running after a 25 s display timeout. `dotnet publish` succeeding is the one
   signal that cannot be trusted here, because native AOT fails at run time on reflection that was
   trimmed away, not at compile time. Diagnostics are re-emitted as workflow annotations, and
-  `AOT probe` now calls the same script a developer runs locally.
+  `AOT probe` now calls the same script a developer runs locally, and assembly-level
+  `IL2104`/`IL3053` aggregates reported for the unannotated `Avalonia.Controls.DataGrid` dependency
+  are suppressed in the Desktop project with the reasoning written there - the six `Md3.Avalonia.*`
+  packages set `IsAotCompatible`, so their own diagnostics stay individual and still fail the gate.
 
 ### Changed
 
@@ -27,8 +30,10 @@
   page type with `Activator.CreateInstance`, which is exactly the call native AOT cannot keep; a
   factory table keyed by the navigation entry rebuilds the current page directly, `MdChart` reads
   its `Kind` with a `switch` instead of `Enum.TryParse`, and the DataGrid sample columns use
-  `CompiledBinding.Create` instead of string property paths. The Gallery is part of the AOT probe
-  result now, not just the library.
+  `CompiledBinding.Create` instead of string property paths, and three sample pages that carried
+  `x:CompileBindings="False"` templates (search results, paged items, paginated data table) now
+  expose their row models so the templates bind with `x:DataType` instead of reflection at run time.
+  The Gallery is part of the AOT probe result now, not just the library.
 - **The five Material packages ship `net8.0` and `net10.0` again.** `Md3.Avalonia`,
   `Md3.Avalonia.Icons`, `Md3.Avalonia.Icons.Lite`, `Md3.Avalonia.Extra` and
   `Md3.Avalonia.DataGrid` now build and pack both target frameworks, so an application that has

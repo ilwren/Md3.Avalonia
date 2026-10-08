@@ -403,7 +403,7 @@ scripts/publish-gallery-aot.sh --rid linux-x64
 powershell -File scripts/publish-gallery-aot.ps1 -Rid win-x64 -Smoke
 ```
 
-`scripts/publish-gallery-aot.sh`（Windows/macOS 用等价的 `publish-gallery-aot.ps1`，或 `.cmd` 转发）既是本地入口，也是 CI `AOT probe` 调用的唯一入口。它做四件事，缺一都不算通过：用 `PublishAot=true` 发布桌面 Gallery；断言产物是原生可执行文件且旁边没有托管 `.dll`（静默回退成框架依赖应用是绿色构建最容易掩盖的失败）；统计发布日志里的 ILxxxx 裁剪/AOT 诊断并要求为 0（`--allow-diagnostics` 只用于人工摸底，CI 不传）；在有显示环境时真实启动产物，超时前仍在运行（退出码 124）才算通过 —— ILC 能编译不代表运行期反射没被裁掉，最后这一步才是结论。日志写到 `artifacts/aot/`，默认清理 `bin`/`obj`。
+`scripts/publish-gallery-aot.sh`（Windows/macOS 用等价的 `publish-gallery-aot.ps1`，或 `.cmd` 转发）既是本地入口，也是 CI `AOT probe` 调用的唯一入口。它做四件事，缺一都不算通过：用 `PublishAot=true` 发布桌面 Gallery；断言产物是原生可执行文件且旁边没有托管 `.dll`（静默回退成框架依赖应用是绿色构建最容易掩盖的失败）；统计发布日志里的 ILxxxx 裁剪/AOT 诊断并要求为 0（`--allow-diagnostics` 只用于人工摸底，CI 不传）；在有显示环境时真实启动产物，超时前仍在运行（退出码 124）才算通过 —— ILC 能编译不代表运行期反射没被裁掉，最后这一步才是结论。日志写到 `artifacts/aot/`，默认清理 `bin`/`obj`。门禁统计的是 ILC 实际报出的诊断；第三方包自身产生的程序集级聚合警告（IL2104/IL3053）在 Gallery.Desktop 项目里显式抑制，理由写在 csproj 注释与 `docs/RELEASE_VALIDATION.md` 中。
 
 当前发布门禁会构建六个包并严格检查六个 `.nupkg`、六个 `.snupkg`、统一版本和已内嵌官方字体。仓库不保留普通构建产物。测试覆盖 Light/Dark Gallery screenshots、任意 HCT seed golden vectors、49 roles、三档 contrast、主题 JSON round-trip、五档 breakpoint、搜索索引、LTR/RTL 渲染、CommunityToolkit.Mvvm、Automation/live-region、虚拟化和主题生命周期、AvaloniaEdit 双语言编辑器、真实 ScrollViewer extent/viewport/wheel offset、Autocomplete/Numeric input、adaptive breakpoints、Flexible NavigationBar、official chip/item 类型、popup 非强制 OverlayLayer、Tabs/Toolbars/Tooltips、Menus/Drawer/Rail/Search/Sheets/Slider/Snackbar/Switch 的渲染与直接 API，以及 Dialog、Lists、contained Loading/Progress、popup 互斥、文化日期网格、一分钟 TimePicker、state layer、buttons、fields、Carousel/Card/Chips、AppBar、Symbols、Radio、Badge、ripple/motion。
 

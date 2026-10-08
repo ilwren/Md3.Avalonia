@@ -4,6 +4,7 @@
              xmlns:eco="using:Md3.Avalonia.Extra.Controls"
              xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             xmlns:pages="using:Md3.Avalonia.Gallery.Pages"
              x:Class="Md3.Avalonia.Gallery.Pages.PagedItemsGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Spacing="28" Margin="0,0,12,24">
@@ -19,8 +20,7 @@
         </WrapPanel>
         <eco:MdPagedItemsView x:Name="PagedItems" AutoLoad="False" PageSize="4" EmptyContent="No records" Refreshed="PagesRefreshed">
           <eco:MdPagedItemsView.ItemTemplate>
-            <!-- PagedRecord is private to the code-behind, so reflection bindings, as elsewhere. -->
-            <DataTemplate x:CompileBindings="False">
+            <DataTemplate x:DataType="pages:PagedRecord">
               <Border Margin="0,0,0,8" Padding="12" CornerRadius="12" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}">
                 <StackPanel>
                   <TextBlock FontWeight="Medium" Text="{Binding Title}" />
