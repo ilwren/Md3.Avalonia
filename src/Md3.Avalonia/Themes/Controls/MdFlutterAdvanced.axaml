@@ -384,24 +384,26 @@
   <ControlTheme x:Key="{x:Type md:MdLicensePage}" TargetType="md:MdLicensePage">
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdLicensePage">
-        <Grid>
-          <Grid x:Name="PART_WideLayout" ColumnDefinitions="260,*" ColumnSpacing="16">
-            <Grid RowDefinitions="Auto,*" RowSpacing="10">
-              <md:MdTextBox Label="{TemplateBinding FilterLabel}" ShowClearButton="True" Text="{TemplateBinding Filter, Mode=TwoWay}" Variant="Outlined" />
-              <ListBox Grid.Row="1" Theme="{StaticResource MdFlutterListBoxTheme}" ItemContainerTheme="{StaticResource MdFlutterListItemTheme}" ItemsSource="{TemplateBinding FilteredLicenses}" SelectedItem="{TemplateBinding SelectedLicense, Mode=TwoWay}">
-                <ListBox.ItemTemplate><DataTemplate x:DataType="md:MdLicenseEntry"><StackPanel Spacing="2"><TextBlock FontWeight="Medium" Text="{Binding Package}" TextWrapping="Wrap" /><TextBlock FontSize="12" Text="{Binding License}" TextWrapping="Wrap" /></StackPanel></DataTemplate></ListBox.ItemTemplate>
-              </ListBox>
-            </Grid>
+        <!-- The filter is shared by both responsive layouts. Duplicating it used to let the
+             modal host focus the wide copy during the first measure; compact layout then hid
+             that focused control and opened the soft keyboard with no visible caret. -->
+        <Grid RowDefinitions="Auto,*" RowSpacing="10">
+          <md:MdTextBox x:Name="PART_Filter" Grid.Row="0"
+                        Label="{TemplateBinding FilterLabel}" ShowClearButton="True"
+                        Text="{TemplateBinding Filter, Mode=TwoWay}" Variant="Outlined" />
+          <Grid x:Name="PART_WideLayout" Grid.Row="1" ColumnDefinitions="260,*" ColumnSpacing="16">
+            <ListBox Grid.Column="0" Theme="{StaticResource MdFlutterListBoxTheme}" ItemContainerTheme="{StaticResource MdFlutterListItemTheme}" ItemsSource="{TemplateBinding FilteredLicenses}" SelectedItem="{TemplateBinding SelectedLicense, Mode=TwoWay}">
+              <ListBox.ItemTemplate><DataTemplate x:DataType="md:MdLicenseEntry"><StackPanel Spacing="2"><TextBlock FontWeight="Medium" Text="{Binding Package}" TextWrapping="Wrap" /><TextBlock FontSize="12" Text="{Binding License}" TextWrapping="Wrap" /></StackPanel></DataTemplate></ListBox.ItemTemplate>
+            </ListBox>
             <Border Grid.Column="1" Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
               <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Spacing="8"><TextBlock FontSize="24" Text="{Binding SelectedLicense.Package, RelativeSource={RelativeSource TemplatedParent}}" TextWrapping="Wrap" /><TextBlock Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{Binding SelectedLicense.License, RelativeSource={RelativeSource TemplatedParent}}" TextWrapping="Wrap" /><TextBlock TextWrapping="Wrap" Text="{Binding SelectedLicense.Text, RelativeSource={RelativeSource TemplatedParent}}" /></StackPanel></md:MdScrollViewer>
             </Border>
           </Grid>
-          <Grid x:Name="PART_CompactLayout" RowDefinitions="Auto,160,*" RowSpacing="12" IsVisible="False">
-            <md:MdTextBox Label="{TemplateBinding FilterLabel}" ShowClearButton="True" Text="{TemplateBinding Filter, Mode=TwoWay}" Variant="Outlined" />
-            <ListBox Grid.Row="1" Theme="{StaticResource MdFlutterListBoxTheme}" ItemContainerTheme="{StaticResource MdFlutterListItemTheme}" ItemsSource="{TemplateBinding FilteredLicenses}" SelectedItem="{TemplateBinding SelectedLicense, Mode=TwoWay}">
+          <Grid x:Name="PART_CompactLayout" Grid.Row="1" RowDefinitions="160,*" RowSpacing="12" IsVisible="False">
+            <ListBox Grid.Row="0" Theme="{StaticResource MdFlutterListBoxTheme}" ItemContainerTheme="{StaticResource MdFlutterListItemTheme}" ItemsSource="{TemplateBinding FilteredLicenses}" SelectedItem="{TemplateBinding SelectedLicense, Mode=TwoWay}">
               <ListBox.ItemTemplate><DataTemplate x:DataType="md:MdLicenseEntry"><StackPanel Spacing="2"><TextBlock FontWeight="Medium" Text="{Binding Package}" TextWrapping="Wrap" /><TextBlock FontSize="12" Text="{Binding License}" TextWrapping="Wrap" /></StackPanel></DataTemplate></ListBox.ItemTemplate>
             </ListBox>
-            <Border Grid.Row="2" Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
+            <Border Grid.Row="1" Padding="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
               <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Spacing="8"><TextBlock FontSize="22" Text="{Binding SelectedLicense.Package, RelativeSource={RelativeSource TemplatedParent}}" TextWrapping="Wrap" /><TextBlock Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{Binding SelectedLicense.License, RelativeSource={RelativeSource TemplatedParent}}" TextWrapping="Wrap" /><TextBlock TextWrapping="Wrap" Text="{Binding SelectedLicense.Text, RelativeSource={RelativeSource TemplatedParent}}" /></StackPanel></md:MdScrollViewer>
             </Border>
           </Grid>
