@@ -13,6 +13,11 @@ namespace Md3.Avalonia.Controls;
 [PseudoClasses(":open", ":closed", ":present", ":actions-below", ":inline-actions", ":reduced-motion", ":no-motion")]
 public sealed class MdBanner : ContentControl
 {
+    // Material banners put their actions below the message on compact surfaces. Leaving the
+    // decision entirely to ForceActionsBelow made the default unusable on a phone: two actions
+    // and the dismiss button could reduce the message column to one or two characters.
+    private const double StackedActionBreakpoint = 600;
+
     public static readonly StyledProperty<object?> LeadingContentProperty =
         AvaloniaProperty.Register<MdBanner, object?>(nameof(LeadingContent));
     public static readonly StyledProperty<object?> ActionsProperty =
@@ -35,7 +40,8 @@ public sealed class MdBanner : ContentControl
     static MdBanner()
     {
         IsOpenProperty.Changed.AddClassHandler<MdBanner>((banner, _) => banner.UpdateVisualState());
-        ForceActionsBelowProperty.Changed.AddClassHandler<MdBanner>((banner, _) => banner.UpdateVisualState());
+        ForceActionsBelowProperty.Changed.AddClassHandler<MdBanner>((banner, _) => banner.UpdateActionLayout());
+        BoundsProperty.Changed.AddClassHandler<MdBanner>((banner, _) => banner.UpdateActionLayout());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdBanner>((banner, _) => banner.UpdateMotion());
     }
 
@@ -103,8 +109,15 @@ public sealed class MdBanner : ContentControl
             PseudoClasses.Set(":closed", true);
             _presence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
         }
-        PseudoClasses.Set(":actions-below", ForceActionsBelow);
-        PseudoClasses.Set(":inline-actions", !ForceActionsBelow);
+        UpdateActionLayout();
+    }
+
+    private void UpdateActionLayout()
+    {
+        var actionsBelow = ForceActionsBelow ||
+                           Bounds.Width > 0 && Bounds.Width < StackedActionBreakpoint;
+        PseudoClasses.Set(":actions-below", actionsBelow);
+        PseudoClasses.Set(":inline-actions", !actionsBelow);
     }
 
     private void UpdateMotion()

@@ -50,7 +50,7 @@ $expectations = @(
     "Md3.Avalonia.DataGrid=net8.0,net10.0",
     "Md3.Avalonia.RichEditor=net10.0"
 )
-$assetArgs = @("--dir", $outputDir, "--version", $version)
+$assetArgs = @("--dir", $outputDir, "--version", $version, "--icon", (Join-Path $root "logo.png"))
 foreach ($expectation in $expectations) { $assetArgs += @("--expect", $expectation) }
 & $python.Source (Join-Path $root "scripts/verify-package-assets.py") @assetArgs
 if ($LASTEXITCODE -ne 0) { throw "Packed packages do not carry the expected target framework assets." }

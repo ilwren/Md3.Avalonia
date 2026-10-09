@@ -146,9 +146,9 @@ EXPECTED_TFMS=(
 ASSET_ARGS=()
 for expected in "${EXPECTED_TFMS[@]}"; do ASSET_ARGS+=(--expect "$expected"); done
 if command -v python3 >/dev/null 2>&1; then
-  python3 "$ROOT/scripts/verify-package-assets.py" --dir "$OUTPUT" --version "$VERSION" "${ASSET_ARGS[@]}"
+  python3 "$ROOT/scripts/verify-package-assets.py" --dir "$OUTPUT" --version "$VERSION" --icon "$ROOT/logo.png" "${ASSET_ARGS[@]}"
 else
-  python "$ROOT/scripts/verify-package-assets.py" --dir "$OUTPUT" --version "$VERSION" "${ASSET_ARGS[@]}"
+  python "$ROOT/scripts/verify-package-assets.py" --dir "$OUTPUT" --version "$VERSION" --icon "$ROOT/logo.png" "${ASSET_ARGS[@]}"
 fi
 
 printf '\nBuilt packages (%s):\n' "$SDK_VERSION"

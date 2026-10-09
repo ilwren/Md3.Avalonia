@@ -423,8 +423,17 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
             Dispatcher.UIThread.Post(() =>
             {
                 if (!IsOpen) return;
-                if (Mode == MdTimePickerMode.Input) _hourInput?.Focus();
-                else _clockFace?.Focus(NavigationMethod.Directional);
+                if (Mode == MdTimePickerMode.Input && _hourInput is { } hourInput)
+                {
+                    // Opening an input picker means "edit this time", not merely "show a panel".
+                    // Put the caret in the first field and select its existing value so the first
+                    // digit replaces it instead of appending to a two-character field.
+                    if (hourInput.Focus()) hourInput.SelectAll();
+                }
+                else
+                {
+                    _clockFace?.Focus(NavigationMethod.Directional);
+                }
             }, DispatcherPriority.Loaded);
             return;
         }

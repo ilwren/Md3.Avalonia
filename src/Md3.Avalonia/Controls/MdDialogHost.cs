@@ -314,7 +314,12 @@ public sealed class MdDialogHost : ContentControl, IMdDialogService
 
     private void UpdateModalFocus()
     {
-        _modalFocus.Update(IsOpen && _isAttached, _dialogPresenter, _mainContent);
+        // A host with Content owns both the page and the overlay, so PART_MainContent is the
+        // background to isolate. Gallery and application shells also use an overlay-only host as
+        // a sibling above their page; its empty presenter is not the background. Passing it used
+        // to leave the real page focusable through a modal and let focus-driven scrolling move it.
+        var background = Content is null ? null : _mainContent;
+        _modalFocus.Update(IsOpen && _isAttached, _dialogPresenter, background);
     }
 
     private void UpdateMotion()

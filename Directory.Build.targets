@@ -1,0 +1,18 @@
+<Project>
+  <!--
+    NuGet renders PackageIcon, not the repository avatar or README artwork. Keep every packable
+    library on the logo already tracked by main, and add it after each project has declared
+    IsPackable so applications and tests do not receive an extra content item.
+  -->
+  <PropertyGroup Condition="'$(IsPackable)' == 'true'">
+    <PackageIcon>logo.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IsPackable)' == 'true'">
+    <None Include="$(MSBuildThisFileDirectory)logo.png"
+          Pack="true"
+          PackagePath="/"
+          Link="logo.png"
+          Visible="false" />
+  </ItemGroup>
+</Project>

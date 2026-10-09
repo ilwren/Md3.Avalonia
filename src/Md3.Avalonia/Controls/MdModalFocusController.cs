@@ -17,6 +17,7 @@ internal sealed class MdModalFocusController
     private Control? _focusBeforeOpen;
     private TopLevel? _topLevel;
     private readonly List<BackgroundState> _isolatedBackground = [];
+    private readonly List<ScrollState> _backgroundScrollOffsets = [];
     private KeyboardNavigationMode _scopeNavigationMode;
     private bool _scopeFocusable;
     private bool _active;
@@ -106,6 +107,8 @@ internal sealed class MdModalFocusController
         _isolatedBackground.Clear();
 
         var restoreTarget = restoreFocus ? _focusBeforeOpen : null;
+        var scrollOffsets = _backgroundScrollOffsets.ToArray();
+        _backgroundScrollOffsets.Clear();
         _active = false;
         _redirectPending = false;
         _failedRedirects = 0;
@@ -115,8 +118,22 @@ internal sealed class MdModalFocusController
         _topLevel = null;
         _focusBeforeOpen = null;
 
+        // Restoring focus can raise RequestBringIntoView on an ancestor ScrollViewer. That used
+        // to move a documentation page to the top (or bottom) as a dialog closed even though the
+        // page was inert for the dialog's entire lifetime. Focus first, then restore the offsets
+        // on the following render turn, after bring-into-view and the soft-keyboard layout pass.
         if (restoreTarget is { } target && target.IsAttachedToVisualTree() && target.IsEffectivelyEnabled)
-            Dispatcher.UIThread.Post(() => target.Focus(NavigationMethod.Unspecified), DispatcherPriority.Input);
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                target.Focus(NavigationMethod.Unspecified);
+                Dispatcher.UIThread.Post(() => RestoreScrollOffsets(scrollOffsets), DispatcherPriority.Render);
+            }, DispatcherPriority.Input);
+        }
+        else if (scrollOffsets.Length > 0)
+        {
+            Dispatcher.UIThread.Post(() => RestoreScrollOffsets(scrollOffsets), DispatcherPriority.Render);
+        }
     }
 
     private void OnTopLevelGotFocus(object? sender, FocusChangedEventArgs e)
@@ -175,8 +192,22 @@ internal sealed class MdModalFocusController
             control,
             control.IsHitTestVisible,
             AutomationProperties.GetAccessibilityView(control)));
+        if (control is ScrollViewer scrollViewer &&
+            !_backgroundScrollOffsets.Any(state => ReferenceEquals(state.ScrollViewer, scrollViewer)))
+        {
+            _backgroundScrollOffsets.Add(new ScrollState(scrollViewer, scrollViewer.Offset));
+        }
         control.SetCurrentValue(InputElement.IsHitTestVisibleProperty, false);
         control.SetCurrentValue(AutomationProperties.AccessibilityViewProperty, AccessibilityView.Raw);
+    }
+
+    private static void RestoreScrollOffsets(IEnumerable<ScrollState> states)
+    {
+        foreach (var state in states)
+        {
+            if (state.ScrollViewer.IsAttachedToVisualTree())
+                state.ScrollViewer.SetCurrentValue(ScrollViewer.OffsetProperty, state.Offset);
+        }
     }
 
     private void FocusInitial(Control? preferred, bool isRedirect = false)
@@ -228,7 +259,7 @@ internal sealed class MdModalFocusController
         scope.IsFocused || scope.GetVisualDescendants().OfType<Control>().Any(control => control.IsFocused);
 
     private static bool CanFocus(Control control) =>
-        control.Focusable && control.IsVisible && control.IsEffectivelyEnabled &&
+        control.Focusable && control.IsEffectivelyVisible && control.IsEffectivelyEnabled &&
         KeyboardNavigation.GetIsTabStop(control);
 
     private static bool IsWithin(Visual source, Visual ancestor) =>
@@ -238,4 +269,6 @@ internal sealed class MdModalFocusController
         Control Control,
         bool IsHitTestVisible,
         AccessibilityView AccessibilityView);
+
+    private readonly record struct ScrollState(ScrollViewer ScrollViewer, Vector Offset);
 }

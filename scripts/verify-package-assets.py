@@ -9,6 +9,7 @@ build script declared with ``--expect``.
 
 Usage:
     verify-package-assets.py --dir artifacts/nuget --version 0.4.1-preview.1 \
+        --icon logo.png \
         --expect Md3.Avalonia=net8.0,net10.0 \
         --expect Md3.Avalonia.RichEditor=net10.0
 
@@ -20,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
@@ -28,6 +30,11 @@ def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dir", required=True, help="directory holding the packed .nupkg files")
     parser.add_argument("--version", required=True, help="package version, used to build file names")
+    parser.add_argument(
+        "--icon",
+        type=Path,
+        help="source icon every regular package must embed and name in its nuspec",
+    )
     parser.add_argument(
         "--expect",
         action="append",
@@ -73,11 +80,36 @@ def lib_frameworks(package: Path) -> tuple[set[str], set[str]]:
     return frameworks, empty
 
 
+def icon_failures(package: Path, source_icon: Path) -> list[str]:
+    """Return actionable failures for the PackageIcon contract of one regular package."""
+    expected_bytes = source_icon.read_bytes()
+    with zipfile.ZipFile(package) as archive:
+        names = archive.namelist()
+        if "logo.png" not in names:
+            return [f"{package.name}: logo.png is missing"]
+        failures = []
+        if archive.read("logo.png") != expected_bytes:
+            failures.append(f"{package.name}: logo.png does not match {source_icon}")
+
+        nuspecs = [name for name in names if name.endswith(".nuspec")]
+        if len(nuspecs) != 1:
+            failures.append(f"{package.name}: expected one nuspec, found {len(nuspecs)}")
+        else:
+            root = ET.fromstring(archive.read(nuspecs[0]))
+            icon = next((element.text for element in root.iter() if element.tag.endswith("}icon") or element.tag == "icon"), None)
+            if icon != "logo.png":
+                failures.append(f"{package.name}: nuspec icon is {icon!r}, expected 'logo.png'")
+        return failures
+
+
 def main() -> int:
     arguments = parse_arguments()
     expectations = parse_expectations(arguments.expect)
     output = Path(arguments.dir)
     failures: list[str] = []
+
+    if arguments.icon is not None and not arguments.icon.is_file():
+        failures.append(f"source package icon is missing: {arguments.icon}")
 
     for package_id, expected in sorted(expectations.items()):
         for extension in ("nupkg", "snupkg"):
@@ -86,6 +118,8 @@ def main() -> int:
             if not package.is_file():
                 failures.append(f"{package.name}: file is missing")
                 continue
+            if extension == "nupkg" and arguments.icon is not None and arguments.icon.is_file():
+                failures.extend(icon_failures(package, arguments.icon))
             found, empty = lib_frameworks(package)
             if found != expected:
                 failures.append(
@@ -103,7 +137,8 @@ def main() -> int:
 
     for package_id, expected in sorted(expectations.items()):
         frameworks = ", ".join(sorted(expected))
-        print(f"package assets ok: {package_id} -> {frameworks}")
+        icon = ", logo.png" if arguments.icon is not None else ""
+        print(f"package assets ok: {package_id} -> {frameworks}{icon}")
     return 0
 
 

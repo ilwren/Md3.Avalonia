@@ -26,6 +26,15 @@
 
 ### Changed
 
+- **The interaction defects visible in the October Gallery recording are guarded now.** Compact
+  banners move their actions below the message instead of squeezing it into a one-character
+  column; overlay-only dialog hosts make the real page inert, retain its scroll offset, and restore
+  its trigger focus; input-mode time pickers open with the hour selected for replacement; and the
+  About/license demonstration uses compact phone dimensions and reports displayed/closed state
+  instead of reporting a queued request as open.
+- **Every NuGet package uses the repository's main-branch `logo.png` as `PackageIcon`.** Shared
+  pack targets embed that existing asset without adding another image, and package verification
+  checks both the nuspec declaration and the exact bytes inside every regular `.nupkg`.
 - **The last reflection bindings in the shipped theme files are compiled bindings now.** The
   palette's item theme passes `DataType` in the two setter bindings, the calendar and date-picker
   weekday templates and the tag-input suggestion template declare their `sys:String` items, and

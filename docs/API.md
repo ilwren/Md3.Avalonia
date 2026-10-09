@@ -227,7 +227,7 @@ string json = MdThemeJson.Serialize(options);
 
 Properties that represent user state use Avalonia styled/direct properties and appropriate two-way defaults. Commands use `ICommand`, so CommunityToolkit.MVVM `RelayCommand` and `AsyncRelayCommand` work without an adapter. Native base classes retain selection, keyboard, validation and automation behavior.
 
-`MdDialogHost.Dialog` accepts either a control or a view model. Add multiple type-specific templates to the host's inherited `DataTemplates` collection, then call `ShowAsync(model)`; Avalonia selects the matching dialog template while the host keeps one modal dialog active.
+`MdDialogHost.Dialog` accepts either a control or a view model. Add multiple type-specific templates to the host's inherited `DataTemplates` collection, then call `ShowAsync(model)`; Avalonia selects the matching dialog template while the host keeps one modal dialog active. A host may wrap its page in `Content`, or it may be an overlay-only sibling above an existing shell. In the latter form the host isolates its real siblings while open rather than its empty content presenter; both forms retain background scroll offsets and return focus to the trigger on close.
 
 The host can be driven three ways, and they interoperate — pick per call site rather than per application:
 
@@ -253,6 +253,8 @@ if (await _dialogs.ShowAsync<bool>(new ConfirmDeleteDialogModel(item)))
 Material allows one dialog at a time, so a request made while another is displayed, or before the host is attached, waits its turn instead of replacing it. Dismissal by the scrim, Escape, the Android back gesture, a cancelled token, or a view model clearing a bound `IsOpen` completes the pending `ShowAsync` with `null`.
 
 An `MdSnackbar` is a visual control, so calling `Show()` on an instance that was never attached to a window cannot render it. For code-behind or ViewModels, place one `MdSnackbarHost` in the application shell, assign a shared `MdSnackbarService`, and inject that same instance as `IMdSnackbarService`. The service queues consecutive messages and the attached host displays them one at a time.
+
+`MdBanner` automatically moves its action slot below the message below 600 DIP so compact layouts keep readable copy; `ForceActionsBelow` forces that layout at any width. Opening an input-mode `MdTimePicker` focuses the hour field and selects its current value, so typing replaces the value immediately; the popup remains provisional until OK/Enter.
 
 Direct APIs include `Show`/`Dismiss` on transient components, `ShowAsync`/`Show`/`Close` on `MdDialogHost` and `IMdDialogService`, `Show`/`ShowAsync`/`Dismiss` on `MdSnackbarHost` and `IMdSnackbarService`, direct collection APIs inherited from Avalonia item controls, and standard routed events. Ecosystem controls additionally expose provider delegates and direct state-machine methods such as `LoadNextPageAsync`, `RefreshAsync`, `SearchAsync`, `SelectDate`, `MoveToTarget`, `Execute`, `Submit`, `PlayAsync`, `NotifyOwnerScrolled`, `MdPinInput.SetCode`/`Clear`, `MdTreeView.ExpandAll`/`CollapseAll`/`SelectById`, `MdTagInput.AddTag`/`RemoveTag`/`ClearTags`, and `MdRating.SetValueFromPosition`.
 
