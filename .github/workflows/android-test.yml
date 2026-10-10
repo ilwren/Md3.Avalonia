@@ -48,9 +48,10 @@ jobs:
             -o artifacts/android/
 
       - name: Run Maestro Tests on Android Emulator (API 34)
-        # Emulator startup is infrastructure-dependent on hosted macOS runners. Keep the
-        # regression evidence available without blocking the package and desktop release checks.
-        continue-on-error: true
+        # This workflow is the Android UI gate. A failed emulator start is still an infrastructure
+        # failure, but treating the step as successful also hid real Maestro assertion failures.
+        # Keep package/desktop checks independent in their own workflows; this job must stay red
+        # until its Android evidence is complete.
         timeout-minutes: 5
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -78,6 +79,22 @@ jobs:
               --android-junit artifacts/android-test/maestro-results.xml
             cp docs/reports/test-spec-execution-results.json artifacts/android-test/verification-results.json
 
+      - name: Verify Android regression evidence exists
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          for evidence in \
+            artifacts/android-test/logcat.txt \
+            artifacts/android-test/maestro-results.xml \
+            artifacts/android-test/verification-results.json
+          do
+            if [[ ! -s "$evidence" ]]; then
+              echo "::error file=.github/workflows/android-test.yml::Android regression evidence is missing or empty: $evidence"
+              exit 1
+            fi
+          done
+
       - name: Upload Android Regression Evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -89,4 +106,4 @@ jobs:
             artifacts/android-test/maestro-results.xml
             artifacts/android-test/verification-results.json
             artifacts/verification/dotnet-test.log
-          if-no-files-found: warn
+          if-no-files-found: error

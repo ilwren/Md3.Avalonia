@@ -14,3 +14,7 @@ artifacts/
 *.aab
 *.deps.json
 *.runtimeconfig.json
+
+# Local review recordings are evidence, not source assets. Keep the repository logo and the
+# Gallery's intentional media under version control, but never recommit the attached recording.
+/1.mp4
