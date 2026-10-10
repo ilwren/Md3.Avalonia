@@ -52,7 +52,9 @@ jobs:
         # failure, but treating the step as successful also hid real Maestro assertion failures.
         # Keep package/desktop checks independent in their own workflows; this job must stay red
         # until its Android evidence is complete.
-        timeout-minutes: 5
+        # API 34 cold boot plus four Maestro flows exceeded the old five-minute cap; the former
+        # continue-on-error setting had disguised that timeout as a successful UI run.
+        timeout-minutes: 12
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
