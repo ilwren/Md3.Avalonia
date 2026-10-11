@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -119,6 +120,65 @@ public sealed class MdMediaPlayerControlTests
             Assert.Equal(
                 new[] { MdPlaybackRequest.ToggleShuffle, MdPlaybackRequest.CycleRepeat, MdPlaybackRequest.Pause, MdPlaybackRequest.OpenQueue },
                 requests);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Player_Controls_Fit_Mobile_Width_And_Wrap_NowPlaying_Buttons()
+    {
+        var video = new MdVideoPlayerControls
+        {
+            Width = 320,
+            Height = 260,
+            Duration = TimeSpan.FromMinutes(5),
+            AutoHideControls = false
+        };
+        var nowPlaying = new MdNowPlayingPanel
+        {
+            Width = 320,
+            Title = "Night Drive",
+            Artist = "Mira Sol",
+            Duration = TimeSpan.FromMinutes(4),
+            Position = TimeSpan.FromMinutes(1)
+        };
+        var content = new StackPanel
+        {
+            Spacing = 12,
+            Children = { video, nowPlaying }
+        };
+        var window = new Window { Width = 320, Height = 1100, Content = content };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+
+            var wrapPanel = Assert.Single(nowPlaying.GetVisualDescendants().OfType<WrapPanel>());
+            var nowPlayingButtons = wrapPanel.GetVisualDescendants().OfType<MdIconButton>().ToArray();
+            var rows = nowPlayingButtons
+                .Select(button => Math.Round(button.TranslatePoint(new Point(0, 0), wrapPanel)!.Value.Y))
+                .Distinct()
+                .Count();
+            Assert.True(rows > 1, "Now-playing actions should wrap instead of overflowing at 320 DIPs.");
+
+            foreach (var button in nowPlayingButtons)
+            {
+                var origin = button.TranslatePoint(new Point(0, 0), nowPlaying);
+                Assert.NotNull(origin);
+                Assert.True(origin!.Value.X >= -0.5);
+                Assert.True(origin.Value.X + button.Bounds.Width <= nowPlaying.Bounds.Width + 0.5);
+            }
+
+            foreach (var button in video.GetVisualDescendants().OfType<MdIconButton>())
+            {
+                var origin = button.TranslatePoint(new Point(0, 0), video);
+                Assert.NotNull(origin);
+                Assert.True(origin!.Value.X >= -0.5);
+                Assert.True(origin.Value.X + button.Bounds.Width <= video.Bounds.Width + 0.5);
+            }
         }
         finally
         {
