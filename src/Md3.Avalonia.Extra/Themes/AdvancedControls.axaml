@@ -577,7 +577,7 @@
                       <Grid ColumnDefinitions="3,*">
                         <Border Background="{DynamicResource Md.Sys.Color.Primary.Brush}" CornerRadius="2" />
                         <StackPanel Grid.Column="1" Margin="8,0,0,0" Spacing="2">
-                          <TextBlock FontSize="10" FontWeight="SemiBold" Opacity=".75" Text="Replying to message" />
+                          <TextBlock FontSize="10" FontWeight="SemiBold" Opacity=".75" Text="{Binding ReplyHeaderText, RelativeSource={RelativeSource TemplatedParent}}" />
                           <ContentPresenter Content="{Binding Message.ReplyPreview, RelativeSource={RelativeSource TemplatedParent}}" FontSize="11" Opacity=".85" MaxHeight="36" />
                         </StackPanel>
                       </Grid>
@@ -600,7 +600,7 @@
                 <StackPanel x:Name="PART_Failure" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="6,0,0,0" IsVisible="False">
                   <md:MdIcon Glyph="&#xe000;" Size="12" Foreground="{DynamicResource Md.Sys.Color.Error.Brush}" VerticalAlignment="Center" />
                   <TextBlock VerticalAlignment="Center" FontSize="10" Foreground="{DynamicResource Md.Sys.Color.Error.Brush}"
-                             Text="{Binding Message.ErrorText, RelativeSource={RelativeSource TemplatedParent}, FallbackValue='Send failed'}" />
+                             Text="{Binding FailureText, RelativeSource={RelativeSource TemplatedParent}}" />
                   <md:MdButton Classes="retry" Content="{Binding RetryText, RelativeSource={RelativeSource AncestorType=eco:MdChatView}}" Size="ExtraSmall" Variant="Text" />
                 </StackPanel>
               </Grid>
@@ -647,9 +647,9 @@
             <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8">
               <md:MdButton Name="PART_CancelSelectionButton" Content="{TemplateBinding CancelText}" Size="Small" Variant="Text" />
               <TextBlock Grid.Column="1" VerticalAlignment="Center" FontWeight="Medium"
-                         Text="{Binding SelectionCount, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0} selected'}" />
-              <md:MdButton Name="PART_QuoteButton" Grid.Column="2" Content="Quote" Size="Small" Variant="Tonal" />
-              <md:MdButton Name="PART_DeleteButton" Grid.Column="3" Content="Delete" Size="Small" Variant="Outlined" />
+                         Text="{TemplateBinding SelectionCountText}" />
+              <md:MdButton Name="PART_QuoteButton" Grid.Column="2" Content="{TemplateBinding QuoteText}" Size="Small" Variant="Tonal" />
+              <md:MdButton Name="PART_DeleteButton" Grid.Column="3" Content="{TemplateBinding DeleteText}" Size="Small" Variant="Outlined" />
             </Grid>
           </Border>
           <ListBox Name="PART_MessagesHost" Grid.Row="1" Theme="{StaticResource EcoListTheme}" ItemContainerTheme="{StaticResource EcoChatListItemTheme}"
@@ -675,7 +675,7 @@
             <Grid ColumnDefinitions="3,*,Auto" ColumnSpacing="8">
               <Border Background="{DynamicResource Md.Sys.Color.Primary.Brush}" CornerRadius="2" />
               <StackPanel Grid.Column="1" Spacing="2">
-                <TextBlock FontSize="11" FontWeight="SemiBold" Text="{Binding QuotedMessage.Sender, RelativeSource={RelativeSource TemplatedParent}, StringFormat='Replying to {0}'}" />
+                <TextBlock FontSize="11" FontWeight="SemiBold" Text="{TemplateBinding QuoteHeaderText}" />
                 <ContentPresenter Content="{Binding QuotedMessage.Content, RelativeSource={RelativeSource TemplatedParent}}" MaxHeight="32" Opacity=".75" />
               </StackPanel>
               <md:MdButton Name="PART_CancelQuoteButton" Grid.Column="2" Content="{TemplateBinding CancelText}" Size="ExtraSmall" Variant="Text" />
@@ -697,7 +697,7 @@
                        AcceptsReturn="True" MaxHeight="120" MinHeight="36"
                        VerticalContentAlignment="Center" Padding="8,6"
                        Background="Transparent" BorderThickness="0"
-                       Watermark="Type a message..." TextWrapping="Wrap" />
+                       Watermark="{TemplateBinding TypeMessageText}" TextWrapping="Wrap" />
               <Button Name="PART_SendButton" Grid.Column="2" Width="48" Height="48" CornerRadius="999"
                       AutomationProperties.Name="{TemplateBinding SendMessageText}"
                       Background="{DynamicResource Md.Sys.Color.Primary.Brush}"

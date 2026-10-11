@@ -78,7 +78,7 @@ Gallery page: **Flutter parity · phase 1**.
 | Skeleton loading | [skeletonizer](https://pub.dev/packages/skeletonizer) | `MdSkeleton` and `MdSkeletonGroup`, content-shape placeholders, shimmer/pulse modes and reduced-motion fallback |
 | Charts | [fl_chart](https://pub.dev/packages/fl_chart) | Provider-agnostic `MdChart` family: line, bar, pie/donut, scatter and radar, with Material tokens and accessible data summaries |
 | Rich text | [flutter_quill](https://pub.dev/packages/flutter_quill) | `MdRichTextEditor` UI, document/selection contracts, toolbar and adapter interfaces; persistence/import formats remain pluggable |
-| Chat | [flutter_chat_ui](https://pub.dev/packages/flutter_chat_ui) | Backend-agnostic `MdChatView`, message grouping, composer, attachments/retry events and incremental history loading |
+| Chat | [flutter_chat_ui](https://pub.dev/packages/flutter_chat_ui) | Backend-agnostic `MdChatView` with composer, quote/delete/retry events and history provider. Planned (see `docs/CHAT_IMPLEMENTATION_PLAN.md`): message grouping, automatic scroll anchoring, attachments and Markdown |
 | Rating | [flutter_rating_bar](https://pub.dev/packages/flutter_rating_bar) | `MdRating` with fractional values, indicator/read-only mode, keyboard/pointer input and screen-reader value text |
 | Timeline | [timeline_tile](https://pub.dev/packages/timeline_tile) | `MdTimeline`/`MdTimelineItem` with start/end connectors, alternating layout, status semantics and virtualization guidance |
 

@@ -1076,6 +1076,10 @@ public sealed class MdChatMessagePresenter : ContentControl
         AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(SenderInitials), control => control.SenderInitials);
     public static readonly DirectProperty<MdChatMessagePresenter, string?> TextContentProperty =
         AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string?>(nameof(TextContent), control => control.TextContent);
+    public static readonly DirectProperty<MdChatMessagePresenter, string> ReplyHeaderTextProperty =
+        AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(ReplyHeaderText), control => control.ReplyHeaderText);
+    public static readonly DirectProperty<MdChatMessagePresenter, string> FailureTextProperty =
+        AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(FailureText), control => control.FailureText);
 
     static MdChatMessagePresenter()
     {
@@ -1090,6 +1094,10 @@ public sealed class MdChatMessagePresenter : ContentControl
 
     public string FormattedTime => Message?.Timestamp.LocalDateTime.ToString("t", CultureInfo.CurrentCulture) ?? string.Empty;
     public string? TextContent => Message?.Content as string;
+    public string ReplyHeaderText => MdLocalization.GetString("ChatReplyingToMessage", this);
+    public string FailureText => string.IsNullOrWhiteSpace(Message?.ErrorText)
+        ? MdLocalization.GetString("ChatSendFailed", this)
+        : Message!.ErrorText!;
     public string AvatarGlyph => Message?.AvatarGlyph ?? (Message?.Role == MdChatMessageRole.Assistant ? "\uf06c" : "\ue7fd");
     public string SenderInitials
     {
@@ -1117,6 +1125,8 @@ public sealed class MdChatMessagePresenter : ContentControl
         RaisePropertyChanged(AvatarGlyphProperty, string.Empty, AvatarGlyph);
         RaisePropertyChanged(SenderInitialsProperty, string.Empty, SenderInitials);
         RaisePropertyChanged(TextContentProperty, null, TextContent);
+        RaisePropertyChanged(ReplyHeaderTextProperty, string.Empty, ReplyHeaderText);
+        RaisePropertyChanged(FailureTextProperty, string.Empty, FailureText);
 
         var sender = Message?.Sender;
         if (string.IsNullOrWhiteSpace(sender)) sender = Message?.Role switch
@@ -1126,7 +1136,7 @@ public sealed class MdChatMessagePresenter : ContentControl
             _ => MdLocalization.GetString("You", this)
         };
         var state = Message?.State == MdAsyncRequestState.Error
-            ? $"Send failed. {Message.ErrorText}".Trim()
+            ? $"{MdLocalization.GetString("ChatSendFailed", this)}. {Message.ErrorText}".Trim()
             : Message?.State.ToString();
         AutomationProperties.SetName(this, $"{sender}, {FormattedTime}. {Message?.Content}. {state}".Trim());
         AutomationProperties.SetHelpText(this, MdLocalization.GetString(IsSelected ? "SelectedMessage" : "Message", this));
@@ -1158,6 +1168,11 @@ public sealed class MdChatView : TemplatedControl
     public static readonly DirectProperty<MdChatView, string> AttachFileTextProperty = AvaloniaProperty.RegisterDirect<MdChatView, string>(nameof(AttachFileText), control => control.AttachFileText);
     public static readonly DirectProperty<MdChatView, string> SendMessageTextProperty = AvaloniaProperty.RegisterDirect<MdChatView, string>(nameof(SendMessageText), control => control.SendMessageText);
     public static readonly DirectProperty<MdChatView, string> MessagesTextProperty = AvaloniaProperty.RegisterDirect<MdChatView, string>(nameof(MessagesText), control => control.MessagesText);
+    public static readonly DirectProperty<MdChatView, string> QuoteTextProperty = AvaloniaProperty.RegisterDirect<MdChatView, string>(nameof(QuoteText), control => control.QuoteText);
+    public static readonly DirectProperty<MdChatView, string> DeleteTextProperty = AvaloniaProperty.RegisterDirect<MdChatView, string>(nameof(DeleteText), control => control.DeleteText);
+    public static readonly DirectProperty<MdChatView, string> TypeMessageTextProperty = AvaloniaProperty.RegisterDirect<MdChatView, string>(nameof(TypeMessageText), control => control.TypeMessageText);
+    public static readonly DirectProperty<MdChatView, string> SelectionCountTextProperty = AvaloniaProperty.RegisterDirect<MdChatView, string>(nameof(SelectionCountText), control => control.SelectionCountText);
+    public static readonly DirectProperty<MdChatView, string> QuoteHeaderTextProperty = AvaloniaProperty.RegisterDirect<MdChatView, string>(nameof(QuoteHeaderText), control => control.QuoteHeaderText);
 
     private Button? _sendButton;
     private Button? _attachmentButton;
@@ -1176,6 +1191,11 @@ public sealed class MdChatView : TemplatedControl
     private string _attachFileText = string.Empty;
     private string _sendMessageText = string.Empty;
     private string _messagesText = string.Empty;
+    private string _quoteText = string.Empty;
+    private string _deleteText = string.Empty;
+    private string _typeMessageText = string.Empty;
+    private string _selectionCountText = string.Empty;
+    private string _quoteHeaderText = string.Empty;
     private bool _synchronizingSelection;
     private INotifyCollectionChanged? _observedMessages;
 
@@ -1206,6 +1226,11 @@ public sealed class MdChatView : TemplatedControl
     public string AttachFileText => _attachFileText;
     public string SendMessageText => _sendMessageText;
     public string MessagesText => _messagesText;
+    public string QuoteText => _quoteText;
+    public string DeleteText => _deleteText;
+    public string TypeMessageText => _typeMessageText;
+    public string SelectionCountText => _selectionCountText;
+    public string QuoteHeaderText => _quoteHeaderText;
     public ObservableCollection<MdChatMessage> SelectedMessages { get; } = [];
     public Func<CancellationToken, ValueTask<IReadOnlyList<MdChatMessage>>>? HistoryProvider { get; set; }
 
@@ -1260,7 +1285,7 @@ public sealed class MdChatView : TemplatedControl
     {
         var message = SelectedMessages.LastOrDefault();
         if (message is null) return false;
-        SetAndRaise(QuotedMessageProperty, ref _quotedMessage, message);
+        SetQuotedMessage(message);
         PseudoClasses.Set(":quoted", true);
         if (QuoteMessageCommand?.CanExecute(message) == true) QuoteMessageCommand.Execute(message);
         QuoteRequested?.Invoke(this, message);
@@ -1271,7 +1296,7 @@ public sealed class MdChatView : TemplatedControl
 
     public void CancelQuote()
     {
-        SetAndRaise(QuotedMessageProperty, ref _quotedMessage, null);
+        SetQuotedMessage(null);
         PseudoClasses.Set(":quoted", false);
     }
 
@@ -1319,6 +1344,7 @@ public sealed class MdChatView : TemplatedControl
         _messagesHost = e.NameScope.Find<ListBox>("PART_MessagesHost");
         if (_messagesHost is not null) _messagesHost.SelectionMode = SelectionMode.Multiple | SelectionMode.Toggle;
         _composer = e.NameScope.Find<TextBox>("PART_Composer");
+        _composer?.AddHandler(InputElement.KeyDownEvent, OnComposerKeyDown, global::Avalonia.Interactivity.RoutingStrategies.Tunnel, true);
         AttachTemplateHandlers();
         SynchronizeHostSelection();
     }
@@ -1330,6 +1356,16 @@ public sealed class MdChatView : TemplatedControl
         else if (e.Key == Key.Delete && SelectionCount > 0 && DeleteSelected()) e.Handled = true;
         else if (e.Key == Key.Enter && !e.KeyModifiers.HasFlag(KeyModifiers.Shift) && Submit()) e.Handled = true;
         else base.OnKeyDown(e);
+    }
+
+    // The composer is an AcceptsReturn TextBox, which consumes Enter before it bubbles back to this
+    // control. Intercepting on the tunnel route lets plain Enter send while Shift+Enter still inserts
+    // a line break. Enter is always swallowed so an empty or busy composer never gains a stray newline.
+    private void OnComposerKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter || e.KeyModifiers.HasFlag(KeyModifiers.Shift)) return;
+        e.Handled = true;
+        Submit();
     }
 
     private void AttachTemplateHandlers()
@@ -1352,6 +1388,7 @@ public sealed class MdChatView : TemplatedControl
 
     private void DetachTemplateHandlers()
     {
+        _composer?.RemoveHandler(InputElement.KeyDownEvent, OnComposerKeyDown);
         if (_sendButton is not null) _sendButton.Click -= OnSend;
         if (_attachmentButton is not null) _attachmentButton.Click -= OnAttachment;
         if (_cancelSelectionButton is not null) _cancelSelectionButton.Click -= OnCancelSelection;
@@ -1405,6 +1442,29 @@ public sealed class MdChatView : TemplatedControl
         SetAndRaise(AttachFileTextProperty, ref _attachFileText, MdLocalization.GetString("AttachFile", this));
         SetAndRaise(SendMessageTextProperty, ref _sendMessageText, MdLocalization.GetString("SendMessage", this));
         SetAndRaise(MessagesTextProperty, ref _messagesText, MdLocalization.GetString("Message", this));
+        SetAndRaise(QuoteTextProperty, ref _quoteText, MdLocalization.GetString("ChatQuote", this));
+        SetAndRaise(DeleteTextProperty, ref _deleteText, MdLocalization.GetString("ChatDelete", this));
+        SetAndRaise(TypeMessageTextProperty, ref _typeMessageText, MdLocalization.GetString("ChatTypeMessage", this));
+        UpdateQuoteHeader();
+        UpdateSelectionCountText();
+    }
+
+    private void UpdateQuoteHeader()
+    {
+        var text = _quotedMessage is null
+            ? string.Empty
+            : MdLocalization.Format("ChatReplyingTo", this, _quotedMessage.Sender ?? LocalizeRole(_quotedMessage.Role));
+        SetAndRaise(QuoteHeaderTextProperty, ref _quoteHeaderText, text);
+    }
+
+    private void UpdateSelectionCountText() =>
+        SetAndRaise(SelectionCountTextProperty, ref _selectionCountText,
+            MdLocalization.Format("MessagesSelected", this, _selectionCount));
+
+    private void SetQuotedMessage(MdChatMessage? message)
+    {
+        SetAndRaise(QuotedMessageProperty, ref _quotedMessage, message);
+        UpdateQuoteHeader();
     }
 
     private string LocalizeRole(MdChatMessageRole role) => role switch
@@ -1451,6 +1511,7 @@ public sealed class MdChatView : TemplatedControl
     private void UpdateSelectionState()
     {
         SetAndRaise(SelectionCountProperty, ref _selectionCount, SelectedMessages.Count);
+        UpdateSelectionCountText();
         PseudoClasses.Set(":selection", SelectionCount > 0);
         StatusText = SelectionCount == 0
             ? MdLocalization.GetString("SelectionCleared", this)
