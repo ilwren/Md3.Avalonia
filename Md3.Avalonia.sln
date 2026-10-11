@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.RichEditor", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.AvaloniaEdit", "src\Md3.Avalonia.AvaloniaEdit\Md3.Avalonia.AvaloniaEdit.csproj", "{5A2D9E14-7C3B-4E62-8F41-2B7C9D0A6E53}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.AvaloniaHex", "src\Md3.Avalonia.AvaloniaHex\Md3.Avalonia.AvaloniaHex.csproj", "{7B5F0C62-9D14-4A38-B7E6-1F0C8A2D3E91}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gallery", "gallery", "{3DD3B10C-2DE9-B2B9-1F65-9DB874E2084B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.Gallery", "gallery\Md3.Avalonia.Gallery\Md3.Avalonia.Gallery.csproj", "{C2DFFDDB-03C1-4352-B084-CA158168E859}"
@@ -64,6 +66,10 @@ Global
 		{5A2D9E14-7C3B-4E62-8F41-2B7C9D0A6E53}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A2D9E14-7C3B-4E62-8F41-2B7C9D0A6E53}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A2D9E14-7C3B-4E62-8F41-2B7C9D0A6E53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B5F0C62-9D14-4A38-B7E6-1F0C8A2D3E91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B5F0C62-9D14-4A38-B7E6-1F0C8A2D3E91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B5F0C62-9D14-4A38-B7E6-1F0C8A2D3E91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B5F0C62-9D14-4A38-B7E6-1F0C8A2D3E91}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C2DFFDDB-03C1-4352-B084-CA158168E859}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C2DFFDDB-03C1-4352-B084-CA158168E859}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2DFFDDB-03C1-4352-B084-CA158168E859}.Release|Any CPU.ActiveCfg = Release|Any CPU

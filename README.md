@@ -9,7 +9,7 @@
 - 每个交互控件使用独立的 `Md*` CLR 类型和 scoped `ControlTheme`；不全局覆盖 Avalonia 原生控件；
 - 核心包不依赖 Fluent/Simple theme，尽量复用 Avalonia 原生行为、绑定、键盘和选择模型；
 - Material 颜色、字体、形状、状态层、阴影和 motion 通过 token 与 `DynamicResource` 消费；
-- Core、Icons、Icons.Lite、Extra、DataGrid、AvaloniaEdit 六个包可以独立发布；Extra 和图表能力不强制绑定第三方 vendor；
+- Core、Icons、Icons.Lite、Extra、DataGrid、AvaloniaEdit、AvaloniaHex 八个包可以独立发布；Extra 和图表能力不强制绑定第三方 vendor；
 - RTL、现有 accessibility 和多平台适配代码会持续保留；当前开发优先级暂不把完整 RTL/多语种布局和屏幕阅读器人工验收作为预览版阻塞项。
 
 | Dark components and app bar | Dark outlined fields |
@@ -122,6 +122,7 @@
 - 富文本有两种选择：`MdRichEditor`（Extra）只提供 Material 命令面，文档交给适配器，不往库里塞编辑器引擎；需要真实编辑能力（行内格式、表格、图片、分页、HTML/JSON/RTF 往返）时，请用 opt-in 的 `Md3.Avalonia.RichEditor` 主题包搭配 AvaloniaRichEditor——该控件自绘文档、不暴露 chrome（没有 `Background`/`CornerRadius`/`Padding`），所以主题只负责墨水（选区、光标、默认字号），容器由宿主提供；另注意它的 `DefaultFontSize` 单位是**磅**而非 DIP；
 - 表格有两种选择：`MdDataGrid`（Extra）是 Material 数据表；需要完整电子表格能力（列宽调整、列重排、冻结列、分组、自动生成列）时，请用 Avalonia 原生 `DataGrid` 搭配 opt-in 的 `Md3.Avalonia.DataGrid` 主题包——控件是原生的，只有外观是 Material 的；
 - 代码/文本编辑器请用 [AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit) 搭配 opt-in 的 `Md3.Avalonia.AvaloniaEdit` 主题包：它把 `TextEditor`、`TextArea`、查找替换面板、补全列表和补全气泡都换成 M3 外观，编辑器内部需要的紧凑输入框、查找按钮与选项开关全部是只在该编辑器模板里引用的 `Md.Comp.AvaloniaEdit.*` 主题，因此**不会覆盖应用其余部分的原生控件样式**，也不需要 FluentTheme。Gallery 的 `CodeExample` 已改用该包，不再为 AvaloniaEdit 局部加载 Fluent 资源；
+- 需要看二进制/十六进制时用 [AvaloniaHex](https://github.com/Washi1337/AvaloniaHex) 搭配 opt-in 的 `Md3.Avalonia.AvaloniaHex` 主题包：它填的是 AvaloniaHex 自己发布的那些资源键（`HexForegroundBase`、`OffsetForeground`、表头、当前行、光标与选区画刷和 Pen），并给编辑器自带一个 Material 的 `ControlTheme`（`SurfaceContainerLow` 表面、`OutlineVariant` 描边、ExtraSmall 圆角、`MdScrollViewer` 滚动条），因此**不会覆盖应用其余部分的原生控件样式**，也不需要 FluentTheme；
 - 独立 `Md3.Avalonia.Extra` 包包含 `MdAvatar`/`MdAvatarGroup`、fractional `MdRating`、`MdBreadcrumb`、`MdBeforeAfter`、`MdAnimatedText`、`MdSpinKit` 与 `MdStaggeredPanel`，并通过 opt-in `ExtraTheme` 复用核心 Material tokens；其中 `MdChart` 保持 provider-neutral，不内置第三方图表引擎；
 - Ecosystem Waves A–C：density/overlay/async/shortcut contracts、`MdPopover`、`MdHoverCard`、`MdCommandPalette`、`MdSlidableItem`、`MdPagedItemsView`、`MdMasonryPanel`、`MdDataGrid`、`MdAsyncSelect`、`MdCalendar`、`MdTimeline`、`MdResultView`、`MdCascader` 与 `MdTransfer`；
 - Ecosystem Waves D–E：provider-neutral `MdChart`、`MdRichEditor`、`MdChatView`、`MdSkeleton` 与 `MdAnimationSequence`；不捆绑 chart vendor、editor engine、network/AI provider 或数据库；
@@ -189,6 +190,7 @@ src/Md3.Avalonia/                 # 官方 Flutter Material 对齐核心包；�
 src/Md3.Avalonia.Icons/           # 可选 Symbols catalog/loader；内嵌完整官方 TTF
 src/Md3.Avalonia.Extra/           # 第三方 Flutter clean-room 控件；依赖核心，不依赖 Icons
 src/Md3.Avalonia.AvaloniaEdit/    # opt-in：AvaloniaEdit 的 Material 3 主题（唯一引入该依赖的包）
+src/Md3.Avalonia.AvaloniaHex/     # opt-in：AvaloniaHex 十六进制编辑器的 Material 3 主题（唯一引入该依赖的包）
 
 gallery/Md3.Avalonia.Gallery/     # 组件、Theme Lab、资源与字体图标页面
 gallery/Md3.Avalonia.Gallery.Android/ # net10.0-android single-view host（solution 外）
@@ -222,7 +224,7 @@ python3 scripts/check-api-doc-coverage.py    # docs/API.md 是否覆盖全部公
 </Application>
 ```
 
-七个可独立 pack 的 NuGet 包版本均为 `0.4.1-preview.1`：`Md3.Avalonia`（核心）、`Md3.Avalonia.Icons`、`Md3.Avalonia.Icons.Lite`（两种可选图标 provider）、`Md3.Avalonia.Extra`（依赖核心），以及三个 opt-in 的第三方控件主题包——`Md3.Avalonia.DataGrid`（Avalonia 原生 `DataGrid` 的 Material 主题，是唯一引入 `Avalonia.Controls.DataGrid` 依赖的包）、`Md3.Avalonia.RichEditor`（[AvaloniaRichEditor](https://github.com/centwon/AvaloniaRichEditor) 的 Material 主题，唯一引入该依赖的包）和 `Md3.Avalonia.AvaloniaEdit`（[AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit) 的 Material 主题，唯一引入 `Avalonia.AvaloniaEdit` 依赖的包；它同时替代了 Gallery 过去为 `CodeExample` 局部加载的 Fluent 资源）。不用就不会被拖进来。核心与 Extra 都不强制引用 Icons；七个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
+八个可独立 pack 的 NuGet 包版本均为 `0.4.1-preview.1`：`Md3.Avalonia`（核心）、`Md3.Avalonia.Icons`、`Md3.Avalonia.Icons.Lite`（两种可选图标 provider）、`Md3.Avalonia.Extra`（依赖核心），以及四个 opt-in 的第三方控件主题包——`Md3.Avalonia.DataGrid`（Avalonia 原生 `DataGrid` 的 Material 主题，是唯一引入 `Avalonia.Controls.DataGrid` 依赖的包）、`Md3.Avalonia.RichEditor`（[AvaloniaRichEditor](https://github.com/centwon/AvaloniaRichEditor) 的 Material 主题，唯一引入该依赖的包）、`Md3.Avalonia.AvaloniaEdit`（[AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit) 的 Material 主题，唯一引入 `Avalonia.AvaloniaEdit` 依赖的包；它同时替代了 Gallery 过去为 `CodeExample` 局部加载的 Fluent 资源）和 `Md3.Avalonia.AvaloniaHex`（[AvaloniaHex](https://github.com/Washi1337/AvaloniaHex) 十六进制编辑器的 Material 主题，唯一引入 `AvaloniaHex` 依赖的包）。不用就不会被拖进来。核心与 Extra 都不强制引用 Icons；八个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
 
 任意 seed 主题可在启动时或运行时应用：
 
@@ -374,7 +376,7 @@ dotnet build Md3.Avalonia.sln -c Release
 dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --no-build
 ```
 
-当前发布门禁会构建七个包并严格检查七个 `.nupkg`、七个 `.snupkg`、统一版本和已内嵌官方字体。仓库不保留普通构建产物。测试覆盖 Light/Dark Gallery screenshots、任意 HCT seed golden vectors、49 roles、三档 contrast、主题 JSON round-trip、五档 breakpoint、搜索索引、LTR/RTL 渲染、CommunityToolkit.Mvvm、Automation/live-region、虚拟化和主题生命周期、AvaloniaEdit 双语言编辑器、真实 ScrollViewer extent/viewport/wheel offset、Autocomplete/Numeric input、adaptive breakpoints、Flexible NavigationBar、official chip/item 类型、popup 非强制 OverlayLayer、Tabs/Toolbars/Tooltips、Menus/Drawer/Rail/Search/Sheets/Slider/Snackbar/Switch 的渲染与直接 API，以及 Dialog、Lists、contained Loading/Progress、popup 互斥、文化日期网格、一分钟 TimePicker、state layer、buttons、fields、Carousel/Card/Chips、AppBar、Symbols、Radio、Badge、ripple/motion。
+当前发布门禁会构建八个包并严格检查八个 `.nupkg`、八个 `.snupkg`、统一版本和已内嵌官方字体。仓库不保留普通构建产物。测试覆盖 Light/Dark Gallery screenshots、任意 HCT seed golden vectors、49 roles、三档 contrast、主题 JSON round-trip、五档 breakpoint、搜索索引、LTR/RTL 渲染、CommunityToolkit.Mvvm、Automation/live-region、虚拟化和主题生命周期、AvaloniaEdit 双语言编辑器、真实 ScrollViewer extent/viewport/wheel offset、Autocomplete/Numeric input、adaptive breakpoints、Flexible NavigationBar、official chip/item 类型、popup 非强制 OverlayLayer、Tabs/Toolbars/Tooltips、Menus/Drawer/Rail/Search/Sheets/Slider/Snackbar/Switch 的渲染与直接 API，以及 Dialog、Lists、contained Loading/Progress、popup 互斥、文化日期网格、一分钟 TimePicker、state layer、buttons、fields、Carousel/Card/Chips、AppBar、Symbols、Radio、Badge、ripple/motion。
 
 每一次 build、test 或 pack 命令结束后必须立即清理编译产物，再继续后续实现或验证。Workspace 不交付 `bin/`、`obj/`、`TestResults/`、DLL、PDB、NuGet、APK 或 AAB；`docs/*.png` 是保留的文档参考图。
 
@@ -384,7 +386,7 @@ dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -
 - HCT dynamic theme、49 个当前 Material role、Theme Lab 与 JSON round-trip 已完成；`MdTextBox.IsPassword` 已覆盖密码输入与 reveal 行为；
 - Android 系统返回键／预测性返回已接入（`MdBackNavigation`，覆盖 dialog、sheet、drawer、search、menu、FAB menu 与两个 picker），安全区内缩已提供按边控制（`MdSafeArea`）；两者的 headless 行为有回归测试，真机手势动画与挖孔几何仍需人工验收；
 - Android Gallery 源码宿主已提供，但当前环境未安装 Android workload，也没有 ARM64 设备，因此 APK、旋转、生命周期、真机/模拟器矩阵不得视为已签署；
-- 七个包均已声明 `IsTrimmable` + `IsAotCompatible` 并开启 IL2xxx/IL3xxx 分析器；主题 JSON 走源生成序列化，`MdDataGrid`/`MdAsyncSelect`/`MdSearchView` 的字符串属性路径均提供了免反射的 selector 委托（见 [API 参考的 Trimming 一节](docs/API.md#trimming)）。**原生 AOT 已验证可用**：`.github/workflows/aot-probe.yml` 用 `PublishAot=true` 发布桌面 Gallery，断言产物是原生 ELF（无托管 dll 残留）、IL 诊断为零，并在 xvfb 下实际启动该二进制确认运行时未因缺反射元数据而崩溃；
+- 八个包均已声明 `IsTrimmable` + `IsAotCompatible` 并开启 IL2xxx/IL3xxx 分析器；主题 JSON 走源生成序列化，`MdDataGrid`/`MdAsyncSelect`/`MdSearchView` 的字符串属性路径均提供了免反射的 selector 委托（见 [API 参考的 Trimming 一节](docs/API.md#trimming)）。**原生 AOT 已验证可用**：`.github/workflows/aot-probe.yml` 用 `PublishAot=true` 发布桌面 Gallery，断言产物是原生 ELF（无托管 dll 残留）、IL 诊断为零，并在 xvfb 下实际启动该二进制确认运行时未因缺反射元数据而崩溃；
 - Narrator、VoiceOver 和 Orca 必须由具备对应 OS/辅助技术的人员按发布清单人工验收；
 - 完整 Material Symbols Rounded variable TTF 与真实 Lite 子集已提交并自动打包；CI 以固定 upstream commit、SHA-256、variable tables 和 glyph 数量阻止占位或替代字体混入发布。
 

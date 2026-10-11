@@ -17,6 +17,9 @@ This document is the public entry point for the `0.4.1-preview.1` API. Preview A
 <!-- Optional Material theme for the AvaloniaEdit text editor; likewise the only package that
      pulls in Avalonia.AvaloniaEdit: -->
 <PackageReference Include="Md3.Avalonia.AvaloniaEdit" Version="0.4.1-preview.1" />
+<!-- Optional Material theme for the AvaloniaHex hex editor; likewise the only package that
+     pulls in AvaloniaHex: -->
+<PackageReference Include="Md3.Avalonia.AvaloniaHex" Version="0.4.1-preview.1" />
 ```
 
 ```xml
@@ -446,6 +449,31 @@ action buttons, the match-case/whole-word/regex option toggles, the expander and
 rows — is styled by keyed `Md.Comp.AvaloniaEdit.*` control themes that only the editor's own
 templates reference. Registering this theme therefore never replaces Avalonia's native
 `Button`, `ToggleButton`, `TextBox` or `ListBox` themes for the rest of the application.
+
+
+## AvaloniaHex
+
+For binary and hex inspection, use [AvaloniaHex](https://github.com/Washi1337/AvaloniaHex) with
+the opt-in `Md3.Avalonia.AvaloniaHex` package:
+
+```xml
+<Application.Styles>
+  <themes:MaterialTheme />
+  <themes:MaterialAvaloniaHexTheme />
+</Application.Styles>
+```
+
+It is the only package that depends on `AvaloniaHex`, and it replaces the library's own
+Fluent/Simple style sheets, so do not include both. Like `MaterialTheme` it is standalone and
+does not need Avalonia's `FluentTheme`.
+
+The theme fills the resource keys AvaloniaHex publishes - `HexForegroundBase`, `OffsetForeground`,
+the header, current-line, caret and selection brushes and pens - from `Md.Sys` tokens, and gives
+`HexEditor` its own control theme: a `SurfaceContainerLow` surface with an `OutlineVariant` outline,
+an ExtraSmall corner and `MdScrollViewer` scrollbars. `onSurface` is the text, `onSurfaceVariant`
+the offsets and column headers, `surfaceContainerHigh`/`surfaceContainerHighest` the header strip
+and the current line, and the caret and selection use the same primary wash the rest of the library
+uses for selection.
 
 ## Trimming
 

@@ -14,7 +14,13 @@
   package that pulls in that dependency, bringing the set to seven. The Gallery's `CodeExample`
   now uses it instead of scoping Fluent resources to the preview, so no project in the repository
   references `Avalonia.Themes.Fluent` any more.
-- **Native AOT.** All six packages declare `IsAotCompatible` and build with the IL3xxx analyzers
+- **`Md3.Avalonia.AvaloniaHex`**, an opt-in Material Design 3 theme for the
+  [AvaloniaHex](https://github.com/Washi1337/AvaloniaHex) hex editor: `HexForegroundBase`,
+  `OffsetForeground`, the header, current-line, caret and selection brushes and pens are filled
+  from `Md.Sys` tokens, and the editor gets a Material surface, outline, corner and
+  `MdScrollViewer` scrollbars. It is the only package that pulls in that dependency, bringing
+  the set to eight.
+- **Native AOT.** All eight packages declare `IsAotCompatible` and build with the IL3xxx analyzers
   on alongside the existing IL2xxx trimming ones. `.github/workflows/aot-probe.yml` publishes the
   desktop gallery with `PublishAot=true` and does not accept a green step as the answer: it
   asserts the output is a native ELF executable with no managed assembly beside it, then runs that
