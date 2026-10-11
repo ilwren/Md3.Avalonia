@@ -25,7 +25,7 @@
                        ShowValueIndicator="True" ValueFormat="0.00×" PropertyChanged="MotionSpeedChanged" />
           <TextBlock x:Name="MotionSpeedText" Grid.Column="2" VerticalAlignment="Center" Text="1.00×" />
         </Grid>
-        <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+        <Border Padding="20" CornerRadius="20" ClipToBounds="True" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
           <StackPanel Spacing="18">
             <Grid ColumnDefinitions="100,*">
               <TextBlock VerticalAlignment="Center" Text="Expressive" />

@@ -7,7 +7,7 @@ using Md3.Avalonia.Motion;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>Template part used by <see cref="MdSlider"/> to carry Material value-indicator state.</summary>
-[PseudoClasses(":show-value", ":reduced-motion", ":no-motion")]
+[PseudoClasses(":show-value", ":dragging", ":reduced-motion", ":no-motion")]
 public sealed class MdSliderThumb : Thumb
 {
     public static readonly StyledProperty<bool> ShowValueIndicatorProperty =

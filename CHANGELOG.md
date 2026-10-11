@@ -4,6 +4,16 @@
 
 ### Fixed
 
+- `MdBanner` actions drop below the text automatically under the 480 dip compact breakpoint
+  (Android squeezed the wrapped text into a sliver); `ForceActionsBelow` still wins.
+- Pickers: the anchor field now force-invalidates when `DisplayText` changes (desktop could
+  paint a stale value while the bound readout was correct), and an open picker popup closes
+  when the surrounding page scrolls so dial/calendar drags can no longer land offset.
+- `MdSlider` value indicator follows the M3 rule - visible only while dragging or hovering when
+  enabled, instead of permanently.
+- Gallery motion demo: spring travel adapts to the realized row width and the section clips, so
+  the dots no longer slide out of the page on narrow screens.
+
 - `MdTabViewItem` reaches interaction parity with the `MdTabItem` family (style merge without
   removing either control, so strip-only consumers who drive their own content keep working):
   pressed state layer at 10%, ripple feedback, 38% disabled fade, and the hover/press state
