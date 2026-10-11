@@ -57,7 +57,12 @@ public class MdAvaloniaEditThemeTests
         Dispatcher.UIThread.RunJobs();
 
         var panel = editor.GetVisualDescendants().OfType<AvaloniaEdit.Search.SearchPanel>().Single();
-        var border = panel.GetVisualDescendants().OfType<Border>().Single(candidate => candidate.Name == "PART_Border");
+
+        // The compact search fields name their own container PART_Border too - that is the name
+        // Avalonia's stock TextBox chrome uses - so the panel's surface is the one whose templated
+        // parent is the panel itself.
+        var border = panel.GetVisualDescendants().OfType<Border>()
+            .Single(candidate => candidate.Name == "PART_Border" && ReferenceEquals(candidate.TemplatedParent, panel));
         Assert.Equal(Brush(editor, "Md.Sys.Color.SurfaceContainerHigh.Brush"), border.Background);
 
         // The parts the panel resolves in code have to exist, and the surface has to be
