@@ -57,6 +57,12 @@ public sealed class MdImageViewer : Decorator
     /// <summary>Raised when the user presses Escape.</summary>
     public event EventHandler? CloseRequested;
 
+    /// <summary>Raised when the user presses Left; the application shows the previous picture.</summary>
+    public event EventHandler? PreviousRequested;
+
+    /// <summary>Raised when the user presses Right; the application shows the next picture.</summary>
+    public event EventHandler? NextRequested;
+
     /// <summary>Restores the fitted view at the default zoom.</summary>
     public void ResetView()
     {
@@ -123,6 +129,12 @@ public sealed class MdImageViewer : Decorator
                 break;
             case Key.Escape:
                 CloseRequested?.Invoke(this, EventArgs.Empty);
+                break;
+            case Key.Left:
+                PreviousRequested?.Invoke(this, EventArgs.Empty);
+                break;
+            case Key.Right:
+                NextRequested?.Invoke(this, EventArgs.Empty);
                 break;
             default:
                 return;

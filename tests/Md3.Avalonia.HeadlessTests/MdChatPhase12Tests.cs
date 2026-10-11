@@ -8,6 +8,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Md3.Avalonia.Chat;
 using Md3.Avalonia.Extra.Infrastructure;
 using Xunit;
@@ -336,5 +337,65 @@ public sealed class MdChatPhase12Tests
 
         var uri = Assert.Single(opener.Opened);
         Assert.Equal("https://example.com/docs", uri.ToString());
+    }
+
+    [AvaloniaFact]
+    public void Image_Viewer_Left_And_Right_Request_Previous_And_Next()
+    {
+        var viewer = new MdImageViewer();
+        var previous = 0;
+        var next = 0;
+        viewer.PreviousRequested += (_, _) => previous++;
+        viewer.NextRequested += (_, _) => next++;
+        var window = new Window { Width = 240, Height = 240, Content = viewer };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            viewer.Focus();
+            window.KeyPress(Key.Right, RawInputModifiers.None, PhysicalKey.ArrowRight, null);
+            window.KeyRelease(Key.Right, RawInputModifiers.None, PhysicalKey.ArrowRight, null);
+            window.KeyPress(Key.Left, RawInputModifiers.None, PhysicalKey.ArrowLeft, null);
+            window.KeyRelease(Key.Left, RawInputModifiers.None, PhysicalKey.ArrowLeft, null);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(1, next);
+            Assert.Equal(1, previous);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Streaming_1000_Tokens_Updates_The_Same_Row_Without_Rebuilding_The_List()
+    {
+        var messages = new ObservableCollection<MdChatMessage>
+        {
+            new("stream", MdChatMessageRole.Assistant, "", DateTimeOffset.Now, IsStreaming: true),
+        };
+        var chat = new MdChatView { MessagesSource = messages };
+        var window = new Window { Width = 480, Height = 640, Content = chat };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var rowBefore = Assert.Single(chat.GetVisualDescendants().OfType<ListBoxItem>());
+            var presenterBefore = Assert.Single(chat.GetVisualDescendants().OfType<MdChatMessagePresenter>());
+
+            var text = string.Empty;
+            for (var i = 0; i < 1000; i++)
+            {
+                text += "tok ";
+                // The stream replaces the same message id for every token, as an application does.
+                messages[0] = messages[0] with { Content = text, IsStreaming = i < 999 };
+            }
+            Dispatcher.UIThread.RunJobs();
+
+            var rowAfter = Assert.Single(chat.GetVisualDescendants().OfType<ListBoxItem>());
+            var presenterAfter = Assert.Single(chat.GetVisualDescendants().OfType<MdChatMessagePresenter>());
+            Assert.Same(rowBefore, rowAfter);
+            Assert.Same(presenterBefore, presenterAfter);
+            Assert.Equal(text, presenterAfter.Message?.Content);
+        }
+        finally { window.Close(); }
     }
 }
