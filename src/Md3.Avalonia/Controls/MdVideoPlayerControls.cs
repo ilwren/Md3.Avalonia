@@ -238,7 +238,7 @@ public sealed class MdVideoPlayerControls : TemplatedControl
     private void UpdateAutoHideTimer()
     {
         _autoHideTimer.Stop();
-        if (!IsAttachedToVisualTree() || !AutoHideControls || !IsPlaying || !IsControlsVisible || IsKeyboardFocusWithin)
+        if (!this.IsAttachedToVisualTree() || !AutoHideControls || !IsPlaying || !IsControlsVisible || IsKeyboardFocusWithin)
             return;
         _autoHideTimer.Interval = AutoHideDelay <= TimeSpan.Zero ? TimeSpan.FromMilliseconds(1) : AutoHideDelay;
         _autoHideTimer.Start();
