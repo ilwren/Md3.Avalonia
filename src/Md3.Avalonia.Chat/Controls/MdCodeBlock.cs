@@ -60,7 +60,7 @@ public sealed class MdCodeBlock : TemplatedControl
     {
         if (_body is null) return;
         var code = Code ?? string.Empty;
-        _body.Inlines.Clear();
+        _body.Inlines?.Clear();
         if (Highlighter is null)
         {
             _body.Text = code;
@@ -68,7 +68,7 @@ public sealed class MdCodeBlock : TemplatedControl
         }
         _body.Text = null;
         foreach (var token in Highlighter.Highlight(code, Language))
-            _body.Inlines.Add(new Run { Text = token.Text, Foreground = BrushFor(token.Kind) });
+            _body.Inlines?.Add(new Run { Text = token.Text, Foreground = BrushFor(token.Kind) });
     }
 
     private IBrush? BrushFor(MdCodeTokenKind kind)
