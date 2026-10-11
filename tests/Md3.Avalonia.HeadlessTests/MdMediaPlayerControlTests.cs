@@ -187,6 +187,53 @@ public sealed class MdMediaPlayerControlTests
     }
 
     [AvaloniaFact]
+    public void Video_AutoHidden_Controls_Are_Not_Reachable_While_Focused_Controls_Stay_Visible()
+    {
+        var video = new MdVideoPlayerControls
+        {
+            Width = 400,
+            Height = 260,
+            IsPlaying = true,
+            AutoHideControls = false
+        };
+        var focusSink = new Button { Content = "Focus sink" };
+        var window = new Window
+        {
+            Width = 600,
+            Height = 360,
+            Content = new StackPanel { Spacing = 12, Children = { video, focusSink } }
+        };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var pause = Assert.Single(video.GetVisualDescendants().OfType<MdIconButton>(),
+                button => AutomationProperties.GetName(button) == "Pause");
+            Assert.True(pause.IsEffectivelyVisible);
+            Assert.True(pause.Focus());
+
+            video.IsControlsVisible = false;
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(video.IsControlsVisible, "Controls must remain visible while keyboard focus is within the player.");
+            Assert.True(pause.IsEffectivelyVisible);
+
+            Assert.True(focusSink.Focus());
+            Dispatcher.UIThread.RunJobs();
+            video.IsControlsVisible = false;
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(pause.IsEffectivelyVisible, "Hidden transport buttons must leave the tab and automation tree.");
+
+            video.IsControlsVisible = true;
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(pause.IsEffectivelyVisible);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void Media_Control_Themes_Render_And_Expose_Seek_And_Transport_Parts()
     {
         var controls = new StackPanel

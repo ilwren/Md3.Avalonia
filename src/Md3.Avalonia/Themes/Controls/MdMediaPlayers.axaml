@@ -51,7 +51,8 @@
       <ControlTemplate TargetType="md:MdVideoPlayerControls">
         <Grid MinHeight="220">
           <Border Background="{DynamicResource Md.Sys.Color.Scrim.Strong.Brush}" />
-          <Grid Margin="20" RowDefinitions="Auto,*,Auto" RowSpacing="16">
+          <Grid Margin="20" RowDefinitions="Auto,*,Auto" RowSpacing="16"
+                IsVisible="{TemplateBinding IsControlsVisible}">
             <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
               <TextBlock VerticalAlignment="Center"
                          FontSize="16"

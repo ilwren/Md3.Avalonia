@@ -77,6 +77,11 @@ public sealed class MdVideoPlayerControls : TemplatedControl
         AutoHideDelayProperty.Changed.AddClassHandler<MdVideoPlayerControls>((control, _) => control.UpdateAutoHideTimer());
         IsControlsVisibleProperty.Changed.AddClassHandler<MdVideoPlayerControls>((control, _) =>
         {
+            if (!control.IsControlsVisible && control.IsKeyboardFocusWithin)
+            {
+                control.ShowControls();
+                return;
+            }
             control.UpdatePseudoClasses();
             control.UpdateAutoHideTimer();
         });
