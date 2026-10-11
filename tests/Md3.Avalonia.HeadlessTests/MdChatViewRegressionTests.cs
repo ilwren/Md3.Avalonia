@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
+using Md3.Avalonia.Chat;
 using Md3.Avalonia.Extra.Controls;
 using Md3.Avalonia.Localization;
 using Xunit;

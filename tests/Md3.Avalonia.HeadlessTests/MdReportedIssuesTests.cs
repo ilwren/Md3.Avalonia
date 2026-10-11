@@ -14,6 +14,7 @@ using Avalonia.Threading;
 using System.Globalization;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Chat;
 using Md3.Avalonia.Extra.Controls;
 using Md3.Avalonia.Extra.Infrastructure;
 using Md3.Avalonia.Gallery;

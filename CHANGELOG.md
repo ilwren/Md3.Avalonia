@@ -1,5 +1,26 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- **`Md3.Avalonia.Chat`**, a new NuGet package that holds the chat controls (`MdChatView`,
+  `MdChatMessagePresenter`, `MdChatMessage`) previously shipped in `Md3.Avalonia.Extra`, plus the
+  `ChatTheme` resource provider. Apps that use chat reference this package and register `ChatTheme`
+  next to `ExtraTheme`. Phase 1–2 status is recorded in `docs/CHAT_IMPLEMENTATION_PLAN.md`.
+- Chat Phase 1: `IMdMarkdownProvider` renders text messages through an application-supplied
+  provider. `MdPlainTextMarkdownProvider` is the selectable plain-text reference. `MdChatView.MarkdownProvider`
+  and `MdChatMessage.IsStreaming` let a streamed reply update in place while a caret is shown.
+- Chat Phase 2: `MdChatAttachment` and `MdChatAttachmentKind` add images and file cards to a message
+  (`MdChatMessage.Attachments`). `MdChatView.AttachmentActivated` reports clicks. `MdImageViewer`
+  is a zoomable, pannable image surface that raises `CloseRequested` on Escape.
+
+### Changed
+
+- `MdChatView` and `MdChatMessagePresenter` moved from `Md3.Avalonia.Extra.Controls` to
+  `Md3.Avalonia.Chat`. Update the namespace and add `ChatTheme`. The chat theme keys were removed from
+  `ExtraTheme`.
+
 ## [0.4.1-preview.1] - 2026-10-06
 
 ### Added

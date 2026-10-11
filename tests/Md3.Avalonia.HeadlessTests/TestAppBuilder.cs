@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Md3.Avalonia.Chat.Themes;
 using Md3.Avalonia.Extra.Themes;
 using Md3.Avalonia.Themes;
 
@@ -14,6 +15,7 @@ public sealed class TestApplication : Application
     {
         Styles.Add(new MaterialTheme());
         Styles.Add(new EcosystemTheme());
+        Styles.Add(new ChatTheme());
         Styles.Add(new MaterialDataGridTheme());
         Styles.Add(new MaterialRichEditorTheme());
     }

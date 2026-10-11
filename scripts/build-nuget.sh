@@ -4,8 +4,8 @@ set -Eeuo pipefail
 usage() {
   cat <<'EOF'
 Build the release NuGet packages for Md3.Avalonia, Md3.Avalonia.Icons,
-Md3.Avalonia.Icons.Lite, Md3.Avalonia.Extra, Md3.Avalonia.DataGrid and
-Md3.Avalonia.RichEditor.
+Md3.Avalonia.Icons.Lite, Md3.Avalonia.Extra, Md3.Avalonia.Chat,
+Md3.Avalonia.DataGrid and Md3.Avalonia.RichEditor.
 
 Usage:
   scripts/build-nuget.sh [--output /absolute/or/relative/path]
@@ -68,6 +68,7 @@ PROJECTS=(
   "$ROOT/src/Md3.Avalonia.Icons/Md3.Avalonia.Icons.csproj"
   "$ROOT/src/Md3.Avalonia.Icons.Lite/Md3.Avalonia.Icons.Lite.csproj"
   "$ROOT/src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj"
+  "$ROOT/src/Md3.Avalonia.Chat/Md3.Avalonia.Chat.csproj"
   "$ROOT/src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj"
   "$ROOT/src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj"
 )
@@ -90,6 +91,7 @@ cleanup_intermediate() {
        "$ROOT/src/Md3.Avalonia.Icons" \
        "$ROOT/src/Md3.Avalonia.Icons.Lite" \
        "$ROOT/src/Md3.Avalonia.Extra" \
+       "$ROOT/src/Md3.Avalonia.Chat" \
        "$ROOT/src/Md3.Avalonia.DataGrid" \
        "$ROOT/src/Md3.Avalonia.RichEditor" \
        -type d \( -name bin -o -name obj \) -prune -exec rm -rf {} + 2>/dev/null || true
@@ -114,7 +116,7 @@ done
 
 VERSION="$(sed -n 's:.*<Version>\([^<]*\)</Version>.*:\1:p' "${PROJECTS[0]}" | head -1)"
 [[ -n "$VERSION" ]] || { echo "error: package version is missing" >&2; exit 1; }
-PACKAGE_IDS=(Md3.Avalonia Md3.Avalonia.Icons Md3.Avalonia.Icons.Lite Md3.Avalonia.Extra Md3.Avalonia.DataGrid Md3.Avalonia.RichEditor)
+PACKAGE_IDS=(Md3.Avalonia Md3.Avalonia.Icons Md3.Avalonia.Icons.Lite Md3.Avalonia.Extra Md3.Avalonia.Chat Md3.Avalonia.DataGrid Md3.Avalonia.RichEditor)
 for package_id in "${PACKAGE_IDS[@]}"; do
   for extension in nupkg snupkg; do
     package="$OUTPUT/$package_id.$VERSION.$extension"

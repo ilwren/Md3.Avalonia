@@ -37,6 +37,8 @@ All component themes are scoped to `Md*` types. Registering `MaterialTheme` does
 | `Md3.Avalonia.Extra.Controls` | Optional clean-room ecosystem controls |
 | `Md3.Avalonia.Extra.Infrastructure` | Density, paging, async-state, shortcut, overlay and focus-return contracts |
 | `Md3.Avalonia.Extra.Themes` | Opt-in `ExtraTheme` resource provider |
+| `Md3.Avalonia.Chat` | Optional chat controls, Markdown provider contract, attachments and image viewer (`Md3.Avalonia.Chat` package) |
+| `Md3.Avalonia.Chat.Themes` | Opt-in `ChatTheme` resource provider |
 
 ## Components
 
@@ -58,7 +60,7 @@ All component themes are scoped to `Md*` types. Registering `MaterialTheme` does
 - Optional Ecosystem Wave A: `MdPopover`, `MdHoverCard`, `MdCommandPalette`, `MdCommandItem`.
 - Optional Ecosystem Wave B: `MdSlidableItem`, `MdPagedItemsView`, `MdMasonryPanel`, `MdDataGrid`, `MdDataGridColumn`.
 - Optional Ecosystem Wave C: `MdAsyncSelect`, `MdCalendar`, `MdTimeline`, `MdResultView`, `MdCascader`, `MdTransfer`.
-- Optional Ecosystem Wave D: `MdChart`, `IMdChartDataProvider`, `MdRichEditor`/`MdRichTextEditor`, `IMdRichEditorAdapter`, `MdChatView`.
+- Optional Ecosystem Wave D: `MdChart`, `IMdChartDataProvider`, `MdRichEditor`/`MdRichTextEditor`, `IMdRichEditorAdapter`. Chat controls are in the separate `Md3.Avalonia.Chat` package (see below).
 - Optional Ecosystem Wave E: `MdSkeleton`, `MdSkeletonGroup`, `MdAnimationSequence`.
 - Optional Ecosystem Wave F: `MdPinInput`, `MdPinCell`, `MdTreeView`, `MdTreeNode`, `MdTreeRow`, `MdTagInput`, `MdTagEntry`, `MdTagChangedEventArgs`.
 - Existing optional Ecosystem controls: `MdAvatar`, `MdAvatarGroup`, `MdRating`, `MdBreadcrumb`, `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, and `MdStaggeredPanel`.
@@ -117,7 +119,7 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 | **Collections and layout** | `MdPagedItemsView`, `MdMasonryPanel`, `MdDataGrid`, `MdDataGridColumn`, `MdSlidableItem`, `MdTreeView`, `MdTreeNode`, `MdTreeRow` |
 | **Selection and transfer** | `MdAsyncSelect`, `MdCalendar`, `MdCascader`, `MdCascaderItem`, `MdTransfer`, `MdColorPicker`, `MdColorPickerButton` |
 | **Feedback and identity** | `MdAvatar`, `MdAvatarGroup`, `MdRating`, `MdResultView`, `MdSkeleton`, `MdSkeletonGroup`, `MdPinInput`, `MdPinCell`, `MdTagInput`, `MdTagEntry` |
-| **Data visualization and editing** | `MdChart`, `MdChartSeries`, `MdChartPoint`, `MdRichEditor`, `MdRichTextEditor`, `MdChatView`, `MdChatMessage`, `MdTimeline`, `MdTimelineItem` |
+| **Data visualization and editing** | `MdChart`, `MdChartSeries`, `MdChartPoint`, `MdRichEditor`, `MdRichTextEditor`, `MdTimeline`, `MdTimelineItem` |
 | **Motion and visual extras** | `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, `MdStaggeredPanel`, `MdAnimationSequence`, `MdAnimatedVisibility`, `MdContainerTransform`, `MdFadeThrough`, `MdSharedAxis`, `MdRevealHost`, `MdMorphPanel` |
 | **Navigation/content** | `MdBreadcrumb`, `MdBreadcrumbItem`, `MdGridTile`-style content helpers |
 
@@ -261,6 +263,28 @@ Direct APIs include `Show`/`Dismiss` on transient components, `ShowAsync`/`Show`
 `MdScrollViewer` keeps wheel, trackpad, touch, pen and scrollbar behavior native. Desktop primary-button panning is opt-in through `AllowMouseDrag`; when enabled, focusable controls retain direct manipulation, and custom content takes precedence by handling the press or capturing the pointer. Set `md:MdScrollViewer.SuppressMouseDragScrolling="True"` on any precision-interaction subtree that does neither.
 
 `MdBorderlessWindow.PlatformAdapter` is replaceable. `PreserveNativeBorder` defaults to `true`: Windows uses `WindowDecorations.Full` plus an extended client area so the native `WS_CAPTION`/minimize/maximize styles and DWM state animations remain available, while macOS/Linux retain the portable border-only path. The Material template suppresses its own outer outline whenever a native frame is present, and an empty Avalonia 12 `WindowDrawnDecorations` theme prevents Fluent/Simple title and caption visuals from being layered over the Material title bar. The caption uses the window surface background without a separator rule, and shows `Window.Icon` unless `ShowIcon="False"`. `ShowMinimizeButton`/`ShowMaximizeButton`/`ShowCloseButton` control visibility, while `IsMinimizeButtonEnabled`/`IsMaximizeButtonEnabled`/`IsCloseButtonEnabled` control each action independently. View models use Avalonia `WindowState`; Android resolves to a safe no-op adapter.
+
+## Chat package (`Md3.Avalonia.Chat`)
+
+`Md3.Avalonia.Chat` is a separate NuGet package. Reference it, then register `ChatTheme` in addition to `MaterialTheme`:
+
+```xml
+<chat:ChatTheme />
+```
+
+```xml
+<chat:MdChatView MessagesSource="{Binding Messages}" SendCommand="{Binding SendCommand}"
+                 MarkdownProvider="{Binding Markdown}" />
+```
+
+| Area | Types |
+|---|---|
+| **Chat view and bubbles** | `MdChatView`, `MdChatMessagePresenter`, `MdChatMessage`, `MdChatMessageRole` |
+| **Markdown** | `IMdMarkdownProvider` (`Render(string text, bool isStreaming)` returns a `Control`), `MdPlainTextMarkdownProvider` |
+| **Attachments and viewer** | `MdChatAttachment`, `MdChatAttachmentKind` (`Image` · `File` · `Audio` · `Video`), `MdImageViewer` |
+| **Theme** | `ChatTheme` |
+
+`MdChatView.MarkdownProvider` is passed to every bubble. When it is null, text is shown as plain selectable text. A message with `IsStreaming = true` gets a visible caret. A same-`Id` replacement keeps the selection and is not announced again unless it becomes an error. `MdChatView.AttachmentActivated` raises when an attachment is clicked. The application decides what to do, for example by showing an `MdImageViewer` with the decoded picture. `MdImageViewer` zooms with the wheel or `+`/`-` (1× to 8×), pans by dragging when zoomed, resets with `0`, and raises `CloseRequested` on Escape. The image is supplied through `Source` as an `IImage`; the controls perform no network or file I/O.
 
 ## Extra visual controls
 
@@ -528,7 +552,7 @@ missing from this document.
 | `MdWindowCapabilities` | `None` · `Move` · `Resize` · `Minimize` · `Maximize` · `Close` · `SystemMenu` · `All` |
 | `MdWindowPlatform` | `Unknown` · `Windows` · `MacOS` · `Linux` · `Android` |
 
-### Optional (`Md3.Avalonia.Extra`) — 19 enumerations
+### Optional (`Md3.Avalonia.Extra`) — 18 enumerations
 
 | Enum | Members |
 |---|---|
@@ -538,7 +562,6 @@ missing from this document.
 | `MdBreadcrumbOverflowBehavior` | `Wrap` · `Scroll` · `Collapse` |
 | `MdCalendarSelectionMode` | `Single` · `Range` · `Multiple` |
 | `MdChartKind` | `Line` · `Area` · `Bar` |
-| `MdChatMessageRole` | `User` · `Assistant` · `System` |
 | `MdColorPickerMode` | `MaterialPalette` · `SpectrumSliders` · `Presets` |
 | `MdComparisonOrientation` | `Horizontal` · `Vertical` |
 | `MdEcosystemDensity` | `Comfortable` · `Compact` · `Touch` |

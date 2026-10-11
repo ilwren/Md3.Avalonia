@@ -51,6 +51,7 @@ SPEC = REPO / "spec-snapshot"
 THEME_GLOBS = (
     "src/Md3.Avalonia/Themes/**/*.axaml",
     "src/Md3.Avalonia.Extra/Themes/**/*.axaml",
+    "src/Md3.Avalonia.Chat/Themes/**/*.axaml",
 )
 TOKEN_DIR = REPO / "src/Md3.Avalonia/Themes/Tokens"
 
@@ -222,6 +223,7 @@ def rule_includes(lint: Lint) -> None:
     asm_roots = {
         "Md3.Avalonia": REPO / "src/Md3.Avalonia",
         "Md3.Avalonia.Extra": REPO / "src/Md3.Avalonia.Extra",
+        "Md3.Avalonia.Chat": REPO / "src/Md3.Avalonia.Chat",
         "Md3.Avalonia.Icons": REPO / "src/Md3.Avalonia.Icons",
         "Md3.Avalonia.Icons.Lite": REPO / "src/Md3.Avalonia.Icons.Lite",
     }

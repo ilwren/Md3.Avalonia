@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Md3.Avalonia.Chat</RootNamespace>
+    <AssemblyName>Md3.Avalonia.Chat</AssemblyName>
+    <Description>Provider-neutral Material 3 chat controls for Avalonia: message list, bubbles, composer, attachments and an image viewer. Backend, network, Markdown engine and media codecs are injected through interfaces.</Description>
+    <PackageId>Md3.Avalonia.Chat</PackageId>
+    <Version>0.4.1-preview.1</Version>
+    <Authors>Md3.Avalonia contributors</Authors>
+    <PackageTags>avalonia;chat;messaging;material-design-3;controls;android;desktop</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IsPackable>true</IsPackable>
+    <!-- Same trimming and AOT contract as the other Md3.Avalonia packages. -->
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <ProjectReference Include="../Md3.Avalonia/Md3.Avalonia.csproj" />
+    <ProjectReference Include="../Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj" />
+    <None Include="../../README.md" Pack="true" PackagePath="/" Link="README.md" />
+    <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />
+  </ItemGroup>
+</Project>

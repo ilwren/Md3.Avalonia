@@ -2,11 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:themes="using:Md3.Avalonia.Themes"
              xmlns:extraThemes="using:Md3.Avalonia.Extra.Themes"
+             xmlns:chatThemes="using:Md3.Avalonia.Chat.Themes"
              x:Class="Md3.Avalonia.Gallery.App"
              RequestedThemeVariant="Default">
   <Application.Styles>
     <themes:MaterialTheme />
     <extraThemes:ExtraTheme />
+    <chatThemes:ChatTheme />
     <themes:MaterialDataGridTheme />
     <themes:MaterialRichEditorTheme />
   </Application.Styles>

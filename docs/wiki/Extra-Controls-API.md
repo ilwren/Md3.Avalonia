@@ -147,6 +147,8 @@ Inspired by `flutter_quill`, `MdRichEditor` provides a complete Material Design 
 ---
 
 ## 4. `MdChatView` & `MdChatMessagePresenter` (Chat UI)
+
+> Since 0.4.1-preview.1 the chat controls live in the separate `Md3.Avalonia.Chat` package (namespace `Md3.Avalonia.Chat`, theme `ChatTheme`), not in `Md3.Avalonia.Extra`. Phase 1–2 add `IMdMarkdownProvider`, `MdChatMessage.IsStreaming`, `MdChatMessage.Attachments`, `MdChatAttachment`, `MdChatView.AttachmentActivated` and `MdImageViewer`; see `docs/API.md`.
 Inspired by `flutter_chat_ui` and `dash_chat_2`, `MdChatView` provides a provider-neutral chat shell with asymmetric message bubbles, avatars, delivery status, quoted reply card, quick suggestions, and floating pill composer.
 
 ### `MdChatMessage` Record

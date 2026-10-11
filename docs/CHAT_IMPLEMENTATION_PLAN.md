@@ -23,8 +23,8 @@
 | 阶段 | 主题 | 优先级 | 依赖 |
 |---|---|---|---|
 | Phase 0 | Enter 发送、本地化、回归测试 | 已完成（待验证） | — |
-| Phase 1 | 消息内容：Markdown provider、流式文本 | P0 | Phase 0 |
-| Phase 2 | 富媒体气泡与图片查看器 | P0 | Phase 1 |
+| Phase 1 | 消息内容：Markdown provider、流式文本 | P0 | Phase 0 — 已实现（核心部分，待构建验证；见下） |
+| Phase 2 | 富媒体气泡与图片查看器 | P0 | Phase 1 — 已实现（核心部分，待构建验证；见下） |
 | Phase 3 | 独立输入框 `MdChatComposer` | P0 | Phase 0 |
 | Phase 4 | 消息交互：上下文菜单、滑动回复、编辑/撤回、反应 | P0/P1 | Phase 2、3 |
 | Phase 5 | 列表行为：自动滚动、回到最新、历史加载锚点、分组与分隔线 | P0 | Phase 1 |
@@ -44,6 +44,18 @@
 - 链接：`MdChatMessagePresenter` 的文本内容支持可点击链接，通过 `IMdLinkOpener` 注入打开行为（桌面用系统浏览器，移动端用平台 Launcher）。
 
 **验收**：纯文本回退与 Markdown provider 两种模式的 Gallery 示例；流式追加 1000 个 token 不引发整列表重排；链接可键盘聚焦并激活。
+
+### Phase 1 — 实现状态（2026-10-11）
+
+- 已实现：`IMdMarkdownProvider` 契约、`MdPlainTextMarkdownProvider`、`MdChatView.MarkdownProvider` 与逐气泡传递、`MdChatMessage.IsStreaming`（流式光标 `PART_Caret`）、同 Id 替换时保留选择且不重复播报。
+- 偏差：纯文本回退实现放在 `Md3.Avalonia.Chat` 包而不是核心包（聊天包拆分后，核心包不再承载聊天功能）。
+- 未实现：`MdStreamingText` 独立控件与 token 淡入；`MdCodeBlock` 与代码高亮；链接可点击与 `IMdLinkOpener`；`IMdSyntaxHighlighter`；1000 token 流式压测。
+
+### Phase 2 — 实现状态（2026-10-11）
+
+- 已实现：`MdChatAttachment` / `MdChatAttachmentKind`；`MdChatMessage.Attachments`；附件行（图片或文件卡片，`PART_Attachments`）；`MdChatView.AttachmentActivated`；`MdImageViewer`（滚轮与 +/- 缩放 1×–8×、拖动平移、0 复位、Escape 发出 `CloseRequested`）。
+- 偏差：没有独立的 `MdChatImageMessage` / `MdChatFileMessage` 类型，统一由 `MdChatAttachment` 与气泡模板承载。
+- 未实现：`MdChatAttachment.Uri` / `Thumbnail` / `Progress` / `State`；`MdChatVoiceMessage` 与波形；`IMdImageProvider`（异步加载与缓存）；加载失败占位与重试；查看器的焦点返回与左右切换；查看器未接入默认覆盖层（由应用在 `AttachmentActivated` 中打开）。
 
 ### Phase 2 — 富媒体与图片查看器
 

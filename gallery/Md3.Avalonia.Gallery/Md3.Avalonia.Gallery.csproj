@@ -14,6 +14,7 @@
     <ProjectReference Include="../../src/Md3.Avalonia.Icons/Md3.Avalonia.Icons.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Icons.Lite/Md3.Avalonia.Icons.Lite.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.Chat/Md3.Avalonia.Chat.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj" />
     <AvaloniaResource Include="Assets/Media/**" />

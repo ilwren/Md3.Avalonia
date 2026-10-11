@@ -1,0 +1,229 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:chat="using:Md3.Avalonia.Chat"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+      <!-- Self-contained chat list themes: the chat package must not depend on the Extra list themes. -->
+  <ControlTheme x:Key="ChatItemsHostTheme" TargetType="ItemsControl">
+    <Setter Property="Template"><ControlTemplate TargetType="ItemsControl"><ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" /></ControlTemplate></Setter>
+  </ControlTheme>
+
+  <!-- Chat selection belongs to the bubble, never the full-width row. -->
+  <ControlTheme x:Key="ChatListItemTheme" TargetType="ListBoxItem">
+    <Setter Property="Padding" Value="0" /><Setter Property="Background" Value="Transparent" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" /><Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template"><ControlTemplate TargetType="ListBoxItem"><ContentPresenter HorizontalAlignment="Stretch" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" /></ControlTemplate></Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="ChatListTheme" TargetType="ListBox">
+    <Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ListBox">
+        <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" ClipToBounds="True">
+          <md:MdScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"><ItemsPresenter x:Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" /></md:MdScrollViewer>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type chat:MdChatMessagePresenter}" TargetType="chat:MdChatMessagePresenter">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="Margin" Value="8,4" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="chat:MdChatMessagePresenter">
+        <Grid x:Name="PART_Layout" MaxWidth="580" HorizontalAlignment="Left" Margin="0,2">
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+            <Border x:Name="PART_AvatarHost" Width="32" Height="32" VerticalAlignment="Top" Margin="0,2,0,0"
+                    CornerRadius="999" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
+                    ClipToBounds="True">
+              <Grid>
+                <md:MdIcon x:Name="PART_AvatarIcon" Glyph="{Binding AvatarGlyph, RelativeSource={RelativeSource TemplatedParent}}"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" Size="18" />
+                <TextBlock x:Name="PART_AvatarInitials" Text="{Binding SenderInitials, RelativeSource={RelativeSource TemplatedParent}}"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" FontSize="12" FontWeight="Bold"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="False" />
+              </Grid>
+            </Border>
+            <StackPanel Grid.Column="1" Spacing="3">
+              <TextBlock x:Name="PART_Sender" Margin="4,0" FontSize="11" FontWeight="Medium" Opacity=".72"
+                         Text="{Binding Message.Sender, RelativeSource={RelativeSource TemplatedParent}}" />
+              <Border x:Name="PART_Bubble" Padding="14,10" Background="{TemplateBinding Background}"
+                      BorderBrush="Transparent" BorderThickness="2" CornerRadius="18,18,18,4" ClipToBounds="True">
+                <Grid>
+                  <StackPanel Spacing="6">
+                    <Border x:Name="PART_Reply" Padding="8,6" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                            CornerRadius="8" IsVisible="False">
+                      <Grid ColumnDefinitions="3,*">
+                        <Border Background="{DynamicResource Md.Sys.Color.Primary.Brush}" CornerRadius="2" />
+                        <StackPanel Grid.Column="1" Margin="8,0,0,0" Spacing="2">
+                          <TextBlock FontSize="10" FontWeight="SemiBold" Opacity=".75" Text="{Binding ReplyHeaderText, RelativeSource={RelativeSource TemplatedParent}}" />
+                          <ContentPresenter Content="{Binding Message.ReplyPreview, RelativeSource={RelativeSource TemplatedParent}}" FontSize="11" Opacity=".85" MaxHeight="36" />
+                        </StackPanel>
+                      </Grid>
+                    </Border>
+                    <ContentPresenter x:Name="PART_RichContent" Content="{TemplateBinding RichContent}"
+                                      Foreground="{TemplateBinding Foreground}" />
+                    <SelectableTextBlock x:Name="PART_TextContent" IsVisible="False" TextWrapping="Wrap"
+                                         Text="{Binding TextContent, RelativeSource={RelativeSource TemplatedParent}}"
+                                         Foreground="{TemplateBinding Foreground}" />
+                    <ItemsControl x:Name="PART_Attachments" IsVisible="False"
+                                  ItemsSource="{Binding Message.Attachments, RelativeSource={RelativeSource TemplatedParent}}">
+                      <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="6" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="chat:MdChatAttachment">
+                          <Button Classes="attachment" Padding="0" Background="Transparent" BorderThickness="0"
+                                  HorizontalContentAlignment="Left" VerticalContentAlignment="Center"
+                                  ToolTip.Tip="{Binding Name}" AutomationProperties.Name="{Binding Name}">
+                            <Grid>
+                              <Image Source="{Binding Image}" IsVisible="{Binding IsImage}" Stretch="Uniform"
+                                     MaxWidth="240" MaxHeight="240" />
+                              <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsFile}" Margin="4">
+                                <md:MdIcon Glyph="{Binding Glyph}" Size="20" VerticalAlignment="Center"
+                                           Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                                <StackPanel VerticalAlignment="Center">
+                                  <TextBlock Text="{Binding Name}" FontSize="12" MaxWidth="200" TextTrimming="CharacterEllipsis" />
+                                  <TextBlock Text="{Binding SizeText}" FontSize="10" Opacity=".7" />
+                                </StackPanel>
+                              </StackPanel>
+                            </Grid>
+                          </Button>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock x:Name="PART_Caret" Text="&#x258D;" IsVisible="False" FontSize="14"
+                               Foreground="{TemplateBinding Foreground}" Opacity=".7" />
+                  </StackPanel>
+                  <Border x:Name="PART_State" Background="{TemplateBinding Foreground}" CornerRadius="16" IsHitTestVisible="False" Opacity="0" />
+                </Grid>
+              </Border>
+              <Grid x:Name="PART_Footer" ColumnDefinitions="Auto,Auto" Margin="4,0" HorizontalAlignment="Left">
+                <TextBlock x:Name="PART_Time" FontSize="10" Opacity=".56" VerticalAlignment="Center"
+                           Text="{Binding Message.Timestamp, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:t}'}" />
+                <StackPanel x:Name="PART_DeliveryStatus" Grid.Column="1" Orientation="Horizontal" Margin="6,0,0,0" VerticalAlignment="Center" IsVisible="False">
+                  <md:MdIcon Glyph="&#xe877;" Size="14" Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+                </StackPanel>
+                <StackPanel x:Name="PART_Failure" Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="6,0,0,0" IsVisible="False">
+                  <md:MdIcon Glyph="&#xe000;" Size="12" Foreground="{DynamicResource Md.Sys.Color.Error.Brush}" VerticalAlignment="Center" />
+                  <TextBlock VerticalAlignment="Center" FontSize="10" Foreground="{DynamicResource Md.Sys.Color.Error.Brush}"
+                             Text="{Binding FailureText, RelativeSource={RelativeSource TemplatedParent}}" />
+                  <md:MdButton Classes="retry" Content="{Binding RetryText, RelativeSource={RelativeSource AncestorType=chat:MdChatView}}" Size="ExtraSmall" Variant="Text" />
+                </StackPanel>
+              </Grid>
+            </StackPanel>
+          </Grid>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.06" /></Style>
+    <Style Selector="^:selected /template/ Border#PART_Bubble"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="2.5" /></Style>
+    <Style Selector="^:reply /template/ Border#PART_Reply"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:text-content /template/ ContentPresenter#PART_RichContent"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:text-content /template/ SelectableTextBlock#PART_TextContent"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:failed /template/ StackPanel#PART_Failure"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:attachments /template/ ItemsControl#PART_Attachments"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:streaming /template/ TextBlock#PART_Caret"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:failed /template/ StackPanel#PART_DeliveryStatus"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:user"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
+    <Style Selector="^:user /template/ Grid#PART_Layout"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
+    <Style Selector="^:user /template/ Border#PART_AvatarHost"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:user /template/ TextBlock#PART_Sender"><Setter Property="HorizontalAlignment" Value="Right" /><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:user /template/ Border#PART_Bubble">
+      <Setter Property="CornerRadius" Value="18,18,4,18" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
+    <Style Selector="^:user /template/ Grid#PART_Footer"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
+    <Style Selector="^:user /template/ StackPanel#PART_DeliveryStatus"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:user"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" /></Style>
+    <Style Selector="^:system"><Setter Property="HorizontalAlignment" Value="Center" /></Style>
+    <Style Selector="^:system /template/ Grid#PART_Layout"><Setter Property="HorizontalAlignment" Value="Center" /></Style>
+    <Style Selector="^:system /template/ Border#PART_AvatarHost"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:system /template/ TextBlock#PART_Sender"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:system /template/ Border#PART_Bubble">
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Padding" Value="12,6" />
+    </Style>
+    <Style Selector="^:system /template/ Grid#PART_Footer"><Setter Property="HorizontalAlignment" Value="Center" /></Style>
+    <Style Selector="^:system"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type chat:MdChatView}" TargetType="chat:MdChatView">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="chat:MdChatView">
+        <Grid RowDefinitions="Auto,*,Auto,Auto,Auto,Auto">
+          <Border x:Name="PART_SelectionToolbar" Margin="8,4" Padding="12,6" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" CornerRadius="16" IsVisible="False">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8">
+              <md:MdButton Name="PART_CancelSelectionButton" Content="{TemplateBinding CancelText}" Size="Small" Variant="Text" />
+              <TextBlock Grid.Column="1" VerticalAlignment="Center" FontWeight="Medium"
+                         Text="{TemplateBinding SelectionCountText}" />
+              <md:MdButton Name="PART_QuoteButton" Grid.Column="2" Content="{TemplateBinding QuoteText}" Size="Small" Variant="Tonal" />
+              <md:MdButton Name="PART_DeleteButton" Grid.Column="3" Content="{TemplateBinding DeleteText}" Size="Small" Variant="Outlined" />
+            </Grid>
+          </Border>
+          <ListBox Name="PART_MessagesHost" Grid.Row="1" Theme="{StaticResource ChatListTheme}" ItemContainerTheme="{StaticResource ChatListItemTheme}"
+                   ItemsSource="{TemplateBinding MessagesSource}" SelectionMode="Multiple" Background="Transparent" Padding="8,4"
+                   AutomationProperties.Name="{TemplateBinding MessagesText}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="chat:MdChatMessage">
+                <chat:MdChatMessagePresenter Message="{Binding}"
+                    MarkdownProvider="{Binding MarkdownProvider, RelativeSource={RelativeSource AncestorType=chat:MdChatView}}"
+                    IsSelected="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <TextBlock Name="PART_Status" Grid.Row="2" Margin="12,0" MinHeight="16" FontSize="11"
+                     Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                     Text="{TemplateBinding StatusText}" TextWrapping="Wrap"
+                     AutomationProperties.LiveSetting="Polite" />
+          <ItemsControl Name="PART_SuggestionsHost" Grid.Row="3" Theme="{StaticResource ChatItemsHostTheme}" ItemsSource="{TemplateBinding SuggestionsSource}" Margin="8,4">
+            <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate><DataTemplate><md:MdAssistChip Content="{Binding}" Margin="3" /></DataTemplate></ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <Border x:Name="PART_QuotePreview" Grid.Row="4" Margin="8,2" Padding="12,8"
+                  Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" CornerRadius="12" IsVisible="False">
+            <Grid ColumnDefinitions="3,*,Auto" ColumnSpacing="8">
+              <Border Background="{DynamicResource Md.Sys.Color.Primary.Brush}" CornerRadius="2" />
+              <StackPanel Grid.Column="1" Spacing="2">
+                <TextBlock FontSize="11" FontWeight="SemiBold" Text="{TemplateBinding QuoteHeaderText}" />
+                <ContentPresenter Content="{Binding QuotedMessage.Content, RelativeSource={RelativeSource TemplatedParent}}" MaxHeight="32" Opacity=".75" />
+              </StackPanel>
+              <md:MdButton Name="PART_CancelQuoteButton" Grid.Column="2" Content="{TemplateBinding CancelText}" Size="ExtraSmall" Variant="Text" />
+            </Grid>
+          </Border>
+          <Border Grid.Row="5" Margin="8,6,8,8" Padding="6,4,6,4"
+                  Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
+                  BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1"
+                  CornerRadius="28">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="6" VerticalAlignment="Center">
+              <Button Name="PART_AttachmentButton" Width="48" Height="48" CornerRadius="999"
+                      Background="Transparent" BorderThickness="0" Padding="0"
+                      HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                      ToolTip.Tip="{TemplateBinding AttachFileText}" AutomationProperties.Name="{TemplateBinding AttachFileText}">
+                <md:MdIcon Glyph="&#xe226;" Size="20" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              </Button>
+              <TextBox Name="PART_Composer" Grid.Column="1"
+                       Text="{TemplateBinding ComposerText, Mode=TwoWay}"
+                       AcceptsReturn="True" MaxHeight="120" MinHeight="36"
+                       VerticalContentAlignment="Center" Padding="8,6"
+                       Background="Transparent" BorderThickness="0"
+                       Watermark="{TemplateBinding TypeMessageText}" TextWrapping="Wrap" />
+              <Button Name="PART_SendButton" Grid.Column="2" Width="48" Height="48" CornerRadius="999"
+                      AutomationProperties.Name="{TemplateBinding SendMessageText}"
+                      Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                      Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}"
+                      BorderThickness="0" Padding="0"
+                      HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                      ToolTip.Tip="{TemplateBinding SendMessageText}">
+                <md:MdIcon Glyph="&#xe163;" Size="18" Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" />
+              </Button>
+            </Grid>
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:selection /template/ Border#PART_SelectionToolbar"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:quoted /template/ Border#PART_QuotePreview"><Setter Property="IsVisible" Value="True" /></Style>
+  </ControlTheme>
+
+</ResourceDictionary>
