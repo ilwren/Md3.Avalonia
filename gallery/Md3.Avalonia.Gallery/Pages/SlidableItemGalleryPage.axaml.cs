@@ -5,7 +5,9 @@ namespace Md3.Avalonia.Gallery.Pages;
 
 public partial class SlidableItemGalleryPage : UserControl
 {
-    public SlidableItemGalleryPage() => InitializeComponent();
+    public SlidableItemGalleryPage()
+    {
+        InitializeComponent();
         if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
         {
             // Touch devices have no modifier keys; pointing at Ctrl shortcuts there is noise.
@@ -17,6 +19,7 @@ public partial class SlidableItemGalleryPage : UserControl
                     "向任意方向水平滑动即可展开操作的列表行。");
             }
         }
+    }
 
     private void CloseSlidable(object? sender, RoutedEventArgs e) => Slidable.Close();
 }
