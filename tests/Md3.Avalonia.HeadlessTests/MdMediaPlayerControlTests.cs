@@ -1,5 +1,6 @@
 using Avalonia.Automation;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -106,19 +107,19 @@ public sealed class MdMediaPlayerControlTests
             nowPlaying.PlaybackRequested += (_, args) => requests.Add(args.Request);
             var buttons = nowPlaying.GetVisualDescendants().OfType<MdIconButton>().ToArray();
 
-            var shuffle = Assert.Single(buttons.Where(button => AutomationProperties.GetName(button) == "Shuffle"));
+            var shuffle = Assert.Single(buttons, button => AutomationProperties.GetName(button) == "Shuffle");
             shuffle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Assert.True(nowPlaying.IsShuffleEnabled);
 
-            var repeat = Assert.Single(buttons.Where(button => AutomationProperties.GetName(button) == "Repeat off"));
+            var repeat = Assert.Single(buttons, button => AutomationProperties.GetName(button) == "Repeat off");
             repeat.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Assert.Equal(MdPlaybackRepeatMode.All, nowPlaying.RepeatMode);
 
-            var pause = Assert.Single(buttons.Where(button => AutomationProperties.GetName(button) == "Pause"));
+            var pause = Assert.Single(buttons, button => AutomationProperties.GetName(button) == "Pause");
             pause.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Assert.False(nowPlaying.IsPlaying);
 
-            var queue = Assert.Single(buttons.Where(button => AutomationProperties.GetName(button) == "Open queue"));
+            var queue = Assert.Single(buttons, button => AutomationProperties.GetName(button) == "Open queue");
             queue.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
 
             Assert.Equal(
@@ -173,11 +174,11 @@ public sealed class MdMediaPlayerControlTests
         try
         {
             Dispatcher.UIThread.RunJobs();
-            Assert.Equal(2, controls.GetVisualDescendants().OfType<MdSeekBar>().Count());
-            Assert.Equal(2, controls.GetVisualDescendants().OfType<MdSlider>().Count());
-            Assert.Equal(1, controls.GetVisualDescendants().OfType<MdVideoPlayerControls>().Count());
-            Assert.Equal(1, controls.GetVisualDescendants().OfType<MdAudioMiniPlayer>().Count());
-            Assert.Equal(1, controls.GetVisualDescendants().OfType<MdNowPlayingPanel>().Count());
+            Assert.Collection(controls.GetVisualDescendants().OfType<MdSeekBar>(), _ => { }, _ => { });
+            Assert.Collection(controls.GetVisualDescendants().OfType<MdSlider>(), _ => { }, _ => { });
+            Assert.Single(controls.GetVisualDescendants().OfType<MdVideoPlayerControls>());
+            Assert.Single(controls.GetVisualDescendants().OfType<MdAudioMiniPlayer>());
+            Assert.Single(controls.GetVisualDescendants().OfType<MdNowPlayingPanel>());
             Assert.NotNull(window.CaptureRenderedFrame());
         }
         finally
