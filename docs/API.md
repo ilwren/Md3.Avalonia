@@ -280,11 +280,11 @@ Direct APIs include `Show`/`Dismiss` on transient components, `ShowAsync`/`Show`
 | Area | Types |
 |---|---|
 | **Chat view and bubbles** | `MdChatView`, `MdChatMessagePresenter`, `MdChatMessage`, `MdChatMessageRole` |
-| **Markdown** | `IMdMarkdownProvider` (`Render(string text, bool isStreaming)` returns a `Control`), `MdPlainTextMarkdownProvider` |
-| **Attachments and viewer** | `MdChatAttachment`, `MdChatAttachmentKind` (`Image` · `File` · `Audio` · `Video`), `MdImageViewer` |
+| **Markdown** | `IMdMarkdownProvider` (`Render(string text, bool isStreaming)` returns a `Control`), `MdPlainTextMarkdownProvider`, `MdFencedCodeMarkdownProvider`, `MdCodeBlock` |
+| **Attachments and viewer** | `MdChatAttachment`, `MdChatAttachmentKind` (`Image` · `File` · `Audio` · `Video`), `IMdImageProvider`, `MdAttachmentImage`, `MdImageLoadState`, `MdImageViewer` |
 | **Theme** | `ChatTheme` |
 
-`MdChatView.MarkdownProvider` is passed to every bubble. When it is null, text is shown as plain selectable text. A message with `IsStreaming = true` gets a visible caret. A same-`Id` replacement keeps the selection and is not announced again unless it becomes an error. `MdChatView.AttachmentActivated` raises when an attachment is clicked. The application decides what to do, for example by showing an `MdImageViewer` with the decoded picture. `MdImageViewer` zooms with the wheel or `+`/`-` (1× to 8×), pans by dragging when zoomed, resets with `0`, and raises `CloseRequested` on Escape. The image is supplied through `Source` as an `IImage`; the controls perform no network or file I/O.
+`MdChatView.MarkdownProvider` is passed to every bubble. When it is null, text is shown as plain selectable text. A message with `IsStreaming = true` gets a visible caret. A same-`Id` replacement keeps the selection and is not announced again unless it becomes an error. `MdChatView.ImageProvider` loads picture attachments that carry a `Uri`; `MdAttachmentImage` shows a loading state and a retry button when loading fails or the provider returns null. `MdFencedCodeMarkdownProvider` is a reference provider that renders ```` ```lang ```` fences as `MdCodeBlock` (language label, copy button, horizontal scrolling) and other text as selectable text; it is not a full Markdown engine. `MdChatView.AttachmentActivated` raises when an attachment is clicked. The application decides what to do, for example by showing an `MdImageViewer` with the decoded picture. `MdImageViewer` zooms with the wheel or `+`/`-` (1× to 8×), pans by dragging when zoomed, resets with `0`, and raises `CloseRequested` on Escape. The image is supplied through `Source` as an `IImage`; the controls perform no network or file I/O.
 
 ## Extra visual controls
 

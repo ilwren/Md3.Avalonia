@@ -41,6 +41,8 @@ public sealed class MdChatMessagePresenter : ContentControl
         AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string?>(nameof(TextContent), control => control.TextContent);
     public static readonly StyledProperty<IMdMarkdownProvider?> MarkdownProviderProperty =
         AvaloniaProperty.Register<MdChatMessagePresenter, IMdMarkdownProvider?>(nameof(MarkdownProvider));
+    public static readonly StyledProperty<IMdImageProvider?> ImageProviderProperty =
+        AvaloniaProperty.Register<MdChatMessagePresenter, IMdImageProvider?>(nameof(ImageProvider));
     public static readonly DirectProperty<MdChatMessagePresenter, object?> RichContentProperty =
         AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, object?>(nameof(RichContent), control => control.RichContent);
     public static readonly DirectProperty<MdChatMessagePresenter, string> ReplyHeaderTextProperty =
@@ -62,6 +64,9 @@ public sealed class MdChatMessagePresenter : ContentControl
 
     /// <summary>Converts text content into a presentation. When null, text is shown as plain selectable text.</summary>
     public IMdMarkdownProvider? MarkdownProvider { get => GetValue(MarkdownProviderProperty); set => SetValue(MarkdownProviderProperty, value); }
+
+    /// <summary>Loads picture attachments that carry a <see cref="MdChatAttachment.Uri"/>.</summary>
+    public IMdImageProvider? ImageProvider { get => GetValue(ImageProviderProperty); set => SetValue(ImageProviderProperty, value); }
 
     /// <summary>The control or object the bubble displays for the message content. Cached per message.</summary>
     public object? RichContent { get => _richContent; private set => SetAndRaise(RichContentProperty, ref _richContent, value); }

@@ -43,18 +43,19 @@ public sealed record MdChatMessage(
 public enum MdChatAttachmentKind { Image, File, Audio, Video }
 
 /// <summary>
-/// One attachment shown under a chat message. The application (or an image provider) decodes the
-/// picture and passes it in as <see cref="Image"/>; the controls perform no network or file I/O.
+/// One attachment shown under a chat message. Pass the decoded picture as <see cref="Image"/>, or pass a
+/// <see cref="Uri"/> and let <see cref="IMdImageProvider"/> load it. The controls perform no network or file I/O.
 /// </summary>
 public sealed record MdChatAttachment(
     string Id,
     MdChatAttachmentKind Kind,
     string Name,
     long? SizeBytes = null,
-    IImage? Image = null)
+    IImage? Image = null,
+    string? Uri = null)
 {
-    /// <summary>True when the attachment is shown as an inline picture.</summary>
-    public bool IsImage => Kind == MdChatAttachmentKind.Image && Image is not null;
+    /// <summary>True when the attachment is shown as an inline picture, even before it has loaded.</summary>
+    public bool IsImage => Kind == MdChatAttachmentKind.Image;
 
     /// <summary>True when the attachment is shown as a file card.</summary>
     public bool IsFile => !IsImage;

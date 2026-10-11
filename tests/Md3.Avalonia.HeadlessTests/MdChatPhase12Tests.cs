@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Md3.Avalonia.Chat;
 using Md3.Avalonia.Extra.Infrastructure;
@@ -160,5 +161,91 @@ public sealed class MdChatPhase12Tests
             Assert.Equal(1, requests);
         }
         finally { window.Close(); }
+    }
+
+    private sealed class FakeImageProvider : IMdImageProvider
+    {
+        private readonly Func<int, Task<IImage?>> _load;
+
+        public FakeImageProvider(Func<int, Task<IImage?>> load) => _load = load;
+
+        public int Calls { get; private set; }
+
+        public Task<IImage?> LoadImageAsync(string uri, CancellationToken cancellationToken) => _load(++Calls);
+    }
+
+    [AvaloniaFact]
+    public void Image_Attachment_Is_An_Image_Before_It_Loads()
+    {
+        var picture = new MdChatAttachment("i1", MdChatAttachmentKind.Image, "pic.png", null, null, "gallery://x");
+
+        Assert.True(picture.IsImage);
+        Assert.False(picture.IsFile);
+    }
+
+    [AvaloniaFact]
+    public void Attachment_Uri_Is_Loaded_Through_The_Image_Provider()
+    {
+        var picture = new DrawingImage();
+        var provider = new FakeImageProvider(_ => Task.FromResult<IImage?>(picture));
+        var control = new MdAttachmentImage { Provider = provider };
+
+        control.Attachment = new MdChatAttachment("i2", MdChatAttachmentKind.Image, "pic.png", null, null, "gallery://pic");
+
+        Assert.Equal(1, provider.Calls);
+        Assert.Equal(MdImageLoadState.Loaded, control.LoadState);
+        Assert.Same(picture, control.Source);
+    }
+
+    [AvaloniaFact]
+    public void Failed_Load_Offers_A_Retry_That_Reloads()
+    {
+        var picture = new DrawingImage();
+        var provider = new FakeImageProvider(call => Task.FromResult<IImage?>(call == 1 ? null : picture));
+        var control = new MdAttachmentImage { Provider = provider };
+
+        control.Attachment = new MdChatAttachment("i3", MdChatAttachmentKind.Image, "pic.png", null, null, "gallery://flaky");
+        Assert.Equal(MdImageLoadState.Failed, control.LoadState);
+        Assert.False(string.IsNullOrEmpty(control.StatusText));
+
+        control.Retry();
+
+        Assert.Equal(2, provider.Calls);
+        Assert.Equal(MdImageLoadState.Loaded, control.LoadState);
+        Assert.Same(picture, control.Source);
+    }
+
+    [AvaloniaFact]
+    public void Provider_Exception_Is_Reported_As_Failed()
+    {
+        var provider = new FakeImageProvider(_ => Task.FromException<IImage?>(new InvalidOperationException("offline")));
+        var control = new MdAttachmentImage { Provider = provider };
+
+        control.Attachment = new MdChatAttachment("i4", MdChatAttachmentKind.Image, "pic.png", null, null, "gallery://down");
+
+        Assert.Equal(MdImageLoadState.Failed, control.LoadState);
+    }
+
+    [AvaloniaFact]
+    public void Fenced_Code_Renders_As_A_Code_Block_Between_Prose()
+    {
+        var panel = Assert.IsType<StackPanel>(new MdFencedCodeMarkdownProvider().Render("Intro\n```csharp\nvar x = 1;\n```\nOutro", isStreaming: false));
+
+        Assert.Equal(3, panel.Children.Count);
+        Assert.Equal("Intro", Assert.IsType<SelectableTextBlock>(panel.Children[0]).Text);
+        var code = Assert.IsType<MdCodeBlock>(panel.Children[1]);
+        Assert.Equal("csharp", code.Language);
+        Assert.Equal("var x = 1;", code.Code);
+        Assert.Equal("Outro", Assert.IsType<SelectableTextBlock>(panel.Children[2]).Text);
+    }
+
+    [AvaloniaFact]
+    public void Unclosed_Fence_While_Streaming_Runs_To_The_End()
+    {
+        var panel = Assert.IsType<StackPanel>(new MdFencedCodeMarkdownProvider().Render("```py\nprint(1)\nprint(2)", isStreaming: true));
+
+        var block = Assert.IsType<MdCodeBlock>(Assert.Single(panel.Children));
+        Assert.Equal("py", block.Language);
+        Assert.Equal("print(1)\nprint(2)", block.Code);
     }
 }

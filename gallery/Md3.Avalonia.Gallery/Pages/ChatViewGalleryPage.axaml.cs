@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media;
 using Md3.Avalonia.Chat;
 using Md3.Avalonia.Extra.Controls;
 using Md3.Avalonia.Extra.Infrastructure;
@@ -14,6 +16,14 @@ public partial class ChatViewGalleryPage : UserControl
         new("question", MdChatMessageRole.User, L("Can the chat preserve provider-neutral message actions?", "聊天能否保留与提供方无关的消息操作？"), DateTimeOffset.Now.AddMinutes(-3), L("You", "你")),
         new("answer", MdChatMessageRole.Assistant, L("Yes. Selection, quote, delete, and retry are surfaced as commands and events.", "可以。选择、引用、删除和重试均通过命令与事件公开。"), DateTimeOffset.Now.AddMinutes(-2), L("Material assistant", "Material 助手"), ReplyToId: "question", ReplyPreview: L("Can the chat preserve provider-neutral message actions?", "聊天能否保留与提供方无关的消息操作？")),
         new("failed", MdChatMessageRole.User, L("Send the release summary", "发送发布摘要"), DateTimeOffset.Now.AddMinutes(-1), L("You", "你"), MdAsyncRequestState.Error, ErrorText: L("Offline · not sent", "离线 · 未发送"))
+        new("code", MdChatMessageRole.Assistant, L("Here is a sample reply:\n```csharp\nvar reply = await provider.SendAsync(text);\n```", "这是一个示例回复：\n```csharp\nvar reply = await provider.SendAsync(text);\n```"), DateTimeOffset.Now.AddSeconds(-50), L("Material assistant", "Material 助手")),
+        new("pictures", MdChatMessageRole.Assistant, L("Pictures load through IMdImageProvider. The second picture shows the retry state.", "图片通过 IMdImageProvider 加载。第二张图片展示重试状态。"), DateTimeOffset.Now.AddSeconds(-40), L("Material assistant", "Material 助手"), Attachments:
+        [
+            new MdChatAttachment("picture", MdChatAttachmentKind.Image, "sample.png", 24_576, Uri: "gallery://sample-picture"),
+            new MdChatAttachment("missing", MdChatAttachmentKind.Image, "missing.png", null, Uri: "gallery://missing"),
+            new MdChatAttachment("notes", MdChatAttachmentKind.File, "release-notes.md", 2_048),
+        ]),
+        new("stream", MdChatMessageRole.Assistant, L("Streaming a reply", "正在流式输出回复"), DateTimeOffset.Now, L("Material assistant", "Material 助手"), IsStreaming: true),
     ];
     private static string L(string english, string chinese) => GalleryLocalization.Choose(english, chinese);
 
@@ -23,6 +33,9 @@ public partial class ChatViewGalleryPage : UserControl
         Chat.MessagesSource = _messages;
         Chat.SuggestionsSource = new[] { L("Show accessibility", "显示无障碍信息"), L("Explain paging", "解释分页"), L("Open docs", "打开文档") };
         Chat.AttachmentRequested += ChatAttachmentRequested;
+        Chat.MarkdownProvider = new MdFencedCodeMarkdownProvider();
+        Chat.ImageProvider = new GalleryImageProvider();
+        Chat.AttachmentActivated += ChatAttachmentActivated;
     }
 
     private void ChatSubmitted(object? sender, string text)
@@ -55,6 +68,27 @@ public partial class ChatViewGalleryPage : UserControl
         var index = _messages.IndexOf(message);
         if (index >= 0) _messages[index] = message with { State = MdAsyncRequestState.Data, ErrorText = null, Timestamp = DateTimeOffset.Now };
         ChatStatus.Text = L($"Retried “{message.Content}”; provider marked it sent.", $"已重试“{message.Content}”；提供方已将其标记为已发送。");
+    }
+
+    private void ChatAttachmentActivated(object? sender, MdChatAttachment attachment) =>
+        ChatStatus.Text = L($"Opened attachment {attachment.Name}.", $"已打开附件 {attachment.Name}。");
+
+    private sealed class GalleryImageProvider : IMdImageProvider
+    {
+        // Only the sample URI resolves; any other URI reports failure so the retry state can be seen.
+        public Task<IImage?> LoadImageAsync(string uri, CancellationToken cancellationToken)
+        {
+            if (uri != "gallery://sample-picture") return Task.FromResult<IImage?>(null);
+            IImage picture = new DrawingImage
+            {
+                Drawing = new GeometryDrawing
+                {
+                    Brush = Brushes.Teal,
+                    Geometry = new EllipseGeometry { Rect = new Rect(0, 0, 160, 120) },
+                },
+            };
+            return Task.FromResult<IImage?>(picture);
+        }
     }
 
     private void ChatAttachmentRequested(object? sender, EventArgs e)

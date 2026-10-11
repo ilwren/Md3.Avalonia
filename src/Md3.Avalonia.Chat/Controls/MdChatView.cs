@@ -38,6 +38,7 @@ public sealed class MdChatView : TemplatedControl
     public static readonly StyledProperty<ICommand?> QuoteMessageCommandProperty = AvaloniaProperty.Register<MdChatView, ICommand?>(nameof(QuoteMessageCommand));
     public static readonly StyledProperty<ICommand?> RetryMessageCommandProperty = AvaloniaProperty.Register<MdChatView, ICommand?>(nameof(RetryMessageCommand));
     public static readonly StyledProperty<IMdMarkdownProvider?> MarkdownProviderProperty = AvaloniaProperty.Register<MdChatView, IMdMarkdownProvider?>(nameof(MarkdownProvider));
+    public static readonly StyledProperty<IMdImageProvider?> ImageProviderProperty = AvaloniaProperty.Register<MdChatView, IMdImageProvider?>(nameof(ImageProvider));
     public static readonly StyledProperty<bool> IsBusyProperty = AvaloniaProperty.Register<MdChatView, bool>(nameof(IsBusy));
     public static readonly StyledProperty<bool> AllowMultipleSelectionProperty = AvaloniaProperty.Register<MdChatView, bool>(nameof(AllowMultipleSelection), true);
     public static readonly DirectProperty<MdChatView, int> SelectionCountProperty = AvaloniaProperty.RegisterDirect<MdChatView, int>(nameof(SelectionCount), control => control.SelectionCount);
@@ -99,6 +100,9 @@ public sealed class MdChatView : TemplatedControl
     public bool IsBusy { get => GetValue(IsBusyProperty); set => SetValue(IsBusyProperty, value); }
     /// <summary>Renders text messages as Markdown or other rich content. Null keeps plain selectable text.</summary>
     public IMdMarkdownProvider? MarkdownProvider { get => GetValue(MarkdownProviderProperty); set => SetValue(MarkdownProviderProperty, value); }
+
+    /// <summary>Loads picture attachments that carry a <see cref="MdChatAttachment.Uri"/>. Passed to every bubble.</summary>
+    public IMdImageProvider? ImageProvider { get => GetValue(ImageProviderProperty); set => SetValue(ImageProviderProperty, value); }
     public bool AllowMultipleSelection { get => GetValue(AllowMultipleSelectionProperty); set => SetValue(AllowMultipleSelectionProperty, value); }
     public int SelectionCount => _selectionCount;
     public MdChatMessage? QuotedMessage => _quotedMessage;

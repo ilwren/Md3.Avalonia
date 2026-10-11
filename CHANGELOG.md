@@ -11,6 +11,10 @@
 - Chat Phase 1: `IMdMarkdownProvider` renders text messages through an application-supplied
   provider. `MdPlainTextMarkdownProvider` is the selectable plain-text reference. `MdChatView.MarkdownProvider`
   and `MdChatMessage.IsStreaming` let a streamed reply update in place while a caret is shown.
+- Chat Phase 1 (continued): `MdCodeBlock` (language label, copy button, horizontal scrolling) and the
+  reference `MdFencedCodeMarkdownProvider`, which renders fenced code and leaves other text as selectable text.
+- Chat Phase 2 (continued): `IMdImageProvider` loads picture attachments by `MdChatAttachment.Uri`.
+  `MdAttachmentImage` shows a loading state and a retry button when loading fails.
 - Chat Phase 2: `MdChatAttachment` and `MdChatAttachmentKind` add images and file cards to a message
   (`MdChatMessage.Attachments`). `MdChatView.AttachmentActivated` reports clicks. `MdImageViewer`
   is a zoomable, pannable image surface that raises `CloseRequested` on Escape.
