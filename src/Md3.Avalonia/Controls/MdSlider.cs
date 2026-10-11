@@ -24,7 +24,7 @@ public sealed class MdSlider : Slider
         AvaloniaProperty.Register<MdSlider, double>(nameof(VisualValue));
 
     private string _displayValue = string.Empty;
-    private Thumb? _thumb;
+    private MdSliderThumb? _thumb;
     private Control? _valueIndicator;
     private Control? _stateLayer;
     private bool _isDragging;
@@ -63,7 +63,7 @@ public sealed class MdSlider : Slider
             _thumb.DragCompleted -= OnThumbDragCompleted;
         }
         base.OnApplyTemplate(e);
-        _thumb = e.NameScope.Find<Thumb>("PART_Thumb");
+        _thumb = e.NameScope.Find<MdSliderThumb>("PART_Thumb");
         _valueIndicator = e.NameScope.Find<Control>("PART_ThumbValue");
         _stateLayer = e.NameScope.Find<Control>("PART_ThumbStateLayer");
         if (_thumb is not null)
