@@ -46,7 +46,11 @@ public static class MdSymbolsLite
     public const string Palette = "\ue40a";
     public const string Person = "\ue7fd";
     public const string Refresh = "\ue5d5";
+    public const string QueueMusic = "\ue03d";
+    public const string Repeat = "\ue040";
+    public const string RepeatOne = "\ue041";
     public const string Search = "\ue8b6";
+    public const string Shuffle = "\ue043";
     public const string Send = "\ue163";
     public const string Settings = "\ue8b8";
     public const string Share = "\ue80d";

@@ -23,7 +23,7 @@ LITE_FONT = ROOT / "src/Md3.Avalonia.Icons.Lite/Assets/Fonts/MaterialSymbolsRoun
 UPSTREAM_COMMIT = "737e3324305806514d7909874fa1818ae1808232"
 UPSTREAM_BLOB = "101997d7897c7c9864b3bdd2262320bddcdc11db"
 FULL_SHA256 = "95b24392bb49efd1bc3e92cff4e2452ad094461bab7c97e7d8723fab97e330ca"
-LITE_SHA256 = "44b4f7010399c84db46f72d03c26f0a2692018aafb55fcfcf80e7ba60c484a87"
+LITE_SHA256 = "981c7ab608e0cd1478fff9786d76039286300873eb193772909df8c8248f5b1c"
 REQUIRED_VARIABLE_TABLES = {b"fvar", b"gvar", b"avar", b"HVAR", b"STAT", b"GSUB", b"glyf"}
 
 
@@ -77,7 +77,7 @@ def inspect_font(path: pathlib.Path, expected_sha: str, minimum_glyphs: int) -> 
 
 def main() -> int:
     full_glyphs, _ = inspect_font(FULL_FONT, FULL_SHA256, 6000)
-    lite_glyphs, _ = inspect_font(LITE_FONT, LITE_SHA256, 60)
+    lite_glyphs, _ = inspect_font(LITE_FONT, LITE_SHA256, 80)
     print(
         "Verified official Material Symbols Rounded fonts: "
         f"full={full_glyphs} glyphs, lite={lite_glyphs} glyphs, "

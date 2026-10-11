@@ -11,5 +11,8 @@ public enum MdPlaybackRequest
     Mute,
     Unmute,
     EnterFullScreen,
-    ExitFullScreen
+    ExitFullScreen,
+    ToggleShuffle,
+    CycleRepeat,
+    OpenQueue
 }

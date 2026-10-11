@@ -1,0 +1,96 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.MediaPlayersGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,32">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Media players" />
+        <TextBlock Classes="body" MaxWidth="820" TextWrapping="Wrap"
+                   Text="Material-themed controls for local audio and video applications. They present state and emit playback or seek requests; the host owns media decoding, file access, and platform playback." />
+      </StackPanel>
+
+      <StackPanel Spacing="14">
+        <TextBlock Classes="h2" Text="Time-based seek bar" />
+        <TextBlock Classes="body" MaxWidth="800" TextWrapping="Wrap"
+                   Text="Shows elapsed and total or remaining time, a buffered segment, and keyboard-accessible seeking. The control does not own a playback clock." />
+        <md:MdSeekBar x:Name="DemoSeekBar"
+                      MaxWidth="760"
+                      Duration="00:04:32"
+                      Position="00:01:18"
+                      BufferedPosition="00:02:46"
+                      SeekStep="00:00:05"
+                      SeekRequested="SeekRequested" />
+      </StackPanel>
+
+      <StackPanel Spacing="14">
+        <TextBlock Classes="h2" Text="Video controls overlay" />
+        <TextBlock Classes="body" MaxWidth="800" TextWrapping="Wrap"
+                   Text="Place the overlay above an app-provided video surface. Pointer activity reveals controls; the player can optionally auto-hide them while playback continues." />
+        <Border MaxWidth="900" MinHeight="330" CornerRadius="24" ClipToBounds="True" Background="#101318">
+          <Grid>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" IsHitTestVisible="False">
+              <md:MdIcon Glyph="{x:Static md:MdSymbols.Movie}" Size="64" Foreground="#B9C4D8" />
+              <TextBlock Foreground="#B9C4D8" Text="Video surface supplied by the host application" />
+            </StackPanel>
+            <md:MdVideoPlayerControls x:Name="VideoControls"
+                                      Title="A short film about the coast"
+                                      Duration="00:08:24"
+                                      Position="00:02:16"
+                                      BufferedPosition="00:04:08"
+                                      IsPlaying="True"
+                                      IsBuffering="False"
+                                      AutoHideControls="False"
+                                      PlaybackRequested="PlaybackRequested"
+                                      SeekRequested="SeekRequested" />
+          </Grid>
+        </Border>
+      </StackPanel>
+
+      <StackPanel Spacing="14">
+        <TextBlock Classes="h2" Text="Audio mini player" />
+        <TextBlock Classes="body" MaxWidth="800" TextWrapping="Wrap"
+                   Text="A compact, accessible track row with cover art, progress, transport actions, and an open action for navigating to a full player." />
+        <md:MdAudioMiniPlayer x:Name="MiniPlayer"
+                              MaxWidth="760"
+                              Title="Night Drive"
+                              Artist="Mira Sol"
+                              Duration="00:03:48"
+                              Position="00:01:07"
+                              BufferedPosition="00:02:30"
+                              IsPlaying="True"
+                              PlaybackRequested="PlaybackRequested"
+                              OpenRequested="OpenRequested" />
+      </StackPanel>
+
+      <StackPanel Spacing="14">
+        <TextBlock Classes="h2" Text="Now playing" />
+        <TextBlock Classes="body" MaxWidth="800" TextWrapping="Wrap"
+                   Text="The expanded audio layout adds album metadata, repeat and shuffle state, queue access, and a full seek control." />
+        <md:MdNowPlayingPanel x:Name="NowPlaying"
+                              Title="Night Drive"
+                              Artist="Mira Sol"
+                              Album="After the Rain"
+                              Duration="00:03:48"
+                              Position="00:01:07"
+                              BufferedPosition="00:02:30"
+                              IsPlaying="True"
+                              RepeatMode="All"
+                              PlaybackRequested="PlaybackRequested"
+                              SeekRequested="SeekRequested" />
+      </StackPanel>
+
+      <Border Padding="18" CornerRadius="18" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+        <TextBlock x:Name="StatusLabel" Classes="body" TextWrapping="Wrap"
+                   Text="Try the controls. The gallery updates demo state locally; it does not load or decode media." />
+      </Border>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdVideoPlayerControls IsPlaying=&quot;{Binding IsPlaying}&quot; Position=&quot;{Binding Position}&quot; Duration=&quot;{Binding Duration}&quot; PlaybackRequested=&quot;OnPlaybackRequested&quot; SeekRequested=&quot;OnSeekRequested&quot; /&gt;&#10;&lt;md:MdNowPlayingPanel Artwork=&quot;{Binding Artwork}&quot; Title=&quot;{Binding Title}&quot; Artist=&quot;{Binding Artist}&quot; /&gt;"
+                             CSharpCode="videoControls.PlaybackRequested += (_, e) =&gt; player.Handle(e.Request);&#10;videoControls.SeekRequested += (_, e) =&gt; player.Seek(e.Position);" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

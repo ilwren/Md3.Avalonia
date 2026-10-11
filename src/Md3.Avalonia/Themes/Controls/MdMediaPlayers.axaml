@@ -1,0 +1,243 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdSeekBar}" TargetType="md:MdSeekBar">
+    <Setter Property="MinWidth" Value="120" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdSeekBar">
+        <Grid RowDefinitions="Auto,Auto" RowSpacing="2">
+          <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8"
+                IsVisible="{TemplateBinding ShowTimeLabels}">
+            <TextBlock x:Name="PART_CurrentTime"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                       Text="{TemplateBinding CurrentTimeText}" />
+            <TextBlock Grid.Column="2"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                       Text="{TemplateBinding EndTimeText}" />
+          </Grid>
+          <Grid Grid.Row="1" MinHeight="48">
+            <md:MdSlider x:Name="PART_Slider"
+                         MinWidth="0"
+                         Background="Transparent"
+                         ShowValueIndicator="False"
+                         ShowStopIndicator="False" />
+            <Canvas IsHitTestVisible="False">
+              <Border x:Name="PART_BufferedTrack"
+                      Width="0"
+                      Height="4"
+                      Canvas.Left="0"
+                      Canvas.Top="44"
+                      CornerRadius="2"
+                      Background="{DynamicResource Md.Sys.Color.Secondary.Brush}"
+                      IsVisible="False"
+                      IsHitTestVisible="False" />
+            </Canvas>
+          </Grid>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.55" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdVideoPlayerControls}" TargetType="md:MdVideoPlayerControls">
+    <Setter Property="MinHeight" Value="220" />
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdVideoPlayerControls">
+        <Grid MinHeight="220">
+          <Border Background="#99000000" />
+          <Grid Margin="20" RowDefinitions="Auto,*,Auto" RowSpacing="16">
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+              <TextBlock VerticalAlignment="Center"
+                         FontSize="16"
+                         FontWeight="Medium"
+                         Foreground="White"
+                         Text="{TemplateBinding Title}"
+                         TextTrimming="CharacterEllipsis" />
+              <md:MdIconButton x:Name="PART_MuteButton" Grid.Column="1" Variant="Standard" Size="Medium" />
+              <md:MdIconButton x:Name="PART_FullScreenButton" Grid.Column="2" Variant="Standard" Size="Medium" />
+            </Grid>
+
+            <Grid Grid.Row="1"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  ColumnDefinitions="48,48,56,48,48"
+                  ColumnSpacing="8">
+              <md:MdIconButton x:Name="PART_PreviousButton" Grid.Column="0" Variant="Standard" Size="Medium" />
+              <md:MdIconButton x:Name="PART_RewindButton" Grid.Column="1" Variant="Standard" Size="Medium" />
+              <Grid Grid.Column="2" Width="56" Height="56">
+                <md:MdIconButton x:Name="PART_PlayPauseButton"
+                                 Width="56"
+                                 Height="56"
+                                 ContainerWidth="48"
+                                 ContainerHeight="48"
+                                 IconSize="28"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"
+                                 Variant="Filled"
+                                 Size="Large" />
+                <md:MdCircularProgressIndicator x:Name="PART_BusyIndicator"
+                                                Width="40"
+                                                Height="40"
+                                                Size="40"
+                                                IsIndeterminate="True"
+                                                IsVisible="False"
+                                                IsHitTestVisible="False" />
+              </Grid>
+              <md:MdIconButton x:Name="PART_ForwardButton" Grid.Column="3" Variant="Standard" Size="Medium" />
+              <md:MdIconButton x:Name="PART_NextButton" Grid.Column="4" Variant="Standard" Size="Medium" />
+            </Grid>
+
+            <md:MdSeekBar x:Name="PART_SeekBar"
+                          Grid.Row="2"
+                          Duration="{TemplateBinding Duration}"
+                          Position="{TemplateBinding Position, Mode=TwoWay}"
+                          BufferedPosition="{TemplateBinding BufferedPosition}"
+                          ShowTimeLabels="True"
+                          ShowRemainingTime="True"
+                          AutomationName="Video position" />
+          </Grid>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:controls-hidden"><Setter Property="Opacity" Value="0" /></Style>
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.55" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdAudioMiniPlayer}" TargetType="md:MdAudioMiniPlayer">
+    <Setter Property="MinWidth" Value="280" />
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdAudioMiniPlayer">
+        <Border Padding="12"
+                CornerRadius="20"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                BorderThickness="1">
+          <Grid ColumnDefinitions="56,*,48,48,48" ColumnSpacing="10" RowDefinitions="Auto,Auto" RowSpacing="5">
+            <Border Grid.RowSpan="2" Width="56" Height="56" CornerRadius="14" ClipToBounds="True"
+                    Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}">
+              <Grid>
+                <Image x:Name="PART_Artwork" Stretch="UniformToFill" IsHitTestVisible="False" />
+                <md:MdIcon x:Name="PART_ArtworkPlaceholder"
+                           Glyph="{DynamicResource Md.Icon.MusicNote}"
+                           Size="26"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                           IsHitTestVisible="False" />
+              </Grid>
+            </Border>
+
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2" IsHitTestVisible="False">
+              <TextBlock FontSize="15" FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                         Text="{TemplateBinding Title}" TextTrimming="CharacterEllipsis" />
+              <TextBlock FontSize="13" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                         Text="{TemplateBinding Artist}" TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+
+            <md:MdIconButton x:Name="PART_PreviousButton" Grid.Column="2" Grid.RowSpan="2"
+                             VerticalAlignment="Center" Variant="Standard" Size="Medium" />
+            <Grid Grid.Column="3" Grid.RowSpan="2" Width="48" Height="48">
+              <md:MdIconButton x:Name="PART_PlayPauseButton" Width="48" Height="48" Variant="Tonal" Size="Medium" />
+              <md:MdCircularProgressIndicator x:Name="PART_BusyIndicator" Width="28" Height="28" Size="28"
+                                              IsIndeterminate="True" IsVisible="False" IsHitTestVisible="False" />
+            </Grid>
+            <md:MdIconButton x:Name="PART_NextButton" Grid.Column="4" Grid.RowSpan="2"
+                             VerticalAlignment="Center" Variant="Standard" Size="Medium" />
+
+            <Grid Grid.Row="1" Grid.Column="1" Height="8" VerticalAlignment="Bottom">
+              <Border Height="4" VerticalAlignment="Center" CornerRadius="2"
+                      Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
+              <md:MdLinearProgressIndicator x:Name="PART_BufferedProgress"
+                                            Height="8" Minimum="0" Maximum="100" Value="0"
+                                            TrackThickness="4" TrackBrush="Transparent"
+                                            IndicatorBrush="{DynamicResource Md.Sys.Color.Secondary.Brush}"
+                                            IsHitTestVisible="False" />
+              <md:MdLinearProgressIndicator x:Name="PART_Progress"
+                                            Height="8" Minimum="0" Maximum="100" Value="0"
+                                            TrackThickness="4" TrackBrush="Transparent"
+                                            IndicatorBrush="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                                            IsHitTestVisible="False" />
+            </Grid>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.55" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdNowPlayingPanel}" TargetType="md:MdNowPlayingPanel">
+    <Setter Property="MinWidth" Value="300" />
+    <Setter Property="MaxWidth" Value="680" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdNowPlayingPanel">
+        <Border Padding="24"
+                CornerRadius="28"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                BorderThickness="1">
+          <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="18">
+            <Border Grid.Row="0"
+                    Width="248"
+                    Height="248"
+                    HorizontalAlignment="Center"
+                    CornerRadius="24"
+                    ClipToBounds="True"
+                    Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}">
+              <Grid>
+                <Image x:Name="PART_Artwork" Stretch="UniformToFill" IsHitTestVisible="False" />
+                <md:MdIcon x:Name="PART_ArtworkPlaceholder"
+                           Glyph="{DynamicResource Md.Icon.MusicNote}"
+                           Size="64"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                           IsHitTestVisible="False" />
+              </Grid>
+            </Border>
+
+            <Grid Grid.Row="1" ColumnDefinitions="*">
+              <StackPanel VerticalAlignment="Center" Spacing="4">
+                <TextBlock FontSize="22" FontWeight="SemiBold" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                           Text="{TemplateBinding Title}" TextTrimming="CharacterEllipsis" />
+                <TextBlock FontSize="16" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                           Text="{TemplateBinding Artist}" TextTrimming="CharacterEllipsis" />
+                <TextBlock x:Name="PART_Album" FontSize="13" Opacity="0.8"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                           Text="{TemplateBinding Album}" TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+            </Grid>
+
+            <md:MdSeekBar x:Name="PART_SeekBar"
+                          Grid.Row="2"
+                          Duration="{TemplateBinding Duration}"
+                          Position="{TemplateBinding Position, Mode=TwoWay}"
+                          BufferedPosition="{TemplateBinding BufferedPosition}"
+                          ShowTimeLabels="True"
+                          AutomationName="Audio position" />
+
+            <WrapPanel Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center">
+              <md:MdIconButton x:Name="PART_ShuffleButton" Margin="2" Variant="Standard" Size="Medium" />
+              <md:MdIconButton x:Name="PART_PreviousButton" Margin="2" Variant="Standard" Size="Medium" />
+              <Grid Width="72" Height="72" Margin="2">
+                <md:MdIconButton x:Name="PART_PlayPauseButton" Width="72" Height="72"
+                                 ContainerWidth="64" ContainerHeight="64" IconSize="32"
+                                 HorizontalAlignment="Center" VerticalAlignment="Center"
+                                 Variant="Filled" Size="Large" />
+                <md:MdCircularProgressIndicator x:Name="PART_BusyIndicator" Width="40" Height="40" Size="40"
+                                                IsIndeterminate="True" IsVisible="False" IsHitTestVisible="False" />
+              </Grid>
+              <md:MdIconButton x:Name="PART_NextButton" Margin="2" Variant="Standard" Size="Medium" />
+              <md:MdIconButton x:Name="PART_RepeatButton" Margin="2" Variant="Standard" Size="Medium" />
+              <md:MdIconButton x:Name="PART_QueueButton" Margin="2" Variant="Standard" Size="Medium" />
+            </WrapPanel>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.55" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

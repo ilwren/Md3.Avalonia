@@ -134,6 +134,7 @@
             <md:MdButton x:Name="ListNav" Content="Lists" Variant="Text" HorizontalContentAlignment="Left" Click="ShowLists" />
             <md:MdButton x:Name="LoadingNav" Content="Loading" Variant="Text" HorizontalContentAlignment="Left" Click="ShowLoading" />
             <md:MdButton x:Name="ProgressNav" Content="Progress" Variant="Text" HorizontalContentAlignment="Left" Click="ShowProgress" />
+            <md:MdButton x:Name="MediaNav" Content="Media players" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMediaPlayers" />
             <md:MdButton x:Name="RefreshNav" Content="Pull to refresh" Variant="Text" HorizontalContentAlignment="Left" Click="ShowRefresh" />
             <md:MdButton x:Name="ReorderableListNav" Content="Reorderable list" Variant="Text" HorizontalContentAlignment="Left" Click="ShowReorderableList" />
             <md:MdButton x:Name="MenuNav" Content="Menus" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMenus" />

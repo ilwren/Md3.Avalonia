@@ -48,6 +48,7 @@ All component themes are scoped to `Md*` types. Registering `MaterialTheme` does
 - Tabs come in two shapes. `MdTabView` carries its own tab strip and content, like a classic `TabControl`. `MdTabs` is only the bar, for the common Material case where it sits in an app bar or header away from the pages; pair it with `MdTabsView`, whose children are the pages matched to the bar's tabs by position, and whose `Tabs` property keeps selection in step both ways. This mirrors Flutter's `TabBar` and `TabBarView`.
 - Transient surfaces: `MdDialog`, `MdDialogHost`, `MdDialogService`, `IMdDialogService`, `MdDialogServiceExtensions`, `MdDropdownMenu`, `MdMenuAnchor`, `MdMenu`, `MdMenuItem`, `MdSheetHost`, `MdSnackbar`, `MdSnackbarHost`, `MdSnackbarService`, `IMdSnackbarService`, `MdTooltip`, `MdTooltipHost`.
 - Feedback: `MdLoadingIndicator`, `MdLinearProgressIndicator`, `MdCircularProgressIndicator`, `MdBadge`, `MdBadgedBox`.
+- Media UI: `MdSeekBar`, `MdVideoPlayerControls`, `MdAudioMiniPlayer`, `MdNowPlayingPanel`; these controls expose bindable playback state, commands and request events without shipping a decoder or platform playback backend.
 - Flutter-inspired Avalonia APIs: `MdBanner`, `MdExpansionPanelList`, `MdDataTable`, `MdStepper`, `MdRefreshIndicator`, `MdPaginatedDataTable`, `MdReorderableList`, `MdGridTile`, `MdDismissible`, `MdForm`, `MdFormField`, `MdDropdownFormField`, `MdSimpleDialog`, `MdAboutDialog`, `MdLicensePage`, `MdDraggableScrollableSheet`, `MdAdaptiveSwitch`, `MdAdaptiveProgressIndicator`, `MdHero`, `MdFocusTraversalGroup`, `MdShortcutScope`. These names do not imply complete Flutter parity; see [Flutter parity status](FLUTTER_PARITY_STATUS.md).
 - `MdAboutDialog` fills itself in from the entry assembly when `ApplicationName`, `ApplicationVersion` or `Legalese` are left unset, matching Flutter's `showAboutDialog`. The resolved text is readable through `EffectiveApplicationName`, `EffectiveApplicationVersion` and `EffectiveLegalese`; explicit values always win, and a blank string counts as unset. The icon, version and copyright lines collapse when empty.
 - Foundations and desktop adapters: `MdScrollViewer`, `MdScrollBar`, five-breakpoint/input-aware `MdAdaptiveLayout`, `MdSurface`, `MdText`, `MdStateLayer`, `MdFocusRing`, `MdWindow`, `MdIcon`, `MdSymbolPresenter`.
@@ -81,12 +82,13 @@ The following catalog covers the public control surface shipped by the core pack
 | **Mobile platform integration** | `MdSafeArea`, `MdBackNavigation`, `MdBackScope`, `MdKeyboardAvoidingHost` |
 | **Settings and preference surfaces** | `MdSettingsGroup`, `MdSettingsCard`, `MdSettingsExpander` |
 | **Feedback and status** | `MdLoadingIndicator`, `MdLinearProgressIndicator`, `MdCircularProgressIndicator`, `MdAdaptiveProgressIndicator`, `MdBadge`, `MdBadgedBox`, `MdRefreshIndicator`, `MdSnackbar`, `MdSnackbarHost`, `MdSnackbarService` |
+| **Media playback UI** | `MdSeekBar`, `MdVideoPlayerControls`, `MdAudioMiniPlayer`, `MdNowPlayingPanel`, `MdPlaybackRequest`, `MdPlaybackRepeatMode`, `MdPlaybackRequestEventArgs`, `MdSeekRequestedEventArgs` |
 | **Pickers and calendars** | `MdDatePicker`, `MdDatePickerDialog`, `MdDateRangePicker`, `MdCalendarGrid`, `MdCalendarDay`, `MdTimePicker`, `MdTimePickerDialog`, `MdTimeDial`, `MdTimeDialPart`, `MdPickerRestorationStore` |
 | **Lists and interaction patterns** | `MdReorderableList`, `MdDismissible`, `MdStepper`, `MdStep`, `MdHero`, `MdFocusTraversalGroup`, `MdShortcutScope` |
 | **Foundations and icons** | `MdText`, `MdIcon`, `MdSymbolPresenter`, `MdStateLayer`, `MdRipplePresenter`, `MdFocusRing`, `MdScrollViewer`, `MdScrollBar`, `MdSliderThumb`, `MdWindow` |
 | **Window chrome** | `MdBorderlessWindow`, `MdWindowTitleBar`, `MdCaptionButton`, `MdWindowCaptionButton`, `MdWindowDragRegion`, `MdWindowResizeGrip`, `IMdWindowPlatformAdapter`, `MdWindowPlatformAdapterResolver`, `MdWindowsWindowPlatformAdapter`, `MdMacOsWindowPlatformAdapter`, `MdLinuxWindowPlatformAdapter`, `MdAvaloniaWindowPlatformAdapter`, `MdAndroidWindowPlatformAdapter` |
 
-Most core controls expose styled properties, bindable `Items`/`ItemsSource` where applicable, routed events, commands, and native Avalonia automation peers. Variant and option enums are part of the public API and should be preferred over string values. All 79 of them are listed with their members under [Enumerations](#enumerations).
+Most core controls expose styled properties, bindable `Items`/`ItemsSource` where applicable, routed events, commands, and native Avalonia automation peers. Variant and option enums are part of the public API and should be preferred over string values. All 80 of them are listed with their members under [Enumerations](#enumerations).
 
 ### Core control quick reference
 
@@ -97,6 +99,10 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 | `MdSearchBar`, `MdSearchView` | Search entry and result presentation | `Text` (inherited from `TextBox`), `SearchCommand`, `SearchSubmitted`; the view adds `Header`, `IsOpen`, `SelectedResult`, `ResultDisplayMemberPath`, `CloseOnResultCommit` and `ResultCommitted` |
 | `MdCheckBox`, `MdRadioButton`, `MdSwitch` | Boolean and mutually exclusive choices | `IsChecked`, `GroupName`/selection binding, `Command` and native input events |
 | `MdSlider`, `MdRangeSlider` | Single and interval values | `Minimum`, `Maximum`; `MdSlider` uses the native `Value` and tick properties, `MdRangeSlider` uses `LowerValue`/`UpperValue` plus `Step` and `ShowValueIndicators` |
+| `MdSeekBar` | Time-based playback progress and seek requests | `Duration`, `Position`, `BufferedPosition`, `SeekStep`, `ShowRemainingTime`, `SeekCommand`, `SeekRequested` |
+| `MdVideoPlayerControls` | Video transport overlay for a host-provided surface | `IsPlaying`, `IsBuffering`, `IsMuted`, `IsFullScreen`, `AutoHideControls`, `PlaybackCommand`, `SeekCommand`, request events |
+| `MdAudioMiniPlayer` | Compact track row with artwork and progress | `PlaybackCommand`, `OpenCommand`, `OpenRequested`, previous/play/next requests |
+| `MdNowPlayingPanel` | Full now-playing layout with seek, shuffle, repeat and queue actions | Artwork/metadata, `IsPlaying`, `IsShuffleEnabled`, `RepeatMode`, `PlaybackCommand`, `SeekCommand`, request events |
 | `MdCard`, `MdSurface`, `MdList`, `MdListItem` | Material containers and lists | variant/elevation/surface properties, content, `ItemsSource`, item templates, selection/invocation events |
 | `MdDialogHost`, `MdSheetHost` | Modal dialogs and bottom/side sheets | `ShowAsync`, `Close`, `Dialog`, `Service`, placement, dismissal and result APIs |
 | `MdMenu`, `MdDropdownMenu`, `MdMenuAnchor` | Contextual and anchored actions | items, submenu support, placement, `Show`/`Dismiss`, keyboard navigation |
@@ -463,7 +469,7 @@ Every public enumeration, with its members in declaration order. Generated from 
 held in place by `python3 scripts/check-api-doc-coverage.py`, which fails when a public type is
 missing from this document.
 
-### Core (`Md3.Avalonia`) — 60 enumerations
+### Core (`Md3.Avalonia`) — 61 enumerations
 
 | Enum | Members |
 |---|---|
@@ -500,7 +506,8 @@ missing from this document.
 | `MdNavigationBarVariant` | `Flexible` · `Baseline` |
 | `MdNavigationDrawerPlacement` | `Left` · `Right` |
 | `MdNavigationSuiteMode` | `Auto` · `NavigationBar` · `NavigationRail` · `NavigationDrawer` |
-| `MdPlaybackRequest` | `Play` · `Pause` · `Previous` · `Next` · `Rewind` · `Forward` · `Mute` · `Unmute` · `EnterFullScreen` · `ExitFullScreen` |
+| `MdPlaybackRequest` | `Play` · `Pause` · `Previous` · `Next` · `Rewind` · `Forward` · `Mute` · `Unmute` · `EnterFullScreen` · `ExitFullScreen` · `ToggleShuffle` · `CycleRepeat` · `OpenQueue` |
+| `MdPlaybackRepeatMode` | `None` · `All` · `One` |
 | `MdProgressShape` | `Flat` · `Wavy` |
 | `MdSafeAreaEdges` | `None` · `Left` · `Top` · `Right` · `Bottom` · `Horizontal` · `Vertical` · `All` |
 | `MdScrollbarThumbVisibility` | `Auto` · `Always` · `Hidden` |
@@ -569,6 +576,7 @@ handlers can be written without casting:
 | `MdFormSubmittedEventArgs` | `MdForm.Submitted` |
 | `MdHeroTransitionEventArgs` | `MdHero.TransitionRequested` — source and destination rectangles |
 | `MdPlaybackRequestEventArgs` | media/playback affordances, paired with `MdPlaybackRequest` |
+| `MdSeekRequestedEventArgs` | `MdSeekBar` and player controls — carries the requested target position |
 | `MdDataGridCellEditEventArgs` | `MdDataGrid` cell commit (Extra) |
 
 `MdSearchBar.SearchSubmitted` passes the submitted text as a plain `string`.

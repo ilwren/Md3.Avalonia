@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Core media-player UI: `MdSeekBar`, `MdVideoPlayerControls`, `MdAudioMiniPlayer` and `MdNowPlayingPanel`. Playback and seek remain provider-neutral requests; no decoder or platform media backend is included.
+- Gallery examples and headless coverage for time formatting, keyboard seek commits and audio transport requests.
+
 ## [0.4.1-preview.1] - 2026-10-06
 
 ### Added

@@ -20,13 +20,17 @@
   <x:String x:Key="Md.Icon.MusicNote">&#x200B;</x:String>
   <x:String x:Key="Md.Icon.Pause">&#x200B;</x:String>
   <x:String x:Key="Md.Icon.PlayArrow">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.QueueMusic">&#x200B;</x:String>
   <x:String x:Key="Md.Icon.Refresh">&#x200B;</x:String>
   <x:String x:Key="Md.Icon.Replay10">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.Repeat">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.RepeatOne">&#x200B;</x:String>
   <x:String x:Key="Md.Icon.RotateRight">&#x200B;</x:String>
   <x:String x:Key="Md.Icon.Schedule">&#x200B;</x:String>
   <x:String x:Key="Md.Icon.Search">&#x200B;</x:String>
   <x:String x:Key="Md.Icon.SkipNext">&#x200B;</x:String>
   <x:String x:Key="Md.Icon.SkipPrevious">&#x200B;</x:String>
+  <x:String x:Key="Md.Icon.Shuffle">&#x200B;</x:String>
   <x:String x:Key="Md.Icon.Slideshow">&#x200B;</x:String>
   <x:String x:Key="Md.Icon.Visibility">&#x200B;</x:String>
   <x:String x:Key="Md.Icon.VisibilityOff">&#x200B;</x:String>

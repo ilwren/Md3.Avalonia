@@ -46,6 +46,7 @@
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdSearch.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdSheet.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdSlider.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdMediaPlayers.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdSnackbar.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdSwitch.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdTabs.axaml" />

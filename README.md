@@ -102,6 +102,14 @@
 - `MdLoadingIndicator`：遵循继承式 motion scheme 的 Expressive morphing indicator，支持官网当前 contained/uncontained 两种形式；
 - `MdLinearProgressIndicator` / `MdCircularProgressIndicator`：determinate/indeterminate；线性 indicator 另支持 Flat/Wavy、可配置 thickness/amplitude/wavelength。
 
+### Media players
+
+- `MdSeekBar`：时间进度、已缓冲区间、elapsed/remaining labels 与键盘/指针 seek；暴露 `Position`、`Duration`、`BufferedPosition`、`SeekCommand` 和 `SeekRequested`；
+- `MdVideoPlayerControls`：可选自动隐藏的视频 transport overlay，包含播放、前后跳转、静音、全屏和 seek 状态；
+- `MdAudioMiniPlayer`：紧凑曲目行，展示封面、曲目信息和进度，提供上一首/播放/下一首及打开完整播放页请求；
+- `MdNowPlayingPanel`：完整音频布局，支持封面、曲目信息、seek、shuffle/repeat 与队列请求；
+- 以上控件仅呈现状态并发出 playback/seek 请求，不包含解码器、本地文件扫描器或平台播放后端；使用方式见 Gallery 的 Media players 页面与 [`docs/API.md`](docs/API.md)。
+
 ### Menus、Navigation、Search 与反馈控件
 
 - `MdMenu` + `MdMenuItem`：M3 临时 surface、leading/trailing slots、enabled/disabled state、`Command` 与 click API；
