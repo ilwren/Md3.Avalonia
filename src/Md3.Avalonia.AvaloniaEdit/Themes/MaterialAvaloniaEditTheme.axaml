@@ -23,13 +23,14 @@
         xmlns:md="using:Md3.Avalonia.Controls"
         xmlns:ae="using:AvaloniaEdit"
         xmlns:editing="using:AvaloniaEdit.Editing"
+        xmlns:rendering="using:AvaloniaEdit.Rendering"
         xmlns:search="using:AvaloniaEdit.Search"
         xmlns:cc="using:AvaloniaEdit.CodeCompletion"
         x:Class="Md3.Avalonia.Themes.MaterialAvaloniaEditTheme">
 
   <!-- TextView only ever appears inside an AvaloniaEdit editor, so a selector for it stays local
        to the editor even though it lives at styles scope. -->
-  <Style Selector="editing|TextView">
+  <Style Selector="rendering|TextView">
     <Setter Property="LinkTextForegroundBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
   </Style>
 
@@ -83,9 +84,9 @@
                                   VerticalAlignment="Center"
                                   Content="{TemplateBinding InnerLeftContent}" />
                 <Panel Grid.Column="1">
-                  <ScrollViewer Name="PART_ScrollViewer"
-                                HorizontalScrollBarVisibility="Hidden"
-                                VerticalScrollBarVisibility="Disabled">
+                  <md:MdScrollViewer Name="PART_ScrollViewer"
+                                     HorizontalScrollBarVisibility="Hidden"
+                                     VerticalScrollBarVisibility="Disabled">
                     <Panel>
                       <TextBlock Name="PART_Placeholder"
                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -116,7 +117,7 @@
                                      TextAlignment="{TemplateBinding TextAlignment}"
                                      TextWrapping="NoWrap" />
                     </Panel>
-                  </ScrollViewer>
+                  </md:MdScrollViewer>
                   <Border Name="PART_Indicator"
                           Height="1"
                           VerticalAlignment="Bottom"
@@ -132,14 +133,14 @@
                                   Content="{TemplateBinding InnerRightContent}" />
               </Grid>
             </Border>
-            <Style Selector="^:focus-visible /template/ Border#PART_FocusIndicator">
-              <Setter Property="IsVisible" Value="True" />
-            </Style>
-            <Style Selector="^:disabled">
-              <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" />
-            </Style>
           </ControlTemplate>
         </Setter>
+        <Style Selector="^:focus /template/ Border#PART_FocusIndicator">
+          <Setter Property="IsVisible" Value="True" />
+        </Style>
+        <Style Selector="^:disabled">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" />
+        </Style>
       </ControlTheme>
 
       <!-- State-layer button for the search actions (find previous/next, close, replace). -->
@@ -654,7 +655,7 @@
                            Margin="0,0,2,0"
                            Source="{Binding Image}"
                            Width="16" />
-                    <ContentControl Content="{Binding Content}" />
+                    <ContentPresenter Content="{Binding Content}" />
                   </StackPanel>
                 </DataTemplate>
               </cc:CompletionListBox.ItemTemplate>
