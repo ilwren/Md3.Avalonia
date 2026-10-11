@@ -25,7 +25,12 @@
   accent, surface, tab and chrome brushes onto `Md.Sys.Color` tokens and includes Dock's own
   control dictionaries by `avares://` URI instead of forking them, so Dock keeps owning its
   templates and part names. It is the only package that pulls in `Dock.Avalonia` and
-  `Dock.Avalonia.Themes.Fluent`, bringing the set to nine.
+  `Dock.Avalonia.Themes.Fluent`, bringing the set to nine. Because Dock's keyed chrome themes
+  (`ButtonCreateDocument`, `ChromeButton`, `DockDrawnCaptionButton`) are
+  `BasedOn="{StaticResource {x:Type Button}}"` and neither `MaterialTheme` nor an absent
+  `FluentTheme` supplies that key, it also ships the one implicit native theme it cannot avoid -
+  a Material text button in `Themes/Controls/MaterialButton.axaml`; every other native control is
+  still left to the host application.
 - **Native AOT.** All nine packages declare `IsAotCompatible` and build with the IL3xxx analyzers
   on alongside the existing IL2xxx trimming ones. `.github/workflows/aot-probe.yml` publishes the
   desktop gallery with `PublishAot=true` and does not accept a green step as the answer: it

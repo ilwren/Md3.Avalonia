@@ -76,7 +76,11 @@ surface，调用方仍可覆盖。
   `Md.Sys.Color` token（悬停/按下用 `onSurface` 状态层，选中标签用 `Primary` 容器配
   `OnPrimary` 文字，窗口关闭悬停用 `ErrorContainer`），并且在结构上**不复刻**上游模板——它通过
   `avares://` 直接引用 Dock 控件的字典，只自带一份 `Accents/Material.axaml`，因此模板与部件名
-  仍然归 Dock 维护，升级不会漂移；
+  仍然归 Dock 维护，升级不会漂移；另外，Dock 的 `ButtonCreateDocument`/`ChromeButton`/
+  `DockDrawnCaptionButton` 都是 `BasedOn="{StaticResource {x:Type Button}}"`，而既不引入
+  `FluentTheme`、核心 `MaterialTheme` 又不碰 Avalonia 原生控件，所以包里还带了一份无法回避的
+  隐式原生主题 `Themes/Controls/MaterialButton.axaml`（Material 文本按钮），其余原生控件仍交由
+  宿主应用自行决定；
 - **原生 AOT 已验证可用。** 九个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
   IL3xxx 分析器。`.github/workflows/aot-probe.yml` 用 `PublishAot=true` 发布桌面 Gallery，并且
   **不把「步骤成功」当作答案**：它断言产物是原生 ELF 可执行文件、输出目录里没有托管 dll 残留（防止

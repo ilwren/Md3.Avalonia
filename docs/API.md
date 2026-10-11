@@ -494,6 +494,17 @@ It is the only package that depends on `Dock.Avalonia` and `Dock.Avalonia.Themes
 replaces `DockFluentTheme`, so do not include both. Like `MaterialTheme` it is standalone and does
 not need Avalonia's `FluentTheme`.
 
+Being standalone is why it also carries the one implicit native theme it cannot avoid: Dock's
+keyed chrome themes (`ButtonCreateDocument`, `ChromeButton`, `DockDrawnCaptionButton`) are
+`BasedOn="{StaticResource {x:Type Button}}"`, and neither `MaterialTheme` (which leaves Avalonia's
+native controls alone) nor a missing `FluentTheme` supplies that key, so `Themes/Controls/MaterialButton.axaml`
+adds a Material text-button theme for `Button`. It is the only native type the package themes -
+`TextBox`, `ScrollViewer`, `ListBox` and the rest keep whatever the host application gives them -
+and `Registering_The_Dock_Theme_Only_Adds_The_Base_Button_Theme_Docks_Chrome_Needs` in the headless
+suite pins both halves of that contract. Three Dock window types
+(`DockAdornerWindow`, `DragPreviewWindow`, `PinnedDockWindow`) base themselves on the
+`{x:Type Window}` theme, which comes from the core `MaterialTheme`.
+
 The theme maps Dock's own accents onto `Md.Sys` tokens: the `DockApplicationAccent*` brushes and
 every `DockTab*`, `DockSurface*`, `DockBorder*`, `DockSplitter*`, `DockChrome*` and `DockTarget*`
 key follow the Material scheme, hover and pressed states are `onSurface` state layers, the

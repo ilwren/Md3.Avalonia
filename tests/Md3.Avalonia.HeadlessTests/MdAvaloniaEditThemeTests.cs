@@ -84,18 +84,21 @@ public class MdAvaloniaEditThemeTests
     public void Registering_The_Editor_Theme_Does_Not_Replace_Native_Control_Themes()
     {
         // The point of the keyed Md.Comp.AvaloniaEdit.* themes: an application that adds this
-        // package must not get Material-looking Buttons/TextBoxes/ListBoxes everywhere else.
+        // package must not get Material-looking TextBoxes/ListBoxes everywhere else. Button is the
+        // one native type this test application *does* theme, because Md3.Avalonia.Dock has to
+        // supply the implicit Button theme Dock's chrome derives from - the exact contract is
+        // pinned by MdDockThemeTests.Registering_The_Dock_Theme_Only_Adds_The_Base_Button_Theme_Docks_Chrome_Needs.
         var variant = Application.Current!.ActualThemeVariant;
-        foreach (var native in new[] { typeof(Button), typeof(ToggleButton), typeof(TextBox), typeof(ListBox), typeof(ListBoxItem) })
+        foreach (var native in new[] { typeof(ToggleButton), typeof(TextBox), typeof(ListBox), typeof(ListBoxItem) })
         {
             Assert.False(Application.Current.TryGetResource(native, variant, out _), native.Name);
         }
 
-        var button = new Button { Content = "plain" };
-        var window = new Window { Width = 200, Height = 100, Content = button };
+        var box = new TextBox { Text = "plain" };
+        var window = new Window { Width = 200, Height = 100, Content = box };
         window.Show();
         Dispatcher.UIThread.RunJobs();
-        Assert.Null(button.Theme);
+        Assert.Null(box.Theme);
         window.Close();
     }
 

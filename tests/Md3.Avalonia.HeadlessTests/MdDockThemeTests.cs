@@ -97,19 +97,31 @@ public class MdDockThemeTests
     }
 
     [AvaloniaFact]
-    public void Registering_The_Dock_Theme_Does_Not_Replace_Native_Control_Themes()
+    public void Registering_The_Dock_Theme_Only_Adds_The_Base_Button_Theme_Docks_Chrome_Needs()
     {
-        // Dock's dictionaries only key themes for Dock's own types, so an application that adds
-        // this package does not get restyled Buttons, TextBoxes or ScrollViewers.
+        // Dock keys themes for its own types, so an application that adds this package gets no
+        // restyled TextBoxes, ScrollViewers or ListBoxes - with one deliberate exception. Dock's
+        // keyed chrome themes (ButtonCreateDocument, ChromeButton, DockDrawnCaptionButton) are
+        // BasedOn="{StaticResource {x:Type Button}}", and core MaterialTheme leaves Avalonia's
+        // native controls alone while this package replaces DockFluentTheme, so Dock chrome could
+        // not load at all unless the package supplies that one implicit theme itself.
         var variant = Application.Current!.ActualThemeVariant;
-        foreach (var native in new[] { typeof(Button), typeof(TextBox), typeof(ScrollViewer), typeof(ListBox) })
+        foreach (var native in new[] { typeof(TextBox), typeof(ScrollViewer), typeof(ListBox), typeof(ToggleButton) })
         {
             Assert.False(Application.Current.TryGetResource(native, variant, out _), native.Name);
         }
 
+        // The Button theme is the package's own Material flat button, not Avalonia FluentTheme's:
+        // the marker state-layer brushes below only exist in the package's Controls/MaterialButton.axaml.
+        Assert.True(Application.Current.TryGetResource("Md.Comp.Dock.ButtonHover.Brush", variant, out _));
+        Assert.True(Application.Current.TryGetResource("Md.Comp.Dock.ButtonPressed.Brush", variant, out _));
+        Assert.True(Application.Current.TryGetResource(typeof(Button), variant, out var value));
+        Assert.Equal(typeof(Button), Assert.IsType<ControlTheme>(value).TargetType);
+
         var button = new Button { Content = "plain" };
         using var host = Show(button);
-        Assert.Null(button.Theme);
+        Assert.NotNull(button.Theme);
+        Assert.Equal(typeof(Button), button.Theme!.TargetType);
     }
 
     private static DockControl NewDock()

@@ -74,20 +74,22 @@ public class MdAvaloniaHexThemeTests
     [AvaloniaFact]
     public void Registering_The_Hex_Theme_Does_Not_Replace_Native_Control_Themes()
     {
-        // An application that adds this package must not get Material-looking Buttons, TextBoxes
-        // or ScrollViewers everywhere else: every selector in the theme targets an AvaloniaHex
-        // type.
+        // An application that adds this package must not get Material-looking TextBoxes,
+        // ScrollViewers or ListBoxes everywhere else: every selector in the theme targets an
+        // AvaloniaHex type. Button is the one native type this test application themes, because
+        // Md3.Avalonia.Dock has to supply the implicit Button theme Dock's chrome derives from
+        // (see MdDockThemeTests).
         var variant = Application.Current!.ActualThemeVariant;
-        foreach (var native in new[] { typeof(Button), typeof(TextBox), typeof(ScrollViewer), typeof(ListBox) })
+        foreach (var native in new[] { typeof(TextBox), typeof(ScrollViewer), typeof(ListBox) })
         {
             Assert.False(Application.Current.TryGetResource(native, variant, out _), native.Name);
         }
 
-        var button = new Button { Content = "plain" };
-        var window = new Window { Width = 200, Height = 100, Content = button };
+        var textBox = new TextBox { Text = "plain" };
+        var window = new Window { Width = 200, Height = 100, Content = textBox };
         window.Show();
         Dispatcher.UIThread.RunJobs();
-        Assert.Null(button.Theme);
+        Assert.Null(textBox.Theme);
         window.Close();
     }
 
