@@ -43,7 +43,7 @@ public sealed class MdInteractionConformanceAuditTests
         var item = host.TabView.GetVisualDescendants().OfType<MdTabViewItem>().First();
         var state = FirstItemState(host);
 
-        Assert.Contains(item.GetVisualDescendants().OfType<MdRipplePresenter>());
+        Assert.NotEmpty(item.GetVisualDescendants().OfType<MdRipplePresenter>());
         Assert.False(state.IsHitTestVisible, "the state layer must never swallow content hits");
         Assert.True(state.Bounds.Width >= item.Bounds.Width - 1 && state.Bounds.Height >= item.Bounds.Height - 1,
             "the state layer must cover the whole item");
@@ -129,7 +129,7 @@ public sealed class MdInteractionConformanceAuditTests
     private static Color ColorOf(Control anchor, string key)
     {
         var brush = Assert.IsAssignableFrom<ISolidColorBrush>(
-            Avalonia.Controls.ResourceNodeExtensions.FindResource(anchor, key));
+            global::Avalonia.Controls.ResourceNodeExtensions.FindResource(anchor, key));
         return brush.Color;
     }
 
