@@ -573,16 +573,35 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             GalleryLocalization.Apply(page, _culture);
     }
 
-    private void ThemeSelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        var variant = ThemeSelector.SelectedIndex switch { 0 => ThemeVariant.Light, 1 => ThemeVariant.Dark, _ => ThemeVariant.Default };
-        if (Application.Current is not { } application) return;
-        application.RequestedThemeVariant = variant;
-        var mode = ThemeSelector.SelectedIndex switch
+    private void ThemeSelectionChanged(object? sender, SelectionChangedEventArgs e) =>
+        ApplyThemeMode(ThemeSelector.SelectedIndex switch
         {
             0 => MdThemeMode.Light,
             1 => MdThemeMode.Dark,
             _ => MdThemeMode.System
+        });
+
+    /// <summary>
+    /// Applies a light/dark/system theme and keeps the shell selector in sync, so pages can
+    /// toggle the theme (e.g. the settings samples' "Dark theme" switch) without the shell UI
+    /// diverging from the actual appearance.
+    /// </summary>
+    public void ApplyThemeMode(MdThemeMode mode)
+    {
+        if (Application.Current is not { } application) return;
+        var wantedIndex = mode switch { MdThemeMode.Light => 0, MdThemeMode.Dark => 1, _ => 2 };
+        if (ThemeSelector.SelectedIndex != wantedIndex)
+        {
+            // Raising SelectionChanged routes back into ApplyThemeMode with the selector aligned.
+            ThemeSelector.SelectedIndex = wantedIndex;
+            return;
+        }
+
+        application.RequestedThemeVariant = mode switch
+        {
+            MdThemeMode.Light => ThemeVariant.Light,
+            MdThemeMode.Dark => ThemeVariant.Dark,
+            _ => ThemeVariant.Default
         };
         var options = MdThemeManager.Current with { ThemeMode = mode };
         var dark = mode == MdThemeMode.Dark || mode == MdThemeMode.System && application.ActualThemeVariant == ThemeVariant.Dark;

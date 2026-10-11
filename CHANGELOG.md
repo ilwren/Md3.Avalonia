@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Gallery code samples auto-size to their content instead of sitting in a fixed 220 px box,
+  removing the large blank strip under short snippets (tall snippets cap out and scroll).
+- Gallery "Dark theme" switches (settings card + Android settings sample) now actually switch
+  the app theme through a new `MainWindow.ApplyThemeMode`, staying in sync with the shell's
+  theme selector instead of being decorative controls with a hard-coded checked state.
+
 ### Fixed
 
 - `MdBanner` actions drop below the text automatically under the 480 dip compact breakpoint
