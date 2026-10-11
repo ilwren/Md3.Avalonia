@@ -48,6 +48,9 @@ public sealed class MdSliderThumb : Thumb
 
     private void UpdatePseudoClasses() => PseudoClasses.Set(":show-value", ShowValueIndicator);
 
+    /// <summary>Forwarded by the owning slider so the value indicator can follow the drag state.</summary>
+    public void SetDragging(bool value) => PseudoClasses.Set(":dragging", value);
+
     private void UpdateMotion()
     {
         var scheme = MdMotion.GetScheme(this);

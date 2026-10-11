@@ -95,7 +95,7 @@ public sealed class MdSlider : Slider
     {
         _isDragging = true;
         PseudoClasses.Set(":dragging", true);
-        _thumb?.PseudoClasses.Set(":dragging", true);
+        _thumb?.SetDragging(true);
         Transitions = null;
         SetCurrentValue(VisualValueProperty, Value);
     }
@@ -104,7 +104,7 @@ public sealed class MdSlider : Slider
     {
         _isDragging = false;
         PseudoClasses.Set(":dragging", false);
-        _thumb?.PseudoClasses.Set(":dragging", false);
+        _thumb?.SetDragging(false);
         SetCurrentValue(VisualValueProperty, Value);
         UpdateMotion();
     }
