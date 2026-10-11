@@ -78,11 +78,11 @@ public sealed class MdInteractionConformanceAuditTests
         Assert.True(items[0].Focus(), "the tab item must be focusable for keyboard users");
         Dispatcher.UIThread.RunJobs();
 
-        host.Window.KeyPress(Key.Right, RawInputModifiers.None, PhysicalKey.Right, null);
+        host.Window.KeyPress(Key.Right, RawInputModifiers.None, PhysicalKey.ArrowRight, null);
         Dispatcher.UIThread.RunJobs();
         Assert.Equal(1, host.TabView.SelectedIndex);
 
-        host.Window.KeyPress(Key.Left, RawInputModifiers.None, PhysicalKey.Left, null);
+        host.Window.KeyPress(Key.Left, RawInputModifiers.None, PhysicalKey.ArrowLeft, null);
         Dispatcher.UIThread.RunJobs();
         Assert.Equal(0, host.TabView.SelectedIndex);
     }
