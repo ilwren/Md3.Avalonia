@@ -484,9 +484,11 @@ public class MdPhaseThreeAndFourGestureParityTests
     [AvaloniaFact]
     public void TabView_Supports_TabStripPlacement_And_Header_Centering()
     {
+        // Qualified on purpose: referencing the Dock docking library puts a root namespace
+        // named Dock in scope, which would otherwise shadow Avalonia.Controls.Dock.
         var tabView = new MdTabView
         {
-            TabStripPlacement = Dock.Bottom,
+            TabStripPlacement = Avalonia.Controls.Dock.Bottom,
             SelectedIndex = 0,
             Items =
             {
@@ -498,7 +500,7 @@ public class MdPhaseThreeAndFourGestureParityTests
         using var host = Show(tabView, 500, 300);
         Dispatcher.UIThread.RunJobs();
 
-        Assert.Equal(Dock.Bottom, tabView.TabStripPlacement);
+        Assert.Equal(Avalonia.Controls.Dock.Bottom, tabView.TabStripPlacement);
         Assert.Equal(0, tabView.SelectedIndex);
         tabView.SelectedIndex = 1;
         Assert.Equal(1, tabView.SelectedIndex);
