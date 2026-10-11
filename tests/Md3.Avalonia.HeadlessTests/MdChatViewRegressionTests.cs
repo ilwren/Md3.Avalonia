@@ -1,11 +1,14 @@
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Md3.Avalonia.Chat;
 using Md3.Avalonia.Extra.Controls;
+using Md3.Avalonia.Extra.Infrastructure;
 using Md3.Avalonia.Localization;
 using Xunit;
 
