@@ -52,7 +52,8 @@
 - 追加实现：`MdCodeBlock`（语言标签、复制按钮、横向滚动）与参考实现 `MdFencedCodeMarkdownProvider`（识别 ``` 围栏；流式时未闭合的围栏延伸到末尾）。
 - 追加实现：链接。`MdFencedCodeMarkdownProvider` 把正文中的 http/https 地址渲染为 `HyperlinkButton`，点击时调用注入的 `IMdLinkOpener.Open(Uri)`；控件本身不打开浏览器，桌面与移动端由应用决定。
 - 追加实现：`IMdSyntaxHighlighter` 与通用参考实现 `MdKeywordSyntaxHighlighter`，由 `MdCodeBlock.Highlighter` 使用。
-- 已验证：流式追加 1000 个 token（同一消息 Id 替换 1000 次）时，列表行与气泡实例保持不变，不重建列表（headless 测试 `Streaming_1000_Tokens_Updates_The_Same_Row_Without_Rebuilding_The_List`）。
+- 已验证：流式追加 1000 个 token（同一消息 Id 替换 1000 次）时，列表行容器实例保持不变，列表不重建（headless 测试 `Streaming_1000_Tokens_Keeps_The_Message_Row_Instance`）。
+- 已知成本（未解决）：每个 token 都是新的 `MdChatMessage` 记录，行内的 `ContentPresenter` 会对新内容重新套用模板，因此气泡控件每次替换都会重建。这不是整列表重排，但对长流式回复有开销。改进方向：用稳定的行包装对象承载可变内容，避免替换记录。该项尚未实现，验收的"不引发整列表重排"仅指行容器层面。
 - 未实现：`MdStreamingText` 独立控件与 token 淡入（流式光标已由 `PART_Caret` 提供）；完整 Markdown 解析（表格、强调、链接）由应用的 provider 实现。
 
 ### Phase 2 — 实现状态（2026-10-11）
