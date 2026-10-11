@@ -112,7 +112,7 @@ public sealed class MdRound2BehaviorTests
         Assert.Equal("Md3.Avalonia", page.SelectedLicense!.Package);
 
         // Filtering away the selection re-selects from the filtered list instead of going null.
-        page.Filter = "Avalonia";
+        page.Filter = "MIT";
         Dispatcher.UIThread.RunJobs();
         Assert.NotNull(page.SelectedLicense);
         Assert.Equal("Avalonia", page.SelectedLicense!.Package);
