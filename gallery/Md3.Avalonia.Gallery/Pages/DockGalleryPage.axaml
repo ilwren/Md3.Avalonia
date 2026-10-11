@@ -46,7 +46,7 @@
                       </StackPanel>
                     </dockModel:ToolTemplate>
                   </dockModel:ToolDock.ToolTemplate>
-                  <dockModel:Tool Id="ExplorerTool" Title="Explorer" />
+                  <dockModel:Tool x:Name="ExplorerTool" Id="ExplorerTool" Title="Explorer" />
                   <dockModel:Tool Id="OutlineTool" Title="Outline" />
                 </dockModel:ToolDock>
 
@@ -64,7 +64,7 @@
                         </StackPanel>
                       </dockModel:DocumentTemplate>
                     </dockModel:DocumentDock.DocumentTemplate>
-                    <dockModel:Document Id="DockDoc" Title="MaterialDockTheme.axaml" />
+                    <dockModel:Document x:Name="DockDoc" Id="DockDoc" Title="MaterialDockTheme.axaml" />
                     <dockModel:Document Id="ReadmeDoc" Title="README.md" />
                   </dockModel:DocumentDock>
 
@@ -81,7 +81,7 @@
                         </StackPanel>
                       </dockModel:ToolTemplate>
                     </dockModel:ToolDock.ToolTemplate>
-                    <dockModel:Tool Id="OutputTool" Title="Output" />
+                    <dockModel:Tool x:Name="OutputTool" Id="OutputTool" Title="Output" />
                   </dockModel:ToolDock>
                 </dockModel:ProportionalDock>
               </dockModel:ProportionalDock>

@@ -7,6 +7,8 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Headless.XUnit" />
+    <!-- Tests build Dock layouts in C#; the theme package itself only needs Dock.Avalonia. -->
+    <PackageReference Include="Dock.Model.Avalonia" />
     <PackageReference Include="Avalonia.Skia" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit.v3" />
