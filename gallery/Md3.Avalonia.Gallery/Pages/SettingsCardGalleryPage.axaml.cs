@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
-using Avalonia.VisualTree;
+
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Themes.Dynamic;
 
@@ -21,7 +21,7 @@ public partial class SettingsCardGalleryPage : UserControl
 
     private void DarkThemeSwitchChanged(object? sender, RoutedEventArgs e)
     {
-        if (this.GetVisualRoot() is MainWindow window && DarkThemeSwitch is not null)
+        if (TopLevel.GetTopLevel(this) is MainWindow window && DarkThemeSwitch is not null)
         {
             window.ApplyThemeMode(DarkThemeSwitch.IsChecked == true ? MdThemeMode.Dark : MdThemeMode.Light);
         }
