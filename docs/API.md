@@ -497,13 +497,19 @@ not need Avalonia's `FluentTheme`.
 Being standalone is why it also carries the one implicit native theme it cannot avoid: Dock's
 keyed chrome themes (`ButtonCreateDocument`, `ChromeButton`, `DockDrawnCaptionButton`) are
 `BasedOn="{StaticResource {x:Type Button}}"`, and neither `MaterialTheme` (which leaves Avalonia's
-native controls alone) nor a missing `FluentTheme` supplies that key, so `Themes/Controls/MaterialButton.axaml`
-adds a Material text-button theme for `Button`. It is the only native type the package themes -
-`TextBox`, `ScrollViewer`, `ListBox` and the rest keep whatever the host application gives them -
-and `Registering_The_Dock_Theme_Only_Adds_The_Base_Button_Theme_Docks_Chrome_Needs` in the headless
-suite pins both halves of that contract. Three Dock window types
-(`DockAdornerWindow`, `DragPreviewWindow`, `PinnedDockWindow`) base themselves on the
-`{x:Type Window}` theme, which comes from the core `MaterialTheme`.
+native controls alone) nor an absent `FluentTheme` supplies that key, so
+`Themes/Controls/MaterialButton.axaml` adds a Material text-button theme for `Button`.
+
+`Button` is the only native type that theme touches, and where the theme is registered decides how
+far it reaches: in `Application.Styles` the application's own plain `Button`s get the Material
+text-button look too, while registering it on a page or panel - `UserControl.Styles`, which is what
+the gallery's Docking page does - keeps the effect inside the dock's subtree and leaves the rest of
+the application on whatever theme it had. `TextBox`, `ScrollViewer`, `ListBox` and the other native
+controls are never touched either way, and
+`Only_The_Scoped_Dock_Theme_Adds_The_Base_Button_Theme_Docks_Chrome_Needs` in the headless suite
+pins both halves of that contract. Three Dock window types (`DockAdornerWindow`,
+`DragPreviewWindow`, `PinnedDockWindow`) base themselves on the `{x:Type Window}` theme, which
+comes from the core `MaterialTheme`.
 
 The theme maps Dock's own accents onto `Md.Sys` tokens: the `DockApplicationAccent*` brushes and
 every `DockTab*`, `DockSurface*`, `DockBorder*`, `DockSplitter*`, `DockChrome*` and `DockTarget*`

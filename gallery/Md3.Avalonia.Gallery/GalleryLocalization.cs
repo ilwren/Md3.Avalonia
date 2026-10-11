@@ -173,7 +173,7 @@ internal static class GalleryLocalization
         ["Tool panes, splitter grips and the drop targets are all Material: OutlineVariant borders, SurfaceContainer headers and a Primary indicator."]="工具窗格、分隔条把手与拖放目标全部 Material 化：outlineVariant 描边、surfaceContainer 表头与 primary 指示器。",
         ["MaterialDockTheme maps the 44 Dock accent, surface, tab and chrome brushes onto Md.Sys.Color tokens; the active document tab is a Primary container with OnPrimary ink."]="MaterialDockTheme 把 Dock 的 44 个强调色、表面、标签与标题栏画刷映射到 Md.Sys.Color tokens；选中的文档标签是 primary 容器配 onPrimary 文字。",
         ["Dock keeps owning its templates; this package owns only the token values, so a Dock upgrade cannot drift from a forked template."]="模板仍然由 Dock 自己维护，这个包只提供 token 取值，因此升级 Dock 不会与复刻的模板产生偏差。",
-        ["Add the theme after MaterialTheme and keep using Dock as usual - the package carries Dock.Avalonia and Dock.Avalonia.Themes.Fluent, and DockFluentTheme must not be included as well."]="把主题加在 MaterialTheme 之后即可照常使用 Dock——该包自带 Dock.Avalonia 与 Dock.Avalonia.Themes.Fluent，且不要同时引入 DockFluentTheme。",
+        ["Add the theme after MaterialTheme and keep using Dock as usual - the package carries Dock.Avalonia and Dock.Avalonia.Themes.Fluent, and DockFluentTheme must not be included as well. Registering it on a page, as this demo does, keeps the implicit Button theme it brings inside the dock's subtree."]="把主题加在 MaterialTheme 之后即可照常使用 Dock——该包自带 Dock.Avalonia 与 Dock.Avalonia.Themes.Fluent，且不要同时引入 DockFluentTheme。像本页这样注册在页面范围内，可以把随之而来的隐式 Button 主题限制在停靠布局的子树内。",
     };
 
     public static void Apply(Control root, CultureInfo culture)

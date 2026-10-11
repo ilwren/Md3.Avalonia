@@ -52,7 +52,7 @@ Markdown.Avalonia（417★）+ LiveMarkdown.Avalonia（176★）。
 | 组件 | 星标 | 最近提交 | Avalonia 12 | 许可 | 主题缝（源码实测） | 接入成本 |
 |---|---|---|---|---|---|---|
 | AvaloniaEdit | 1,137 | 2026-08-28 | 12.0.0 ✔ | MIT | `Themes/Base.xaml`(11 行) + `Themes/Fluent/AvaloniaEdit.xaml`(38 行，纯资源映射) + `Simple` 变体；控件模板内嵌 | **极低** |
-| Dock | 1,490 | 2026-10-11 | 12.1.3 ✔ | MIT | `Dock.Avalonia.Themes.Fluent` = 56 个 axaml / 5,311 行 / 52 个 ControlTheme（48 个控件主题文件）；`Accents/Fluent.axaml` 提供 token，控制主题里仅 4 处硬编码色 | 低-中 |
+| Dock | 1,490 | 2026-10-11 | 12.1.3 ✔（最新 tag 要求；本仓库固定 12.1.0.6，见 §4.2） | MIT | `Dock.Avalonia.Themes.Fluent` = 56 个 axaml / 5,311 行 / 52 个 ControlTheme（48 个控件主题文件）；`Accents/Fluent.axaml` 提供 token，控制主题里仅 4 处硬编码色 | 低-中 |
 | AvaloniaHex | 136 | 2026-04-18 | 12.0.0 ✔ | MIT | `Themes/Base.axaml`(53 行 styles) + `Fluent`/`Simple` 资源变体(46 行) | **极低** |
 | Tabalonia（可拖拽/撕出标签页） | 264 | 2026-07-05 | 12.0.5 ✔ | MIT | `Themes/Custom/{Brushes,CustomTheme,Controls,Buttons,DragTabItem}.axaml` 共 476 行，Brush 驱动；另有 Fluent 变体；官方声明「fully restylable via brush resources」 | 低 |
 | Avalonia.Labs（Lottie/Gif/Qr/AnimatedImage/InfoBadge/Panels/SwipeView/FlipView/Notifications…） | 329 | 2026-09-09 | 12.0.1 ✔ | MIT | `Themes/ControlThemes.xaml` + `Themes/Controls/*.axaml`（每控件一个 ControlTheme） | 低 |
@@ -145,10 +145,20 @@ Markdown.Avalonia（417★）+ LiveMarkdown.Avalonia（176★）。
 - Dock 的主题层已经很干净：`Accents/Fluent.axaml` 定义 `DockApplicationAccentBrush{Low,Med,High}`、
   `DockTheme{Background,Foreground,BorderLow,Accent}Brush`、`DockSurface{Workbench,Sidebar,Editor,Panel,
   Header,HeaderActive}Brush` 以及尺寸 token；52 个 ControlTheme 只有 4 处硬编码颜色。
-- 落地方式：以 `DockFluentTheme` 为骨架建立 `Md3.Avalonia.Dock.DockMaterialTheme : Styles`，
-  重写 Accents/token 字典（映射到 `Md.Sys.Color.*` / `Md.Sys.Shape.*` / elevation），
-  按需微调 `DocumentTabStripItem`、`ToolTabStrip`、`DockTarget` 的几何与状态层。
-  Dock 自带的 PNG 资源（DockTarget 指示图）保留，候选未来用矢量重绘。
+- **已落地（2026-10-11）**：`Md3.Avalonia.Themes.MaterialDockTheme : Styles`（类名跟另外五个主题一致，
+  不叫 `DockMaterialTheme`），在 `src/Md3.Avalonia.Dock/`。做法比这里设想的更省：控件字典不复制，而是照
+  `DockFluentTheme` 的同名同序清单用绝对 `avares://Dock.Avalonia.Themes.Fluent/Controls/*.axaml` 直接引用
+  上游，只自带一份 `Themes/Accents/Material.axaml`（197 行 / 159 个键，44 个画刷重写成 `Md.Sys.Color.*`），
+  于是模板、部件名连 `/Assets/*.png` 指示图都留在上游，Dock 升级不会漂移。两处例外：上游的 compact 密度样式
+  与 `CacheDocumentTabContent` 文档模板覆盖没有搬（密度由核心 `MaterialTheme` 管）；上游那 4 处硬编码颜色其实
+  都是 BoxShadow 阴影色（`#33000000`/`#80000000`），M3 的阴影同样是黑色，故原样保留。
+- **一个无法回避的隐式主题**：`ButtonCreateDocument`/`ChromeButton`/`DockDrawnCaptionButton` 都
+  `BasedOn="{StaticResource {x:Type Button}}"`，而核心 `MaterialTheme` 不碰 Avalonia 原生控件、这里也不引入
+  `FluentTheme`，所以包里必须自带 `Themes/Controls/MaterialButton.axaml`（Material 文本按钮），这是该包唯一
+  会影响的原生类型，`MdDockThemeTests` 把这条边界钉住。（也因此 AvaloniaEdit/AvaloniaHex 的「不替换原生主题」
+  测试改为只断言各自相关的类型，Button 归 Dock 的测试管。）
+- 版本：仓库基线 Avalonia 12.1.2，而 Dock 12.1.0.7 要求 Avalonia ≥ 12.1.3，因此固定 **12.1.0.6**（要求
+  12.1.1；accent 键集与 12.1.0.7 完全一致），`Directory.Packages.props` 里注明两者要一起升。
 - 风险：Dock 迭代很快（当天仍有提交），主题包需要跟版本对齐，建议固定上游版本号并在 README 标注适配范围。
 
 **E. `Md3.Avalonia.Tabalonia`** —— 与已有 `MdTabs` 互补：Dock 场景之外，用户要「可拖拽 / 可撕出窗口 / 可
