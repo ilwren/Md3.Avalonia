@@ -68,6 +68,26 @@ public sealed class MdRound2BehaviorTests
         Assert.Equal("Europe", cascader.DisplayText);
     }
 
+    [AvaloniaFact]
+    public void Linear_Indicator_Renders_Determinate_And_Indeterminate_Without_Faulting()
+    {
+        // Smoke guard for the rewritten Render paths: the disjoint sweep (timer + two-segment
+        // geometry) and the determinate/wavy branch must both survive real render passes.
+        var indicator = new MdLinearProgressIndicator { Width = 240, Height = 12, IsIndeterminate = true };
+        var window = new Window { Width = 400, Height = 120, Content = indicator };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(indicator.Bounds.Width > 0);
+
+        indicator.IsIndeterminate = false;
+        indicator.Value = 40;
+        Dispatcher.UIThread.RunJobs();
+
+        indicator.Shape = MdProgressShape.Wavy;
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(40, indicator.Value);
+    }
+
     [Fact]
     public void Linear_Indeterminate_Sweep_Follows_The_M3_Two_Segment_Timeline()
     {
