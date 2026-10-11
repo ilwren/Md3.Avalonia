@@ -175,8 +175,9 @@ public sealed class MdSeekBar : TemplatedControl
         if (!IsSeekKey(e.Key) || !IsSeekEnabled || Duration <= TimeSpan.Zero || _slider is null) return;
         if (!_isSeeking)
         {
+            var keyboardPosition = FromSliderValue(_slider.Value);
             BeginSeeking();
-            SetPreviewPosition(FromSliderValue(_slider.Value));
+            SetPreviewPosition(keyboardPosition);
             RefreshState();
         }
     }
