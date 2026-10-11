@@ -21,7 +21,12 @@ public partial class ChatViewGalleryPage : UserControl
         [
             new MdChatAttachment("picture", MdChatAttachmentKind.Image, "sample.png", 24_576, Uri: "gallery://sample-picture"),
             new MdChatAttachment("missing", MdChatAttachmentKind.Image, "missing.png", null, Uri: "gallery://missing"),
-            new MdChatAttachment("notes", MdChatAttachmentKind.File, "release-notes.md", 2_048),
+            new MdChatAttachment("notes", MdChatAttachmentKind.File, "release-notes.md", 2_048, Progress: 0.4),
+        ]),
+        new("voice", MdChatMessageRole.User, L("Voice note", "语音消息"), DateTimeOffset.Now.AddSeconds(-20), L("You", "你"), Attachments:
+        [
+            new MdChatAttachment("voice", MdChatAttachmentKind.Audio, "reply.m4a", 96_000, Duration: TimeSpan.FromSeconds(42),
+                Waveform: [6, 10, 14, 8, 18, 22, 12, 9, 16, 20, 11, 7, 13, 17, 9]),
         ]),
         new("stream", MdChatMessageRole.Assistant, L("Streaming a reply", "正在流式输出回复"), DateTimeOffset.Now, L("Material assistant", "Material 助手"), IsStreaming: true),
     ];
@@ -33,7 +38,7 @@ public partial class ChatViewGalleryPage : UserControl
         Chat.MessagesSource = _messages;
         Chat.SuggestionsSource = new[] { L("Show accessibility", "显示无障碍信息"), L("Explain paging", "解释分页"), L("Open docs", "打开文档") };
         Chat.AttachmentRequested += ChatAttachmentRequested;
-        Chat.MarkdownProvider = new MdFencedCodeMarkdownProvider();
+        Chat.MarkdownProvider = new MdFencedCodeMarkdownProvider(new MdKeywordSyntaxHighlighter());
         Chat.ImageProvider = new GalleryImageProvider();
         Chat.AttachmentActivated += ChatAttachmentActivated;
     }

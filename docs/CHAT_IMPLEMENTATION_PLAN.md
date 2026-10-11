@@ -50,13 +50,15 @@
 - 已实现：`IMdMarkdownProvider` 契约、`MdPlainTextMarkdownProvider`、`MdChatView.MarkdownProvider` 与逐气泡传递、`MdChatMessage.IsStreaming`（流式光标 `PART_Caret`）、同 Id 替换时保留选择且不重复播报。
 - 偏差：纯文本回退实现放在 `Md3.Avalonia.Chat` 包而不是核心包（聊天包拆分后，核心包不再承载聊天功能）。
 - 追加实现：`MdCodeBlock`（语言标签、复制按钮、横向滚动）与参考实现 `MdFencedCodeMarkdownProvider`（识别 ``` 围栏；流式时未闭合的围栏延伸到末尾）。
-- 未实现：`MdStreamingText` 独立控件与 token 淡入（流式光标已由 `PART_Caret` 提供）；代码语法高亮（`IMdSyntaxHighlighter`）；链接可点击与 `IMdLinkOpener`；1000 token 流式压测；完整 Markdown 解析（表格、强调、链接）由应用的 provider 实现。
+- 追加实现：`IMdSyntaxHighlighter` 与通用参考实现 `MdKeywordSyntaxHighlighter`，由 `MdCodeBlock.Highlighter` 使用。
+- 未实现：`MdStreamingText` 独立控件与 token 淡入（流式光标已由 `PART_Caret` 提供）；链接可点击与 `IMdLinkOpener`（需先确认 Avalonia 12 的超链接控件用法，本轮未做）；1000 token 流式压测；完整 Markdown 解析（表格、强调、链接）由应用的 provider 实现。
 
 ### Phase 2 — 实现状态（2026-10-11）
 
 - 已实现：`MdChatAttachment` / `MdChatAttachmentKind`（含 `Uri`）；`MdChatMessage.Attachments`；附件行（图片或文件卡片，`PART_Attachments`）；`MdChatView.AttachmentActivated`；`MdImageViewer`（滚轮与 +/- 缩放 1×–8×、拖动平移、0 复位、Escape 发出 `CloseRequested`）；`IMdImageProvider` 异步加载（`MdAttachmentImage`，含加载中、失败与重试状态）。
 - 偏差：没有独立的 `MdChatImageMessage` / `MdChatFileMessage` 类型，统一由 `MdChatAttachment` 与气泡模板承载。
-- 未实现：`MdChatAttachment.Thumbnail` / `Progress` / `State`；图片缓存（由 `IMdImageProvider` 实现方负责）；`MdChatVoiceMessage` 与波形；查看器的焦点返回与左右切换；查看器未接入默认覆盖层（由应用在 `AttachmentActivated` 中打开）。
+- 追加实现：`Thumbnail`（加载期间显示）、`Progress`（进度条）、`Duration` 与 `Waveform`（语音消息的时长与波形，`Waveform` 为以设备无关像素计的柱高）。语音播放由应用在 `AttachmentActivated` 中处理。
+- 未实现：`MdChatAttachment.State`；图片缓存（由 `IMdImageProvider` 实现方负责）；查看器的焦点返回与左右切换；查看器未接入默认覆盖层（由应用在 `AttachmentActivated` 中打开）。
 
 ### Phase 2 — 富媒体与图片查看器
 

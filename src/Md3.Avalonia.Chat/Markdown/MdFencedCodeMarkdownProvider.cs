@@ -12,6 +12,12 @@ namespace Md3.Avalonia.Chat;
 /// </summary>
 public sealed class MdFencedCodeMarkdownProvider : IMdMarkdownProvider
 {
+    private readonly IMdSyntaxHighlighter? _highlighter;
+
+    /// <summary>Creates the provider. Pass a highlighter to colour the code blocks.</summary>
+    /// <param name="highlighter">Optional highlighter given to every code block.</param>
+    public MdFencedCodeMarkdownProvider(IMdSyntaxHighlighter? highlighter = null) => _highlighter = highlighter;
+
     /// <inheritdoc />
     public Control Render(string text, bool isStreaming)
     {
@@ -51,8 +57,8 @@ public sealed class MdFencedCodeMarkdownProvider : IMdMarkdownProvider
         return panel;
     }
 
-    private static MdCodeBlock CreateCode(string? language, StringBuilder code) =>
-        new() { Language = string.IsNullOrEmpty(language) ? null : language, Code = code.ToString().TrimEnd('\n') };
+    private MdCodeBlock CreateCode(string? language, StringBuilder code) =>
+        new() { Language = string.IsNullOrEmpty(language) ? null : language, Code = code.ToString().TrimEnd('\n'), Highlighter = _highlighter };
 
     private static void AddProse(StackPanel panel, StringBuilder prose)
     {

@@ -248,4 +248,63 @@ public sealed class MdChatPhase12Tests
         Assert.Equal("py", block.Language);
         Assert.Equal("print(1)\nprint(2)", block.Code);
     }
+
+    [AvaloniaFact]
+    public void Voice_Attachment_Formats_Duration_And_Reports_Progress()
+    {
+        var voice = new MdChatAttachment("v1", MdChatAttachmentKind.Audio, "reply.m4a", Duration: TimeSpan.FromSeconds(42), Progress: 0.25, Waveform: new double[] { 4, 8 });
+
+        Assert.Equal("0:42", voice.DurationText);
+        Assert.True(voice.HasProgress);
+        Assert.Equal(0.25, voice.ProgressValue);
+        Assert.True(voice.HasWaveform);
+        Assert.Equal("1:15:00", new MdChatAttachment("v2", MdChatAttachmentKind.Audio, "long.m4a", Duration: TimeSpan.FromMinutes(75)).DurationText);
+    }
+
+    [AvaloniaFact]
+    public void Progress_Is_Clamped_And_Absent_Progress_Is_Zero()
+    {
+        Assert.Equal(1, new MdChatAttachment("p1", MdChatAttachmentKind.File, "x", Progress: 1.5).ProgressValue);
+        var none = new MdChatAttachment("p2", MdChatAttachmentKind.File, "x");
+        Assert.False(none.HasProgress);
+        Assert.Equal(0, none.ProgressValue);
+    }
+
+    [AvaloniaFact]
+    public void Keyword_Highlighter_Tokens_Reproduce_The_Code_And_Classify_Parts()
+    {
+        const string code = "var s = \"hi\"; // note";
+
+        var tokens = new MdKeywordSyntaxHighlighter().Highlight(code, "csharp");
+
+        Assert.Equal(code, string.Concat(tokens.Select(token => token.Text)));
+        Assert.Contains(tokens, token => token.Kind == MdCodeTokenKind.Keyword && token.Text == "var");
+        Assert.Contains(tokens, token => token.Kind == MdCodeTokenKind.String && token.Text == "\"hi\"");
+        Assert.Contains(tokens, token => token.Kind == MdCodeTokenKind.Comment && token.Text == "// note");
+    }
+
+    [AvaloniaFact]
+    public void Fenced_Code_Gives_Each_Block_The_Configured_Highlighter()
+    {
+        var highlighter = new MdKeywordSyntaxHighlighter();
+
+        var panel = Assert.IsType<StackPanel>(new MdFencedCodeMarkdownProvider(highlighter).Render("```csharp\nvar x = 1;\n```", isStreaming: false));
+
+        var block = Assert.IsType<MdCodeBlock>(Assert.Single(panel.Children));
+        Assert.Same(highlighter, block.Highlighter);
+    }
+
+    [AvaloniaFact]
+    public void Thumbnail_Is_Shown_While_The_Picture_Loads()
+    {
+        var pending = new TaskCompletionSource<IImage?>();
+        var provider = new FakeImageProvider(_ => pending.Task);
+        var thumbnail = new DrawingImage();
+        var control = new MdAttachmentImage { Provider = provider };
+
+        control.Attachment = new MdChatAttachment("t1", MdChatAttachmentKind.Image, "pic.png", Uri: "gallery://slow", Thumbnail: thumbnail);
+
+        Assert.Equal(MdImageLoadState.Loading, control.LoadState);
+        Assert.Same(thumbnail, control.Source);
+    }
 }

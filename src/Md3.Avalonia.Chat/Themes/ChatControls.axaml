@@ -85,6 +85,18 @@
                                 <StackPanel VerticalAlignment="Center">
                                   <TextBlock Text="{Binding Name}" FontSize="12" MaxWidth="200" TextTrimming="CharacterEllipsis" />
                                   <TextBlock Text="{Binding SizeText}" FontSize="10" Opacity=".7" />
+                                  <ItemsControl ItemsSource="{Binding Waveform}" IsVisible="{Binding HasWaveform}" Margin="0,4,0,0">
+                                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="2" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                      <DataTemplate x:DataType="x:Double">
+                                        <Border Width="3" Height="{Binding}" CornerRadius="1.5" VerticalAlignment="Center"
+                                                Background="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+                                      </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                  </ItemsControl>
+                                  <TextBlock Text="{Binding DurationText}" IsVisible="{Binding HasDuration}" FontSize="10" Opacity=".7" />
+                                  <ProgressBar Value="{Binding ProgressValue}" Maximum="1" Height="4" MinWidth="120"
+                                               IsVisible="{Binding HasProgress}" Margin="0,4,0,0" />
                                 </StackPanel>
                               </StackPanel>
                             </Grid>
@@ -244,6 +256,7 @@
       </ControlTemplate>
     </Setter>
     <Style Selector="^:loaded /template/ Image#PART_Image"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:loading /template/ Image#PART_Image"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:loading /template/ TextBlock#PART_Status"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:failed /template/ TextBlock#PART_Status"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:failed /template/ Button#PART_Retry"><Setter Property="IsVisible" Value="True" /></Style>
@@ -261,7 +274,7 @@
               <Button x:Name="PART_Copy" Grid.Column="1" Padding="6,2" FontSize="11" />
             </Grid>
             <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-              <SelectableTextBlock Text="{TemplateBinding Code}" FontFamily="monospace" FontSize="13" TextWrapping="NoWrap" />
+              <SelectableTextBlock x:Name="PART_Body" FontFamily="monospace" FontSize="13" TextWrapping="NoWrap" />
             </ScrollViewer>
           </Grid>
         </Border>

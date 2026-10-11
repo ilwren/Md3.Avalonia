@@ -44,7 +44,8 @@ public enum MdChatAttachmentKind { Image, File, Audio, Video }
 
 /// <summary>
 /// One attachment shown under a chat message. Pass the decoded picture as <see cref="Image"/>, or pass a
-/// <see cref="Uri"/> and let <see cref="IMdImageProvider"/> load it. The controls perform no network or file I/O.
+/// <see cref="Uri"/> and let <see cref="IMdImageProvider"/> load it; <see cref="Thumbnail"/> is shown while it loads.
+/// <see cref="Waveform"/> holds bar heights in device-independent pixels for audio. The controls perform no network or file I/O.
 /// </summary>
 public sealed record MdChatAttachment(
     string Id,
@@ -52,10 +53,31 @@ public sealed record MdChatAttachment(
     string Name,
     long? SizeBytes = null,
     IImage? Image = null,
-    string? Uri = null)
+    string? Uri = null,
+    IImage? Thumbnail = null,
+    double? Progress = null,
+    TimeSpan? Duration = null,
+    IReadOnlyList<double>? Waveform = null)
 {
     /// <summary>True when the attachment is shown as an inline picture, even before it has loaded.</summary>
     public bool IsImage => Kind == MdChatAttachmentKind.Image;
+
+    /// <summary>True when a transfer progress value between 0 and 1 is set.</summary>
+    public bool HasProgress => Progress is not null;
+
+    /// <summary>The progress value clamped to 0..1, or 0 when none is set.</summary>
+    public double ProgressValue => Progress is { } value ? Math.Clamp(value, 0, 1) : 0;
+
+    /// <summary>True when a duration is set, for audio and video.</summary>
+    public bool HasDuration => Duration is not null;
+
+    /// <summary>The duration as m:ss, or h:mm:ss for an hour or longer; empty when unknown.</summary>
+    public string DurationText => Duration is { } span
+        ? span.ToString(span.TotalHours >= 1 ? @"h\:mm\:ss" : @"m\:ss", CultureInfo.InvariantCulture)
+        : string.Empty;
+
+    /// <summary>True when waveform bars are set.</summary>
+    public bool HasWaveform => Waveform is { Count: > 0 };
 
     /// <summary>True when the attachment is shown as a file card.</summary>
     public bool IsFile => !IsImage;

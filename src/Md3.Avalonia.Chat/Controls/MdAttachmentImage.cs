@@ -119,7 +119,8 @@ public sealed class MdAttachmentImage : TemplatedControl
             UpdateState(MdImageLoadState.Loaded);
             return;
         }
-        Source = null;
+        // The thumbnail, when there is one, stands in until the full picture arrives.
+        Source = attachment.Thumbnail;
         var provider = Provider;
         var uri = attachment.Uri;
         if (provider is null || string.IsNullOrWhiteSpace(uri))
