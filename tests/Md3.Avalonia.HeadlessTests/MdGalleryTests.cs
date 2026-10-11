@@ -92,6 +92,7 @@ public sealed class MdGalleryTests
             new SlidableItemGalleryPage(),
             new DataGridGalleryPage(),
             new HexEditorGalleryPage(),
+            new DockGalleryPage(),
             new MasonryPanelGalleryPage(),
             new PagedItemsGalleryPage(),
             new AsyncSelectGalleryPage(),

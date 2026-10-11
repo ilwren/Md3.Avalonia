@@ -69,7 +69,15 @@ surface，调用方仍可覆盖。
   它沿用上游的资源键与样式结构（十六进制文本、偏移量、表头、当前行、光标与选区），只是把颜色换成
   `Md.Sys` token，并给 `HexEditor` 一个 Material 的 `ControlTheme`：`SurfaceContainerLow` 表面、
   `OutlineVariant` 描边、ExtraSmall 圆角、`MdScrollViewer` 滚动条，因此同样不需要 FluentTheme；
-- **原生 AOT 已验证可用。** 八个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
+- **`Md3.Avalonia.Dock`** —— [Dock](https://github.com/wieslawsoltes/Dock) 停靠布局系统的
+  Material Design 3 主题，opt-in，唯一引入 `Dock.Avalonia` 与 `Dock.Avalonia.Themes.Fluent`
+  依赖的包，包总数到九个。它把 Dock 自己的五个 `DockApplicationAccent*` 画刷以及全部
+  `DockTab*`/`DockSurface*`/`DockBorder*`/`DockSplitter*`/`DockChrome*`/`DockTarget*` 键重写成
+  `Md.Sys.Color` token（悬停/按下用 `onSurface` 状态层，选中标签用 `Primary` 容器配
+  `OnPrimary` 文字，窗口关闭悬停用 `ErrorContainer`），并且在结构上**不复刻**上游模板——它通过
+  `avares://` 直接引用 Dock 控件的字典，只自带一份 `Accents/Material.axaml`，因此模板与部件名
+  仍然归 Dock 维护，升级不会漂移；
+- **原生 AOT 已验证可用。** 九个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
   IL3xxx 分析器。`.github/workflows/aot-probe.yml` 用 `PublishAot=true` 发布桌面 Gallery，并且
   **不把「步骤成功」当作答案**：它断言产物是原生 ELF 可执行文件、输出目录里没有托管 dll 残留（防止
   apphost 冒充），然后在 xvfb 下把那个二进制真正跑起来。原生 AOT 是在运行期因反射元数据被裁而失败的，

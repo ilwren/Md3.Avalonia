@@ -131,6 +131,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Chat view", () => new ChatViewGalleryPage());
         AddPage("Command palette", () => new CommandPaletteGalleryPage());
         AddPage("Data grids", () => new DataGridGalleryPage());
+        AddPage("Docking", () => new DockGalleryPage());
         AddPage("Hex editor", () => new HexEditorGalleryPage());
         AddPage("Density", () => new DensityGalleryPage());
         AddPage("Hover cards", () => new HoverCardGalleryPage());

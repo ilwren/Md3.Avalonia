@@ -20,6 +20,9 @@ This document is the public entry point for the `0.4.1-preview.1` API. Preview A
 <!-- Optional Material theme for the AvaloniaHex hex editor; likewise the only package that
      pulls in AvaloniaHex: -->
 <PackageReference Include="Md3.Avalonia.AvaloniaHex" Version="0.4.1-preview.1" />
+<!-- Optional Material theme for the Dock docking layout system; likewise the only package
+     that pulls in Dock.Avalonia and Dock.Avalonia.Themes.Fluent: -->
+<PackageReference Include="Md3.Avalonia.Dock" Version="0.4.1-preview.1" />
 ```
 
 ```xml
@@ -474,6 +477,32 @@ an ExtraSmall corner and `MdScrollViewer` scrollbars. `onSurface` is the text, `
 the offsets and column headers, `surfaceContainerHigh`/`surfaceContainerHighest` the header strip
 and the current line, and the caret and selection use the same primary wash the rest of the library
 uses for selection.
+
+## Dock
+
+For docking layouts - tool panes, document tabs and floating windows - use
+[Dock](https://github.com/wieslawsoltes/Dock) with the opt-in `Md3.Avalonia.Dock` package:
+
+```xml
+<Application.Styles>
+  <themes:MaterialTheme />
+  <themes:MaterialDockTheme />
+</Application.Styles>
+```
+
+It is the only package that depends on `Dock.Avalonia` and `Dock.Avalonia.Themes.Fluent`, and it
+replaces `DockFluentTheme`, so do not include both. Like `MaterialTheme` it is standalone and does
+not need Avalonia's `FluentTheme`.
+
+The theme maps Dock's own accents onto `Md.Sys` tokens: the `DockApplicationAccent*` brushes and
+every `DockTab*`, `DockSurface*`, `DockBorder*`, `DockSplitter*`, `DockChrome*` and `DockTarget*`
+key follow the Material scheme, hover and pressed states are `onSurface` state layers, the
+selected document tab is a `Primary` container with `OnPrimary` ink, and the window-close hover is
+`ErrorContainer`. Structurally it differs from `DockFluentTheme` on purpose: instead of forking
+Dock's templates it includes the pinned Fluent package's control dictionaries by `avares://` URI
+and adds `Accents/Material.axaml`, so Dock keeps owning its templates and part names. Dock's
+absence of a density/preset API means light and dark, contrast and density all come from the core
+`MaterialTheme`.
 
 ## Trimming
 
