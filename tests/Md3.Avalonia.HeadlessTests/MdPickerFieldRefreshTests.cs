@@ -54,7 +54,7 @@ public sealed class MdPickerFieldRefreshTests
     public void Date_Picker_Popup_Closes_When_The_Ancestor_Page_Scrolls()
     {
         var picker = new MdDatePicker();
-        var scroller = new ScrollViewer
+        var scroller = new MdScrollViewer
         {
             Height = 400,
             Content = new StackPanel
@@ -79,7 +79,7 @@ public sealed class MdPickerFieldRefreshTests
     public void Time_Picker_Popup_Closes_When_The_Ancestor_Page_Scrolls()
     {
         var picker = new MdTimePicker();
-        var scroller = new ScrollViewer
+        var scroller = new MdScrollViewer
         {
             Height = 400,
             Content = new StackPanel
