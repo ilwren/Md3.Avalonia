@@ -14,6 +14,10 @@
   (1800 ms loop, per-edge delays/durations and bezier interpolators from
   material-components-android) instead of a single gliding segment; wavy shape still applies.
 
+- `MdRichEditor` no longer renders Ctrl shortcut labels on Android/iOS - touch devices have no
+  modifier keys, so the chips were noise there. Gallery pages that advertise keyboard shortcuts
+  (search, slidable item) adapt their copy on touch platforms too.
+
 ### Fixed
 
 - `MdBanner` actions drop below the text automatically under the 480 dip compact breakpoint

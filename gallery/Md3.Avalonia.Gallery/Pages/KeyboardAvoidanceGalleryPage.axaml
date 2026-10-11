@@ -16,7 +16,8 @@
           <md:MdButton Content="Toggle virtual keyboard" Variant="Outlined" Click="ToggleVirtualKeyboard" />
           <md:MdButton Content="Focus bottom input" Variant="Text" Click="FocusBottomInput" />
         </StackPanel>
-        <Border Height="260" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="16" ClipToBounds="True">
+        <Border Height="320" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="16" ClipToBounds="True">
+          <Grid>
           <md:MdKeyboardAvoidingHost x:Name="DemoKeyboardHost" AutoScrollToFocused="True" ExtraBottomOffset="16">
             <md:MdScrollViewer VerticalScrollBarVisibility="Auto">
               <StackPanel Margin="16" Spacing="12">
@@ -28,6 +29,17 @@
               </StackPanel>
             </md:MdScrollViewer>
           </md:MdKeyboardAvoidingHost>
+          <Border x:Name="FakeKeyboard" Height="0" VerticalAlignment="Bottom"
+                  Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
+                  CornerRadius="16,16,0,0" ClipToBounds="True">
+            <StackPanel Margin="12,10" Spacing="8" VerticalAlignment="Top">
+              <Border Height="26" CornerRadius="6" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+              <Border Height="26" CornerRadius="6" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+              <Border Width="140" Height="26" HorizontalAlignment="Center" CornerRadius="6"
+                      Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+            </StackPanel>
+          </Border>
+          </Grid>
         </Border>
         <TextBlock x:Name="KeyboardStatus" Classes="body" Text="Virtual keyboard inactive (height: 0dp)." />
       </StackPanel>

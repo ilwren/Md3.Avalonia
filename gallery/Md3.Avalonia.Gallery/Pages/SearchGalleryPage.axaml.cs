@@ -23,6 +23,17 @@ public partial class SearchGalleryPage : UserControl
             new("README.md", GalleryLocalization.Choose("Documentation · Markdown", "文档 · Markdown"))
         ];
         ApplyFilter(string.Empty);
+        if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS())
+        {
+            // Touch devices have no keyboard; showing "Ctrl+K"/Escape hints there is noise.
+            if (OpenSearchButton is not null) OpenSearchButton.Content = "Open search";
+            if (SearchStatus is not null)
+            {
+                SearchStatus.Text = GalleryLocalization.Choose(
+                    "Tap the search field to expand it; results filter as you type.",
+                    "点按搜索框展开搜索；输入时会实时筛选结果。");
+            }
+        }
     }
 
     protected override void OnAttachedToVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e)

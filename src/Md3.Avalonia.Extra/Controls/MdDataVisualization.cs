@@ -1026,16 +1026,21 @@ public class MdRichEditor : ContentControl
         MdRichEditorCommand.StrikeThrough or MdRichEditorCommand.Heading or MdRichEditorCommand.Quote or
         MdRichEditorCommand.Code or MdRichEditorCommand.BulletedList or MdRichEditorCommand.NumberedList;
 
-    private static string? GetShortcut(MdRichEditorCommand command) => command switch
+    private static string? GetShortcut(MdRichEditorCommand command)
     {
-        MdRichEditorCommand.Bold => "Ctrl+B",
-        MdRichEditorCommand.Italic => "Ctrl+I",
-        MdRichEditorCommand.Underline => "Ctrl+U",
-        MdRichEditorCommand.Link => "Ctrl+K",
-        MdRichEditorCommand.Undo => "Ctrl+Z",
-        MdRichEditorCommand.Redo => "Ctrl+Y",
-        _ => null
-    };
+        // Touch devices have no modifier keys; rendering "Ctrl+…" chips there is noise.
+        if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS()) return null;
+        return command switch
+        {
+            MdRichEditorCommand.Bold => "Ctrl+B",
+            MdRichEditorCommand.Italic => "Ctrl+I",
+            MdRichEditorCommand.Underline => "Ctrl+U",
+            MdRichEditorCommand.Link => "Ctrl+K",
+            MdRichEditorCommand.Undo => "Ctrl+Z",
+            MdRichEditorCommand.Redo => "Ctrl+Y",
+            _ => null
+        };
+    }
 }
 
 /// <summary>Long-form compatibility name for MdRichEditor.</summary>
