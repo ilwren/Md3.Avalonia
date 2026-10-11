@@ -93,12 +93,13 @@ public sealed class MdChatViewRegressionTests
             },
         };
         MdLocalization.SetCulture(chat, CultureInfo.GetCultureInfo("en-US"));
-        chat.ToggleMessageSelection(chat.MessagesSource!.Cast<MdChatMessage>().First());
-        Assert.Equal("1 message(s) selected", chat.SelectionCountText);
+        var first = chat.MessagesSource!.Cast<MdChatMessage>().First();
 
+        // Nothing is selected yet, so there is nothing to quote.
         Assert.False(chat.QuoteSelected());
 
-        chat.ToggleMessageSelection(chat.MessagesSource!.Cast<MdChatMessage>().First());
+        chat.ToggleMessageSelection(first);
+        Assert.Equal("1 message(s) selected", chat.SelectionCountText);
         Assert.True(chat.QuoteSelected());
         Assert.Equal("Replying to Ada", chat.QuoteHeaderText);
 
