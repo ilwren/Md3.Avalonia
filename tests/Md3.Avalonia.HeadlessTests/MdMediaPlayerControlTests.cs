@@ -83,6 +83,52 @@ public sealed class MdMediaPlayerControlTests
     }
 
     [AvaloniaFact]
+    public void SeekBar_Pointer_Drag_Commits_One_Seek_Request()
+    {
+        var seekBar = new MdSeekBar
+        {
+            Width = 560,
+            Duration = TimeSpan.FromMinutes(1),
+            Position = TimeSpan.FromSeconds(15)
+        };
+        var window = new Window { Width = 640, Height = 150, Content = seekBar };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var slider = Assert.Single(seekBar.GetVisualDescendants().OfType<MdSlider>());
+            var thumb = Assert.Single(slider.GetVisualDescendants().OfType<MdSliderThumb>());
+            var start = thumb.TranslatePoint(new Point(2, 22), window)!.Value;
+            var end = start.WithX(start.X + 80);
+            MdSeekRequestedEventArgs? request = null;
+            var requestCount = 0;
+            seekBar.SeekRequested += (_, args) =>
+            {
+                request = args;
+                requestCount++;
+            };
+
+            window.MouseMove(start, RawInputModifiers.None);
+            window.MouseDown(start, MouseButton.Left, RawInputModifiers.None);
+            window.MouseMove(end, RawInputModifiers.LeftMouseButton);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(seekBar.IsSeeking);
+            window.MouseUp(end, MouseButton.Left, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(seekBar.IsSeeking);
+            Assert.Equal(1, requestCount);
+            var completedRequest = Assert.IsType<MdSeekRequestedEventArgs>(request);
+            Assert.True(completedRequest.Position > TimeSpan.FromSeconds(15));
+            Assert.Equal(completedRequest.Position, seekBar.Position);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void NowPlaying_Buttons_Emit_Playback_Requests_And_Update_Toggle_State()
     {
         var nowPlaying = new MdNowPlayingPanel
