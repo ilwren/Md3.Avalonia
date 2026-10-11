@@ -80,6 +80,8 @@ public sealed class MdScrollViewer : ScrollViewer
     private bool _contentPressObserved;
     private bool _contentHandledAtTunnel;
     private object? _contentCaptureAtTunnel;
+    private ScrollBar? _verticalScrollBar;
+    private ScrollBar? _horizontalScrollBar;
 
     // Velocity tracker
     private readonly Stopwatch _stopwatch = new();
@@ -115,13 +117,78 @@ public sealed class MdScrollViewer : ScrollViewer
         // presenter consumes a new wheel gesture.
         AddHandler(PointerWheelChangedEvent, OnPreviewPointerWheelChanged,
             RoutingStrategies.Tunnel, handledEventsToo: true);
+
+        LayoutUpdated += OnFirstLayoutUpdated;
+    }
+
+    private void OnFirstLayoutUpdated(object? sender, EventArgs e)
+    {
+        LayoutUpdated -= OnFirstLayoutUpdated;
+
+        // Some virtualizing compositions realize their containers one layout pass late on
+        // desktop platforms; the accidental cure users applied was resizing the window. One
+        // extra measure pass after the first layout reproduces that cure before the first
+        // frame paints, at the cost of a single startup pass.
+        InvalidateMeasure();
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
         if (change.Property == ContentProperty)
+        {
             AttachContentPressObserver(Content as InputElement);
+        }
+        else if (change.Property == ExtentProperty ||
+                 change.Property == ViewportProperty ||
+                 change.Property == OffsetProperty ||
+                 change.Property == VerticalScrollBarVisibilityProperty ||
+                 change.Property == HorizontalScrollBarVisibilityProperty)
+        {
+            SyncScrollBars();
+        }
+    }
+
+    /// <summary>
+    /// Captures the template scroll bars and calibrates them synchronously.
+    /// </summary>
+    /// <remarks>
+    /// <c>ScrollBar.AttachToScrollViewer</c> creates its self-bindings only when the bar
+    /// attaches to the visual tree, so depending on it alone can leave the first rendered frame
+    /// - or any frame whose Extent/Viewport arrives through an unlucky ordering - at RangeBase
+    /// defaults (a full-track thumb) until some later invalidation, classically a window resize;
+    /// the defect was only reproducible on desktop platforms. <see cref="SyncScrollBars"/> writes
+    /// the mirror values directly, synchronously, on every relevant owner change, so the bars
+    /// track the owner from the very first frame on every platform, with no resize and no
+    /// binding/attach ordering involved. XAML cannot express the mirror either:
+    /// <c>TemplateBinding</c> rejects the <c>ScrollBarMaximum.Y</c>-style paths (AVLN2000).
+    /// </remarks>
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        base.OnApplyTemplate(e);
+
+        _verticalScrollBar = e.NameScope.Find<ScrollBar>("PART_VerticalScrollBar");
+        _horizontalScrollBar = e.NameScope.Find<ScrollBar>("PART_HorizontalScrollBar");
+        SyncScrollBars();
+    }
+
+    private void SyncScrollBars()
+    {
+        if (_verticalScrollBar is { } vertical)
+        {
+            vertical.SetCurrentValue(RangeBase.MaximumProperty, ScrollBarMaximum.Y);
+            vertical.SetCurrentValue(RangeBase.ValueProperty, Offset.Y);
+            vertical.SetCurrentValue(ScrollBar.ViewportSizeProperty, Viewport.Height);
+            vertical.SetCurrentValue(ScrollBar.VisibilityProperty, VerticalScrollBarVisibility);
+        }
+
+        if (_horizontalScrollBar is { } horizontal)
+        {
+            horizontal.SetCurrentValue(RangeBase.MaximumProperty, ScrollBarMaximum.X);
+            horizontal.SetCurrentValue(RangeBase.ValueProperty, Offset.X);
+            horizontal.SetCurrentValue(ScrollBar.ViewportSizeProperty, Viewport.Width);
+            horizontal.SetCurrentValue(ScrollBar.VisibilityProperty, HorizontalScrollBarVisibility);
+        }
     }
 
     private void AttachContentPressObserver(InputElement? contentRoot)

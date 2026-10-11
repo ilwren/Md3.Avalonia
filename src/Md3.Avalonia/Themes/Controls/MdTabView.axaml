@@ -44,20 +44,36 @@
     <Style Selector="^:selected"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
     <Style Selector="^:selected /template/ Border#PART_Indicator"><Setter Property="Width" Value="32" /><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
     <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
+    <!-- Primary variant: text-first, full-width active indicator, no icon (M3 primary tabs). -->
+    <Style Selector="^[Variant=Primary] /template/ md|MdSymbolPresenter#PART_Icon"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^[Variant=Primary] /template/ Border#PART_Indicator">
+      <Setter Property="Width" Value="NaN" /><Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+    <Style Selector="^[Variant=Primary]:selected /template/ Border#PART_Indicator">
+      <Setter Property="Width" Value="NaN" /><Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdTabView}" TargetType="md:MdTabView">
     <Setter Property="ItemsPanel"><ItemsPanelTemplate><UniformGrid Rows="1" /></ItemsPanelTemplate></Setter>
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdTabView">
+        <!-- Upstream Avalonia issue 22094 can drop Bottom-docked children at fractional Windows
+             display scaling (the fill sibling paints over them until a resize); MdTabView detects
+             a misplaced strip after the first layout and applies a one-time size nudge instead,
+             keeping the simple DockPanel structure. -->
         <DockPanel>
           <Border x:Name="PART_TabStripBorder"
                   DockPanel.Dock="{TemplateBinding TabStripPlacement}"
                   BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
                   BorderThickness="0,0,0,1">
-            <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
+            <!-- The strip's scroller is an MdScrollViewer, not the native ScrollViewer: the native
+                 control has no template in apps that load only MaterialTheme; MdScrollViewer is
+                 themed here and calibrated from its own first layout pass. -->
+            <md:MdScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
               <ItemsPresenter x:Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
-            </ScrollViewer>
+            </md:MdScrollViewer>
           </Border>
           <!-- TabControl owns this one and only selected-content presenter. A short opacity
                transition preserves motion without attempting to parent the content twice. -->

@@ -24,6 +24,10 @@ public sealed class MdLinearProgressIndicator : ProgressBar
     public static readonly StyledProperty<double> WaveLengthProperty =
         AvaloniaProperty.Register<MdLinearProgressIndicator, double>(nameof(WaveLength), 24);
 
+    private static TimeSpan FrameInterval => OperatingSystem.IsAndroid()
+        ? TimeSpan.FromMilliseconds(33)
+        : TimeSpan.FromMilliseconds(16);
+
     private readonly DispatcherTimer _timer;
     private readonly long _createdAt = Stopwatch.GetTimestamp();
 
@@ -38,7 +42,9 @@ public sealed class MdLinearProgressIndicator : ProgressBar
 
     public MdLinearProgressIndicator()
     {
-        _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
+        // Render-priority ticks land with the frame; software-rasterized backends (Android
+        // emulators) get a 30 fps cap - motion stays time-based, so the wave remains smooth.
+        _timer = new DispatcherTimer(DispatcherPriority.Render) { Interval = FrameInterval };
         _timer.Tick += (_, _) => InvalidateVisual();
         SetCurrentValue(MinHeightProperty, 12d);
     }

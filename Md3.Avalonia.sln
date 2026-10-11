@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -21,8 +21,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.Gallery", "gallery\Md3.Avalonia.Gallery\Md3.Avalonia.Gallery.csproj", "{C2DFFDDB-03C1-4352-B084-CA158168E859}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.Gallery.Desktop", "gallery\Md3.Avalonia.Gallery.Desktop\Md3.Avalonia.Gallery.Desktop.csproj", "{D3DFFDDB-03C1-4352-B084-CA158168E860}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.Gallery.Android", "gallery\Md3.Avalonia.Gallery.Android\Md3.Avalonia.Gallery.Android.csproj", "{E4DFFDDB-03C1-4352-B084-CA158168E861}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
@@ -66,12 +64,6 @@ Global
 		{D3DFFDDB-03C1-4352-B084-CA158168E860}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3DFFDDB-03C1-4352-B084-CA158168E860}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3DFFDDB-03C1-4352-B084-CA158168E860}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E4DFFDDB-03C1-4352-B084-CA158168E861}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E4DFFDDB-03C1-4352-B084-CA158168E861}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E4DFFDDB-03C1-4352-B084-CA158168E861}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{E4DFFDDB-03C1-4352-B084-CA158168E861}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E4DFFDDB-03C1-4352-B084-CA158168E861}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E4DFFDDB-03C1-4352-B084-CA158168E861}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{CC6188EF-DFE3-4F2D-AAD8-22E78F47319D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CC6188EF-DFE3-4F2D-AAD8-22E78F47319D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC6188EF-DFE3-4F2D-AAD8-22E78F47319D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -87,7 +79,6 @@ Global
 		{247044DF-FA5C-4AD9-9BB1-86C104C6663D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{C2DFFDDB-03C1-4352-B084-CA158168E859} = {3DD3B10C-2DE9-B2B9-1F65-9DB874E2084B}
 		{D3DFFDDB-03C1-4352-B084-CA158168E860} = {3DD3B10C-2DE9-B2B9-1F65-9DB874E2084B}
-		{E4DFFDDB-03C1-4352-B084-CA158168E861} = {3DD3B10C-2DE9-B2B9-1F65-9DB874E2084B}
 		{CC6188EF-DFE3-4F2D-AAD8-22E78F47319D} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal

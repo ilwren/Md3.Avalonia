@@ -17,5 +17,6 @@
     <ProjectReference Include="../../src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj" />
     <AvaloniaResource Include="Assets/Media/**" />
+    <AvaloniaResource Include="Assets/tray-icon.png" />
   </ItemGroup>
 </Project>

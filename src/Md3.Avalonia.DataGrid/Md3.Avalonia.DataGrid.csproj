@@ -12,6 +12,7 @@
     <PackageTags>avalonia;datagrid;table;controls;theme;material-design-3</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>logo-128.png</PackageIcon>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
@@ -29,6 +30,7 @@
     <PackageReference Include="Avalonia.Controls.DataGrid" />
     <ProjectReference Include="../Md3.Avalonia/Md3.Avalonia.csproj" />
     <None Include="../../README.md" Pack="true" PackagePath="/" Link="README.md" />
+    <None Include="../../assets/logo-128.png" Pack="true" PackagePath="/" Link="logo-128.png" />
     <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />
   </ItemGroup>
 </Project>

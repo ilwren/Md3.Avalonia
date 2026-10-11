@@ -413,9 +413,9 @@ scrollbars, and a cell editor that no longer derives from Fluent's `TextBox` the
 
 ## Trimming
 
-All five packages set `IsTrimmable`, so an application that publishes with
-`PublishTrimmed=true` can trim them, and they build with the IL2xxx analyzer on, so a new
-reflective call fails the build rather than breaking a trimmed app quietly.
+All six packages set `IsTrimmable` and `IsAotCompatible`, so an application that publishes with
+`PublishTrimmed=true` or `PublishAot=true` can trim them, and they build with the IL2xxx/IL3xxx
+analyzers on, so a new reflective call fails the build rather than breaking a trimmed app quietly.
 
 Two things in a UI library genuinely need reflection, and both are handled:
 

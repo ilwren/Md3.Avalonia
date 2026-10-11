@@ -116,6 +116,13 @@
                                        Extent="{Binding Extent, ElementName=PART_ContentPresenter}" />
             </ScrollContentPresenter.GestureRecognizers>
           </ScrollContentPresenter>
+          <!-- The bars are calibrated synchronously from MdScrollViewer (OnApplyTemplate plus a
+               direct write on every Extent/Viewport/Offset change): TemplateBinding cannot
+               express the ScrollBarMaximum/Offset/Viewport paths (AVLN2000), and relying solely
+               on ScrollBar.AttachToScrollViewer left the first rendered frame - on desktop
+               platforms - with RangeBase defaults (a full-track thumb) until the next
+               invalidation, classically a window resize. AttachToScrollViewer skips properties
+               that are already set, so the two mechanisms cannot fight. -->
           <md:MdScrollBar Name="PART_HorizontalScrollBar" Grid.Row="1" Grid.Column="0" Orientation="Horizontal" />
           <md:MdScrollBar Name="PART_VerticalScrollBar" Grid.Row="0" Grid.Column="1" Orientation="Vertical" />
         </Grid>
@@ -520,5 +527,115 @@
   </ControlTheme>
   <ControlTheme x:Key="{x:Type md:MdWindowResizeGrip}" TargetType="md:MdWindowResizeGrip">
     <Setter Property="Width" Value="8" /><Setter Property="Height" Value="8" />
+  </ControlTheme>
+
+  <!-- The Win32 tray icon's right-click popup is a bare Window hosting a MenuFlyoutPresenter
+       whose item containers are native MenuItem/Separator controls. Apps that load only the
+       Material themes carry no base theme, so those three types had no ControlTheme and the
+       tray menu rendered empty on right-click. These compact Material themes keep the tray
+       menu - and any native context menu - visible without a base theme. -->
+  <ControlTheme x:Key="{x:Type MenuFlyoutPresenter}" TargetType="MenuFlyoutPresenter">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="Padding" Value="0,8" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}">
+          <ItemsPresenter Name="PART_ItemsPresenter" Margin="{TemplateBinding Padding}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type Separator}" TargetType="Separator">
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Setter Property="Margin" Value="12,4" />
+    <Setter Property="Height" Value="1" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type MenuItem}" TargetType="MenuItem">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Padding" Value="12,0" />
+    <Setter Property="Height" Value="36" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="root" Background="{TemplateBinding Background}">
+          <Grid ColumnDefinitions="28,*,Auto,20">
+            <ContentControl Name="PART_ToggleIconPresenter" Grid.Column="0" IsVisible="False"
+                            Width="16" Height="16"
+                            HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <ContentControl Name="PART_IconPresenter" Grid.Column="0" Width="16" Height="16"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Content="{TemplateBinding Icon}" />
+            <ContentPresenter Name="PART_HeaderPresenter" Grid.Column="1"
+                              Margin="{TemplateBinding Padding}"
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding Header}"
+                              ContentTemplate="{TemplateBinding HeaderTemplate}" />
+            <Path Name="PART_SubmenuArrow" Grid.Column="3" Margin="8,0"
+                  VerticalAlignment="Center" Data="M0,0L4,3.5 0,7z"
+                  Fill="{TemplateBinding Foreground}" />
+            <Popup Name="PART_Popup" IsLightDismissEnabled="False"
+                   IsOpen="{TemplateBinding IsSubMenuOpen, Mode=TwoWay}"
+                   Placement="RightEdgeAlignedTop">
+              <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
+                      BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                      BorderThickness="1" CornerRadius="4">
+                <ItemsPresenter Name="PART_ItemsPresenter" Margin="0,8" />
+              </Border>
+            </Popup>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:separator">
+      <Setter Property="Template">
+        <ControlTemplate><Separator /></ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="^:empty /template/ Path#PART_SubmenuArrow">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.38" />
+    </Style>
+    <Style Selector="^:selected /template/ Border#root">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
+    </Style>
+    <Style Selector="^:toggle /template/ ContentControl#PART_ToggleIconPresenter, ^:radio /template/ ContentControl#PART_ToggleIconPresenter">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:toggle /template/ ContentControl#PART_IconPresenter, ^:radio /template/ ContentControl#PART_IconPresenter">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:checked:radio /template/ ContentControl#PART_ToggleIconPresenter">
+      <Setter Property="Content">
+        <Template>
+          <Ellipse Width="8" Height="8" Margin="4"
+                   Fill="{Binding $parent[MenuItem].Foreground}" />
+        </Template>
+      </Setter>
+    </Style>
+    <Style Selector="^:checked:toggle /template/ ContentControl#PART_ToggleIconPresenter">
+      <Setter Property="Content">
+        <Template>
+          <Path VerticalAlignment="Center" Data="F1M10,1.2L4.7,9.1 4.5,9.1 0,5.2 1.3,3.5 4.3,6.1 8.3,0 10,1.2z"
+                Fill="{Binding $parent[MenuItem].Foreground}" />
+        </Template>
+      </Setter>
+    </Style>
   </ControlTheme>
 </ResourceDictionary>

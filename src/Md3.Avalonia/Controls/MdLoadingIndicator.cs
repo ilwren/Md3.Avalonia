@@ -30,6 +30,11 @@ public sealed class MdLoadingIndicator : ProgressBar
         AvaloniaProperty.Register<MdLoadingIndicator, IBrush?>(nameof(ContainerBrush));
 
     private const double SecondsPerShape = 0.650;
+
+    private static TimeSpan FrameInterval => OperatingSystem.IsAndroid()
+        ? TimeSpan.FromMilliseconds(33)
+        : TimeSpan.FromMilliseconds(16);
+
     private readonly DispatcherTimer _timer;
     private readonly long _createdAt = Stopwatch.GetTimestamp();
 
@@ -48,7 +53,9 @@ public sealed class MdLoadingIndicator : ProgressBar
         IsIndeterminate = true;
         IsHitTestVisible = false;
         UpdateAutomationName();
-        _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
+        // Render-priority ticks land with the frame; software-rasterized backends (Android
+        // emulators) get a 30 fps cap so the morph never competes with the rasterizer.
+        _timer = new DispatcherTimer(DispatcherPriority.Render) { Interval = FrameInterval };
         _timer.Tick += (_, _) => InvalidateVisual();
         ApplySize();
         UpdateContainedState();
