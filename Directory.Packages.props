@@ -12,9 +12,12 @@
     <PackageVersion Include="Avalonia.AvaloniaEdit" Version="12.0.0" />
     <PackageVersion Include="AvaloniaHex" Version="0.1.13" />
     <PackageVersion Include="AvaloniaRichEditor" Version="1.2.1" />
-    <PackageVersion Include="Dock.Avalonia" Version="12.1.0.7" />
-    <PackageVersion Include="Dock.Avalonia.Themes.Fluent" Version="12.1.0.7" />
-    <PackageVersion Include="Dock.Model.Avalonia" Version="12.1.0.7" />
+    <!-- Dock 12.1.0.7 requires Avalonia 12.1.3; this repository is pinned to 12.1.2, so the
+         last Dock release that builds against that baseline is 12.1.0.6 (needs 12.1.1).
+         Bump both together. -->
+    <PackageVersion Include="Dock.Avalonia" Version="12.1.0.6" />
+    <PackageVersion Include="Dock.Avalonia.Themes.Fluent" Version="12.1.0.6" />
+    <PackageVersion Include="Dock.Model.Avalonia" Version="12.1.0.6" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.2" />
     <PackageVersion Include="MaterialColorUtilities" Version="0.3.0" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />

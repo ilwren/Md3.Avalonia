@@ -1,7 +1,7 @@
 <!--
   Material Design 3 theme for Dock.
 
-  Structurally the same theme as Dock.Avalonia.Themes.Fluent 12.1.0.7 DockFluentTheme.axaml
+  Structurally the same theme as Dock.Avalonia.Themes.Fluent 12.1.0.6 DockFluentTheme.axaml
   (MIT, see THIRD-PARTY-NOTICES.md), with two deliberate differences. The accent dictionary is
   ours - Accents/Material.axaml resolves Dock's DockApplicationAccent*/DockTheme*/DockSurface*
   and tab/chrome keys to Md.Sys.Color.* tokens - and the control dictionaries are loaded from
