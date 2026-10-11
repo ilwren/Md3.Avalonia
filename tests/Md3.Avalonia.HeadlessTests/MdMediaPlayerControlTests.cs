@@ -52,6 +52,8 @@ public sealed class MdMediaPlayerControlTests
         {
             Dispatcher.UIThread.RunJobs();
             var slider = Assert.Single(seekBar.GetVisualDescendants().OfType<MdSlider>());
+            Assert.True(slider.Focus());
+            Dispatcher.UIThread.RunJobs();
             MdSeekRequestedEventArgs? request = null;
             var requestCount = 0;
             seekBar.SeekRequested += (_, args) =>
@@ -60,21 +62,13 @@ public sealed class MdMediaPlayerControlTests
                 requestCount++;
             };
 
-            slider.RaiseEvent(new KeyEventArgs
-            {
-                RoutedEvent = InputElement.KeyDownEvent,
-                Key = Key.Right,
-                Source = slider
-            });
+            window.KeyPress(Key.Right, RawInputModifiers.None, PhysicalKey.ArrowRight, null);
+            Dispatcher.UIThread.RunJobs();
             Assert.True(seekBar.IsSeeking);
             Assert.Equal(TimeSpan.FromSeconds(15), seekBar.PreviewPosition);
 
-            slider.RaiseEvent(new KeyEventArgs
-            {
-                RoutedEvent = InputElement.KeyUpEvent,
-                Key = Key.Right,
-                Source = slider
-            });
+            window.KeyRelease(Key.Right, RawInputModifiers.None, PhysicalKey.ArrowRight, null);
+            Dispatcher.UIThread.RunJobs();
 
             Assert.False(seekBar.IsSeeking);
             Assert.Equal(TimeSpan.FromSeconds(15), seekBar.Position);
