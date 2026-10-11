@@ -67,7 +67,7 @@ public class MdAvaloniaHexThemeTests
 
         var caret = editor.HexView.Layers.OfType<CaretLayer>().Single();
         var caretPen = Assert.IsAssignableFrom<IPen>(caret.PrimaryColumnBorder);
-        Assert.Same(Brush(editor, "Md.Sys.Color.Primary.Brush"), caretPen.Brush);
+        Assert.Equal(ColorOf(Brush(editor, "Md.Sys.Color.Primary.Brush")), ColorOf(caretPen.Brush!));
         Assert.Same(Brush(editor, "PrimaryCaretBackground"), caret.PrimaryColumnBackground);
     }
 
@@ -99,7 +99,7 @@ public class MdAvaloniaHexThemeTests
 
         Assert.Equal(32ul, editor.Document!.Length);
 
-        editor.SelectAll();
+        editor.Selection.SelectAll();
         Dispatcher.UIThread.RunJobs();
         Assert.Equal(0ul, editor.Selection.Range.Start.ByteIndex);
         Assert.Equal(editor.Document.Length, editor.Selection.Range.End.ByteIndex);
@@ -112,7 +112,7 @@ public class MdAvaloniaHexThemeTests
 
         var changes = 0;
         editor.DocumentChanged += (_, _) => changes++;
-        editor.Document = new ByteArrayBinaryDocument(new byte[] { 1, 2, 3 });
+        editor.Document = new MemoryBinaryDocument(new byte[] { 1, 2, 3 });
         Dispatcher.UIThread.RunJobs();
         Assert.Equal(1, changes);
         Assert.Equal(3ul, editor.Document!.Length);
@@ -124,7 +124,7 @@ public class MdAvaloniaHexThemeTests
         {
             Width = 520,
             Height = 260,
-            Document = new ByteArrayBinaryDocument(new byte[32])
+            Document = new MemoryBinaryDocument(new byte[32])
         };
         editor.Columns.Add(new OffsetColumn());
         editor.Columns.Add(new HexColumn());
