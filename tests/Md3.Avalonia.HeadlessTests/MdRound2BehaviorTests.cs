@@ -68,6 +68,31 @@ public sealed class MdRound2BehaviorTests
         Assert.Equal("Europe", cascader.DisplayText);
     }
 
+    [Fact]
+    public void Linear_Indeterminate_Sweep_Follows_The_M3_Two_Segment_Timeline()
+    {
+        // Both segments start collapsed at the leading edge of the 1800 ms loop.
+        Assert.Equal(0, MdLinearProgressIndicator.SampleIndeterminateEdge(0, 0), 6);
+        Assert.Equal(0, MdLinearProgressIndicator.SampleIndeterminateEdge(0, 3), 6);
+
+        // Segment 2's end edge is already crossing while segment 1's end has not started (delay 0 vs 1000).
+        Assert.True(MdLinearProgressIndicator.SampleIndeterminateEdge(400, 3) > 0.4);
+        Assert.Equal(0, MdLinearProgressIndicator.SampleIndeterminateEdge(400, 1), 6);
+
+        // By the end of the loop every edge has crossed the track, so the restart is seamless.
+        for (var i = 0; i < 4; i++)
+        {
+            Assert.Equal(1, MdLinearProgressIndicator.SampleIndeterminateEdge(1800, i), 6);
+        }
+
+        // Segment 1 always trails segment 2 (start edge index 0 vs 2, end edge index 1 vs 3).
+        for (var t = 0; t <= 1800; t += 50)
+        {
+            Assert.True(MdLinearProgressIndicator.SampleIndeterminateEdge(t, 1) <= MdLinearProgressIndicator.SampleIndeterminateEdge(t, 3) + 1e-9);
+            Assert.True(MdLinearProgressIndicator.SampleIndeterminateEdge(t, 0) <= MdLinearProgressIndicator.SampleIndeterminateEdge(t, 2) + 1e-9);
+        }
+    }
+
     [AvaloniaFact]
     public void License_Page_Keeps_A_Selection_So_The_Detail_Pane_Is_Never_Blank()
     {

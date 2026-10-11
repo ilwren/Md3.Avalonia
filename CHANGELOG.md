@@ -10,6 +10,10 @@
   the app theme through a new `MainWindow.ApplyThemeMode`, staying in sync with the shell's
   theme selector instead of being decorative controls with a hard-coded checked state.
 
+- `MdLinearProgressIndicator` indeterminate now runs the official M3 disjoint two-segment sweep
+  (1800 ms loop, per-edge delays/durations and bezier interpolators from
+  material-components-android) instead of a single gliding segment; wavy shape still applies.
+
 ### Fixed
 
 - `MdBanner` actions drop below the text automatically under the 480 dip compact breakpoint
