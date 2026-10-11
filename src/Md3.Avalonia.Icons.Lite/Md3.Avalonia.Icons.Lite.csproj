@@ -10,6 +10,7 @@
     <PackageTags>avalonia;icons;fonts;material-symbols;lite;subset</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>logo-128.png</PackageIcon>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
@@ -28,6 +29,7 @@
     <AvaloniaResource Include="Assets/Fonts/MaterialSymbolsRounded-Lite.ttf" />
     <None Include="../Md3.Avalonia.Icons/Assets/Fonts/MaterialSymbolsRounded-LICENSE.txt" Pack="true" PackagePath="licenses/MaterialSymbolsRounded-LICENSE.txt" Link="MaterialSymbolsRounded-LICENSE.txt" />
     <None Include="../../README.md" Pack="true" PackagePath="/" Link="README.md" />
+    <None Include="../../assets/logo-128.png" Pack="true" PackagePath="/" Link="logo-128.png" />
     <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />
   </ItemGroup>
 </Project>

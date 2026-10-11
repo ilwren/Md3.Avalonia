@@ -23,11 +23,11 @@ The runtime library references only `Avalonia` and `MaterialColorUtilities`. It 
 
 ## Android boundary
 
-`samples/Md3.Avalonia.Gallery.Android` is deliberately kept outside the desktop solution so developers without the Android workload can build the library and desktop Gallery. Validate it with an installed .NET Android workload:
+`gallery/Md3.Avalonia.Gallery.Android` is deliberately kept outside the desktop solution so developers without the Android workload can build the library and desktop Gallery. Validate it with an installed .NET Android workload:
 
 ```bash
 dotnet workload install android
-dotnet build samples/Md3.Avalonia.Gallery.Android -c Release
+dotnet build gallery/Md3.Avalonia.Gallery.Android -c Release
 ```
 
 The host uses `ISingleViewApplicationLifetime` and `AndroidGalleryView`. Popup templates do not force `OverlayLayer`, preserving Avalonia's Android fallback behavior.

@@ -12,6 +12,8 @@ public sealed class MdTabViewItem : TabItem
 {
     private Border? _indicator;
     public static readonly StyledProperty<object?> BadgeProperty = AvaloniaProperty.Register<MdTabViewItem, object?>(nameof(Badge));
+    public static readonly StyledProperty<MdTabVariant> VariantProperty =
+        AvaloniaProperty.Register<MdTabViewItem, MdTabVariant>(nameof(Variant), MdTabVariant.Secondary);
 
     static MdTabViewItem()
     {
@@ -21,6 +23,9 @@ public sealed class MdTabViewItem : TabItem
     }
     public MdTabViewItem() => UpdatePseudoClasses();
     public object? Badge { get => GetValue(BadgeProperty); set => SetValue(BadgeProperty, value); }
+
+    /// <summary>Material tab style: primary (full-width indicator, text-first) or secondary.</summary>
+    public MdTabVariant Variant { get => GetValue(VariantProperty); set => SetValue(VariantProperty, value); }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {

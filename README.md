@@ -9,7 +9,7 @@
 - 每个交互控件使用独立的 `Md*` CLR 类型和 scoped `ControlTheme`；不全局覆盖 Avalonia 原生控件；
 - 核心包不依赖 Fluent/Simple theme，尽量复用 Avalonia 原生行为、绑定、键盘和选择模型；
 - Material 颜色、字体、形状、状态层、阴影和 motion 通过 token 与 `DynamicResource` 消费；
-- Core、Icons、Icons.Lite、Extra、DataGrid 五个包可以独立发布；Extra 和图表能力不强制绑定第三方 vendor；
+- Core、Icons、Icons.Lite、Extra、DataGrid、RichEditor 六个包可以独立发布；Extra 和图表能力不强制绑定第三方 vendor；
 - RTL、现有 accessibility 和多平台适配代码会持续保留；当前开发优先级暂不把完整 RTL/多语种布局和屏幕阅读器人工验收作为预览版阻塞项。
 
 | Dark components and app bar | Dark outlined fields |
@@ -372,7 +372,17 @@ dotnet build Md3.Avalonia.sln -c Release
 dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release --no-build
 ```
 
-当前发布门禁会构建五个包并严格检查五个 `.nupkg`、五个 `.snupkg`、统一版本和已内嵌官方字体。仓库不保留普通构建产物。测试覆盖 Light/Dark Gallery screenshots、任意 HCT seed golden vectors、49 roles、三档 contrast、主题 JSON round-trip、五档 breakpoint、搜索索引、LTR/RTL 渲染、CommunityToolkit.Mvvm、Automation/live-region、虚拟化和主题生命周期、AvaloniaEdit 双语言编辑器、真实 ScrollViewer extent/viewport/wheel offset、Autocomplete/Numeric input、adaptive breakpoints、Flexible NavigationBar、official chip/item 类型、popup 非强制 OverlayLayer、Tabs/Toolbars/Tooltips、Menus/Drawer/Rail/Search/Sheets/Slider/Snackbar/Switch 的渲染与直接 API，以及 Dialog、Lists、contained Loading/Progress、popup 互斥、文化日期网格、一分钟 TimePicker、state layer、buttons、fields、Carousel/Card/Chips、AppBar、Symbols、Radio、Badge、ripple/motion。
+原生 AOT 发布桌面 Gallery（Linux 需要 clang/zlib，`--smoke` 另需 xvfb）：
+
+```bash
+bash scripts/publish-gallery-aot.sh --rid linux-x64 --smoke   # 或 win-x64 / osx-x64 / osx-arm64
+# Windows PowerShell：
+# powershell -File scripts/publish-gallery-aot.ps1 -Rid win-x64
+```
+
+脚本会断言产物是原生可执行文件且旁边没有托管 dll，`--smoke` 在 xvfb 下实际启动该二进制确认运行时未因裁剪丢失反射元数据而崩溃；默认清理 bin/obj。`.github/workflows/aot-probe.yml` 在 main 与 arena 分支上运行同一脚本。
+
+当前发布门禁会构建六个包并严格检查六个 `.nupkg`、六个 `.snupkg`、统一版本和已内嵌官方字体。仓库不保留普通构建产物。测试覆盖 Light/Dark Gallery screenshots、任意 HCT seed golden vectors、49 roles、三档 contrast、主题 JSON round-trip、五档 breakpoint、搜索索引、LTR/RTL 渲染、CommunityToolkit.Mvvm、Automation/live-region、虚拟化和主题生命周期、AvaloniaEdit 双语言编辑器、真实 ScrollViewer extent/viewport/wheel offset、Autocomplete/Numeric input、adaptive breakpoints、Flexible NavigationBar、official chip/item 类型、popup 非强制 OverlayLayer、Tabs/Toolbars/Tooltips、Menus/Drawer/Rail/Search/Sheets/Slider/Snackbar/Switch 的渲染与直接 API，以及 Dialog、Lists、contained Loading/Progress、popup 互斥、文化日期网格、一分钟 TimePicker、state layer、buttons、fields、Carousel/Card/Chips、AppBar、Symbols、Radio、Badge、ripple/motion。
 
 每一次 build、test 或 pack 命令结束后必须立即清理编译产物，再继续后续实现或验证。Workspace 不交付 `bin/`、`obj/`、`TestResults/`、DLL、PDB、NuGet、APK 或 AAB；`docs/*.png` 是保留的文档参考图。
 
