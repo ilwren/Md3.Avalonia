@@ -13,6 +13,7 @@
   and `MdChatMessage.IsStreaming` let a streamed reply update in place while a caret is shown.
 - Chat Phase 1 (continued): `MdCodeBlock` (language label, copy button, horizontal scrolling) and the
   reference `MdFencedCodeMarkdownProvider`, which renders fenced code and leaves other text as selectable text.
+- Chat Phase 1 (continued): web addresses in message text become links that are passed to `IMdLinkOpener`; the controls never open a browser themselves.
 - Chat Phase 1 (continued): `IMdSyntaxHighlighter` colours code blocks; `MdKeywordSyntaxHighlighter` is a generic reference.
 - Chat Phase 2 (continued): audio attachments show a waveform and duration; file attachments show a transfer `Progress`; a `Thumbnail` stands in while a picture loads.
 - Chat Phase 2 (continued): `IMdImageProvider` loads picture attachments by `MdChatAttachment.Uri`.

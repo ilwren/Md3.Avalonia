@@ -16,7 +16,7 @@ public partial class ChatViewGalleryPage : UserControl
         new("question", MdChatMessageRole.User, L("Can the chat preserve provider-neutral message actions?", "聊天能否保留与提供方无关的消息操作？"), DateTimeOffset.Now.AddMinutes(-3), L("You", "你")),
         new("answer", MdChatMessageRole.Assistant, L("Yes. Selection, quote, delete, and retry are surfaced as commands and events.", "可以。选择、引用、删除和重试均通过命令与事件公开。"), DateTimeOffset.Now.AddMinutes(-2), L("Material assistant", "Material 助手"), ReplyToId: "question", ReplyPreview: L("Can the chat preserve provider-neutral message actions?", "聊天能否保留与提供方无关的消息操作？")),
         new("failed", MdChatMessageRole.User, L("Send the release summary", "发送发布摘要"), DateTimeOffset.Now.AddMinutes(-1), L("You", "你"), MdAsyncRequestState.Error, ErrorText: L("Offline · not sent", "离线 · 未发送")),
-        new("code", MdChatMessageRole.Assistant, L("Here is a sample reply:\n```csharp\nvar reply = await provider.SendAsync(text);\n```", "这是一个示例回复：\n```csharp\nvar reply = await provider.SendAsync(text);\n```"), DateTimeOffset.Now.AddSeconds(-50), L("Material assistant", "Material 助手")),
+        new("code", MdChatMessageRole.Assistant, L("Here is a sample reply. Docs: https://avaloniaui.net\n```csharp\nvar reply = await provider.SendAsync(text);\n```", "这是一个示例回复：\n```csharp\nvar reply = await provider.SendAsync(text);\n```"), DateTimeOffset.Now.AddSeconds(-50), L("Material assistant", "Material 助手")),
         new("pictures", MdChatMessageRole.Assistant, L("Pictures load through IMdImageProvider. The second picture shows the retry state.", "图片通过 IMdImageProvider 加载。第二张图片展示重试状态。"), DateTimeOffset.Now.AddSeconds(-40), L("Material assistant", "Material 助手"), Attachments:
         [
             new MdChatAttachment("picture", MdChatAttachmentKind.Image, "sample.png", 24_576, Uri: "gallery://sample-picture"),
@@ -38,7 +38,8 @@ public partial class ChatViewGalleryPage : UserControl
         Chat.MessagesSource = _messages;
         Chat.SuggestionsSource = new[] { L("Show accessibility", "显示无障碍信息"), L("Explain paging", "解释分页"), L("Open docs", "打开文档") };
         Chat.AttachmentRequested += ChatAttachmentRequested;
-        Chat.MarkdownProvider = new MdFencedCodeMarkdownProvider(new MdKeywordSyntaxHighlighter());
+        Chat.MarkdownProvider = new MdFencedCodeMarkdownProvider(new MdKeywordSyntaxHighlighter(),
+            new StatusLinkOpener(uri => ChatStatus.Text = L($"Link handled by the application: {uri}", $"应用已处理链接：{uri}")));
         Chat.ImageProvider = new GalleryImageProvider();
         Chat.AttachmentActivated += ChatAttachmentActivated;
     }
@@ -77,6 +78,16 @@ public partial class ChatViewGalleryPage : UserControl
 
     private void ChatAttachmentActivated(object? sender, MdChatAttachment attachment) =>
         ChatStatus.Text = L($"Opened attachment {attachment.Name}.", $"已打开附件 {attachment.Name}。");
+
+    private sealed class StatusLinkOpener(Action<Uri> onOpen) : IMdLinkOpener
+    {
+        // The gallery does not launch browsers; it reports which link was activated.
+        public bool Open(Uri uri)
+        {
+            onOpen(uri);
+            return true;
+        }
+    }
 
     private sealed class GalleryImageProvider : IMdImageProvider
     {

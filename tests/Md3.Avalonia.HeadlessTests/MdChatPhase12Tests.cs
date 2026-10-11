@@ -1,9 +1,11 @@
 using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Md3.Avalonia.Chat;
@@ -306,5 +308,33 @@ public sealed class MdChatPhase12Tests
 
         Assert.Equal(MdImageLoadState.Loading, control.LoadState);
         Assert.Same(thumbnail, control.Source);
+    }
+
+    private sealed class RecordingLinkOpener : IMdLinkOpener
+    {
+        public List<Uri> Opened { get; } = new();
+
+        public bool Open(Uri uri)
+        {
+            Opened.Add(uri);
+            return true;
+        }
+    }
+
+    [AvaloniaFact]
+    public void Web_Address_Becomes_A_Link_And_Clicking_It_Calls_The_Opener()
+    {
+        var opener = new RecordingLinkOpener();
+        var panel = Assert.IsType<StackPanel>(new MdFencedCodeMarkdownProvider(linkOpener: opener).Render("See https://example.com/docs.", isStreaming: false));
+
+        var block = Assert.IsType<SelectableTextBlock>(Assert.Single(panel.Children));
+        Assert.Equal(3, block.Inlines!.Count);
+        var link = Assert.IsType<HyperlinkButton>(Assert.IsType<InlineUIContainer>(block.Inlines![1]).Child);
+        Assert.Equal<object?>("https://example.com/docs", link.Content);
+
+        link.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+
+        var uri = Assert.Single(opener.Opened);
+        Assert.Equal("https://example.com/docs", uri.ToString());
     }
 }

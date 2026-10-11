@@ -50,8 +50,9 @@
 - 已实现：`IMdMarkdownProvider` 契约、`MdPlainTextMarkdownProvider`、`MdChatView.MarkdownProvider` 与逐气泡传递、`MdChatMessage.IsStreaming`（流式光标 `PART_Caret`）、同 Id 替换时保留选择且不重复播报。
 - 偏差：纯文本回退实现放在 `Md3.Avalonia.Chat` 包而不是核心包（聊天包拆分后，核心包不再承载聊天功能）。
 - 追加实现：`MdCodeBlock`（语言标签、复制按钮、横向滚动）与参考实现 `MdFencedCodeMarkdownProvider`（识别 ``` 围栏；流式时未闭合的围栏延伸到末尾）。
+- 追加实现：链接。`MdFencedCodeMarkdownProvider` 把正文中的 http/https 地址渲染为 `HyperlinkButton`，点击时调用注入的 `IMdLinkOpener.Open(Uri)`；控件本身不打开浏览器，桌面与移动端由应用决定。
 - 追加实现：`IMdSyntaxHighlighter` 与通用参考实现 `MdKeywordSyntaxHighlighter`，由 `MdCodeBlock.Highlighter` 使用。
-- 未实现：`MdStreamingText` 独立控件与 token 淡入（流式光标已由 `PART_Caret` 提供）；链接可点击与 `IMdLinkOpener`（需先确认 Avalonia 12 的超链接控件用法，本轮未做）；1000 token 流式压测；完整 Markdown 解析（表格、强调、链接）由应用的 provider 实现。
+- 未实现：`MdStreamingText` 独立控件与 token 淡入（流式光标已由 `PART_Caret` 提供）；1000 token 流式压测；完整 Markdown 解析（表格、强调、链接）由应用的 provider 实现。
 
 ### Phase 2 — 实现状态（2026-10-11）
 
