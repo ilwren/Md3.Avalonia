@@ -58,6 +58,12 @@ surface，调用方仍可覆盖。
 
 - **`Md3.Avalonia.RichEditor`** —— [AvaloniaRichEditor](https://github.com/centwon/AvaloniaRichEditor)
   的 Material Design 3 主题，opt-in。它是唯一引入该依赖的包，包总数到六个。
+- **`Md3.Avalonia.AvaloniaEdit`** —— [AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit)
+  的 Material Design 3 主题，opt-in。它是唯一引入 `Avalonia.AvaloniaEdit` 依赖的包，包总数到七个。
+  主题保留了上游模板的部件名与绑定；编辑器自己创建、但没有公开外观入口的原生控件（紧凑查找输入框、
+  查找按钮、match case/whole word/regex 开关、展开箭头、补全行）全部改成只在该编辑器模板里引用的
+  `Md.Comp.AvaloniaEdit.*` 键，所以注册它**不会**替换应用其余部分的原生控件样式。Gallery 的
+  `CodeExample` 已改用它，仓库不再需要 Fluent 资源。
 - **原生 AOT 已验证可用。** 六个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
   IL3xxx 分析器。`.github/workflows/aot-probe.yml` 用 `PublishAot=true` 发布桌面 Gallery，并且
   **不把「步骤成功」当作答案**：它断言产物是原生 ELF 可执行文件、输出目录里没有托管 dll 残留（防止

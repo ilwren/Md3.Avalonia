@@ -7,6 +7,13 @@
 - **`Md3.Avalonia.RichEditor`**, an opt-in Material Design 3 theme for the
   [AvaloniaRichEditor](https://github.com/centwon/AvaloniaRichEditor) control. It is the only
   package that pulls in that dependency, bringing the set to six packages.
+- **`Md3.Avalonia.AvaloniaEdit`**, an opt-in Material Design 3 chrome theme for the
+  [AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit) text editor: `TextEditor`, `TextArea`,
+  the search and replace panel, the completion list and the completion tooltip, plus keyed
+  `Md.Comp.AvaloniaEdit.*` themes for the inner controls the editor instantiates. It is the only
+  package that pulls in that dependency, bringing the set to seven. The Gallery's `CodeExample`
+  now uses it instead of scoping Fluent resources to the preview, so no project in the repository
+  references `Avalonia.Themes.Fluent` any more.
 - **Native AOT.** All six packages declare `IsAotCompatible` and build with the IL3xxx analyzers
   on alongside the existing IL2xxx trimming ones. `.github/workflows/aot-probe.yml` publishes the
   desktop gallery with `PublishAot=true` and does not accept a green step as the answer: it

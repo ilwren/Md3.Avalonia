@@ -14,6 +14,9 @@ This document is the public entry point for the `0.4.1-preview.1` API. Preview A
 <!-- Optional Material theme for Avalonia's own DataGrid; the only package that pulls in
      Avalonia.Controls.DataGrid: -->
 <PackageReference Include="Md3.Avalonia.DataGrid" Version="0.4.1-preview.1" />
+<!-- Optional Material theme for the AvaloniaEdit text editor; likewise the only package that
+     pulls in Avalonia.AvaloniaEdit: -->
+<PackageReference Include="Md3.Avalonia.AvaloniaEdit" Version="0.4.1-preview.1" />
 ```
 
 ```xml
@@ -410,6 +413,39 @@ THIRD-PARTY-NOTICES.md), keeping its control templates and `PART_` names so the 
 everything it looks up. Changed: M3 tokens throughout, a 56 DIP header and 52 DIP rows with
 16 DIP gutters, a divider between rows, `secondaryContainer` for the selected row, Material
 scrollbars, and a cell editor that no longer derives from Fluent's `TextBox` theme.
+
+## AvaloniaEdit
+
+`MdRichEditor` in `Md3.Avalonia.Extra` is a chrome-only editor surface: it exposes a Material
+command bar and delegates the document to an `IMdRichEditorAdapter`, and it never ships an
+editing engine.
+
+For a real code/text editor, use [AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit)
+with the opt-in `Md3.Avalonia.AvaloniaEdit` package. `MaterialAvaloniaEditTheme` themes the
+editor chrome to Material 3:
+
+```xml
+<Application.Styles>
+  <themes:MaterialTheme />
+  <themes:MaterialAvaloniaEditTheme />
+</Application.Styles>
+```
+
+It is the only package that depends on `Avalonia.AvaloniaEdit`, and it replaces the editor's
+own Fluent/Simple style sheets, so do not include both. Like `MaterialTheme` it is standalone
+and does not need Avalonia's `FluentTheme`.
+
+The theme is derived from the AvaloniaEdit package's own theme files (MIT, see
+THIRD-PARTY-NOTICES.md), keeping their templates, bindings and `PART_` names — `TextEditor`,
+`TextArea`, the search and replace panel, the completion list and the completion tooltip.
+Changed: M3 tokens throughout, `MdScrollViewer` scrollbars, `primary` selection and caret ink,
+`onSurfaceVariant` line numbers, and `tertiaryContainer` search-result highlights.
+
+Everything the editor instantiates but does not expose — the compact search fields, the search
+action buttons, the match-case/whole-word/regex option toggles, the expander and the completion
+rows — is styled by keyed `Md.Comp.AvaloniaEdit.*` control themes that only the editor's own
+templates reference. Registering this theme therefore never replaces Avalonia's native
+`Button`, `ToggleButton`, `TextBox` or `ListBox` themes for the rest of the application.
 
 ## Trimming
 

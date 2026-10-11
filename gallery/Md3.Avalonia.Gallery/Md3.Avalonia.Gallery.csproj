@@ -8,7 +8,6 @@
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.AvaloniaEdit" />
     <PackageReference Include="AvaloniaRichEditor" />
-    <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <ProjectReference Include="../../src/Md3.Avalonia/Md3.Avalonia.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Icons/Md3.Avalonia.Icons.csproj" />
@@ -16,6 +15,7 @@
     <ProjectReference Include="../../src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.AvaloniaEdit/Md3.Avalonia.AvaloniaEdit.csproj" />
     <AvaloniaResource Include="Assets/Media/**" />
   </ItemGroup>
 </Project>
