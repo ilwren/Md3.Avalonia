@@ -161,6 +161,12 @@ internal static class GalleryLocalization
         ["Value is fixed"]="数值固定", ["Variants"]="变体", ["Vertical"]="垂直", ["View shortcuts"]="查看快捷键", ["Voice"]="语音",
         ["Wave"]="波浪", ["Week"]="周", ["Weekend plans"]="周末计划", ["Width and shape"]="宽度与形状", ["Without a stepper"]="无步进器",
         ["Workspace"]="工作区",
+        ["Text editor"]="文本编辑器", ["Open find panel"]="打开查找面板", ["Themed editor"]="已主题化的编辑器",
+        ["Hex editor"]="十六进制编辑器", ["Toggle column headers"]="切换列表头", ["Themed hex view"]="已主题化的十六进制视图",
+        ["AvaloniaEdit wearing the opt-in Md3.Avalonia.AvaloniaEdit theme: line numbers, find and replace, completion, and the Material caret and selection ink. No Fluent resources anywhere in the app."]="AvaloniaEdit 配上 opt-in 的 Md3.Avalonia.AvaloniaEdit 主题：行号、查找替换、补全，以及 Material 的光标与选区配色；整个应用不需要 Fluent 资源。",
+        ["The theme re-templates TextEditor, TextArea, the search panel and the completion list, and styles the controls the editor creates for itself with keyed Md.Comp.AvaloniaEdit.* themes, so the rest of the application keeps its own control themes."]="该主题重新模板化了 TextEditor、TextArea、查找面板和补全列表，并用带键的 Md.Comp.AvaloniaEdit.* 主题为编辑器自建的内部控件换肤，因此应用其余部分仍保留自己的控件主题。",
+        ["AvaloniaHex wearing the opt-in Md3.Avalonia.AvaloniaHex theme: offset, hex and ASCII columns on a Material surface, drawn with the library's selection wash, caret and header colours."]="AvaloniaHex 配上 opt-in 的 Md3.Avalonia.AvaloniaHex 主题：Material 表面上的偏移量、十六进制与 ASCII 三列，并使用本库统一的选区配色、光标与表头颜色。",
+        ["The editor brings its own Material chrome — surfaceContainerLow surface, outlineVariant outline, ExtraSmall corner and MdScrollViewer scrollbars — so it can be dropped straight into a page. Offsets and column headers are onSurfaceVariant, bytes are onSurface, the header strip sits on surfaceContainerHigh and the current line on surfaceContainerHighest."]="编辑器自带 Material 外观——surfaceContainerLow 表面、outlineVariant 描边、ExtraSmall 圆角与 MdScrollViewer 滚动条——可以直接放进页面。偏移量与列表头用 onSurfaceVariant，字节用 onSurface，表头条带用 surfaceContainerHigh，当前行用 surfaceContainerHighest。",
     };
 
     public static void Apply(Control root, CultureInfo culture)

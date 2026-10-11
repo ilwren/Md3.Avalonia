@@ -131,6 +131,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Chat view", () => new ChatViewGalleryPage());
         AddPage("Command palette", () => new CommandPaletteGalleryPage());
         AddPage("Data grids", () => new DataGridGalleryPage());
+        AddPage("Hex editor", () => new HexEditorGalleryPage());
         AddPage("Density", () => new DensityGalleryPage());
         AddPage("Hover cards", () => new HoverCardGalleryPage());
         AddPage("Masonry panel", () => new MasonryPanelGalleryPage());
@@ -140,6 +141,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Rating", () => new RatingGalleryPage());
         AddPage("Result view", () => new ResultViewGalleryPage());
         AddPage("Rich editor", () => new RichEditorGalleryPage());
+        AddPage("Text editor", () => new TextEditorGalleryPage());
         AddPage("Skeleton", () => new SkeletonGalleryPage());
         AddPage("Slidable item", () => new SlidableItemGalleryPage());
         AddPage("Spin kit", () => new SpinKitGalleryPage());

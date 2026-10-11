@@ -179,6 +179,8 @@
             <md:MdButton x:Name="RatingNav" Content="Rating" Variant="Text" HorizontalContentAlignment="Left" Click="ShowRating" />
             <md:MdButton x:Name="ResultViewNav" Content="Result view" Variant="Text" HorizontalContentAlignment="Left" Click="ShowResultView" />
             <md:MdButton x:Name="RichEditorNav" Content="Rich editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowRichEditor" />
+            <md:MdButton x:Name="TextEditorNav" Content="Text editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTextEditor" />
+            <md:MdButton x:Name="HexEditorNav" Content="Hex editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowHexEditor" />
             <md:MdButton x:Name="SkeletonNav" Content="Skeleton" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSkeleton" />
             <md:MdButton x:Name="SlidableNav" Content="Slidable item" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSlidableItem" />
             <md:MdButton x:Name="SpinKitNav" Content="Spin kit" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSpinKit" />
