@@ -91,9 +91,16 @@ public sealed class MdInteractionConformanceAuditTests
     public void Core_Text_Tokens_Meet_Wcag_Aa_Contrast()
     {
         using var host = ShowTabView();
-        var surface = ColorOf(host.TabView, "Md.Sys.Color.Surface.Brush");
-        var onSurface = ColorOf(host.TabView, "Md.Sys.Color.OnSurface.Brush");
-        var onSurfaceVariant = ColorOf(host.TabView, "Md.Sys.Color.OnSurfaceVariant.Brush");
+        var strip = host.TabView.GetVisualDescendants().OfType<Border>()
+            .Single(border => border.Name == "PART_TabStripBorder");
+        var items = host.TabView.GetVisualDescendants().OfType<MdTabViewItem>().ToList();
+        var unselected = items[1];
+        var state = unselected.GetVisualDescendants().OfType<Border>()
+            .Single(border => border.Name == "PART_State");
+
+        var surface = Solid(strip.Background, "strip surface");
+        var onSurface = Solid(state.Background, "state layer on-surface");
+        var onSurfaceVariant = Solid(unselected.Foreground, "unselected tab foreground");
 
         Assert.True(Contrast(onSurface, surface) >= 4.5, "OnSurface on Surface must meet 4.5:1");
         Assert.True(Contrast(onSurfaceVariant, surface) >= 4.5, "OnSurfaceVariant on Surface must meet 4.5:1 for body-size text");
@@ -126,11 +133,11 @@ public sealed class MdInteractionConformanceAuditTests
     private static Point ToWindow(Window window, Visual visual) =>
         visual.TranslatePoint(new Point(visual.Bounds.Width / 2, visual.Bounds.Height / 2), window)!.Value;
 
-    private static Color ColorOf(Control anchor, string key)
+    private static Color Solid(IBrush? brush, string label)
     {
-        var brush = Assert.IsAssignableFrom<ISolidColorBrush>(
-            global::Avalonia.Controls.ResourceNodeExtensions.FindResource(anchor, key));
-        return brush.Color;
+        var solid = Assert.IsAssignableFrom<ISolidColorBrush>(brush);
+        Assert.NotNull(solid);
+        return solid.Color;
     }
 
     private static double Contrast(Color a, Color b)
