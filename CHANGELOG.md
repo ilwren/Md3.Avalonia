@@ -22,6 +22,12 @@
   material-web), replacing the 24 px primary bar and the margin-inset secondary bar; secondary
   also gets the spec's 2 px top corner radius.
 
+- M3 compliance pass: the navigation bar active indicator is now the spec 64x32 dp pill (was
+  56x32), and the snackbar container uses the spec 4 dp corner (was 24) via a new
+  `Md.Comp.Snackbar.Container.Shape` token. Audited and confirmed compliant: switch 52x32 with
+  24/16 handles, chip 32/8/18, FAB 56/16, dialog 280-560/28, text field 56, card 12, button 40/20,
+  segmented button end radii, navigation bar height 80.
+
 ### Fixed
 
 - `MdBanner` actions drop below the text automatically under the 480 dip compact breakpoint

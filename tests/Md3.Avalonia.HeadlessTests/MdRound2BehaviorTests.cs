@@ -93,6 +93,37 @@ public sealed class MdRound2BehaviorTests
     }
 
     [AvaloniaFact]
+    public void Navigation_Bar_Active_Indicator_Uses_The_M3_Pill_Size()
+    {
+        var bar = new MdNavigationBar { Width = 400 };
+        bar.Items.Add(new MdNavigationBarItem { Label = "Home" });
+        bar.Items.Add(new MdNavigationBarItem { Label = "Search" });
+        var window = new Window { Width = 480, Height = 240, Content = bar };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        // M3: the navigation bar active indicator is a 64x32 dp pill.
+        var indicator = bar.GetVisualDescendants().OfType<global::Avalonia.Controls.Border>()
+            .First(border => border.Name == "PART_Indicator");
+        Assert.Equal(64, indicator.Bounds.Width, 1);
+        Assert.Equal(32, indicator.Bounds.Height, 1);
+    }
+
+    [AvaloniaFact]
+    public void Snackbar_Container_Uses_The_M3_Four_DP_Corner()
+    {
+        var host = new MdSnackbarHost();
+        var window = new Window { Width = 480, Height = 320, Content = host };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        // M3: md.comp.snackbar.container.shape = 4dp, not a 24dp pill.
+        var container = host.GetVisualDescendants().OfType<global::Avalonia.Controls.Border>()
+            .First(border => border.Name == "PART_Container");
+        Assert.Equal(new CornerRadius(4), container.CornerRadius);
+    }
+
+    [AvaloniaFact]
     public void Linear_Indicator_Renders_Determinate_And_Indeterminate_Without_Faulting()
     {
         // Smoke guard for the rewritten Render paths: the disjoint sweep (timer + two-segment
