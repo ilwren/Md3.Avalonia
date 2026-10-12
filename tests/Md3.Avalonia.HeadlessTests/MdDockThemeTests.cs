@@ -2,7 +2,6 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Styling;
@@ -110,16 +109,66 @@ public class MdDockThemeTests
         var documentDock = center.VisibleDockables!.OfType<DocumentDock>().Single();
         Assert.Equal(2, documentDock.VisibleDockables!.Count);
         Assert.Equal("Documents", documentDock.ActiveDockable!.Title);
+    }
 
-        // The dock chrome is built from Dock's own templates, which the theme reaches through the
-        // implicit ControlThemes asserted above. Dock materializes the layout through a
-        // DeferredContentControl, so the frame has to actually render before the tab strip items
-        // exist - the same reason the gallery suite captures frames instead of just pumping jobs.
-        scope.Window.CaptureRenderedFrame();
-        Dispatcher.UIThread.RunJobs();
+    [AvaloniaFact]
+    public void The_Material_Theme_Reaches_Docks_Rendered_Chrome()
+    {
+        // A DockControl presents its tree through a DeferredContentControl, whose timeline a
+        // headless test does not pump - that full-dock render is the gallery suite's job (the
+        // Docking page and the frames every gallery test captures). What this asserts is the layer
+        // under it: Dock's own tab strips, hosted directly the way Dock's own headless tests host
+        // them, must materialize the real DocumentTabStripItem/ToolTabStripItem templates and must
+        // read this package's tokens instead of Avalonia's defaults.
+        var factory = new Factory();
+        var documents = factory.CreateList<IDockable>(
+            new DockDocument { Id = "Doc1", Title = "Documents" },
+            new DockDocument { Id = "Doc2", Title = "README.md" });
+        var documentStrip = new DocumentTabStrip
+        {
+            Width = 420,
+            Height = 40,
+            ItemsSource = documents
+        };
+        using var documentScope = Show(documentStrip);
+        Layout(documentScope.Window, documentStrip);
 
-        Assert.NotEmpty(dock.GetVisualDescendants().OfType<DocumentTabStripItem>());
-        Assert.NotEmpty(dock.GetVisualDescendants().OfType<ToolTabStripItem>());
+        var documentItems = new[]
+        {
+            Assert.IsType<DocumentTabStripItem>(documentStrip.ContainerFromIndex(0)),
+            Assert.IsType<DocumentTabStripItem>(documentStrip.ContainerFromIndex(1))
+        };
+        Assert.Equal(
+            new[] { "Documents", "README.md" },
+            documentItems.Select(item => Assert.IsAssignableFrom<IDockable>(item.DataContext).Title).ToArray());
+
+        Assert.All(documentItems, item =>
+        {
+            // Straight from Accents/Material.axaml - a theme that failed to load would leave
+            // Avalonia's defaults here (no minimum height, square corners).
+            Assert.Equal(24d, item.MinHeight);
+            Assert.Equal(new CornerRadius(4), item.CornerRadius);
+            AssertTabInk(item.Foreground);
+        });
+
+        var tools = factory.CreateList<IDockable>(
+            new DockTool { Id = "Explorer", Title = "Explorer" },
+            new DockTool { Id = "Output", Title = "Output" });
+        var toolStrip = new ToolTabStrip
+        {
+            Width = 300,
+            Height = 40,
+            ItemsSource = tools
+        };
+        using var toolScope = Show(toolStrip);
+        Layout(toolScope.Window, toolStrip);
+
+        var toolItems = new[]
+        {
+            Assert.IsType<ToolTabStripItem>(toolStrip.ContainerFromIndex(0)),
+            Assert.IsType<ToolTabStripItem>(toolStrip.ContainerFromIndex(1))
+        };
+        Assert.All(toolItems, item => AssertTabInk(item.Foreground));
     }
 
     [AvaloniaFact]
@@ -237,10 +286,36 @@ public class MdDockThemeTests
         public void Dispose() => Window.Close();
     }
 
+    /// <summary>
+    /// A Dock tab's ink is one of the two colours this theme maps it to: the idle
+    /// <c>DockTabForegroundBrush</c> (onSurfaceVariant) or, on the selected tab, the
+    /// <c>DockTabActiveForegroundBrush</c> (onPrimary). Which one depends on Dock's own selectors,
+    /// so the test accepts either and rejects anything else - including no theme at all.
+    /// </summary>
+    private static void AssertTabInk(IBrush? foreground)
+    {
+        var ink = ColorOf(Assert.IsAssignableFrom<IBrush>(foreground));
+        Assert.Contains(ink, new[]
+        {
+            ColorOf(Brush("Md.Sys.Color.OnSurfaceVariant.Brush")),
+            ColorOf(Brush("Md.Sys.Color.OnPrimary.Brush"))
+        });
+    }
+
     private static IBrush Brush(string key)
     {
         Assert.True(Application.Current!.TryGetResource(key, Application.Current.ActualThemeVariant, out var value), key);
         return Assert.IsAssignableFrom<IBrush>(value);
+    }
+
+    /// <summary>
+    /// Runs the layout passes Dock's own headless tests run before reading a strip's containers.
+    /// </summary>
+    private static void Layout(Window window, Control control)
+    {
+        control.ApplyTemplate();
+        window.UpdateLayout();
+        control.UpdateLayout();
     }
 
     private static Color ColorOf(IBrush brush) => Assert.IsType<SolidColorBrush>(brush).Color;
