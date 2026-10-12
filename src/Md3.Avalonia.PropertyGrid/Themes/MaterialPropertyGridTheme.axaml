@@ -1336,7 +1336,8 @@
                       VerticalAlignment="Center"
                       Data="M0,0 L5,5 L10,0"
                       IsHitTestVisible="False"
-                      RenderTransform="rotate(0)"
+                      RenderTransform="rotate(0deg)"
+                      RenderTransformOrigin="50%,50%"
                       Stretch="Uniform"
                       Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                       StrokeThickness="1.5" />
@@ -1345,7 +1346,7 @@
           </ControlTemplate>
         </Setter>
         <Style Selector="^:checked /template/ Path#PART_Chevron">
-          <Setter Property="RenderTransform" Value="rotate(180)" />
+          <Setter Property="RenderTransform" Value="rotate(180deg)" />
         </Style>
         <Style Selector="^:pointerover /template/ Border#PART_StateLayer">
           <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" />

@@ -218,7 +218,11 @@ public class MdPropertyGridThemeTests
     [AvaloniaFact]
     public void The_Package_Exposes_One_Public_Type()
     {
-        var exported = typeof(MaterialPropertyGridTheme).Assembly.GetExportedTypes();
+        // Avalonia's XAML compiler adds two public helper types under CompiledAvaloniaXaml to every
+        // assembly that embeds XAML, so the surface is counted over the package's own namespace.
+        var exported = typeof(MaterialPropertyGridTheme).Assembly.GetTypes()
+            .Where(type => type.IsPublic && type.Namespace != "CompiledAvaloniaXaml")
+            .ToArray();
 
         Assert.Equal([typeof(MaterialPropertyGridTheme)], exported);
         Assert.IsAssignableFrom<Styles>(new MaterialPropertyGridTheme());
