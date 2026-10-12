@@ -189,6 +189,15 @@
                      Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                      Text="{TemplateBinding StatusText}" TextWrapping="Wrap"
                      AutomationProperties.LiveSetting="Polite" />
+          <Button Name="PART_JumpToLatest" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                  Margin="0,0,16,12" CornerRadius="999" Padding="14,8" IsVisible="False"
+                  Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
+                  Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="{TemplateBinding JumpToLatestText}" />
+              <TextBlock Name="PART_UnreadCount" Text="{TemplateBinding UnreadCount}" IsVisible="False" FontWeight="Medium" />
+            </StackPanel>
+          </Button>
           <ItemsControl Name="PART_SuggestionsHost" Grid.Row="3" Theme="{StaticResource ChatItemsHostTheme}" ItemsSource="{TemplateBinding SuggestionsSource}" Margin="8,4">
             <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate><DataTemplate><md:MdAssistChip Content="{Binding}" Margin="3" /></DataTemplate></ItemsControl.ItemTemplate>

@@ -16,6 +16,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Extra.Infrastructure;
 using Md3.Avalonia.Localization;
@@ -30,6 +31,12 @@ namespace Md3.Avalonia.Chat;
 public sealed class MdChatView : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable?> MessagesSourceProperty = AvaloniaProperty.Register<MdChatView, IEnumerable?>(nameof(MessagesSource));
+    public static readonly DirectProperty<MdChatView, bool> IsAtBottomProperty =
+        AvaloniaProperty.RegisterDirect<MdChatView, bool>(nameof(IsAtBottom), control => control.IsAtBottom);
+    public static readonly DirectProperty<MdChatView, int> UnreadCountProperty =
+        AvaloniaProperty.RegisterDirect<MdChatView, int>(nameof(UnreadCount), control => control.UnreadCount);
+    public static readonly DirectProperty<MdChatView, string> JumpToLatestTextProperty =
+        AvaloniaProperty.RegisterDirect<MdChatView, string>(nameof(JumpToLatestText), control => control.JumpToLatestText);
     public static readonly StyledProperty<string?> ComposerTextProperty = AvaloniaProperty.Register<MdChatView, string?>(nameof(ComposerText), defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
     public static readonly StyledProperty<IEnumerable?> SuggestionsSourceProperty = AvaloniaProperty.Register<MdChatView, IEnumerable?>(nameof(SuggestionsSource));
     public static readonly StyledProperty<ICommand?> SendCommandProperty = AvaloniaProperty.Register<MdChatView, ICommand?>(nameof(SendCommand));
@@ -64,6 +71,12 @@ public sealed class MdChatView : TemplatedControl
     private ItemsControl? _suggestionsHost;
     private ListBox? _messagesHost;
     private readonly ObservableCollection<MdChatRow> _rows = new();
+    private ScrollViewer? _messagesScroll;
+    private Button? _jumpToLatestButton;
+    private TextBlock? _unreadText;
+    private bool _isAtBottom = true;
+    private int _unreadCount;
+    private string _jumpToLatestText = string.Empty;
     private TextBox? _composer;
     private int _selectionCount;
     private MdChatMessage? _quotedMessage;
@@ -130,6 +143,32 @@ public sealed class MdChatView : TemplatedControl
     public event EventHandler<MdChatMessage>? RetryRequested;
     /// <summary>Raised when the user activates an attachment (opens a picture, file, or media item).</summary>
     public event EventHandler<MdChatAttachment>? AttachmentActivated;
+
+    /// <summary>True when the message list is scrolled to its latest message.</summary>
+    public bool IsAtBottom { get => _isAtBottom; private set => SetAndRaise(IsAtBottomProperty, ref _isAtBottom, value); }
+
+    /// <summary>Messages that arrived while the list was scrolled up. Reset by <see cref="ScrollToLatest"/>.</summary>
+    public int UnreadCount { get => _unreadCount; private set => SetAndRaise(UnreadCountProperty, ref _unreadCount, value); }
+
+    /// <summary>Localized label of the jump-to-latest button.</summary>
+    public string JumpToLatestText { get => _jumpToLatestText; private set => SetAndRaise(JumpToLatestTextProperty, ref _jumpToLatestText, value); }
+
+    /// <summary>Scrolls the message list to its latest message and clears <see cref="UnreadCount"/>.</summary>
+    public void ScrollToLatest()
+    {
+        if (_messagesScroll is { } scroll)
+            scroll.Offset = new Vector(scroll.Offset.X, Math.Max(0, scroll.Extent.Height - scroll.Viewport.Height));
+        SetUnreadCount(0);
+        UpdateScrollState();
+    }
+
+    /// <summary>Scrolls the message list until the given message is in view.</summary>
+    public void ScrollToMessage(MdChatMessage message)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+        var row = _rows.FirstOrDefault(candidate => candidate.Message.Id == message.Id);
+        if (row is not null) _messagesHost?.ScrollIntoView(row);
+    }
 
     public bool Submit()
     {
@@ -235,7 +274,13 @@ public sealed class MdChatView : TemplatedControl
         {
             _messagesHost.SelectionMode = SelectionMode.Multiple | SelectionMode.Toggle;
             _messagesHost.ItemsSource = _rows;
+            _messagesHost.TemplateApplied += OnMessagesHostTemplateApplied;
+            AttachMessagesScroll();
         }
+        _jumpToLatestButton = e.NameScope.Find<Button>("PART_JumpToLatest");
+        if (_jumpToLatestButton is not null) _jumpToLatestButton.Click += OnJumpToLatestClick;
+        _unreadText = e.NameScope.Find<TextBlock>("PART_UnreadCount");
+        UpdateScrollState();
         _composer = e.NameScope.Find<TextBox>("PART_Composer");
         _composer?.AddHandler(InputElement.KeyDownEvent, OnComposerKeyDown, global::Avalonia.Interactivity.RoutingStrategies.Tunnel, true);
         AttachTemplateHandlers();
@@ -281,6 +326,12 @@ public sealed class MdChatView : TemplatedControl
 
     private void DetachTemplateHandlers()
     {
+        if (_messagesHost is not null) _messagesHost.TemplateApplied -= OnMessagesHostTemplateApplied;
+        if (_messagesScroll is not null) _messagesScroll.ScrollChanged -= OnMessagesScrollChanged;
+        _messagesScroll = null;
+        if (_jumpToLatestButton is not null) _jumpToLatestButton.Click -= OnJumpToLatestClick;
+        _jumpToLatestButton = null;
+        _unreadText = null;
         _composer?.RemoveHandler(InputElement.KeyDownEvent, OnComposerKeyDown);
         if (_sendButton is not null) _sendButton.Click -= OnSend;
         if (_attachmentButton is not null) _attachmentButton.Click -= OnAttachment;
@@ -335,6 +386,7 @@ public sealed class MdChatView : TemplatedControl
     private void UpdateLocalizedText()
     {
         SetAndRaise(CancelTextProperty, ref _cancelText, MdLocalization.GetString("Cancel", this));
+        SetAndRaise(JumpToLatestTextProperty, ref _jumpToLatestText, MdLocalization.GetString("ChatJumpToLatest", this));
         SetAndRaise(RetryTextProperty, ref _retryText, MdLocalization.GetString("Retry", this));
         SetAndRaise(AttachFileTextProperty, ref _attachFileText, MdLocalization.GetString("AttachFile", this));
         SetAndRaise(SendMessageTextProperty, ref _sendMessageText, MdLocalization.GetString("SendMessage", this));
@@ -387,9 +439,56 @@ public sealed class MdChatView : TemplatedControl
         if (_observedMessages is not null) _observedMessages.CollectionChanged += OnMessagesCollectionChanged;
     }
 
+    private void AttachMessagesScroll()
+    {
+        var scroll = _messagesHost?.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
+        if (scroll is null || ReferenceEquals(scroll, _messagesScroll)) return;
+        if (_messagesScroll is not null) _messagesScroll.ScrollChanged -= OnMessagesScrollChanged;
+        _messagesScroll = scroll;
+        scroll.ScrollChanged += OnMessagesScrollChanged;
+        UpdateScrollState();
+    }
+
+    private void OnMessagesHostTemplateApplied(object? sender, TemplateAppliedEventArgs e) => AttachMessagesScroll();
+
+    private void OnMessagesScrollChanged(object? sender, ScrollChangedEventArgs e) => UpdateScrollState();
+
+    private void OnJumpToLatestClick(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        e.Handled = true;
+        ScrollToLatest();
+    }
+
+    private void UpdateScrollState()
+    {
+        // Within two DIP of the end counts as the bottom, so rounding does not drop the follow state.
+        var atBottom = _messagesScroll is not { } scroll
+            || scroll.Offset.Y + scroll.Viewport.Height >= scroll.Extent.Height - 2;
+        IsAtBottom = atBottom;
+        if (_jumpToLatestButton is not null) _jumpToLatestButton.IsVisible = !atBottom;
+        if (atBottom && UnreadCount > 0) SetUnreadCount(0);
+    }
+
+    private void SetUnreadCount(int count)
+    {
+        UnreadCount = count;
+        if (_unreadText is not null) _unreadText.IsVisible = count > 0;
+    }
+
     private void OnMessagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        SyncRows(e);
+        // Read before the rows change, while the layout still reflects the position the reader sees.
+        var followLatest = IsAtBottom;
+        var added = SyncRows(e);
+        if (followLatest)
+        {
+            // Posted so the list lays out the new row before the offset is set.
+            Dispatcher.UIThread.Post(ScrollToLatest);
+        }
+        else if (added > 0)
+        {
+            SetUnreadCount(UnreadCount + added);
+        }
         ReconcileSelection();
         var message = e.NewItems?.OfType<MdChatMessage>().LastOrDefault();
         if (message is null) return;
@@ -408,7 +507,7 @@ public sealed class MdChatView : TemplatedControl
     /// Keeps the list rows in step with <see cref="MessagesSource"/>. A same-position replacement (a streamed token)
     /// updates its row in place; other changes reuse the rows of messages that are still present.
     /// </summary>
-    private void SyncRows(NotifyCollectionChangedEventArgs? e)
+    private int SyncRows(NotifyCollectionChangedEventArgs? e)
     {
         var messages = (MessagesSource ?? Array.Empty<object>()).OfType<MdChatMessage>().ToList();
         if (e?.Action == NotifyCollectionChangedAction.Replace
@@ -417,7 +516,7 @@ public sealed class MdChatView : TemplatedControl
             && _rows.Count == messages.Count && _rows[e.NewStartingIndex].Message.Id == replacement.Id)
         {
             _rows[e.NewStartingIndex].Message = replacement;
-            return;
+            return 0;
         }
 
         var existing = new Dictionary<string, MdChatRow>(StringComparer.Ordinal);
@@ -441,13 +540,16 @@ public sealed class MdChatView : TemplatedControl
         if (common == _rows.Count)
         {
             // Appending keeps the existing rows, so the list does not rebuild its containers.
+            var appended = next.Count - common;
             for (var i = common; i < next.Count; i++) _rows.Add(next[i]);
+            return appended;
         }
         else
         {
             _rows.Clear();
             foreach (var row in next) _rows.Add(row);
         }
+        return 0;
     }
 
     private void ReconcileSelection()
