@@ -225,12 +225,13 @@ public sealed class MdMotionLifecycleTests
         try
         {
             Dispatcher.UIThread.RunJobs();
-            host.Show();
-            var point = host.TranslatePoint(
-                new Point(host.Bounds.Width / 2, host.Bounds.Height / 2), window);
+            var anchor = Assert.IsType<MdButton>(host.Content);
+            var point = anchor.TranslatePoint(
+                new Point(anchor.Bounds.Width / 2, anchor.Bounds.Height / 2), window);
             Assert.NotNull(point);
             window.MouseMove(point!.Value, RawInputModifiers.None);
-            Assert.True(host.IsPointerOver);
+            Assert.True(host.IsPointerOver, "moving onto the trigger should establish pointer presence");
+            host.Show();
 
             // Opening an interactive popup can move keyboard focus. That focus transition must
             // not arm a hide timer while the pointer is still on the trigger.
@@ -242,7 +243,8 @@ public sealed class MdMotionLifecycleTests
             // is still scheduled; this is not a sticky tooltip.
             window.MouseMove(new Point(window.ClientSize.Width - 2, window.ClientSize.Height - 2),
                 RawInputModifiers.None);
-            Assert.True(host.IsHideDelayPending);
+            Assert.True(host.IsHideDelayPending,
+                "leaving both the trigger and tooltip should start the rich-tooltip grace timer");
         }
         finally
         {
