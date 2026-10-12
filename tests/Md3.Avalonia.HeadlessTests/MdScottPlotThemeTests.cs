@@ -11,6 +11,7 @@ using ScottPlot;
 using ScottPlot.Avalonia;
 using Xunit;
 using AvaloniaColor = Avalonia.Media.Color;
+using AvaloniaFontFamily = Avalonia.Media.FontFamily;
 using PlotColor = ScottPlot.Color;
 
 namespace Md3.Avalonia.HeadlessTests;
@@ -47,6 +48,11 @@ public sealed class MdScottPlotThemeTests
     public void Applying_The_Theme_Styles_The_Surfaces_Ink_Grid_Legend_And_Type_Scale()
     {
         var plot = new Plot();
+
+        // Minor grid lines ship at width 0, so they are switched on first: that makes the assertion
+        // below prove the theme turns them off rather than reading a default it never wrote.
+        plot.Grid.MinorLineWidth = 4;
+
         new MaterialScottPlotTheme(dark: false).Apply(plot);
 
         // A Material chart is one surface: the figure and the data area are the same plane.
@@ -63,7 +69,10 @@ public sealed class MdScottPlotThemeTests
 
         // One OutlineVariant grid at major ticks, no minor lines.
         Assert.Equal(Token("OutlineVariant", dark: false), plot.Grid.MajorLineColor);
-        Assert.Equal(0f, plot.Grid.MinorLineWidth);
+        // DefaultGrid.MinorLineWidth is write-only, so the theme's "no minor lines" rule is
+        // read back where it lands: the minor line style of both axis grids.
+        Assert.Equal(0f, plot.Grid.XAxisStyle.MinorLineStyle.Width);
+        Assert.Equal(0f, plot.Grid.YAxisStyle.MinorLineStyle.Width);
 
         // The legend floats over the data, so it is a surface container with a soft outline.
         Assert.Equal(Token("SurfaceContainerHigh", dark: false), plot.Legend.BackgroundColor);
@@ -241,6 +250,6 @@ public sealed class MdScottPlotThemeTests
         Assert.True(
             Application.Current!.TryGetResource("Md.Sys.Typeface.Plain", null, out var value),
             "Md.Sys.Typeface.Plain is not registered");
-        return Assert.IsType<Avalonia.Media.FontFamily>(value).Name;
+        return Assert.IsType<AvaloniaFontFamily>(value).Name;
     }
 }
