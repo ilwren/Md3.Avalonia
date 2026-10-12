@@ -37,7 +37,7 @@ public sealed class MdPickerFieldRefreshTests
         Dispatcher.UIThread.RunJobs();
         Dispatcher.UIThread.RunJobs();
         Assert.Equal(picker.DisplayText, field.Text);
-        Assert.Contains("9/5", field.Text);
+        Assert.Contains("09/05", field.Text);
     }
 
     [AvaloniaFact]
