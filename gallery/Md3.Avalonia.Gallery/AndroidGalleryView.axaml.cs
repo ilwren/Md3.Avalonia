@@ -120,6 +120,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Tooltips", () => new TooltipGalleryPage());
 
         AddSection("Extra controls");
+        AddPage("File explorer", () => new FileExplorerGalleryPage());
         AddPage("Animated text", () => new AnimatedTextGalleryPage());
         AddPage("Animation sequence", () => new AnimationSequenceGalleryPage());
         AddPage("Async select", () => new AsyncSelectGalleryPage());
