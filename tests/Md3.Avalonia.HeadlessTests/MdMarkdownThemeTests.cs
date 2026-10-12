@@ -60,8 +60,8 @@ public class MdMarkdownThemeTests
 
             // The document panel is what carries the class every selector in the collection is scoped
             // to, and it only gets that class once the Markdown has been rendered.
-            Assert.Single(viewer.GetVisualDescendants()
-                .Where(control => control.Classes.Contains("Markdown_Avalonia_MarkdownViewer")));
+            Assert.Single(viewer.GetVisualDescendants(),
+                control => control.Classes.Contains("Markdown_Avalonia_MarkdownViewer"));
         }
         finally
         {
@@ -233,7 +233,7 @@ public class MdMarkdownThemeTests
         var table = borders.Single(border => border.Classes.Contains("Table"));
         Assert.Equal(ColorOf(Brush("Md.Sys.Color.OutlineVariant.Brush")), ColorOf(table.BorderBrush!));
         Assert.Equal(new Thickness(0, 0, 1, 1), table.BorderThickness);
-        Assert.Single(viewer.GetVisualDescendants().OfType<Grid>().Where(grid => grid.Classes.Contains("Table")));
+        Assert.Single(viewer.GetVisualDescendants().OfType<Grid>(), grid => grid.Classes.Contains("Table"));
 
         var cells = viewer.GetVisualDescendants().OfType<Grid>()
             .Single(grid => grid.Classes.Contains("Table")).Children.OfType<Border>().ToArray();
