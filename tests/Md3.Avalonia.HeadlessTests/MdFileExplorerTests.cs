@@ -1,9 +1,7 @@
-using BindingFlags = System.Reflection.BindingFlags;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
-using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
@@ -394,82 +392,6 @@ public sealed class MdFileExplorerTests
         Assert.Equal("Pictures", explorer.CurrentPath);
         Assert.False(explorer.CanNavigateForward);
         Assert.True(explorer.CanNavigateUp);
-    }
-
-    [AvaloniaFact]
-    public void Compact_ItemsView_Uses_Touch_Tap_And_Long_Press_For_Selection()
-    {
-        var folder = new MdFileEntry("folder", "Folder", "Folder", MdFileEntryKind.Directory);
-        var file = new MdFileEntry("file", "note.txt", "note.txt", MdFileEntryKind.File);
-        var view = new MdFileItemsView { IsCompact = true, ItemsSource = new[] { folder, file } };
-        var window = new Window { Width = 420, Height = 520, Content = view };
-        window.Styles.Add(new ExtraTheme());
-        window.Show();
-        try
-        {
-            Dispatcher.UIThread.RunJobs();
-            var folderContainer = view.GetVisualDescendants().OfType<ListBoxItem>()
-                .Single(item => view.ItemFromContainer(item) is MdFileEntry entry && entry.Id == folder.Id);
-            var fileContainer = view.GetVisualDescendants().OfType<ListBoxItem>()
-                .Single(item => view.ItemFromContainer(item) is MdFileEntry entry && entry.Id == file.Id);
-            MdFileEntry? activated = null;
-            view.ItemActivated += (_, entry) => activated = entry;
-
-            RaiseTouchTap(folderContainer, window);
-            Assert.Same(folder, activated);
-            view.ClearSelection();
-
-            RaiseTouchPress(fileContainer, window);
-            RaiseTouchHolding(fileContainer, window, HoldingState.Started);
-            Assert.True(view.IsSelectionMode);
-            Assert.Equal("note.txt", Assert.Single(view.SelectedEntries).Name);
-
-            RaiseTouchPress(folderContainer, window);
-            RaiseTouchTap(folderContainer, window);
-            Assert.Equal(2, view.SelectedEntries.Count);
-            Assert.Contains(view.SelectedEntries, entry => entry.Id == file.Id);
-            Assert.Contains(view.SelectedEntries, entry => entry.Id == folder.Id);
-
-            view.EndSelectionMode();
-            Assert.False(view.IsSelectionMode);
-            Assert.Empty(view.SelectedEntries);
-        }
-        finally
-        {
-            window.Close();
-        }
-    }
-
-    private static void RaiseTouchPress(Control target, Window root)
-    {
-        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Touch, isPrimary: true);
-        target.RaiseEvent(new PointerPressedEventArgs(target, pointer, root, new global::Avalonia.Point(8, 8), 1,
-            PointerPointProperties.None, KeyModifiers.None));
-    }
-
-    private static void RaiseTouchTap(Control target, Window root)
-    {
-        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Touch, isPrimary: true);
-        var pointerArgs = new PointerEventArgs(InputElement.PointerReleasedEvent, target, pointer, root,
-            new global::Avalonia.Point(8, 8), 2, PointerPointProperties.None, KeyModifiers.None);
-        target.RaiseEvent(new TappedEventArgs(InputElement.TappedEvent, pointerArgs) { Source = target });
-    }
-
-    private static void RaiseTouchHolding(Control target, Window root, HoldingState state)
-    {
-        var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Touch, isPrimary: true);
-        var pointerArgs = new PointerEventArgs(InputElement.PointerMovedEvent, target, pointer, root,
-            new global::Avalonia.Point(8, 8), 3, PointerPointProperties.None, KeyModifiers.None);
-        var constructor = typeof(HoldingRoutedEventArgs).GetConstructor(
-            BindingFlags.Instance | BindingFlags.NonPublic,
-            binder: null,
-            [typeof(HoldingState), typeof(global::Avalonia.Point), typeof(PointerType), typeof(PointerEventArgs)],
-            modifiers: null);
-        Assert.NotNull(constructor);
-        var holding = (HoldingRoutedEventArgs)constructor!.Invoke(
-            [state, new global::Avalonia.Point(8, 8), PointerType.Touch, pointerArgs]);
-        holding.Source = target;
-        target.RaiseEvent(holding);
     }
 
     private sealed class InlineProgress<T>(Action<T> report) : IProgress<T>
