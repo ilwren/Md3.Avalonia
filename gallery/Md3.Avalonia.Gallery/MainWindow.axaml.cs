@@ -44,7 +44,7 @@ public partial class MainWindow : Window
             ComponentsOverviewNav, AndroidSettingsNav, ClockNav, TasksNav,
             ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, BreadcrumbNav, TextFieldNav,
             CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, ColorPickerNav,
-            DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
+            DialogNav, DividerNav, ListNav, FileExplorerNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
             NavigationDrawerNav, AdaptiveNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
             SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, BorderlessWindowNav,
 AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
@@ -86,6 +86,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Dialogs", "dialog modal alert", DialogNav, () => new DialogGalleryPage()),
             Entry("Divider", "separator inset", DividerNav, () => new DividerGalleryPage()),
             Entry("Lists", "list item virtualized", ListNav, () => new ListGalleryPage()),
+            Entry("File explorer", "file explorer filesystem folder browse local provider path breadcrumb grid details preview copy move rename delete", FileExplorerNav, () => new FileExplorerGalleryPage()),
             Entry("Loading", "loading indicator contained", LoadingNav, () => new LoadingGalleryPage()),
             Entry("Progress", "progress linear circular", ProgressNav, () => new ProgressGalleryPage()),
             Entry("Menus", "menu anchor popup dropdown", MenuNav, () => new MenuGalleryPage()),
@@ -219,6 +220,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
     private void ShowDialogs(object? s, RoutedEventArgs e) => Navigate(new DialogGalleryPage(), DialogNav);
     private void ShowDivider(object? s, RoutedEventArgs e) => Navigate(new DividerGalleryPage(), DividerNav);
     private void ShowLists(object? s, RoutedEventArgs e) => Navigate(new ListGalleryPage(), ListNav);
+    private void ShowFileExplorer(object? s, RoutedEventArgs e) => Navigate(new FileExplorerGalleryPage(), FileExplorerNav);
     private void ShowLoading(object? s, RoutedEventArgs e) => Navigate(new LoadingGalleryPage(), LoadingNav);
     private void ShowProgress(object? s, RoutedEventArgs e) => Navigate(new ProgressGalleryPage(), ProgressNav);
     private void ShowMenus(object? s, RoutedEventArgs e) => Navigate(new MenuGalleryPage(), MenuNav);

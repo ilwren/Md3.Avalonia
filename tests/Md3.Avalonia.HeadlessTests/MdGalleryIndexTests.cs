@@ -1,7 +1,10 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.LogicalTree;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Extra.Controls;
 using Md3.Avalonia.Gallery;
 using Md3.Avalonia.Gallery.Pages;
 using Xunit;
@@ -16,6 +19,23 @@ namespace Md3.Avalonia.HeadlessTests;
 /// </summary>
 public sealed class MdGalleryIndexTests
 {
+    [AvaloniaFact]
+    public void Android_Gallery_Exposes_File_Explorer_Demo()
+    {
+        var gallery = new AndroidGalleryView();
+        var host = new Window { Width = 412, Height = 860, Content = gallery };
+        host.Show();
+        try
+        {
+            Assert.True(gallery.NavigateToPage("File explorer"));
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal("File explorer", gallery.CurrentPageTitle);
+            var explorer = Assert.Single(gallery.GetVisualDescendants().OfType<MdFileExplorer>());
+            Assert.IsType<MdLocalFileSystemProvider>(explorer.Provider);
+        }
+        finally { host.Close(); }
+    }
+
     [AvaloniaFact]
     public void Components_Overview_Links_Resolve_And_Cover_Every_Indexed_Page()
     {

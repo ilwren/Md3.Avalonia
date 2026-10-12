@@ -120,8 +120,11 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 | **Data visualization and editing** | `MdChart`, `MdChartSeries`, `MdChartPoint`, `MdRichEditor`, `MdRichTextEditor`, `MdChatView`, `MdChatMessage`, `MdTimeline`, `MdTimelineItem` |
 | **Motion and visual extras** | `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, `MdStaggeredPanel`, `MdAnimationSequence`, `MdAnimatedVisibility`, `MdContainerTransform`, `MdFadeThrough`, `MdSharedAxis`, `MdRevealHost`, `MdMorphPanel` |
 | **Navigation/content** | `MdBreadcrumb`, `MdBreadcrumbItem`, `MdGridTile`-style content helpers |
+| **Provider-backed file explorer** | `MdFileExplorer`, `MdFileLocationBar`, `MdFileItemsView`, `MdFileSelectionToolbar`, `MdFileContextMenu`, `MdFilePreviewPane`, `MdFileOperationCenter`; provider contracts `IMdFileSystemProvider` and `IMdFileThumbnailProvider`; local implementation `MdLocalFileSystemProvider`; models `MdFileLocation`, `MdFileEntry`, `MdFilePreview`, `MdFileOperationRequest`, `MdFileOperationProgress`, `MdFileOperationResult`, `MdFileAction`; supporting types `MdFilePathNavigationEventArgs`, `MdFileActionInvokedEventArgs`, `MdFileConflictEventArgs`, `MdFileOperationQueue`, `MdFileOperationTask` |
 
 `MdPagedItemsView.ItemTemplate` sets the presentation of each loaded record; `MdDataGrid` is a narrower surface than Avalonia `DataGrid` and is not a drop-in replacement for it.
+
+The provider-backed file explorer uses the same Material 3 visual language on compact and expanded layouts. `MdFileExplorer` composes location/path navigation with back/forward history, list/grid/details presentation, touch and keyboard multiselection, image/text preview with an explicit Open action, optional `IMdFileThumbnailProvider` grid thumbnails, browsable copy/move destinations, conflict prompts and queued progress. `IMdFileSystemProvider` keeps storage addresses opaque; the included `MdLocalFileSystemProvider` exposes only roots explicitly configured by the host, checks traversal/symbolic-link boundaries, and stages copies before committing. Android document-tree access should be implemented as a URI-backed provider rather than passing SAF URIs to the local provider. See [Provider-backed file explorer](FILE_EXPLORER.md) for keyboard shortcuts, interaction behavior, configuration, operation semantics and the Gallery example.
 
 The Extra support contracts are also public: `IMdPageProvider<T>`, `MdPageRequest`, `MdPageResult<T>`, `MdAsyncRequestState`, `MdDensity`, `MdEcosystemDensity`, `MdOverlayPlacement`, `MdOverlayAlignment`, `MdShortcutBinding`, and `MdFocusReturnScope`. Data and adapter contracts include `IMdChartDataProvider`, `IMdRichEditorAdapter`, and `IMdRichEditorStateAdapter`. Supporting enums and records such as `MdCalendarSelectionMode`, `MdTransferLayoutMode`, `MdMasonryLayoutStrategy`, `MdResultKind`, `MdSkeletonShape`, `MdSpinKitKind`, `MdAnimatedTextEffect`, and `MdTimelineItemState` configure those controls.
 
@@ -528,7 +531,7 @@ missing from this document.
 | `MdWindowCapabilities` | `None` · `Move` · `Resize` · `Minimize` · `Maximize` · `Close` · `SystemMenu` · `All` |
 | `MdWindowPlatform` | `Unknown` · `Windows` · `MacOS` · `Linux` · `Android` |
 
-### Optional (`Md3.Avalonia.Extra`) — 19 enumerations
+### Optional (`Md3.Avalonia.Extra`) — 25 enumerations
 
 | Enum | Members |
 |---|---|
@@ -542,6 +545,12 @@ missing from this document.
 | `MdColorPickerMode` | `MaterialPalette` · `SpectrumSliders` · `Presets` |
 | `MdComparisonOrientation` | `Horizontal` · `Vertical` |
 | `MdEcosystemDensity` | `Comfortable` · `Compact` · `Touch` |
+| `MdFileConflictPolicy` | `Fail` · `Skip` · `Overwrite` · `KeepBoth` |
+| `MdFileEntryKind` | `File` · `Directory` |
+| `MdFileOperationKind` | `CreateDirectory` · `Rename` · `Delete` · `Copy` · `Move` |
+| `MdFileOperationState` | `Queued` · `Running` · `Completed` · `Skipped` · `Conflict` · `Failed` · `Cancelled` |
+| `MdFileSortKey` | `Name` · `Kind` · `Size` · `Modified` |
+| `MdFileViewMode` | `List` · `Grid` · `Details` |
 | `MdMasonryLayoutStrategy` | `Masonry` · `Quilted` · `Woven` |
 | `MdOverlayAlignment` | `Start` · `Center` · `End` |
 | `MdResultKind` | `Information` · `Success` · `Warning` · `Error` · `Empty` |
@@ -570,6 +579,9 @@ handlers can be written without casting:
 | `MdHeroTransitionEventArgs` | `MdHero.TransitionRequested` — source and destination rectangles |
 | `MdPlaybackRequestEventArgs` | media/playback affordances, paired with `MdPlaybackRequest` |
 | `MdDataGridCellEditEventArgs` | `MdDataGrid` cell commit (Extra) |
+| `MdFileActionInvokedEventArgs` | `MdFileSelectionToolbar` / `MdFileContextMenu` action activation (Extra) |
+| `MdFileConflictEventArgs` | `MdFileExplorer.ConflictRequested` conflict-policy negotiation (Extra) |
+| `MdFilePathNavigationEventArgs` | `MdFileLocationBar.NavigationRequested` (Extra) |
 
 `MdSearchBar.SearchSubmitted` passes the submitted text as a plain `string`.
 

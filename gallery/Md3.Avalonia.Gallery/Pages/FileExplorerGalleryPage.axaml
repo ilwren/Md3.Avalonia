@@ -1,0 +1,23 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.FileExplorerGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="24" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="File explorer" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="A provider-backed Material 3 browser with responsive desktop and phone layouts, touch-friendly folder navigation and long-press multiselection, back/forward history, a browsable copy/move destination, explicit file opening, previews, and guarded operations. This demo only uses its own temporary sample folder." />
+      </StackPanel>
+      <eco:MdFileExplorer x:Name="Explorer" Height="620" />
+      <TextBlock x:Name="OpenStatus" Classes="body" Text="Select a file to preview, then choose Open; on a phone, tap folders to browse and long-press to select multiple items." />
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdFileExplorer Provider=&quot;{Binding FileProvider}&quot;&#10;                  ViewMode=&quot;Details&quot;&#10;                  IsPreviewPaneOpen=&quot;True&quot; /&gt;"
+                             CSharpCode="var explorer = new MdFileExplorer&#10;{&#10;    Provider = new MdLocalFileSystemProvider([&#10;        new MdFileLocation(&quot;docs&quot;, &quot;Documents&quot;, documentsPath)&#10;    ]),&#10;    ViewMode = MdFileViewMode.Details&#10;};&#10;explorer.EntryOpened += (_, entry) =&gt; OpenDocument(entry);" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>
