@@ -36,7 +36,7 @@ public sealed class MdFileItemsView : ListBox
 
     public MdFileItemsView()
     {
-        SelectionMode = Avalonia.Controls.SelectionMode.Multiple;
+        SelectionMode = global::Avalonia.Controls.SelectionMode.Multiple;
         ItemTemplate = CreateItemTemplate();
         UpdateViewMode();
         DoubleTapped += OnDoubleTapped;

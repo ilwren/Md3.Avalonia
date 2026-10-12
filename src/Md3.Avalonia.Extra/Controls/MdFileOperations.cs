@@ -198,8 +198,8 @@ public sealed class MdFileOperationCenter : UserControl
                 new MdScrollViewer
                 {
                     MaxHeight = 240,
-                    VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto,
-                    HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled,
+                    VerticalScrollBarVisibility = global::Avalonia.Controls.Primitives.ScrollBarVisibility.Auto,
+                    HorizontalScrollBarVisibility = global::Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled,
                     Content = _items
                 }
             }
@@ -224,8 +224,8 @@ public sealed class MdFileOperationCenter : UserControl
 
     private static Control CreateTaskView(MdFileOperationTask task)
     {
-        var title = new MdText { Text = task.Title, StyleRole = MdTextStyle.TitleSmall, TextTrimming = Avalonia.Media.TextTrimming.CharacterEllipsis };
-        var status = new MdText { Text = task.StatusText, StyleRole = MdTextStyle.BodySmall, TextTrimming = Avalonia.Media.TextTrimming.CharacterEllipsis };
+        var title = new MdText { Text = task.Title, StyleRole = MdTextStyle.TitleSmall, TextTrimming = global::Avalonia.Media.TextTrimming.CharacterEllipsis };
+        var status = new MdText { Text = task.StatusText, StyleRole = MdTextStyle.BodySmall, TextTrimming = global::Avalonia.Media.TextTrimming.CharacterEllipsis };
         var progress = new MdLinearProgressIndicator
         {
             Minimum = 0,

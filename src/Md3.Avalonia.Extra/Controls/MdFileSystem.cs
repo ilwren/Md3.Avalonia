@@ -653,11 +653,11 @@ public sealed class MdLocalFileSystemProvider : IMdFileSystemProvider, IMdFileTh
             {
                 DeleteEntity(source);
             }
-            catch (Exception exception)
+            catch (Exception cleanupException)
             {
                 throw new SourceCleanupException(
-                    $"The destination copy at '{destination}' is complete, but the source could not be fully removed: {exception.Message}",
-                    exception);
+                    $"The destination copy at '{destination}' is complete, but the source could not be fully removed: {cleanupException.Message}",
+                    cleanupException);
             }
         }
         ReportProgress(progress, new MdFileOperationProgress(Path.GetFileName(source), 1, 1));

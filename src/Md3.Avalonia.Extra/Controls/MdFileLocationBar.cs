@@ -82,7 +82,7 @@ public sealed class MdFileLocationBar : UserControl
         _pathEditor = new MdTextBox
         {
             Variant = MdTextBoxVariant.Outlined,
-            Watermark = "Enter a path relative to this location",
+            PlaceholderText = "Enter a path relative to this location",
             MinHeight = 40,
             VerticalAlignment = VerticalAlignment.Center
         };

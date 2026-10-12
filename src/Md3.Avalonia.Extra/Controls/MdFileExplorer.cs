@@ -100,12 +100,12 @@ public sealed class MdFileExplorer : UserControl
             explorer.SyncSearchText();
             explorer.ApplyFilterAndSort();
         });
-        IncludeHiddenProperty.Changed.AddClassHandler<MdFileExplorer>((explorer, _) =>
+        IncludeHiddenProperty.Changed.AddClassHandler<MdFileExplorer>((explorer, args) =>
         {
             explorer.SyncHiddenItems();
             _ = explorer.ReloadCurrentDirectory();
         });
-        IsPreviewPaneOpenProperty.Changed.AddClassHandler<MdFileExplorer>((explorer, _) =>
+        IsPreviewPaneOpenProperty.Changed.AddClassHandler<MdFileExplorer>((explorer, args) =>
         {
             explorer.UpdateResponsiveLayout();
             _ = explorer.UpdatePreviewForSelectionAsync();
@@ -174,7 +174,7 @@ public sealed class MdFileExplorer : UserControl
         {
             Variant = MdTextBoxVariant.Outlined,
             Label = "Search files",
-            Watermark = "Search this folder",
+            PlaceholderText = "Search this folder",
             ShowClearButton = true,
             MinHeight = 48,
             VerticalAlignment = VerticalAlignment.Center
@@ -915,7 +915,7 @@ public sealed class MdFileExplorer : UserControl
             Variant = MdTextBoxVariant.Outlined,
             Label = "Destination folder path",
             Text = CurrentPath,
-            Watermark = "Blank means the location root",
+            PlaceholderText = "Blank means the location root",
             MinWidth = 280
         };
         var content = new StackPanel { Spacing = 12, Children = { destinationPicker, pathEditor } };
