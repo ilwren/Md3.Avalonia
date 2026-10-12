@@ -23,12 +23,12 @@ Automated baseline date: 2026-10-12
 
 ## Current automated result
 
-- GitHub CI builds the Desktop Gallery with warnings as errors, runs the complete xUnit v3 headless suite, emits named failure annotations, and verifies all NuGet packages.
-- The multi-platform workflow publishes Linux, Windows and macOS Desktop Gallery outputs and builds the Android APK with the .NET Android workload.
-- Package verification covers Core, Icons, Icons.Lite, Extra, DataGrid and RichEditor at `0.4.5-preview.1`, including `.nupkg`/`.snupkg`, XML docs, README/notices and dependency direction. Temporary validation packages are deleted after inspection.
-- The 0.4.5 preview CI run must report **0 failed tests**; use its own GitHub Actions summary/TRX rather than copying historical test totals.
-- The Gallery workflow builds Linux, Windows and macOS desktop outputs and compiles/uploads the Android APK. Physical-device interaction is **not** inferred from compilation and remains in the unsigned matrix below.
-- The Linux x64 AOT probe must produce a native executable and pass its xvfb smoke run. It reports linker diagnostics and does not sign off Windows/macOS/Android AOT or consuming-app trim behavior.
+Automated evidence for code commit [`258abb6`](https://github.com/ilwren/Md3.Avalonia/commit/258abb666c63df7cac051f6119bc53dc0dbd84e6):
+
+- [CI run `38224349059`](https://github.com/ilwren/Md3.Avalonia/actions/runs/38224349059) passed static checks, Gallery/test builds and the full headless suite, including the interaction regressions below.
+- [NuGet run `38224348930`](https://github.com/ilwren/Md3.Avalonia/actions/runs/38224348930) passed the six-package build, pack and artifact upload. It also verified embedded fonts.
+- [Multi-platform Gallery run `38224348901`](https://github.com/ilwren/Md3.Avalonia/actions/runs/38224348901) passed Linux, Windows and macOS desktop publish plus Android APK build/upload. APK compilation is not physical-device sign-off.
+- [Linux x64 AOT probe `38224348903`](https://github.com/ilwren/Md3.Avalonia/actions/runs/38224348903) passed native executable verification and xvfb smoke test. It reported `Binding(String)` trim/dynamic-code warnings in `gallery/Md3.Avalonia.Gallery/Pages/DataGridGalleryPage.axaml.cs:23–25`; this is not a zero-diagnostic result and does not sign off other platforms or consuming-app behavior.
 
 ## Interaction regression acceptance
 
