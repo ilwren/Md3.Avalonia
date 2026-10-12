@@ -113,6 +113,13 @@
 - 日期分隔与未读分割线：`MdChatDateSeparator`、`MdUnreadDivider`，由消息时间戳和 `LastReadMessageId` 计算。
 - 虚拟化：`ListBox` 默认 `VirtualizingStackPanel`，需验证可变高度 + 锚点补偿的正确性。
 
+**实现状态（原型，2026-10-12）**
+
+- 已实现：`IsAtBottom`、`UnreadCount`、`ScrollToLatest()`、`ScrollToMessage(MdChatMessage)`；在底部时新消息自动贴底（先读取变化前的贴底状态，再延后滚动）；中间时不移动视口并递增未读数；"回到最新"按钮显示未读数，点击后回到底部。
+- 验收：1、2 已由 headless 测试覆盖（`MdChatPhase5Tests`）。CI 中 427 个 headless 测试全部通过。
+- 未实现（下一轮）：历史加载 `HistoryProvider` 与前插锚点补偿（验收 3）；`MdChatGroupingPolicy` 分组；`MdChatDateSeparator` 与 `MdUnreadDivider`；10 万条消息的帧耗时基准（验收 4）。
+- 已知限制：集合的添加以外的变化（前插、删除、重置）会清空并重建行，这正是锚点补偿要解决的问题，目前尚未处理。
+
 **验收**（需要自动化测试）：
 1. 在底部时收到消息，视口停在底部；
 2. 在中间时收到消息，视口位置不变且 `UnreadCount` 增加；
