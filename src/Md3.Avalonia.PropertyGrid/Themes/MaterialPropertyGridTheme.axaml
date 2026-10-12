@@ -1480,12 +1480,14 @@
                                   Content="{TemplateBinding Header}"
                                   ContentTemplate="{TemplateBinding HeaderTemplate}"
                                   Foreground="{TemplateBinding Foreground}" />
+                <!-- MenuItem publishes the shortcut as a KeyGesture; the binding reaches the
+                     string target through KeyGesture.ToString, so no converter is needed. -->
                 <TextBlock Name="PART_InputGestureText"
                            Grid.Column="2"
                            Margin="12,0,12,0"
                            VerticalAlignment="Center"
                            Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
-                           Text="{TemplateBinding InputGestureText}" />
+                           Text="{TemplateBinding InputGesture}" />
                 <Popup Name="PART_Popup"
                        IsLightDismissEnabled="False"
                        Placement="RightEdgeAlignedTop"
