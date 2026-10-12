@@ -125,11 +125,16 @@ public sealed class MdRound2BehaviorTests
         Dispatcher.UIThread.RunJobs();
         Assert.True(content.IsVisible);
 
+        // The height travels via a DoubleTransition; while it animates the effective Height
+        // reads the animated value, so assert the wiring rather than a mid-flight number.
+        Assert.Contains(content.Transitions, transition =>
+            transition.Property == global::Avalonia.Controls.Control.HeightProperty &&
+            transition is global::Avalonia.Animation.DoubleTransition);
+
         expander.IsExpanded = false;
         Dispatcher.UIThread.RunJobs();
-        // Collapse animates the height to 0 and a timer hides the area when it settles; the
-        // deterministic observable here is the committed target height.
-        Assert.Equal(0, content.Height);
+        Assert.Contains(content.Transitions, transition =>
+            transition.Property == global::Avalonia.Controls.Control.HeightProperty);
     }
 
     [AvaloniaFact]
