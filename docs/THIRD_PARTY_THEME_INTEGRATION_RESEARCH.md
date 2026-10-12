@@ -196,6 +196,45 @@ Markdown.Avalonia（417★）+ LiveMarkdown.Avalonia（176★）。
 - `LiveMarkdown.Avalonia` 只有一个 `Styles.axaml`（346 行），是「实时渲染 + LLM 场景」的常见选择，
   覆盖它的 `MarkdownTextBlock` / `CodeBlock` 等 selector 即可。
 
+**已落地（2026-10-12，`Markdown.Avalonia` 那一半）**：`Md3.Avalonia.Themes.MaterialMarkdownTheme : Styles`，
+在 `src/Md3.Avalonia.Markdown/`。做法与这里设想的不同——**它不是应用级主题，而是赋给查看器的样式集合**，
+原因是上游的接缝本身如此：
+
+- `MarkdownScrollViewer` 的构造函数自己挑一个集合，再用 `Styles.Insert(0, _markdownStyle)` 插进**它自己的**
+  `Styles`；样式按「离控件最近者胜」解析，所以应用级 `StyleInclude` 对查看器永远无效。
+  `MarkdownStyleName` 是反射 `typeof(MarkdownStyle)` 的静态属性（`Standard`/`SimpleTheme`/`FluentTheme`/
+  `FluentAvalonia`/`GithubLike`），而它们都实现 internal 的 `INamedStyle`，第三方既加不进这个名单也不可能被选中；
+  唯一接缝就是 `MarkdownStyle` 属性（XAML 里 `<md:MarkdownScrollViewer.MarkdownStyle>`），每个查看器一个实例
+  （内置集合的静态属性同样每次 `new`）。
+- 还有一条容易踩的坑：`ThemeDetector` 只看 `Application.Current.Styles` 的**第一项**，遇到非
+  `FluentTheme`/`SimpleTheme` 的实现就立刻返回 false——因此注册了 `MaterialTheme` 的应用里，查看器的默认集合是
+  `Standard`（紧凑、4px 圆角那一版），不替换它就只能得到 Standard 的外观。
+- 集合按上游 `MarkdownStyleFluentTheme` 的选择器清单逐条重写：颜色全部 `Md.Sys.Color`（正文
+  `OnSurfaceVariant`、标题/代码 `OnSurface`、链接 `Primary`+下划线、悬停 `Tertiary`（上游要的是互补
+  强调色）、引用条 `Primary`、表格线与分隔线 `OutlineVariant`、代码块 `SurfaceContainerLow`、
+  提示/表头/行内代码 `SurfaceContainerHighest`、上游标红的未处理 `:::` 容器换成 `Error`），字号全部
+  `Md.Sys.TypeScale`（h1 `HeadlineLarge` … h6 `TitleSmall`、正文 `BodyLarge`、代码与表格单元
+  `BodyMedium`、表头 `LabelLarge`；标题权重按 M3 给这些角色的值——到 `TitleLarge` 为止 Regular，
+  `TitleMedium`/`TitleSmall` 与表头 Medium，与 `MdText` 自己的 ControlTheme 同一套）；文档不继承宿主
+  字体而固定 `Md.Sys.Typeface.Plain`；布局照搬上游，只在 Material 自有形状处改动（代码块用
+  `SurfaceContainerLow` 卡片 + 8 圆角 + 12/10 内边距取代上游上下两条细线、表格单元格内边距 10/6、
+  未处理 `:::` 容器的 `Error` 标记为 3 宽边框）。
+- 三处内置集合留下的空白一并补上，且都有 headless 断言：查看器与每个文本块的 `SelectionBrush` 指向
+  `Md.Sys.Color.PrimarySelection.Brush`（上游集合靠自定义 `MarkdownScrollViewer.SelectionBrush` 资源键，
+  因为他们没有 token 可指；`TrySetupSelectionBrush` 读不到那个键时 `ComputedSelectionBrush` 会退回青色，
+  而设置属性即可压过它，且仍可被调用方局部覆盖）；h5/h6 有类名、有解析器产出，却没有任何集合为它们写过
+  样式；`mdc|Rule` 用自己的 `Foreground` 画线，否则直接继承窗口墨色。
+- **不引用 `SyntaxHigh`**：只依赖 `Markdown.Avalonia.Tight`（程序集名 `Markdown.Avalonia`，带来
+  ColorTextBlock/ColorDocument），代码块保持 Tight 的普通 `TextBlock`。上游的 appendix 样式
+  （`avedit|TextEditor`/`Label.LangInfo`/`Button.CopyButton`）只由 `SyntaxOverride` 为**具名**集合注入，
+  第三方集合拿不到，所以应用若自行再加该插件需自己补；这一点写在 README 与 API 参考里。
+- 版本：`Markdown.Avalonia.Tight` **12.0.0-a3**（Avalonia 12 线目前只有预发布；`net8.0`/`net10.0`，声明
+  `Avalonia >= 12.0.0`，低于本仓库 12.1.2 基线，restore 无冲突），稳定线为 `11.0.3`（Avalonia ≥ 11.0.0），
+  留作回退。升级上游时需要重新核对 `StyleCollections/MarkdownStyleFluentTheme.axaml` 的选择器清单与
+  `TrySetupSelectionBrush` 的资源键名（`MdMarkdownThemeTests` 已钉住隔离、token 消费与渲染角色）。
+- 仍未做：`LiveMarkdown.Avalonia`（Apache-2.0，仓内直接引用 Avalonia 12.0.0 + Markdig 1.1.2 +
+  TextMateSharp 2.0.0），是「实时渲染 + LLM」场景的另一套控件，可在同一形状下另开一个集合。
+
 **G. 图表 provider 主题** —— 与「`MdChart` provider-neutral、不捆绑图表引擎」的定位一致：
 
 - `Md3.Avalonia.LiveCharts2`：实现一个 `LiveCharts` 主题（LvcThemeKind + ColorPalletes + 字体），
@@ -221,7 +260,9 @@ Markdown.Avalonia（417★）+ LiveMarkdown.Avalonia（176★）。
    - `IsPackable/GenerateDocumentationFile/IncludeSymbols/IsTrimmable/IsAotCompatible/EnableTrimAnalyzer`；
    - `PackageReference`：`Avalonia` + 上游控件包 + 核心 `ProjectReference`；**不引用 Fluent/Simple**；
    - 打包 `README.md` 与 `THIRD-PARTY-NOTICES.md`。
-2. `Themes/Material<X>Theme.axaml` + `.axaml.cs`（`Styles` 子类），颜色全部 `DynamicResource Md.Sys.*`。
+2. `Themes/Material<X>Theme.axaml` + `.axaml.cs`（`Styles` 子类），颜色全部 `DynamicResource Md.Sys.*`；
+   若上游的主题缝不是应用级 `Styles` 而是「控件自己挂集合」（见 §4.2 F 的 Markdown 案例），则改为由调用方
+   赋给控件属性，并在 README/API 参考里写清为什么不能注册到 `Application.Styles`。
 3. `THIRD-PARTY-NOTICES.md` 增加一行：包名、版本、用途、许可证、上游地址。
 4. `README.md`、`docs/API.md`、`Directory.Packages.props`（新增 `PackageVersion`）登记。
 5. Gallery 增加一个页面，并且**只在页面内局部加载该主题**，不做全局 `StyleInclude`。

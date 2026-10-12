@@ -94,6 +94,7 @@ public sealed class MdGalleryTests
             new HexEditorGalleryPage(),
             new DockGalleryPage(),
             new DraggableTabsGalleryPage(),
+            new MarkdownGalleryPage(),
             new MasonryPanelGalleryPage(),
             new PagedItemsGalleryPage(),
             new AsyncSelectGalleryPage(),

@@ -26,6 +26,10 @@ This document is the public entry point for the `0.4.1-preview.1` API. Preview A
 <!-- Optional Material theme for Tabalonia draggable tabs; likewise the only package that
      pulls in Tabalonia: -->
 <PackageReference Include="Md3.Avalonia.Tabalonia" Version="0.4.1-preview.1" />
+<!-- Optional Material style collection for Markdown.Avalonia documents; likewise the only package
+     that pulls in Markdown.Avalonia.Tight. Unlike every other theme package it is not registered
+     in Application.Styles - see the Markdown section below: -->
+<PackageReference Include="Md3.Avalonia.Markdown" Version="0.4.1-preview.1" />
 ```
 
 ```xml
@@ -560,9 +564,75 @@ forking templates it merges `Themes/Custom/TabsControl.axaml` and style-includes
 accents file holds no theme dictionaries of its own, light and dark both come from the core
 `MaterialTheme` variant.
 
+## Markdown
+
+For Markdown documents rendered with
+[Markdown.Avalonia](https://github.com/whistyun/Markdown.Avalonia), use the opt-in
+`Md3.Avalonia.Markdown` package. It is the only package that depends on `Markdown.Avalonia.Tight`
+(the core-only package; its assembly is `Markdown.Avalonia`) and, unlike every other theme package,
+it is *not* registered in `Application.Styles`:
+
+```xml
+<md:MarkdownScrollViewer Markdown="{Binding Document}">
+  <md:MarkdownScrollViewer.MarkdownStyle>
+    <themes:MaterialMarkdownTheme />
+  </md:MarkdownScrollViewer.MarkdownStyle>
+</md:MarkdownScrollViewer>
+```
+
+That shape comes from upstream, not from this package. `MarkdownScrollViewer` picks its own style
+collection and inserts it into its *own* `Styles` collection, so the collection closest to the
+control wins and an application-level `StyleInclude` can never restyle a viewer; the five built-in
+collections are selected by reflection over `MarkdownStyle`'s static properties through
+`MarkdownStyleName`, and the `INamedStyle` marker they implement is internal, so a third party
+cannot add a name to that list. The only seam is the `MarkdownStyle` property itself, and it takes
+one instance per viewer - the built-in collections also hand out a fresh object per access.
+
+Read the collection as a retokenization of the package's own `MarkdownStyleFluentTheme` (the
+collection of the Avalonia 12 line, which is what the pinned package ships): every selector it
+styles is styled here with the same shape. Prose is `OnSurfaceVariant` on `Surface`, headings and
+code are `OnSurface`, links are `Primary` underlined and switch to `Tertiary` on hover (upstream
+asks for the complementary accent), the blockquote bar is `Primary`, cell and divider rules are
+`OutlineVariant`, code blocks sit on `SurfaceContainerLow`, notes, table headers and inline code on
+`SurfaceContainerHighest`, and the red marker upstream paints on an unhandled `:::` container uses
+the `Error` role. Sizes and weights come from `Md.Sys.TypeScale`: `HeadlineLarge` for h1 through
+`TitleSmall` for h6, `BodyLarge` for prose, `BodyMedium` for code blocks and table cells,
+`LabelLarge` for table headers. Headings follow the weights M3 gives those roles - Regular down to
+`TitleLarge`, Medium for `TitleMedium`/`TitleSmall` and table headers, the same split `MdText`'s own
+ControlTheme uses - rather than Fluent's Light, and the document is typeset in
+`Md.Sys.Typeface.Plain` rather than inheriting the host application's font. Layout follows upstream
+except where Material has a shape of its own: the code block is a `SurfaceContainerLow` card with an
+8 DIP radius and 12/10 DIP padding instead of Fluent's two hairlines, table cells get 10/6 DIP
+padding instead of 2, and the `Error` marker on an unhandled `:::` container is a 3 DIP frame. The
+code block's mono font stack has no token and is carried over verbatim.
+
+Three gaps the built-in collections leave are filled here, and each is asserted by the headless
+suite:
+
+- Selection is `Md.Sys.Color.PrimarySelection.Brush`. Upstream's collections define a
+  `MarkdownScrollViewer.SelectionBrush` resource because they have no token to point at; the
+  collection sets the viewer's and every block's `SelectionBrush` property from the Material token
+  instead, which keeps `ComputedSelectionBrush` off its cyan fallback and still leaves the property
+  overridable per viewer.
+- h5 and h6 have classes and are emitted by the parser, but no built-in collection styles them, so
+  they complete the type-scale ladder here.
+- `mdc|Rule` draws its line with `Foreground`, which is otherwise inherited straight from the
+  window; the M3 divider role is `OutlineVariant`.
+
+Two things to know when the document is not the only thing on the page. `Markdown.Avalonia`'s
+`SyntaxHigh` plugin is not referenced by this package: code blocks are the Tight package's plain
+`TextBlock`, not an AvaloniaEdit editor. An application that adds the plugin - which is what the
+`Markdown.Avalonia` metapackage does - should also add that plugin's own appendix styles for
+`avedit|TextEditor`, `Label.LangInfo` and `Button.CopyButton`, because the plugin only injects them
+for upstream's named collections, not for a third-party one. And because the collection replaces
+the viewer's own, scope it per page (`<UserControl.Styles>`, as the gallery's Markdown page does)
+when the rest of the application should keep a different document look; nothing else in the
+application is affected either way, since the selectors are all scoped to the viewer's document
+tree.
+
 ## Trimming
 
-All ten packages set `IsTrimmable`, so an application that publishes with
+All eleven packages set `IsTrimmable`, so an application that publishes with
 `PublishTrimmed=true` can trim them, and they build with the IL2xxx analyzer on, so a new
 reflective call fails the build rather than breaking a trimmed app quietly.
 

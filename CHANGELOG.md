@@ -40,7 +40,34 @@
   read from Avalonia's `FluentTheme`, so the theme is standalone. Like the Dock theme it includes the
   pinned package's dictionaries by `avares://` URI instead of forking templates. It is the only
   package that pulls in `Tabalonia`, bringing the set to ten.
-- **Native AOT.** All ten packages declare `IsAotCompatible` and build with the IL3xxx analyzers
+- **`Md3.Avalonia.Markdown`**, an opt-in Material Design 3 style collection for
+  [Markdown.Avalonia](https://github.com/whistyun/Markdown.Avalonia) documents. It is shaped unlike
+  the other theme packages, because upstream is: `MarkdownScrollViewer` chooses a style collection
+  itself and inserts it into its own `Styles`, the five built-in collections are selected by
+  reflection over `MarkdownStyle`'s static properties, and the `INamedStyle` marker they implement
+  is internal - so neither `MarkdownStyleName` nor an application-level `StyleInclude` can restyle a
+  viewer. `MaterialMarkdownTheme : Styles` is therefore assigned to the viewer's `MarkdownStyle`
+  property (or `<md:MarkdownScrollViewer.MarkdownStyle>` in XAML) instead of being merged
+  application-wide, one instance per viewer like the built-in collections. It mirrors the selector
+  set of the package's `MarkdownStyleFluentTheme` retokenized onto `Md.Sys.*`: prose
+  `OnSurfaceVariant` on `Surface`, headings and code `OnSurface`, links `Primary` (`Tertiary` on
+  hover, where upstream asks for the complementary accent), the blockquote bar `Primary`, table
+  rules and dividers `OutlineVariant`, code blocks `SurfaceContainerLow`, notes and table headers
+  `SurfaceContainerHighest`, and the red marker upstream paints on an unhandled `:::` container the
+  `Error` role. Sizes come from `Md.Sys.TypeScale` - `HeadlineLarge` for h1 down to `TitleSmall`
+  for h6, `BodyLarge` for prose, `BodyMedium` for code and table cells, `LabelLarge` for table
+  headers - so h5 and h6, which no built-in collection styles at all, are filled in. Headings follow
+  the weights M3 gives those roles instead of Fluent's Light (Regular down to `TitleLarge`, Medium
+  for `TitleMedium`/`TitleSmall` and table headers), the document is typeset in
+  `Md.Sys.Typeface.Plain` rather than inheriting the host's font, and selection is
+  `Md.Sys.Color.PrimarySelection.Brush` - the same wash the editor, hex viewer and text field themes
+  use - so it never falls back to upstream's cyan; `mdc|Rule` gets the `OutlineVariant` foreground it
+  otherwise inherits from the window. Layout follows upstream except where Material has a shape of
+  its own: the code block is a `SurfaceContainerLow` card with an 8 DIP radius instead of Fluent's
+  two hairlines, table cells get 10/6 DIP padding instead of 2, and the `Error` marker on an
+  unhandled `:::` container is a 3 DIP frame. It is the only package that pulls in
+  `Markdown.Avalonia.Tight` (whose assembly is `Markdown.Avalonia`), bringing the set to eleven.
+- **Native AOT.** All eleven packages declare `IsAotCompatible` and build with the IL3xxx analyzers
   on alongside the existing IL2xxx trimming ones. `.github/workflows/aot-probe.yml` publishes the
   desktop gallery with `PublishAot=true` and does not accept a green step as the answer: it
   asserts the output is a native ELF executable with no managed assembly beside it, then runs that
@@ -52,6 +79,11 @@
 
 ### Fixed
 
+- **Two of the theme projects were missing from the solution's build configuration.** The Dock
+  entry lost its `EndProject` line when Tabalonia was added after it, which swallowed Tabalonia's
+  project block, and neither theme project had a `ProjectConfigurationPlatforms` entry - so
+  `dotnet build Md3.Avalonia.sln` silently skipped them and only the packaging script's per-project
+  builds kept them honest. Both are mapped now, with `Md3.Avalonia.Markdown` alongside them.
 - **The carousel ignored how wide it was.** The arrangement produced one large item and one medium
   one at every window size, so from the third item on everything collapsed to the 56 DIP small
   keyline: four items covering 584 DIP of an 1188 DIP track, with the rest empty. Correct on a

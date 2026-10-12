@@ -21,6 +21,13 @@
     <!-- Tabalonia ships one package for both themes; 12.0.0 declares Avalonia 12.0.0, so it
          restores fine against this repository's 12.1.2 baseline. -->
     <PackageVersion Include="Tabalonia" Version="12.0.0" />
+    <!-- Markdown.Avalonia's Avalonia 12 line is a prerelease: Markdown.Avalonia.Tight 12.0.0-a3
+         targets net8.0/net10.0 and declares Avalonia >= 12.0.0, so it restores against this
+         repository's 12.1.2 baseline. It brings ColorTextBlock.Avalonia and ColorDocument.Avalonia
+         12.0.0-a3, whose types the theme's selectors name; bump the three together. The
+         metapackage (Markdown.Avalonia, with the SyntaxHigh plugin) is not used - see the
+         Markdown section of the root README for what that means for an app that adds it. -->
+    <PackageVersion Include="Markdown.Avalonia.Tight" Version="12.0.0-a3" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.2" />
     <PackageVersion Include="MaterialColorUtilities" Version="0.3.0" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />

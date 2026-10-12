@@ -42,6 +42,7 @@
             <md:MdButton Content="Masonry panel" Tag="Masonry panel" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Docking" Tag="Docking" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Draggable tabs" Tag="Draggable tabs" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Markdown" Tag="Markdown" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Surfaces and type scale" Tag="Surfaces and type scale" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Settings cards" Tag="Settings cards" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Scrolling surface" Tag="Scrolling surface" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />

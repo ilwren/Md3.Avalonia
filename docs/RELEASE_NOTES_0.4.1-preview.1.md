@@ -98,7 +98,32 @@ surface，调用方仍可覆盖。
   `Themes/Accents/Material.axaml`，所以模板与部件名仍由 Tabalonia 维护，升级不会漂移；
   由于 accent 字典本身不带主题字典，明暗完全跟随核心 `MaterialTheme` 变体。原包自带
   `CustomTheme`/`FluentTheme` 都不要同时引入；
-- **原生 AOT 已验证可用。** 十个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
+- **`Md3.Avalonia.Markdown`** —— [Markdown.Avalonia](https://github.com/whistyun/Markdown.Avalonia)
+  文档渲染的 Material Design 3 样式集合，opt-in，唯一引入 `Markdown.Avalonia.Tight` 依赖的包
+  （核心包，程序集名 `Markdown.Avalonia`），包总数到十一个。它是唯一**不注册到 `Application.Styles`**
+  的主题包，这不是取舍而是上游的接缝：`MarkdownScrollViewer` 自己挑选样式集合并把它插进自己的 `Styles`
+  （最近的集合胜出，应用级 `StyleInclude` 永远赢不了），五个内置集合是通过 `MarkdownStyleName` 反射
+  `MarkdownStyle` 的静态属性按名选取的，而它们的 `INamedStyle` 标记是 internal——第三方既无法命名也
+  无法注册。唯一可用的接缝就是 `MarkdownStyle` 属性本身：
+  `<md:MarkdownScrollViewer.MarkdownStyle><themes:MaterialMarkdownTheme /></md:MarkdownScrollViewer.MarkdownStyle>`，
+  每个查看器一个实例（内置集合的静态属性同样每次返回新对象）。它按上游 `MarkdownStyleFluentTheme`
+  （Avalonia 12 那一线，正是固定版本所带的集合）的选择器清单逐条重写：形状全部保留，颜色换成
+  `Md.Sys.Color`（正文 `OnSurfaceVariant`、标题与代码 `OnSurface`、链接 `Primary` 加下划线、悬停为
+  上游要求的互补强调色即 `Tertiary`、引用条 `Primary`、表格线与分隔线 `OutlineVariant`、代码块
+  `SurfaceContainerLow`、提示/表头/行内代码 `SurfaceContainerHighest`、上游用红色标记的未处理 `:::`
+  容器换成 `Error` 角色），字号换成 `Md.Sys.TypeScale`（h1 `HeadlineLarge` 一路到 h6 `TitleSmall`、
+  正文 `BodyLarge`、代码与表格单元 `BodyMedium`、表头 `LabelLarge`；标题按 M3 给这些角色的字重——到 `TitleLarge`
+  为止 Regular，`TitleMedium`/`TitleSmall` 与表头为 Medium，与 MdText 自己的 ControlTheme 同一套；
+  文档固定使用 `Md.Sys.Typeface.Plain` 而不继承宿主字体）。
+  另外补了三个内置集合留下的空白：查看器与每个文本块的 `SelectionBrush` 指向
+  `Md.Sys.Color.PrimarySelection.Brush`（与 AvaloniaEdit、AvaloniaHex、输入框主题同一层选区色，
+  否则 `ComputedSelectionBrush` 会退回青色）、h5/h6 的字号（解析器会发类名但没有任何集合为它们写过
+  样式）、以及 `mdc|Rule` 的前景色（该控件用自己的 `Foreground` 画线，否则直接继承窗口的墨色）；
+  三者都有 headless 断言。布局基本照搬上游，只在 Material 自有形状处改动：代码块是 SurfaceContainerLow
+  卡片、8 圆角与 12/10 内边距（取代上游上下两条细线），表格单元格内边距 10/6（上游为 2），未处理
+  `:::` 容器的 `Error` 标记为 3 宽边框。它不引用 `SyntaxHigh` 插件（代码块是 Tight 的普通 `TextBlock`）；应用若自行再加该插件，需要自己补它的 appendix 样式
+  （`avedit|TextEditor`/`Label.LangInfo`/`Button.CopyButton`），因为插件只为上游具名集合注入这些样式。
+- **原生 AOT 已验证可用。** 十一个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
   IL3xxx 分析器。`.github/workflows/aot-probe.yml` 用 `PublishAot=true` 发布桌面 Gallery，并且
   **不把「步骤成功」当作答案**：它断言产物是原生 ELF 可执行文件、输出目录里没有托管 dll 残留（防止
   apphost 冒充），然后在 xvfb 下把那个二进制真正跑起来。原生 AOT 是在运行期因反射元数据被裁而失败的，

@@ -22,6 +22,7 @@
     <ProjectReference Include="../../src/Md3.Avalonia.AvaloniaHex/Md3.Avalonia.AvaloniaHex.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Dock/Md3.Avalonia.Dock.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Tabalonia/Md3.Avalonia.Tabalonia.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.Markdown/Md3.Avalonia.Markdown.csproj" />
     <AvaloniaResource Include="Assets/Media/**" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,226 @@
+<!--
+  Material Design 3 style collection for Markdown.Avalonia.
+
+  Markdown.Avalonia does not take its look from the application's style tree. MarkdownScrollViewer
+  creates a style collection itself and inserts it into its own Styles, so the collection closest to
+  the control wins and an application-level StyleInclude can never restyle a viewer. The five
+  built-in collections are picked by name through reflection over MarkdownStyle's static properties,
+  and the INamedStyle marker they implement is internal - a third party cannot add one and cannot be
+  selected with MarkdownStyleName. The only seam is the property itself:
+
+      <md:MarkdownScrollViewer>
+        <md:MarkdownScrollViewer.MarkdownStyle>
+          <themes:MaterialMarkdownTheme />
+        </md:MarkdownScrollViewer.MarkdownStyle>
+      </md:MarkdownScrollViewer>
+
+  This file is therefore a collection, not an application theme: it is assigned per viewer (or per
+  page) instead of being merged into Application.Styles.
+
+  It mirrors the selector set of MarkdownStyleFluentTheme - the collection of the Avalonia 12 line,
+  which is what the pinned Markdown.Avalonia.Tight ships - retokenized onto Md.Sys.*. Colours and
+  sizes become tokens; everything else is upstream's own value, except where Material has a shape or
+  a spacing of its own (marked "Material" below). Per element:
+
+  * every colour becomes an Md.Sys.Color role: prose OnSurfaceVariant on the surface, headings and
+    the code block's text OnSurface, links Primary (Tertiary on hover, where upstream asks for the
+    complementary accent), the blockquote bar Primary, table and divider rules OutlineVariant, the
+    code block on SurfaceContainerLow, notes / table headers / inline code on the highest container,
+    and upstream's red "unhandled ::: container" marker the Error role;
+  * the type scale replaces Fluent's multipliers: HeadlineLarge for h1 down to TitleSmall for h6
+    (upstream leaves h5/h6 completely unstyled), BodyLarge for prose, BodyMedium for code and table
+    cells, LabelLarge for table headers, all read from Md.Sys.TypeScale.*.Size/LineHeight. Weights
+    follow the same roles as MdText's own ControlTheme - Regular for the Display/Headline/TitleLarge
+    roles, Medium for the TitleMedium/TitleSmall and LabelLarge roles - instead of Fluent's Light;
+  * the document is typeset in Md.Sys.Typeface.Plain rather than inheriting the host's font, and the
+    code block in a mono stack Material has no token for;
+  * selection is Md.Sys.Color.PrimarySelection.Brush, the same wash the AvaloniaEdit, AvaloniaHex,
+    TextBox and Search themes use. Upstream's collections define a MarkdownScrollViewer.SelectionBrush
+    resource because they have no token to point at; a DynamicResource setter reaches ours directly
+    and stays theme-variant aware, and it still leaves the property overridable per viewer.
+    ComputedSelectionBrush is SelectionBrush ?? (that resource) ?? Brushes.Cyan, so this is what keeps
+    a selection from falling back to cyan;
+  * two gaps no built-in collection fills: ctxt|CTextBlock.Heading5/Heading6 have classes and Heading
+    elements but no style anywhere, and mdc|Rule draws its line with Foreground, which is otherwise
+    inherited straight from the window.
+
+  Shape and spacing. Fluent's layout values are kept as written for prose and list margins, the
+  blockquote bar and its indent, the table grid (1 DIP cells inside a 1 DIP frame) and the note box.
+  Material takes over where it has an idiom: the code block becomes a SurfaceContainerLow card with
+  a small 8 DIP radius and 12/10 DIP padding instead of Fluent's two hairline rules, and table cells
+  get 10/6 DIP padding instead of 2 DIP.
+
+  Avalonia has no selector specificity: two styles at the same priority resolve by registration
+  order, the later one winning (upstream's own collections already rely on this for their heading
+  sizes). Order in this file is therefore load-bearing - the base ctxt|CTextBlock rule comes before
+  the heading, note and list-marker rules, the generic TextBlock rule before TextBlock.CodeBlock, the
+  cell rule before the table header rule, and Border.CodeBlock before Border.NoContainer.
+
+  Deliberately not styled: Border.OddTableRow (the odd rows stay transparent, so only the even rows
+  are tinted), Border.ContainerBlock (a ::: block that has a handler is whatever control the handler
+  returned, and that control brings its own look), and the SyntaxHigh plugin's appendix styles -
+  adding that plugin also brings its own app-wide styles for avedit|TextEditor, Button.CopyButton and
+  Label.LangInfo, which this collection does not and cannot replace. See README.md.
+-->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:md="clr-namespace:Markdown.Avalonia;assembly=Markdown.Avalonia"
+        xmlns:mdc="clr-namespace:Markdown.Avalonia.Controls;assembly=Markdown.Avalonia"
+        xmlns:ctxt="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia"
+        x:Class="Md3.Avalonia.Themes.MaterialMarkdownTheme">
+  <Style Selector=":is(md|MarkdownScrollViewer)">
+    <Setter Property="SelectionBrush" Value="{DynamicResource Md.Sys.Color.PrimarySelection.Brush}" />
+  </Style>
+
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CTextBlock">
+    <Setter Property="SelectionBrush" Value="{DynamicResource Md.Sys.Color.PrimarySelection.Brush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource Md.Sys.Typeface.Plain}" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyLarge.Size}" />
+    <Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.BodyLarge.LineHeight}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="Margin" Value="0,5" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer TextBlock">
+    <Setter Property="FontFamily" Value="{DynamicResource Md.Sys.Typeface.Plain}" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyLarge.Size}" />
+  </Style>
+
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CTextBlock.Heading1">
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.HeadlineLarge.Size}" />
+    <Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.HeadlineLarge.LineHeight}" />
+    <Setter Property="FontWeight" Value="Normal" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CTextBlock.Heading2">
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.HeadlineMedium.Size}" />
+    <Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.HeadlineMedium.LineHeight}" />
+    <Setter Property="FontWeight" Value="Normal" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CTextBlock.Heading3">
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.HeadlineSmall.Size}" />
+    <Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.HeadlineSmall.LineHeight}" />
+    <Setter Property="FontWeight" Value="Normal" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CTextBlock.Heading4">
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.TitleLarge.Size}" />
+    <Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.TitleLarge.LineHeight}" />
+    <Setter Property="FontWeight" Value="Normal" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CTextBlock.Heading5">
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.TitleMedium.Size}" />
+    <Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.TitleMedium.LineHeight}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CTextBlock.Heading6">
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.TitleSmall.Size}" />
+    <Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.TitleSmall.LineHeight}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+  </Style>
+
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CHyperlink">
+    <Setter Property="IsUnderline" Value="True" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CHyperlink:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Tertiary.Brush}" />
+  </Style>
+
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CCode">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+    <Setter Property="CornerRadius" Value="4" />
+  </Style>
+
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.Blockquote">
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="BorderThickness" Value="5,0,0,0" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer StackPanel.Blockquote">
+    <Setter Property="Margin" Value="10, 5" />
+  </Style>
+
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Grid.List">
+    <Setter Property="Margin" Value="40,0,0,0" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CTextBlock.ListMarker">
+    <Setter Property="Margin" Value="0,5,5,5" />
+  </Style>
+
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.CodeBlock">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="12,10" />
+    <Setter Property="Margin" Value="5,0,5,0" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer TextBlock.CodeBlock">
+    <Setter Property="FontFamily"
+            Value="menlo,monaco,consolas,droid sans mono,inconsolata,courier new,monospace,dejavu sans mono" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" />
+    <Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.LineHeight}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+  </Style>
+  <!-- A ::: block with no handler is drawn as a code block tagged NoContainer; upstream only swaps
+       its brush, so the 3 DIP Error frame below is what keeps the marker visible on the card. -->
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.NoContainer">
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+    <Setter Property="BorderThickness" Value="3" />
+  </Style>
+
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.Note">
+    <Setter Property="Margin" Value="5,0,5,0" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Setter Property="BorderThickness" Value="3,3,3,3" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CTextBlock.Note">
+    <Setter Property="Margin" Value="10, 5" />
+  </Style>
+
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.Table">
+    <Setter Property="Margin" Value="5" />
+    <Setter Property="BorderThickness" Value="0,0,1,1" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.TightTable">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Grid.Table > Border">
+    <Setter Property="Margin" Value="0" />
+    <Setter Property="BorderThickness" Value="1,1,0,0" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Setter Property="Padding" Value="10,6" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Grid.Table">
+    <Setter Property="mdc:AutoScaleColumnDefinitions.IsEnabled" Value="True" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Grid.Table > Border ctxt|CTextBlock">
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" />
+    <Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.LineHeight}" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.TableHeader">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+  </Style>
+  <!-- A header cell is a Grid child like any other, so the cell rule above matches it too. Both rules
+       sit at the same priority, and Avalonia resolves that by registration order: this one is later
+       and wins. Reordering the two would silently put body cells in the header's ink. -->
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.TableHeader ctxt|CTextBlock">
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.LabelLarge.Size}" />
+    <Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.LabelLarge.LineHeight}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+  </Style>
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer Border.EvenTableRow">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
+  </Style>
+
+  <Style Selector=".Markdown_Avalonia_MarkdownViewer mdc|Rule">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Setter Property="Margin" Value="0,3" />
+  </Style>
+</Styles>
