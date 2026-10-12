@@ -127,7 +127,11 @@ public class MdLiveChartsThemeTests
         // theme does for the label, needle and angular-tick rules this theme has an opinion about. So
         // the Material rules take those slots over instead of appending to them, and this is what the
         // chart reads back out of them.
-        var label = new LabelVisual();
+        // The label rule is driven through the only concrete label visual the SkiaSharp view has.
+        // Upstream marks it obsolete in favour of a visual that is not a BaseLabelVisual at all, so it
+        // is created by name rather than referenced - a reference is a warning, and warnings are errors.
+        var label = (BaseLabelVisual)Activator.CreateInstance(
+            typeof(SolidColorPaint).Assembly.GetType("LiveChartsCore.SkiaSharpView.VisualElements.LabelVisual")!)!;
         ElementRule<BaseLabelVisual>(theme)(label);
         Assert.Equal(Token("OnSurfaceVariant", dark: false), Assert.IsType<SolidColorPaint>(label.Paint).Color);
 
