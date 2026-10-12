@@ -246,7 +246,7 @@ public class MdPropertyGridThemeTests
 
     // The theme is handed to the window that owns the grid, the way an application that does not
     // want it application-wide would register it; the gallery page registers it the same way.
-    private static IDisposable Show(Control content)
+    private static Scope Show(Control content)
     {
         var window = new Window { Width = 560, Height = 640, Content = content };
         window.Styles.Add(new MaterialPropertyGridTheme());
@@ -261,11 +261,13 @@ public class MdPropertyGridThemeTests
         return Assert.IsType<ControlTheme>(value);
     }
 
-    private sealed class Scope(Window window) : IDisposable
+    private sealed class Scope : IDisposable
     {
-        public Window Window { get; } = window;
+        public Scope(Window window) => Window = window;
 
-        public void Dispose() => window.Close();
+        public Window Window { get; }
+
+        public void Dispose() => Window.Close();
     }
 }
 
