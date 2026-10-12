@@ -104,7 +104,7 @@ public sealed class MdParityHardeningTests
         host.Window.MouseMove(pointer, RawInputModifiers.None);
         Assert.Equal(0.08, reorderState.Opacity, precision: 3);
         host.Window.MouseDown(pointer, MouseButton.Left, RawInputModifiers.None);
-        Assert.Equal(0.12, reorderState.Opacity, precision: 3);
+        Assert.Equal(0.10, reorderState.Opacity, precision: 3); // M3 pressed state layer is 10% (12% is M2)
         host.Window.MouseUp(pointer, MouseButton.Left, RawInputModifiers.None);
 
         foreach (var row in transfer.GetVisualDescendants().OfType<ListBoxItem>())
