@@ -35,6 +35,16 @@
   the pre-2023 `#FFFBFE`), and dark `SurfaceBright` to `#36343B`; the rest of the baseline
   palette audited and confirmed.
 
+- `MdNumericBox` defaults its +/- spinner column to the right (Avalonia's ButtonSpinner
+  defaults left, which collided with the trailing-icon space the field reserves).
+- `MdAboutDialog` stacks the icon above the text under 420 dp (`:compact`), fixing the
+  side-by-side squeeze on phones.
+- `MdSettingsExpander` now animates expand/collapse (spring height transition, chevron
+  rotation transition) instead of popping.
+- Gallery: dialog demos host at the page root so the scrim covers the whole viewport; the
+  adaptive suite clamps its medium/expanded presets to the visible width on phones and the
+  expanded preset can finally reach 1040 dp.
+
 ### Fixed
 
 - `MdBanner` actions drop below the text automatically under the 480 dip compact breakpoint

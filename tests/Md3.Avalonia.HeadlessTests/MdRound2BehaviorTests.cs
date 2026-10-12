@@ -148,7 +148,7 @@ public sealed class MdRound2BehaviorTests
         window.Show();
         Dispatcher.UIThread.RunJobs();
 
-        var icon = dialog.GetVisualDescendants().OfType<global::Avalonia.Controls.Primitives.ContentPresenter>()
+        var icon = dialog.GetVisualDescendants().OfType<global::Avalonia.Controls.Presenters.ContentPresenter>()
             .Single(presenter => presenter.Name == "PART_Icon");
         var text = dialog.GetVisualDescendants().OfType<StackPanel>()
             .Single(panel => panel.Name == "PART_TextColumn");
@@ -165,7 +165,7 @@ public sealed class MdRound2BehaviorTests
         wide.Show();
         Dispatcher.UIThread.RunJobs();
         var wideDialog = (MdAboutDialog)wide.Content!;
-        var wideIcon = wideDialog.GetVisualDescendants().OfType<global::Avalonia.Controls.Primitives.ContentPresenter>()
+        var wideIcon = wideDialog.GetVisualDescendants().OfType<global::Avalonia.Controls.Presenters.ContentPresenter>()
             .Single(presenter => presenter.Name == "PART_Icon");
         var wideText = wideDialog.GetVisualDescendants().OfType<StackPanel>()
             .Single(panel => panel.Name == "PART_TextColumn");
