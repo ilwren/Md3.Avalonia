@@ -2,6 +2,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Styling;
@@ -111,7 +112,12 @@ public class MdDockThemeTests
         Assert.Equal("Documents", documentDock.ActiveDockable!.Title);
 
         // The dock chrome is built from Dock's own templates, which the theme reaches through the
-        // implicit ControlThemes asserted above.
+        // implicit ControlThemes asserted above. Dock materializes the layout through a
+        // DeferredContentControl, so the frame has to actually render before the tab strip items
+        // exist - the same reason the gallery suite captures frames instead of just pumping jobs.
+        scope.Window.CaptureRenderedFrame();
+        Dispatcher.UIThread.RunJobs();
+
         Assert.NotEmpty(dock.GetVisualDescendants().OfType<DocumentTabStripItem>());
         Assert.NotEmpty(dock.GetVisualDescendants().OfType<ToolTabStripItem>());
     }
@@ -125,10 +131,7 @@ public class MdDockThemeTests
         // implicit theme with it - and only that one. This is the package's widest side effect and it
         // is deliberate: without it Dock chrome could not load at all.
         var variant = Application.Current!.ActualThemeVariant;
-        foreach (var native in new[]
-                 {
-                     typeof(Button), typeof(TextBox), typeof(ScrollViewer), typeof(ListBox), typeof(ToggleButton)
-                 })
+        foreach (var native in new[] { typeof(TextBox), typeof(ScrollViewer), typeof(ListBox), typeof(ToggleButton) })
         {
             Assert.False(Application.Current.TryGetResource(native, variant, out _), native.Name);
         }
@@ -204,16 +207,18 @@ public class MdDockThemeTests
             DefaultDockable = center
         };
 
-        var dock = new DockControl
+        // Deliberately the same shape as the Docking gallery page: let DockControl run
+        // InitializeFactory/InitializeLayout itself, which also means it rebuilds the layout when
+        // it attaches to the visual tree instead of leaving a manually built model behind.
+        return new DockControl
         {
             Width = 720,
             Height = 420,
+            InitializeFactory = true,
+            InitializeLayout = true,
             Factory = factory,
             Layout = root
         };
-
-        factory.InitLayout(root);
-        return dock;
     }
 
     /// <summary>Shows <paramref name="content"/> in a window and returns a scope that closes it.</summary>
