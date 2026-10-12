@@ -101,15 +101,15 @@ public sealed class MdRound2BehaviorTests
         // The 2023 baseline moved light surface/background/bright to #FEF7FF (from the old
         // #FFFBFE) and dark surface-bright to #36343B.
         var theme = new MaterialTheme();
-        Assert.True(theme.TryFindResource("Md.Sys.Color.Surface", ThemeVariant.Light, out var surface));
+        Assert.True(theme.TryGetResource("Md.Sys.Color.Surface", ThemeVariant.Light, out var surface));
         Assert.Equal(global::Avalonia.Media.Color.Parse("#FEF7FF"), Assert.IsType<global::Avalonia.Media.Color>(surface));
-        Assert.True(theme.TryFindResource("Md.Sys.Color.Background", ThemeVariant.Light, out var background));
+        Assert.True(theme.TryGetResource("Md.Sys.Color.Background", ThemeVariant.Light, out var background));
         Assert.Equal(global::Avalonia.Media.Color.Parse("#FEF7FF"), Assert.IsType<global::Avalonia.Media.Color>(background));
-        Assert.True(theme.TryFindResource("Md.Sys.Color.SurfaceBright", ThemeVariant.Light, out var bright));
+        Assert.True(theme.TryGetResource("Md.Sys.Color.SurfaceBright", ThemeVariant.Light, out var bright));
         Assert.Equal(global::Avalonia.Media.Color.Parse("#FEF7FF"), Assert.IsType<global::Avalonia.Media.Color>(bright));
-        Assert.True(theme.TryFindResource("Md.Sys.Color.Surface", ThemeVariant.Dark, out var darkSurface));
+        Assert.True(theme.TryGetResource("Md.Sys.Color.Surface", ThemeVariant.Dark, out var darkSurface));
         Assert.Equal(global::Avalonia.Media.Color.Parse("#141218"), Assert.IsType<global::Avalonia.Media.Color>(darkSurface));
-        Assert.True(theme.TryFindResource("Md.Sys.Color.SurfaceBright", ThemeVariant.Dark, out var darkBright));
+        Assert.True(theme.TryGetResource("Md.Sys.Color.SurfaceBright", ThemeVariant.Dark, out var darkBright));
         Assert.Equal(global::Avalonia.Media.Color.Parse("#36343B"), Assert.IsType<global::Avalonia.Media.Color>(darkBright));
     }
 
