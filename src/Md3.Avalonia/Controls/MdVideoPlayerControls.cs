@@ -235,7 +235,7 @@ public sealed class MdVideoPlayerControls : TemplatedControl
 
     private void OnPointerMoved(object? sender, PointerEventArgs e)
     {
-        if (_pointerPressed && (e.GetCurrentPoint(this).Position - _pointerPressPosition).Length > TapMovementThreshold)
+        if (_pointerPressed && Distance(e.GetCurrentPoint(this).Position, _pointerPressPosition) > TapMovementThreshold)
             _pointerPressed = false;
         ShowControls();
         UpdateAutoHideTimer();
@@ -262,7 +262,7 @@ public sealed class MdVideoPlayerControls : TemplatedControl
         if (!_pointerPressed) return;
         _pointerPressed = false;
         var point = e.GetCurrentPoint(this).Position;
-        if ((point - _pointerPressPosition).Length > TapMovementThreshold) return;
+        if (Distance(point, _pointerPressPosition) > TapMovementThreshold) return;
 
         var now = Environment.TickCount64;
         if (_tapPending && now - _pendingTapTimestamp <= DoubleTapWindowMilliseconds &&
@@ -314,6 +314,13 @@ public sealed class MdVideoPlayerControls : TemplatedControl
                 Request(MdPlaybackRequest.Forward);
                 break;
         }
+    }
+
+    private static double Distance(Point first, Point second)
+    {
+        var deltaX = first.X - second.X;
+        var deltaY = first.Y - second.Y;
+        return Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
     }
 
     private TapZone GetTapZone(Point point)
