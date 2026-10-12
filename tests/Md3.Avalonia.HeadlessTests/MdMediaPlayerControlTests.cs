@@ -382,6 +382,14 @@ public sealed class MdMediaPlayerControlTests
             Tap(window, new Point(558, 130));
             Assert.Equal(new[] { MdPlaybackRequest.Rewind, MdPlaybackRequest.Forward }, requests);
             Assert.Equal("10 sec ahead", feedbackLabel.Text);
+
+            Tap(window, new Point(300, 20));
+            await Task.Delay(60);
+            Dispatcher.UIThread.RunJobs();
+            Tap(window, new Point(300, 20));
+            Assert.Equal(new[] { MdPlaybackRequest.Rewind, MdPlaybackRequest.Forward, MdPlaybackRequest.Pause }, requests);
+            Assert.False(video.IsPlaying, "A center double-tap should toggle playback without targeting a control.");
+            Assert.Equal("Pause", feedbackLabel.Text);
         }
         finally
         {
@@ -390,7 +398,7 @@ public sealed class MdMediaPlayerControlTests
     }
 
     [AvaloniaFact]
-    public void Video_DoubleTap_Does_Not_Replace_Transport_Button_Clicks()
+    public async Task Video_DoubleTap_Does_Not_Replace_Transport_Button_Clicks()
     {
         var video = new MdVideoPlayerControls
         {
@@ -415,6 +423,68 @@ public sealed class MdMediaPlayerControlTests
             Tap(window, point);
 
             Assert.Equal(new[] { MdPlaybackRequest.Rewind, MdPlaybackRequest.Rewind }, requests);
+
+            requests.Clear();
+            window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
+            await Task.Delay(700);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Empty(requests);
+            window.MouseUp(point, MouseButton.Left, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(new[] { MdPlaybackRequest.Rewind }, requests);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task Video_LongPress_On_Either_Edge_Seeks_Continuously_With_Rate_Feedback()
+    {
+        var video = new MdVideoPlayerControls
+        {
+            Width = 600,
+            Height = 260,
+            Duration = TimeSpan.FromMinutes(3),
+            Position = TimeSpan.FromSeconds(45),
+            IsPlaying = true,
+            AutoHideControls = false
+        };
+        MdMotion.SetScheme(video, MdMotionScheme.None);
+        var window = new Window { Width = 600, Height = 300, Content = video };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var requestedPositions = new List<TimeSpan>();
+            video.SeekRequested += (_, args) => requestedPositions.Add(args.Position);
+            var feedbackLabel = Assert.Single(video.GetVisualDescendants().OfType<TextBlock>(),
+                textBlock => textBlock.Name == "PART_GestureFeedbackLabel");
+
+            var left = new Point(40, 130);
+            window.MouseMove(left, RawInputModifiers.None);
+            window.MouseDown(left, MouseButton.Left, RawInputModifiers.None);
+            await Task.Delay(850);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(requestedPositions.Count >= 2, "Holding the left edge should issue repeated seek targets.");
+            Assert.All(requestedPositions, position => Assert.True(position < TimeSpan.FromSeconds(45)));
+            Assert.Equal("2x back", feedbackLabel.Text);
+            window.MouseUp(left, MouseButton.Left, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+
+            var beforeForward = requestedPositions.Count;
+            var right = new Point(560, 130);
+            window.MouseMove(right, RawInputModifiers.None);
+            window.MouseDown(right, MouseButton.Left, RawInputModifiers.None);
+            await Task.Delay(2_100);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(requestedPositions.Count >= beforeForward + 2, "Holding the right edge should issue repeated seek targets.");
+            Assert.All(requestedPositions.Skip(beforeForward), position => Assert.True(position > TimeSpan.FromSeconds(45)));
+            Assert.Equal("4x ahead", feedbackLabel.Text);
+            window.MouseUp(right, MouseButton.Left, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(video.IsControlsVisible);
         }
         finally
         {

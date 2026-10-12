@@ -14,13 +14,17 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>
 /// An overlay for video surfaces with transport, mute, fullscreen and seek affordances.
-/// Double-taps in the outer thirds request ten-second jumps; the host supplies the video surface
-/// and playback engine, while this control raises requests only.
+/// Double-taps in the outer thirds request ten-second jumps, a center double-tap toggles playback,
+/// and holding either edge seeks continuously. The host supplies the video surface and playback engine,
+/// while this control raises requests only.
 /// </summary>
 [PseudoClasses(":playing", ":paused", ":busy", ":controls-hidden", ":full-screen", ":reduced-motion", ":no-motion")]
 public sealed class MdVideoPlayerControls : TemplatedControl
 {
     private const int DoubleTapWindowMilliseconds = 320;
+    private const int LongPressDelayMilliseconds = 450;
+    private const int LongPressSeekIntervalMilliseconds = 200;
+    private const int LongPressFeedbackDismissMilliseconds = 450;
     private const double TapMovementThreshold = 24;
 
     public static readonly StyledProperty<string?> TitleProperty =
@@ -60,6 +64,7 @@ public sealed class MdVideoPlayerControls : TemplatedControl
 
     private readonly DispatcherTimer _autoHideTimer;
     private readonly DispatcherTimer _tapTimer;
+    private readonly DispatcherTimer _longPressTimer;
     private readonly DispatcherTimer _feedbackTimer;
     private readonly MdPresenceController _controlsPresence;
     private readonly MdPresenceController _feedbackPresence;
@@ -78,10 +83,17 @@ public sealed class MdVideoPlayerControls : TemplatedControl
     private MdIconButton? _fullScreenButton;
     private MdCircularProgressIndicator? _busyIndicator;
     private bool _pointerPressed;
-    private Point _pointerPressPosition;
+    private bool _longPressActive;
+    private bool _longPressConsumed;
     private bool _tapPending;
+    private IPointer? _pressedPointer;
+    private Point _pointerPressPosition;
     private Point _pendingTapPosition;
     private long _pendingTapTimestamp;
+    private long _longPressSeekStartedAt;
+    private TimeSpan _longPressSeekOrigin;
+    private TimeSpan? _lastLongPressSeekPosition;
+    private TapZone _longPressSeekZone;
 
     static MdVideoPlayerControls()
     {
@@ -120,6 +132,8 @@ public sealed class MdVideoPlayerControls : TemplatedControl
         _autoHideTimer.Tick += OnAutoHideTimerTick;
         _tapTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(DoubleTapWindowMilliseconds) };
         _tapTimer.Tick += OnTapTimerTick;
+        _longPressTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(LongPressDelayMilliseconds) };
+        _longPressTimer.Tick += OnLongPressTimerTick;
         _feedbackTimer = new DispatcherTimer();
         _feedbackTimer.Tick += OnFeedbackTimerTick;
         _controlsPresence = new MdPresenceController(present =>
@@ -134,6 +148,7 @@ public sealed class MdVideoPlayerControls : TemplatedControl
         AddHandler(PointerMovedEvent, OnPointerMoved, RoutingStrategies.Tunnel, handledEventsToo: true);
         AddHandler(PointerPressedEvent, OnPointerPressed, RoutingStrategies.Tunnel, handledEventsToo: true);
         AddHandler(PointerReleasedEvent, OnPointerReleased, RoutingStrategies.Tunnel, handledEventsToo: true);
+        AddHandler(PointerCaptureLostEvent, OnPointerCaptureLost, RoutingStrategies.Bubble, handledEventsToo: true);
         AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel, handledEventsToo: true);
         UpdateState();
     }
@@ -212,12 +227,19 @@ public sealed class MdVideoPlayerControls : TemplatedControl
     {
         _autoHideTimer.Stop();
         _tapTimer.Stop();
+        _longPressTimer.Stop();
         _feedbackTimer.Stop();
         _controlsPresence.Stop();
         _feedbackPresence.Stop();
         _feedbackPresence.Initialize(false);
+        var pressedPointer = _pressedPointer;
         _pointerPressed = false;
+        _longPressActive = false;
+        _longPressConsumed = false;
+        _pressedPointer = null;
         _tapPending = false;
+        if (pressedPointer is not null && ReferenceEquals(pressedPointer.Captured, this))
+            pressedPointer.Capture(null);
         base.OnDetachedFromVisualTree(e);
     }
 
@@ -235,8 +257,21 @@ public sealed class MdVideoPlayerControls : TemplatedControl
 
     private void OnPointerMoved(object? sender, PointerEventArgs e)
     {
-        if (_pointerPressed && Distance(e.GetCurrentPoint(this).Position, _pointerPressPosition) > TapMovementThreshold)
+        if (_pointerPressed && ReferenceEquals(e.Pointer, _pressedPointer) &&
+            Distance(e.GetCurrentPoint(this).Position, _pointerPressPosition) > TapMovementThreshold)
+        {
             _pointerPressed = false;
+            _longPressTimer.Stop();
+            if (_longPressActive)
+            {
+                StopLongPressSeek();
+                _longPressConsumed = true;
+            }
+            else
+            {
+                ResumePendingTapTimer();
+            }
+        }
         ShowControls();
         UpdateAutoHideTimer();
     }
@@ -252,17 +287,59 @@ public sealed class MdVideoPlayerControls : TemplatedControl
         }
         if (_pointerPressed || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
 
+        var point = e.GetCurrentPoint(this).Position;
+        if (_tapPending && Environment.TickCount64 - _pendingTapTimestamp <= DoubleTapWindowMilliseconds &&
+            GetTapZone(point) == GetTapZone(_pendingTapPosition))
+            _tapTimer.Stop();
+
         _pointerPressed = true;
-        _pointerPressPosition = e.GetCurrentPoint(this).Position;
+        _longPressActive = false;
+        _longPressConsumed = false;
+        _pressedPointer = e.Pointer;
+        _pointerPressPosition = point;
+        e.Pointer.Capture(this);
+        _longPressTimer.Interval = TimeSpan.FromMilliseconds(LongPressDelayMilliseconds);
+        _longPressTimer.Start();
+        UpdateAutoHideTimer();
         e.Handled = true;
     }
 
     private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
-        if (!_pointerPressed) return;
-        _pointerPressed = false;
+        if (!ReferenceEquals(e.Pointer, _pressedPointer)) return;
         var point = e.GetCurrentPoint(this).Position;
-        if (Distance(point, _pointerPressPosition) > TapMovementThreshold) return;
+        _pressedPointer = null;
+        if (ReferenceEquals(e.Pointer.Captured, this)) e.Pointer.Capture(null);
+
+        if (_longPressActive)
+        {
+            _pointerPressed = false;
+            StopLongPressSeek();
+            _longPressConsumed = false;
+            UpdateAutoHideTimer();
+            e.Handled = true;
+            return;
+        }
+
+        if (!_pointerPressed)
+        {
+            if (_longPressConsumed)
+            {
+                _longPressConsumed = false;
+                e.Handled = true;
+            }
+            UpdateAutoHideTimer();
+            return;
+        }
+
+        _pointerPressed = false;
+        _longPressTimer.Stop();
+        if (Distance(point, _pointerPressPosition) > TapMovementThreshold)
+        {
+            ResumePendingTapTimer();
+            UpdateAutoHideTimer();
+            return;
+        }
 
         var now = Environment.TickCount64;
         if (_tapPending && now - _pendingTapTimestamp <= DoubleTapWindowMilliseconds &&
@@ -271,6 +348,7 @@ public sealed class MdVideoPlayerControls : TemplatedControl
             _tapTimer.Stop();
             _tapPending = false;
             HandleDoubleTap(point);
+            UpdateAutoHideTimer();
             e.Handled = true;
             return;
         }
@@ -281,7 +359,22 @@ public sealed class MdVideoPlayerControls : TemplatedControl
         _tapPending = true;
         _tapTimer.Stop();
         _tapTimer.Start();
+        UpdateAutoHideTimer();
         e.Handled = true;
+    }
+
+    private void OnPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
+    {
+        if (!ReferenceEquals(e.Pointer, _pressedPointer)) return;
+        _pressedPointer = null;
+        _pointerPressed = false;
+        _longPressTimer.Stop();
+        if (_longPressActive)
+            StopLongPressSeek();
+        else
+            ResumePendingTapTimer();
+        _longPressConsumed = false;
+        UpdateAutoHideTimer();
     }
 
     private void OnTapTimerTick(object? sender, EventArgs e)
@@ -302,6 +395,19 @@ public sealed class MdVideoPlayerControls : TemplatedControl
             ShowControls();
     }
 
+    private void ResumePendingTapTimer()
+    {
+        if (!_tapPending || _tapTimer.IsEnabled) return;
+        var remainingMilliseconds = DoubleTapWindowMilliseconds - (Environment.TickCount64 - _pendingTapTimestamp);
+        if (remainingMilliseconds <= 0)
+        {
+            CompletePendingSingleTap();
+            return;
+        }
+        _tapTimer.Interval = TimeSpan.FromMilliseconds(remainingMilliseconds);
+        _tapTimer.Start();
+    }
+
     private void HandleDoubleTap(Point point)
     {
         ShowControls();
@@ -310,10 +416,75 @@ public sealed class MdVideoPlayerControls : TemplatedControl
             case TapZone.Back:
                 Request(MdPlaybackRequest.Rewind);
                 break;
+            case TapZone.Center:
+                TogglePlayback();
+                break;
             case TapZone.Forward:
                 Request(MdPlaybackRequest.Forward);
                 break;
         }
+    }
+
+    private void OnLongPressTimerTick(object? sender, EventArgs e)
+    {
+        _longPressTimer.Stop();
+        if (!_pointerPressed) return;
+
+        if (!_longPressActive)
+        {
+            var zone = GetTapZone(_pointerPressPosition);
+            if (zone == TapZone.Center || Duration <= TimeSpan.Zero) return;
+
+            _longPressSeekZone = zone;
+            _longPressSeekOrigin = Clamp(Position, Duration);
+            _longPressSeekStartedAt = Environment.TickCount64;
+            _lastLongPressSeekPosition = null;
+            _longPressActive = true;
+            _longPressConsumed = true;
+            _tapTimer.Stop();
+            _tapPending = false;
+            ShowControls();
+            IssueLongPressSeek();
+        }
+        else
+        {
+            IssueLongPressSeek();
+        }
+
+        _longPressTimer.Interval = TimeSpan.FromMilliseconds(LongPressSeekIntervalMilliseconds);
+        _longPressTimer.Start();
+    }
+
+    private void IssueLongPressSeek()
+    {
+        if (!_longPressActive || Duration <= TimeSpan.Zero) return;
+
+        var elapsedMilliseconds = Math.Max(0, Environment.TickCount64 - _longPressSeekStartedAt);
+        var speed = elapsedMilliseconds >= 1_500 ? 4 : 2;
+        var offsetSeconds = 2 + elapsedMilliseconds / 1000d * speed;
+        var direction = _longPressSeekZone == TapZone.Back ? -1d : 1d;
+        var targetTicks = _longPressSeekOrigin.Ticks + direction * offsetSeconds * TimeSpan.TicksPerSecond;
+        var clampedTicks = (long)Math.Clamp(targetTicks, 0, Duration.Ticks);
+        var requestedPosition = TimeSpan.FromTicks(clampedTicks);
+        var request = _longPressSeekZone == TapZone.Back ? MdPlaybackRequest.Rewind : MdPlaybackRequest.Forward;
+        var label = _longPressSeekZone == TapZone.Back ? $"{speed}x back" : $"{speed}x ahead";
+        ShowGestureFeedback(request, label, keepVisible: true);
+        if (_lastLongPressSeekPosition == requestedPosition) return;
+
+        _lastLongPressSeekPosition = requestedPosition;
+        MdMediaControlHelpers.RequestSeek(this, SeekCommand, SeekRequested, requestedPosition);
+    }
+
+    private void StopLongPressSeek()
+    {
+        _longPressTimer.Stop();
+        if (!_longPressActive) return;
+        IssueLongPressSeek();
+        _longPressActive = false;
+        _feedbackTimer.Stop();
+        _feedbackTimer.Interval = TimeSpan.FromMilliseconds(LongPressFeedbackDismissMilliseconds);
+        _feedbackTimer.Start();
+        UpdateAutoHideTimer();
     }
 
     private static double Distance(Point first, Point second)
@@ -321,6 +492,12 @@ public sealed class MdVideoPlayerControls : TemplatedControl
         var deltaX = first.X - second.X;
         var deltaY = first.Y - second.Y;
         return Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
+    }
+
+    private static TimeSpan Clamp(TimeSpan value, TimeSpan duration)
+    {
+        if (value <= TimeSpan.Zero) return TimeSpan.Zero;
+        return value > duration ? duration : value;
     }
 
     private TapZone GetTapZone(Point point)
@@ -368,7 +545,8 @@ public sealed class MdVideoPlayerControls : TemplatedControl
     private void UpdateAutoHideTimer()
     {
         _autoHideTimer.Stop();
-        if (!this.IsAttachedToVisualTree() || !AutoHideControls || !IsPlaying || !IsControlsVisible || IsKeyboardFocusWithin)
+        if (!this.IsAttachedToVisualTree() || !AutoHideControls || !IsPlaying || !IsControlsVisible ||
+            IsKeyboardFocusWithin || _pointerPressed || _longPressActive)
             return;
         _autoHideTimer.Interval = AutoHideDelay <= TimeSpan.Zero ? TimeSpan.FromMilliseconds(1) : AutoHideDelay;
         _autoHideTimer.Start();
@@ -490,11 +668,11 @@ public sealed class MdVideoPlayerControls : TemplatedControl
         _feedbackPresence.Update(false, GetEffectsDuration());
     }
 
-    private void ShowGestureFeedback(MdPlaybackRequest request)
+    private void ShowGestureFeedback(MdPlaybackRequest request, string? labelOverride = null, bool keepVisible = false)
     {
         if (_gestureFeedback is null || _gestureFeedbackIcon is null || _gestureFeedbackLabel is null) return;
 
-        var (resourceKey, label) = request switch
+        var (resourceKey, defaultLabel) = request switch
         {
             MdPlaybackRequest.Play => ("Md.Icon.PlayArrow", "Play"),
             MdPlaybackRequest.Pause => ("Md.Icon.Pause", "Pause"),
@@ -506,7 +684,7 @@ public sealed class MdVideoPlayerControls : TemplatedControl
 
         if (Application.Current?.TryGetResource(resourceKey, ActualThemeVariant, out var glyph) == true)
             _gestureFeedbackIcon.Glyph = glyph?.ToString();
-        _gestureFeedbackLabel.Text = label;
+        _gestureFeedbackLabel.Text = labelOverride ?? defaultLabel;
 
         var wasPresent = _feedbackPresence.IsPresent;
         _feedbackPresence.Update(true, TimeSpan.Zero);
@@ -518,8 +696,11 @@ public sealed class MdVideoPlayerControls : TemplatedControl
         }, DispatcherPriority.Render);
 
         _feedbackTimer.Stop();
-        _feedbackTimer.Interval = TimeSpan.FromMilliseconds(620);
-        _feedbackTimer.Start();
+        if (!keepVisible)
+        {
+            _feedbackTimer.Interval = TimeSpan.FromMilliseconds(620);
+            _feedbackTimer.Start();
+        }
     }
 
     private void UpdatePseudoClasses() => PseudoClasses.Set(":controls-hidden", !IsControlsVisible);
