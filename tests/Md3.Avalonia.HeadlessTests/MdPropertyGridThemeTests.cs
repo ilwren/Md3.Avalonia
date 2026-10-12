@@ -63,8 +63,11 @@ public class MdPropertyGridThemeTests
         var search = grid.GetVisualDescendants().OfType<TextBox>().Single(box => box.Name == "SearchTextBox");
         Assert.Same(Keyed(grid, "Md.Comp.PropertyGrid.FieldTheme"), search.Theme);
 
-        var category = grid.GetVisualDescendants().OfType<Expander>().Single();
-        Assert.Same(Keyed(grid, "Md.Comp.PropertyGrid.CategoryTheme"), category.Theme);
+        // One expander per category, and the grid hands every one of them the same theme.
+        var categories = grid.GetVisualDescendants().OfType<Expander>().ToList();
+        Assert.Equal(3, categories.Count);
+        Assert.All(categories, category =>
+            Assert.Same(Keyed(grid, "Md.Comp.PropertyGrid.CategoryTheme"), category.Theme));
 
         var splitter = grid.GetVisualDescendants().OfType<GridSplitter>().Single();
         Assert.Same(Keyed(grid, "Md.Comp.PropertyGrid.SplitterTheme"), splitter.Theme);
@@ -148,8 +151,9 @@ public class MdPropertyGridThemeTests
 
         // The presenter resolves its container, its three panels and its accept button with
         // NameScope.Get, so a template missing one of them throws the moment the flyout opens.
-        var realized = Assert.IsAssignableFrom<TopLevel>(grid.GetVisualRoot())!
-            .GetVisualDescendants().OfType<DatePickerPresenter>().Single();
+        // Headless has no IPopupImpl, so the flyout is hosted in the window's overlay layer: the
+        // realized presenter hangs off the top level, not off the grid.
+        var realized = TopLevel.GetTopLevel(grid)!.GetVisualDescendants().OfType<DatePickerPresenter>().Single();
         Assert.NotNull(realized.GetVisualDescendants().OfType<Grid>().SingleOrDefault(panel => panel.Name == "PART_PickerContainer"));
         Assert.Equal(3, realized.GetVisualDescendants().OfType<DateTimePickerPanel>().Count());
 
