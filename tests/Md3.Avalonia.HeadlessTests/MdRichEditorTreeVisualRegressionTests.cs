@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using Avalonia.Controls.Shapes;
+using ShapePath = Avalonia.Controls.Shapes.Path;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -111,7 +111,7 @@ public sealed class MdRichEditorTreeVisualRegressionTests
             Assert.Equal(1d, window.RenderScaling);
 
             var toggle = Assert.Single(tree.GetVisualDescendants().OfType<ToggleButton>());
-            var chevron = Assert.Single(toggle.GetVisualDescendants().OfType<Path>());
+            var chevron = Assert.Single(toggle.GetVisualDescendants().OfType<ShapePath>());
             Assert.Equal(40d, toggle.Bounds.Width);
             Assert.Equal(40d, toggle.Bounds.Height);
             Assert.True(chevron.Bounds.Width > 0);
