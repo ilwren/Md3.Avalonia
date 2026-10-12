@@ -63,6 +63,7 @@ public sealed class MdChatView : TemplatedControl
     private Button? _cancelQuoteButton;
     private ItemsControl? _suggestionsHost;
     private ListBox? _messagesHost;
+    private readonly ObservableCollection<MdChatRow> _rows = new();
     private TextBox? _composer;
     private int _selectionCount;
     private MdChatMessage? _quotedMessage;
@@ -230,7 +231,11 @@ public sealed class MdChatView : TemplatedControl
         _cancelQuoteButton = e.NameScope.Find<Button>("PART_CancelQuoteButton");
         _suggestionsHost = e.NameScope.Find<ItemsControl>("PART_SuggestionsHost");
         _messagesHost = e.NameScope.Find<ListBox>("PART_MessagesHost");
-        if (_messagesHost is not null) _messagesHost.SelectionMode = SelectionMode.Multiple | SelectionMode.Toggle;
+        if (_messagesHost is not null)
+        {
+            _messagesHost.SelectionMode = SelectionMode.Multiple | SelectionMode.Toggle;
+            _messagesHost.ItemsSource = _rows;
+        }
         _composer = e.NameScope.Find<TextBox>("PART_Composer");
         _composer?.AddHandler(InputElement.KeyDownEvent, OnComposerKeyDown, global::Avalonia.Interactivity.RoutingStrategies.Tunnel, true);
         AttachTemplateHandlers();
@@ -299,7 +304,7 @@ public sealed class MdChatView : TemplatedControl
         try
         {
             SelectedMessages.Clear();
-            foreach (var message in (_messagesHost.SelectedItems ?? Array.Empty<object>()).OfType<MdChatMessage>())
+            foreach (var message in (_messagesHost.SelectedItems ?? Array.Empty<object>()).OfType<MdChatRow>().Select(row => row.Message))
             {
                 if (!AllowMultipleSelection) SelectedMessages.Clear();
                 SelectedMessages.Add(message);
@@ -318,7 +323,11 @@ public sealed class MdChatView : TemplatedControl
             var selectedItems = _messagesHost.SelectedItems;
             if (selectedItems is null) return;
             selectedItems.Clear();
-            foreach (var message in SelectedMessages) selectedItems.Add(message);
+            foreach (var message in SelectedMessages)
+            {
+                var row = _rows.FirstOrDefault(candidate => candidate.Message.Id == message.Id);
+                if (row is not null) selectedItems.Add(row);
+            }
         }
         finally { _synchronizingSelection = false; }
     }
@@ -370,6 +379,7 @@ public sealed class MdChatView : TemplatedControl
 
     private void ObserveMessagesSource()
     {
+        SyncRows(null);
         var next = this.IsAttachedToVisualTree() ? MessagesSource as INotifyCollectionChanged : null;
         if (ReferenceEquals(next, _observedMessages)) return;
         if (_observedMessages is not null) _observedMessages.CollectionChanged -= OnMessagesCollectionChanged;
@@ -379,6 +389,7 @@ public sealed class MdChatView : TemplatedControl
 
     private void OnMessagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        SyncRows(e);
         ReconcileSelection();
         var message = e.NewItems?.OfType<MdChatMessage>().LastOrDefault();
         if (message is null) return;
@@ -391,6 +402,52 @@ public sealed class MdChatView : TemplatedControl
         StatusText = message.State == MdAsyncRequestState.Error
             ? MdLocalization.Format("MessageFromFailed", this, senderName, message.ErrorText)
             : MdLocalization.Format("NewMessageFrom", this, senderName, message.Content);
+    }
+
+    /// <summary>
+    /// Keeps the list rows in step with <see cref="MessagesSource"/>. A same-position replacement (a streamed token)
+    /// updates its row in place; other changes reuse the rows of messages that are still present.
+    /// </summary>
+    private void SyncRows(NotifyCollectionChangedEventArgs? e)
+    {
+        var messages = (MessagesSource ?? Array.Empty<object>()).OfType<MdChatMessage>().ToList();
+        if (e?.Action == NotifyCollectionChangedAction.Replace
+            && e.NewItems is { Count: 1 } && e.NewItems[0] is MdChatMessage replacement
+            && e.NewStartingIndex >= 0 && e.NewStartingIndex < _rows.Count
+            && _rows.Count == messages.Count && _rows[e.NewStartingIndex].Message.Id == replacement.Id)
+        {
+            _rows[e.NewStartingIndex].Message = replacement;
+            return;
+        }
+
+        var existing = new Dictionary<string, MdChatRow>(StringComparer.Ordinal);
+        foreach (var row in _rows) existing.TryAdd(row.Message.Id, row);
+        var next = new List<MdChatRow>(messages.Count);
+        foreach (var message in messages)
+        {
+            if (existing.Remove(message.Id, out var reused))
+            {
+                reused.Message = message;
+                next.Add(reused);
+            }
+            else
+            {
+                next.Add(new MdChatRow(message));
+            }
+        }
+
+        var common = 0;
+        while (common < _rows.Count && common < next.Count && ReferenceEquals(_rows[common], next[common])) common++;
+        if (common == _rows.Count)
+        {
+            // Appending keeps the existing rows, so the list does not rebuild its containers.
+            for (var i = common; i < next.Count; i++) _rows.Add(next[i]);
+        }
+        else
+        {
+            _rows.Clear();
+            foreach (var row in next) _rows.Add(row);
+        }
     }
 
     private void ReconcileSelection()
@@ -457,7 +514,7 @@ public sealed class MdChatView : TemplatedControl
         // Select explicitly instead of depending on ListBoxItem's presenter surface. Rich and
         // selectable text inside the bubble may otherwise consume the press before ListBox sees it.
         var row = path.OfType<ListBoxItem>().FirstOrDefault();
-        if (row?.DataContext is not MdChatMessage) return;
+        if (row?.DataContext is not MdChatRow) return;
         var toggle = AllowMultipleSelection && e.KeyModifiers.HasFlag(KeyModifiers.Control);
         if (toggle)
         {
@@ -473,9 +530,9 @@ public sealed class MdChatView : TemplatedControl
 
     private void OnMessageActionClick(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if (e.Source is Button { Classes: var classes, DataContext: MdChatMessage message } && classes.Contains("retry"))
+        if (e.Source is Button { Classes: var classes, DataContext: MdChatRow row } && classes.Contains("retry"))
         {
-            Retry(message);
+            Retry(row.Message);
             e.Handled = true;
         }
         else if (e.Source is Button { DataContext: MdChatAttachment attachment })

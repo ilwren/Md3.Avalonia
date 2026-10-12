@@ -174,11 +174,11 @@
             </Grid>
           </Border>
           <ListBox Name="PART_MessagesHost" Grid.Row="1" Theme="{StaticResource ChatListTheme}" ItemContainerTheme="{StaticResource ChatListItemTheme}"
-                   ItemsSource="{TemplateBinding MessagesSource}" SelectionMode="Multiple" Background="Transparent" Padding="8,4"
+                   SelectionMode="Multiple" Background="Transparent" Padding="8,4"
                    AutomationProperties.Name="{TemplateBinding MessagesText}">
             <ListBox.ItemTemplate>
-              <DataTemplate x:DataType="chat:MdChatMessage">
-                <chat:MdChatMessagePresenter Message="{Binding}"
+              <DataTemplate>
+                <chat:MdChatMessagePresenter Message="{Binding Message}"
                     MarkdownProvider="{Binding MarkdownProvider, RelativeSource={RelativeSource AncestorType=chat:MdChatView}}"
                     ImageProvider="{Binding ImageProvider, RelativeSource={RelativeSource AncestorType=chat:MdChatView}}"
                     IsSelected="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />

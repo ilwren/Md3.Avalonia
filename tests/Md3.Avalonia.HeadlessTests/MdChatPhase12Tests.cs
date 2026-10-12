@@ -366,7 +366,7 @@ public sealed class MdChatPhase12Tests
     }
 
     [AvaloniaFact]
-    public void Streaming_1000_Tokens_Keeps_The_Message_Row_Instance()
+    public void Streaming_1000_Tokens_Keeps_The_Row_And_Bubble_Instances()
     {
         var messages = new ObservableCollection<MdChatMessage>
         {
@@ -379,6 +379,7 @@ public sealed class MdChatPhase12Tests
         {
             Dispatcher.UIThread.RunJobs();
             var rowBefore = Assert.Single(chat.GetVisualDescendants().OfType<ListBoxItem>());
+            var presenterBefore = Assert.Single(chat.GetVisualDescendants().OfType<MdChatMessagePresenter>());
 
             var text = string.Empty;
             for (var i = 0; i < 1000; i++)
@@ -390,10 +391,10 @@ public sealed class MdChatPhase12Tests
             Dispatcher.UIThread.RunJobs();
 
             var rowAfter = Assert.Single(chat.GetVisualDescendants().OfType<ListBoxItem>());
-            // The row container survives every token. The bubble inside it is rebuilt because each token is a new
-            // record; that cost is recorded in the plan and is not asserted here.
+            // Each token is a new record, but the row and the bubble inside it are kept and only re-bound.
             Assert.Same(rowBefore, rowAfter);
             var presenter = Assert.Single(chat.GetVisualDescendants().OfType<MdChatMessagePresenter>());
+            Assert.Same(presenterBefore, presenter);
             Assert.Equal(text, presenter.Message?.Content);
         }
         finally { window.Close(); }
