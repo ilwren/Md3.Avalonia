@@ -150,6 +150,8 @@ public sealed class MdChatPhase5Tests
             scroll.Offset = new Vector(0, 400);
             Settle(window);
             var before = FirstVisible(chat, scroll);
+            var state = $"offset={scroll.Offset.Y} extent={scroll.Extent.Height} viewport={scroll.Viewport.Height} atBottom={chat.IsAtBottom} before={before}";
+            Assert.False(chat.IsAtBottom, state);
 
             for (var i = 0; i < 50; i++)
             {
@@ -160,8 +162,9 @@ public sealed class MdChatPhase5Tests
             Settle(window);
 
             var after = FirstVisible(chat, scroll);
-            Assert.Equal(before.Id, after.Id);
-            Assert.Equal(before.Top, after.Top, 1);
+            var detail = $"{state} | after offset={scroll.Offset.Y} extent={scroll.Extent.Height} atBottom={chat.IsAtBottom} after={after}";
+            Assert.True(before.Id == after.Id, detail);
+            Assert.True(Math.Abs(before.Top - after.Top) <= 1, detail);
             Assert.Equal(0, chat.UnreadCount);
         }
         finally { window.Close(); }
@@ -193,7 +196,7 @@ public sealed class MdChatPhase5Tests
             scroll.Offset = new Vector(0, 0);
             Settle(window);
 
-            Assert.Equal(2, requests);
+            Assert.True(requests == 2, $"requests={requests} offset={scroll.Offset.Y} atBottom={chat.IsAtBottom}");
         }
         finally { window.Close(); }
     }
