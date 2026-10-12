@@ -10,6 +10,14 @@
     <!-- Tests build Dock layouts in C#; the theme package itself only needs Dock.Avalonia. -->
     <PackageReference Include="Dock.Model.Avalonia" />
     <PackageReference Include="Avalonia.Skia" />
+    <!-- ScottPlot 5.1.59 pulls in SkiaSharp.NativeAssets.Linux.NoDependencies, a libSkiaSharp
+         built without fontconfig for minimal containers. It writes the same
+         runtimes/linux-x64/native/libSkiaSharp.so as the fontconfig build Avalonia.Skia needs,
+         and whichever copy wins decides whether the process can enumerate system fonts at all:
+         with the NoDependencies one, every family this suite does not embed - Consolas in the
+         markdown and hex editor font stacks - fails to shape. Declaring the package here with no
+         assets keeps Avalonia's build the only one in the output. -->
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" ExcludeAssets="all" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="xunit.runner.visualstudio">

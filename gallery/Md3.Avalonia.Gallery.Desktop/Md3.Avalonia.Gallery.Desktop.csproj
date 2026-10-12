@@ -12,6 +12,13 @@
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.Desktop" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
+    <!-- The published Linux gallery hits the same trap as the headless suite: ScottPlot 5.1.59
+         brings SkiaSharp.NativeAssets.Linux.NoDependencies, a libSkiaSharp without fontconfig,
+         and it overwrites the fontconfig build Avalonia.Skia needs at
+         runtimes/linux-x64/native/libSkiaSharp.so. Without fontconfig the gallery cannot
+         enumerate system fonts, so the markdown and hex editor pages fail on their Consolas
+         fallback. Excluding its assets leaves Avalonia's build in place. -->
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" ExcludeAssets="all" />
     <ProjectReference Include="../Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" />
   </ItemGroup>
 </Project>

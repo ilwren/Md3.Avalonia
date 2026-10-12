@@ -43,6 +43,16 @@
          DataBackground, Plot.Axes.Color, Plot.Grid, Plot.Legend, LabelStyle and the
          IPalette/Palettes.Custom seam) was read at the tag this build was cut from. -->
     <PackageVersion Include="ScottPlot.Avalonia" Version="5.1.59" />
+    <!-- ScottPlot 5.1.59 depends on SkiaSharp.NativeAssets.Linux.NoDependencies, a libSkiaSharp
+         built without fontconfig for minimal containers. It installs to the same
+         runtimes/linux-x64/native/libSkiaSharp.so path as the fontconfig build Avalonia.Skia
+         brings in (SkiaSharp.NativeAssets.Linux), and which of the two ends up in the output is
+         a coin flip: with the NoDependencies copy there is no system font enumeration at all, so
+         every family this repository does not embed - Consolas in the markdown and hex editor
+         font stacks - fails to shape with "Could not create glyphTypeface". It is versioned here
+         only so the runnable heads can exclude its assets; nothing in this repository wants the
+         fontconfig-less build. Bump it with ScottPlot. -->
+    <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.0" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.2" />
     <PackageVersion Include="MaterialColorUtilities" Version="0.3.0" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />

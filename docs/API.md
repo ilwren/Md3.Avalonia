@@ -764,6 +764,19 @@ variant tracking, the baselines and the fact that a plot that was not asked for 
 `MdChart` in the core package stays provider neutral: it keeps drawing through whichever chart
 engine an application picks, and this package only styles ScottPlot.
 
+One deployment note, because it is invisible until it breaks: `ScottPlot` depends on
+`SkiaSharp.NativeAssets.Linux.NoDependencies`, a `libSkiaSharp.so` built without fontconfig for
+minimal containers. It installs over the same `runtimes/linux-x64/native/libSkiaSharp.so` path as
+the fontconfig build `Avalonia.Skia` needs, and if that copy wins the host loses system font
+enumeration entirely - text in any family the app does not embed then fails with "Could not create
+glyphTypeface". A Linux head that wants system fonts should exclude it:
+
+```xml
+<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" ExcludeAssets="all" />
+```
+
+The gallery's desktop head and the headless suite both do.
+
 ## Trimming
 
 All thirteen packages set `IsTrimmable`, so an application that publishes with
