@@ -58,7 +58,7 @@
     <Style Selector="^:pointerover /template/ Border#PART_ThumbState"><Setter Property="Opacity" Value="0.08" /></Style>
     <!-- Pressed: the chevrons spread outwards, the Material read of "this is what you are holding". -->
     <Style Selector="^:dragging /template/ Border#PART_Thumb"><Setter Property="RenderTransform" Value="scale(1.1)" /></Style>
-    <Style Selector="^:dragging /template/ Border#PART_ThumbState"><Setter Property="Opacity" Value="0.12" /></Style>
+    <Style Selector="^:dragging /template/ Border#PART_ThumbState"><Setter Property="Opacity" Value="0.16" /></Style>
     <Style Selector="^:dragging /template/ Path#PART_ChevronLeft"><Setter Property="RenderTransform" Value="translate(-2px,0px)" /></Style>
     <Style Selector="^:dragging /template/ Path#PART_ChevronRight"><Setter Property="RenderTransform" Value="translate(2px,0px)" /></Style>
     <Style Selector="^:focus-visible /template/ Border#PART_Thumb"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="3" /></Style>
@@ -609,7 +609,7 @@
         </Grid>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.06" /></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
     <Style Selector="^:selected /template/ Border#PART_Bubble"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="2.5" /></Style>
     <Style Selector="^:reply /template/ Border#PART_Reply"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:text-content /template/ ContentPresenter#PART_RichContent"><Setter Property="IsVisible" Value="False" /></Style>
