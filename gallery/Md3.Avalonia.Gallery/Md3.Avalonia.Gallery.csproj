@@ -11,6 +11,7 @@
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="Dock.Avalonia" />
     <PackageReference Include="Dock.Model.Avalonia" />
+    <PackageReference Include="Tabalonia" />
     <ProjectReference Include="../../src/Md3.Avalonia/Md3.Avalonia.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Icons/Md3.Avalonia.Icons.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Icons.Lite/Md3.Avalonia.Icons.Lite.csproj" />
@@ -20,6 +21,7 @@
     <ProjectReference Include="../../src/Md3.Avalonia.AvaloniaEdit/Md3.Avalonia.AvaloniaEdit.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.AvaloniaHex/Md3.Avalonia.AvaloniaHex.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Dock/Md3.Avalonia.Dock.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.Tabalonia/Md3.Avalonia.Tabalonia.csproj" />
     <AvaloniaResource Include="Assets/Media/**" />
   </ItemGroup>
 </Project>

@@ -132,6 +132,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Command palette", () => new CommandPaletteGalleryPage());
         AddPage("Data grids", () => new DataGridGalleryPage());
         AddPage("Docking", () => new DockGalleryPage());
+        AddPage("Draggable tabs", () => new DraggableTabsGalleryPage());
         AddPage("Hex editor", () => new HexEditorGalleryPage());
         AddPage("Density", () => new DensityGalleryPage());
         AddPage("Hover cards", () => new HoverCardGalleryPage());

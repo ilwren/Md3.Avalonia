@@ -93,6 +93,7 @@ public sealed class MdGalleryTests
             new DataGridGalleryPage(),
             new HexEditorGalleryPage(),
             new DockGalleryPage(),
+            new DraggableTabsGalleryPage(),
             new MasonryPanelGalleryPage(),
             new PagedItemsGalleryPage(),
             new AsyncSelectGalleryPage(),

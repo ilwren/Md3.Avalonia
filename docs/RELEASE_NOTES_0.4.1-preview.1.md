@@ -84,7 +84,21 @@ surface，调用方仍可覆盖。
   `FluentTheme` 也能工作的代价；其余原生控件仍交由宿主应用自行决定（所以其他 opt-in 主题包的隔离测试
   改为只断言各自的控件类型）。若想让应用自己的按钮保持宿主主题，可把该主题注册在 Dock 所在的范围内
   （Gallery 的停靠页就放在 `UserControl.Styles`）里；
-- **原生 AOT 已验证可用。** 九个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
+- **`Md3.Avalonia.Tabalonia`** —— [Tabalonia](https://github.com/egorozh/Tabalonia) 可拖拽/
+  可撕出标签页的 Material Design 3 主题，opt-in，唯一引入 `Tabalonia` 依赖的包，包总数到十个。
+  它把上游 `Themes/Custom/Brushes.axaml` 的 19 个画刷全部重写成 `Md.Sys.Color` token（标签条与
+  标签容器用 `Surface`，未选中标签是 `OnSurfaceVariant` 文字配透明容器，悬停是 0.08 的 `OnSurface`
+  状态层、非活动窗口 0.04，选中标签是 `Primary` 容器配 `OnPrimary` 文字，分隔线用 `OutlineVariant`），
+  并补上上游模板真正读取、却由 Avalonia `FluentTheme` 提供的六个 `TabItemHeader*` 键
+  （`TabItemHeaderForeground{Unselected,UnselectedPointerOver,Selected,SelectedPointerOver}`、
+  `TabItemHeaderMargin`、`TabItemHeaderThemeFontWeight`）——因此它不需要任何 Fluent 资源；
+  另外补了两个上游留给宿主的空白：添加按钮的常态前景色，以及选中（填充）标签上关闭按钮的
+  `OnPrimary` 文字。结构上与 Dock 包一致：**不复刻**模板，而是按 `avares://` 直接引用上游的
+  `TabsControl.axaml`（字典）与 `Buttons.axaml`/`DragTabItem.axaml`（样式），只自带一份
+  `Themes/Accents/Material.axaml`，所以模板与部件名仍由 Tabalonia 维护，升级不会漂移；
+  由于 accent 字典本身不带主题字典，明暗完全跟随核心 `MaterialTheme` 变体。原包自带
+  `CustomTheme`/`FluentTheme` 都不要同时引入；
+- **原生 AOT 已验证可用。** 十个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
   IL3xxx 分析器。`.github/workflows/aot-probe.yml` 用 `PublishAot=true` 发布桌面 Gallery，并且
   **不把「步骤成功」当作答案**：它断言产物是原生 ELF 可执行文件、输出目录里没有托管 dll 残留（防止
   apphost 冒充），然后在 xvfb 下把那个二进制真正跑起来。原生 AOT 是在运行期因反射元数据被裁而失败的，

@@ -32,7 +32,15 @@
   a Material text button in `Themes/Controls/MaterialButton.axaml` - the one native theme the
   package adds, and by design: without it Dock's chrome cannot load when no `FluentTheme` is
   present. Every other native control is still left to the host application.
-- **Native AOT.** All nine packages declare `IsAotCompatible` and build with the IL3xxx analyzers
+- **`Md3.Avalonia.Tabalonia`**, an opt-in Material Design 3 theme for
+  [Tabalonia](https://github.com/egorozh/Tabalonia) draggable tabs. It retokenizes the 19 brushes of
+  Tabalonia's `Themes/Custom` onto `Md.Sys.Color` tokens - strip on `Surface`, idle tab ink
+  `OnSurfaceVariant`, hover an `OnSurface` state layer, selected tab a `Primary` container with
+  `OnPrimary` ink - and supplies the six `TabItemHeader*` keys Tabalonia's Custom templates actually
+  read from Avalonia's `FluentTheme`, so the theme is standalone. Like the Dock theme it includes the
+  pinned package's dictionaries by `avares://` URI instead of forking templates. It is the only
+  package that pulls in `Tabalonia`, bringing the set to ten.
+- **Native AOT.** All ten packages declare `IsAotCompatible` and build with the IL3xxx analyzers
   on alongside the existing IL2xxx trimming ones. `.github/workflows/aot-probe.yml` publishes the
   desktop gallery with `PublishAot=true` and does not accept a green step as the answer: it
   asserts the output is a native ELF executable with no managed assembly beside it, then runs that

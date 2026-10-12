@@ -19,6 +19,7 @@ public sealed class TestApplication : Application
         Styles.Add(new MaterialAvaloniaEditTheme());
         Styles.Add(new MaterialAvaloniaHexTheme());
         Styles.Add(new MaterialDockTheme());
+        Styles.Add(new MaterialTabaloniaTheme());
     }
 }
 

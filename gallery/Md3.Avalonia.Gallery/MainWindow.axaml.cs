@@ -51,7 +51,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             BeforeAfterNav, CalendarNav, CascaderNav, ChartNav,
             ChatNav, CommandPaletteNav, DataGridNav, DensityNav,
             HoverCardNav, MasonryNav, PagedItemsNav, PinInputNav,
-            PopoverNav, RatingNav, ResultViewNav, RichEditorNav, DockNav,
+            PopoverNav, RatingNav, ResultViewNav, RichEditorNav, DockNav, DraggableTabsNav,
             TextEditorNav, HexEditorNav,
             SkeletonNav, SlidableNav, SpinKitNav, StaggeredPanelNav,
             TagInputNav, TimelineNav, TransferNav, TreeViewNav,
@@ -130,6 +130,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Result view", "result empty success error state placeholder action", ResultViewNav, () => new ResultViewGalleryPage()),
             Entry("Rich editor", "rich text editor markdown bold italic toolbar adapter", RichEditorNav, () => new RichEditorGalleryPage()),
             Entry("Docking", "dock docking layout tool pane document tab splitter float drop target", DockNav, () => new DockGalleryPage()),
+            Entry("Draggable tabs", "draggable tabs tab strip reorder tear out detach attach tabalonia theme", DraggableTabsNav, () => new DraggableTabsGalleryPage()),
             Entry("Text editor", "code editor syntax highlighting line numbers find replace completion avaloniedit theme", TextEditorNav, () => new TextEditorGalleryPage()),
             Entry("Hex editor", "hex binary bytes dump offsets ascii editor avaloniahex theme", HexEditorNav, () => new HexEditorGalleryPage()),
             Entry("Skeleton", "skeleton shimmer placeholder loading", SkeletonNav, () => new SkeletonGalleryPage()),
@@ -266,6 +267,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
     private void ShowResultView(object? s, RoutedEventArgs e) => Navigate(new ResultViewGalleryPage(), ResultViewNav);
     private void ShowRichEditor(object? s, RoutedEventArgs e) => Navigate(new RichEditorGalleryPage(), RichEditorNav);
     private void ShowDock(object? s, RoutedEventArgs e) => Navigate(new DockGalleryPage(), DockNav);
+    private void ShowDraggableTabs(object? s, RoutedEventArgs e) => Navigate(new DraggableTabsGalleryPage(), DraggableTabsNav);
     private void ShowTextEditor(object? s, RoutedEventArgs e) => Navigate(new TextEditorGalleryPage(), TextEditorNav);
     private void ShowHexEditor(object? s, RoutedEventArgs e) => Navigate(new HexEditorGalleryPage(), HexEditorNav);
     private void ShowSkeleton(object? s, RoutedEventArgs e) => Navigate(new SkeletonGalleryPage(), SkeletonNav);

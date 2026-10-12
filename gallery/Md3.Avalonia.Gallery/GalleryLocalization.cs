@@ -174,6 +174,18 @@ internal static class GalleryLocalization
         ["MaterialDockTheme maps the 44 Dock accent, surface, tab and chrome brushes onto Md.Sys.Color tokens; the active document tab is a Primary container with OnPrimary ink."]="MaterialDockTheme 把 Dock 的 44 个强调色、表面、标签与标题栏画刷映射到 Md.Sys.Color tokens；选中的文档标签是 primary 容器配 onPrimary 文字。",
         ["Dock keeps owning its templates; this package owns only the token values, so a Dock upgrade cannot drift from a forked template."]="模板仍然由 Dock 自己维护，这个包只提供 token 取值，因此升级 Dock 不会与复刻的模板产生偏差。",
         ["Add the theme after MaterialTheme and keep using Dock as usual - the package carries Dock.Avalonia and Dock.Avalonia.Themes.Fluent, and DockFluentTheme must not be included as well. Registering it on a page, as this demo does, keeps the implicit Button theme it brings inside the dock's subtree."]="把主题加在 MaterialTheme 之后即可照常使用 Dock——该包自带 Dock.Avalonia 与 Dock.Avalonia.Themes.Fluent，且不要同时引入 DockFluentTheme。本页把主题注册在页面自己的样式里，而不是应用级别。",
+        ["Draggable tabs"]="可拖拽标签页",
+        ["Tabalonia wearing the opt-in Md3.Avalonia.Tabalonia theme: reorder a tab by dragging it, tear one out into its own window, or drop it on the other strip. The strip, the tab containers and both icon buttons all read Material tokens, and no Fluent resources are needed."]="Tabalonia 配上 opt-in 的 Md3.Avalonia.Tabalonia 主题：拖动标签即可重新排序，也可以把标签撕出为独立窗口，或拖放到另一条标签条上。标签条、标签容器与两个图标按钮全部读取 Material tokens，且不需要 Fluent 资源。",
+        ["Themed strips"]="已主题化的标签条",
+        ["The idle tab is an onSurfaceVariant label on the surface, hover is the standard onSurface state layer, and the selected tab is a Primary container with OnPrimary ink - the same mapping the Dock theme uses for its document tabs. The second strip pins its first tab, so that one cannot be dragged or closed."]="未选中的标签是表面上的 onSurfaceVariant 文字，悬停为标准 onSurface 状态层，选中的标签是 primary 容器配 onPrimary 文字——与 Dock 主题用于文档标签的映射一致。第二条标签条固定了它的第一个标签，因此该标签不能拖动或关闭。",
+        ["Pinned"]="已固定",
+        ["Add a tab"]="添加标签页",
+        ["Close the selected tab"]="关闭选中的标签页",
+        ["Register the theme after MaterialTheme and keep using TabsControl as usual. It replaces Tabalonia's CustomTheme and FluentTheme and needs neither of them nor Avalonia's FluentTheme; ItemsSource must implement IList, and NewItemFactory decides what the add button appends."]="在 MaterialTheme 之后注册该主题，然后照常使用 TabsControl。它会替代 Tabalonia 的 CustomTheme 与 FluentTheme，既不需要这两个，也不需要 Avalonia 的 FluentTheme；ItemsSource 必须实现 IList，添加按钮追加什么内容由 NewItemFactory 决定。",
+        ["Tokens"]="令牌",
+        ["Notes"]="笔记",
+        ["Material tokens drive this pane: the strip sits on Surface, the selected tab is a Primary container with OnPrimary ink, and hover is the 0.08 onSurface state layer."]="本窗格由 Material tokens 驱动：标签条位于 surface 上，选中标签是 primary 容器配 onPrimary 文字，悬停则是 0.08 的 onSurface 状态层。",
+        ["Added from the strip's own add button."]="由标签条自带的添加按钮添加。",
     };
 
     public static void Apply(Control root, CultureInfo culture)

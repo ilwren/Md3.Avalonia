@@ -25,6 +25,7 @@
     <ProjectReference Include="../../src/Md3.Avalonia.AvaloniaEdit/Md3.Avalonia.AvaloniaEdit.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.AvaloniaHex/Md3.Avalonia.AvaloniaHex.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Dock/Md3.Avalonia.Dock.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.Tabalonia/Md3.Avalonia.Tabalonia.csproj" />
     <ProjectReference Include="../../gallery/Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" />
   </ItemGroup>
 </Project>

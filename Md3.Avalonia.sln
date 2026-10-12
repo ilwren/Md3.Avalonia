@@ -21,6 +21,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.AvaloniaHex", "src\Md3.Avalonia.AvaloniaHex\Md3.Avalonia.AvaloniaHex.csproj", "{7B5F0C62-9D14-4A38-B7E6-1F0C8A2D3E91}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.Dock", "src\Md3.Avalonia.Dock\Md3.Avalonia.Dock.csproj", "{8C6E1D73-2F94-4A50-B8D2-6E1F3A9C7B04}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.Tabalonia", "src\Md3.Avalonia.Tabalonia\Md3.Avalonia.Tabalonia.csproj", "{9D2A7E14-6C3B-4F58-A1D7-4E8B2C5F0A63}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gallery", "gallery", "{3DD3B10C-2DE9-B2B9-1F65-9DB874E2084B}"
 EndProject

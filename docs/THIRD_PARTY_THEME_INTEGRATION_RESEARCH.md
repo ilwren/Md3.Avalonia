@@ -54,7 +54,7 @@ Markdown.Avalonia（417★）+ LiveMarkdown.Avalonia（176★）。
 | AvaloniaEdit | 1,137 | 2026-08-28 | 12.0.0 ✔ | MIT | `Themes/Base.xaml`(11 行) + `Themes/Fluent/AvaloniaEdit.xaml`(38 行，纯资源映射) + `Simple` 变体；控件模板内嵌 | **极低** |
 | Dock | 1,490 | 2026-10-11 | 12.1.3 ✔（最新 tag 要求；本仓库固定 12.1.0.6，见 §4.2） | MIT | `Dock.Avalonia.Themes.Fluent` = 56 个 axaml / 5,311 行 / 52 个 ControlTheme（48 个控件主题文件）；`Accents/Fluent.axaml` 提供 token，控制主题里仅 4 处硬编码色 | 低-中 |
 | AvaloniaHex | 136 | 2026-04-18 | 12.0.0 ✔ | MIT | `Themes/Base.axaml`(53 行 styles) + `Fluent`/`Simple` 资源变体(46 行) | **极低** |
-| Tabalonia（可拖拽/撕出标签页） | 264 | 2026-07-05 | 12.0.5 ✔ | MIT | `Themes/Custom/{Brushes,CustomTheme,Controls,Buttons,DragTabItem}.axaml` 共 476 行，Brush 驱动；另有 Fluent 变体；官方声明「fully restylable via brush resources」 | 低 |
+| Tabalonia（可拖拽/撕出标签页） | 264 | 2026-07-05 | 12.0.5 ✔（本仓库固定 12.0.0，见 §4.2） | MIT | `Themes/Custom/{Brushes,CustomTheme,Controls,Buttons,DragTabItem}.axaml` 共 476 行，Brush 驱动；另有 Fluent 变体；官方声明「fully restylable via brush resources」 | 低 |
 | Avalonia.Labs（Lottie/Gif/Qr/AnimatedImage/InfoBadge/Panels/SwipeView/FlipView/Notifications…） | 329 | 2026-09-09 | 12.0.1 ✔ | MIT | `Themes/ControlThemes.xaml` + `Themes/Controls/*.axaml`（每控件一个 ControlTheme） | 低 |
 | Avalonia.PropertyGrid | 344 | 2026-08-24 | 12.1.1 ✔ | MIT | 样式内嵌在 `Sources/Avalonia.PropertyGrid/Controls/*.axaml`（11 个控件） | 中 |
 | Markdown.Avalonia | 417 | 2026-07-13 | 12.0.0 ✔ | MIT | `Markdown.Avalonia.Tight/StyleCollections/MarkdownStyle{DefaultTheme,FluentTheme,Standard,GithubLike}.axaml` + SyntaxHigh 附录样式 | 低-中 |
@@ -162,8 +162,32 @@ Markdown.Avalonia（417★）+ LiveMarkdown.Avalonia（176★）。
   12.1.1；accent 键集与 12.1.0.7 完全一致），`Directory.Packages.props` 里注明两者要一起升。
 - 风险：Dock 迭代很快（当天仍有提交），主题包需要跟版本对齐，建议固定上游版本号并在 README 标注适配范围。
 
-**E. `Md3.Avalonia.Tabalonia`** —— 与已有 `MdTabs` 互补：Dock 场景之外，用户要「可拖拽 / 可撕出窗口 / 可
-跨窗口停靠」的标签页时用得上。以 `Themes/Custom` 为基线换成 M3 token（Brushes 55 行 + 少量模板）。
+**E. `Md3.Avalonia.Tabalonia`** —— 与已有 `MdTabs` 互补：Dock 场景之外，用户要「可拖拽 / 可撕出窗口 /
+跨窗口停靠」的标签页时用得上。
+
+- **已落地（2026-10-12）**：`Md3.Avalonia.Themes.MaterialTabaloniaTheme : Styles`，在
+  `src/Md3.Avalonia.Tabalonia/`。做法与 Dock 包同源：模板不复制，`Themes/MaterialTabaloniaTheme.axaml`
+  用 `ResourceInclude` 引用上游 `Themes/Custom/TabsControl.axaml`（含 `TabsControl` 与 `WindowThumbStyle`
+  两个 ControlTheme）、用 `StyleInclude` 引用 `Themes/Custom/Buttons.axaml` 与 `DragTabItem.axaml`，
+  只自带一份 `Themes/Accents/Material.axaml`，所以模板、部件名（`PART_TopPanel`、`PART_ItemsPresenter`、
+  `PART_AddItemButton`、`PART_LeftCorner`/`PART_RightBorder` 等）与拖拽/撕出行为全部留在上游，升级不会漂移。
+- **上游 `Themes/Custom` 并不是自足的**：它读了 6 个自己没定义的键——
+  `TabItemHeaderForeground{Unselected,UnselectedPointerOver,Selected,SelectedPointerOver}`、
+  `TabItemHeaderMargin`、`TabItemHeaderThemeFontWeight`——这些在 upstream 的用法里来自 Avalonia 的
+  `FluentTheme`（Demo 的 `App.axaml` 就是 `<FluentTheme/><custom:CustomTheme/>`）。因此 accent 字典除了把
+  上游 19 个画刷重写成 `Md.Sys.Color.*`（标签条 `Surface`、未选中 `OnSurfaceVariant` 文字 + 透明容器、
+  悬停 0.08 `OnSurface` 状态层/非活动 0.04、选中 `Primary` 容器 + `OnPrimary` 文字、分隔线 `OutlineVariant`、
+  关闭/添加按钮 `OnSurfaceVariant`→`OnSurface`/`Primary`），还必须自己定义这 6 个键，M3 取值分别为
+  `OnSurfaceVariant`/`OnSurface`/`OnPrimary`/`OnPrimary` 与 `12,0,12,0`、`Medium`。另外补了两处上游留给宿主的
+  空白（各一条 additive style）：添加按钮的常态 `Foreground`，以及选中标签上关闭按钮的 `OnPrimary`
+  （上游只有一个共享画刷，在 `Primary` 填充容器上对比度不足）。因为 accent 字典不带主题字典，明暗跟随核心
+  `MaterialTheme` 变体。
+- **`Themes.Fluent` 变体不搬**：它的 `TabsControl.axaml`/`DragTabItem.axaml`（428 行）消费几十个真正的 Fluent 键，
+  换完等于重写一遍 Fluent 主题，收益为零。
+- 版本：上游 `Tabalonia` 12.0.0 声明依赖 `Avalonia 12.0.0`（其 `Directory.Build.props` 用 12.0.5），
+  低于本仓库 12.1.2 基线，restore 无冲突，故固定 **12.0.0**。
+- 风险：与 Dock 同——上游迭代快，且 accent 键集是照上游模板逐个核对出来的，升级 Tabalonia 时要重新核对
+  `Themes/Custom` 的 `DynamicResource` 引用清单（`MdTabaloniaThemeTests` 已钉住隔离与 token 消费）。
 
 **F. Markdown 主题集** —— 二选一或都做：
 

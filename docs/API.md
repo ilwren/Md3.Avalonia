@@ -23,6 +23,9 @@ This document is the public entry point for the `0.4.1-preview.1` API. Preview A
 <!-- Optional Material theme for the Dock docking layout system; likewise the only package
      that pulls in Dock.Avalonia and Dock.Avalonia.Themes.Fluent: -->
 <PackageReference Include="Md3.Avalonia.Dock" Version="0.4.1-preview.1" />
+<!-- Optional Material theme for Tabalonia draggable tabs; likewise the only package that
+     pulls in Tabalonia: -->
+<PackageReference Include="Md3.Avalonia.Tabalonia" Version="0.4.1-preview.1" />
 ```
 
 ```xml
@@ -522,9 +525,44 @@ and adds `Accents/Material.axaml`, so Dock keeps owning its templates and part n
 absence of a density/preset API means light and dark, contrast and density all come from the core
 `MaterialTheme`.
 
+## Tabalonia
+
+For draggable tabs that can be reordered, torn out into their own window and attached to another
+strip, use [Tabalonia](https://github.com/egorozh/Tabalonia) with the opt-in `Md3.Avalonia.Tabalonia`
+package:
+
+```xml
+<Application.Styles>
+  <themes:MaterialTheme />
+  <themes:MaterialTabaloniaTheme />
+</Application.Styles>
+```
+
+It is the only package that depends on `Tabalonia`, and it replaces both of Tabalonia's own themes
+(`Tabalonia.Themes.Custom.CustomTheme` and `Tabalonia.Themes.Fluent.FluentTheme`), so do not include
+either. Like `MaterialTheme` it is standalone and does not need Avalonia's `FluentTheme`. Keep using
+`TabsControl` as usual - `ItemsSource` must implement `IList`, because Tabalonia reorders and removes
+items through it.
+
+The theme retokenizes the 19 brushes of Tabalonia's `Themes/Custom/Brushes.axaml`: the strip and the
+tab containers sit on `Surface`, an idle tab is an `OnSurfaceVariant` label on a transparent
+container, hover is an `OnSurface` state layer (0.08, or 0.04 in an inactive window), the selected tab
+is a `Primary` container with `OnPrimary` ink, and the separators, the close glyph and the add-a-tab
+button use `OutlineVariant`, `OnSurfaceVariant` and `Primary`. It also fills the six keys Tabalonia's
+Custom templates read but its own brush dictionary never declares - `TabItemHeaderForeground{Unselected,
+UnselectedPointerOver,Selected,SelectedPointerOver}`, `TabItemHeaderMargin` and
+`TabItemHeaderThemeFontWeight` come from Avalonia's `FluentTheme` in upstream's setup - plus the idle
+foreground of the add-a-tab button, which upstream leaves to the host, and `OnPrimary` for the close
+glyph of the selected (filled) tab. Structurally it differs from `CustomTheme` on purpose: instead of
+forking templates it merges `Themes/Custom/TabsControl.axaml` and style-includes
+`Themes/Custom/Buttons.axaml` and `Themes/Custom/DragTabItem.axaml` by `avares://` URI and adds
+`Themes/Accents/Material.axaml`, so Tabalonia keeps owning its templates and part names. Because the
+accents file holds no theme dictionaries of its own, light and dark both come from the core
+`MaterialTheme` variant.
+
 ## Trimming
 
-All five packages set `IsTrimmable`, so an application that publishes with
+All ten packages set `IsTrimmable`, so an application that publishes with
 `PublishTrimmed=true` can trim them, and they build with the IL2xxx analyzer on, so a new
 reflective call fails the build rather than breaking a trimmed app quietly.
 
