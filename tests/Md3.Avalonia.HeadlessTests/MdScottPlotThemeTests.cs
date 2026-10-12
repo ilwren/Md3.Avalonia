@@ -157,7 +157,7 @@ public sealed class MdScottPlotThemeTests
         Assert.Equal(Colors.White, untouched.FigureBackground.Color);
         Assert.Equal(Colors.Transparent, untouched.DataBackground.Color);
         Assert.Equal(Colors.Black, untouched.Axes.Bottom.TickLabelStyle.ForeColor);
-        Assert.IsType<Palettes.Category10>(untouched.Add.Palette);
+        Assert.Equal("Category 10", untouched.Add.Palette.Name);
         Assert.Null(untouched.Legend.FontSize);
 
         // Nothing process-wide was rewritten either: a theme that set Fonts.Default would change
@@ -227,12 +227,12 @@ public sealed class MdScottPlotThemeTests
     }
 
     /// <summary>Reads <c>Md.Sys.TypeScale.&lt;role&gt;.Size</c> from the running application.</summary>
-    private static double Size(string role)
+    private static float Size(string role)
     {
         Assert.True(
             Application.Current!.TryGetResource($"Md.Sys.TypeScale.{role}.Size", null, out var value),
             $"Md.Sys.TypeScale.{role}.Size is not registered");
-        return Assert.IsType<double>(value);
+        return (float)Assert.IsType<double>(value);
     }
 
     /// <summary>Reads <c>Md.Sys.Typeface.Plain</c> from the running application.</summary>

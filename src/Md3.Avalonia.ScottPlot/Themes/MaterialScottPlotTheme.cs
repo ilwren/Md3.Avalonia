@@ -65,7 +65,9 @@ public sealed class MaterialScottPlotTheme
     /// <summary>Builds the Material series palette for one variant.</summary>
     /// <param name="dark">Whether the dark variant's tokens should be read.</param>
     /// <returns>A palette over <see cref="SeriesPaletteRoles"/>, wrapping like ScottPlot's own.</returns>
-    public static IPalette SeriesPalette(bool dark) => new Palettes.Custom(
+    // Named in full: ScottPlot.Palettes is a nested namespace, and a using directive imports the types
+    // of a namespace, not the namespaces inside it.
+    public static IPalette SeriesPalette(bool dark) => new ScottPlot.Palettes.Custom(
         PaletteRoleNames.Select(role => MdScottPlotTokens.Color(role, dark)),
         dark ? "Material 3 (dark)" : "Material 3",
         "Md.Sys.Color roles, in the order the Material themes walk them");
