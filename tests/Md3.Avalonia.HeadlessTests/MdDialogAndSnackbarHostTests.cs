@@ -38,8 +38,8 @@ public sealed class MdDialogAndSnackbarHostTests
             var overlay = dialogHost.GetVisualDescendants().OfType<Grid>()
                 .Single(grid => grid.Name == "PART_Overlay" &&
                                 grid.Children.Any(child => child.Name == "PART_DialogPresenter"));
-            var scrim = Assert.Single(overlay.Children.OfType<Border>()
-                .Where(border => border.Name == "PART_Scrim"));
+            var scrim = Assert.Single(overlay.Children.OfType<Border>(),
+                border => border.Name == "PART_Scrim");
 
             // The global host is a window-root overlay, not a child of ContentShell's body row.
             // Its scrim must therefore include the app bar and the primary navigation rail too.

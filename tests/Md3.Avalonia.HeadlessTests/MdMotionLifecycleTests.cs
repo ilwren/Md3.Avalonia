@@ -208,15 +208,15 @@ public sealed class MdMotionLifecycleTests
         {
             Width = 160,
             Height = 56,
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left,
-            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top,
             Margin = new Thickness(24),
             Tooltip = tooltip,
             Content = new MdButton
             {
                 Content = "Rich tooltip",
-                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
-                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch
             }
         };
         MdMotion.SetScheme(host, MdMotionScheme.None);
