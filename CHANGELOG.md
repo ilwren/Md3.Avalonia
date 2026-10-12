@@ -19,7 +19,7 @@
 - Chat Phase 2 (continued): `IMdImageProvider` loads picture attachments by `MdChatAttachment.Uri`.
   `MdAttachmentImage` shows a loading state and a retry button when loading fails.
 - Chat Phase 2: `MdChatAttachment` and `MdChatAttachmentKind` add images and file cards to a message
-  (`MdChatMessage.Attachments`). `MdChatView.AttachmentActivated` reports clicks. Chat list prototype: `IsAtBottom`, `UnreadCount`, `ScrollToLatest()`, `ScrollToMessage()` and a jump-to-latest button; new messages follow the bottom only when it is already in view. `HistoryRequested` is raised near the top, and prepended history keeps the visible message in place. `MdImageViewer`
+  (`MdChatMessage.Attachments`). `MdChatView.AttachmentActivated` reports clicks. Chat list prototype: `IsAtBottom`, `UnreadCount`, `ScrollToLatest()`, `ScrollToMessage()` and a jump-to-latest button; new messages follow the bottom only when it is already in view. `HistoryRequested` is raised near the top, and prepended history keeps the visible message in place. Message grouping (`MdChatGroupingPolicy`), date separators and an unread divider after `LastReadMessageId` are added. `MdImageViewer`
   is a zoomable, pannable image surface that raises `CloseRequested` on Escape.
 
 ### Changed

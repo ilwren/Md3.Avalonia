@@ -9,6 +9,7 @@ namespace Md3.Avalonia.Chat;
 internal sealed class MdChatRow : INotifyPropertyChanged
 {
     private MdChatMessage _message;
+    private MdChatMessageLayout? _layout;
 
     public MdChatRow(MdChatMessage message) => _message = message;
 
@@ -20,6 +21,18 @@ internal sealed class MdChatRow : INotifyPropertyChanged
             if (ReferenceEquals(_message, value)) return;
             _message = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Message)));
+        }
+    }
+
+    /// <summary>How the message is grouped and separated from the one before it; set by the chat view.</summary>
+    public MdChatMessageLayout? Layout
+    {
+        get => _layout;
+        set
+        {
+            if (_layout == value) return;
+            _layout = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Layout)));
         }
     }
 

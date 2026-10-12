@@ -31,6 +31,11 @@ namespace Md3.Avalonia.Chat;
 public sealed class MdChatView : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable?> MessagesSourceProperty = AvaloniaProperty.Register<MdChatView, IEnumerable?>(nameof(MessagesSource));
+    public static readonly StyledProperty<MdChatGroupingPolicy> GroupingPolicyProperty =
+        AvaloniaProperty.Register<MdChatView, MdChatGroupingPolicy>(nameof(GroupingPolicy), new MdChatGroupingPolicy());
+    public static readonly StyledProperty<string?> LastReadMessageIdProperty =
+        AvaloniaProperty.Register<MdChatView, string?>(nameof(LastReadMessageId));
+    private static readonly MdChatGroupingPolicy DefaultGroupingPolicy = new();
     public static readonly DirectProperty<MdChatView, bool> IsAtBottomProperty =
         AvaloniaProperty.RegisterDirect<MdChatView, bool>(nameof(IsAtBottom), control => control.IsAtBottom);
     public static readonly DirectProperty<MdChatView, int> UnreadCountProperty =
@@ -102,6 +107,8 @@ public sealed class MdChatView : TemplatedControl
     static MdChatView()
     {
         MessagesSourceProperty.Changed.AddClassHandler<MdChatView>((control, _) => control.OnMessagesSourceChanged());
+        GroupingPolicyProperty.Changed.AddClassHandler<MdChatView>((control, _) => control.RecomputeLayouts());
+        LastReadMessageIdProperty.Changed.AddClassHandler<MdChatView>((control, _) => control.RecomputeLayouts());
         IsBusyProperty.Changed.AddClassHandler<MdChatView>((control, _) => control.StatusText = MdLocalization.GetString(control.IsBusy ? "LoadingMessages" : "MessagesReady", control));
         MdLocalization.CultureProperty.Changed.AddClassHandler<MdChatView>((control, _) => control.UpdateLocalizedText());
     }
@@ -155,6 +162,12 @@ public sealed class MdChatView : TemplatedControl
     /// change to the source, so an application that has no older messages can ignore the event.
     /// </summary>
     public event EventHandler? HistoryRequested;
+
+    /// <summary>Decides grouping, date separators and the unread divider for each message.</summary>
+    public MdChatGroupingPolicy GroupingPolicy { get => GetValue(GroupingPolicyProperty); set => SetValue(GroupingPolicyProperty, value); }
+
+    /// <summary>Id of the last message the user has read. The message after it starts with an unread divider.</summary>
+    public string? LastReadMessageId { get => GetValue(LastReadMessageIdProperty); set => SetValue(LastReadMessageIdProperty, value); }
 
     /// <summary>True when the message list is scrolled to its latest message.</summary>
     public bool IsAtBottom { get => _isAtBottom; private set => SetAndRaise(IsAtBottomProperty, ref _isAtBottom, value); }
@@ -598,7 +611,11 @@ public sealed class MdChatView : TemplatedControl
             && e.NewStartingIndex >= 0 && e.NewStartingIndex < _rows.Count
             && _rows.Count == messages.Count && _rows[e.NewStartingIndex].Message.Id == replacement.Id)
         {
-            _rows[e.NewStartingIndex].Message = replacement;
+            var index = e.NewStartingIndex;
+            _rows[index].Message = replacement;
+            // Only this message and the one after it depend on the replaced content.
+            UpdateLayoutAt(index);
+            UpdateLayoutAt(index + 1);
             return 0;
         }
 
@@ -648,7 +665,21 @@ public sealed class MdChatView : TemplatedControl
                 if (i > lastPrevious) added++;
             }
         }
+        RecomputeLayouts();
         return added;
+    }
+
+    private void RecomputeLayouts()
+    {
+        for (var i = 0; i < _rows.Count; i++) UpdateLayoutAt(i);
+    }
+
+    private void UpdateLayoutAt(int index)
+    {
+        if ((uint)index >= (uint)_rows.Count) return;
+        var policy = GroupingPolicy ?? DefaultGroupingPolicy;
+        var previous = index > 0 ? _rows[index - 1].Message : null;
+        _rows[index].Layout = policy.Layout(previous, _rows[index].Message, LastReadMessageId);
     }
 
     private void ReconcileSelection()

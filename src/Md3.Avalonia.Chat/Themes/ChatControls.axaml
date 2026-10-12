@@ -33,6 +33,14 @@
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="chat:MdChatMessagePresenter">
+        <StackPanel>
+          <TextBlock x:Name="PART_DateSeparator" HorizontalAlignment="Center" FontSize="12" Opacity=".7" Margin="0,8,0,4"
+                     IsVisible="False" Text="{Binding DateSeparatorText, RelativeSource={RelativeSource TemplatedParent}}" />
+          <Border x:Name="PART_UnreadDivider" HorizontalAlignment="Stretch" Margin="0,6" IsVisible="False">
+            <TextBlock HorizontalAlignment="Center" FontSize="12" FontWeight="Medium"
+                       Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                       Text="{Binding UnreadDividerText, RelativeSource={RelativeSource TemplatedParent}}" />
+          </Border>
         <Grid x:Name="PART_Layout" MaxWidth="580" HorizontalAlignment="Left" Margin="0,2">
           <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
             <Border x:Name="PART_AvatarHost" Width="32" Height="32" VerticalAlignment="Top" Margin="0,2,0,0"
@@ -126,6 +134,7 @@
             </StackPanel>
           </Grid>
         </Grid>
+        </StackPanel>
       </ControlTemplate>
     </Setter>
     <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.06" /></Style>
@@ -138,6 +147,10 @@
     <Style Selector="^:streaming /template/ TextBlock#PART_Caret"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:failed /template/ StackPanel#PART_DeliveryStatus"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:user"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
+    <Style Selector="^:grouped /template/ Border#PART_AvatarHost"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:grouped /template/ TextBlock#PART_Sender"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:dated /template/ TextBlock#PART_DateSeparator"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:unread /template/ Border#PART_UnreadDivider"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:user /template/ Grid#PART_Layout"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
     <Style Selector="^:user /template/ Border#PART_AvatarHost"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:user /template/ TextBlock#PART_Sender"><Setter Property="HorizontalAlignment" Value="Right" /><Setter Property="IsVisible" Value="False" /></Style>
@@ -178,7 +191,7 @@
                    AutomationProperties.Name="{TemplateBinding MessagesText}">
             <ListBox.ItemTemplate>
               <DataTemplate x:DataType="chat:MdChatRow">
-                <chat:MdChatMessagePresenter Message="{Binding Message}"
+                <chat:MdChatMessagePresenter Message="{Binding Message}" Layout="{Binding Layout}"
                     MarkdownProvider="{Binding MarkdownProvider, RelativeSource={RelativeSource AncestorType=chat:MdChatView}}"
                     ImageProvider="{Binding ImageProvider, RelativeSource={RelativeSource AncestorType=chat:MdChatView}}"
                     IsSelected="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" />

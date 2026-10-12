@@ -23,7 +23,7 @@ using Md3.Avalonia.Localization;
 namespace Md3.Avalonia.Chat;
 
 /// <summary>Role-aware message bubble used by <see cref="MdChatView"/>.</summary>
-[PseudoClasses(":user", ":assistant", ":system", ":selected", ":failed", ":reply", ":text-content", ":attachments", ":streaming")]
+[PseudoClasses(":user", ":assistant", ":system", ":selected", ":failed", ":reply", ":text-content", ":attachments", ":streaming", ":grouped", ":dated", ":unread")]
 public sealed class MdChatMessagePresenter : ContentControl
 {
     public static readonly StyledProperty<MdChatMessage?> MessageProperty =
@@ -33,6 +33,10 @@ public sealed class MdChatMessagePresenter : ContentControl
 
     public static readonly DirectProperty<MdChatMessagePresenter, string> FormattedTimeProperty =
         AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(FormattedTime), control => control.FormattedTime);
+    public static readonly StyledProperty<MdChatMessageLayout?> LayoutProperty =
+        AvaloniaProperty.Register<MdChatMessagePresenter, MdChatMessageLayout?>(nameof(Layout));
+    public static readonly DirectProperty<MdChatMessagePresenter, string> DateSeparatorTextProperty =
+        AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(DateSeparatorText), control => control.DateSeparatorText);
     public static readonly DirectProperty<MdChatMessagePresenter, string> AvatarGlyphProperty =
         AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(AvatarGlyph), control => control.AvatarGlyph);
     public static readonly DirectProperty<MdChatMessagePresenter, string> SenderInitialsProperty =
@@ -52,6 +56,7 @@ public sealed class MdChatMessagePresenter : ContentControl
 
     static MdChatMessagePresenter()
     {
+        LayoutProperty.Changed.AddClassHandler<MdChatMessagePresenter>((presenter, _) => presenter.UpdateLayoutState());
         MessageProperty.Changed.AddClassHandler<MdChatMessagePresenter>((presenter, _) => presenter.UpdateRole());
         MarkdownProviderProperty.Changed.AddClassHandler<MdChatMessagePresenter>((presenter, _) => presenter.UpdateRichContent());
         IsSelectedProperty.Changed.AddClassHandler<MdChatMessagePresenter>((presenter, _) => presenter.UpdateRole());
@@ -72,6 +77,25 @@ public sealed class MdChatMessagePresenter : ContentControl
     public object? RichContent { get => _richContent; private set => SetAndRaise(RichContentProperty, ref _richContent, value); }
 
     private object? _richContent;
+
+    /// <summary>How the message is grouped and separated; set by the chat row.</summary>
+    public MdChatMessageLayout? Layout { get => GetValue(LayoutProperty); set => SetValue(LayoutProperty, value); }
+
+    private string _dateSeparatorText = string.Empty;
+
+    /// <summary>The local day shown above the message, or empty when there is no date separator.</summary>
+    public string DateSeparatorText { get => _dateSeparatorText; private set => SetAndRaise(DateSeparatorTextProperty, ref _dateSeparatorText, value); }
+
+    /// <summary>Localized text of the unread divider.</summary>
+    public string UnreadDividerText => MdLocalization.GetString("ChatUnreadDivider", this);
+
+    private void UpdateLayoutState()
+    {
+        PseudoClasses.Set(":grouped", Layout is { ShowSender: false });
+        PseudoClasses.Set(":dated", Layout is { ShowDateSeparator: true });
+        PseudoClasses.Set(":unread", Layout is { ShowUnreadDivider: true });
+        DateSeparatorText = Layout?.DateSeparator is { } day ? day.ToString("D", CultureInfo.CurrentCulture) : string.Empty;
+    }
 
     public string FormattedTime => Message?.Timestamp.LocalDateTime.ToString("t", CultureInfo.CurrentCulture) ?? string.Empty;
     public string? TextContent => Message?.Content as string;
