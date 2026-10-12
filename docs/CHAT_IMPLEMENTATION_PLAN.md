@@ -117,8 +117,9 @@
 
 - 已实现：`IsAtBottom`、`UnreadCount`、`ScrollToLatest()`、`ScrollToMessage(MdChatMessage)`；在底部时新消息自动贴底（先读取变化前的贴底状态，再延后滚动）；中间时不移动视口并递增未读数；"回到最新"按钮显示未读数，点击后回到底部。
 - 验收：1、2 已由 headless 测试覆盖（`MdChatPhase5Tests`）。CI 中 427 个 headless 测试全部通过。
-- 未实现（下一轮）：历史加载 `HistoryProvider` 与前插锚点补偿（验收 3）；`MdChatGroupingPolicy` 分组；`MdChatDateSeparator` 与 `MdUnreadDivider`；10 万条消息的帧耗时基准（验收 4）。
-- 已知限制：集合的添加以外的变化（前插、删除、重置）会清空并重建行，这正是锚点补偿要解决的问题，目前尚未处理。
+- 已实现（验收 3）：`HistoryRequested` 在视口接近顶部时触发一次；应用把更早的消息前插到 `MessagesSource`，控件记录前插前第一条可见消息的屏幕位置，布局后补偿偏移，使其回到原位置，且前插不计为未读。行的增量同步保证前插不重建已有行；若锚点因虚拟化被移出渲染范围，先 `ScrollIntoView` 再测量（最多两次重试）。headless 测试 `Prepending_History_Keeps_The_First_Visible_Message_In_Place_And_Is_Not_Unread` 与 `History_Is_Requested_Once_Near_The_Top_And_Re_Armed_By_A_Change` 覆盖。
+- 注意：`HistoryRequested` 之后控件保持"已请求"状态，直到 `MessagesSource` 再次变化才会重新请求；没有更早消息的应用可以忽略该事件。
+- 未实现（下一轮）：`MdChatGroupingPolicy` 分组；`MdChatDateSeparator` 与 `MdUnreadDivider`；10 万条消息的帧耗时基准（验收 4）；锚点补偿在真机滚动惯性下的表现尚未验证。
 
 **验收**（需要自动化测试）：
 1. 在底部时收到消息，视口停在底部；
