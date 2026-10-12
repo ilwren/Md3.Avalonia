@@ -509,7 +509,8 @@ public sealed class MdChatView : TemplatedControl
         if (_messagesScroll is not { } scroll || _messagesHost is null) return null;
         foreach (var item in _messagesHost.GetVisualDescendants().OfType<ListBoxItem>())
         {
-            if (item.DataContext is not MdChatRow row) continue;
+            // The list item is the row; its DataContext is not guaranteed to be.
+            if (item.Content is not MdChatRow row) continue;
             if (item.TranslatePoint(new Point(0, 0), scroll) is not { } top) continue;
             // The first row whose bottom edge is at or below the top of the viewport is the anchor.
             if (top.Y + item.Bounds.Height > 0) return (row, top.Y);
@@ -522,7 +523,7 @@ public sealed class MdChatView : TemplatedControl
     {
         if (_messagesScroll is not { } scroll || _messagesHost is null) return;
         var item = _messagesHost.GetVisualDescendants().OfType<ListBoxItem>()
-            .FirstOrDefault(candidate => ReferenceEquals(candidate.DataContext, anchor.Row));
+            .FirstOrDefault(candidate => ReferenceEquals(candidate.Content, anchor.Row));
         if (item?.TranslatePoint(new Point(0, 0), scroll) is not { } top) return;
         var delta = top.Y - anchor.Top;
         if (Math.Abs(delta) < 0.5) return;
@@ -689,7 +690,7 @@ public sealed class MdChatView : TemplatedControl
         // Select explicitly instead of depending on ListBoxItem's presenter surface. Rich and
         // selectable text inside the bubble may otherwise consume the press before ListBox sees it.
         var row = path.OfType<ListBoxItem>().FirstOrDefault();
-        if (row?.DataContext is not MdChatRow) return;
+        if (row?.Content is not MdChatRow) return;
         var toggle = AllowMultipleSelection && e.KeyModifiers.HasFlag(KeyModifiers.Control);
         if (toggle)
         {
