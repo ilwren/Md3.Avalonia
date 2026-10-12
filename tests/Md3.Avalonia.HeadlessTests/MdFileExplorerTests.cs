@@ -369,28 +369,28 @@ public sealed class MdFileExplorerTests
         {
             Provider = new MdLocalFileSystemProvider([new MdFileLocation("home", "Home", directory.Path)])
         };
-        await explorer.InitializeAsync();
+        await explorer.InitializeAsync(TestContext.Current.CancellationToken);
 
         Assert.False(explorer.CanNavigateBack);
         Assert.False(explorer.CanNavigateForward);
         Assert.False(explorer.CanNavigateUp);
 
-        await explorer.NavigateToAsync("home", "Documents");
+        await explorer.NavigateToAsync("home", "Documents", cancellationToken: TestContext.Current.CancellationToken);
         Assert.True(explorer.CanNavigateBack);
         Assert.True(explorer.CanNavigateUp);
-        await explorer.NavigateToAsync("home", "Documents/Notes");
+        await explorer.NavigateToAsync("home", "Documents/Notes", cancellationToken: TestContext.Current.CancellationToken);
         Assert.True(explorer.CanNavigateBack);
 
-        Assert.True(await explorer.NavigateBackAsync());
+        Assert.True(await explorer.NavigateBackAsync(TestContext.Current.CancellationToken));
         Assert.Equal("Documents", explorer.CurrentPath);
         Assert.True(explorer.CanNavigateForward);
-        Assert.True(await explorer.NavigateForwardAsync());
+        Assert.True(await explorer.NavigateForwardAsync(TestContext.Current.CancellationToken));
         Assert.Equal("Documents/Notes", explorer.CurrentPath);
         Assert.False(explorer.CanNavigateForward);
 
-        Assert.True(await explorer.NavigateUpAsync());
+        Assert.True(await explorer.NavigateUpAsync(TestContext.Current.CancellationToken));
         Assert.Equal("Documents", explorer.CurrentPath);
-        await explorer.NavigateToAsync("home", "Pictures");
+        await explorer.NavigateToAsync("home", "Pictures", cancellationToken: TestContext.Current.CancellationToken);
         Assert.Equal("Pictures", explorer.CurrentPath);
         Assert.False(explorer.CanNavigateForward);
         Assert.True(explorer.CanNavigateUp);

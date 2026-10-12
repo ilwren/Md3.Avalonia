@@ -190,9 +190,9 @@ public sealed class MdFileItemsView : ListBox
 
     private void RaiseContextRequest(Visual source, RoutedEventArgs e)
     {
-        var entry = FindEntry(source);
-        if (entry is null) return;
-        if (SelectedItems?.OfType<MdFileEntry>().Any(selected => selected.Id == entry.Id) != true)
+        var container = source as ListBoxItem ?? source.GetVisualAncestors().OfType<ListBoxItem>().FirstOrDefault();
+        if (container is null || ItemFromContainer(container) is not MdFileEntry entry) return;
+        if (SelectedEntries.All(selected => !string.Equals(selected.Id, entry.Id, StringComparison.Ordinal)))
         {
             if (SelectedItems is { } selection) selection.Clear();
             SelectedItem = entry;
