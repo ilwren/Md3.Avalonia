@@ -497,10 +497,20 @@ public sealed class MdChatView : TemplatedControl
     private void FinishChange()
     {
         _changePending = false;
-        if (_followBeforeChange) ScrollToLatest();
-        else if (_anchorBeforeChange is { } anchor) RestoreAnchor(anchor);
+        if (_followBeforeChange)
+        {
+            ScrollToLatest();
+            _historyPending = false;
+        }
+        else if (_anchorBeforeChange is { } anchor)
+        {
+            RestoreAnchor(anchor, 0);
+        }
+        else
+        {
+            _historyPending = false;
+        }
         _anchorBeforeChange = null;
-        _historyPending = false;
     }
 
     /// <summary>The first visible message and its screen position, captured before the list changes.</summary>
@@ -519,15 +529,30 @@ public sealed class MdChatView : TemplatedControl
     }
 
     /// <summary>Moves the offset so the anchor message is back at its captured screen position.</summary>
-    private void RestoreAnchor((MdChatRow Row, double Top) anchor)
+    private void RestoreAnchor((MdChatRow Row, double Top) anchor, int attempt)
     {
-        if (_messagesScroll is not { } scroll || _messagesHost is null) return;
+        if (_messagesScroll is not { } scroll || _messagesHost is null)
+        {
+            _historyPending = false;
+            return;
+        }
         var item = _messagesHost.GetVisualDescendants().OfType<ListBoxItem>()
             .FirstOrDefault(candidate => ReferenceEquals(candidate.Content, anchor.Row));
-        if (item?.TranslatePoint(new Point(0, 0), scroll) is not { } top) return;
+        if (item?.TranslatePoint(new Point(0, 0), scroll) is not { } top)
+        {
+            if (attempt < 2)
+            {
+                // The change moved the anchor out of the realized range. Bring it back, then measure after the next layout.
+                _messagesHost.ScrollIntoView(anchor.Row);
+                Dispatcher.UIThread.Post(() => RestoreAnchor(anchor, attempt + 1), DispatcherPriority.Background);
+                return;
+            }
+            _historyPending = false;
+            return;
+        }
         var delta = top.Y - anchor.Top;
-        if (Math.Abs(delta) < 0.5) return;
-        scroll.Offset = new Vector(scroll.Offset.X, Math.Max(0, scroll.Offset.Y + delta));
+        if (Math.Abs(delta) >= 0.5) scroll.Offset = new Vector(scroll.Offset.X, Math.Max(0, scroll.Offset.Y + delta));
+        _historyPending = false;
         UpdateScrollState();
     }
 
