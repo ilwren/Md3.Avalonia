@@ -123,4 +123,78 @@ public sealed class MdChatPhase5Tests
         }
         finally { window.Close(); }
     }
+
+    /// <summary>The first realized message whose bottom edge is in view, with its screen position.</summary>
+    private static (string Id, double Top) FirstVisible(MdChatView chat, ScrollViewer scroll)
+    {
+        foreach (var presenter in chat.GetVisualDescendants().OfType<MdChatMessagePresenter>())
+        {
+            if (presenter.Message is not { } message) continue;
+            if (presenter.TranslatePoint(new Point(0, 0), scroll) is not { } top) continue;
+            if (top.Y + presenter.Bounds.Height > 0) return (message.Id, top.Y);
+        }
+        throw new Xunit.Sdk.XunitException("No message is visible.");
+    }
+
+    [AvaloniaFact]
+    public void Prepending_History_Keeps_The_First_Visible_Message_In_Place_And_Is_Not_Unread()
+    {
+        var messages = Conversation(40);
+        var chat = new MdChatView { MessagesSource = messages };
+        var window = new Window { Width = 480, Height = 320, Content = chat };
+        window.Show();
+        try
+        {
+            Settle(window);
+            var scroll = MessagesScroll(chat);
+            scroll.Offset = new Vector(0, 400);
+            Settle(window);
+            var before = FirstVisible(chat, scroll);
+
+            for (var i = 0; i < 50; i++)
+            {
+                messages.Insert(i, new MdChatMessage($"older{i}", MdChatMessageRole.User,
+                    $"Older message {i} with enough text to take a line or two of space in the list.",
+                    DateTimeOffset.Now.AddHours(-1 - i)));
+            }
+            Settle(window);
+
+            var after = FirstVisible(chat, scroll);
+            Assert.Equal(before.Id, after.Id);
+            Assert.Equal(before.Top, after.Top, 1);
+            Assert.Equal(0, chat.UnreadCount);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void History_Is_Requested_Once_Near_The_Top_And_Re_Armed_By_A_Change()
+    {
+        var messages = Conversation(40);
+        var chat = new MdChatView { MessagesSource = messages };
+        var requests = 0;
+        chat.HistoryRequested += (_, _) => requests++;
+        var window = new Window { Width = 480, Height = 320, Content = chat };
+        window.Show();
+        try
+        {
+            Settle(window);
+            Assert.Equal(1, requests);
+            Settle(window);
+            Assert.Equal(1, requests);
+
+            for (var i = 0; i < 5; i++)
+            {
+                messages.Insert(i, new MdChatMessage($"older{i}", MdChatMessageRole.User, "Older message",
+                    DateTimeOffset.Now.AddHours(-1 - i)));
+            }
+            Settle(window);
+            var scroll = MessagesScroll(chat);
+            scroll.Offset = new Vector(0, 0);
+            Settle(window);
+
+            Assert.Equal(2, requests);
+        }
+        finally { window.Close(); }
+    }
 }

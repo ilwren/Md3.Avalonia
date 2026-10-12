@@ -75,6 +75,8 @@ public sealed class MdChatView : TemplatedControl
     private Button? _jumpToLatestButton;
     private TextBlock? _unreadText;
     private bool _isAtBottom = true;
+    private bool _historyPending;
+    private const double HistoryTriggerDistance = 48;
     private int _unreadCount;
     private string _jumpToLatestText = string.Empty;
     private TextBox? _composer;
@@ -143,6 +145,13 @@ public sealed class MdChatView : TemplatedControl
     public event EventHandler<MdChatMessage>? RetryRequested;
     /// <summary>Raised when the user activates an attachment (opens a picture, file, or media item).</summary>
     public event EventHandler<MdChatAttachment>? AttachmentActivated;
+
+    /// <summary>
+    /// Raised once when the list is scrolled near its top. The application should insert older messages at the start of
+    /// <see cref="MessagesSource"/>. The control keeps the visible message in place and asks again only after the next
+    /// change to the source, so an application that has no older messages can ignore the event.
+    /// </summary>
+    public event EventHandler? HistoryRequested;
 
     /// <summary>True when the message list is scrolled to its latest message.</summary>
     public bool IsAtBottom { get => _isAtBottom; private set => SetAndRaise(IsAtBottomProperty, ref _isAtBottom, value); }
@@ -467,6 +476,13 @@ public sealed class MdChatView : TemplatedControl
         IsAtBottom = atBottom;
         if (_jumpToLatestButton is not null) _jumpToLatestButton.IsVisible = !atBottom;
         if (atBottom && UnreadCount > 0) SetUnreadCount(0);
+        // Asks for older messages near the top. Re-armed once the application has answered (see OnMessagesCollectionChanged).
+        if (_messagesScroll is { } history && !_historyPending && _rows.Count > 0
+            && history.Extent.Height > history.Viewport.Height && history.Offset.Y < HistoryTriggerDistance)
+        {
+            _historyPending = true;
+            HistoryRequested?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private void SetUnreadCount(int count)
@@ -475,20 +491,48 @@ public sealed class MdChatView : TemplatedControl
         if (_unreadText is not null) _unreadText.IsVisible = count > 0;
     }
 
+    /// <summary>The first visible message and its screen position, captured before the list changes.</summary>
+    private (MdChatRow Row, double Top)? CaptureAnchor()
+    {
+        if (_messagesScroll is not { } scroll || _messagesHost is null) return null;
+        foreach (var item in _messagesHost.GetVisualDescendants().OfType<ListBoxItem>())
+        {
+            if (item.DataContext is not MdChatRow row) continue;
+            if (item.TranslatePoint(new Point(0, 0), scroll) is not { } top) continue;
+            // The first row whose bottom edge is at or below the top of the viewport is the anchor.
+            if (top.Y + item.Bounds.Height > 0) return (row, top.Y);
+        }
+        return null;
+    }
+
+    /// <summary>Moves the offset so the anchor message is back at its captured screen position.</summary>
+    private void RestoreAnchor((MdChatRow Row, double Top) anchor)
+    {
+        if (_messagesScroll is not { } scroll || _messagesHost is null) return;
+        var item = _messagesHost.GetVisualDescendants().OfType<ListBoxItem>()
+            .FirstOrDefault(candidate => ReferenceEquals(candidate.DataContext, anchor.Row));
+        if (item?.TranslatePoint(new Point(0, 0), scroll) is not { } top) return;
+        var delta = top.Y - anchor.Top;
+        if (Math.Abs(delta) < 0.5) return;
+        scroll.Offset = new Vector(scroll.Offset.X, Math.Max(0, scroll.Offset.Y + delta));
+        UpdateScrollState();
+    }
+
     private void OnMessagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         // Read before the rows change, while the layout still reflects the position the reader sees.
         var followLatest = IsAtBottom;
+        var anchor = followLatest ? null : CaptureAnchor();
         var added = SyncRows(e);
-        if (followLatest)
+        // Posted so the list lays out the change first. The history guard stays up until then, so the offset that
+        // is compensated here cannot trigger another history request.
+        Dispatcher.UIThread.Post(() =>
         {
-            // Posted so the list lays out the new row before the offset is set.
-            Dispatcher.UIThread.Post(ScrollToLatest);
-        }
-        else if (added > 0)
-        {
-            SetUnreadCount(UnreadCount + added);
-        }
+            if (followLatest) ScrollToLatest();
+            else if (anchor is { } captured) RestoreAnchor(captured);
+            _historyPending = false;
+        }, DispatcherPriority.Background);
+        if (!followLatest && added > 0) SetUnreadCount(UnreadCount + added);
         ReconcileSelection();
         var message = e.NewItems?.OfType<MdChatMessage>().LastOrDefault();
         if (message is null) return;
@@ -535,21 +579,37 @@ public sealed class MdChatView : TemplatedControl
             }
         }
 
-        var common = 0;
-        while (common < _rows.Count && common < next.Count && ReferenceEquals(_rows[common], next[common])) common++;
-        if (common == _rows.Count)
+        // Rows that are no longer present are removed. The rest keep their containers and are moved or inserted
+        // into place, so a prepend or an append does not rebuild the list.
+        var previous = new HashSet<MdChatRow>(_rows);
+        var retained = new HashSet<MdChatRow>(next);
+        for (var i = _rows.Count - 1; i >= 0; i--)
         {
-            // Appending keeps the existing rows, so the list does not rebuild its containers.
-            var appended = next.Count - common;
-            for (var i = common; i < next.Count; i++) _rows.Add(next[i]);
-            return appended;
+            if (!retained.Contains(_rows[i])) _rows.RemoveAt(i);
         }
-        else
+        var lastPrevious = -1;
+        for (var i = 0; i < next.Count; i++)
         {
-            _rows.Clear();
-            foreach (var row in next) _rows.Add(row);
+            if (previous.Contains(next[i])) lastPrevious = i;
         }
-        return 0;
+        var added = 0;
+        for (var i = 0; i < next.Count; i++)
+        {
+            var want = next[i];
+            if (i < _rows.Count && ReferenceEquals(_rows[i], want)) continue;
+            var at = _rows.IndexOf(want);
+            if (at >= 0)
+            {
+                _rows.Move(at, i);
+            }
+            else
+            {
+                _rows.Insert(i, want);
+                // Only rows after the last existing one are new messages at the end, which count as unread.
+                if (i > lastPrevious) added++;
+            }
+        }
+        return added;
     }
 
     private void ReconcileSelection()
