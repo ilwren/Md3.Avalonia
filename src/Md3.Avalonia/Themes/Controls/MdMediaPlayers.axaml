@@ -36,6 +36,27 @@
                       Background="{DynamicResource Md.Sys.Color.Secondary.Brush}"
                       IsVisible="False"
                       IsHitTestVisible="False" />
+              <Border x:Name="PART_PreviewIndicator"
+                      Width="72"
+                      Height="24"
+                      Canvas.Left="0"
+                      Canvas.Top="0"
+                      CornerRadius="12"
+                      Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                      BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                      BorderThickness="1"
+                      IsVisible="False"
+                      IsHitTestVisible="False"
+                      Opacity="0">
+                <TextBlock x:Name="PART_PreviewLabel"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="12"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                           Text="0:00"
+                           TextTrimming="CharacterEllipsis" />
+              </Border>
             </Canvas>
           </Grid>
         </Grid>
@@ -49,64 +70,90 @@
     <Setter Property="Focusable" Value="True" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdVideoPlayerControls">
-        <Grid MinHeight="220">
-          <Border Background="{DynamicResource Md.Sys.Color.Scrim.Strong.Brush}" />
-          <Grid Margin="20" RowDefinitions="Auto,*,Auto" RowSpacing="16"
-                IsVisible="{TemplateBinding IsControlsVisible}">
-            <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
-              <TextBlock VerticalAlignment="Center"
-                         FontSize="16"
-                         FontWeight="Medium"
-                         Foreground="White"
-                         Text="{TemplateBinding Title}"
-                         TextTrimming="CharacterEllipsis" />
-              <md:MdIconButton x:Name="PART_MuteButton" Grid.Column="1" Variant="Standard" Size="Medium" />
-              <md:MdIconButton x:Name="PART_FullScreenButton" Grid.Column="2" Variant="Standard" Size="Medium" />
-            </Grid>
+        <Border Background="Transparent" ClipToBounds="True">
+          <Grid MinHeight="220">
+            <Grid x:Name="PART_Overlay" MinHeight="220" Opacity="1">
+              <Border Background="{DynamicResource Md.Sys.Color.Scrim.Strong.Brush}" />
+              <Grid x:Name="PART_ControlsSurface" Margin="20" RowDefinitions="Auto,*,Auto" RowSpacing="16">
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                  <TextBlock VerticalAlignment="Center"
+                             FontSize="16"
+                             FontWeight="Medium"
+                             Foreground="White"
+                             Text="{TemplateBinding Title}"
+                             TextTrimming="CharacterEllipsis" />
+                  <md:MdIconButton x:Name="PART_MuteButton" Grid.Column="1" Variant="Standard" Size="Medium" />
+                  <md:MdIconButton x:Name="PART_FullScreenButton" Grid.Column="2" Variant="Standard" Size="Medium" />
+                </Grid>
 
-            <Grid Grid.Row="1"
-                  HorizontalAlignment="Center"
-                  VerticalAlignment="Center"
-                  ColumnDefinitions="48,48,56,48,48"
-                  ColumnSpacing="8">
-              <md:MdIconButton x:Name="PART_PreviousButton" Grid.Column="0" Variant="Standard" Size="Medium" />
-              <md:MdIconButton x:Name="PART_RewindButton" Grid.Column="1" Variant="Standard" Size="Medium" />
-              <Grid Grid.Column="2" Width="56" Height="56">
-                <md:MdIconButton x:Name="PART_PlayPauseButton"
-                                 Width="56"
-                                 Height="56"
-                                 ContainerWidth="48"
-                                 ContainerHeight="48"
-                                 IconSize="28"
-                                 HorizontalAlignment="Center"
-                                 VerticalAlignment="Center"
-                                 Variant="Filled"
-                                 Size="Large" />
-                <md:MdCircularProgressIndicator x:Name="PART_BusyIndicator"
-                                                Width="40"
-                                                Height="40"
-                                                Size="40"
-                                                IsIndeterminate="True"
-                                                IsVisible="False"
-                                                IsHitTestVisible="False" />
+                <Grid Grid.Row="1"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      ColumnDefinitions="48,48,56,48,48"
+                      ColumnSpacing="8">
+                  <md:MdIconButton x:Name="PART_PreviousButton" Grid.Column="0" Variant="Standard" Size="Medium" />
+                  <md:MdIconButton x:Name="PART_RewindButton" Grid.Column="1" Variant="Standard" Size="Medium" />
+                  <Grid Grid.Column="2" Width="56" Height="56">
+                    <md:MdIconButton x:Name="PART_PlayPauseButton"
+                                     Width="56"
+                                     Height="56"
+                                     ContainerWidth="48"
+                                     ContainerHeight="48"
+                                     IconSize="28"
+                                     HorizontalAlignment="Center"
+                                     VerticalAlignment="Center"
+                                     Variant="Filled"
+                                     Size="Large" />
+                    <md:MdCircularProgressIndicator x:Name="PART_BusyIndicator"
+                                                    Width="40"
+                                                    Height="40"
+                                                    Size="40"
+                                                    IsIndeterminate="True"
+                                                    IsVisible="False"
+                                                    IsHitTestVisible="False" />
+                  </Grid>
+                  <md:MdIconButton x:Name="PART_ForwardButton" Grid.Column="3" Variant="Standard" Size="Medium" />
+                  <md:MdIconButton x:Name="PART_NextButton" Grid.Column="4" Variant="Standard" Size="Medium" />
+                </Grid>
+
+                <md:MdSeekBar x:Name="PART_SeekBar"
+                              Grid.Row="2"
+                              Duration="{TemplateBinding Duration}"
+                              Position="{TemplateBinding Position, Mode=TwoWay}"
+                              BufferedPosition="{TemplateBinding BufferedPosition}"
+                              ShowTimeLabels="True"
+                              ShowRemainingTime="True"
+                              AutomationName="Video position" />
               </Grid>
-              <md:MdIconButton x:Name="PART_ForwardButton" Grid.Column="3" Variant="Standard" Size="Medium" />
-              <md:MdIconButton x:Name="PART_NextButton" Grid.Column="4" Variant="Standard" Size="Medium" />
-            </Grid>
 
-            <md:MdSeekBar x:Name="PART_SeekBar"
-                          Grid.Row="2"
-                          Duration="{TemplateBinding Duration}"
-                          Position="{TemplateBinding Position, Mode=TwoWay}"
-                          BufferedPosition="{TemplateBinding BufferedPosition}"
-                          ShowTimeLabels="True"
-                          ShowRemainingTime="True"
-                          AutomationName="Video position" />
+              <Border x:Name="PART_GestureFeedback"
+                      Width="96"
+                      Height="84"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      CornerRadius="24"
+                      Background="{DynamicResource Md.Sys.Color.Scrim.Strong.Brush}"
+                      IsVisible="False"
+                      IsHitTestVisible="False"
+                      Opacity="0">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="2">
+                  <md:MdIcon x:Name="PART_GestureFeedbackIcon"
+                             Glyph="{DynamicResource Md.Icon.PlayArrow}"
+                             Size="32"
+                             Foreground="White" />
+                  <TextBlock x:Name="PART_GestureFeedbackLabel"
+                             HorizontalAlignment="Center"
+                             FontSize="12"
+                             FontWeight="Medium"
+                             Foreground="White"
+                             Text="Play" />
+                </StackPanel>
+              </Border>
+            </Grid>
           </Grid>
-        </Grid>
+        </Border>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:controls-hidden"><Setter Property="Opacity" Value="0" /></Style>
     <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.55" /></Style>
   </ControlTheme>
 

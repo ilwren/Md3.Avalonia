@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -8,6 +9,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Motion;
 using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
@@ -91,6 +93,7 @@ public sealed class MdMediaPlayerControlTests
             Duration = TimeSpan.FromMinutes(1),
             Position = TimeSpan.FromSeconds(15)
         };
+        MdMotion.SetScheme(seekBar, MdMotionScheme.Reduced);
         var window = new Window { Width = 640, Height = 150, Content = seekBar };
         window.Show();
         try
@@ -113,6 +116,14 @@ public sealed class MdMediaPlayerControlTests
             window.MouseMove(end, RawInputModifiers.LeftMouseButton);
             Dispatcher.UIThread.RunJobs();
             Assert.True(seekBar.IsSeeking);
+            var previewIndicator = Assert.Single(seekBar.GetVisualDescendants().OfType<Border>(),
+                border => border.Name == "PART_PreviewIndicator");
+            var previewLabel = Assert.Single(seekBar.GetVisualDescendants().OfType<TextBlock>(),
+                textBlock => textBlock.Name == "PART_PreviewLabel");
+            Assert.True(previewIndicator.IsVisible);
+            Assert.NotEqual("0:00", previewLabel.Text);
+            var previewFade = Assert.IsType<DoubleTransition>(Assert.Single(previewIndicator.Transitions!));
+            Assert.Equal(TimeSpan.FromMilliseconds(100), previewFade.Duration);
             window.MouseUp(end, MouseButton.Left, RawInputModifiers.None);
             Dispatcher.UIThread.RunJobs();
 
@@ -242,6 +253,7 @@ public sealed class MdMediaPlayerControlTests
             IsPlaying = true,
             AutoHideControls = false
         };
+        MdMotion.SetScheme(video, MdMotionScheme.None);
         var focusSink = new Button { Content = "Focus sink" };
         var window = new Window
         {
@@ -272,6 +284,176 @@ public sealed class MdMediaPlayerControlTests
             video.IsControlsVisible = true;
             Dispatcher.UIThread.RunJobs();
             Assert.True(pause.IsEffectivelyVisible);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task Video_Controls_Fade_And_Honor_Reduced_And_No_Motion()
+    {
+        var video = new MdVideoPlayerControls
+        {
+            Width = 400,
+            Height = 260,
+            IsPlaying = true,
+            AutoHideControls = false
+        };
+        MdMotion.SetScheme(video, MdMotionScheme.Reduced);
+        var focusSink = new Button { Content = "Focus sink" };
+        var window = new Window
+        {
+            Width = 600,
+            Height = 360,
+            Content = new StackPanel { Children = { video, focusSink } }
+        };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(focusSink.Focus());
+            var overlay = Assert.Single(video.GetVisualDescendants().OfType<Grid>(), grid => grid.Name == "PART_Overlay");
+            var pause = Assert.Single(video.GetVisualDescendants().OfType<MdIconButton>(),
+                button => AutomationProperties.GetName(button) == "Pause");
+            var fade = Assert.IsType<DoubleTransition>(Assert.Single(overlay.Transitions!));
+            Assert.Equal(TimeSpan.FromMilliseconds(100), fade.Duration);
+
+            video.IsControlsVisible = false;
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(overlay.IsVisible, "The overlay must remain mounted for its reduced-motion fade-out.");
+            Assert.False(pause.IsEffectivelyEnabled, "Controls must stop accepting input as soon as they begin fading out.");
+            await Task.Delay(130);
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(overlay.IsVisible);
+            Assert.False(pause.IsEffectivelyVisible, "Fully hidden controls must leave the automation and tab order.");
+
+            MdMotion.SetScheme(video, MdMotionScheme.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Null(overlay.Transitions);
+            video.IsControlsVisible = true;
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(overlay.IsVisible);
+            video.IsControlsVisible = false;
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(overlay.IsVisible, "The no-motion scheme removes the overlay without a delayed exit.");
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task Video_DoubleTap_Requests_Ten_Second_Jumps_And_Shows_Feedback()
+    {
+        var video = new MdVideoPlayerControls
+        {
+            Width = 600,
+            Height = 260,
+            IsPlaying = true,
+            AutoHideControls = false
+        };
+        MdMotion.SetScheme(video, MdMotionScheme.None);
+        var window = new Window { Width = 600, Height = 300, Content = video };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var requests = new List<MdPlaybackRequest>();
+            video.PlaybackRequested += (_, args) => requests.Add(args.Request);
+
+            Tap(window, new Point(40, 130));
+            await Task.Delay(60);
+            Dispatcher.UIThread.RunJobs();
+            Tap(window, new Point(42, 130));
+            Assert.Equal(new[] { MdPlaybackRequest.Rewind }, requests);
+            var feedbackLabel = Assert.Single(video.GetVisualDescendants().OfType<TextBlock>(),
+                textBlock => textBlock.Name == "PART_GestureFeedbackLabel");
+            Assert.Equal("10 sec back", feedbackLabel.Text);
+            var feedback = Assert.Single(video.GetVisualDescendants().OfType<Border>(),
+                border => border.Name == "PART_GestureFeedback");
+            Assert.True(feedback.IsVisible);
+
+            Tap(window, new Point(560, 130));
+            await Task.Delay(60);
+            Dispatcher.UIThread.RunJobs();
+            Tap(window, new Point(558, 130));
+            Assert.Equal(new[] { MdPlaybackRequest.Rewind, MdPlaybackRequest.Forward }, requests);
+            Assert.Equal("10 sec ahead", feedbackLabel.Text);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Video_DoubleTap_Does_Not_Replace_Transport_Button_Clicks()
+    {
+        var video = new MdVideoPlayerControls
+        {
+            Width = 600,
+            Height = 260,
+            IsPlaying = true,
+            AutoHideControls = false
+        };
+        MdMotion.SetScheme(video, MdMotionScheme.None);
+        var window = new Window { Width = 600, Height = 300, Content = video };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var rewind = Assert.Single(video.GetVisualDescendants().OfType<MdIconButton>(),
+                button => AutomationProperties.GetName(button) == "Rewind 10 seconds");
+            var point = rewind.TranslatePoint(new Point(rewind.Bounds.Width / 2, rewind.Bounds.Height / 2), window)!.Value;
+            var requests = new List<MdPlaybackRequest>();
+            video.PlaybackRequested += (_, args) => requests.Add(args.Request);
+
+            Tap(window, point);
+            Tap(window, point);
+
+            Assert.Equal(new[] { MdPlaybackRequest.Rewind, MdPlaybackRequest.Rewind }, requests);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Video_PlayPause_Button_Emits_Animated_State_Feedback()
+    {
+        var video = new MdVideoPlayerControls
+        {
+            Width = 600,
+            Height = 260,
+            AutoHideControls = false
+        };
+        MdMotion.SetScheme(video, MdMotionScheme.Reduced);
+        var window = new Window { Width = 600, Height = 300, Content = video };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var play = Assert.Single(video.GetVisualDescendants().OfType<MdIconButton>(),
+                button => AutomationProperties.GetName(button) == "Play");
+            var requests = new List<MdPlaybackRequest>();
+            video.PlaybackRequested += (_, args) => requests.Add(args.Request);
+            play.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(video.IsPlaying);
+            Assert.Equal(new[] { MdPlaybackRequest.Play }, requests);
+            var feedback = Assert.Single(video.GetVisualDescendants().OfType<Border>(),
+                border => border.Name == "PART_GestureFeedback");
+            var label = Assert.Single(video.GetVisualDescendants().OfType<TextBlock>(),
+                textBlock => textBlock.Name == "PART_GestureFeedbackLabel");
+            Assert.True(feedback.IsVisible);
+            Assert.Equal("Play", label.Text);
+            var feedbackFade = Assert.IsType<DoubleTransition>(Assert.Single(feedback.Transitions!));
+            Assert.Equal(TimeSpan.FromMilliseconds(100), feedbackFade.Duration);
         }
         finally
         {
@@ -332,5 +514,13 @@ public sealed class MdMediaPlayerControlTests
         {
             window.Close();
         }
+    }
+
+    private static void Tap(Window window, Point point)
+    {
+        window.MouseMove(point, RawInputModifiers.None);
+        window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
+        window.MouseUp(point, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
     }
 }

@@ -6,14 +6,17 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>
-/// A Material-styled, time-based seek control with buffered progress and accessible time labels.
-/// It reports seek requests only; decoding and media transport stay in the hosting application.
+/// A Material-styled, time-based seek control with buffered progress, accessible time labels and
+/// a live time bubble while scrubbing. It reports seek requests only; media transport stays in the host.
 /// </summary>
+[PseudoClasses(":seeking", ":reduced-motion", ":no-motion")]
 public sealed class MdSeekBar : TemplatedControl
 {
     public static readonly StyledProperty<TimeSpan> DurationProperty =
@@ -51,6 +54,9 @@ public sealed class MdSeekBar : TemplatedControl
 
     private MdSlider? _slider;
     private Border? _bufferedTrack;
+    private Border? _previewIndicator;
+    private TextBlock? _previewLabel;
+    private readonly MdPresenceController _previewPresence;
     private TimeSpan _previewPosition;
     private bool _isSeeking;
     private double _progressFraction;
@@ -69,10 +75,15 @@ public sealed class MdSeekBar : TemplatedControl
         ShowRemainingTimeProperty.Changed.AddClassHandler<MdSeekBar>((control, _) => control.RefreshState());
         AutomationNameProperty.Changed.AddClassHandler<MdSeekBar>((control, _) => control.UpdateAutomation());
         IsEnabledProperty.Changed.AddClassHandler<MdSeekBar>((control, _) => control.RefreshState());
+        MdMotion.SchemeProperty.Changed.AddClassHandler<MdSeekBar>((control, _) => control.UpdateMotion());
     }
 
     public MdSeekBar()
     {
+        _previewPresence = new MdPresenceController(present =>
+        {
+            if (_previewIndicator is not null) _previewIndicator.IsVisible = present;
+        });
         AddHandler(PointerPressedEvent, OnPointerPressed, RoutingStrategies.Tunnel, handledEventsToo: true);
         AddHandler(PointerReleasedEvent, OnPointerReleased, RoutingStrategies.Bubble, handledEventsToo: true);
         AddHandler(PointerCaptureLostEvent, OnPointerCaptureLost, RoutingStrategies.Bubble, handledEventsToo: true);
@@ -120,6 +131,10 @@ public sealed class MdSeekBar : TemplatedControl
         base.OnApplyTemplate(e);
         _slider = e.NameScope.Find<MdSlider>("PART_Slider");
         _bufferedTrack = e.NameScope.Find<Border>("PART_BufferedTrack");
+        _previewIndicator = e.NameScope.Find<Border>("PART_PreviewIndicator");
+        _previewLabel = e.NameScope.Find<TextBlock>("PART_PreviewLabel");
+        _previewPresence.Initialize(false);
+        UpdateMotion();
         if (_slider is not null)
         {
             _slider.PropertyChanged += OnSliderPropertyChanged;
@@ -130,15 +145,32 @@ public sealed class MdSeekBar : TemplatedControl
         RefreshState();
     }
 
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        RefreshState();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        _previewPresence.Stop();
+        _previewPresence.Initialize(false);
+        base.OnDetachedFromVisualTree(e);
+    }
+
     private void DetachSlider()
     {
-        if (_slider is null) return;
-        _slider.PropertyChanged -= OnSliderPropertyChanged;
-        _slider.SizeChanged -= OnSliderSizeChanged;
-        _slider.RemoveHandler(KeyDownEvent, OnSliderKeyDown);
-        _slider.RemoveHandler(KeyUpEvent, OnSliderKeyUp);
+        if (_slider is not null)
+        {
+            _slider.PropertyChanged -= OnSliderPropertyChanged;
+            _slider.SizeChanged -= OnSliderSizeChanged;
+            _slider.RemoveHandler(KeyDownEvent, OnSliderKeyDown);
+            _slider.RemoveHandler(KeyUpEvent, OnSliderKeyUp);
+        }
         _slider = null;
         _bufferedTrack = null;
+        _previewIndicator = null;
+        _previewLabel = null;
     }
 
     private void OnSliderPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
@@ -150,7 +182,11 @@ public sealed class MdSeekBar : TemplatedControl
         }
     }
 
-    private void OnSliderSizeChanged(object? sender, SizeChangedEventArgs e) => UpdateBufferedTrack();
+    private void OnSliderSizeChanged(object? sender, SizeChangedEventArgs e)
+    {
+        UpdateBufferedTrack();
+        UpdatePreviewIndicator();
+    }
 
     private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
@@ -246,6 +282,7 @@ public sealed class MdSeekBar : TemplatedControl
 
         UpdateSlider();
         UpdateBufferedTrack();
+        UpdatePreviewIndicator();
         UpdateAutomation();
     }
 
@@ -286,6 +323,56 @@ public sealed class MdSeekBar : TemplatedControl
             4 + (durationTicks > 0 ? availableWidth * (double)start.Ticks / durationTicks : 0));
         Canvas.SetTop(_bufferedTrack, Math.Max(0, _slider.Bounds.Height / 2 + 8));
     }
+
+    private void UpdatePreviewIndicator()
+    {
+        PseudoClasses.Set(":seeking", _isSeeking);
+        if (_previewIndicator is null || _previewLabel is null || _slider is null ||
+            !_isSeeking || !IsEnabled || !IsSeekEnabled || Duration <= TimeSpan.Zero)
+        {
+            if (_previewIndicator is not null) _previewIndicator.Opacity = 0;
+            _previewPresence.Update(false, GetEffectsDuration());
+            return;
+        }
+
+        _previewLabel.Text = FormatTime(PreviewPosition);
+        var sliderWidth = _slider.Bounds.Width;
+        var indicatorWidth = _previewIndicator.Width;
+        var availableWidth = Math.Max(0, sliderWidth - 8);
+        var fraction = Duration.Ticks > 0
+            ? Math.Clamp((double)PreviewPosition.Ticks / Duration.Ticks, 0, 1)
+            : 0;
+        var center = 4 + availableWidth * fraction;
+        Canvas.SetLeft(_previewIndicator, Math.Clamp(center - indicatorWidth / 2, 0, Math.Max(0, sliderWidth - indicatorWidth)));
+        Canvas.SetTop(_previewIndicator, 0);
+
+        var needsFadeIn = !_previewPresence.IsPresent || _previewIndicator.Opacity < 1;
+        _previewPresence.Update(true, TimeSpan.Zero);
+        if (!needsFadeIn) return;
+        if (_previewIndicator.Opacity >= 1) _previewIndicator.Opacity = 0;
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (_isSeeking && _previewIndicator is not null)
+                _previewIndicator.Opacity = 1;
+        }, DispatcherPriority.Render);
+    }
+
+    private void UpdateMotion()
+    {
+        var scheme = MdMotion.GetScheme(this);
+        PseudoClasses.Set(":reduced-motion", scheme == MdMotionScheme.Reduced);
+        PseudoClasses.Set(":no-motion", scheme == MdMotionScheme.None);
+        if (_previewIndicator is not null)
+        {
+            _previewIndicator.Transitions = MdMotionTransitions.Collect(
+                MdMotionTransitions.CreateDouble(this, Visual.OpacityProperty, MdMotionKind.Effects, MdMotionSpeed.Fast));
+            if (!_isSeeking)
+                _previewPresence.Update(false, GetEffectsDuration());
+        }
+    }
+
+    private TimeSpan GetEffectsDuration() =>
+        MdMotion.Resolve(this, MdMotionKind.Effects, MdMotionSpeed.Fast).Duration;
 
     private void UpdateAutomation()
     {

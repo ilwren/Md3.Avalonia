@@ -8,16 +8,21 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>
 /// An overlay for video surfaces with transport, mute, fullscreen and seek affordances.
-/// This control raises requests only; the host supplies the video surface and playback engine.
+/// Double-taps in the outer thirds request ten-second jumps; the host supplies the video surface
+/// and playback engine, while this control raises requests only.
 /// </summary>
-[PseudoClasses(":playing", ":paused", ":busy", ":controls-hidden", ":full-screen")]
+[PseudoClasses(":playing", ":paused", ":busy", ":controls-hidden", ":full-screen", ":reduced-motion", ":no-motion")]
 public sealed class MdVideoPlayerControls : TemplatedControl
 {
+    private const int DoubleTapWindowMilliseconds = 320;
+    private const double TapMovementThreshold = 24;
+
     public static readonly StyledProperty<string?> TitleProperty =
         AvaloniaProperty.Register<MdVideoPlayerControls, string?>(nameof(Title));
     public static readonly StyledProperty<TimeSpan> DurationProperty =
@@ -54,6 +59,15 @@ public sealed class MdVideoPlayerControls : TemplatedControl
         AvaloniaProperty.Register<MdVideoPlayerControls, ICommand?>(nameof(SeekCommand));
 
     private readonly DispatcherTimer _autoHideTimer;
+    private readonly DispatcherTimer _tapTimer;
+    private readonly DispatcherTimer _feedbackTimer;
+    private readonly MdPresenceController _controlsPresence;
+    private readonly MdPresenceController _feedbackPresence;
+    private Grid? _overlay;
+    private Grid? _controlsSurface;
+    private Border? _gestureFeedback;
+    private MdIcon? _gestureFeedbackIcon;
+    private TextBlock? _gestureFeedbackLabel;
     private MdSeekBar? _seekBar;
     private MdIconButton? _previousButton;
     private MdIconButton? _rewindButton;
@@ -63,6 +77,11 @@ public sealed class MdVideoPlayerControls : TemplatedControl
     private MdIconButton? _muteButton;
     private MdIconButton? _fullScreenButton;
     private MdCircularProgressIndicator? _busyIndicator;
+    private bool _pointerPressed;
+    private Point _pointerPressPosition;
+    private bool _tapPending;
+    private Point _pendingTapPosition;
+    private long _pendingTapTimestamp;
 
     static MdVideoPlayerControls()
     {
@@ -83,6 +102,7 @@ public sealed class MdVideoPlayerControls : TemplatedControl
                 return;
             }
             control.UpdatePseudoClasses();
+            control.UpdateControlVisibility();
             control.UpdateAutoHideTimer();
         });
         IsEnabledProperty.Changed.AddClassHandler<MdVideoPlayerControls>((control, _) => control.UpdateState());
@@ -91,14 +111,29 @@ public sealed class MdVideoPlayerControls : TemplatedControl
             if (control.IsKeyboardFocusWithin) control.ShowControls();
             control.UpdateAutoHideTimer();
         });
+        MdMotion.SchemeProperty.Changed.AddClassHandler<MdVideoPlayerControls>((control, _) => control.UpdateMotion());
     }
 
     public MdVideoPlayerControls()
     {
         _autoHideTimer = new DispatcherTimer();
         _autoHideTimer.Tick += OnAutoHideTimerTick;
+        _tapTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(DoubleTapWindowMilliseconds) };
+        _tapTimer.Tick += OnTapTimerTick;
+        _feedbackTimer = new DispatcherTimer();
+        _feedbackTimer.Tick += OnFeedbackTimerTick;
+        _controlsPresence = new MdPresenceController(present =>
+        {
+            if (_overlay is not null) _overlay.IsVisible = present;
+        });
+        _feedbackPresence = new MdPresenceController(present =>
+        {
+            if (_gestureFeedback is not null) _gestureFeedback.IsVisible = present;
+        });
+
         AddHandler(PointerMovedEvent, OnPointerMoved, RoutingStrategies.Tunnel, handledEventsToo: true);
         AddHandler(PointerPressedEvent, OnPointerPressed, RoutingStrategies.Tunnel, handledEventsToo: true);
+        AddHandler(PointerReleasedEvent, OnPointerReleased, RoutingStrategies.Tunnel, handledEventsToo: true);
         AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel, handledEventsToo: true);
         UpdateState();
     }
@@ -133,6 +168,11 @@ public sealed class MdVideoPlayerControls : TemplatedControl
     {
         DetachParts();
         base.OnApplyTemplate(e);
+        _overlay = e.NameScope.Find<Grid>("PART_Overlay");
+        _controlsSurface = e.NameScope.Find<Grid>("PART_ControlsSurface");
+        _gestureFeedback = e.NameScope.Find<Border>("PART_GestureFeedback");
+        _gestureFeedbackIcon = e.NameScope.Find<MdIcon>("PART_GestureFeedbackIcon");
+        _gestureFeedbackLabel = e.NameScope.Find<TextBlock>("PART_GestureFeedbackLabel");
         _seekBar = e.NameScope.Find<MdSeekBar>("PART_SeekBar");
         _previousButton = e.NameScope.Find<MdIconButton>("PART_PreviousButton");
         _rewindButton = e.NameScope.Find<MdIconButton>("PART_RewindButton");
@@ -151,18 +191,33 @@ public sealed class MdVideoPlayerControls : TemplatedControl
         if (_nextButton is not null) _nextButton.Click += OnNextClick;
         if (_muteButton is not null) _muteButton.Click += OnMuteClick;
         if (_fullScreenButton is not null) _fullScreenButton.Click += OnFullScreenClick;
+
+        _controlsPresence.Initialize(IsControlsVisible);
+        _feedbackPresence.Initialize(false);
+        if (_gestureFeedback is not null)
+            AutomationProperties.SetAccessibilityView(_gestureFeedback, AccessibilityView.Raw);
+        UpdateMotion();
+        UpdateControlVisibility(immediate: true);
         UpdateState();
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        UpdateControlVisibility(immediate: true);
         UpdateAutoHideTimer();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         _autoHideTimer.Stop();
+        _tapTimer.Stop();
+        _feedbackTimer.Stop();
+        _controlsPresence.Stop();
+        _feedbackPresence.Stop();
+        _feedbackPresence.Initialize(false);
+        _pointerPressed = false;
+        _tapPending = false;
         base.OnDetachedFromVisualTree(e);
     }
 
@@ -180,30 +235,93 @@ public sealed class MdVideoPlayerControls : TemplatedControl
 
     private void OnPointerMoved(object? sender, PointerEventArgs e)
     {
+        if (_pointerPressed && (e.GetCurrentPoint(this).Position - _pointerPressPosition).Length > TapMovementThreshold)
+            _pointerPressed = false;
         ShowControls();
         UpdateAutoHideTimer();
     }
 
     private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (!IsControlsVisible)
-        {
-            ShowControls();
-            e.Handled = true;
-            return;
-        }
+        if (!IsEnabled) return;
         if (MdMediaControlHelpers.IsInsideInteractiveControl(e.Source, this))
         {
             ShowControls();
             UpdateAutoHideTimer();
             return;
         }
-        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
-        if (IsPlaying && IsControlsVisible)
+        if (_pointerPressed || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
+
+        _pointerPressed = true;
+        _pointerPressPosition = e.GetCurrentPoint(this).Position;
+        e.Handled = true;
+    }
+
+    private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (!_pointerPressed) return;
+        _pointerPressed = false;
+        var point = e.GetCurrentPoint(this).Position;
+        if ((point - _pointerPressPosition).Length > TapMovementThreshold) return;
+
+        var now = Environment.TickCount64;
+        if (_tapPending && now - _pendingTapTimestamp <= DoubleTapWindowMilliseconds &&
+            GetTapZone(point) == GetTapZone(_pendingTapPosition))
+        {
+            _tapTimer.Stop();
+            _tapPending = false;
+            HandleDoubleTap(point);
+            e.Handled = true;
+            return;
+        }
+
+        if (_tapPending) CompletePendingSingleTap();
+        _pendingTapPosition = point;
+        _pendingTapTimestamp = now;
+        _tapPending = true;
+        _tapTimer.Stop();
+        _tapTimer.Start();
+        e.Handled = true;
+    }
+
+    private void OnTapTimerTick(object? sender, EventArgs e)
+    {
+        _tapTimer.Stop();
+        CompletePendingSingleTap();
+    }
+
+    private void CompletePendingSingleTap()
+    {
+        if (!_tapPending) return;
+        _tapPending = false;
+        if (!IsControlsVisible)
+            ShowControls();
+        else if (IsPlaying)
             SetCurrentValue(IsControlsVisibleProperty, false);
         else
             ShowControls();
-        e.Handled = true;
+    }
+
+    private void HandleDoubleTap(Point point)
+    {
+        ShowControls();
+        switch (GetTapZone(point))
+        {
+            case TapZone.Back:
+                Request(MdPlaybackRequest.Rewind);
+                break;
+            case TapZone.Forward:
+                Request(MdPlaybackRequest.Forward);
+                break;
+        }
+    }
+
+    private TapZone GetTapZone(Point point)
+    {
+        if (Bounds.Width <= 0) return TapZone.Center;
+        var fraction = point.X / Bounds.Width;
+        if (fraction < 0.35) return TapZone.Back;
+        return fraction > 0.65 ? TapZone.Forward : TapZone.Center;
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
@@ -227,7 +345,7 @@ public sealed class MdVideoPlayerControls : TemplatedControl
             SetCurrentValue(IsMutedProperty, request == MdPlaybackRequest.Mute);
         if (request is MdPlaybackRequest.EnterFullScreen or MdPlaybackRequest.ExitFullScreen)
             SetCurrentValue(IsFullScreenProperty, request == MdPlaybackRequest.EnterFullScreen);
-        MdMediaControlHelpers.RequestPlayback(this, PlaybackCommand, PlaybackRequested, request.Value);
+        Request(request.Value);
         e.Handled = true;
     }
 
@@ -253,6 +371,7 @@ public sealed class MdVideoPlayerControls : TemplatedControl
     {
         if (!IsControlsVisible)
             SetCurrentValue(IsControlsVisibleProperty, true);
+        UpdateAutoHideTimer();
     }
 
     private void UpdateState()
@@ -281,8 +400,119 @@ public sealed class MdVideoPlayerControls : TemplatedControl
         if (_muteButton is not null) _muteButton.SetCurrentValue(IsEnabledProperty, IsEnabled);
         if (_fullScreenButton is not null) _fullScreenButton.SetCurrentValue(IsEnabledProperty, IsEnabled);
         if (_busyIndicator is not null) _busyIndicator.SetCurrentValue(IsVisibleProperty, IsBuffering);
+        if (_controlsSurface is not null)
+            _controlsSurface.SetCurrentValue(IsEnabledProperty, IsEnabled && IsControlsVisible);
         AutomationProperties.SetName(this, string.IsNullOrWhiteSpace(Title) ? "Video player controls" : $"Video player controls for {Title}");
         UpdateAutoHideTimer();
+    }
+
+    private void UpdateControlVisibility(bool immediate = false)
+    {
+        if (_overlay is null || _controlsSurface is null)
+        {
+            _controlsPresence.Update(IsControlsVisible, GetEffectsDuration());
+            return;
+        }
+
+        _controlsSurface.SetCurrentValue(IsEnabledProperty, IsEnabled && IsControlsVisible);
+        _controlsSurface.IsHitTestVisible = IsControlsVisible;
+        _overlay.IsHitTestVisible = true;
+
+        if (immediate)
+        {
+            _controlsPresence.Initialize(IsControlsVisible);
+            _overlay.IsVisible = IsControlsVisible;
+            _overlay.Opacity = IsControlsVisible ? 1 : 0;
+            return;
+        }
+
+        if (IsControlsVisible)
+        {
+            var wasPresent = _controlsPresence.IsPresent;
+            _controlsPresence.Update(true, TimeSpan.Zero);
+            if (!wasPresent)
+            {
+                _overlay.Opacity = 0;
+                Dispatcher.UIThread.Post(() =>
+                {
+                    if (IsControlsVisible && _overlay is not null)
+                        _overlay.Opacity = 1;
+                }, DispatcherPriority.Render);
+            }
+            else
+            {
+                _overlay.Opacity = 1;
+            }
+        }
+        else
+        {
+            _overlay.Opacity = 0;
+            _controlsPresence.Update(false, GetEffectsDuration());
+        }
+    }
+
+    private void UpdateMotion()
+    {
+        var scheme = MdMotion.GetScheme(this);
+        PseudoClasses.Set(":reduced-motion", scheme == MdMotionScheme.Reduced);
+        PseudoClasses.Set(":no-motion", scheme == MdMotionScheme.None);
+        if (_overlay is not null)
+        {
+            _overlay.Transitions = MdMotionTransitions.Collect(
+                MdMotionTransitions.CreateDouble(this, Visual.OpacityProperty, MdMotionKind.Effects, MdMotionSpeed.Fast));
+            if (!IsControlsVisible)
+                _controlsPresence.Update(false, GetEffectsDuration());
+        }
+        if (_gestureFeedback is not null)
+        {
+            _gestureFeedback.Transitions = MdMotionTransitions.Collect(
+                MdMotionTransitions.CreateDouble(this, Visual.OpacityProperty, MdMotionKind.Effects, MdMotionSpeed.Fast));
+            if (!_feedbackTimer.IsEnabled && _feedbackPresence.IsPresent)
+                _feedbackPresence.Update(false, GetEffectsDuration());
+        }
+    }
+
+    private TimeSpan GetEffectsDuration() =>
+        MdMotion.Resolve(this, MdMotionKind.Effects, MdMotionSpeed.Fast).Duration;
+
+    private void OnFeedbackTimerTick(object? sender, EventArgs e)
+    {
+        _feedbackTimer.Stop();
+        if (_gestureFeedback is null) return;
+        _gestureFeedback.Opacity = 0;
+        _feedbackPresence.Update(false, GetEffectsDuration());
+    }
+
+    private void ShowGestureFeedback(MdPlaybackRequest request)
+    {
+        if (_gestureFeedback is null || _gestureFeedbackIcon is null || _gestureFeedbackLabel is null) return;
+
+        var (resourceKey, label) = request switch
+        {
+            MdPlaybackRequest.Play => ("Md.Icon.PlayArrow", "Play"),
+            MdPlaybackRequest.Pause => ("Md.Icon.Pause", "Pause"),
+            MdPlaybackRequest.Rewind => ("Md.Icon.Replay10", "10 sec back"),
+            MdPlaybackRequest.Forward => ("Md.Icon.Forward10", "10 sec ahead"),
+            _ => (string.Empty, string.Empty)
+        };
+        if (string.IsNullOrEmpty(resourceKey)) return;
+
+        if (Application.Current?.TryGetResource(resourceKey, ActualThemeVariant, out var glyph) == true)
+            _gestureFeedbackIcon.Glyph = glyph?.ToString();
+        _gestureFeedbackLabel.Text = label;
+
+        var wasPresent = _feedbackPresence.IsPresent;
+        _feedbackPresence.Update(true, TimeSpan.Zero);
+        if (!wasPresent) _gestureFeedback.Opacity = 0;
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (_feedbackPresence.IsPresent && _gestureFeedback is not null)
+                _gestureFeedback.Opacity = 1;
+        }, DispatcherPriority.Render);
+
+        _feedbackTimer.Stop();
+        _feedbackTimer.Interval = TimeSpan.FromMilliseconds(620);
+        _feedbackTimer.Start();
     }
 
     private void UpdatePseudoClasses() => PseudoClasses.Set(":controls-hidden", !IsControlsVisible);
@@ -319,6 +549,16 @@ public sealed class MdVideoPlayerControls : TemplatedControl
         Request(request);
     }
 
-    private void Request(MdPlaybackRequest request) =>
+    private void Request(MdPlaybackRequest request)
+    {
+        ShowGestureFeedback(request);
         MdMediaControlHelpers.RequestPlayback(this, PlaybackCommand, PlaybackRequested, request);
+    }
+
+    private enum TapZone
+    {
+        Back,
+        Center,
+        Forward
+    }
 }

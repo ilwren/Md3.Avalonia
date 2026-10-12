@@ -47,7 +47,6 @@
                                       BufferedPosition="00:00:00"
                                       IsPlaying="False"
                                       IsBuffering="False"
-                                      AutoHideControls="False"
                                       IsVisible="False"
                                       IsEnabled="False"
                                       PlaybackRequested="PlaybackRequested"
