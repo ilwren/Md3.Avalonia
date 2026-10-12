@@ -112,7 +112,10 @@
                         HorizontalAlignment="Center" VerticalAlignment="Center"
                         IsVisible="{Binding HasChildren}" IsChecked="{Binding IsExpanded}"
                         AutomationProperties.Name="Toggle children">
-            <Path Width="16" Height="16" Data="M 9,6 L 15,12 L 9,18" Stretch="Uniform"
+            <!-- This chevron's geometry bounds are 6x12. Avalonia normalizes a Path's geometry to its top-left,
+                 so a 16x16 Path leaves the fitted 8x16 stroke left of the Path's center. Match the control's
+                 1:2 bounds so the painted stroke itself is centered in the 40x40 transparent state target. -->
+            <Path Width="8" Height="16" Data="M 9,6 L 15,12 L 9,18" Stretch="Uniform"
                   HorizontalAlignment="Center" VerticalAlignment="Center"
                   Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round"
                   RenderTransformOrigin="50%,50%">
