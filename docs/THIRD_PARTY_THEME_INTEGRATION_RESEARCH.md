@@ -250,7 +250,9 @@ Markdown.Avalonia（417★）+ LiveMarkdown.Avalonia（176★）。
 .DefaultSettings.GetTheme()`，即每个进程只有一个主题。因此包公开面不是样式集合，而是配置入口
 （`LiveChartsSettings.AddMaterialTheme()` / `Theme.ApplyMaterialRules()` / `SeriesPalette(bool dark)`；
 包内没有 `Styles`、`Style`、`ControlTheme`，公开类型只有一个）。做法与上游自己的 `AddDefaultTheme` 同形：
-把规则追加在一个 `AddDefaultTheme` 之上，于是工具提示/图例工厂、动画与上游既定的几何原样保留；颜色在规则里
+把规则追加在一个 `AddDefaultTheme` 之上（平面/系列规则追加进列表；可视化元素规则走的是 `HasRuleFor<TChartElement>` 的字典，
+重复键会抛 `ArgumentException`，而上游默认主题已经占了 `BaseLabelVisual`/`BaseNeedleVisual`/`BaseAngularTicksVisual`，
+所以元素规则改为经包内 `SetRuleFor` 接管槽位），于是工具提示/图例工厂、动画与上游既定的几何原样保留；颜色在规则里
 按 `theme.IsDark` 逐次读 `Md.Sys.Color.*`（`IChartView.IsDarkMode` 由 Avalonia 视图取自应用的主题变体），
 未注册 `MaterialTheme` 时回退到包内 M3 基线值（八个调色板角色与规则直接读的七个角色都有基线，并由测试逐一对上
 核心 token）；`OnInitialized` 里写 `Colors`，`ApplyMaterialRules` 里先播一次种，读色则走包内 `SeriesColor`——它把
@@ -265,7 +267,8 @@ LiveCharts 尚未分配的槽位（`ISeries.SeriesId` 默认为 `-1`）当作第
   声明 `Avalonia >= 12.0.0`，tag/commit `65be96876e` 为 2.1.0-dev-798 同期的树），与 Tabalonia/Markdown 一样
   属于「低于 12.1.2 基线」的预发布固定。升级上游时要重读 `Themes/Theme.cs`、
   `Themes/LiveChartsStylerExtensions.cs` 与 `SkiaSharp/ThemesExtensions.cs`（`MdLiveChartsThemeTests` 钉住了
-  调色板顺序、按族规则与暗色变体只读暗色 token）。
+  调色板顺序、按族规则、暗色变体只读暗色 token，以及真实 measure 路径：用 `CoreMotionCanvas.IsTesting` 抬起渲染检查后
+  由图表测轴与上色，X 轴无分隔线、Y 轴为 `OutlineVariant`）。
 - 仍未做：`Md3.Avalonia.ScottPlot`（同一 Wave 的下一个 provider，`Plot.Palette` + 背景/网格/字体，与
   `MdChart` 同样保持 provider-neutral）。
 

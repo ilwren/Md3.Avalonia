@@ -648,7 +648,10 @@ nothing to register in `Application.Styles` and nothing that could leak into an 
 did not configure it. `MaterialLiveChartsTheme.AddMaterialTheme` is `LiveChartsSettings
 .AddDefaultTheme` with `ApplyMaterialRules` appended - the rules run after LiveCharts' own, so the
 tooltip and legend factories, the animation speed and easing, and every geometry upstream already
-decides stay exactly as they ship. An application that builds its own theme calls
+decides stay exactly as they ship. Appending is only possible for planes and series: a theme keeps
+one rule per visual-element type in a dictionary that rejects a second rule for the same type, which
+LiveCharts' default theme already registers for labels, needles and angular ticks, so those three
+take the slot over. An application that builds its own theme calls
 `ApplyMaterialRules` on it instead, and `SeriesPalette(bool dark)` hands out the same eight colours
 for a provider that takes one colour per series.
 
@@ -676,6 +679,9 @@ What the rules write, and the token each value comes from:
   rather than a border. A gauge is a `SurfaceContainerHighest` track with a `Primary` indicator -
   the shape Material's own progress ring uses.
 - Candlesticks: `Tertiary` rising and `Error` falling, replacing upstream's hardcoded green and red.
+- Visual elements: gauge labels and tick labels are painted in `OnSurfaceVariant`, and so is the
+  needle of a gauge, which keeps upstream's 20 DIP width - it is the one shape Material has no
+  counterpart for. These are the rules that take over LiveCharts' own slots rather than appending.
 - Tooltips and legends: an `InverseSurface` card with `InverseOnSurface` text and a `DropShadow`,
   the legend without a background, both typeset at `LabelLarge`. The chart's canvas is cleared to
   `Surface` so a chart inside a card blends with the card.

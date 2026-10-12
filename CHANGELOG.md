@@ -75,16 +75,19 @@
   style collection: LiveCharts has no per-control style seam, so the package's whole public surface
   is a configuration entry point - `LiveCharts.Configure(settings => settings.AddMaterialTheme())`,
   once, before the first chart view exists - and it contains no `Styles` or `ControlTheme` at all.
-  The rules are appended to LiveCharts' own default theme, so its tooltip and legend factories, its
-  animations and every geometry it already decides ship unchanged; what changes is the Material
-  part. Series take an eight-role palette (`Primary`, `Tertiary`, `Secondary`, `Error`,
+  The plane and series rules are appended to LiveCharts' own default theme, so its tooltip and
+  legend factories, its animations and every geometry it already decides ship unchanged; what
+  changes is the Material part. (The label, needle and angular-tick rules take over the one slot
+  LiveCharts keeps for each visual-element type instead - it throws when a type is registered
+  twice, which its own default theme does for those three.) Series take an eight-role palette (`Primary`, `Tertiary`, `Secondary`, `Error`,
   `PrimaryContainer`, `TertiaryContainer`, `InversePrimary`, `Outline` - the first four give a
   four-hue palette the way upstream's own does, the rest are further tones of the same hues). Axes
   use `LabelMedium`/`LabelLarge` in `OnSurfaceVariant` with an `OutlineVariant` grid at 12 DIP
   padding; a line is a 3 DIP stroke with upstream's area fill cleared and 8 DIP surface-filled
   markers ringed in the series colour; bars take a 4 DIP rounded end and 6 DIP between them while
   stacked bars stay square; pie slices are separated by the surface showing through rather than a
-  border; a gauge is a `SurfaceContainerHighest` track with a `Primary` indicator; candlesticks use
+  border; a gauge is a `SurfaceContainerHighest` track with a `Primary` indicator and a needle in
+  `OnSurfaceVariant`; candlesticks use
   `Tertiary` and `Error` instead of upstream's hardcoded green and red; tooltips and legends are
   inverse-surface cards with a shadow at `LabelLarge`, and the canvas clears to `Surface`. Every
   colour is read from `Md.Sys.Color.*` for the variant each chart draws in, so light/dark follow the

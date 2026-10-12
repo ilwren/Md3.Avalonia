@@ -16,7 +16,9 @@ using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Avalonia;
 using LiveChartsCore.SkiaSharpView.Painting;
 using LiveChartsCore.SkiaSharpView.Painting.ImageFilters;
+using LiveChartsCore.SkiaSharpView.VisualElements;
 using LiveChartsCore.Themes;
+using LiveChartsCore.VisualElements;
 using Md3.Avalonia.Themes;
 using SkiaSharp;
 using Xunit;
@@ -119,6 +121,25 @@ public class MdLiveChartsThemeTests
         Assert.NotEmpty(theme.Initialized);
         Assert.NotEmpty(theme.AxisBuilder);
         Assert.NotEmpty(theme.SeriesBuilder);
+
+        // Visual elements are built differently: a theme has one slot per element type rather than a
+        // list, and it throws when a type is registered twice - which is what LiveCharts' own default
+        // theme does for the label, needle and angular-tick rules this theme has an opinion about. So
+        // the Material rules take those slots over instead of appending to them, and this is what the
+        // chart reads back out of them.
+        var label = new LabelVisual();
+        ElementRule<BaseLabelVisual>(theme)(label);
+        Assert.Equal(Token("OnSurfaceVariant", dark: false), Assert.IsType<SolidColorPaint>(label.Paint).Color);
+
+        var needle = new NeedleVisual();
+        ElementRule<BaseNeedleVisual>(theme)(needle);
+        Assert.Equal(20d, needle.Width);
+        Assert.Equal(Token("OnSurfaceVariant", dark: false), Assert.IsType<SolidColorPaint>(needle.Fill).Color);
+
+        var ticks = new AngularTicksVisual();
+        ElementRule<BaseAngularTicksVisual>(theme)(ticks);
+        Assert.Equal(Token("OnSurfaceVariant", dark: false), Assert.IsType<SolidColorPaint>(ticks.Stroke).Color);
+        Assert.Equal(Token("OnSurfaceVariant", dark: false), Assert.IsType<SolidColorPaint>(ticks.LabelsPaint).Color);
 
         Assert.False(theme.IsDark);
         Assert.Equal(MaterialLiveChartsTheme.SeriesPalette(false), theme.Colors);
@@ -419,6 +440,10 @@ public class MdLiveChartsThemeTests
         Assert.NotNull(isTesting);
         isTesting!.SetValue(null, true);
     }
+
+    /// <summary>The one rule a theme holds for a visual element type.</summary>
+    private static Action<TChartElement> ElementRule<TChartElement>(Theme theme) =>
+        (Action<TChartElement>)theme.ChartElementElementBuilder[typeof(TChartElement)];
 
     /// <summary>Puts a series in the palette slot a chart would give it.</summary>
     private static T InSlot<T>(T series, int slot) where T : ISeries

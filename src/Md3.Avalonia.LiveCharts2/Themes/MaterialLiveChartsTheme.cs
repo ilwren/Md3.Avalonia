@@ -99,10 +99,12 @@ public static class MaterialLiveChartsTheme
     /// <remarks>
     /// <para>
     /// Use this when the application already builds a theme through <c>LiveChartsSettings.HasTheme</c>
-    /// and wants to keep the rest of that theme: rules are appended, so they run after whatever the
-    /// caller registered and win. A theme built from scratch also needs LiveCharts' tooltip and
-    /// legend factories (<c>HasDefaultTooltip</c> / <c>HasDefaultLegend</c>); the default theme that
-    /// <see cref="AddMaterialTheme"/> starts from brings them along.
+    /// and wants to keep the rest of that theme: the rules for planes and series are appended, so
+    /// they run after whatever the caller registered and win, and the rules for visual elements
+    /// (labels, needles, angular ticks) take over the one slot a theme has for each of those types.
+    /// Applying the rules twice is harmless. A theme built from scratch also needs LiveCharts'
+    /// tooltip and legend factories (<c>HasDefaultTooltip</c> / <c>HasDefaultLegend</c>); the default
+    /// theme that <see cref="AddMaterialTheme"/> starts from brings them along.
     /// </para>
     /// <para>
     /// The palette has to be in place before anything is styled, because the rules read each series'
@@ -303,11 +305,24 @@ public static class MaterialLiveChartsTheme
                 financialSeries.DownFill = new SolidColorPaint(colors.Error);
                 financialSeries.DownStroke = new SolidColorPaint(colors.Error, 3);
             })
-            .HasRuleFor<BaseLabelVisual>(label =>
+            // The visual elements sit in a different builder to the planes and series: a theme holds
+            // one rule per element type in a dictionary, and LiveCharts' own default theme - the
+            // theme AddMaterialTheme layers on - already fills the label and angular-tick slots. The
+            // rules above are appended to lists and run last; these take their slot over, which is
+            // what makes the Material rule the one that runs.
+            .SetRuleFor<BaseLabelVisual>(label =>
             {
                 label.Paint = new SolidColorPaint(new Colors(theme.IsDark).OnSurfaceVariant);
             })
-            .HasRuleFor<BaseAngularTicksVisual>(ticks =>
+            .SetRuleFor<BaseNeedleVisual>(needle =>
+            {
+                // A gauge needle is the one shape Material has no counterpart for; like every other
+                // text and line in the theme it takes the medium-emphasis ink rather than a colour
+                // of its own.
+                needle.Width = 20;
+                needle.Fill = new SolidColorPaint(new Colors(theme.IsDark).OnSurfaceVariant);
+            })
+            .SetRuleFor<BaseAngularTicksVisual>(ticks =>
             {
                 var colors = new Colors(theme.IsDark);
 
@@ -327,6 +342,20 @@ public static class MaterialLiveChartsTheme
     /// </remarks>
     public static LvcColor[] SeriesPalette(bool dark) =>
         [.. SeriesPaletteRoles.Select(role => MdLiveChartsTokens.Color(role, dark).AsLvcColor())];
+
+    /// <summary>Puts a visual-element rule in the one slot a theme has for that element type.</summary>
+    /// <remarks>
+    /// LiveCharts' <c>HasRuleFor&lt;TChartElement&gt;</c> adds to the theme's element dictionary and
+    /// throws when the type is already there, and LiveCharts' default theme registers rules for the
+    /// label, needle and angular-tick elements, so adding a Material rule for one of them means
+    /// taking the slot over. The element dictionary is keyed by type and read once per element, so the rule
+    /// that lands in the slot is still the last word - which is what the appended rules are too.
+    /// </remarks>
+    private static Theme SetRuleFor<TChartElement>(this Theme theme, Action<TChartElement> predicate)
+    {
+        theme.ChartElementElementBuilder[typeof(TChartElement)] = predicate;
+        return theme;
+    }
 
     /// <summary>Reads the palette colour a series' rule paints it with.</summary>
     /// <remarks>
