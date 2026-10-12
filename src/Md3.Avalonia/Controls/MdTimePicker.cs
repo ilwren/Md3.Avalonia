@@ -542,11 +542,8 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         // though Text already holds the new value: round-trip through an invisible trailing
         // character so the TextBlock has to build a fresh text layout and glyph run, then
         // restore the exact string on the following render pass.
-        Dispatcher.UIThread.Post(() =>
-        {
-            textBlock.Text = text + "\u200b";
-            Dispatcher.UIThread.Post(() => textBlock.Text = text, DispatcherPriority.Render);
-        }, DispatcherPriority.Render);
+        Dispatcher.UIThread.Post(() => textBlock.Text = text + "\u200b", DispatcherPriority.Render);
+        Dispatcher.UIThread.Post(() => textBlock.Text = text, DispatcherPriority.Render);
     }
 
     private ScrollViewer? _scrollAncestor;
