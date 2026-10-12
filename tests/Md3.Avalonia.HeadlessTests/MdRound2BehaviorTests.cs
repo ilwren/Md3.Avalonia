@@ -127,14 +127,13 @@ public sealed class MdRound2BehaviorTests
 
         // The height travels via a DoubleTransition; while it animates the effective Height
         // reads the animated value, so assert the wiring rather than a mid-flight number.
-        Assert.Contains(content.Transitions, transition =>
-            transition.Property == global::Avalonia.Controls.Control.HeightProperty &&
-            transition is global::Avalonia.Animation.DoubleTransition);
+        Assert.Contains(content.Transitions.OfType<global::Avalonia.Animation.DoubleTransition>(),
+            transition => transition.Property == global::Avalonia.Controls.Control.HeightProperty);
 
         expander.IsExpanded = false;
         Dispatcher.UIThread.RunJobs();
-        Assert.Contains(content.Transitions, transition =>
-            transition.Property == global::Avalonia.Controls.Control.HeightProperty);
+        Assert.Contains(content.Transitions.OfType<global::Avalonia.Animation.DoubleTransition>(),
+            transition => transition.Property == global::Avalonia.Controls.Control.HeightProperty);
     }
 
     [AvaloniaFact]
