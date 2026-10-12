@@ -51,7 +51,7 @@ public sealed class GalleryMediaPlaybackSession : IDisposable
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
         player.Stop();
-        using var media = new Media(_libVlc, filePath, FromType.FromPath, ":no-video-title-show");
+        using var media = new LibVLCSharp.Shared.Media(_libVlc, filePath, FromType.FromPath, ":no-video-title-show");
         return player.Play(media);
     }
 

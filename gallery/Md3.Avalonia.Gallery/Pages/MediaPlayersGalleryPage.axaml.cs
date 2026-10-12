@@ -639,7 +639,7 @@ public partial class MediaPlayersGalleryPage : UserControl
             {
                 Content = $"{i + 1:00}  ·  {track.Title}",
                 Variant = i == _audioIndex ? MdButtonVariant.Tonal : MdButtonVariant.Text,
-                HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Left
+                HorizontalContentAlignment = global::Avalonia.Layout.HorizontalAlignment.Left
             };
             button.Click += (_, _) =>
             {
@@ -734,8 +734,8 @@ public partial class MediaPlayersGalleryPage : UserControl
         VideoFrame.Height = isFullScreen ? PageScrollViewer.Bounds.Height : 330;
         VideoFrame.MinHeight = isFullScreen ? VideoFrame.Height : 330;
         PageScrollViewer.VerticalScrollBarVisibility = isFullScreen
-            ? Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled
-            : Avalonia.Controls.Primitives.ScrollBarVisibility.Auto;
+            ? global::Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled
+            : global::Avalonia.Controls.Primitives.ScrollBarVisibility.Auto;
 
         if (isFullScreen)
             UpdateVideoFullScreenBounds();
