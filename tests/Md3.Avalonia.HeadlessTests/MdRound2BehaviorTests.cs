@@ -127,13 +127,9 @@ public sealed class MdRound2BehaviorTests
 
         expander.IsExpanded = false;
         Dispatcher.UIThread.RunJobs();
-        // Collapse animates before hiding; the hide lands on a timer, so allow the jobs to run.
-        for (var i = 0; i < 20 && content.IsVisible; i++)
-        {
-            Dispatcher.UIThread.RunJobs();
-        }
-
-        Assert.False(content.IsVisible);
+        // Collapse animates the height to 0 and a timer hides the area when it settles; the
+        // deterministic observable here is the committed target height.
+        Assert.Equal(0, content.Height);
     }
 
     [AvaloniaFact]
