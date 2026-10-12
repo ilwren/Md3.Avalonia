@@ -1,4 +1,4 @@
-using System.Reflection;
+using BindingFlags = System.Reflection.BindingFlags;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -443,7 +443,7 @@ public sealed class MdFileExplorerTests
     private static void RaiseTouchPress(Control target, Window root)
     {
         var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Touch, isPrimary: true);
-        target.RaiseEvent(new PointerPressedEventArgs(target, pointer, root, new Avalonia.Point(8, 8), 1,
+        target.RaiseEvent(new PointerPressedEventArgs(target, pointer, root, new global::Avalonia.Point(8, 8), 1,
             PointerPointProperties.None, KeyModifiers.None));
     }
 
@@ -451,7 +451,7 @@ public sealed class MdFileExplorerTests
     {
         var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Touch, isPrimary: true);
         var pointerArgs = new PointerEventArgs(InputElement.PointerReleasedEvent, target, pointer, root,
-            new Avalonia.Point(8, 8), 2, PointerPointProperties.None, KeyModifiers.None);
+            new global::Avalonia.Point(8, 8), 2, PointerPointProperties.None, KeyModifiers.None);
         target.RaiseEvent(new TappedEventArgs(InputElement.TappedEvent, pointerArgs) { Source = target });
     }
 
@@ -459,15 +459,15 @@ public sealed class MdFileExplorerTests
     {
         var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Touch, isPrimary: true);
         var pointerArgs = new PointerEventArgs(InputElement.PointerMovedEvent, target, pointer, root,
-            new Avalonia.Point(8, 8), 3, PointerPointProperties.None, KeyModifiers.None);
+            new global::Avalonia.Point(8, 8), 3, PointerPointProperties.None, KeyModifiers.None);
         var constructor = typeof(HoldingRoutedEventArgs).GetConstructor(
             BindingFlags.Instance | BindingFlags.NonPublic,
             binder: null,
-            [typeof(HoldingState), typeof(Avalonia.Point), typeof(PointerType), typeof(PointerEventArgs)],
+            [typeof(HoldingState), typeof(global::Avalonia.Point), typeof(PointerType), typeof(PointerEventArgs)],
             modifiers: null);
         Assert.NotNull(constructor);
         var holding = (HoldingRoutedEventArgs)constructor!.Invoke(
-            [state, new Avalonia.Point(8, 8), PointerType.Touch, pointerArgs]);
+            [state, new global::Avalonia.Point(8, 8), PointerType.Touch, pointerArgs]);
         holding.Source = target;
         target.RaiseEvent(holding);
     }
