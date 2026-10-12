@@ -347,6 +347,7 @@ public sealed class MdLocalFileSystemProvider : IMdFileSystemProvider, IMdFileTh
                         var destinationName = request.NewName is null ? Path.GetFileName(source) : ValidateName(request.NewName);
                         var destination = Resolve(request.DestinationLocationId,
                             CombineRelative(request.DestinationPath, destinationName));
+                        var sourceAttributes = File.GetAttributes(source);
                         if (PathEquals(source, destination))
                         {
                             if (request.Kind == MdFileOperationKind.Move || request.ConflictPolicy == MdFileConflictPolicy.Overwrite)
@@ -359,7 +360,7 @@ public sealed class MdLocalFileSystemProvider : IMdFileSystemProvider, IMdFileTh
                         if (Directory.Exists(source) && IsPathWithin(source, destination))
                             return MdFileOperationResult.Failure("A folder cannot be copied or moved into itself or one of its descendants.");
                         if (ResolveConflict(ref destination, request.DestinationLocationId, request.ConflictPolicy,
-                                File.GetAttributes(source).HasFlag(FileAttributes.Directory), out var backup) is { } conflict)
+                                sourceAttributes.HasFlag(FileAttributes.Directory), out var backup) is { } conflict)
                             return conflict;
                         try
                         {

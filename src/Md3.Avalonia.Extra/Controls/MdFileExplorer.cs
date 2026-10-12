@@ -114,6 +114,14 @@ public sealed class MdFileExplorer : UserControl
         GlyphSelectorProperty.Changed.AddClassHandler<MdFileExplorer>((explorer, _) => explorer.UpdateGlyphSelector());
     }
 
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        if (double.IsFinite(availableSize.Width) && availableSize.Width > 0 &&
+            (availableSize.Width < CompactBreakpoint) != _isCompactLayout)
+            UpdateResponsiveLayout(availableSize.Width);
+        return base.MeasureOverride(availableSize);
+    }
+
     public MdFileExplorer()
     {
         _toolbar = new MdToolbar
@@ -661,10 +669,11 @@ public sealed class MdFileExplorer : UserControl
         if (_itemsView is not null) _itemsView.GlyphSelector = GlyphSelector;
     }
 
-    private void UpdateResponsiveLayout()
+    private void UpdateResponsiveLayout(double? availableWidth = null)
     {
         if (_mainGrid is null) return;
-        var compact = Bounds.Width > 0 && Bounds.Width < CompactBreakpoint;
+        var width = availableWidth ?? Bounds.Width;
+        var compact = width > 0 && width < CompactBreakpoint;
         if (compact != _isCompactLayout)
         {
             _isCompactLayout = compact;
