@@ -257,7 +257,7 @@ Markdown.Avalonia（417★）+ LiveMarkdown.Avalonia（176★）。
 未注册 `MaterialTheme` 时回退到包内 M3 基线值（八个调色板角色与规则直接读的七个角色都有基线，并由测试逐一对上
 核心 token）；`OnInitialized` 里写 `Colors`，`ApplyMaterialRules` 里先播一次种，读色则走包内 `SeriesColor`——它把
 LiveCharts 尚未分配的槽位（`ISeries.SeriesId` 默认为 `-1`）当作第一个槽位，所以不经过 `Setup` 直接驱动的调用方与
-测试也能用。
+测试也能用（上游自己的按族规则没有这层保护，仍要求系列已由图表分配槽位，测试里会先分配再调用）。
 调色板取八个角色（前四个与上游调色板一样凑出四种色相，后四个是同色相的更多色调）；除 Material 有主张处
 （柱 4 DIP 圆角 + 6 间隔、堆叠柱直角、折线清空面积填充、饼图 2 DIP 表面色分隔、仪表轨道 + 指示弧、K 线
 `Tertiary`/`Error`）外不动几何。

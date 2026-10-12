@@ -195,8 +195,11 @@ public class MdLiveChartsThemeTests
             Assert.Equal(Token("OnSurfaceVariant", dark: true), Assert.IsType<SolidColorPaint>(theme.LegendTextPaint).Color);
 
             // The dark palette is the one the rules paint from now: the same series under the
-            // light variant would take the light Primary, and the two are different colours.
-            var series = new LineSeries<double>();
+            // light variant would take the light Primary, and the two are different colours. The
+            // series takes a slot first, because this theme also carries LiveCharts' own rules and
+            // those read the palette without the guard the Material rules have for a series that
+            // is not in a chart yet.
+            var series = InSlot(new LineSeries<double>(), 0);
             theme.ApplyStyleToSeries(series);
             Assert.Equal(
                 MaterialLiveChartsTheme.SeriesPalette(true)[0].AsSKColor(),
