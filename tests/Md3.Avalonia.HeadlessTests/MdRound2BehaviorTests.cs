@@ -4,6 +4,7 @@ using Avalonia.VisualTree;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Motion;
 using Md3.Avalonia.Extra.Controls;
 using Xunit;
 
@@ -90,6 +91,44 @@ public sealed class MdRound2BehaviorTests
             .Single(border => border.Name == "PART_SelectionIndicator");
         Assert.True(indicator.IsVisible);
         Assert.Equal(item.Bounds.Width, indicator.Bounds.Width, 1);
+    }
+
+    [Fact]
+    public void Motion_Spring_Tokens_Match_The_M3_Generated_Values()
+    {
+        // Official M3 spring tokens (AndroidX M3 generated tokens / material-components-android):
+        // expressive spatial 0.6/800, 0.8/380, 0.8/200; standard spatial 0.9/1400, 0.9/700,
+        // 0.9/300; effects (both schemes) critically damped 3800/1600/800.
+        Assert.Equal((0.6, 800d), (MdMotionTokens.ExpressiveFastSpatial.DampingRatio, MdMotionTokens.ExpressiveFastSpatial.Stiffness));
+        Assert.Equal((0.8, 380d), (MdMotionTokens.ExpressiveDefaultSpatial.DampingRatio, MdMotionTokens.ExpressiveDefaultSpatial.Stiffness));
+        Assert.Equal((0.8, 200d), (MdMotionTokens.ExpressiveSlowSpatial.DampingRatio, MdMotionTokens.ExpressiveSlowSpatial.Stiffness));
+        Assert.Equal((0.9, 1400d), (MdMotionTokens.StandardFastSpatial.DampingRatio, MdMotionTokens.StandardFastSpatial.Stiffness));
+        Assert.Equal((0.9, 700d), (MdMotionTokens.StandardDefaultSpatial.DampingRatio, MdMotionTokens.StandardDefaultSpatial.Stiffness));
+        Assert.Equal((0.9, 300d), (MdMotionTokens.StandardSlowSpatial.DampingRatio, MdMotionTokens.StandardSlowSpatial.Stiffness));
+        Assert.Equal((1.0, 3800d), (MdMotionTokens.FastEffects.DampingRatio, MdMotionTokens.FastEffects.Stiffness));
+        Assert.Equal((1.0, 1600d), (MdMotionTokens.DefaultEffects.DampingRatio, MdMotionTokens.DefaultEffects.Stiffness));
+        Assert.Equal((1.0, 800d), (MdMotionTokens.SlowEffects.DampingRatio, MdMotionTokens.SlowEffects.Stiffness));
+
+        // Resolved durations are the springs' ~0.1% settling points; keep the tiers ordered and
+        // within a frame of the analytic values (360/440/600 expressive, 230/320/490 standard).
+        var expressiveFast = MdMotion.Resolve(MdMotionScheme.Expressive, MdMotionKind.Spatial, MdMotionSpeed.Fast);
+        var expressiveDefault = MdMotion.Resolve(MdMotionScheme.Expressive, MdMotionKind.Spatial, MdMotionSpeed.Default);
+        var expressiveSlow = MdMotion.Resolve(MdMotionScheme.Expressive, MdMotionKind.Spatial, MdMotionSpeed.Slow);
+        Assert.Equal(360, expressiveFast.Duration.TotalMilliseconds, 10);
+        Assert.Equal(440, expressiveDefault.Duration.TotalMilliseconds, 10);
+        Assert.Equal(600, expressiveSlow.Duration.TotalMilliseconds, 10);
+
+        var standardFast = MdMotion.Resolve(MdMotionScheme.Standard, MdMotionKind.Spatial, MdMotionSpeed.Fast);
+        var standardDefault = MdMotion.Resolve(MdMotionScheme.Standard, MdMotionKind.Spatial, MdMotionSpeed.Default);
+        var standardSlow = MdMotion.Resolve(MdMotionScheme.Standard, MdMotionKind.Spatial, MdMotionSpeed.Slow);
+        Assert.Equal(230, standardFast.Duration.TotalMilliseconds, 10);
+        Assert.Equal(320, standardDefault.Duration.TotalMilliseconds, 10);
+        Assert.Equal(490, standardSlow.Duration.TotalMilliseconds, 10);
+
+        // Reduced motion drops spatial travel entirely and keeps only a short effects fade.
+        var reduced = MdMotion.Resolve(MdMotionScheme.Reduced, MdMotionKind.Spatial, MdMotionSpeed.Default);
+        Assert.False(reduced.IsEnabled);
+        Assert.True(MdMotion.Resolve(MdMotionScheme.Reduced, MdMotionKind.Effects, MdMotionSpeed.Default).IsEnabled);
     }
 
     [AvaloniaFact]
