@@ -53,6 +53,7 @@
 - 追加实现：链接。`MdFencedCodeMarkdownProvider` 把正文中的 http/https 地址渲染为 `HyperlinkButton`，点击时调用注入的 `IMdLinkOpener.Open(Uri)`；控件本身不打开浏览器，桌面与移动端由应用决定。
 - 追加实现：`IMdSyntaxHighlighter` 与通用参考实现 `MdKeywordSyntaxHighlighter`，由 `MdCodeBlock.Highlighter` 使用。
 - 已解决：列表绑定到内部稳定行对象 `MdChatRow`（每条消息一行，行只更新 `Message`）。流式同一位置替换只更新行，行内气泡与行容器都保持不变（headless 测试 `Streaming_1000_Tokens_Keeps_The_Row_And_Bubble_Instances`）。添加、删除、重置时复用仍存在消息的行。
+- 测试覆盖（`MdChatPhase12Tests.cs`）：流式 1000 token 保持行与气泡实例；围栏代码块把高亮器传给每个代码块（`Fenced_Code_Gives_Each_Block_The_Configured_Highlighter`）；关键字高亮的 token 拼接等于原文（`Keyword_Highlighter_Tokens_Reproduce_The_Code_And_Classify_Parts`）；语音时长 `0:42` 与进度（`Voice_Attachment_Formats_Duration_And_Reports_Progress`）；进度夹取到 0..1（`Progress_Is_Clamped_And_Absent_Progress_Is_Zero`）；图片加载期间显示缩略图（`Thumbnail_Is_Shown_While_The_Picture_Loads`）。
 - 未实现：`MdStreamingText` 独立控件与 token 淡入（流式光标已由 `PART_Caret` 提供）；完整 Markdown 解析（表格、强调、链接）由应用的 provider 实现。
 
 ### Phase 2 — 实现状态（2026-10-11）
