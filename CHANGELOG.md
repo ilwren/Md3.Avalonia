@@ -54,8 +54,8 @@
   when the surrounding page scrolls so dial/calendar drags can no longer land offset.
 - Pickers (desktop, follow-up): measure/visual invalidation alone still left the committed
   date/time unpainted on real desktop builds (reproduced on 9b2213f). The field text is now
-  assigned directly from `DisplayText` and a zero-width-character round-trip forces the
-  TextBlock to rebuild its glyph run, so docked-calendar and dial commits repaint the field.
+  assigned directly from `DisplayText` (synchronously, without going through the template
+  binding) whenever it changes, so docked-calendar and dial commits repaint the field.
 - `MdSlider` value indicator follows the M3 rule - visible only while dragging or hovering when
   enabled, instead of permanently.
 - Gallery motion demo: spring travel adapts to the realized row width and the section clips, so

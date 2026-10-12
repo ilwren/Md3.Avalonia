@@ -532,18 +532,15 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         var textBlock = _displayTextBlock;
         if (textBlock is null) return;
         var text = DisplayText;
-        // Assign directly instead of leaning on the template binding to the read-only direct
-        // property, so the field string tracks DisplayText on every platform.
+        // Assign the committed string synchronously instead of leaning on the template binding
+        // to the read-only direct property: desktop builds were observed keeping the previous
+        // value on screen after a commit while the bound readout below was already correct.
+        // Writing the text directly and invalidating measure+render keeps the field in lockstep
+        // with DisplayText on every platform.
         if (!string.Equals(textBlock.Text, text, System.StringComparison.Ordinal)) textBlock.Text = text;
         textBlock.InvalidateMeasure();
         textBlock.InvalidateVisual();
         _anchorButton?.InvalidateVisual();
-        // Desktop builds were observed keeping the previously committed string on screen even
-        // though Text already holds the new value: round-trip through an invisible trailing
-        // character so the TextBlock has to build a fresh text layout and glyph run, then
-        // restore the exact string on the following render pass.
-        Dispatcher.UIThread.Post(() => textBlock.Text = text + "\u200b", DispatcherPriority.Render);
-        Dispatcher.UIThread.Post(() => textBlock.Text = text, DispatcherPriority.Render);
     }
 
     private ScrollViewer? _scrollAncestor;

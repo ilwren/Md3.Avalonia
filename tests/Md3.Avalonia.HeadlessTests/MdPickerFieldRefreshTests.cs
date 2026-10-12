@@ -26,14 +26,10 @@ public sealed class MdPickerFieldRefreshTests
 
         picker.SelectedDate = new DateTimeOffset(2026, 9, 22, 0, 0, 0, TimeSpan.Zero);
         Dispatcher.UIThread.RunJobs();
-        // The refresh posts a zero-width round-trip through the dispatcher; run the queue again
-        // so the field has to settle back on the exact committed string.
-        Dispatcher.UIThread.RunJobs();
 
         var field = picker.GetVisualDescendants().OfType<TextBlock>()
             .Single(text => text.Name == "PART_DisplayText");
         Assert.Equal(picker.DisplayText, field.Text);
-        Assert.DoesNotContain("\u200b", field.Text);
         Assert.Contains("2026", field.Text);
 
         // A second commit must also land on the field, not just the first one.
@@ -41,7 +37,6 @@ public sealed class MdPickerFieldRefreshTests
         Dispatcher.UIThread.RunJobs();
         Dispatcher.UIThread.RunJobs();
         Assert.Equal(picker.DisplayText, field.Text);
-        Assert.DoesNotContain("\u200b", field.Text);
         Assert.Contains("9/5", field.Text);
     }
 
@@ -60,14 +55,11 @@ public sealed class MdPickerFieldRefreshTests
         var field = picker.GetVisualDescendants().OfType<TextBlock>()
             .Single(text => text.Name == "PART_DisplayText");
         Assert.Equal(picker.DisplayText, field.Text);
-        Assert.DoesNotContain("\u200b", field.Text);
         Assert.Contains("2:30", field.Text);
 
         picker.SelectedTime = new TimeSpan(17, 30, 0);
         Dispatcher.UIThread.RunJobs();
-        Dispatcher.UIThread.RunJobs();
         Assert.Equal(picker.DisplayText, field.Text);
-        Assert.DoesNotContain("\u200b", field.Text);
         Assert.Contains("5:30", field.Text);
     }
 
