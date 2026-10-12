@@ -18,6 +18,10 @@
   modifier keys, so the chips were noise there. Gallery pages that advertise keyboard shortcuts
   (search, slidable item) adapt their copy on touch platforms too.
 
+- `MdTabs` selection indicator now spans the full tab width in both variants (per the M3 spec /
+  material-web), replacing the 24 px primary bar and the margin-inset secondary bar; secondary
+  also gets the spec's 2 px top corner radius.
+
 ### Fixed
 
 - `MdBanner` actions drop below the text automatically under the 480 dip compact breakpoint

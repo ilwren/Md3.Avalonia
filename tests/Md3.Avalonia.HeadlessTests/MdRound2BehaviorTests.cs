@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.VisualTree;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Md3.Avalonia.Controls;
@@ -66,6 +67,26 @@ public sealed class MdRound2BehaviorTests
         Assert.False(cascader.IsDropDownOpen);
         Assert.Single(cascader.Columns);
         Assert.Equal("Europe", cascader.DisplayText);
+    }
+
+    [AvaloniaFact]
+    public void Tabs_Selection_Indicator_Spans_The_Full_Tab_Width()
+    {
+        var tabs = new MdTabs { Width = 640, SelectedIndex = 1 };
+        tabs.Items.Add(new MdTabItem { Content = "Overview" });
+        tabs.Items.Add(new MdTabItem { Content = "Activity" });
+        var window = new Window { Width = 700, Height = 300, Content = tabs };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var item = Assert.IsType<MdTabItem>(tabs.Items[1]);
+        Assert.True(item.Bounds.Width > 0);
+
+        // Per-item indicator is the default renderer (UseSharedIndicator is opt-in).
+        var indicator = item.GetVisualDescendants().OfType<Avalonia.Controls.Border>()
+            .Single(border => border.Name == "PART_PrimaryIndicator");
+        Assert.True(indicator.IsVisible);
+        Assert.Equal(item.Bounds.Width, indicator.Bounds.Width, 1);
     }
 
     [AvaloniaFact]
