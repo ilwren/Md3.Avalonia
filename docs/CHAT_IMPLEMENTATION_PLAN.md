@@ -62,7 +62,8 @@
 - 偏差：没有独立的 `MdChatImageMessage` / `MdChatFileMessage` 类型，统一由 `MdChatAttachment` 与气泡模板承载。
 - 追加实现：`Thumbnail`（加载期间显示）、`Progress`（进度条）、`Duration` 与 `Waveform`（语音消息的时长与波形，`Waveform` 为以设备无关像素计的柱高）。语音播放由应用在 `AttachmentActivated` 中处理。
 - 追加实现：查看器左右键分别发出 `PreviousRequested` / `NextRequested`，由应用决定切换哪张图。
-- 未实现：`MdChatAttachment.State`；图片缓存（由 `IMdImageProvider` 实现方负责）；查看器的焦点返回（需要应用在关闭时记录触发气泡，尚未设计 API）；查看器未接入默认覆盖层（由应用在 `AttachmentActivated` 中打开）。
+- 追加实现：查看器挂载时记录当前焦点控件，卸载后把焦点还给它；应用从气泡打开查看器时，关闭后焦点回到该气泡（headless 测试 `Image_Viewer_Returns_Focus_To_The_Control_That_Opened_It`）。
+- 未实现：`MdChatAttachment.State`；图片缓存（由 `IMdImageProvider` 实现方负责）；查看器未接入默认覆盖层（由应用在 `AttachmentActivated` 中打开）。
 
 ### Phase 2 — 富媒体与图片查看器
 

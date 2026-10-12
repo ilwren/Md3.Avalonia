@@ -398,4 +398,29 @@ public sealed class MdChatPhase12Tests
         }
         finally { window.Close(); }
     }
+
+    [AvaloniaFact]
+    public void Image_Viewer_Returns_Focus_To_The_Control_That_Opened_It()
+    {
+        var trigger = new Button { Content = "open" };
+        var host = new ContentControl();
+        var window = new Window { Width = 320, Height = 320, Content = new StackPanel { Children = { trigger, host } } };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            trigger.Focus();
+            Dispatcher.UIThread.RunJobs();
+
+            host.Content = new MdImageViewer();
+            Dispatcher.UIThread.RunJobs();
+            Assert.NotSame(trigger, window.FocusManager?.GetFocusedElement());
+
+            host.Content = null;
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Same(trigger, window.FocusManager?.GetFocusedElement());
+        }
+        finally { window.Close(); }
+    }
 }

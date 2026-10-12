@@ -4,6 +4,8 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Md3.Avalonia.Localization;
 
 namespace Md3.Avalonia.Chat;
@@ -38,6 +40,8 @@ public sealed class MdImageViewer : Decorator
         SourceProperty.Changed.AddClassHandler<MdImageViewer>((viewer, _) => viewer._image.Source = viewer.Source);
         ZoomProperty.Changed.AddClassHandler<MdImageViewer>((viewer, _) => viewer.OnZoomChanged());
     }
+
+    private Control? _focusBeforeOpen;
 
     public MdImageViewer()
     {
@@ -77,6 +81,26 @@ public sealed class MdImageViewer : Decorator
         if (e.Delta.Y == 0) return;
         Zoom *= Math.Pow(1.1, e.Delta.Y);
         e.Handled = true;
+    }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        // The control that had focus when the viewer opened is the one that opened it (for example a picture bubble).
+        _focusBeforeOpen = TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() as Control;
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        var target = _focusBeforeOpen;
+        _focusBeforeOpen = null;
+        if (target is null) return;
+        // Removal moves focus away from the viewer; restoring after the tree update keeps the focus on the target.
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (target.Focusable && TopLevel.GetTopLevel(target) is not null) target.Focus();
+        });
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
