@@ -83,7 +83,7 @@ public sealed class MdRound2BehaviorTests
         Assert.True(item.Bounds.Width > 0);
 
         // Per-item indicator is the default renderer (UseSharedIndicator is opt-in).
-        var indicator = item.GetVisualDescendants().OfType<Avalonia.Controls.Border>()
+        var indicator = item.GetVisualDescendants().OfType<global::Avalonia.Controls.Border>()
             .Single(border => border.Name == "PART_PrimaryIndicator");
         Assert.True(indicator.IsVisible);
         Assert.Equal(item.Bounds.Width, indicator.Bounds.Width, 1);
