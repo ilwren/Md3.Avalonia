@@ -37,8 +37,10 @@ public sealed class MdChatPhase5Tests
     {
         for (var i = 0; i < 3; i++)
         {
+            // The same measure, arrange and run-jobs sequence the other headless layout tests use.
+            window.Measure(new Size(window.Width, window.Height));
+            window.Arrange(new Rect(0, 0, window.Width, window.Height));
             Dispatcher.UIThread.RunJobs();
-            window.LayoutManager.ExecuteLayoutPass();
         }
     }
 
