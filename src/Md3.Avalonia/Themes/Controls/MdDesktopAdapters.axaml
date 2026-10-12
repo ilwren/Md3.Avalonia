@@ -159,7 +159,7 @@
       </ControlTemplate>
     </Setter>
     <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
-    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.12" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.10" /></Style>
   </ControlTheme>
 
   <ControlTheme x:Key="MdNumericSpinnerTheme" TargetType="ButtonSpinner">

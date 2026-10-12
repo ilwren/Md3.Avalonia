@@ -34,7 +34,7 @@
       </ControlTemplate>
     </Setter>
     <Style Selector="^:pointerover /template/ Border#PART_ThumbStateLayer"><Setter Property="Opacity" Value="0.08" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
-    <Style Selector="^:pressed /template/ Border#PART_ThumbStateLayer"><Setter Property="Opacity" Value="0.12" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_ThumbStateLayer"><Setter Property="Opacity" Value="0.10" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
     <Style Selector="^:show-value:dragging /template/ Canvas#PART_ThumbValue"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
     <Style Selector="^:show-value:pointerover /template/ Canvas#PART_ThumbValue"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
     <Style Selector="^:reduced-motion /template/ Border#PART_ThumbStateLayer"><Setter Property="RenderTransform" Value="scale(1)" /></Style>

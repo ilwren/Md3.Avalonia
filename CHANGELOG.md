@@ -28,8 +28,9 @@
   24/16 handles, chip 32/8/18, FAB 56/16, dialog 280-560/28, text field 56, card 12, button 40/20,
   segmented button end radii, navigation bar height 80.
 
-- State layers normalized to the M3 table everywhere: hover 8%, focus 10%, pressed 12% (13
-  themes used 10%, one 14%), dragged 16%; chat/search hover outliers fixed.
+- State layers normalized to the M3 table everywhere: hover 8%, focus 10%, pressed 10% (28
+  themes carried the Material 2 12% value, one used 14%), dragged 16%; chat/search hover
+  outliers (4%/6%) raised to the spec 8%.
 - Light `Surface`/`Background`/`SurfaceBright` updated to the 2023 M3 baseline `#FEF7FF` (were
   the pre-2023 `#FFFBFE`), and dark `SurfaceBright` to `#36343B`; the rest of the baseline
   palette audited and confirmed.
