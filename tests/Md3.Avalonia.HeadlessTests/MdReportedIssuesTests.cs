@@ -131,6 +131,8 @@ public sealed class MdReportedIssuesTests
         var widthBeforeTap = collapsed.Bounds.Width;
         var largeWidth = containers.Max(item => item.Bounds.Width);
         Assert.InRange(widthBeforeTap, 39, 56);
+        Assert.False(carousel.IsKeyboardFocusWithin,
+            "the regression must cover the initial pointer click before the Carousel has focus");
 
         var point = collapsed.TranslatePoint(
             new Point(collapsed.Bounds.Width / 2, collapsed.Bounds.Height / 2), host.Window)!.Value;
@@ -140,6 +142,8 @@ public sealed class MdReportedIssuesTests
         Dispatcher.UIThread.RunJobs();
 
         Assert.Equal(collapsedIndex, carousel.SelectedIndex);
+        Assert.True(carousel.IsKeyboardFocusWithin,
+            "the clicked collapsed card should receive keyboard focus before it becomes the focal keyline");
         Assert.True(collapsed.Bounds.Width > widthBeforeTap + 100,
             $"the clicked small keyline stayed at {collapsed.Bounds.Width} DIP instead of expanding");
         Assert.Equal(largeWidth, collapsed.Bounds.Width, 1);

@@ -1,4 +1,4 @@
-# Build the release NuGet packages for Md3.Avalonia, Md3.Avalonia.Icons, Md3.Avalonia.Icons.Lite, Md3.Avalonia.Extra
+# Build the release NuGet packages for all six Md3.Avalonia packages.
 [CmdletBinding()]
 param(
     [string]$Output = "$PSScriptRoot/../artifacts/nuget",
@@ -19,7 +19,9 @@ $projects = @(
     (Join-Path $root "src/Md3.Avalonia/Md3.Avalonia.csproj"),
     (Join-Path $root "src/Md3.Avalonia.Icons/Md3.Avalonia.Icons.csproj"),
     (Join-Path $root "src/Md3.Avalonia.Icons.Lite/Md3.Avalonia.Icons.Lite.csproj"),
-    (Join-Path $root "src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj")
+    (Join-Path $root "src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj")
 )
 
 if ($SkipFontCheck) {

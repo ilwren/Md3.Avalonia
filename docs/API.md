@@ -1,28 +1,55 @@
 # Md3.Avalonia public API overview
 
-This document is the public entry point for the `0.4.1-preview.1` API. Preview APIs may still receive compatibility-preserving refinements before the first stable release. The NuGet package also emits `Md3.Avalonia.xml` from the source XML comments for IDE IntelliSense and API documentation generation.
+This is the public API entry point for preview version `0.4.5-preview.1`. Preview APIs may receive compatibility-preserving refinements before the first stable release. Each NuGet package also ships generated XML documentation for IDE IntelliSense.
 
 ## Install and register
 
-```xml
-<PackageReference Include="Md3.Avalonia" Version="0.4.1-preview.1" />
-<!-- Optional symbol providers (choose one): -->
-<PackageReference Include="Md3.Avalonia.Icons" Version="0.4.1-preview.1" />
-<PackageReference Include="Md3.Avalonia.Icons.Lite" Version="0.4.1-preview.1" />
-<!-- Optional clean-room third-party Flutter patterns (depends on core): -->
-<PackageReference Include="Md3.Avalonia.Extra" Version="0.4.1-preview.1" />
-<!-- Optional Material theme for Avalonia's own DataGrid; the only package that pulls in
-     Avalonia.Controls.DataGrid: -->
-<PackageReference Include="Md3.Avalonia.DataGrid" Version="0.4.1-preview.1" />
+Start with the core package:
+
+```bash
+dotnet add package Md3.Avalonia --version 0.4.5-preview.1
 ```
 
+All six packages are versioned together. Add only the optional packages your application uses; choose **one** icon provider:
+
+| NuGet package | Purpose | Theme/resource registration |
+|---|---|---|
+| `Md3.Avalonia` | Core Material 3 controls and tokens | `MaterialTheme` |
+| `Md3.Avalonia.Icons` | Full Material Symbols Rounded font and glyph catalog | Discovered automatically; no extra theme |
+| `Md3.Avalonia.Icons.Lite` | Reduced Material Symbols Rounded subset | Discovered automatically; use instead of `Icons` |
+| `Md3.Avalonia.Extra` | Optional ecosystem controls | `ExtraTheme` after `MaterialTheme` |
+| `Md3.Avalonia.DataGrid` | Material theme for Avalonia's native `DataGrid` | `MaterialDataGridTheme` |
+| `Md3.Avalonia.RichEditor` | Material theme for `AvaloniaRichEditor` | `MaterialRichEditorTheme` |
+
+For explicit project-file references, use the same version for each package:
+
 ```xml
-<Application.Styles>
-  <themes:MaterialTheme />
-</Application.Styles>
+<PackageReference Include="Md3.Avalonia" Version="0.4.5-preview.1" />
+<!-- Optional: choose one icon provider. -->
+<PackageReference Include="Md3.Avalonia.Icons" Version="0.4.5-preview.1" />
+<!-- Or: <PackageReference Include="Md3.Avalonia.Icons.Lite" Version="0.4.5-preview.1" /> -->
+<PackageReference Include="Md3.Avalonia.Extra" Version="0.4.5-preview.1" />
+<PackageReference Include="Md3.Avalonia.DataGrid" Version="0.4.5-preview.1" />
+<PackageReference Include="Md3.Avalonia.RichEditor" Version="0.4.5-preview.1" />
 ```
 
-All component themes are scoped to `Md*` types. Registering `MaterialTheme` does not replace Avalonia's built-in `Button`, `TextBox`, `ComboBox`, `ScrollViewer`, or other native themes.
+Register the core theme; register optional themes only when their packages are referenced:
+
+```xml
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:themes="using:Md3.Avalonia.Themes"
+             xmlns:extra="using:Md3.Avalonia.Extra.Themes">
+  <Application.Styles>
+    <themes:MaterialTheme />
+    <!-- Optional: -->
+    <extra:ExtraTheme />
+    <themes:MaterialDataGridTheme />
+    <themes:MaterialRichEditorTheme />
+  </Application.Styles>
+</Application>
+```
+
+All component themes are scoped to `Md*` types. Registering `MaterialTheme` does not replace Avalonia's built-in `Button`, `TextBox`, `ComboBox`, `ScrollViewer`, or other native themes. The DataGrid and rich-editor themes are opt-in and do not add those third-party controls to the core package.
 
 ## Namespaces
 
@@ -86,7 +113,7 @@ The following catalog covers the public control surface shipped by the core pack
 | **Foundations and icons** | `MdText`, `MdIcon`, `MdSymbolPresenter`, `MdStateLayer`, `MdRipplePresenter`, `MdFocusRing`, `MdScrollViewer`, `MdScrollBar`, `MdSliderThumb`, `MdWindow` |
 | **Window chrome** | `MdBorderlessWindow`, `MdWindowTitleBar`, `MdCaptionButton`, `MdWindowCaptionButton`, `MdWindowDragRegion`, `MdWindowResizeGrip`, `IMdWindowPlatformAdapter`, `MdWindowPlatformAdapterResolver`, `MdWindowsWindowPlatformAdapter`, `MdMacOsWindowPlatformAdapter`, `MdLinuxWindowPlatformAdapter`, `MdAvaloniaWindowPlatformAdapter`, `MdAndroidWindowPlatformAdapter` |
 
-Most core controls expose styled properties, bindable `Items`/`ItemsSource` where applicable, routed events, commands, and native Avalonia automation peers. Variant and option enums are part of the public API and should be preferred over string values. All 79 of them are listed with their members under [Enumerations](#enumerations).
+Most core controls expose styled properties, bindable `Items`/`ItemsSource` where applicable, routed events, commands, and native Avalonia automation peers. Variant and option enums are part of the public API and should be preferred over string values. All 81 public enums (60 core and 21 Extra) are listed with their members under [Enumerations](#enumerations).
 
 ### Core control quick reference
 
@@ -123,7 +150,30 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 
 `MdPagedItemsView.ItemTemplate` sets the presentation of each loaded record; `MdDataGrid` is a narrower surface than Avalonia `DataGrid` and is not a drop-in replacement for it.
 
-The Extra support contracts are also public: `IMdPageProvider<T>`, `MdPageRequest`, `MdPageResult<T>`, `MdAsyncRequestState`, `MdDensity`, `MdEcosystemDensity`, `MdOverlayPlacement`, `MdOverlayAlignment`, `MdShortcutBinding`, and `MdFocusReturnScope`. Data and adapter contracts include `IMdChartDataProvider`, `IMdRichEditorAdapter`, and `IMdRichEditorStateAdapter`. Supporting enums and records such as `MdCalendarSelectionMode`, `MdTransferLayoutMode`, `MdMasonryLayoutStrategy`, `MdResultKind`, `MdSkeletonShape`, `MdSpinKitKind`, `MdAnimatedTextEffect`, and `MdTimelineItemState` configure those controls.
+The Extra support contracts are also public: `IMdPageProvider<T>`, `MdPageRequest`, `MdPageResult<T>`, `MdAsyncRequestState`, `MdDensity`, `MdEcosystemDensity`, `MdOverlayPlacement`, `MdOverlayAlignment`, `MdShortcutBinding`, and `MdFocusReturnScope`. Data and adapter contracts include `IMdChartDataProvider`, `IMdRichEditorAdapter`, and `IMdRichEditorStateAdapter`. Supporting enums and records configure those controls.
+
+### Rich-text editor theme package
+
+`Md3.Avalonia.RichEditor` themes the third-party `AvaloniaRichEditor.Controls.RichEditor`; it does not replace the engine or supply an editor document. The host supplies the surface/chrome, and the application can load or export HTML through the editor API:
+
+```xml
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:rte="using:AvaloniaRichEditor.Controls">
+  <Border Padding="16" CornerRadius="12"
+          Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+          BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
+    <rte:RichEditor x:Name="Editor" Height="240" />
+  </Border>
+</UserControl>
+```
+
+```csharp
+Editor.LoadHtml("<p><b>Welcome</b> to the editor.</p>");
+string html = Editor.ToHtml();
+```
+
+Register `MaterialRichEditorTheme` after `MaterialTheme`. This is separate from `MdRichEditor` in `Md3.Avalonia.Extra`, which provides an engine-neutral command surface and expects an `IMdRichEditorAdapter`.
 
 ### Common usage patterns
 
@@ -413,9 +463,9 @@ scrollbars, and a cell editor that no longer derives from Fluent's `TextBox` the
 
 ## Trimming
 
-All six packages set `IsTrimmable` and `IsAotCompatible`, so an application that publishes with
-`PublishTrimmed=true` or `PublishAot=true` can trim them, and they build with the IL2xxx/IL3xxx
-analyzers on, so a new reflective call fails the build rather than breaking a trimmed app quietly.
+All six packages declare `IsTrimmable` and `IsAotCompatible` and build with the IL2xxx/IL3xxx analyzers enabled. This describes the library assemblies; application-owned reflection, dynamic XAML, and third-party code may still require preservation or selectors in the consuming app.
+
+The Linux x64 AOT probe publishes the desktop Gallery with `PublishAot=true`, checks that the output is a native executable without a managed Gallery assembly beside it, and smoke-runs that binary under xvfb. It reports linker diagnostics but does not claim zero diagnostics for every downstream app or validate Windows, macOS, or Android AOT.
 
 Two things in a UI library genuinely need reflection, and both are handled:
 
@@ -455,13 +505,11 @@ properties elsewhere in XAML. The selector exists so that is a choice rather tha
 discovered by assembly probing, which is annotated and degrades to the zero-width fallback glyphs
 when neither package is present.
 
-AOT is a separate question and is not claimed: these packages do not set `IsAotCompatible`.
+
 
 ## Enumerations
 
-Every public enumeration, with its members in declaration order. Generated from the sources and
-held in place by `python3 scripts/check-api-doc-coverage.py`, which fails when a public type is
-missing from this document.
+Every public enum and its members are listed below. To print the current member lists from source, run `python3 scripts/check-api-doc-coverage.py --enums`. The default coverage check fails when a public type name is missing from this document; it does not compare enum member lists, so review this table when the source enums change.
 
 ### Core (`Md3.Avalonia`) — 60 enumerations
 
@@ -528,7 +576,7 @@ missing from this document.
 | `MdWindowCapabilities` | `None` · `Move` · `Resize` · `Minimize` · `Maximize` · `Close` · `SystemMenu` · `All` |
 | `MdWindowPlatform` | `Unknown` · `Windows` · `MacOS` · `Linux` · `Android` |
 
-### Optional (`Md3.Avalonia.Extra`) — 19 enumerations
+### Optional (`Md3.Avalonia.Extra`) — 21 enumerations
 
 | Enum | Members |
 |---|---|

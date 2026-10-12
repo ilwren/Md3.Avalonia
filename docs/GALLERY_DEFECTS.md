@@ -550,12 +550,13 @@ with which variant.
 
 ### AOT
 
-**Supported, and now declared.** All six packages carry `IsAotCompatible` and the IL3xxx
-analyzers report nothing. `.github/workflows/aot-probe.yml` publishes the desktop gallery with
-`PublishAot=true`, and rather than trusting a green step it asserts the output is a native ELF
-executable with no managed assembly beside it, then runs that binary under xvfb for 25 seconds.
-Compiling proves little on its own - native AOT fails at runtime, on reflection that is not
-there - so the smoke run is the part that matters: the window stays up, which means the themes,
-the compiled XAML and the icon font all resolved.
+**Supported, and now declared.** All six packages carry `IsAotCompatible` and enable the
+trim/AOT analyzers; package builds treat warnings as errors. The AOT probe is a separate,
+platform-limited integration check: `.github/workflows/aot-probe.yml` publishes the desktop
+Gallery with `PublishAot=true`, asserts the output is a native ELF executable with no managed
+assembly beside it, and smoke-runs it under xvfb for 25 seconds. The workflow reports linker
+and trim diagnostics; a successful smoke run means the Linux x64 Gallery stays alive through
+startup, not that every code path or glyph was exercised or that diagnostics are universally zero.
 
-Not covered: Windows and macOS publishes, and Android, which uses a different runtime model.
+Not covered: Windows and macOS publishes, Android's different runtime model, or trimming/AOT
+behavior in a consuming application.

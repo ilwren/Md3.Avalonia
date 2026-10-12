@@ -1,7 +1,7 @@
 # Release validation record
 
-Version: `0.4.1-preview.1`
-Automated baseline date: 2026-10-05
+Version: `0.4.5-preview.1`
+Automated baseline date: 2026-10-12
 
 ## Automated gates
 
@@ -11,7 +11,7 @@ Automated baseline date: 2026-10-05
 | Restore | `dotnet restore Md3.Avalonia.sln` | Success |
 | Release compile | CI `Build Gallery Desktop` plus multi-platform Gallery workflow | 0 warnings, 0 errors for .NET 10 release projects |
 | Tests | `dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release` | 0 failed; no unexplained skipped tests |
-| Package | `bash scripts/build-nuget.sh` for Core, Icons, Icons.Lite, Extra, DataGrid and RichEditor | `.nupkg` and `.snupkg`; `0.4.1-preview.1` metadata/readme/notices/XML docs and one-way dependencies present |
+| Package | `bash scripts/build-nuget.sh` or `scripts/build-nuget.ps1` for Core, Icons, Icons.Lite, Extra, DataGrid and RichEditor | Six `.nupkg` and six `.snupkg`; `0.4.5-preview.1` metadata/readme/notices/XML docs and one-way dependencies present |
 | Immediate artifact cleanup | after every build/test/pack, scan and remove `bin`, `obj`, `TestResults`, DLL/PDB and packages before continuing | No generated workspace artifacts |
 | Dynamic color | golden seed vectors, arbitrary seed/variant, contrast pairs, JSON round-trip | Pass |
 | Trim analysis | CI `Build tests` with `EnableTrimAnalyzer` on all six packages | 0 IL2xxx warnings; every suppression carries a written justification |
@@ -25,9 +25,22 @@ Automated baseline date: 2026-10-05
 
 - GitHub CI builds the Desktop Gallery with warnings as errors, runs the complete xUnit v3 headless suite, emits named failure annotations, and verifies all NuGet packages.
 - The multi-platform workflow publishes Linux, Windows and macOS Desktop Gallery outputs and builds the Android APK with the .NET Android workload.
-- Independent package verification checks Core, Icons, Icons.Lite, Extra and DataGrid `0.4.1-preview.1` `.nupkg`/`.snupkg`, XML docs, README/notices and one-way dependencies. Temporary validation packages are deleted after inspection.
-- The final 0.3 preview run URL and exact test totals are recorded by GitHub Actions; release readiness requires **0 failed**. Do not copy historical 0.1 totals into this release record.
-- Android source/APK compilation is automated. Physical-device interaction is **not** inferred from compilation and remains in the unsigned matrix below.
+- Package verification covers Core, Icons, Icons.Lite, Extra, DataGrid and RichEditor at `0.4.5-preview.1`, including `.nupkg`/`.snupkg`, XML docs, README/notices and dependency direction. Temporary validation packages are deleted after inspection.
+- The 0.4.5 preview CI run must report **0 failed tests**; use its own GitHub Actions summary/TRX rather than copying historical test totals.
+- The Gallery workflow builds Linux, Windows and macOS desktop outputs and compiles/uploads the Android APK. Physical-device interaction is **not** inferred from compilation and remains in the unsigned matrix below.
+- The Linux x64 AOT probe must produce a native executable and pass its xvfb smoke run. It reports linker diagnostics and does not sign off Windows/macOS/Android AOT or consuming-app trim behavior.
+
+## Interaction regression acceptance
+
+Keep these scenarios in the headless suite; a generic focused-control drag or a layout-property assertion is not a substitute for the actual regression:
+
+- `MdReportedIssuesTests.Carousel_Clicking_A_Collapsed_Card_Makes_It_The_Focal_Keyline`: the first click on a collapsed Carousel keyline focuses and expands that card.
+- `MdDialogAndSnackbarHostTests.Gallery_Simple_Dialog_Scrim_Covers_The_Whole_Desktop_Window`: the SimpleDialog scrim spans the Gallery's entire desktop root, including the app bar and navigation rail.
+- `MdMotionLifecycleTests.Rich_Tooltip_Does_Not_Start_Hide_Delay_While_The_Anchor_Is_Hovered`: rich-tooltip hover/focus transitions do not prematurely arm dismissal; leaving both sides starts the normal grace period.
+- `MdComparisonDragTests.First_Gallery_Drag_From_An_Edge_Tracks_The_Pointer_Before_Focus_Has_Been_Established`: exercise the first drag before focus, with the Gallery ScrollViewer bringing the partly clipped control into view; desktop confirmation remains pending.
+- `MdRichEditorTreeVisualRegressionTests.RichEditor_Gallery_Starts_With_Rasterized_Sample_Content` and `TreeView_Chevron_Painted_Ink_Is_Centered_In_The_Transparent_State_Target`: verify actual rendered pixels and the chevron's rasterized-ink centroid inside its transparent state area.
+
+Picker stale-field behavior and Cascader label/dropdown clipping have headless/CI coverage, but their actual desktop appearance still requires manual confirmation. Do not infer desktop sign-off from the headless result.
 
 ## Manual platform matrix — not signed in this environment
 

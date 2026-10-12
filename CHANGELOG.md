@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+_No unreleased changes._
+
+## [0.4.5-preview.1] - 2026-10-12
+
 ### Changed
 
 - Gallery code samples auto-size to their content instead of sitting in a fixed 220 px box,
@@ -47,8 +51,9 @@
 
 ### Fixed
 
-- `MdCarousel` now promotes a clicked compact keyline to the focal item, so mouse selection on
-  desktop expands the card just as touch selection does on Android.
+- `MdCarousel` now gives focus to a clicked compact keyline and promotes it to the focal item,
+  so the first desktop click both focuses and expands the card just as touch selection does on
+  Android.
 - The Gallery's shared dialog host now overlays the entire window root, including the desktop
   app bar and navigation rail; its scrim no longer stops at the content pane.
 - Rich tooltips remain open while the pointer or keyboard focus is on either the trigger or the
@@ -97,6 +102,13 @@
 
 ### Fixed
 
+- The Gallery's third-party RichEditor now opens with a formatted HTML document instead of a
+  blank editing surface. The TreeView chevron's vector geometry now centers its painted ink—not
+  merely its `Path` control—in the 40×40 DIP transparent toggle target; raster-pixel regression
+  tests cover both visible editor content and chevron centroid.
+- `MdBeforeAfter` preserves the pointer origin on the first drag started at an edge, including the
+  Gallery's focus/scroll-into-view transition. The regression exercises that initial interaction;
+  desktop sign-off remains pending.
 - **`MdScrollViewer`'s scrollbar was wrong on the very first frame (desktop platforms; a window
   resize repaired it).** The template relied solely on `ScrollBar.AttachToScrollViewer`, whose
   self-bindings are created when the bar attaches to the visual tree; with unlucky ordering the
@@ -144,14 +156,16 @@
 - All six NuGet packages now ship the repository logo as their package icon: the root
   `logo.png` is downscaled to a 128×128 `assets/logo-128.png` and packed via `PackageIcon`
   in every package.
-- `Md3.Avalonia.Gallery.Android` removed from `Md3.Avalonia.sln`, restoring the documented
-  design: developers without the Android workload can build the solution; CI builds the Android
-  csproj directly.
+- Restored `Md3.Avalonia.Gallery.Android` to `Md3.Avalonia.sln`. The multi-platform Gallery
+  workflow builds the Android APK as well as Linux, Windows and macOS desktop outputs; physical
+  Android behavior remains a separate manual sign-off.
 - Documentation corrections: package counts updated to six (`Md3.Avalonia.RichEditor` was
   missing), `samples/Md3.Avalonia.Gallery.Android` paths corrected to `gallery/`, the stale
   `Md3.Avalonia.Themes`/`Color`/`Motion`/`tools` solution sketch in the design specification
   replaced with the real structure, the Material Symbols DoD item closed (the official TTF is
   committed and verified), and `docs/API.md` trimming section updated for `IsAotCompatible`.
+
+For details, see [`docs/RELEASE_NOTES_0.4.5-preview.1.md`](docs/RELEASE_NOTES_0.4.5-preview.1.md).
 
 ## [0.4.1-preview.1] - 2026-10-06
 
