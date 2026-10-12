@@ -194,6 +194,62 @@ public sealed class MdMotionLifecycleTests
         Assert.False(tooltip.IsPopupOpen);
     }
 
+    [AvaloniaFact]
+    public void Rich_Tooltip_Does_Not_Start_Hide_Delay_While_The_Anchor_Is_Hovered()
+    {
+        var tooltip = new MdTooltip
+        {
+            Variant = MdTooltipVariant.Rich,
+            Title = "Keyboard shortcuts",
+            Content = "Use Command K to open search.",
+            ActionContent = new MdButton { Content = "View shortcuts" }
+        };
+        var host = new MdTooltipHost
+        {
+            Width = 160,
+            Height = 56,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top,
+            Margin = new Thickness(24),
+            Tooltip = tooltip,
+            Content = new MdButton
+            {
+                Content = "Rich tooltip",
+                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch
+            }
+        };
+        MdMotion.SetScheme(host, MdMotionScheme.None);
+        var window = new Window { Width = 420, Height = 240, Content = new Grid { Children = { host } } };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            host.Show();
+            var point = host.TranslatePoint(
+                new Point(host.Bounds.Width / 2, host.Bounds.Height / 2), window);
+            Assert.NotNull(point);
+            window.MouseMove(point!.Value, RawInputModifiers.None);
+            Assert.True(host.IsPointerOver);
+
+            // Opening an interactive popup can move keyboard focus. That focus transition must
+            // not arm a hide timer while the pointer is still on the trigger.
+            host.RaiseEvent(new FocusChangedEventArgs(InputElement.LostFocusEvent));
+            Assert.True(host.IsOpen);
+            Assert.False(host.IsHideDelayPending);
+
+            // Once neither side of the rich-tooltip bridge is attended, the normal grace period
+            // is still scheduled; this is not a sticky tooltip.
+            window.MouseMove(new Point(window.ClientSize.Width - 2, window.ClientSize.Height - 2),
+                RawInputModifiers.None);
+            Assert.True(host.IsHideDelayPending);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     [Fact]
     public void Combo_And_AutoComplete_Presence_Reverses_And_Replacement_Unmounts_Old_Host()
     {

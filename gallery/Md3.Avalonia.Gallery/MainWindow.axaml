@@ -214,9 +214,10 @@
       <Border x:Name="NavigationScrim" Grid.ColumnSpan="3" ZIndex="10" IsVisible="False" Background="#66000000" PointerPressed="DismissNavigation" />
     </Grid>
 
-    <!-- Shared viewport-level modal host. Documentation pages route task dialogs here so the
-         scrim blocks the shell rather than being measured inside a long scrolling page. -->
-      <md:MdDialogHost x:Name="GlobalDialogHost" Grid.Row="1" ZIndex="100" />
     </Grid>
+
+    <!-- Shared window-level modal host. It spans both the navigation rail and ContentShell so a
+         dialog scrim covers the complete desktop client area, not only the document pane. -->
+    <md:MdDialogHost x:Name="GlobalDialogHost" Grid.ColumnSpan="2" ZIndex="100" />
   </Grid>
 </Window>

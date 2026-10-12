@@ -63,7 +63,7 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
         _presence = new MdPresenceController(SetPopupPresence);
         _presence.Initialize(IsOpen);
         _showTimer = CreateTimer(() => SetOpen(true));
-        _hideTimer = CreateTimer(() => SetOpen(false));
+        _hideTimer = CreateTimer(HideIfUnattended);
         _longPressTimer = CreateTimer(() =>
         {
             _longPressTriggered = true;
@@ -80,10 +80,14 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
         {
             _showTimer.Stop();
             if (e.Pointer.Type is PointerType.Touch or PointerType.Pen) CancelLongPress();
-            Schedule(_hideTimer, EffectiveHideDelay);
+            ScheduleHideIfUnattended();
         };
-        GotFocus += (_, _) => Schedule(_showTimer, ShowDelay);
-        LostFocus += (_, _) => Schedule(_hideTimer, EffectiveHideDelay);
+        GotFocus += (_, _) =>
+        {
+            _hideTimer.Stop();
+            Schedule(_showTimer, ShowDelay);
+        };
+        LostFocus += (_, _) => ScheduleHideIfUnattended();
         AddHandler(InputElement.PointerPressedEvent, OnPointerPressed, global::Avalonia.Interactivity.RoutingStrategies.Tunnel, handledEventsToo: true);
         AddHandler(InputElement.PointerMovedEvent, OnPointerMoved, global::Avalonia.Interactivity.RoutingStrategies.Tunnel, handledEventsToo: true);
         AddHandler(InputElement.PointerReleasedEvent, OnPointerReleased, global::Avalonia.Interactivity.RoutingStrategies.Tunnel, handledEventsToo: true);
@@ -119,6 +123,10 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
         : HideDelay;
 
     private static readonly TimeSpan RichPointerBridgeDelay = TimeSpan.FromMilliseconds(600);
+    // DispatcherTimer does not tick under headless RunJobs; expose only its state internally so
+    // the focus/hover regression can assert that an attended rich tooltip has no pending hide.
+    internal bool IsHideDelayPending => _hideTimer.IsEnabled;
+
     public TimeSpan LongPressDelay { get => GetValue(LongPressDelayProperty); set => SetValue(LongPressDelayProperty, value); }
     public bool OpenOnClick { get => GetValue(OpenOnClickProperty); set => SetValue(OpenOnClickProperty, value); }
     public TimeSpan LongPressVisibleDuration { get => GetValue(LongPressVisibleDurationProperty); set => SetValue(LongPressVisibleDurationProperty, value); }
@@ -234,17 +242,60 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
         {
             oldTooltip.PointerEntered -= TooltipPointerEntered;
             oldTooltip.PointerExited -= TooltipPointerExited;
+            oldTooltip.GotFocus -= TooltipGotFocus;
+            oldTooltip.LostFocus -= TooltipLostFocus;
         }
         if (newTooltip is not null)
         {
             newTooltip.PointerEntered += TooltipPointerEntered;
             newTooltip.PointerExited += TooltipPointerExited;
+            newTooltip.GotFocus += TooltipGotFocus;
+            newTooltip.LostFocus += TooltipLostFocus;
             newTooltip.SetCurrentValue(MdTooltip.IsOpenProperty, IsOpen);
         }
     }
 
-    private void TooltipPointerEntered(object? sender, PointerEventArgs e) => _hideTimer.Stop();
-    private void TooltipPointerExited(object? sender, PointerEventArgs e) => Schedule(_hideTimer, EffectiveHideDelay);
+    private void TooltipPointerEntered(object? sender, PointerEventArgs e)
+    {
+        if (e.Pointer.Type != PointerType.Mouse) return;
+        _hideTimer.Stop();
+    }
+
+    private void TooltipPointerExited(object? sender, PointerEventArgs e)
+    {
+        ScheduleHideIfUnattended();
+    }
+
+    private void TooltipGotFocus(object? sender, FocusChangedEventArgs e) =>
+        _hideTimer.Stop();
+
+    private void TooltipLostFocus(object? sender, FocusChangedEventArgs e) =>
+        ScheduleHideIfUnattended();
+
+    private bool HasPointerOrKeyboardPresence =>
+        IsPointerOver ||
+        Tooltip?.IsPointerOver == true ||
+        IsKeyboardFocusWithin ||
+        Tooltip?.IsKeyboardFocusWithin == true;
+
+    private void ScheduleHideIfUnattended()
+    {
+        if (HasPointerOrKeyboardPresence)
+        {
+            _hideTimer.Stop();
+            return;
+        }
+
+        _showTimer.Stop();
+        Schedule(_hideTimer, EffectiveHideDelay);
+    }
+
+    private void HideIfUnattended()
+    {
+        // Pointer/focus transitions across the PopupRoot and the anchor can arrive in either
+        // order. Re-check at the deadline as well, so a stale exit cannot dismiss a hovered tip.
+        if (!HasPointerOrKeyboardPresence) SetOpen(false);
+    }
 
     private void SetOpen(bool value) => SetCurrentValue(IsOpenProperty, value);
 
@@ -260,6 +311,8 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
     {
         if (IsOpen)
         {
+            _showTimer.Stop();
+            _hideTimer.Stop();
             _presence.Update(true, TimeSpan.Zero);
             Tooltip?.SetCurrentValue(MdTooltip.IsOpenProperty, true);
             PseudoClasses.Set(":open", true);
@@ -267,6 +320,8 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
         }
         else
         {
+            _showTimer.Stop();
+            _hideTimer.Stop();
             Tooltip?.SetCurrentValue(MdTooltip.IsOpenProperty, false);
             PseudoClasses.Set(":open", false);
             PseudoClasses.Set(":closed", true);

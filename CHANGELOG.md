@@ -41,12 +41,19 @@
   side-by-side squeeze on phones.
 - `MdSettingsExpander` now animates expand/collapse (spring height transition, chevron
   rotation transition) instead of popping.
-- Gallery: dialog demos host at the page root so the scrim covers the whole viewport; the
+- Gallery: dialog demos use shared/root-level hosts rather than a fixed-height demo panel; the
   adaptive suite clamps its medium/expanded presets to the visible width on phones and the
   expanded preset can finally reach 1040 dp.
 
 ### Fixed
 
+- `MdCarousel` now promotes a clicked compact keyline to the focal item, so mouse selection on
+  desktop expands the card just as touch selection does on Android.
+- The Gallery's shared dialog host now overlays the entire window root, including the desktop
+  app bar and navigation rail; its scrim no longer stops at the content pane.
+- Rich tooltips remain open while the pointer or keyboard focus is on either the trigger or the
+  tooltip surface. A focus transition can no longer re-arm the exit timer during hover, and the
+  timer rechecks presence before dismissing.
 - `MdBanner` actions drop below the text automatically under the 480 dip compact breakpoint
   (Android squeezed the wrapped text into a sliver); `ForceActionsBelow` still wins.
 - Pickers: the anchor field now force-invalidates when `DisplayText` changes (desktop could
