@@ -84,10 +84,11 @@ public sealed class MdRound2BehaviorTests
         Assert.True(item.IsSelected);
         Assert.True(item.Bounds.Width > 0);
 
-        // Per-item indicator is the default renderer (UseSharedIndicator is opt-in); M3 wants it
-        // to span the whole tab, not a centered 24 px bar.
-        var indicator = item.GetVisualDescendants().OfType<global::Avalonia.Controls.Border>()
-            .Single(border => border.Name == "PART_PrimaryIndicator");
+        // MdTabs switches its items to the shared strip indicator; M3 wants that bar to span
+        // the whole tab, not the old centered 24 px stub.
+        var indicator = tabs.GetVisualDescendants().OfType<global::Avalonia.Controls.Border>()
+            .Single(border => border.Name == "PART_SelectionIndicator");
+        Assert.True(indicator.IsVisible);
         Assert.Equal(item.Bounds.Width, indicator.Bounds.Width, 1);
     }
 
