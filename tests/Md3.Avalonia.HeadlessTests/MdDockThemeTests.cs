@@ -39,10 +39,11 @@ public class MdDockThemeTests
         // Dock.Avalonia.Themes.Fluent dictionaries by avares URI and adds its own accents, so the
         // implicit themes for Dock's controls have to be reachable from this theme alone, with no
         // DockFluentTheme anywhere.
-        using var window = Show(new TextBlock());
-        var variant = Application.Current!.ActualThemeVariant;
+        using var scope = Show(new TextBlock());
+        var window = scope.Window;
+        var variant = window.ActualThemeVariant;
         Assert.DoesNotContain(window.Styles, style => style.GetType().Name == "DockFluentTheme");
-        Assert.DoesNotContain(Application.Current.Styles, style => style.GetType().Name == "DockFluentTheme");
+        Assert.DoesNotContain(Application.Current!.Styles, style => style.GetType().Name == "DockFluentTheme");
 
         foreach (var type in new[]
                  {
@@ -62,7 +63,8 @@ public class MdDockThemeTests
         // Dock's five DockApplicationAccent* brushes used to be #007ACC and friends, and every
         // tab, surface, border and chrome key was an alias of one of them. The package rewrites
         // those values into Md.Sys.Color tokens, so light and dark come from the Material theme.
-        using var window = Show(new TextBlock());
+        using var scope = Show(new TextBlock());
+        var window = scope.Window;
         Assert.NotEqual(Color.Parse("#007ACC"), ColorOf(Brush(window, "DockApplicationAccentBrushLow")));
 
         Assert.Equal(ColorOf(Brush(window, "Md.Sys.Color.Primary.Brush")),
@@ -106,7 +108,7 @@ public class MdDockThemeTests
     public void The_Dock_Control_Builds_A_Layout_With_The_Material_Theme()
     {
         var dock = NewDock();
-        using var window = Show(dock);
+        using var scope = Show(dock);
 
         Assert.NotNull(dock.Layout);
         var center = dock.Layout!.VisibleDockables!.OfType<ProportionalDock>().Single();
@@ -143,7 +145,8 @@ public class MdDockThemeTests
         }
 
         var button = new Button { Content = "plain" };
-        using var window = Show(button);
+        using var scope = Show(button);
+        var window = scope.Window;
         foreach (var native in new[] { typeof(TextBox), typeof(ScrollViewer), typeof(ListBox), typeof(ToggleButton) })
         {
             Assert.False(window.TryGetResource(native, variant, out _), native.Name);
@@ -226,13 +229,20 @@ public class MdDockThemeTests
     /// Shows <paramref name="content"/> in a window that carries the Dock theme in its own styles,
     /// the same scoping the gallery's Docking page uses.
     /// </summary>
-    private static Window Show(Control content, bool dockTheme = true)
+    private static Scope Show(Control content, bool dockTheme = true)
     {
         var window = new Window { Content = content };
         if (dockTheme) window.Styles.Add(new MaterialDockTheme());
         window.Show();
         Dispatcher.UIThread.RunJobs();
-        return window;
+        return new Scope(window);
+    }
+
+    private sealed class Scope(Window window) : IDisposable
+    {
+        public Window Window { get; } = window;
+
+        public void Dispose() => Window.Close();
     }
 
     private static IBrush Brush(IResourceHost host, string key)
