@@ -80,30 +80,51 @@ public class MdTabaloniaThemeTests
     public void The_Tab_Strip_Renders_Material_Tab_Containers()
     {
         var tabs = Tabs("Overview", "Tokens");
-        var strip = new TabsControl { Width = 420, Height = 200, ItemsSource = tabs, TabItemWidth = 160, ItemTemplate = TabLabel };
+        var strip = new TabsControl
+        {
+            Width = 420,
+            Height = 200,
+            ItemsSource = tabs,
+            TabItemWidth = 160,
+            ItemTemplate = TabLabel
+        };
+        // TabsControl leaves the first tab unselected, so pick one: the assertions below are about
+        // the two roles, not about which container happens to start as selected.
+        strip.SelectedIndex = 0;
         using var scope = Show(strip);
         Layout(scope.Window, strip);
 
-        var containers = new[] { Container(strip, 0), Container(strip, 1) };
+        var selected = Container(strip, 0);
+        var idle = Container(strip, 1);
 
-        // These values come from this package's accents. Tabalonia's own Custom theme would leave the
-        // containers on whatever TabsControl has (no Material role and no state layer) instead.
-        Assert.All(containers, item =>
+        // Both containers are the same 32 DIP, 4 DIP-cornered box that upstream's template draws.
+        Assert.All(new[] { selected, idle }, container =>
         {
-            Assert.Equal(32d, item.Height);
-            Assert.Equal(new CornerRadius(4, 4, 0, 0), item.CornerRadius);
-            Assert.Equal(ColorOf(Token("Md.Sys.Color.OnSurfaceVariant.Brush")), ColorOf(item.Foreground!));
-            Assert.Equal(Colors.Transparent, ColorOf(item.Background!));
+            Assert.Equal(32d, container.Height);
+            Assert.Equal(new CornerRadius(4, 4, 0, 0), container.CornerRadius);
         });
 
-        // Selecting the second tab turns it into a Primary container and swaps the label ink to
-        // OnPrimary, which the template applies as an inherited TextBlock.Foreground on the container.
+        // The idle one is an onSurfaceVariant label on the transparent strip, so the surface shows
+        // through; the selected one is a filled Primary container. Those two roles come from this
+        // package's accents - upstream's own Custom theme would leave the containers square, grey and
+        // without a state layer instead.
+        Assert.Equal(Colors.Transparent, ColorOf(idle.Background!));
+        Assert.Equal(ColorOf(Token("Md.Sys.Color.OnSurfaceVariant.Brush")), ColorOf(idle.Foreground!));
+        Assert.Equal(ColorOf(Token("Md.Sys.Color.Primary.Brush")), ColorOf(selected.Background!));
+        Assert.Equal(ColorOf(Token("Md.Sys.Color.OnPrimary.Brush")), ColorOf(selected.Foreground!));
+
+        // The label is what the reader sees: the template renders it through a ContentPresenter, so
+        // it inherits the container's ink rather than setting one of its own.
+        Assert.Equal(ColorOf(Token("Md.Sys.Color.OnPrimary.Brush")), ColorOf(Label(selected, "Overview").Foreground!));
+
+        // Moving the selection swaps the two roles.
         strip.SelectedIndex = 1;
         Dispatcher.UIThread.RunJobs();
 
-        Assert.Equal(ColorOf(Token("Md.Sys.Color.Primary.Brush")), ColorOf(containers[1].Background!));
-        Assert.Equal(ColorOf(Token("Md.Sys.Color.OnPrimary.Brush")), ColorOf(Label(containers[1], "Tokens").Foreground!));
-        Assert.Equal(ColorOf(Token("Md.Sys.Color.OnSurfaceVariant.Brush")), ColorOf(Label(containers[0], "Overview").Foreground!));
+        Assert.Equal(Colors.Transparent, ColorOf(selected.Background!));
+        Assert.Equal(ColorOf(Token("Md.Sys.Color.OnSurfaceVariant.Brush")), ColorOf(selected.Foreground!));
+        Assert.Equal(ColorOf(Token("Md.Sys.Color.Primary.Brush")), ColorOf(idle.Background!));
+        Assert.Equal(ColorOf(Token("Md.Sys.Color.OnPrimary.Brush")), ColorOf(Label(idle, "Tokens").Foreground!));
     }
 
     [AvaloniaFact]
@@ -119,6 +140,7 @@ public class MdTabaloniaThemeTests
             ItemTemplate = TabLabel,
             NewItemFactory = () => new DemoTab($"Tab {tabs.Count + 1}", DemoTab.DefaultBody)
         };
+        strip.SelectedIndex = 0;
         using var scope = Show(strip);
         Layout(scope.Window, strip);
 
@@ -162,10 +184,11 @@ public class MdTabaloniaThemeTests
             Assert.False(Application.Current.TryGetResource(native, variant, out _), native.Name);
         }
 
+        // Tabalonia's two button styles are opt-in classes, so a plain Button never wears them.
         var plainButton = new Button { Content = "plain" };
         using var scope = Show(plainButton);
-        Assert.False(plainButton.Classes.Contains("CloseItemButtonStyle"));
-        Assert.False(plainButton.Classes.Contains("AddItemCommandButtonStyle"));
+        Assert.DoesNotContain("CloseItemButtonStyle", plainButton.Classes);
+        Assert.DoesNotContain("AddItemCommandButtonStyle", plainButton.Classes);
     }
 
     /// <summary>The strip mutates ItemsSource, so the collection has to implement IList.</summary>

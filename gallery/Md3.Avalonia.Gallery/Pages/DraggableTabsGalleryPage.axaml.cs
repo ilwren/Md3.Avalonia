@@ -18,6 +18,11 @@ public partial class DraggableTabsGalleryPage : UserControl
         MainTabs.ItemsSource = _tabs;
         MainTabs.NewItemFactory = () => new DemoTab($"Tab {_tabs.Count + 1}", "Added from the strip's own add button.");
         PinnedTabs.ItemsSource = _pinnedTabs;
+
+        // TabsControl does not select anything by itself, and a strip with nothing selected shows an
+        // empty content host.
+        MainTabs.SelectedIndex = 0;
+        PinnedTabs.SelectedIndex = 0;
     }
 
     // The same command the strip's own add button invokes, so the demo button and the built-in one
