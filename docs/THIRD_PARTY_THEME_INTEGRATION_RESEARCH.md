@@ -252,8 +252,10 @@ Markdown.Avalonia（417★）+ LiveMarkdown.Avalonia（176★）。
 包内没有 `Styles`、`Style`、`ControlTheme`，公开类型只有一个）。做法与上游自己的 `AddDefaultTheme` 同形：
 把规则追加在一个 `AddDefaultTheme` 之上，于是工具提示/图例工厂、动画与上游既定的几何原样保留；颜色在规则里
 按 `theme.IsDark` 逐次读 `Md.Sys.Color.*`（`IChartView.IsDarkMode` 由 Avalonia 视图取自应用的主题变体），
-未注册 `MaterialTheme` 时回退到包内 M3 基线值；`OnInitialized` 里写 `Colors`（`GetSeriesColor` 会除以它的长度，
-默认是空数组）并在 `ApplyMaterialRules` 里先播一次种，好让不经过 `Setup` 直接驱动的调用方/测试也能用。
+未注册 `MaterialTheme` 时回退到包内 M3 基线值（八个调色板角色与规则直接读的七个角色都有基线，并由测试逐一对上
+核心 token）；`OnInitialized` 里写 `Colors`，`ApplyMaterialRules` 里先播一次种，读色则走包内 `SeriesColor`——它把
+LiveCharts 尚未分配的槽位（`ISeries.SeriesId` 默认为 `-1`）当作第一个槽位，所以不经过 `Setup` 直接驱动的调用方与
+测试也能用。
 调色板取八个角色（前四个与上游调色板一样凑出四种色相，后四个是同色相的更多色调）；除 Material 有主张处
 （柱 4 DIP 圆角 + 6 间隔、堆叠柱直角、折线清空面积填充、饼图 2 DIP 表面色分隔、仪表轨道 + 指示弧、K 线
 `Tertiary`/`Error`）外不动几何。

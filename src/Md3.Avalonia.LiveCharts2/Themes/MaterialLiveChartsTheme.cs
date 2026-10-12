@@ -117,8 +117,8 @@ public static class MaterialLiveChartsTheme
 
         // LiveCharts sets a theme up - which is what runs the callback below - before it styles the
         // first axis or series, so the palette is in place by then. Seeding it here as well keeps the
-        // rules usable on a theme that is styled without ever being set up (a caller driving
-        // ApplyStyleToSeries itself, or a test): GetSeriesColor divides by the palette's length.
+        // rules usable on a theme that is styled without ever being set up, which is what a caller
+        // driving ApplyStyleToSeries itself - or a test - does.
         theme.Colors = SeriesPalette(theme.IsDark);
 
         return theme
@@ -159,13 +159,14 @@ public static class MaterialLiveChartsTheme
                 axis.ShowSeparatorLines = true;
 
                 // Grid lines are the same OutlineVariant rule the rest of the theme draws with.
-                // Only a cartesian plane's horizontal lines are drawn, as upstream does; a polar
-                // plane gets the full grid.
+                // A cartesian plane keeps upstream's geometry - the chart decides the axis'
+                // orientation when it measures it, and only the non-X axes draw separators - while
+                // a polar plane gets the full grid.
                 if (axis is ICartesianAxis cartesian)
                 {
-                    axis.SeparatorsPaint = cartesian.Orientation == AxisOrientation.Y
-                        ? new SolidColorPaint(colors.OutlineVariant)
-                        : null;
+                    axis.SeparatorsPaint = cartesian.Orientation == AxisOrientation.X
+                        ? null
+                        : new SolidColorPaint(colors.OutlineVariant);
                     cartesian.Padding = new Padding(12);
                 }
                 else
@@ -186,7 +187,7 @@ public static class MaterialLiveChartsTheme
             .HasRuleForLineSeries(lineSeries =>
             {
                 var colors = new Colors(theme.IsDark);
-                var color = theme.GetSeriesColor(lineSeries).AsSKColor();
+                var color = SeriesColor(theme, lineSeries);
 
                 // A Material line chart is a stroke with data points, so upstream's area fill is
                 // cleared - set Fill yourself for an area chart. The markers are the series colour
@@ -203,14 +204,14 @@ public static class MaterialLiveChartsTheme
             .HasRuleForStepLineSeries(stepLineSeries =>
             {
                 // A step line is the same statement as a line, drawn square.
-                stepLineSeries.Stroke = new SolidColorPaint(theme.GetSeriesColor(stepLineSeries).AsSKColor(), 3);
+                stepLineSeries.Stroke = new SolidColorPaint(SeriesColor(theme, stepLineSeries), 3);
                 stepLineSeries.Fill = null;
             })
             .HasRuleForStackedLineSeries(stackedLineSeries =>
             {
                 // A stacked area is read as one filled shape, so it keeps its fill; the markers go
                 // away, because a stack of markers is noise rather than data.
-                stackedLineSeries.Stroke = new SolidColorPaint(theme.GetSeriesColor(stackedLineSeries).AsSKColor(), 3);
+                stackedLineSeries.Stroke = new SolidColorPaint(SeriesColor(theme, stackedLineSeries), 3);
                 stackedLineSeries.GeometrySize = 0;
             })
             .HasRuleForBarSeries(barSeries =>
@@ -218,7 +219,7 @@ public static class MaterialLiveChartsTheme
                 var colors = new Colors(theme.IsDark);
 
                 barSeries.Stroke = null;
-                barSeries.Fill = new SolidColorPaint(theme.GetSeriesColor(barSeries).AsSKColor());
+                barSeries.Fill = new SolidColorPaint(SeriesColor(theme, barSeries));
 
                 // Material bars grow with a 4 DIP rounded end and sit further apart than upstream's
                 // default, which sets a bar's own width per unit rather than a gap between bars.
@@ -240,14 +241,14 @@ public static class MaterialLiveChartsTheme
             {
                 // A stacked bar is one column made of segments, so the segments keep square corners.
                 stackedBarSeries.Stroke = null;
-                stackedBarSeries.Fill = new SolidColorPaint(theme.GetSeriesColor(stackedBarSeries).AsSKColor());
+                stackedBarSeries.Fill = new SolidColorPaint(SeriesColor(theme, stackedBarSeries));
                 stackedBarSeries.Rx = 0;
                 stackedBarSeries.Ry = 0;
             })
             .HasRuleForStackedColumnSeries(stackedColumnSeries =>
             {
                 stackedColumnSeries.Stroke = null;
-                stackedColumnSeries.Fill = new SolidColorPaint(theme.GetSeriesColor(stackedColumnSeries).AsSKColor());
+                stackedColumnSeries.Fill = new SolidColorPaint(SeriesColor(theme, stackedColumnSeries));
                 stackedColumnSeries.Rx = 0;
                 stackedColumnSeries.Ry = 0;
             })
@@ -258,7 +259,7 @@ public static class MaterialLiveChartsTheme
                 // Slices are separated by the surface showing through, which is how M3 draws
                 // adjacent segments - the ring is the surface, not a border.
                 pieSeries.Stroke = new SolidColorPaint(colors.Surface, 2);
-                pieSeries.Fill = new SolidColorPaint(theme.GetSeriesColor(pieSeries).AsSKColor());
+                pieSeries.Fill = new SolidColorPaint(SeriesColor(theme, pieSeries));
 
                 if (pieSeries.ShowDataLabels)
                 {
@@ -285,7 +286,7 @@ public static class MaterialLiveChartsTheme
                 var colors = new Colors(theme.IsDark);
 
                 scatterSeries.Stroke = null;
-                scatterSeries.Fill = new SolidColorPaint(theme.GetSeriesColor(scatterSeries).AsSKColor());
+                scatterSeries.Fill = new SolidColorPaint(SeriesColor(theme, scatterSeries));
 
                 if (scatterSeries.ShowError)
                     scatterSeries.ErrorPaint = new SolidColorPaint(colors.OnSurfaceVariant);
@@ -326,6 +327,18 @@ public static class MaterialLiveChartsTheme
     /// </remarks>
     public static LvcColor[] SeriesPalette(bool dark) =>
         [.. SeriesPaletteRoles.Select(role => MdLiveChartsTokens.Color(role, dark).AsLvcColor())];
+
+    /// <summary>Reads the palette colour a series' rule paints it with.</summary>
+    /// <remarks>
+    /// LiveCharts gives a series its slot when a chart adds it and leaves it at -1 until then, so a
+    /// series styled on its own - which is what <see cref="ApplyMaterialRules"/> supports - takes the
+    /// first slot instead of rolling a negative index into the array.
+    /// </remarks>
+    private static SKColor SeriesColor(Theme theme, ISeries series)
+    {
+        var palette = theme.Colors.Length == 0 ? SeriesPalette(theme.IsDark) : theme.Colors;
+        return palette[(series.SeriesId < 0 ? 0 : series.SeriesId) % palette.Length].AsSKColor();
+    }
 
     /// <summary>The tokens the rules read, resolved once per rule.</summary>
     private readonly struct Colors

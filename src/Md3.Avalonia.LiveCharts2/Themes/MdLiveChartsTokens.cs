@@ -28,12 +28,12 @@ internal static class MdLiveChartsTokens
         ["Tertiary"] = ("#7D5260", "#EFB8C8"),
         ["TertiaryContainer"] = ("#FFD8E4", "#633B48"),
         ["InversePrimary"] = ("#D0BCFF", "#6750A4"),
+        ["Outline"] = ("#79747E", "#938F99"),
         ["Error"] = ("#B3261E", "#F2B8B5"),
         ["Surface"] = ("#FFFBFE", "#141218"),
         ["SurfaceContainerHighest"] = ("#E6E0E9", "#36343B"),
         ["InverseSurface"] = ("#322F35", "#E6E0E9"),
         ["InverseOnSurface"] = ("#F5EFF7", "#322F35"),
-        ["OnSurface"] = ("#1D1B20", "#E6E0E9"),
         ["OnSurfaceVariant"] = ("#49454F", "#CAC4D0"),
         ["OutlineVariant"] = ("#CAC4D0", "#49454F"),
     };
