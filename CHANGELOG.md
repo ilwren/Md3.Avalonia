@@ -67,7 +67,30 @@
   two hairlines, table cells get 10/6 DIP padding instead of 2, and the `Error` marker on an
   unhandled `:::` container is a 3 DIP frame. It is the only package that pulls in
   `Markdown.Avalonia.Tight` (whose assembly is `Markdown.Avalonia`), bringing the set to eleven.
-- **Native AOT.** All eleven packages declare `IsAotCompatible` and build with the IL3xxx analyzers
+- **`Md3.Avalonia.LiveCharts2`**, an opt-in Material Design 3 theme for
+  [LiveCharts2](https://github.com/Live-Charts/LiveCharts2) charts. It is the only package that
+  pulls in `LiveChartsCore.SkiaSharpView.Avalonia` (pinned at `2.1.0-dev-798`, the Avalonia 12 line;
+  the stable `2.0.x` line is the Avalonia 11 build and does not load against Avalonia 12), bringing
+  the set to twelve. It is also the only Material theme in the repository that is *not* an Avalonia
+  style collection: LiveCharts has no per-control style seam, so the package's whole public surface
+  is a configuration entry point - `LiveCharts.Configure(settings => settings.AddMaterialTheme())`,
+  once, before the first chart view exists - and it contains no `Styles` or `ControlTheme` at all.
+  The rules are appended to LiveCharts' own default theme, so its tooltip and legend factories, its
+  animations and every geometry it already decides ship unchanged; what changes is the Material
+  part. Series take an eight-role palette (`Primary`, `Tertiary`, `Secondary`, `Error`,
+  `PrimaryContainer`, `TertiaryContainer`, `InversePrimary`, `Outline` - the first four give a
+  four-hue palette the way upstream's own does, the rest are further tones of the same hues). Axes
+  use `LabelMedium`/`LabelLarge` in `OnSurfaceVariant` with an `OutlineVariant` grid at 12 DIP
+  padding; a line is a 3 DIP stroke with upstream's area fill cleared and 8 DIP surface-filled
+  markers ringed in the series colour; bars take a 4 DIP rounded end and 6 DIP between them while
+  stacked bars stay square; pie slices are separated by the surface showing through rather than a
+  border; a gauge is a `SurfaceContainerHighest` track with a `Primary` indicator; candlesticks use
+  `Tertiary` and `Error` instead of upstream's hardcoded green and red; tooltips and legends are
+  inverse-surface cards with a shadow at `LabelLarge`, and the canvas clears to `Surface`. Every
+  colour is read from `Md.Sys.Color.*` for the variant each chart draws in, so light/dark follow the
+  application, and an application that does not register `MaterialTheme` gets the M3 baseline values
+  the package carries. `MdChart` in the core package stays provider neutral.
+- **Native AOT.** All twelve packages declare `IsAotCompatible` and build with the IL3xxx analyzers
   on alongside the existing IL2xxx trimming ones. `.github/workflows/aot-probe.yml` publishes the
   desktop gallery with `PublishAot=true` and does not accept a green step as the answer: it
   asserts the output is a native ELF executable with no managed assembly beside it, then runs that

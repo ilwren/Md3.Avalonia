@@ -95,6 +95,7 @@ public sealed class MdGalleryTests
             new DockGalleryPage(),
             new DraggableTabsGalleryPage(),
             new MarkdownGalleryPage(),
+            new LiveChartsGalleryPage(),
             new MasonryPanelGalleryPage(),
             new PagedItemsGalleryPage(),
             new AsyncSelectGalleryPage(),

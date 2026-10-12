@@ -123,7 +123,33 @@ surface，调用方仍可覆盖。
   卡片、8 圆角与 12/10 内边距（取代上游上下两条细线），表格单元格内边距 10/6（上游为 2），未处理
   `:::` 容器的 `Error` 标记为 3 宽边框。它不引用 `SyntaxHigh` 插件（代码块是 Tight 的普通 `TextBlock`）；应用若自行再加该插件，需要自己补它的 appendix 样式
   （`avedit|TextEditor`/`Label.LangInfo`/`Button.CopyButton`），因为插件只为上游具名集合注入这些样式。
-- **原生 AOT 已验证可用。** 十一个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
+- **`Md3.Avalonia.LiveCharts2`** —— [LiveCharts2](https://github.com/Live-Charts/LiveCharts2) 图表的
+  Material Design 3 主题，opt-in，唯一引入 `LiveChartsCore.SkiaSharpView.Avalonia` 依赖的包，包总数到十二个。
+  它也是仓库里唯一**完全不是 Avalonia 样式集合**的 Material 主题：包内没有任何 `Styles` 或 `ControlTheme`，
+  因此不可能泄漏进没配置过它的应用。这不是取舍而是上游的接缝——LiveCharts 没有针对单个控件的样式，
+  每张图的外观都来自 `LiveCharts.DefaultSettings` 里那唯一一个 `Theme`，所以包的公开面就是一个配置入口：
+  启动时、在第一个图表控件出现之前 `LiveCharts.Configure(settings => settings.AddMaterialTheme());`
+  （`AddMaterialTheme` = 上游 `AddDefaultTheme` + `ApplyMaterialRules`，规则追加在其后，因此上游的工具提示与
+  图例工厂、动画与既定的几何全部原样保留；应用已有自己的主题时改调 `theme.ApplyMaterialRules()`）。
+  映射：系列色是八个角色（`Primary`、`Tertiary`、`Secondary`、`Error`、`PrimaryContainer`、
+  `TertiaryContainer`、`InversePrimary`、`Outline`——前四个与上游自带调色板一样凑出四种色相，后四个是同色相
+  的更多色调）；坐标轴用 `LabelMedium` 刻度 / `LabelLarge` 轴名 + `OnSurfaceVariant` 墨色、`OutlineVariant`
+  网格（只画水平线，与上游一致）与 12 内边距，极坐标轴拿到完整网格与 `Surface` 标签底色；折线与阶梯线是
+  3 DIP 描边、清空上游的面积填充、8 DIP 数据点（外圈系列色、内里 `Surface`），堆叠面积保留填充但去掉数据点；
+  柱/条以 4 DIP 圆角收尾、间距 6，堆叠柱保持直角；饼/环图用 2 DIP 的 `Surface` 描边（即表面色透出，
+  而非边框）；仪表是 `SurfaceContainerHighest` 轨道配 `Primary` 指示弧（与 `MdProgress` 同一映射）；K 线用
+  `Tertiary` 涨、`Error` 跌，取代上游硬编码的绿与红；工具提示与图例是 `InverseSurface` 卡片配
+  `InverseOnSurface` 文字与投影、字号 `LabelLarge`（图例无底色），画布清屏到 `Surface`。所有颜色都按每张图
+  绘制时所在的变体读取 `Md.Sys.Color.*`（Avalonia 视图取应用的主题变体），明暗跟随应用；未注册
+  `MaterialTheme` 时回退到包内自带的 M3 基线取值。控件自身的覆盖（`ChartTheme`、工具提示与图例画刷）与系列
+  自己设置的画刷依旧优先。核心包的 `MdChart` 保持与绘图引擎无关。
+  版本固定 **`2.1.0-dev-798`**：Avalonia 12 线目前只有 2.1.0-dev 预发布（`net8.0`/`net10.0`，声明
+  `Avalonia >= 12.0.0`，低于本仓库 12.1.2 基线与 Tabalonia/Markdown 同一档），稳定线 2.0.x 是 Avalonia 11
+  构建（声明 `Avalonia >= 11.0.0`、`netstandard2.0`/`net6.0`/`net8.0`），在 Avalonia 12 下无法加载，故不选。
+  headless 测试钉住：八个角色的顺序与两套变体的取值、`AddMaterialTheme` 装上的主题（调色板、工具提示/图例
+  画刷与投影、画布表面色、字号）、折线/柱/堆叠/饼/仪表/散点/K 线与坐标轴的逐项规则、暗色变体只读暗色 token，
+  以及「包内没有 `Styles`/`Style`/`ControlTheme`、公开类型只有 `MaterialLiveChartsTheme`」。
+- **原生 AOT 已验证可用。** 十二个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
   IL3xxx 分析器。`.github/workflows/aot-probe.yml` 用 `PublishAot=true` 发布桌面 Gallery，并且
   **不把「步骤成功」当作答案**：它断言产物是原生 ELF 可执行文件、输出目录里没有托管 dll 残留（防止
   apphost 冒充），然后在 xvfb 下把那个二进制真正跑起来。原生 AOT 是在运行期因反射元数据被裁而失败的，

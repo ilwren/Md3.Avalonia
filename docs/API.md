@@ -630,9 +630,76 @@ when the rest of the application should keep a different document look; nothing 
 application is affected either way, since the selectors are all scoped to the viewer's document
 tree.
 
+## LiveCharts2
+
+For charts drawn with [LiveCharts2](https://github.com/Live-Charts/LiveCharts2), use the opt-in
+`Md3.Avalonia.LiveCharts2` package. It is the only package that depends on
+`LiveChartsCore.SkiaSharpView.Avalonia`, and the only Material theme in this repository that is not
+an Avalonia style collection at all:
+
+```csharp
+// Once, before the first chart view is created.
+LiveCharts.Configure(settings => settings.AddMaterialTheme());
+```
+
+That shape comes from upstream, not from this package. LiveCharts has no per-control style seam: a
+chart resolves its look from the single `Theme` held by `LiveCharts.DefaultSettings`, so there is
+nothing to register in `Application.Styles` and nothing that could leak into an application that
+did not configure it. `MaterialLiveChartsTheme.AddMaterialTheme` is `LiveChartsSettings
+.AddDefaultTheme` with `ApplyMaterialRules` appended - the rules run after LiveCharts' own, so the
+tooltip and legend factories, the animation speed and easing, and every geometry upstream already
+decides stay exactly as they ship. An application that builds its own theme calls
+`ApplyMaterialRules` on it instead, and `SeriesPalette(bool dark)` hands out the same eight colours
+for a provider that takes one colour per series.
+
+The palette is eight `Md.Sys.Color` roles in the order LiveCharts walks them - `Primary`,
+`Tertiary`, `Secondary`, `Error`, `PrimaryContainer`, `TertiaryContainer`, `InversePrimary`,
+`Outline`. The first four give a four-hue palette the way LiveCharts' own palette does; the rest are
+further tones of the same accent hues, so a chart with more than four series still reads as Material
+instead of inventing colours. Every colour is read for the variant the chart is drawing in, which the
+Avalonia views take from the application's theme variant, so a Material chart follows the light/dark
+switch. An application that does not register `MaterialTheme` gets the M3 baseline values the package
+carries instead.
+
+What the rules write, and the token each value comes from:
+
+- Axes: `LabelMedium` for tick labels and `LabelLarge` for axis names, both in `OnSurfaceVariant`;
+  separators `OutlineVariant` with upstream's horizontal-only geometry and 12 DIP padding. A polar
+  plane gets the full grid and a `Surface` label background.
+- Line and step-line series: a 3 DIP stroke in the series colour, upstream's area fill cleared, and
+  8 DIP markers filled with `Surface` inside a ring of the series colour. A stacked line keeps its
+  fill - a stacked area is read as one shape - and drops its markers.
+- Bars and columns: the fill in the series colour, a 4 DIP rounded end (`Rx`/`Ry`) and 6 DIP between
+  bars; stacked bars and columns keep square corners so the segments read as one bar. Data labels
+  drawn inside the fill take `OnPrimary`, labels outside it `OnSurfaceVariant`, as do error bars.
+- Pie and donut: a 2 DIP `Surface` stroke, which is the surface showing through between slices
+  rather than a border. A gauge is a `SurfaceContainerHighest` track with a `Primary` indicator -
+  the shape Material's own progress ring uses.
+- Candlesticks: `Tertiary` rising and `Error` falling, replacing upstream's hardcoded green and red.
+- Tooltips and legends: an `InverseSurface` card with `InverseOnSurface` text and a `DropShadow`,
+  the legend without a background, both typeset at `LabelLarge`. The chart's canvas is cleared to
+  `Surface` so a chart inside a card blends with the card.
+
+A chart view's own overrides still win: `ChartTheme` on a view replaces the configured theme
+entirely, and the view's tooltip and legend paints are preferred over the theme's. So does any paint
+a series sets itself, because theme rules never overwrite a value that is already there where
+LiveCharts documents user values as taking precedence.
+
+The pinned version is **2.1.0-dev-798**: LiveCharts2's Avalonia 12 line is currently published only
+as `2.1.0-dev` prereleases (`net8.0`/`net10.0`, declaring `Avalonia >= 12.0.0`, which restores
+against this repository's 12.1.2 baseline). The stable `2.0.x` line is the Avalonia 11 build - it
+declares `Avalonia >= 11.0.0`, targets `netstandard2.0`/`net6.0`/`net8.0` and does not load against
+Avalonia 12 - so it is not an option here even though it sorts higher. Upgrading the package means
+re-reading `Themes/Theme.cs`, `Themes/LiveChartsStylerExtensions.cs` and the SkiaSharp
+`ThemesExtensions.cs` of the new build; `MdLiveChartsThemeTests` pins the palette, the rules and the
+dark-variant reads that would move.
+
+`MdChart` in the core package stays provider neutral: it keeps drawing through whichever chart
+engine an application picks, and this package only styles LiveCharts2.
+
 ## Trimming
 
-All eleven packages set `IsTrimmable`, so an application that publishes with
+All twelve packages set `IsTrimmable`, so an application that publishes with
 `PublishTrimmed=true` can trim them, and they build with the IL2xxx analyzer on, so a new
 reflective call fails the build rather than breaking a trimmed app quietly.
 

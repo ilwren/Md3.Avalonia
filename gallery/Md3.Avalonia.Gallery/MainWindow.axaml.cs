@@ -51,7 +51,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             BeforeAfterNav, CalendarNav, CascaderNav, ChartNav,
             ChatNav, CommandPaletteNav, DataGridNav, DensityNav,
             HoverCardNav, MasonryNav, PagedItemsNav, PinInputNav,
-            PopoverNav, RatingNav, ResultViewNav, RichEditorNav, DockNav, DraggableTabsNav, MarkdownNav,
+            PopoverNav, RatingNav, ResultViewNav, RichEditorNav, DockNav, DraggableTabsNav, MarkdownNav, LiveChartsNav,
             TextEditorNav, HexEditorNav,
             SkeletonNav, SlidableNav, SpinKitNav, StaggeredPanelNav,
             TagInputNav, TimelineNav, TransferNav, TreeViewNav,
@@ -132,6 +132,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Docking", "dock docking layout tool pane document tab splitter float drop target", DockNav, () => new DockGalleryPage()),
             Entry("Draggable tabs", "draggable tabs tab strip reorder tear out detach attach tabalonia theme", DraggableTabsNav, () => new DraggableTabsGalleryPage()),
             Entry("Markdown", "markdown document renderer heading prose link list quote code block table note rule typography markdown.avalonia", MarkdownNav, () => new MarkdownGalleryPage()),
+            Entry("LiveCharts2 charts", "livecharts2 charts series axis legend tooltip palette line column pie donut gauge scatter candlestick skia", LiveChartsNav, () => new LiveChartsGalleryPage()),
             Entry("Text editor", "code editor syntax highlighting line numbers find replace completion avaloniedit theme", TextEditorNav, () => new TextEditorGalleryPage()),
             Entry("Hex editor", "hex binary bytes dump offsets ascii editor avaloniahex theme", HexEditorNav, () => new HexEditorGalleryPage()),
             Entry("Skeleton", "skeleton shimmer placeholder loading", SkeletonNav, () => new SkeletonGalleryPage()),
@@ -271,6 +272,8 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
     private void ShowDraggableTabs(object? s, RoutedEventArgs e) => Navigate(new DraggableTabsGalleryPage(), DraggableTabsNav);
 
     private void ShowMarkdown(object? s, RoutedEventArgs e) => Navigate(new MarkdownGalleryPage(), MarkdownNav);
+
+    private void ShowLiveCharts(object? s, RoutedEventArgs e) => Navigate(new LiveChartsGalleryPage(), LiveChartsNav);
     private void ShowTextEditor(object? s, RoutedEventArgs e) => Navigate(new TextEditorGalleryPage(), TextEditorNav);
     private void ShowHexEditor(object? s, RoutedEventArgs e) => Navigate(new HexEditorGalleryPage(), HexEditorNav);
     private void ShowSkeleton(object? s, RoutedEventArgs e) => Navigate(new SkeletonGalleryPage(), SkeletonNav);

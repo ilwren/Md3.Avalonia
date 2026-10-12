@@ -19,6 +19,7 @@ import sys
 PACKAGES = ["Md3.Avalonia", "Md3.Avalonia.Extra", "Md3.Avalonia.Icons", "Md3.Avalonia.Icons.Lite",
             "Md3.Avalonia.AvaloniaHex",
             "Md3.Avalonia.Dock", "Md3.Avalonia.Tabalonia", "Md3.Avalonia.Markdown",
+            "Md3.Avalonia.LiveCharts2",
             "Md3.Avalonia.DataGrid", "Md3.Avalonia.AvaloniaEdit"]
 # 16k lines of generated glyph constants; the catalog is documented as a whole, not per glyph.
 SKIP_FILES = {"MdSymbols.cs", "MdSymbolsLite.cs"}

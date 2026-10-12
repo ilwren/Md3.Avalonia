@@ -28,6 +28,15 @@
          metapackage (Markdown.Avalonia, with the SyntaxHigh plugin) is not used - see the
          Markdown section of the root README for what that means for an app that adds it. -->
     <PackageVersion Include="Markdown.Avalonia.Tight" Version="12.0.0-a3" />
+    <!-- LiveCharts2's Avalonia 12 line is the 2.1.0-dev builds: 2.1.0-dev-798 targets
+         net8.0/net10.0 and declares Avalonia >= 12.0.0, so it restores against this
+         repository's 12.1.2 baseline. The stable 2.0.x line (2.0.5 and older) is the Avalonia 11
+         build - it declares Avalonia >= 11.0.0, targets netstandard2.0/net6.0/net8.0 and does not
+         load against Avalonia 12 - so it is not an option here even though it sorts higher.
+         Bump the dev build and the theme's expectations together; the API this theme uses
+         (LiveChartsSettings.AddDefaultTheme, the Theme rule builders, the SkiaSharp paints) was
+         read at the commit the 2.1.0-dev-798 build was cut from. -->
+    <PackageVersion Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.1.0-dev-798" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.2" />
     <PackageVersion Include="MaterialColorUtilities" Version="0.3.0" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />

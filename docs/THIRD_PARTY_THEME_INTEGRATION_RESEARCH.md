@@ -60,7 +60,7 @@ Markdown.Avalonia（417★）+ LiveMarkdown.Avalonia（176★）。
 | Markdown.Avalonia | 417 | 2026-07-13 | 12.0.0 ✔ | MIT | `Markdown.Avalonia.Tight/StyleCollections/MarkdownStyle{DefaultTheme,FluentTheme,Standard,GithubLike}.axaml` + SyntaxHigh 附录样式 | 低-中 |
 | LiveMarkdown.Avalonia | 176 | 2026-09-19 | 12.0.0 ✔ | Apache-2.0 | `src/LiveMarkdown.Avalonia/Styles.axaml`（346 行 Style）+ Mermaid 变体 | 中 |
 | NodifyM.Avalonia（节点编辑器） | 222 | 2026-05-12 | 12.0.2 ✔ | MIT | `Styles/ControlStyles.axaml`（单文件集中样式） | 中 |
-| LiveCharts2 | 5,483 | 2026-07-20 | 12.0.0 ✔ | MIT | `LiveChartsCore/Themes/`（`Theme`、`ColorPalletes`、`LvcThemeKind`、`LiveChartsStylerExtensions`）+ `SkiaSharp/ThemesExtensions.cs` | 低（调色板/字体） |
+| LiveCharts2 | 5,483 | 2026-07-20 | 12.0.0 ✔（源码；NuGet 上 Avalonia 12 只有 `2.1.0-dev-*`，stable 2.0.x 是 Avalonia 11 构建，见 §4.2 G） | MIT | `LiveChartsCore/Themes/`（`Theme`、`ColorPalletes`、`LvcThemeKind`、`LiveChartsStylerExtensions`）+ `SkiaSharp/ThemesExtensions.cs` | 低（调色板/字体） |
 | ScottPlot | 6,773 | 2026-08-15 | 12.0.0 ✔ | MIT | `ScottPlot.Avalonia` 5.1.60；`Plot.Palette`、背景/字体/网格属性 | 低（调色板/字体） |
 | Mapsui | 1,577 | 2026-10-02 | **有 `Mapsui.Avalonia12` 包** ✔ | MIT | 地图渲染自绘；可主题化的是控件外壳与图层配色 | 低 |
 | PanAndZoom | 479 | 2026-10-03 | 12.1.1 ✔ | MIT | 无 chrome，本身不需要主题 | 极低（仅登记） |
@@ -242,6 +242,31 @@ Markdown.Avalonia（417★）+ LiveMarkdown.Avalonia（176★）。
 - `Md3.Avalonia.ScottPlot`：设置 `Plot.Palette`、背景、网格与字体。
 - 二者都**只做外观**，不引入新的数据管线。
 
+**已落地（2026-10-12，`LiveCharts2` 那一半）**：`Md3.Avalonia.Themes.MaterialLiveChartsTheme`（静态类，不是
+`Styles` 子类），在 `src/Md3.Avalonia.LiveCharts2/`。原设想「LvcThemeKind + ColorPalletes + 字体」过于简略：
+2.0.x/Avalonia 12 线的 LiveChartsCore 已经有一套完整的 `Theme`（`Colors`、`VirtualBackroundColor`、
+工具提示/图例画刷与字号、按系列族的 `HasRuleForXxx`、`HasRuleFor<TChartElement>`、`OnInitialized`），
+而且它**没有任何针对单个控件的样式接缝**——`Chart.GetTheme()` 取 `View.ChartTheme ?? LiveCharts
+.DefaultSettings.GetTheme()`，即每个进程只有一个主题。因此包公开面不是样式集合，而是配置入口
+（`LiveChartsSettings.AddMaterialTheme()` / `Theme.ApplyMaterialRules()` / `SeriesPalette(bool dark)`；
+包内没有 `Styles`、`Style`、`ControlTheme`，公开类型只有一个）。做法与上游自己的 `AddDefaultTheme` 同形：
+把规则追加在一个 `AddDefaultTheme` 之上，于是工具提示/图例工厂、动画与上游既定的几何原样保留；颜色在规则里
+按 `theme.IsDark` 逐次读 `Md.Sys.Color.*`（`IChartView.IsDarkMode` 由 Avalonia 视图取自应用的主题变体），
+未注册 `MaterialTheme` 时回退到包内 M3 基线值；`OnInitialized` 里写 `Colors`（`GetSeriesColor` 会除以它的长度，
+默认是空数组）并在 `ApplyMaterialRules` 里先播一次种，好让不经过 `Setup` 直接驱动的调用方/测试也能用。
+调色板取八个角色（前四个与上游调色板一样凑出四种色相，后四个是同色相的更多色调）；除 Material 有主张处
+（柱 4 DIP 圆角 + 6 间隔、堆叠柱直角、折线清空面积填充、饼图 2 DIP 表面色分隔、仪表轨道 + 指示弧、K 线
+`Tertiary`/`Error`）外不动几何。
+- 版本：固定 **`2.1.0-dev-798`**。这里修正 §6 的提醒：NuGet 上 stable **2.0.5** 虽然日期新（2026-06-18），
+  但仍是 **Avalonia 11 构建**（`Avalonia >= 11.0.0`、`netstandard2.0`/`net6.0`/`net8.0`、tag `2.0.5` 的
+  csproj 就是这套目标框架），在 Avalonia 12 下不可用；Avalonia 12 线目前只有 `2.1.0-dev-*`（`net8.0`/`net10.0`、
+  声明 `Avalonia >= 12.0.0`，tag/commit `65be96876e` 为 2.1.0-dev-798 同期的树），与 Tabalonia/Markdown 一样
+  属于「低于 12.1.2 基线」的预发布固定。升级上游时要重读 `Themes/Theme.cs`、
+  `Themes/LiveChartsStylerExtensions.cs` 与 `SkiaSharp/ThemesExtensions.cs`（`MdLiveChartsThemeTests` 钉住了
+  调色板顺序、按族规则与暗色变体只读暗色 token）。
+- 仍未做：`Md3.Avalonia.ScottPlot`（同一 Wave 的下一个 provider，`Plot.Palette` + 背景/网格/字体，与
+  `MdChart` 同样保持 provider-neutral）。
+
 ### 4.3 Wave 3（按需）
 
 - `Md3.Avalonia.PropertyGrid`（11 个内嵌控件样式，需要逐个替换）、`Md3.Avalonia.NodifyM`、
@@ -263,6 +288,10 @@ Markdown.Avalonia（417★）+ LiveMarkdown.Avalonia（176★）。
 2. `Themes/Material<X>Theme.axaml` + `.axaml.cs`（`Styles` 子类），颜色全部 `DynamicResource Md.Sys.*`；
    若上游的主题缝不是应用级 `Styles` 而是「控件自己挂集合」（见 §4.2 F 的 Markdown 案例），则改为由调用方
    赋给控件属性，并在 README/API 参考里写清为什么不能注册到 `Application.Styles`。
+   第三种形态见 §4.2 G 的 LiveCharts2：上游根本没有样式接缝，只有一个全局 `Theme`（LiveCharts 的
+   `LiveCharts.DefaultSettings`），此时包是一个配置入口（静态类 + `AddMaterialTheme` 扩展方法），
+   **不含任何 `Styles`/`ControlTheme`**；Gallery 处仍在 `App.axaml.cs`/页面里显式配置一次，并在文档里写明
+   这是全局设置、控件自身的覆盖优先。
 3. `THIRD-PARTY-NOTICES.md` 增加一行：包名、版本、用途、许可证、上游地址。
 4. `README.md`、`docs/API.md`、`Directory.Packages.props`（新增 `PackageVersion`）登记。
 5. Gallery 增加一个页面，并且**只在页面内局部加载该主题**，不做全局 `StyleInclude`。

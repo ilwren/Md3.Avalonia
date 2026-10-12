@@ -182,6 +182,7 @@
             <md:MdButton x:Name="DockNav" Content="Docking" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDock" />
             <md:MdButton x:Name="DraggableTabsNav" Content="Draggable tabs" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDraggableTabs" />
             <md:MdButton x:Name="MarkdownNav" Content="Markdown" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMarkdown" />
+            <md:MdButton x:Name="LiveChartsNav" Content="LiveCharts2 charts" Variant="Text" HorizontalContentAlignment="Left" Click="ShowLiveCharts" />
             <md:MdButton x:Name="TextEditorNav" Content="Text editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTextEditor" />
             <md:MdButton x:Name="HexEditorNav" Content="Hex editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowHexEditor" />
             <md:MdButton x:Name="SkeletonNav" Content="Skeleton" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSkeleton" />

@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using LiveChartsCore;
 using Md3.Avalonia.Extra.Themes;
 using Md3.Avalonia.Themes;
 
@@ -20,6 +21,12 @@ public sealed class TestApplication : Application
         Styles.Add(new MaterialAvaloniaHexTheme());
         Styles.Add(new MaterialDockTheme());
         Styles.Add(new MaterialTabaloniaTheme());
+
+        // LiveCharts is the one dependency whose theme is not an Avalonia style collection: every
+        // chart resolves its look from one theme held by its global settings, so the test app
+        // configures the Material one exactly as the gallery's App.axaml.cs does - a chart view
+        // created without a theme configured throws instead of drawing unthemed.
+        LiveCharts.Configure(settings => settings.AddMaterialTheme());
     }
 }
 
