@@ -39,6 +39,10 @@ This document is the public entry point for the `0.4.1-preview.1` API. Preview A
      ScottPlot.Avalonia. It is a plot-level entry point rather than a style collection, so it is not
      registered in Application.Styles either; see the ScottPlot section below: -->
 <PackageReference Include="Md3.Avalonia.ScottPlot" Version="0.4.1-preview.1" />
+<!-- Optional Material theme for the Avalonia.PropertyGrid property grid; likewise the only package
+     that pulls in bodong.Avalonia.PropertyGrid. It is a normal style collection - register it after
+     MaterialTheme; see the Property grid section below: -->
+<PackageReference Include="Md3.Avalonia.PropertyGrid" Version="0.4.1-preview.1" />
 ```
 
 ```xml
@@ -777,9 +781,71 @@ glyphTypeface". A Linux head that wants system fonts should exclude it:
 
 The gallery's desktop head and the headless suite both do.
 
+## Property grid
+
+For an object inspector built with
+[bodong.Avalonia.PropertyGrid](https://github.com/bodong1987/Avalonia.PropertyGrid), use the opt-in
+`Md3.Avalonia.PropertyGrid` package. It is the only package that depends on
+`bodong.Avalonia.PropertyGrid`, and unlike the chart packages it is an ordinary style collection:
+
+```xml
+<Application.Styles>
+  <themes:MaterialTheme />
+  <themes:MaterialPropertyGridTheme />
+</Application.Styles>
+```
+
+It can also be registered on the `Styles` of the window or page that owns the grid, which is what
+the gallery does.
+
+The reason the package exists is easy to miss. `PropertyGrid` sets no colours of its own: its 604
+lines of embedded styles only lay out templates, and every cell editor is a plain Avalonia control
+the grid builds at runtime - `TextBox`, `CheckBox`, `ComboBox`, `ToggleButton`, `RadioButton`,
+`NumericUpDown`, `Slider`, `ProgressBar`, `DatePicker`, `TimePicker`, `Button`, `Expander`,
+`GridSplitter`, `ScrollViewer`, `ContextMenu`, `MenuItem`, `Separator`, `ToolTip`, `ItemsControl`,
+`ContentControl` and `DataValidationErrors`. All of those are `TemplatedControl`s, so in an
+application that has no native control theme - which is the state this repository's own themes
+leave an app in, by design - the grid draws its chrome and none of its cells.
+
+What the package supplies is 32 keyed `Md.Comp.PropertyGrid.*` control themes, one per role: the
+pass-through containers, Material filled fields (40 DIP, `SurfaceContainerHighest` fill, `Outline`
+hairline that becomes a 2 DIP `Primary` rule on focus, `Error` when the cell fails validation),
+buttons, filter chips, checkboxes, radio buttons, drop-downs and their items, the numeric field and
+its spinners, sliders and their thumbs, progress bars, the date and time fields with their wheel
+presenters, category expanders, the name/value splitter, the scroller, the context menu with its
+items and separators, and tooltips. Every colour is a `Md.Sys.Color.*` token, every size a
+`Md.Sys.TypeScale.*` value, every corner a `Md.Sys.Shape.Corner.*` one, and the property list
+scrolls on the core package's `MdScrollBar`.
+
+It stays local the same way `Md3.Avalonia.AvaloniaEdit` does: none of those themes is registered for
+its native type. One style per native type hands the theme over, and every one of those selectors
+requires a `PropertyGrid` ancestor, so registering this theme never replaces Avalonia's native
+`TextBox`, `ComboBox` or `DatePicker` theme for the rest of the application - a control outside a
+grid keeps having no theme at all. `MdPropertyGridThemeTests` pins that, including the fact that the
+package defines no implicit control theme.
+
+Three things stay upstream's, and two of them cannot be changed from a style:
+
+- The 0.5 DIP `Gray` hairline the grid's own templates draw around the list, radio-button and
+  toggle-group editors, and the same hairline its expandable-object factory sets from C#. Both are
+  local values, so no style reaches them; forking the grid's eleven embedded control styles to
+  repaint them would drift from the part names the grid looks up.
+- Avalonia's `ColorPicker` in the colour cells, whose Fluent and Simple sheets the grid already
+  style-includes for its own subtree. This package therefore has no ColorPicker dependency.
+- The date and time flyouts keep the control's wheel mechanics inside a Material surface card. A
+  Material date picker is a calendar, and re-implementing `DatePickerPresenter` as one is a
+  different project.
+
+The pinned version is **12.1.1.1**: it targets `net8.0`/`net9.0`/`net10.0` and declares
+`Avalonia >= 12.1.1`, `Avalonia.Controls.ColorPicker >= 12.1.1` and `bodong.PropertyModels >= 12.0.0`,
+so it restores against this repository's 12.1.2 baseline. The grid iterates quickly, so upgrading it
+means re-reading `Controls/*.axaml` and the built-in cell-edit factories for new controls and new
+part names; `MdPropertyGridThemeTests` pins the cell editors, the chrome, the date flyout's parts
+and the editing behaviour that would move.
+
 ## Trimming
 
-All thirteen packages set `IsTrimmable`, so an application that publishes with
+All fourteen packages set `IsTrimmable`, so an application that publishes with
 `PublishTrimmed=true` can trim them, and they build with the IL2xxx analyzer on, so a new
 reflective call fails the build rather than breaking a trimmed app quietly.
 

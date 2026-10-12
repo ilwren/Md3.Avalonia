@@ -126,6 +126,7 @@
             <md:MdButton Content="Menus" Tag="Menus" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Rich editor" Tag="Rich editor" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Text editor" Tag="Text editor" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Property grid" Tag="Property grid" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Keyboard avoidance" Tag="Keyboard avoidance" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Sheets" Tag="Sheets" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Draggable sheet" Tag="Draggable sheet" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />

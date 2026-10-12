@@ -97,6 +97,7 @@ public sealed class MdGalleryTests
             new MarkdownGalleryPage(),
             new LiveChartsGalleryPage(),
             new ScottPlotGalleryPage(),
+            new PropertyGridGalleryPage(),
             new MasonryPanelGalleryPage(),
             new PagedItemsGalleryPage(),
             new AsyncSelectGalleryPage(),

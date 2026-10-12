@@ -112,7 +112,29 @@
   default, and nothing process-wide is rewritten - the theme never assigns `Fonts.Default`, so it
   cannot change the type of plots it was not asked to style. `MdChart` in the core package stays
   provider neutral.
-- **Native AOT.** All thirteen packages declare `IsAotCompatible` and build with the IL3xxx analyzers
+- **`Md3.Avalonia.PropertyGrid`**, an opt-in Material Design 3 theme for
+  [bodong.Avalonia.PropertyGrid](https://github.com/bodong1987/Avalonia.PropertyGrid), the first of
+  Wave 3. It is the only package that pulls in that dependency (pinned at `12.1.1.1`, which declares
+  `Avalonia >= 12.1.1`), bringing the set to fourteen. The grid sets no colours of its own - its 604
+  lines of embedded styles only lay out templates and host plain Avalonia controls - so in an
+  application that ships no native control theme it draws its chrome and none of its cells.
+  `MaterialPropertyGridTheme` supplies what is missing as 32 keyed `Md.Comp.PropertyGrid.*` control
+  themes: the pass-through containers every cell is wrapped in, Material filled fields, buttons,
+  filter chips, checkboxes, radio buttons, drop-downs and their items, the numeric field and its
+  spinners, sliders and their thumbs, progress bars, the date and time fields with their wheel
+  presenters, category expanders, the name/value splitter, the scroller, the context menu with its
+  items and separators, and tooltips. Each one is handed to a control by a style whose selector
+  requires a `PropertyGrid` ancestor, which is what keeps the package opt-in: registering it never
+  replaces a native control theme for the rest of the application, and the grid needs no
+  `FluentTheme`. Upstream keeps what only upstream can paint - the 0.5 DIP `Gray` hairlines its own
+  templates and its expandable-object factory set as local values, and Avalonia's `ColorPicker`,
+  whose style sheets the grid already loads for its own subtree - and the date and time presenters
+  keep the control's wheel mechanics rather than becoming a Material calendar.
+  `MdPropertyGridThemeTests` pins the cell and chrome themes, that every control theme the package
+  ships is keyed rather than implicit, that a control outside a grid stays unthemed, the date
+  flyout's parts and its confirm path, the options menu, and that the grid still edits, filters and
+  writes values back.
+- **Native AOT.** All fourteen packages declare `IsAotCompatible` and build with the IL3xxx analyzers
   on alongside the existing IL2xxx trimming ones. `.github/workflows/aot-probe.yml` publishes the
   desktop gallery with `PublishAot=true` and does not accept a green step as the answer: it
   asserts the output is a native ELF executable with no managed assembly beside it, then runs that

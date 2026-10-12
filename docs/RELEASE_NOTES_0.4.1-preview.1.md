@@ -166,7 +166,25 @@ surface，调用方仍可覆盖。
   低于本仓库 12.1.2 基线）。headless 测试钉住：八个角色的顺序与两套变体取值、表面/墨色/网格/图例/字阶规则、
   暗色变体、`Follow` 跟随应用明暗、未被处理的绘图对象保持默认值且不改写 `Fonts.Default`、每个角色都有与核心
   token 一致的 M3 基线取值，以及「包内没有 `Styles`/`ControlTheme`、公开类型只有 `MaterialScottPlotTheme`」。
-- **原生 AOT 已验证可用。** 十三个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
+- **`Md3.Avalonia.PropertyGrid`** —— [Avalonia.PropertyGrid](https://github.com/bodong1987/Avalonia.PropertyGrid)
+  属性网格的 Material Design 3 主题，opt-in，唯一引入 `bodong.Avalonia.PropertyGrid` 依赖的包，
+  包总数到十四个，也是 Wave 3 的第一个。网格自身不设置任何颜色：它的 604 行内嵌样式只负责模板布局，
+  单元格编辑器全部是运行期创建的原生 Avalonia 控件，因此在没有原生控件主题的应用里它只画得出外壳、画不出单元格。
+  `MaterialPropertyGridTheme`（普通 `Styles` 集合，注册在 `MaterialTheme` 之后）用 32 个
+  `Md.Comp.PropertyGrid.*` 键控控件主题补齐：每个单元格外的透传容器、40 DIP 的 Material 填充字段
+  （`SurfaceContainerHighest` 填充、`Outline` 细线、聚焦时 2 DIP `Primary`、校验失败 `Error`）、按钮、
+  筛选标签块、复选框、单选按钮、组合框及其条目、数值字段与微调器、滑块与滑块柄、进度条、日期/时间字段及其
+  滚轮面板、分类展开器、名称/值分隔条、滚动器、上下文菜单与其条目和分隔线、工具提示。颜色全部走
+  `Md.Sys.Color.*`、字号走 `Md.Sys.TypeScale.*`、圆角走 `Md.Sys.Shape.Corner.*`，属性列表滚动在核心的
+  `MdScrollBar` 上。局部性与 AvaloniaEdit 包同构：主题都不按原生类型注册，而是由「选择器要求存在
+  `PropertyGrid` 祖先」的样式逐个下发，所以注册它不会替换应用其他位置的任何原生控件主题。
+  三处仍属上游：其模板与可展开对象工厂作为本地值设置的 0.5 DIP 灰色细线（样式覆盖不到，本包也不复刻上游
+  11 个内嵌样式以免与 part 名漂移）、颜色单元格沿用的 Avalonia `ColorPicker`，以及日期/时间浮层保留的
+  滚轮机制。版本固定 **`12.1.1.1`**（`net8.0`/`net9.0`/`net10.0`，声明 `Avalonia >= 12.1.1`、
+  `Avalonia.Controls.ColorPicker >= 12.1.1` 与 `bodong.PropertyModels >= 12.0.0`）。
+  headless 测试钉住：单元格与外壳拿到的主题、包内所有控件主题都是键控而非隐式、网格外的控件仍然没有主题、
+  日期浮层的必需 part 与确认回写、选项菜单，以及网格的编辑、筛选与写回行为未变。
+- **原生 AOT 已验证可用。** 十四个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
   IL3xxx 分析器。`.github/workflows/aot-probe.yml` 用 `PublishAot=true` 发布桌面 Gallery，并且
   **不把「步骤成功」当作答案**：它断言产物是原生 ELF 可执行文件、输出目录里没有托管 dll 残留（防止
   apphost 冒充），然后在 xvfb 下把那个二进制真正跑起来。原生 AOT 是在运行期因反射元数据被裁而失败的，

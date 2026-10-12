@@ -278,8 +278,39 @@ LiveCharts 尚未分配的槽位（`ISeries.SeriesId` 默认为 `-1`）当作第
 
 ### 4.3 Wave 3（按需）
 
-- `Md3.Avalonia.PropertyGrid`（11 个内嵌控件样式，需要逐个替换）、`Md3.Avalonia.NodifyM`、
-  `Md3.Avalonia.Mapsui`（外壳 + 图层配色）、Avalonia.Labs 剩余控件。
+- `Md3.Avalonia.NodifyM`、`Md3.Avalonia.Mapsui`（外壳 + 图层配色）、Avalonia.Labs 剩余控件。
+
+**已落地（2026-10-12，`Md3.Avalonia.PropertyGrid`）**：`Md3.Avalonia.Themes.MaterialPropertyGridTheme : Styles`，
+在 `src/Md3.Avalonia.PropertyGrid/`。这里修正本文件对成本与做法的预估：**不需要「逐个替换 11 个内嵌控件样式」**，
+真正缺的是别的东西。
+
+- 上游 `Sources/Avalonia.PropertyGrid/Controls/*.axaml`（604 行）只写模板与布局，**没有任何 `DynamicResource`**，
+  只有 4 处 `BorderBrush="Gray"`；单元格编辑器全部是运行期 `new` 出来的原生控件
+  （`TextBox`/`CheckBox`/`ComboBox`/`ToggleButton`/`RadioButton`/`NumericUpDown`/`Slider`/`ProgressBar`/
+  `DatePicker`/`TimePicker`/`Button`/`Expander`/`GridSplitter`/`ScrollViewer`/`ContextMenu`/`MenuItem`/
+  `Separator`/`ToolTip`/`ItemsControl`/`ContentControl`/`DataValidationErrors`），而它们全是
+  `TemplatedControl`。本仓库的主题刻意不装原生控件主题，所以在 Material 应用里这个网格只画得出外壳、
+  画不出任何单元格——要接的接缝是「给这些原生类型补 M3 控件主题」，不是改上游那 11 个样式。
+- 局部性靠 `StyledElement.Theme` 是 StyledProperty（`GetEffectiveTheme()` 里显式 `Theme` 优先于资源查找）：
+  包内 32 个 `Md.Comp.PropertyGrid.*` 键控控件主题，由「每种原生类型一条、选择器要求 `pg|PropertyGrid` 祖先」
+  的样式下发。于是注册到 `Application.Styles` 也不会替换应用其他位置的原生主题；同一规则里
+  `ContentControl`/`ItemsControl`/`Button`/`ToggleButton`/`ListBoxItem` 必须排在各自派生类型之前
+  （同特异性时后者胜）。
+- 模板按控件的 part 名逐个核对：`PART_TextPresenter`/`PART_ScrollViewer`、`PART_Popup`、`PART_Track`、
+  `PART_Indicator`、`PART_TextBox`/`PART_IncreaseButton`/`PART_DecreaseButton`、
+  `PART_FlyoutButton`/`PART_ButtonContentGrid`/`PART_*TextBlock`/`PART_First|SecondSpacer`/`PART_Popup`/
+  `PART_PickerPresenter`、两个 presenter 的 `PART_PickerContainer`/`PART_*Host`/`PART_*Selector`/
+  `PART_AcceptButton`（这些用 `NameScope.Get`，缺一个就抛）、以及 `PART_ContentPresenter`
+  （网格自己在 `TemplateApplied` 里给它设缩进）。`DateTimePickerPanel : Panel` 不需要主题，
+  但它生成的 `ListBoxItem` 需要。
+- 三处留给上游：0.5 DIP `Gray` 细线是模板里的**本地值**（`ExpandableCellEditFactory` 那处还在 C# 里设），
+  样式覆盖不到，也不值得为此复刻上游 11 个样式；`ColorPicker` 由网格自己 `StyleInclude` 的 Fluent/Simple
+  样式表覆盖（因此本包不依赖 ColorPicker）；日期/时间浮层保留滚轮机制（M3 的日历是另一个工程）。
+- 版本：固定 **`bodong.Avalonia.PropertyGrid` 12.1.1.1**（NuGet 最新版，`net8.0`/`net9.0`/`net10.0`，
+  声明 `Avalonia >= 12.1.1` + `Avalonia.Controls.ColorPicker >= 12.1.1` + `bodong.PropertyModels >= 12.0.0`，
+  低于本仓库 12.1.2 基线）。上游迭代快，升级时要重读 `Controls/*.axaml` 与 `Controls/Factories/Builtins/`
+  （`MdPropertyGridThemeTests` 钉住了单元格/外壳主题、键控而非隐式、网格外控件不受影响、日期浮层 part 与
+  确认回写、选项菜单，以及编辑/筛选/写回行为）。
 - 与已有 `Md*` 控件重叠的（MessageBox.Avalonia、DialogHost.Avalonia、Notification.Avalonia、
   Jc.PopupView、RangeSlider）：**优先用仓库自身的 `MdDialogHost` / `MdSnackbar` / `MdSlider`**；
   只有当使用者的既有代码必须保留第三方 API 形态时，才值得单独出主题包。

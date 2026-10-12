@@ -1,0 +1,1552 @@
+<!--
+  Material Design 3 chrome for bodong.Avalonia.PropertyGrid 12.1.1.1.
+
+  The grid sets no colours of its own: its 604 lines of embedded styles only lay out templates and
+  host plain Avalonia controls, so in an application that ships no native control theme the grid
+  draws its chrome and none of its cells. This file supplies the missing Material chrome for every
+  native control the grid creates - the search field, the options button and its context menu, the
+  category expanders, the name/value splitter, the scroller, and the cell editors the built-in
+  factories produce (TextBox, CheckBox, ComboBox, ToggleButton, RadioButton, NumericUpDown, Slider,
+  ProgressBar, DatePicker, TimePicker, ButtonEdit, PreviewableColorPicker).
+
+  How it stays local, which is the whole reason this is a Styles collection: every control theme
+  below is keyed Md.Comp.PropertyGrid.* and is handed to a control by a style in the first section
+  whose selector requires a PropertyGrid ancestor. Registering this theme therefore never replaces
+  Avalonia's native TextBox, ComboBox or DatePicker theme for the rest of the application, which is
+  the same contract Md3.Avalonia.AvaloniaEdit keeps with its Md.Comp.AvaloniaEdit.* keys.
+
+  Template shapes follow the M3 components the core package already draws (MdTextBox, MdComboBox,
+  MdCheckBox, MdSlider), and every template part the controls look up by name is present:
+  PART_TextPresenter/PART_ScrollViewer (TextBox), PART_Popup (ComboBox), PART_Track (Slider),
+  PART_Indicator (ProgressBar), PART_TextBox/PART_IncreaseButton/PART_DecreaseButton (NumericUpDown),
+  PART_FlyoutButton/PART_ButtonContentGrid/PART_*TextBlock/PART_First|SecondSpacer/PART_Popup/
+  PART_PickerPresenter (DatePicker, TimePicker), PART_PickerContainer/PART_*Host/PART_*Selector/
+  PART_AcceptButton (the two presenters) and PART_ContentPresenter (Expander - the grid indents that
+  presenter itself once the template is applied).
+
+  What this file deliberately does not do:
+    * It does not fork the grid's eleven embedded control styles. Four of them paint a 0.5 DIP Gray
+      hairline around the list / radio / toggle-group editors as a local value, and
+      ExpandableCellEditFactory paints the same hairline around an expanded sub-object from C#, so
+      no style can reach either. A fork would drift from the part names the grid looks up.
+    * It does not theme Avalonia.Controls.ColorPicker. The grid style-includes the picker's own
+      Fluent and Simple sheets into its own Styles, so colour cells are already covered upstream;
+      this package therefore has no ColorPicker dependency of its own.
+    * The date and time presenters keep the control's wheel mechanics. A Material date picker is a
+      calendar, and re-implementing DatePickerPresenter as one is a different project.
+-->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:md="using:Md3.Avalonia.Controls"
+        xmlns:pg="using:Avalonia.PropertyGrid.Controls"
+        x:Class="Md3.Avalonia.Themes.MaterialPropertyGridTheme">
+
+  <!-- =========================================================================================
+       1. The grid's own chrome. Only properties upstream leaves alone are set here: its own
+          styles own the header metrics (Padding 4 / FontSize 18 / Margin) and the cell geometry,
+          and a style cannot win against either.
+       ========================================================================================= -->
+
+  <Style Selector="pg|PropertyGrid">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource Md.Sys.Typeface.Plain}" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" />
+  </Style>
+
+  <!-- Property names, list titles, enum labels. -->
+  <Style Selector="pg|PropertyGrid TextBlock">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource Md.Sys.Typeface.Plain}" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" />
+  </Style>
+
+  <!-- The two column headers keep upstream's 18 DIP size and get the Material ink and weight. -->
+  <Style Selector="pg|PropertyGrid TextBlock#ColumnName, pg|PropertyGrid TextBlock#ColumnProperties">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="FontWeight" Value="Medium" />
+  </Style>
+
+  <!-- Upstream's search field asks for Fluent's clearButton class, which has no Material
+       equivalent; the field itself is the Material filled field. Its placeholder text is a local
+       value from the grid's own localization service, so it stays upstream's. -->
+  <Style Selector="pg|PropertyGrid TextBox#SearchTextBox">
+    <Setter Property="Margin" Value="4" />
+  </Style>
+
+  <!-- =========================================================================================
+       2. Handing the keyed themes to the native controls, one rule per type.
+          Order matters: Avalonia resolves equal-specificity selectors by position, so every rule
+          has to come after the rules for the types it derives from (ContentControl before
+          ToolTip/DataValidationErrors/Expander/NumericUpDown, ItemsControl before MenuItem,
+          TextBox before nothing, Button before RepeatButton, ToggleButton before CheckBox and
+          RadioButton, ListBoxItem before ComboBoxItem).
+       ========================================================================================= -->
+
+  <Style Selector="pg|PropertyGrid ContentControl">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.ContentTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid ToolTip">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.ToolTipTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid DataValidationErrors">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.ValidationTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid ItemsControl">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.ItemsTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid MenuItem">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.MenuItemTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid ContextMenu">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.MenuTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid Separator">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.MenuSeparatorTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid TextBox">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.FieldTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid Button">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.ActionTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid RepeatButton">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.SpinTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid ToggleButton">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.FilterChipTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid CheckBox">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.CheckTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid RadioButton">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.RadioTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid ComboBox">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.DropDownTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid NumericUpDown">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.NumberFieldTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid Slider">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.SliderTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid ProgressBar">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.MeterTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid DatePicker">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.DateFieldTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid DatePickerPresenter">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.DatePanelTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid TimePicker">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.TimeFieldTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid TimePickerPresenter">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.TimePanelTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid Expander">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.CategoryTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid GridSplitter">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.SplitterTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid ScrollViewer">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.ScrollerTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid ListBoxItem">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.PickerItemTheme}" />
+  </Style>
+  <Style Selector="pg|PropertyGrid ComboBoxItem">
+    <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.DropDownItemTheme}" />
+  </Style>
+
+  <Styles.Resources>
+    <ResourceDictionary>
+
+      <!-- =====================================================================================
+           Pass-through containers. Upstream wraps every cell in DataValidationErrors and puts
+           the middle/bottom areas and the list editors in ContentControl/ItemsControl, all of
+           which are TemplatedControls and draw nothing without a theme.
+           ===================================================================================== -->
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.ContentTheme" TargetType="ContentControl">
+        <Setter Property="Template">
+          <ControlTemplate TargetType="ContentControl">
+            <ContentPresenter Name="PART_ContentPresenter"
+                              Padding="{TemplateBinding Padding}"
+                              Background="{TemplateBinding Background}"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+
+      <!-- Errors stay with the host: Material shows them as supporting text under the field, and
+           the grid's cells are too short for a second line. -->
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.ValidationTheme" TargetType="DataValidationErrors">
+        <Setter Property="Template">
+          <ControlTemplate TargetType="DataValidationErrors">
+            <ContentPresenter Name="PART_ContentPresenter"
+                              Padding="{TemplateBinding Padding}"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.ItemsTheme" TargetType="ItemsControl">
+        <Setter Property="Template">
+          <ControlTemplate TargetType="ItemsControl">
+            <Border Padding="{TemplateBinding Padding}"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{TemplateBinding CornerRadius}">
+              <ItemsPresenter Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+            </Border>
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+
+      <!-- =====================================================================================
+           Fields. 40 DIP, filled, 4 DIP top corners, hairline indicator that turns into a 2 DIP
+           Primary rule on focus - the same filled field MdTextBox draws.
+           ===================================================================================== -->
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.FieldTheme" TargetType="TextBox">
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        <Setter Property="PlaceholderForeground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource Md.Sys.Color.PrimarySelection.Brush}" />
+        <Setter Property="SelectionForegroundBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        <Setter Property="CaretBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+        <Setter Property="CornerRadius" Value="4,4,0,0" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="IBeam" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="TextBox">
+            <Border Name="PART_Border"
+                    Background="{TemplateBinding Background}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    ClipToBounds="True">
+              <Panel>
+                <ScrollViewer Name="PART_ScrollViewer"
+                                   HorizontalScrollBarVisibility="Hidden"
+                                   VerticalScrollBarVisibility="Disabled">
+                  <Panel>
+                    <TextBlock Name="PART_Watermark"
+                               Margin="{TemplateBinding Padding}"
+                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                               FontFamily="{TemplateBinding FontFamily}"
+                               FontSize="{TemplateBinding FontSize}"
+                               Foreground="{TemplateBinding PlaceholderForeground}"
+                               IsHitTestVisible="False"
+                               Text="{TemplateBinding PlaceholderText}"
+                               TextWrapping="NoWrap">
+                      <TextBlock.IsVisible>
+                        <Binding Converter="{x:Static StringConverters.IsNullOrEmpty}"
+                                 Path="Text"
+                                 RelativeSource="{RelativeSource TemplatedParent}" />
+                      </TextBlock.IsVisible>
+                    </TextBlock>
+                    <TextPresenter Name="PART_TextPresenter"
+                                   Margin="{TemplateBinding Padding}"
+                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                   CaretBlinkInterval="{TemplateBinding CaretBlinkInterval}"
+                                   CaretBrush="{TemplateBinding CaretBrush}"
+                                   CaretIndex="{TemplateBinding CaretIndex}"
+                                   PasswordChar="{TemplateBinding PasswordChar}"
+                                   SelectionBrush="{TemplateBinding SelectionBrush}"
+                                   SelectionEnd="{TemplateBinding SelectionEnd}"
+                                   SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                                   SelectionStart="{TemplateBinding SelectionStart}"
+                                   Text="{TemplateBinding Text, Mode=TwoWay}"
+                                   TextAlignment="{TemplateBinding TextAlignment}"
+                                   TextWrapping="{TemplateBinding TextWrapping}" />
+                  </Panel>
+                </ScrollViewer>
+                <Border Name="PART_Indicator"
+                        Height="1"
+                        VerticalAlignment="Bottom"
+                        Background="{DynamicResource Md.Sys.Color.Outline.Brush}" />
+                <Border Name="PART_FocusIndicator"
+                        Height="2"
+                        VerticalAlignment="Bottom"
+                        Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                        IsVisible="False" />
+              </Panel>
+            </Border>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:focus /template/ Border#PART_Indicator">
+          <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="^:focus /template/ Border#PART_FocusIndicator">
+          <Setter Property="IsVisible" Value="True" />
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#PART_Indicator">
+          <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        </Style>
+        <Style Selector="^:disabled">
+          <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" />
+        </Style>
+        <Style Selector="^:error /template/ Border#PART_Indicator, ^:error /template/ Border#PART_FocusIndicator">
+          <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" />
+          <Setter Property="IsVisible" Value="True" />
+        </Style>
+      </ControlTheme>
+
+      <!-- The text box inside the numeric field: same metrics, no fill and no indicator of its
+           own, because the number field around it draws those. -->
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.NumberTextTheme" TargetType="TextBox"
+                    BasedOn="{StaticResource Md.Comp.PropertyGrid.FieldTheme}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="TextBox">
+            <ScrollViewer Name="PART_ScrollViewer"
+                               HorizontalScrollBarVisibility="Hidden"
+                               VerticalScrollBarVisibility="Disabled">
+              <Panel>
+                <TextBlock Name="PART_Watermark"
+                           VerticalAlignment="Center"
+                           Foreground="{TemplateBinding PlaceholderForeground}"
+                           IsHitTestVisible="False"
+                           Text="{TemplateBinding PlaceholderText}">
+                  <TextBlock.IsVisible>
+                    <Binding Converter="{x:Static StringConverters.IsNullOrEmpty}"
+                             Path="Text"
+                             RelativeSource="{RelativeSource TemplatedParent}" />
+                  </TextBlock.IsVisible>
+                </TextBlock>
+                <TextPresenter Name="PART_TextPresenter"
+                               VerticalAlignment="Center"
+                               CaretBlinkInterval="{TemplateBinding CaretBlinkInterval}"
+                               CaretBrush="{TemplateBinding CaretBrush}"
+                               CaretIndex="{TemplateBinding CaretIndex}"
+                               PasswordChar="{TemplateBinding PasswordChar}"
+                               SelectionBrush="{TemplateBinding SelectionBrush}"
+                               SelectionEnd="{TemplateBinding SelectionEnd}"
+                               SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                               SelectionStart="{TemplateBinding SelectionStart}"
+                               Text="{TemplateBinding Text, Mode=TwoWay}"
+                               TextAlignment="{TemplateBinding TextAlignment}"
+                               TextWrapping="NoWrap" />
+              </Panel>
+            </ScrollViewer>
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+
+      <!-- =====================================================================================
+           Buttons and toggles.
+           ===================================================================================== -->
+
+      <!-- The options button, the "?" property-operation button, and the add / insert / remove /
+           clear buttons upstream sizes to 32 DIP itself. -->
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.ActionTheme" TargetType="Button">
+        <Setter Property="MinWidth" Value="32" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.Full}" />
+        <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.LabelLarge.Size}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="Button">
+            <Border Name="PART_Container"
+                    Background="{TemplateBinding Background}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    ClipToBounds="True">
+              <Grid>
+                <Border Name="PART_StateLayer"
+                        Background="{TemplateBinding Foreground}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Opacity="0" />
+                <ContentPresenter Name="PART_ContentPresenter"
+                                  Padding="{TemplateBinding Padding}"
+                                  HorizontalContentAlignment="Center"
+                                  VerticalContentAlignment="Center"
+                                  Content="{TemplateBinding Content}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  Foreground="{TemplateBinding Foreground}" />
+              </Grid>
+            </Border>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" />
+        </Style>
+        <Style Selector="^:focus-visible /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Focus.Opacity}" />
+        </Style>
+        <Style Selector="^:disabled">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" />
+        </Style>
+      </ControlTheme>
+
+      <!-- The numeric spinner arrows. -->
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.SpinTheme" TargetType="RepeatButton">
+        <Setter Property="MinWidth" Value="24" />
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.Full}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="RepeatButton">
+            <Border Background="{TemplateBinding Background}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    ClipToBounds="True">
+              <Grid>
+                <Border Name="PART_StateLayer"
+                        Background="{TemplateBinding Foreground}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Opacity="0" />
+                <ContentPresenter Name="PART_ContentPresenter"
+                                  HorizontalContentAlignment="Center"
+                                  VerticalContentAlignment="Center"
+                                  Content="{TemplateBinding Content}"
+                                  Foreground="{TemplateBinding Foreground}" />
+              </Grid>
+            </Border>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" />
+        </Style>
+        <Style Selector="^:disabled">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" />
+        </Style>
+      </ControlTheme>
+
+      <!-- The quick category filter above the grid, and the toggle-group cell editor. -->
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.FilterChipTheme" TargetType="ToggleButton">
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Outline.Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.Small}" />
+        <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.LabelLarge.Size}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="ToggleButton">
+            <Border Name="PART_Container"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    ClipToBounds="True">
+              <Grid>
+                <Border Name="PART_StateLayer"
+                        Background="{TemplateBinding Foreground}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Opacity="0" />
+                <ContentPresenter Name="PART_ContentPresenter"
+                                  Padding="{TemplateBinding Padding}"
+                                  HorizontalContentAlignment="Center"
+                                  VerticalContentAlignment="Center"
+                                  Content="{TemplateBinding Content}"
+                                  Foreground="{TemplateBinding Foreground}" />
+              </Grid>
+            </Border>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:checked">
+          <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
+          <Setter Property="BorderBrush" Value="Transparent" />
+          <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" />
+        </Style>
+        <Style Selector="^:focus-visible /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Focus.Opacity}" />
+        </Style>
+        <Style Selector="^:disabled">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" />
+        </Style>
+      </ControlTheme>
+
+      <!-- Boolean cells and the checked-list editor. -->
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.CheckTheme" TargetType="CheckBox">
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="Padding" Value="4,0,0,0" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="CheckBox">
+            <Grid ColumnDefinitions="40,*" Background="Transparent">
+              <Panel Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border Name="PART_StateLayer"
+                        Width="40"
+                        Height="40"
+                        Background="{TemplateBinding Foreground}"
+                        CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Full}"
+                        IsHitTestVisible="False"
+                        Opacity="0" />
+                <Border Name="PART_Box"
+                        Width="18"
+                        Height="18"
+                        Background="Transparent"
+                        BorderBrush="{DynamicResource Md.Sys.Color.Outline.Brush}"
+                        BorderThickness="2"
+                        CornerRadius="2" />
+                <Path Name="PART_Glyph"
+                      Width="12"
+                      Height="10"
+                      Data="M0,5 L4,9 L11,0"
+                      IsVisible="False"
+                      Stretch="Uniform"
+                      Stroke="{DynamicResource Md.Sys.Color.OnPrimary.Brush}"
+                      StrokeThickness="2" />
+              </Panel>
+              <ContentPresenter Name="PART_ContentPresenter"
+                                Grid.Column="1"
+                                Margin="{TemplateBinding Padding}"
+                                VerticalAlignment="Center"
+                                Content="{TemplateBinding Content}"
+                                Foreground="{TemplateBinding Foreground}" />
+            </Grid>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:checked /template/ Border#PART_Box">
+          <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+          <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+        </Style>
+        <Style Selector="^:checked /template/ Path#PART_Glyph">
+          <Setter Property="IsVisible" Value="True" />
+        </Style>
+        <Style Selector="^:indeterminate /template/ Border#PART_Box">
+          <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+          <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" />
+        </Style>
+        <Style Selector="^:disabled">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" />
+        </Style>
+      </ControlTheme>
+
+      <!-- The radio-button list editor. -->
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.RadioTheme" TargetType="RadioButton">
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="Padding" Value="4,0,0,0" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="RadioButton">
+            <Grid ColumnDefinitions="40,*" Background="Transparent">
+              <Panel Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border Name="PART_StateLayer"
+                        Width="40"
+                        Height="40"
+                        Background="{TemplateBinding Foreground}"
+                        CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Full}"
+                        IsHitTestVisible="False"
+                        Opacity="0" />
+                <Border Name="PART_Ring"
+                        Width="20"
+                        Height="20"
+                        Background="Transparent"
+                        BorderBrush="{DynamicResource Md.Sys.Color.Outline.Brush}"
+                        BorderThickness="2"
+                        CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Full}" />
+                <Border Name="PART_Dot"
+                        Width="10"
+                        Height="10"
+                        Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                        CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Full}"
+                        IsVisible="False" />
+              </Panel>
+              <ContentPresenter Name="PART_ContentPresenter"
+                                Grid.Column="1"
+                                Margin="{TemplateBinding Padding}"
+                                VerticalAlignment="Center"
+                                Content="{TemplateBinding Content}"
+                                Foreground="{TemplateBinding Foreground}" />
+            </Grid>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:checked /template/ Border#PART_Ring">
+          <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+        </Style>
+        <Style Selector="^:checked /template/ Border#PART_Dot">
+          <Setter Property="IsVisible" Value="True" />
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" />
+        </Style>
+        <Style Selector="^:disabled">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" />
+        </Style>
+      </ControlTheme>
+
+      <!-- =====================================================================================
+           Selection: the enum, font-family and selectable-list cells.
+           ===================================================================================== -->
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.DropDownTheme" TargetType="ComboBox">
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="MinWidth" Value="80" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        <Setter Property="CornerRadius" Value="4,4,0,0" />
+        <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="ItemContainerTheme" Value="{StaticResource Md.Comp.PropertyGrid.DropDownItemTheme}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="ComboBox">
+            <Border Name="PART_Container"
+                    Background="{TemplateBinding Background}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    ClipToBounds="False">
+              <Grid ColumnDefinitions="*,Auto">
+                <Panel Grid.Column="0" Margin="{TemplateBinding Padding}">
+                  <TextBlock Name="PART_Placeholder"
+                             VerticalAlignment="Center"
+                             Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                             Text="{TemplateBinding PlaceholderText}">
+                    <TextBlock.IsVisible>
+                      <Binding Path="SelectionBoxItem"
+                               RelativeSource="{RelativeSource TemplatedParent}"
+                               Converter="{x:Static ObjectConverters.IsNull}" />
+                    </TextBlock.IsVisible>
+                  </TextBlock>
+                  <ContentPresenter Name="PART_ContentPresenter"
+                                    VerticalAlignment="Center"
+                                    Content="{TemplateBinding SelectionBoxItem}"
+                                    ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                    Foreground="{TemplateBinding Foreground}" />
+                </Panel>
+                <Path Name="PART_DropDownGlyph"
+                      Grid.Column="1"
+                      Width="10"
+                      Height="6"
+                      Margin="0,0,12,0"
+                      VerticalAlignment="Center"
+                      Data="M0,0 L5,5 L10,0"
+                      IsHitTestVisible="False"
+                      Stretch="Uniform"
+                      Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                      StrokeThickness="1.5" />
+                <Border Name="PART_Indicator"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Height="1"
+                        VerticalAlignment="Bottom"
+                        Background="{DynamicResource Md.Sys.Color.Outline.Brush}" />
+                <Popup Name="PART_Popup"
+                       IsLightDismissEnabled="True"
+                       Placement="BottomEdgeAlignedLeft"
+                       PlacementTarget="{Binding #PART_Container}"
+                       IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}">
+                  <Popup.Styles>
+                    <Style Selector="PopupRoot">
+                      <Setter Property="Background" Value="Transparent" />
+                      <Setter Property="TransparencyLevelHint" Value="Transparent" />
+                      <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
+                    </Style>
+                  </Popup.Styles>
+                  <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
+                          BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                          BorderThickness="1"
+                          CornerRadius="{DynamicResource Md.Sys.Shape.Corner.ExtraSmall}"
+                          MaxHeight="320">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                      <ItemsPresenter Name="PART_ItemsPresenter"
+                                      Margin="0,4"
+                                      ItemsPanel="{TemplateBinding ItemsPanel}" />
+                    </ScrollViewer>
+                  </Border>
+                </Popup>
+              </Grid>
+            </Border>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#PART_Indicator">
+          <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        </Style>
+        <Style Selector="^:focus /template/ Border#PART_Indicator">
+          <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+          <Setter Property="Height" Value="2" />
+        </Style>
+        <Style Selector="^:disabled">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" />
+        </Style>
+      </ControlTheme>
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.DropDownItemTheme" TargetType="ComboBoxItem">
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="ComboBoxItem">
+            <Border Background="{TemplateBinding Background}" ClipToBounds="True">
+              <Grid>
+                <Border Name="PART_StateLayer"
+                        Background="{TemplateBinding Foreground}"
+                        Opacity="0" />
+                <ContentPresenter Name="PART_ContentPresenter"
+                                  Padding="{TemplateBinding Padding}"
+                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                  VerticalContentAlignment="Center"
+                                  Content="{TemplateBinding Content}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  Foreground="{TemplateBinding Foreground}" />
+              </Grid>
+            </Border>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" />
+        </Style>
+        <Style Selector="^:selected">
+          <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+          <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+        </Style>
+        <Style Selector="^:disabled">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" />
+        </Style>
+      </ControlTheme>
+
+      <!-- =====================================================================================
+           Numeric and measured values.
+           ===================================================================================== -->
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.NumberFieldTheme" TargetType="NumericUpDown">
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="MinWidth" Value="120" />
+        <Setter Property="Padding" Value="12,0,4,0" />
+        <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        <Setter Property="CornerRadius" Value="4,4,0,0" />
+        <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="NumericUpDown">
+            <Border Name="PART_Container"
+                    Background="{TemplateBinding Background}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    ClipToBounds="True">
+              <Grid ColumnDefinitions="*,Auto,Auto" Margin="{TemplateBinding Padding}">
+                <TextBox Name="PART_TextBox"
+                         Grid.Column="0"
+                         VerticalAlignment="Center"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         CaretBrush="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                         Foreground="{TemplateBinding Foreground}"
+                         Padding="0"
+                         Theme="{StaticResource Md.Comp.PropertyGrid.NumberTextTheme}" />
+                <RepeatButton Name="PART_IncreaseButton"
+                              Grid.Column="1"
+                              Theme="{StaticResource Md.Comp.PropertyGrid.SpinTheme}">
+                  <Path Width="8" Height="5" Data="M0,5 L4,0 L8,5" Stretch="Uniform"
+                        Stroke="{Binding $parent[RepeatButton].Foreground}" StrokeThickness="1.5" />
+                </RepeatButton>
+                <RepeatButton Name="PART_DecreaseButton"
+                              Grid.Column="2"
+                              Theme="{StaticResource Md.Comp.PropertyGrid.SpinTheme}">
+                  <Path Width="8" Height="5" Data="M0,0 L4,5 L8,0" Stretch="Uniform"
+                        Stroke="{Binding $parent[RepeatButton].Foreground}" StrokeThickness="1.5" />
+                </RepeatButton>
+                <Border Name="PART_Indicator"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="3"
+                        Height="1"
+                        Margin="-12,0,-4,0"
+                        VerticalAlignment="Bottom"
+                        Background="{DynamicResource Md.Sys.Color.Outline.Brush}" />
+              </Grid>
+            </Border>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#PART_Indicator">
+          <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        </Style>
+        <Style Selector="^:disabled">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" />
+        </Style>
+      </ControlTheme>
+
+      <!-- TrackableEdit hosts this through its own PreviewableSlider template. Horizontal only:
+           that is the orientation the grid's slider editor uses. -->
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.SliderTheme" TargetType="Slider">
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="MinWidth" Value="80" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="Slider">
+            <Grid Background="Transparent" MinHeight="32">
+              <Track Name="PART_Track"
+                     Height="24"
+                     VerticalAlignment="Center"
+                     IsDirectionReversed="{TemplateBinding IsDirectionReversed}"
+                     Maximum="{TemplateBinding Maximum}"
+                     Minimum="{TemplateBinding Minimum}"
+                     Orientation="{TemplateBinding Orientation}"
+                     Value="{TemplateBinding Value, Mode=TwoWay}">
+                <Track.DecreaseButton>
+                  <RepeatButton Theme="{StaticResource Md.Comp.PropertyGrid.SliderDecreaseTheme}" />
+                </Track.DecreaseButton>
+                <Track.Thumb>
+                  <Thumb Name="PART_Thumb" Theme="{StaticResource Md.Comp.PropertyGrid.SliderThumbTheme}" />
+                </Track.Thumb>
+                <Track.IncreaseButton>
+                  <RepeatButton Theme="{StaticResource Md.Comp.PropertyGrid.SliderIncreaseTheme}" />
+                </Track.IncreaseButton>
+              </Track>
+            </Grid>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:disabled">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContainerOpacity}" />
+        </Style>
+      </ControlTheme>
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.SliderDecreaseTheme" TargetType="RepeatButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="RepeatButton">
+            <Border Height="4"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                    CornerRadius="2,0,0,2" />
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.SliderIncreaseTheme" TargetType="RepeatButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="RepeatButton">
+            <Border Height="4"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                    CornerRadius="0,2,2,0" />
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.SliderThumbTheme" TargetType="Thumb">
+        <Setter Property="Width" Value="4" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="ClipToBounds" Value="False" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="Thumb">
+            <Panel Width="24" Height="24" Background="Transparent">
+              <Border Name="PART_StateLayer"
+                      Width="24"
+                      Height="24"
+                      Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                      CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Full}"
+                      IsHitTestVisible="False"
+                      Opacity="0" />
+              <Border Width="4"
+                      Height="24"
+                      Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                      CornerRadius="2" />
+            </Panel>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" />
+        </Style>
+      </ControlTheme>
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.MeterTheme" TargetType="ProgressBar">
+        <Setter Property="MinHeight" Value="4" />
+        <Setter Property="MinWidth" Value="80" />
+        <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.Full}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="ProgressBar">
+            <Border Background="{TemplateBinding Background}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    ClipToBounds="True">
+              <Border Name="PART_Indicator"
+                      HorizontalAlignment="Left"
+                      Background="{TemplateBinding Foreground}"
+                      CornerRadius="{TemplateBinding CornerRadius}" />
+            </Border>
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+
+      <!-- =====================================================================================
+           Dates and times. The field is a Material filled field; the flyout keeps the control's
+           own wheel presenter, restyled as a Material surface card.
+           ===================================================================================== -->
+
+      <!-- The button a DatePicker/TimePicker opens its flyout with. -->
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.PickerFieldTheme" TargetType="Button">
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="MinWidth" Value="120" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        <Setter Property="CornerRadius" Value="4,4,0,0" />
+        <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="Button">
+            <Border Background="{TemplateBinding Background}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    ClipToBounds="True">
+              <ContentPresenter Name="PART_ContentPresenter"
+                                Padding="{TemplateBinding Padding}"
+                                HorizontalContentAlignment="Stretch"
+                                VerticalContentAlignment="Center"
+                                Content="{TemplateBinding Content}"
+                                Foreground="{TemplateBinding Foreground}" />
+            </Border>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:disabled">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" />
+        </Style>
+      </ControlTheme>
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.DateFieldTheme" TargetType="DatePicker">
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+        <Setter Property="CornerRadius" Value="4,4,0,0" />
+        <Setter Property="MinWidth" Value="160" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="DatePicker">
+            <Grid Name="LayoutRoot">
+              <Button Name="PART_FlyoutButton"
+                      Background="{TemplateBinding Background}"
+                      CornerRadius="{TemplateBinding CornerRadius}"
+                      Foreground="{TemplateBinding Foreground}"
+                      IsEnabled="{TemplateBinding IsEnabled}"
+                      MaxWidth="{TemplateBinding MaxWidth}"
+                      MinWidth="{TemplateBinding MinWidth}"
+                      Theme="{StaticResource Md.Comp.PropertyGrid.PickerFieldTheme}">
+                <!-- Column definitions are rebuilt by DatePicker.SetGrid from the culture's short
+                     date pattern; the two spacers are dereferenced there, so they have to exist. -->
+                <Grid Name="PART_ButtonContentGrid">
+                  <TextBlock Name="PART_DayTextBlock" HorizontalAlignment="Center" />
+                  <TextBlock Name="PART_MonthTextBlock" HorizontalAlignment="Center" />
+                  <TextBlock Name="PART_YearTextBlock" HorizontalAlignment="Center" />
+                  <Rectangle Name="PART_FirstSpacer" Fill="Transparent" Width="8" />
+                  <Rectangle Name="PART_SecondSpacer" Fill="Transparent" Width="8" />
+                </Grid>
+              </Button>
+              <Border Height="1"
+                      VerticalAlignment="Bottom"
+                      Background="{DynamicResource Md.Sys.Color.Outline.Brush}" />
+              <Popup Name="PART_Popup"
+                     IsLightDismissEnabled="True"
+                     Placement="Bottom"
+                     PlacementTarget="{TemplateBinding}">
+                <Popup.Styles>
+                  <Style Selector="PopupRoot">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="TransparencyLevelHint" Value="Transparent" />
+                    <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
+                  </Style>
+                </Popup.Styles>
+                <DatePickerPresenter Name="PART_PickerPresenter" />
+              </Popup>
+            </Grid>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:hasnodate /template/ Button#PART_FlyoutButton">
+          <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+        </Style>
+        <Style Selector="^:disabled">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" />
+        </Style>
+      </ControlTheme>
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.DatePanelTheme" TargetType="DatePickerPresenter">
+        <Setter Property="MinWidth" Value="280" />
+        <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.ExtraLarge}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="DatePickerPresenter">
+            <Border Background="{TemplateBinding Background}"
+                    BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                    BorderThickness="1"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    Padding="8">
+              <Grid RowDefinitions="*,Auto">
+                <Grid Name="PART_PickerContainer">
+                  <Grid.Styles>
+                    <Style Selector="DateTimePickerPanel &gt; ListBoxItem">
+                      <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.PickerItemTheme}" />
+                    </Style>
+                  </Grid.Styles>
+                  <Panel Name="PART_MonthHost">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+                      <DateTimePickerPanel Name="PART_MonthSelector" PanelType="Month" ItemHeight="40" ShouldLoop="True" />
+                    </ScrollViewer>
+                  </Panel>
+                  <Panel Name="PART_DayHost">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+                      <DateTimePickerPanel Name="PART_DaySelector" PanelType="Day" ItemHeight="40" ShouldLoop="True" />
+                    </ScrollViewer>
+                  </Panel>
+                  <Panel Name="PART_YearHost">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+                      <DateTimePickerPanel Name="PART_YearSelector" PanelType="Year" ItemHeight="40" ShouldLoop="False" />
+                    </ScrollViewer>
+                  </Panel>
+                  <Rectangle Name="HighlightRect"
+                             Grid.Column="0"
+                             Grid.ColumnSpan="5"
+                             Height="40"
+                             VerticalAlignment="Center"
+                             Fill="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                             IsHitTestVisible="False"
+                             RadiusX="20"
+                             RadiusY="20"
+                             ZIndex="-1" />
+                  <Rectangle Name="PART_FirstSpacer"
+                             Grid.Column="1"
+                             Width="1"
+                             HorizontalAlignment="Center"
+                             Fill="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+                  <Rectangle Name="PART_SecondSpacer"
+                             Grid.Column="3"
+                             Width="1"
+                             HorizontalAlignment="Center"
+                             Fill="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+                </Grid>
+                <Button Name="PART_AcceptButton"
+                        Grid.Row="1"
+                        Margin="0,8,0,0"
+                        HorizontalAlignment="Right"
+                        Theme="{StaticResource Md.Comp.PropertyGrid.ActionTheme}">
+                  <Path Width="14" Height="11" Data="M0,5 L4,9 L11,0" Stretch="Uniform"
+                        Stroke="{DynamicResource Md.Sys.Color.Primary.Brush}" StrokeThickness="2" />
+                </Button>
+              </Grid>
+            </Border>
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.TimeFieldTheme" TargetType="TimePicker">
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+        <Setter Property="CornerRadius" Value="4,4,0,0" />
+        <Setter Property="MinWidth" Value="120" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="TimePicker">
+            <Grid Name="LayoutRoot">
+              <Button Name="PART_FlyoutButton"
+                      Background="{TemplateBinding Background}"
+                      CornerRadius="{TemplateBinding CornerRadius}"
+                      Foreground="{TemplateBinding Foreground}"
+                      IsEnabled="{TemplateBinding IsEnabled}"
+                      MaxWidth="{TemplateBinding MaxWidth}"
+                      MinWidth="{TemplateBinding MinWidth}"
+                      Theme="{StaticResource Md.Comp.PropertyGrid.PickerFieldTheme}">
+                <!-- TimePicker.SetGrid assigns the columns, and dereferences the first three
+                     hosts and the first two splitters, so all four hosts and three splitters
+                     stay - the fourth host and third splitter are what enable seconds. -->
+                <Grid Name="PART_FlyoutButtonContentGrid">
+                  <Border Name="PART_FirstPickerHost">
+                    <TextBlock Name="PART_HourTextBlock" HorizontalAlignment="Center" />
+                  </Border>
+                  <Rectangle Name="PART_FirstColumnDivider" Width="8" Fill="Transparent" />
+                  <Border Name="PART_SecondPickerHost">
+                    <TextBlock Name="PART_MinuteTextBlock" HorizontalAlignment="Center" />
+                  </Border>
+                  <Rectangle Name="PART_SecondColumnDivider" Width="8" Fill="Transparent" />
+                  <Border Name="PART_ThirdPickerHost">
+                    <TextBlock Name="PART_SecondTextBlock" HorizontalAlignment="Center" />
+                  </Border>
+                  <Rectangle Name="PART_ThirdColumnDivider" Width="8" Fill="Transparent" />
+                  <Border Name="PART_FourthPickerHost">
+                    <TextBlock Name="PART_PeriodTextBlock" HorizontalAlignment="Center" />
+                  </Border>
+                </Grid>
+              </Button>
+              <Border Height="1"
+                      VerticalAlignment="Bottom"
+                      Background="{DynamicResource Md.Sys.Color.Outline.Brush}" />
+              <Popup Name="PART_Popup"
+                     IsLightDismissEnabled="True"
+                     Placement="Bottom"
+                     PlacementTarget="{TemplateBinding}">
+                <Popup.Styles>
+                  <Style Selector="PopupRoot">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="TransparencyLevelHint" Value="Transparent" />
+                    <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
+                  </Style>
+                </Popup.Styles>
+                <TimePickerPresenter Name="PART_PickerPresenter" />
+              </Popup>
+            </Grid>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:hasnotime /template/ Button#PART_FlyoutButton">
+          <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+        </Style>
+        <Style Selector="^:disabled">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" />
+        </Style>
+      </ControlTheme>
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.TimePanelTheme" TargetType="TimePickerPresenter">
+        <Setter Property="MinWidth" Value="240" />
+        <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.ExtraLarge}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="TimePickerPresenter">
+            <Border Background="{TemplateBinding Background}"
+                    BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                    BorderThickness="1"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    Padding="8">
+              <Grid RowDefinitions="*,Auto">
+                <Grid Name="PART_PickerContainer">
+                  <Grid.Styles>
+                    <Style Selector="DateTimePickerPanel &gt; ListBoxItem">
+                      <Setter Property="Theme" Value="{StaticResource Md.Comp.PropertyGrid.PickerItemTheme}" />
+                    </Style>
+                  </Grid.Styles>
+                  <Panel Name="PART_HourHost">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+                      <DateTimePickerPanel Name="PART_HourSelector" PanelType="Hour" ItemHeight="40" ShouldLoop="True" />
+                    </ScrollViewer>
+                  </Panel>
+                  <Panel Name="PART_MinuteHost">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+                      <DateTimePickerPanel Name="PART_MinuteSelector" PanelType="Minute" ItemHeight="40" ShouldLoop="True" />
+                    </ScrollViewer>
+                  </Panel>
+                  <Panel Name="PART_SecondHost">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+                      <DateTimePickerPanel Name="PART_SecondSelector" PanelType="Second" ItemHeight="40" ShouldLoop="True" />
+                    </ScrollViewer>
+                  </Panel>
+                  <Panel Name="PART_PeriodHost">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+                      <DateTimePickerPanel Name="PART_PeriodSelector" PanelType="TimePeriod" ItemHeight="40" ShouldLoop="True" />
+                    </ScrollViewer>
+                  </Panel>
+                  <Rectangle Name="HighlightRect"
+                             Grid.Column="0"
+                             Grid.ColumnSpan="7"
+                             Height="40"
+                             VerticalAlignment="Center"
+                             Fill="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                             IsHitTestVisible="False"
+                             RadiusX="20"
+                             RadiusY="20"
+                             ZIndex="-1" />
+                  <Rectangle Name="PART_FirstSpacer"
+                             Grid.Column="1"
+                             Width="1"
+                             HorizontalAlignment="Center"
+                             Fill="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+                  <Rectangle Name="PART_SecondSpacer"
+                             Grid.Column="3"
+                             Width="1"
+                             HorizontalAlignment="Center"
+                             Fill="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+                  <Rectangle Name="PART_ThirdSpacer"
+                             Grid.Column="5"
+                             Width="1"
+                             HorizontalAlignment="Center"
+                             Fill="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+                </Grid>
+                <Button Name="PART_AcceptButton"
+                        Grid.Row="1"
+                        Margin="0,8,0,0"
+                        HorizontalAlignment="Right"
+                        Theme="{StaticResource Md.Comp.PropertyGrid.ActionTheme}">
+                  <Path Width="14" Height="11" Data="M0,5 L4,9 L11,0" Stretch="Uniform"
+                        Stroke="{DynamicResource Md.Sys.Color.Primary.Brush}" StrokeThickness="2" />
+                </Button>
+              </Grid>
+            </Border>
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+
+      <!-- One wheel row. The panels build their own ListBoxItems. -->
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.PickerItemTheme" TargetType="ListBoxItem">
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyLarge.Size}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="ListBoxItem">
+            <Border Background="{TemplateBinding Background}">
+              <ContentPresenter Name="PART_ContentPresenter"
+                                Padding="{TemplateBinding Padding}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="Center"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                Foreground="{TemplateBinding Foreground}" />
+            </Border>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:selected">
+          <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+          <Setter Property="FontWeight" Value="Medium" />
+        </Style>
+      </ControlTheme>
+
+      <!-- =====================================================================================
+           Structure: categories, the name/value splitter, the scroller.
+           ===================================================================================== -->
+
+      <!-- The grid always expands downwards, so that is the direction this template implements.
+           PART_ContentPresenter keeps its name: the grid indents it after the template applies. -->
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.CategoryTheme" TargetType="Expander">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.TitleSmall.Size}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="Expander">
+            <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+              <Grid RowDefinitions="Auto,*">
+                <ToggleButton Name="PART_toggle"
+                              Grid.Row="0"
+                              MinHeight="40"
+                              HorizontalAlignment="Stretch"
+                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"
+                              Theme="{StaticResource Md.Comp.PropertyGrid.CategoryToggleTheme}">
+                  <ContentPresenter Content="{TemplateBinding Header}"
+                                    ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                    Foreground="{TemplateBinding Foreground}" />
+                </ToggleButton>
+                <Border Name="PART_ContentBorder"
+                        Grid.Row="1"
+                        BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                        BorderThickness="1,0,0,0"
+                        Margin="20,0,0,0"
+                        IsVisible="{TemplateBinding IsExpanded}">
+                  <ContentPresenter Name="PART_ContentPresenter"
+                                    Margin="8,0,0,8"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    Content="{TemplateBinding Content}"
+                                    ContentTemplate="{TemplateBinding ContentTemplate}" />
+                </Border>
+              </Grid>
+            </Border>
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.CategoryToggleTheme" TargetType="ToggleButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="ToggleButton">
+            <Border Background="{TemplateBinding Background}"
+                    CornerRadius="{DynamicResource Md.Sys.Shape.Corner.ExtraSmall}"
+                    ClipToBounds="True">
+              <Grid ColumnDefinitions="*,Auto">
+                <Border Name="PART_StateLayer"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Background="{TemplateBinding Foreground}"
+                        Opacity="0" />
+                <ContentPresenter Name="PART_ContentPresenter"
+                                  Grid.Column="0"
+                                  Padding="12,0"
+                                  VerticalAlignment="Center"
+                                  Content="{TemplateBinding Content}"
+                                  Foreground="{TemplateBinding Foreground}" />
+                <Path Name="PART_Chevron"
+                      Grid.Column="1"
+                      Width="10"
+                      Height="6"
+                      Margin="0,0,12,0"
+                      VerticalAlignment="Center"
+                      Data="M0,0 L5,5 L10,0"
+                      IsHitTestVisible="False"
+                      RenderTransform="rotate(0)"
+                      Stretch="Uniform"
+                      Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                      StrokeThickness="1.5" />
+              </Grid>
+            </Border>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:checked /template/ Path#PART_Chevron">
+          <Setter Property="RenderTransform" Value="rotate(180)" />
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" />
+        </Style>
+      </ControlTheme>
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.SplitterTheme" TargetType="GridSplitter">
+        <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+        <Setter Property="MinWidth" Value="2" />
+        <Setter Property="MinHeight" Value="2" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="GridSplitter">
+            <Border Background="{TemplateBinding Background}" />
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover">
+          <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+        </Style>
+      </ControlTheme>
+
+      <!-- The grid's property list scrolls in a native ScrollViewer, whose scrollbars the core
+           package does not theme - so the scroller here hands them to MdScrollBar. -->
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.ScrollerTheme" TargetType="ScrollViewer">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="ScrollViewer">
+            <Grid ColumnDefinitions="*,Auto" RowDefinitions="*,Auto">
+              <ScrollContentPresenter Name="PART_ContentPresenter"
+                                      Grid.Row="0"
+                                      Grid.Column="0"
+                                      Background="{TemplateBinding Background}"
+                                      HorizontalSnapPointsAlignment="{TemplateBinding HorizontalSnapPointsAlignment}"
+                                      HorizontalSnapPointsType="{TemplateBinding HorizontalSnapPointsType}"
+                                      Padding="{TemplateBinding Padding}"
+                                      VerticalSnapPointsAlignment="{TemplateBinding VerticalSnapPointsAlignment}"
+                                      VerticalSnapPointsType="{TemplateBinding VerticalSnapPointsType}">
+                <ScrollContentPresenter.GestureRecognizers>
+                  <ScrollGestureRecognizer CanHorizontallyScroll="{Binding CanHorizontallyScroll, ElementName=PART_ContentPresenter}"
+                                           CanVerticallyScroll="{Binding CanVerticallyScroll, ElementName=PART_ContentPresenter}"
+                                           Extent="{Binding Extent, ElementName=PART_ContentPresenter}"
+                                           Offset="{Binding Offset, ElementName=PART_ContentPresenter}"
+                                           Viewport="{Binding Viewport, ElementName=PART_ContentPresenter}" />
+                </ScrollContentPresenter.GestureRecognizers>
+              </ScrollContentPresenter>
+              <md:MdScrollBar Name="PART_HorizontalScrollBar" Grid.Row="1" Orientation="Horizontal" />
+              <md:MdScrollBar Name="PART_VerticalScrollBar" Grid.Column="1" Orientation="Vertical" />
+              <Panel Name="PART_ScrollBarsSeparator"
+                     Grid.Row="1"
+                     Grid.Column="1"
+                     Background="Transparent" />
+            </Grid>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^[AllowAutoHide=True] /template/ ScrollContentPresenter#PART_ContentPresenter">
+          <Setter Property="Grid.ColumnSpan" Value="2" />
+          <Setter Property="Grid.RowSpan" Value="2" />
+        </Style>
+      </ControlTheme>
+
+      <!-- =====================================================================================
+           Overlays: the options menu and the tooltips.
+           ===================================================================================== -->
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.MenuTheme" TargetType="ContextMenu">
+        <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.ExtraSmall}" />
+        <Setter Property="Padding" Value="0,4" />
+        <Setter Property="MinWidth" Value="180" />
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="WindowManagerAddShadowHint" Value="False" />
+        <Setter Property="ItemContainerTheme" Value="{StaticResource Md.Comp.PropertyGrid.MenuItemTheme}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="ContextMenu">
+            <Border Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    MaxWidth="{TemplateBinding MaxWidth}"
+                    MinWidth="{TemplateBinding MinWidth}"
+                    Padding="{TemplateBinding Padding}">
+              <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                <ItemsPresenter Name="PART_ItemsPresenter"
+                                ItemsPanel="{TemplateBinding ItemsPanel}"
+                                KeyboardNavigation.TabNavigation="Continue" />
+              </ScrollViewer>
+            </Border>
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.MenuItemTheme" TargetType="MenuItem">
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+        <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.LabelLarge.Size}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="MenuItem">
+            <Border Background="{TemplateBinding Background}" ClipToBounds="True">
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <Border Name="PART_StateLayer"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="3"
+                        Background="{TemplateBinding Foreground}"
+                        Opacity="0" />
+                <Panel Name="PART_ToggleIconPresenter"
+                       Grid.Column="0"
+                       Width="24"
+                       Margin="12,0,0,0"
+                       VerticalAlignment="Center">
+                  <Path Name="PART_CheckGlyph"
+                        Width="12"
+                        Height="10"
+                        Data="M0,5 L4,9 L11,0"
+                        IsVisible="False"
+                        Stretch="Uniform"
+                        Stroke="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                        StrokeThickness="2" />
+                </Panel>
+                <ContentPresenter Name="PART_ContentPresenter"
+                                  Grid.Column="1"
+                                  Margin="{TemplateBinding Padding}"
+                                  VerticalAlignment="Center"
+                                  Content="{TemplateBinding Header}"
+                                  ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                  Foreground="{TemplateBinding Foreground}" />
+                <TextBlock Name="PART_InputGestureText"
+                           Grid.Column="2"
+                           Margin="12,0,12,0"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                           Text="{TemplateBinding InputGestureText}" />
+                <Popup Name="PART_Popup"
+                       IsLightDismissEnabled="False"
+                       Placement="RightEdgeAlignedTop"
+                       PlacementTarget="{TemplateBinding}">
+                  <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
+                          BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                          BorderThickness="1"
+                          CornerRadius="{DynamicResource Md.Sys.Shape.Corner.ExtraSmall}"
+                          Padding="0,4">
+                    <ItemsPresenter Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+                  </Border>
+                </Popup>
+              </Grid>
+            </Border>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:checked /template/ Path#PART_CheckGlyph">
+          <Setter Property="IsVisible" Value="True" />
+        </Style>
+        <Style Selector="^:pointerover /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border#PART_StateLayer">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" />
+        </Style>
+        <Style Selector="^:disabled">
+          <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" />
+        </Style>
+      </ControlTheme>
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.MenuSeparatorTheme" TargetType="Separator">
+        <Setter Property="Template">
+          <ControlTemplate TargetType="Separator">
+            <Border Height="1"
+                    Margin="12,4"
+                    Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+
+      <ControlTheme x:Key="Md.Comp.PropertyGrid.ToolTipTheme" TargetType="ToolTip">
+        <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.InverseSurface.Brush}" />
+        <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}" />
+        <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodySmall.Size}" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="MaxWidth" Value="320" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="ToolTip">
+            <Border Background="{TemplateBinding Background}"
+                    CornerRadius="{DynamicResource Md.Sys.Shape.Corner.ExtraSmall}"
+                    MaxWidth="{TemplateBinding MaxWidth}">
+              <ContentPresenter Name="PART_ContentPresenter"
+                                Margin="{TemplateBinding Padding}"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                Foreground="{TemplateBinding Foreground}" />
+            </Border>
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+
+    </ResourceDictionary>
+  </Styles.Resources>
+</Styles>
