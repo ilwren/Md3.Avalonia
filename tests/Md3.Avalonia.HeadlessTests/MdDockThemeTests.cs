@@ -287,10 +287,13 @@ public class MdDockThemeTests
     }
 
     /// <summary>
-    /// A Dock tab's ink is one of the two colours this theme maps it to: the idle
-    /// <c>DockTabForegroundBrush</c> (onSurfaceVariant) or, on the selected tab, the
-    /// <c>DockTabActiveForegroundBrush</c> (onPrimary). Which one depends on Dock's own selectors,
-    /// so the test accepts either and rejects anything else - including no theme at all.
+    /// A Dock tab's ink is one of the colour roles this theme maps Dock's tab foregrounds to:
+    /// idle <c>DockTabForegroundBrush</c> (onSurfaceVariant), pointer-over
+    /// <c>DockDocumentTabPointerOverForegroundBrush</c> (onSurface), selected
+    /// <c>DockTabSelectedForegroundBrush</c> (primary), or the active tab's
+    /// <c>DockTabActiveForegroundBrush</c> (onPrimary). Which role applies is Dock's own selector's
+    /// business, so the test accepts any of the four and rejects everything else - an unthemed tab
+    /// has no foreground at all, and a Fluent one would be neither role.
     /// </summary>
     private static void AssertTabInk(IBrush? foreground)
     {
@@ -298,6 +301,8 @@ public class MdDockThemeTests
         Assert.Contains(ink, new[]
         {
             ColorOf(Brush("Md.Sys.Color.OnSurfaceVariant.Brush")),
+            ColorOf(Brush("Md.Sys.Color.OnSurface.Brush")),
+            ColorOf(Brush("Md.Sys.Color.Primary.Brush")),
             ColorOf(Brush("Md.Sys.Color.OnPrimary.Brush"))
         });
     }
