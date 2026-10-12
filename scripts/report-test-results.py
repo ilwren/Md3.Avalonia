@@ -19,6 +19,7 @@ def main():
 
     failed = 0
     passed = 0
+    skipped = 0
     failures = []
     for result in results:
         outcome = result.get('outcome')
@@ -43,14 +44,19 @@ def main():
             failures.append((test_name, msg))
         elif outcome == 'Passed':
             passed += 1
+        else:
+            skipped += 1
 
-    print(f"Summary: {passed} passed, {failed} failed.")
+    print(f"Summary: {passed} passed, {failed} failed, {skipped} not executed.")
+    # A notice annotation keeps the counts readable from the check run itself, not only from the step summary.
+    print(f"::notice title=Headless test results::{passed} passed, {failed} failed, {skipped} not executed.")
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary_path:
         with open(summary_path, "a", encoding="utf-8") as stream:
             stream.write("## Headless test results\n\n")
             stream.write(f"- Passed: **{passed}**\n")
             stream.write(f"- Failed: **{failed}**\n")
+            stream.write(f"- Not executed: **{skipped}**\n")
             # GitHub caps annotations at ten per level per step, so the summary carries the
             # full list; otherwise a broad regression hides most of its own evidence.
             if failures:
