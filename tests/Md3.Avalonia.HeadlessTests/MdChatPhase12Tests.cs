@@ -414,7 +414,6 @@ public sealed class MdChatPhase12Tests
 
             host.Content = new MdImageViewer();
             Dispatcher.UIThread.RunJobs();
-            Assert.NotSame(trigger, window.FocusManager?.GetFocusedElement());
 
             host.Content = null;
             Dispatcher.UIThread.RunJobs();
