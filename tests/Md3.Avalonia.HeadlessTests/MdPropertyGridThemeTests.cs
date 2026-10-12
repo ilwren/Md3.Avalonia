@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
@@ -140,29 +141,32 @@ public class MdPropertyGridThemeTests
         using var host = Show(grid);
 
         var picker = grid.GetVisualDescendants().OfType<DatePicker>().Single();
+        var popup = picker.GetVisualDescendants().OfType<Popup>().Single(control => control.Name == "PART_Popup");
         var flyout = picker.GetVisualDescendants().OfType<Button>().Single(button => button.Name == "PART_FlyoutButton");
         Assert.Same(Keyed(grid, "Md.Comp.PropertyGrid.PickerFieldTheme"), flyout.Theme);
 
         flyout.RaiseEvent(new RoutedEventArgs(Button.ClickEvent, flyout));
         Dispatcher.UIThread.RunJobs();
+        Assert.True(popup.IsOpen);
 
         var presenter = picker.GetLogicalDescendants().OfType<DatePickerPresenter>().Single();
         Assert.Same(Keyed(grid, "Md.Comp.PropertyGrid.DatePanelTheme"), presenter.Theme);
 
-        // The presenter resolves its container, its three panels and its accept button with
-        // NameScope.Get, so a template missing one of them throws the moment the flyout opens.
-        // Headless has no IPopupImpl, so the flyout is hosted in the window's overlay layer: the
-        // realized presenter hangs off the top level, not off the grid.
-        var realized = TopLevel.GetTopLevel(grid)!.GetVisualDescendants().OfType<DatePickerPresenter>().Single();
-        Assert.NotNull(realized.GetVisualDescendants().OfType<Grid>().SingleOrDefault(panel => panel.Name == "PART_PickerContainer"));
-        Assert.Equal(3, realized.GetVisualDescendants().OfType<DateTimePickerPanel>().Count());
+        // Headless has no IPopupImpl, so the flyout is hosted in the window's overlay layer, where
+        // it is only realized once the window renders again. Realizing it is the point: the
+        // presenter resolves its container, its three panels and its accept button with
+        // NameScope.Get, so a template missing one of them throws here rather than degrading.
+        Assert.NotNull(host.Window.CaptureRenderedFrame());
 
-        var accept = realized.GetVisualDescendants().OfType<Button>().Single(button => button.Name == "PART_AcceptButton");
+        Assert.NotNull(presenter.GetLogicalDescendants().OfType<Grid>().SingleOrDefault(panel => panel.Name == "PART_PickerContainer"));
+        Assert.Equal(3, presenter.GetLogicalDescendants().OfType<DateTimePickerPanel>().Count());
+
+        var accept = presenter.GetLogicalDescendants().OfType<Button>().Single(button => button.Name == "PART_AcceptButton");
         accept.RaiseEvent(new RoutedEventArgs(Button.ClickEvent, accept));
         Dispatcher.UIThread.RunJobs();
 
         Assert.Equal(new DateTime(2026, 10, 12), model.Published.Date);
-        Assert.False(picker.GetLogicalDescendants().OfType<Popup>().Single().IsOpen);
+        Assert.False(popup.IsOpen);
     }
 
     [AvaloniaFact]
@@ -171,12 +175,15 @@ public class MdPropertyGridThemeTests
         var grid = NewGrid(new PropertyGridTestModel());
         using var host = Show(grid);
 
+        // The grid opens its options menu from the click handler rather than through
+        // Button.ContextMenu, so the menu is what a click produces.
         var options = grid.GetVisualDescendants().OfType<Button>().Single(button => button.Name == "OptionsButton");
-        var menu = Assert.IsType<ContextMenu>(options.ContextMenu);
-        Assert.Same(Keyed(grid, "Md.Comp.PropertyGrid.MenuTheme"), menu.Theme);
-
-        menu.Open(options);
+        options.RaiseEvent(new RoutedEventArgs(Button.ClickEvent, options));
         Dispatcher.UIThread.RunJobs();
+        Assert.NotNull(host.Window.CaptureRenderedFrame());
+
+        var menu = Assert.IsType<ContextMenu>(Assert.Single(grid.GetLogicalDescendants().OfType<ContextMenu>()));
+        Assert.Same(Keyed(grid, "Md.Comp.PropertyGrid.MenuTheme"), menu.Theme);
 
         var items = menu.GetLogicalDescendants().OfType<MenuItem>().ToList();
         Assert.NotEmpty(items);
@@ -256,6 +263,8 @@ public class MdPropertyGridThemeTests
 
     private sealed class Scope(Window window) : IDisposable
     {
+        public Window Window { get; } = window;
+
         public void Dispose() => window.Close();
     }
 }
