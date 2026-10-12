@@ -345,11 +345,11 @@
         <Border MinWidth="0" MaxWidth="560" Padding="24"
                 Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
                 CornerRadius="28">
-          <Grid x:Name="PART_Layout" ColumnDefinitions="Auto,*" ColumnSpacing="0">
+          <Grid x:Name="PART_Layout" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="0">
             <ContentPresenter x:Name="PART_Icon"
                               Content="{TemplateBinding ApplicationIcon}"
                               IsVisible="False" />
-            <StackPanel Grid.Column="1" Spacing="6">
+            <StackPanel x:Name="PART_TextColumn" Grid.Column="1" Spacing="6">
               <TextBlock FontSize="24"
                          TextWrapping="Wrap"
                          Text="{TemplateBinding EffectiveApplicationName}" />
@@ -379,6 +379,19 @@
     </Style>
     <Style Selector="^:has-legalese /template/ TextBlock#PART_Legalese">
       <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:compact /template/ Grid#PART_Layout">
+      <Setter Property="ColumnSpacing" Value="0" />
+      <Setter Property="RowSpacing" Value="16" />
+    </Style>
+    <Style Selector="^:compact /template/ ContentPresenter#PART_Icon">
+      <Setter Property="Grid.ColumnSpan" Value="2" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="^:compact /template/ StackPanel#PART_TextColumn">
+      <Setter Property="Grid.Row" Value="1" />
+      <Setter Property="Grid.Column" Value="0" />
+      <Setter Property="Grid.ColumnSpan" Value="2" />
     </Style>
   </ControlTheme>
   <ControlTheme x:Key="{x:Type md:MdLicensePage}" TargetType="md:MdLicensePage">

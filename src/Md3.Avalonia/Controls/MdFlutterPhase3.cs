@@ -441,9 +441,13 @@ public sealed class MdAboutDialog : ContentControl
         ApplicationVersionProperty.Changed.AddClassHandler<MdAboutDialog>((dialog, _) => dialog.UpdateEffectiveMetadata());
         LegaleseProperty.Changed.AddClassHandler<MdAboutDialog>((dialog, _) => dialog.UpdateEffectiveMetadata());
         ApplicationIconProperty.Changed.AddClassHandler<MdAboutDialog>((dialog, _) => dialog.UpdateEffectiveMetadata());
+        BoundsProperty.Changed.AddClassHandler<MdAboutDialog>((dialog, _) => dialog.UpdateResponsiveState());
     }
 
     public MdAboutDialog() => UpdateEffectiveMetadata();
+
+    // M3: narrow surfaces stack the icon above the text instead of beside it.
+    private void UpdateResponsiveState() => PseudoClasses.Set(":compact", Bounds.Width > 0 && Bounds.Width < 420);
 
     public object? ApplicationIcon { get => GetValue(ApplicationIconProperty); set => SetValue(ApplicationIconProperty, value); }
 

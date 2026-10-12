@@ -95,6 +95,83 @@ public sealed class MdRound2BehaviorTests
         Assert.Equal(item.Bounds.Width, indicator.Bounds.Width, 1);
     }
 
+    [AvaloniaFact]
+    public void Numeric_Box_Puts_The_Spinner_Buttons_On_The_Right()
+    {
+        var box = new MdNumericBox();
+        var window = new Window { Width = 400, Height = 200, Content = box };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        // Avalonia's ButtonSpinner defaults to the left; the field reserves its space as a
+        // trailing icon, so the theme must default the location to the right.
+        Assert.Equal(Location.Right, box.ButtonSpinnerLocation);
+    }
+
+    [AvaloniaFact]
+    public void Settings_Expander_Reveals_And_Hides_Its_Content_With_The_Expanded_State()
+    {
+        var expander = new MdSettingsExpander { Header = "Network", Width = 400 };
+        expander.Items.Add(new MdSettingsCard { Header = "Private DNS" });
+        var window = new Window { Width = 480, Height = 400, Content = expander };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var content = expander.GetVisualDescendants().OfType<global::Avalonia.Controls.Border>()
+            .Single(border => border.Name == "PART_ContentArea");
+        Assert.False(content.IsVisible);
+
+        expander.IsExpanded = true;
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(content.IsVisible);
+
+        expander.IsExpanded = false;
+        Dispatcher.UIThread.RunJobs();
+        // Collapse animates before hiding; the hide lands on a timer, so allow the jobs to run.
+        for (var i = 0; i < 20 && content.IsVisible; i++)
+        {
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        Assert.False(content.IsVisible);
+    }
+
+    [AvaloniaFact]
+    public void About_Dialog_Stacks_The_Icon_Above_The_Text_On_Narrow_Surfaces()
+    {
+        var dialog = new MdAboutDialog
+        {
+            ApplicationName = "Md3.Avalonia",
+            ApplicationIcon = new global::Avalonia.Controls.Border { Width = 48, Height = 48 },
+        };
+        var window = new Window { Width = 360, Height = 560, Content = dialog };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var icon = dialog.GetVisualDescendants().OfType<global::Avalonia.Controls.Primitives.ContentPresenter>()
+            .Single(presenter => presenter.Name == "PART_Icon");
+        var text = dialog.GetVisualDescendants().OfType<StackPanel>()
+            .Single(panel => panel.Name == "PART_TextColumn");
+
+        // Narrow: stacked - text sits below the icon.
+        Assert.True(text.Bounds.Y > icon.Bounds.Y, $"stacked layout expected, got icon {icon.Bounds} text {text.Bounds}");
+
+        // Wide: side by side - text sits to the right of the icon.
+        var wide = new Window { Width = 640, Height = 560, Content = new MdAboutDialog
+        {
+            ApplicationName = "Md3.Avalonia",
+            ApplicationIcon = new global::Avalonia.Controls.Border { Width = 48, Height = 48 },
+        } };
+        wide.Show();
+        Dispatcher.UIThread.RunJobs();
+        var wideDialog = (MdAboutDialog)wide.Content!;
+        var wideIcon = wideDialog.GetVisualDescendants().OfType<global::Avalonia.Controls.Primitives.ContentPresenter>()
+            .Single(presenter => presenter.Name == "PART_Icon");
+        var wideText = wideDialog.GetVisualDescendants().OfType<StackPanel>()
+            .Single(panel => panel.Name == "PART_TextColumn");
+        Assert.True(wideText.Bounds.X > wideIcon.Bounds.X, $"side-by-side layout expected, got icon {wideIcon.Bounds} text {wideText.Bounds}");
+    }
+
     [Fact]
     public void Baseline_Surface_Tokens_Match_The_M3_2023_Values()
     {

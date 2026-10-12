@@ -206,6 +206,9 @@
   <ControlTheme x:Key="{x:Type md:MdNumericBox}" TargetType="md:MdNumericBox">
     <Setter Property="MinWidth" Value="160" /><Setter Property="MinHeight" Value="56" />
     <Setter Property="VerticalAlignment" Value="Top" />
+    <!-- Avalonia's ButtonSpinner defaults its +/- column to the left; the field reserves its
+         space as a trailing icon, so M3 puts the spinner on the right. -->
+    <Setter Property="ButtonSpinnerLocation" Value="Right" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
     <Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" />
     <Setter Property="Template">

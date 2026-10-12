@@ -206,9 +206,7 @@
                           Cursor="Hand">
               <ToggleButton.Styles>
                 <Style Selector="ToggleButton:checked /template/ Path#PART_ExpanderChevron">
-                  <Setter Property="RenderTransform">
-                    <RotateTransform Angle="180" />
-                  </Setter>
+                  <Setter Property="RenderTransform" Value="rotate(180deg)" />
                 </Style>
               </ToggleButton.Styles>
               <ToggleButton.Template>
@@ -245,10 +243,13 @@
                             StrokeJoin="Round"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            RenderTransformOrigin="50%,50%">
-                        <Path.RenderTransform>
-                          <RotateTransform Angle="0" />
-                        </Path.RenderTransform>
+                            RenderTransformOrigin="50%,50%"
+                            RenderTransform="rotate(0deg)">
+                        <Path.Transitions>
+                          <Transitions>
+                            <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.25" />
+                          </Transitions>
+                        </Path.Transitions>
                       </Path>
                     </Grid>
                   </Grid>
@@ -260,7 +261,6 @@
             <!-- No horizontal padding: the hosted MdSettingsCards already carry 16, so adding
                  another 16 here indented them to 32 and broke alignment with the header above. -->
             <Border x:Name="PART_ContentArea"
-                    IsVisible="{TemplateBinding IsExpanded}"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
                     BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
                     BorderThickness="0,1,0,0"
@@ -276,6 +276,9 @@
         <StackPanel Spacing="4" />
       </ItemsPanelTemplate>
     </Setter>
+    <Style Selector="^:not(:expanded) /template/ Border#PART_ContentArea">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
   </ControlTheme>
 
 </ResourceDictionary>
