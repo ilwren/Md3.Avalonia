@@ -76,6 +76,9 @@ public sealed class MdChatView : TemplatedControl
     private TextBlock? _unreadText;
     private bool _isAtBottom = true;
     private bool _historyPending;
+    private bool _changePending;
+    private bool _followBeforeChange;
+    private (MdChatRow Row, double Top)? _anchorBeforeChange;
     private const double HistoryTriggerDistance = 48;
     private int _unreadCount;
     private string _jumpToLatestText = string.Empty;
@@ -491,6 +494,15 @@ public sealed class MdChatView : TemplatedControl
         if (_unreadText is not null) _unreadText.IsVisible = count > 0;
     }
 
+    private void FinishChange()
+    {
+        _changePending = false;
+        if (_followBeforeChange) ScrollToLatest();
+        else if (_anchorBeforeChange is { } anchor) RestoreAnchor(anchor);
+        _anchorBeforeChange = null;
+        _historyPending = false;
+    }
+
     /// <summary>The first visible message and its screen position, captured before the list changes.</summary>
     private (MdChatRow Row, double Top)? CaptureAnchor()
     {
@@ -520,19 +532,20 @@ public sealed class MdChatView : TemplatedControl
 
     private void OnMessagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        // Read before the rows change, while the layout still reflects the position the reader sees.
-        var followLatest = IsAtBottom;
-        var anchor = followLatest ? null : CaptureAnchor();
-        var added = SyncRows(e);
-        // Posted so the list lays out the change first. The history guard stays up until then, so the offset that
-        // is compensated here cannot trigger another history request.
-        Dispatcher.UIThread.Post(() =>
+        // A burst of changes (for example 50 prepended messages) is captured once, before its first change. The layout
+        // still reflects the position the reader sees at that moment; capturing per change would read rows that have
+        // not been laid out yet.
+        if (!_changePending)
         {
-            if (followLatest) ScrollToLatest();
-            else if (anchor is { } captured) RestoreAnchor(captured);
-            _historyPending = false;
-        }, DispatcherPriority.Background);
-        if (!followLatest && added > 0) SetUnreadCount(UnreadCount + added);
+            _changePending = true;
+            _followBeforeChange = IsAtBottom;
+            _anchorBeforeChange = _followBeforeChange ? null : CaptureAnchor();
+            // Posted so the list lays out the whole burst first. The history guard stays up until then, so the offset
+            // compensated here cannot trigger another history request.
+            Dispatcher.UIThread.Post(FinishChange, DispatcherPriority.Background);
+        }
+        var added = SyncRows(e);
+        if (!_followBeforeChange && added > 0) SetUnreadCount(UnreadCount + added);
         ReconcileSelection();
         var message = e.NewItems?.OfType<MdChatMessage>().LastOrDefault();
         if (message is null) return;
