@@ -445,13 +445,24 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
 
     private void InvalidateDisplayText()
     {
-        // Desktop compositors can keep a stale glyph run on the anchor text after a commit
-        // (the bound SelectedDate/SelectedTime readout below the field is already correct while
-        // the field still paints the old string). Measure + render invalidation forces the new
-        // text onto the screen.
-        _displayTextBlock?.InvalidateMeasure();
-        _displayTextBlock?.InvalidateVisual();
+        var textBlock = _displayTextBlock;
+        if (textBlock is null) return;
+        var text = DisplayText;
+        // Assign directly instead of leaning on the template binding to the read-only direct
+        // property, so the field string tracks DisplayText on every platform.
+        if (!string.Equals(textBlock.Text, text, System.StringComparison.Ordinal)) textBlock.Text = text;
+        textBlock.InvalidateMeasure();
+        textBlock.InvalidateVisual();
         _anchorButton?.InvalidateVisual();
+        // Desktop builds were observed keeping the previously committed string on screen even
+        // though Text already holds the new value: round-trip through an invisible trailing
+        // character so the TextBlock has to build a fresh text layout and glyph run, then
+        // restore the exact string on the following render pass.
+        Dispatcher.UIThread.Post(() =>
+        {
+            textBlock.Text = text + "\u200b";
+            Dispatcher.UIThread.Post(() => textBlock.Text = text, DispatcherPriority.Render);
+        }, DispatcherPriority.Render);
     }
 
     private ScrollViewer? _scrollAncestor;
