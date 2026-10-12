@@ -10,6 +10,8 @@
     <PackageReference Include="AvaloniaRichEditor" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
+    <!-- The Gallery owns its concrete playback backend; Md3.Avalonia controls stay backend-neutral. -->
+    <PackageReference Include="LibVLCSharp" />
     <ProjectReference Include="../../src/Md3.Avalonia/Md3.Avalonia.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Icons/Md3.Avalonia.Icons.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Icons.Lite/Md3.Avalonia.Icons.Lite.csproj" />

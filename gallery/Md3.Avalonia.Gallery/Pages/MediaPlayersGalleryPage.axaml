@@ -2,94 +2,116 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             xmlns:player="using:Md3.Avalonia.Gallery.Media"
              x:Class="Md3.Avalonia.Gallery.Pages.MediaPlayersGalleryPage">
-  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Spacing="28" Margin="0,0,12,32">
-      <StackPanel Spacing="8">
+  <md:MdScrollViewer x:Name="PageScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel x:Name="ContentStack" Spacing="28" Margin="0,0,12,32">
+      <StackPanel x:Name="IntroSection" Spacing="8">
         <TextBlock Classes="h1" Text="Media players" />
         <TextBlock Classes="body" MaxWidth="820" TextWrapping="Wrap"
-                   Text="Material-themed controls for local audio and video applications. They present state and emit playback or seek requests; the host owns media decoding, file access, and platform playback." />
+                   Text="Choose local audio or video files to try the controls against real LibVLC playback. The Gallery owns this backend; Md3.Avalonia controls only expose playback state and requests." />
       </StackPanel>
 
-      <StackPanel Spacing="14">
+      <StackPanel x:Name="SeekSection" Spacing="14">
         <TextBlock Classes="h2" Text="Time-based seek bar" />
         <TextBlock Classes="body" MaxWidth="800" TextWrapping="Wrap"
-                   Text="Shows elapsed and total or remaining time, a buffered segment, and keyboard-accessible seeking. The control does not own a playback clock." />
+                   Text="This timeline follows the selected audio file. Drag it or use the arrow keys to seek the actual playback position." />
         <md:MdSeekBar x:Name="DemoSeekBar"
                       MaxWidth="760"
-                      Duration="00:04:32"
-                      Position="00:01:18"
-                      BufferedPosition="00:02:46"
+                      Duration="00:00:00"
+                      Position="00:00:00"
+                      BufferedPosition="00:00:00"
                       SeekStep="00:00:05"
+                      IsEnabled="False"
                       SeekRequested="SeekRequested" />
       </StackPanel>
 
-      <StackPanel Spacing="14">
-        <TextBlock Classes="h2" Text="Video controls overlay" />
-        <TextBlock Classes="body" MaxWidth="800" TextWrapping="Wrap"
-                   Text="Place the overlay above an app-provided video surface. Pointer activity reveals controls; the player can optionally auto-hide them while playback continues." />
-        <Border MaxWidth="900" MinHeight="330" CornerRadius="24" ClipToBounds="True" Background="#101318">
+      <StackPanel x:Name="VideoSection" Spacing="14">
+        <TextBlock x:Name="VideoSectionTitle" Classes="h2" Text="Video controls overlay" />
+        <TextBlock x:Name="VideoSectionDescription" Classes="body" MaxWidth="800" TextWrapping="Wrap"
+                   Text="Open a local video to render decoded frames in the Avalonia surface below. Transport, mute, fullscreen, and seeking commands go to the Gallery's LibVLC player." />
+        <md:MdButton x:Name="OpenVideoButton" Content="Open video file" Variant="Tonal" Click="OpenVideoFile" />
+        <Border x:Name="VideoFrame" MaxWidth="900" Height="330" MinHeight="330"
+                CornerRadius="24" ClipToBounds="True" Background="#101318">
           <Grid>
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" IsHitTestVisible="False">
+            <player:VlcVideoSurface x:Name="VideoSurface" IsHitTestVisible="False" />
+            <StackPanel x:Name="VideoSurfacePlaceholder" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Spacing="10" IsHitTestVisible="False">
               <md:MdIcon Glyph="{x:Static md:MdSymbols.Movie}" Size="64" Foreground="#B9C4D8" />
-              <TextBlock Foreground="#B9C4D8" Text="Video surface supplied by the host application" />
+              <TextBlock Foreground="#B9C4D8" Text="Open a video file to start playback" />
+              <TextBlock x:Name="VideoFileName" Foreground="#B9C4D8" TextWrapping="Wrap" TextAlignment="Center" />
             </StackPanel>
             <md:MdVideoPlayerControls x:Name="VideoControls"
-                                      Title="A short film about the coast"
-                                      Duration="00:08:24"
-                                      Position="00:02:16"
-                                      BufferedPosition="00:04:08"
-                                      IsPlaying="True"
+                                      Duration="00:00:00"
+                                      Position="00:00:00"
+                                      BufferedPosition="00:00:00"
+                                      IsPlaying="False"
                                       IsBuffering="False"
                                       AutoHideControls="False"
+                                      IsVisible="False"
+                                      IsEnabled="False"
                                       PlaybackRequested="PlaybackRequested"
                                       SeekRequested="SeekRequested" />
           </Grid>
         </Border>
       </StackPanel>
 
-      <StackPanel Spacing="14">
+      <StackPanel x:Name="AudioMiniSection" Spacing="14">
         <TextBlock Classes="h2" Text="Audio mini player" />
         <TextBlock Classes="body" MaxWidth="800" TextWrapping="Wrap"
-                   Text="A compact, accessible track row with cover art, progress, transport actions, and an open action for navigating to a full player." />
+                   Text="Open one or more local tracks. The mini player and expanded player share the real queue and playback clock." />
+        <md:MdButton x:Name="OpenAudioButton" Content="Open audio files" Variant="Tonal" Click="OpenAudioFiles" />
         <md:MdAudioMiniPlayer x:Name="MiniPlayer"
                               MaxWidth="760"
-                              Title="Night Drive"
-                              Artist="Mira Sol"
-                              Duration="00:03:48"
-                              Position="00:01:07"
-                              BufferedPosition="00:02:30"
-                              IsPlaying="True"
+                              Title="No audio selected"
+                              Artist="Open a local audio file"
+                              Duration="00:00:00"
+                              Position="00:00:00"
+                              BufferedPosition="00:00:00"
+                              IsPlaying="False"
+                              IsEnabled="False"
                               PlaybackRequested="PlaybackRequested"
                               OpenRequested="OpenRequested" />
       </StackPanel>
 
-      <StackPanel Spacing="14">
+      <StackPanel x:Name="NowPlayingSection" Spacing="14">
         <TextBlock Classes="h2" Text="Now playing" />
         <TextBlock Classes="body" MaxWidth="800" TextWrapping="Wrap"
-                   Text="The expanded audio layout adds album metadata, repeat and shuffle state, queue access, and a full seek control." />
+                   Text="The expanded audio layout is connected to the same local queue, including real seeking, previous/next, shuffle, repeat, and queue selection." />
         <md:MdNowPlayingPanel x:Name="NowPlaying"
-                              Title="Night Drive"
-                              Artist="Mira Sol"
-                              Album="After the Rain"
-                              Duration="00:03:48"
-                              Position="00:01:07"
-                              BufferedPosition="00:02:30"
-                              IsPlaying="True"
-                              RepeatMode="All"
+                              Title="No audio selected"
+                              Artist="Open a local audio file"
+                              Album="Gallery playback"
+                              Duration="00:00:00"
+                              Position="00:00:00"
+                              BufferedPosition="00:00:00"
+                              IsPlaying="False"
+                              IsEnabled="False"
+                              RepeatMode="None"
                               PlaybackRequested="PlaybackRequested"
                               SeekRequested="SeekRequested" />
       </StackPanel>
 
-      <Border Padding="18" CornerRadius="18" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
-        <TextBlock x:Name="StatusLabel" Classes="body" TextWrapping="Wrap"
-                   Text="Try the controls. The gallery updates demo state locally; it does not load or decode media." />
+      <Border x:Name="QueuePanel" IsVisible="False" Padding="18" CornerRadius="18"
+              Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+        <StackPanel Spacing="12">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Classes="h2" Text="Playback queue" />
+            <md:MdButton Grid.Column="1" Content="Close" Variant="Text" Click="CloseQueue" />
+          </Grid>
+          <StackPanel x:Name="QueueItems" Spacing="4" />
+        </StackPanel>
       </Border>
 
-      <StackPanel Spacing="10">
+      <Border x:Name="StatusPanel" Padding="18" CornerRadius="18" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+        <TextBlock x:Name="StatusLabel" Classes="body" TextWrapping="Wrap"
+                   Text="No media is bundled. Open local files to start real playback. Windows, macOS, and Android include a LibVLC runtime; Linux requires the system VLC/libvlc package." />
+      </Border>
+
+      <StackPanel x:Name="UsageSection" Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdVideoPlayerControls IsPlaying=&quot;{Binding IsPlaying}&quot; Position=&quot;{Binding Position}&quot; Duration=&quot;{Binding Duration}&quot; PlaybackRequested=&quot;OnPlaybackRequested&quot; SeekRequested=&quot;OnSeekRequested&quot; /&gt;&#10;&lt;md:MdNowPlayingPanel Artwork=&quot;{Binding Artwork}&quot; Title=&quot;{Binding Title}&quot; Artist=&quot;{Binding Artist}&quot; /&gt;"
-                             CSharpCode="videoControls.PlaybackRequested += (_, e) =&gt; player.Handle(e.Request);&#10;videoControls.SeekRequested += (_, e) =&gt; player.Seek(e.Position);" />
+                             CSharpCode="videoControls.PlaybackRequested += OnPlaybackRequested;&#10;videoControls.SeekRequested += OnSeekRequested;&#10;// Implement both handlers with the playback engine owned by your host app." />
       </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>

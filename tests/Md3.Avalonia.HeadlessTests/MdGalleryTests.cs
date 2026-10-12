@@ -45,6 +45,7 @@ public sealed class MdGalleryTests
             new ListGalleryPage(),
             new LoadingGalleryPage(),
             new ProgressGalleryPage(),
+            new MediaPlayersGalleryPage(),
             new MenuGalleryPage(),
             new NavigationBarGalleryPage(),
             new NavigationDrawerGalleryPage(),

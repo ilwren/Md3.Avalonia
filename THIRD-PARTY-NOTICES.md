@@ -12,6 +12,8 @@ This repository and its distributable projects use the following third-party sof
 | AvaloniaRichEditor 1.2.1 | The rich text editor control itself, themed by `Md3.Avalonia.RichEditor`. No upstream markup or template is copied: the Material theme only sets properties the control exposes publicly | MIT | https://github.com/centwon/AvaloniaRichEditor |
 | AvaloniaEdit | Gallery source-code editor | MIT | https://github.com/AvaloniaUI/AvaloniaEdit |
 | CommunityToolkit.Mvvm | Gallery MVVM compatibility examples | MIT | https://github.com/CommunityToolkit/dotnet |
+| LibVLCSharp 3.10.1 | Gallery-only LibVLC playback adapter for selected local audio/video; never referenced by the controls library | LGPL-2.1 | https://github.com/videolan/libvlcsharp |
+| LibVLC 3.x native runtimes | Gallery-only native decoder/output; packaged by platform where available (Linux uses the system VLC installation) | LGPL-2.1-or-later | https://code.videolan.org/videolan/vlc |
 | xUnit.net | Automated tests only | Apache-2.0 | https://github.com/xunit/xunit |
 
 Each NuGet package declares only its direct runtime dependencies. Gallery- and test-only dependencies are listed here for repository-wide compliance.

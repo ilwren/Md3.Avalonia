@@ -4,8 +4,9 @@
 
 ### Added
 
-- Core media-player UI: `MdSeekBar`, `MdVideoPlayerControls`, `MdAudioMiniPlayer` and `MdNowPlayingPanel`. Playback and seek remain provider-neutral requests; no decoder or platform media backend is included.
-- Gallery examples and headless coverage for time formatting, keyboard seek commits and audio transport requests.
+- Core media-player UI: `MdSeekBar`, `MdVideoPlayerControls`, `MdAudioMiniPlayer` and `MdNowPlayingPanel`. Playback and seek remain provider-neutral requests; the controls package contains no decoder or platform media backend.
+- The Gallery media page now opens real local audio/video files through a Gallery-only LibVLCSharp playback service, including audio queue transport, real seeking and decoded video frames in an Avalonia surface.
+- Gallery-only native VLC runtimes are bundled for Windows, macOS and Android. Linux Gallery playback uses the system VLC/libvlc installation; headless controls tests remain backend-free.
 
 ## [0.4.1-preview.1] - 2026-10-06
 
