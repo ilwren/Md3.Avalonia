@@ -99,20 +99,18 @@ public class MdSettingsExpander : ItemsControl
         }
         else
         {
+            // Commit the start height and the target in the same frame: the transition picks the
+            // rendered height up as its origin, so no render-priority post is needed here.
             var current = _contentArea.Bounds.Height > 0 ? _contentArea.Bounds.Height : _contentArea.DesiredSize.Height;
             _contentArea.Height = current;
-            Dispatcher.UIThread.Post(() =>
+            _contentArea.Height = 0;
+            var timer = new DispatcherTimer { Interval = spec.Duration + TimeSpan.FromMilliseconds(50) };
+            timer.Tick += (_, _) =>
             {
-                if (version != _expansionVersion) return;
-                _contentArea.Height = 0;
-                var timer = new DispatcherTimer { Interval = spec.Duration + TimeSpan.FromMilliseconds(50) };
-                timer.Tick += (_, _) =>
-                {
-                    timer.Stop();
-                    if (version == _expansionVersion && !IsExpanded) _contentArea.IsVisible = false;
-                };
-                timer.Start();
-            }, DispatcherPriority.Render);
+                timer.Stop();
+                if (version == _expansionVersion && !IsExpanded) _contentArea.IsVisible = false;
+            };
+            timer.Start();
         }
     }
 
