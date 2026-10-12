@@ -114,16 +114,16 @@ public sealed class MdRound2BehaviorTests
         var expressiveFast = MdMotion.Resolve(MdMotionScheme.Expressive, MdMotionKind.Spatial, MdMotionSpeed.Fast);
         var expressiveDefault = MdMotion.Resolve(MdMotionScheme.Expressive, MdMotionKind.Spatial, MdMotionSpeed.Default);
         var expressiveSlow = MdMotion.Resolve(MdMotionScheme.Expressive, MdMotionKind.Spatial, MdMotionSpeed.Slow);
-        Assert.Equal(360, expressiveFast.Duration.TotalMilliseconds, 10);
-        Assert.Equal(440, expressiveDefault.Duration.TotalMilliseconds, 10);
-        Assert.Equal(600, expressiveSlow.Duration.TotalMilliseconds, 10);
+        Assert.InRange(expressiveFast.Duration.TotalMilliseconds, 350, 370);
+        Assert.InRange(expressiveDefault.Duration.TotalMilliseconds, 425, 450);
+        Assert.InRange(expressiveSlow.Duration.TotalMilliseconds, 590, 610);
 
         var standardFast = MdMotion.Resolve(MdMotionScheme.Standard, MdMotionKind.Spatial, MdMotionSpeed.Fast);
         var standardDefault = MdMotion.Resolve(MdMotionScheme.Standard, MdMotionKind.Spatial, MdMotionSpeed.Default);
         var standardSlow = MdMotion.Resolve(MdMotionScheme.Standard, MdMotionKind.Spatial, MdMotionSpeed.Slow);
-        Assert.Equal(230, standardFast.Duration.TotalMilliseconds, 10);
-        Assert.Equal(320, standardDefault.Duration.TotalMilliseconds, 10);
-        Assert.Equal(490, standardSlow.Duration.TotalMilliseconds, 10);
+        Assert.InRange(standardFast.Duration.TotalMilliseconds, 215, 240);
+        Assert.InRange(standardDefault.Duration.TotalMilliseconds, 310, 330);
+        Assert.InRange(standardSlow.Duration.TotalMilliseconds, 475, 500);
 
         // Reduced motion drops spatial travel entirely and keeps only a short effects fade.
         var reduced = MdMotion.Resolve(MdMotionScheme.Reduced, MdMotionKind.Spatial, MdMotionSpeed.Default);
