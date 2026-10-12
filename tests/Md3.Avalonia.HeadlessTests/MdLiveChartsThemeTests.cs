@@ -184,8 +184,10 @@ public class MdLiveChartsThemeTests
             // so the palette and the card paints follow the application, as M3 requires.
             application.RequestedThemeVariant = ThemeVariant.Dark;
 
-            Assert.True(theme.IsDark);
+            // The setup runs when a chart asks for the theme, not when the variant flips, so the
+            // chart is asked first - and it is the same theme object it hands back.
             Assert.Same(theme, chart.CoreChart.GetTheme());
+            Assert.True(theme.IsDark);
             Assert.Equal(MaterialLiveChartsTheme.SeriesPalette(true), theme.Colors);
             Assert.Equal(Token("Surface", dark: true), theme.VirtualBackroundColor.AsSKColor());
             Assert.Equal(Token("InverseSurface", dark: true), Assert.IsType<SolidColorPaint>(theme.TooltipBackgroundPaint).Color);
