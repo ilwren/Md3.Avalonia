@@ -10,6 +10,13 @@
         <TextBlock Classes="body" TextWrapping="Wrap" Text="The host pads its viewport by the virtual keyboard inset and scrolls the focused text control into the space that is left." />
       </StackPanel>
 
+      <Border x:Name="DesktopNote" IsVisible="False" MaxWidth="820" HorizontalAlignment="Left"
+              Padding="16,12" CornerRadius="12"
+              Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}">
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="On desktop this page is a simulation: soft-keyboard avoidance exists for the Android IME, while desktop input methods never cover the window. The strip below stands in for a keyboard inset so MdKeyboardAvoidingHost can be exercised on any platform." />
+      </Border>
+
       <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="body" Text="Simulate a virtual keyboard inset to verify that the host automatically adjusts viewport bottom padding and scrolls focused text controls into view." />
         <StackPanel Orientation="Horizontal" Spacing="8">
