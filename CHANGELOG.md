@@ -93,7 +93,26 @@
   colour is read from `Md.Sys.Color.*` for the variant each chart draws in, so light/dark follow the
   application, and an application that does not register `MaterialTheme` gets the M3 baseline values
   the package carries. `MdChart` in the core package stays provider neutral.
-- **Native AOT.** All twelve packages declare `IsAotCompatible` and build with the IL3xxx analyzers
+- **`Md3.Avalonia.ScottPlot`**, an opt-in Material Design 3 theme for
+  [ScottPlot](https://github.com/ScottPlot/ScottPlot) charts. It is the only package that pulls in
+  `ScottPlot.Avalonia` (pinned at `5.1.59`, whose dependencies declare `Avalonia >= 12.0.0` and
+  `ScottPlot >= 5.1.59`), bringing the set to thirteen. Like the LiveCharts2 package it is not an
+  Avalonia style collection: a ScottPlot `Plot` carries its own colours and its own type, so the
+  package's whole public surface is a plot-level entry point - `MaterialScottPlotTheme.Follow(avaPlot)`
+  applies the rules for the variant the control actually has and re-applies them from the control's
+  `ActualThemeVariantChanged` event, because ScottPlot bakes colours into a plot when they are set,
+  and `Apply(plot, dark)` / the instance `Apply` overloads style a plot directly. The figure and the
+  data background are both `Surface`; `Plot.Axes.Color` paints the frame, ticks, tick labels, axis
+  names and title in `OnSurfaceVariant` in one call; major grid lines are `OutlineVariant` while minor
+  lines are off; the legend is a `SurfaceContainerHigh` panel with an `OutlineVariant` outline and
+  `OnSurfaceVariant` text; the type scale is `TitleMedium` for the title, `LabelLarge` for axis names
+  and legend entries and `LabelMedium` for tick labels, all in the family `Md.Sys.Typeface.Plain`
+  names; and series take the same eight-role palette the LiveCharts2 theme walks. ScottPlot's frames,
+  tick generation, layout and interaction ship unchanged, a plot the theme was not handed keeps every
+  default, and nothing process-wide is rewritten - the theme never assigns `Fonts.Default`, so it
+  cannot change the type of plots it was not asked to style. `MdChart` in the core package stays
+  provider neutral.
+- **Native AOT.** All thirteen packages declare `IsAotCompatible` and build with the IL3xxx analyzers
   on alongside the existing IL2xxx trimming ones. `.github/workflows/aot-probe.yml` publishes the
   desktop gallery with `PublishAot=true` and does not accept a green step as the answer: it
   asserts the output is a native ELF executable with no managed assembly beside it, then runs that

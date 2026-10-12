@@ -61,7 +61,7 @@ Markdown.Avalonia（417★）+ LiveMarkdown.Avalonia（176★）。
 | LiveMarkdown.Avalonia | 176 | 2026-09-19 | 12.0.0 ✔ | Apache-2.0 | `src/LiveMarkdown.Avalonia/Styles.axaml`（346 行 Style）+ Mermaid 变体 | 中 |
 | NodifyM.Avalonia（节点编辑器） | 222 | 2026-05-12 | 12.0.2 ✔ | MIT | `Styles/ControlStyles.axaml`（单文件集中样式） | 中 |
 | LiveCharts2 | 5,483 | 2026-07-20 | 12.0.0 ✔（源码；NuGet 上 Avalonia 12 只有 `2.1.0-dev-*`，stable 2.0.x 是 Avalonia 11 构建，见 §4.2 G） | MIT | `LiveChartsCore/Themes/`（`Theme`、`ColorPalletes`、`LvcThemeKind`、`LiveChartsStylerExtensions`）+ `SkiaSharp/ThemesExtensions.cs` | 低（调色板/字体） |
-| ScottPlot | 6,773 | 2026-08-15 | 12.0.0 ✔ | MIT | `ScottPlot.Avalonia` 5.1.60；`Plot.Palette`、背景/字体/网格属性 | 低（调色板/字体） |
+| ScottPlot | 6,773 | 2026-08-15 | 12.0.0 ✔ | MIT | `ScottPlot.Avalonia` **5.1.59**（声明 `Avalonia >= 12.0.0`）；无样式接缝：`Plot` 自带颜色与字体，接缝是 `Plot.FigureBackground`/`Plot.DataBackground`、`Plot.Axes.Color`、`Plot.Grid`、`Plot.Legend`、`LabelStyle` 与 `IPalette` | 低（调色板/字体） |
 | Mapsui | 1,577 | 2026-10-02 | **有 `Mapsui.Avalonia12` 包** ✔ | MIT | 地图渲染自绘；可主题化的是控件外壳与图层配色 | 低 |
 | PanAndZoom | 479 | 2026-10-03 | 12.1.1 ✔ | MIT | 无 chrome，本身不需要主题 | 极低（仅登记） |
 | Svg.Skia（`Svg.Controls.Skia.Avalonia`） | 738 | 2026-08-27 | 12.0.0 ✔ | MIT | 叶子控件，无主题需求 | 极低（仅登记） |
@@ -239,7 +239,7 @@ Markdown.Avalonia（417★）+ LiveMarkdown.Avalonia（176★）。
 
 - `Md3.Avalonia.LiveCharts2`：实现一个 `LiveCharts` 主题（LvcThemeKind + ColorPalletes + 字体），
   把 M3 tonal palette 映射成系列色。
-- `Md3.Avalonia.ScottPlot`：设置 `Plot.Palette`、背景、网格与字体。
+- `Md3.Avalonia.ScottPlot`：**已实现**（`MaterialScottPlotTheme`）：设置绘图对象的表面、墨色、网格、图例、字阶与八角色调色板。
 - 二者都**只做外观**，不引入新的数据管线。
 
 **已落地（2026-10-12，`LiveCharts2` 那一半）**：`Md3.Avalonia.Themes.MaterialLiveChartsTheme`（静态类，不是
@@ -269,8 +269,12 @@ LiveCharts 尚未分配的槽位（`ISeries.SeriesId` 默认为 `-1`）当作第
   `Themes/LiveChartsStylerExtensions.cs` 与 `SkiaSharp/ThemesExtensions.cs`（`MdLiveChartsThemeTests` 钉住了
   调色板顺序、按族规则、暗色变体只读暗色 token，以及真实 measure 路径：用 `CoreMotionCanvas.IsTesting` 抬起渲染检查后
   由图表测轴与上色，X 轴无分隔线、Y 轴为 `OutlineVariant`）。
-- 仍未做：`Md3.Avalonia.ScottPlot`（同一 Wave 的下一个 provider，`Plot.Palette` + 背景/网格/字体，与
-  `MdChart` 同样保持 provider-neutral）。
+- 版本：固定 **`5.1.59`**（`net8.0`/`net10.0`，声明 `Avalonia >= 12.0.0` 与 `ScottPlot >= 5.1.59`，
+  低于 12.1.2 基线）。升级时要重读 `Plot.cs`、`Primitives/PlotStyle.cs`、`Primitives/LabelStyle.cs`
+  与 `ScottPlot.Avalonia` 的 `AvaPlot`；`MdScottPlotThemeTests` 钉住调色板顺序、逐项规则、变体跟随与
+  M3 基线，以及未被处理的绘图对象保持默认值且不改写进程级 `Fonts.Default`。
+- Wave 2 的 provider 至此全部完成：Tabalonia、Markdown、LiveCharts2、ScottPlot；三者都只做外观，
+  不引入新的数据管线，核心 `MdChart` 保持 provider-neutral。
 
 ### 4.3 Wave 3（按需）
 

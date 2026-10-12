@@ -149,7 +149,24 @@ surface，调用方仍可覆盖。
   headless 测试钉住：八个角色的顺序与两套变体的取值、`AddMaterialTheme` 装上的主题（调色板、工具提示/图例
   画刷与投影、画布表面色、字号）、折线/柱/堆叠/饼/仪表/散点/K 线与坐标轴的逐项规则、暗色变体只读暗色 token，
   以及「包内没有 `Styles`/`Style`/`ControlTheme`、公开类型只有 `MaterialLiveChartsTheme`」。
-- **原生 AOT 已验证可用。** 十二个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
+- **`Md3.Avalonia.ScottPlot`** —— [ScottPlot](https://github.com/ScottPlot/ScottPlot) 图表的
+  Material Design 3 主题，opt-in，唯一引入 `ScottPlot.Avalonia` 依赖的包，包总数到十三个。
+  与 LiveCharts2 包同属「不是 Avalonia 样式集合」的形态：ScottPlot 的 `Plot` 自己保存颜色与字体，
+  包内没有 `Styles` 或 `ControlTheme`，公开面是绘图对象级入口 `MaterialScottPlotTheme`——
+  `Follow(avaPlot)` 按控件当前变体应用规则，并订阅控件自身的 `ActualThemeVariantChanged` 在明暗切换时重放；
+  离屏绘图对象用 `Apply(plot, dark)` 或实例 `Apply`。
+  映射：图形背景与数据区背景同为 `Surface`；`Plot.Axes.Color` 一次把边框、刻度线、刻度标签、轴名与标题
+  刷成 `OnSurfaceVariant`；网格主刻度 `OutlineVariant`、次网格关闭；图例是 `SurfaceContainerHigh` 面板配
+  `OutlineVariant` 描边与 `OnSurfaceVariant` 文字；字阶为标题 `TitleMedium`、轴名与图例 `LabelLarge`、
+  刻度标签 `LabelMedium`，字族取自 `Md.Sys.Typeface.Plain`；系列走与 LiveCharts2 相同的八个角色调色板
+  （经 `Plot.Add.Palette`，之后添加的 plottable 都沿用）。ScottPlot 的边框、刻度生成、布局与交互保持原样，
+  未被处理的绘图对象保持默认外观，进程级状态（`Fonts.Default` 等）不被改写；未注册 `MaterialTheme` 时
+  回退到包内自带的 M3 基线取值。核心包的 `MdChart` 保持与绘图引擎无关。
+  版本固定 **`5.1.59`**（`net8.0`/`net10.0`，声明 `Avalonia >= 12.0.0` 与 `ScottPlot >= 5.1.59`，
+  低于本仓库 12.1.2 基线）。headless 测试钉住：八个角色的顺序与两套变体取值、表面/墨色/网格/图例/字阶规则、
+  暗色变体、`Follow` 跟随应用明暗、未被处理的绘图对象保持默认值且不改写 `Fonts.Default`、每个角色都有与核心
+  token 一致的 M3 基线取值，以及「包内没有 `Styles`/`ControlTheme`、公开类型只有 `MaterialScottPlotTheme`」。
+- **原生 AOT 已验证可用。** 十三个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
   IL3xxx 分析器。`.github/workflows/aot-probe.yml` 用 `PublishAot=true` 发布桌面 Gallery，并且
   **不把「步骤成功」当作答案**：它断言产物是原生 ELF 可执行文件、输出目录里没有托管 dll 残留（防止
   apphost 冒充），然后在 xvfb 下把那个二进制真正跑起来。原生 AOT 是在运行期因反射元数据被裁而失败的，

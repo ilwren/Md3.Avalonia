@@ -1,0 +1,88 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:sp="using:ScottPlot.Avalonia"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.ScottPlotGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="ScottPlot charts" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="ScottPlot charts wearing the opt-in Md3.Avalonia.ScottPlot theme: the plot is a Material surface, axes and grids take the theme's inks and type scale, the legend is a surface container, and the series walk the same eight Material roles the LiveCharts2 theme uses." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h3" Text="Themed charts" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Both controls below are stock ScottPlot AvaPlot views. The page calls the theme once per control and the theme keeps them in step with the application's light/dark switch - ScottPlot writes colours into a plot when they are set, so a themed plot does not re-resolve them the way an Avalonia style would." />
+        <Border CornerRadius="12" Padding="4"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
+          <Border CornerRadius="8" Padding="12" ClipToBounds="True"
+                  Background="{DynamicResource Md.Sys.Color.Surface.Brush}">
+            <StackPanel Spacing="12">
+              <sp:AvaPlot x:Name="Signals" Height="260" />
+              <sp:AvaPlot x:Name="Bars" Height="260" />
+            </StackPanel>
+          </Border>
+        </Border>
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The signal curves, the bars, the grid, the axis inks and the legend are all drawn from Md.Sys.* tokens; the bars take the palette's first role and each curve the next one, wrapping like ScottPlot's own palettes." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Series palette" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Eight Material roles carry the series palette, in the same order the LiveCharts2 theme walks them: the first four give a palette of four hues the way ScottPlot's own palettes do, and the remaining four are further tones of the same accent hues, so a chart with more than four series still reads as Material instead of inventing colours." />
+        <WrapPanel Orientation="Horizontal">
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="Primary" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.Tertiary.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="Tertiary" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.Secondary.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="Secondary" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.Error.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="Error" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="PrimaryContainer" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="TertiaryContainer" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.InversePrimary.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="InversePrimary" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.Outline.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="Outline" />
+          </StackPanel>
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="ScottPlot has no per-control styles either: a plot carries its own colours, so there is nothing to register in Application.Styles and nothing that could leak into a chart this package was not asked to style. Follow() themes a control for the variant it actually has and keeps it in step; an application that draws plots off screen can apply the rules to a Plot directly." />
+        <gallery:CodeExample XamlCode="&lt;sp:AvaPlot x:Name=&quot;Plot&quot; /&gt;"
+                            CSharpCode="// Once, in the page or window that owns the control.&#10;MaterialScottPlotTheme.Follow(Plot);&#10;&#10;// A plot that never reaches the screen takes the rules directly:&#10;MaterialScottPlotTheme.Apply(Plot.Plot, dark: false);" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Mapping" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Figure and data background are the same Material surface, so a chart inside a card blends with the card. Axes, their names and the title carry the OnSurfaceVariant ink, which colors the frame, the tick marks, the tick labels and the axis names in one call. The grid is a single OutlineVariant line at major ticks and minor lines are switched off, and the legend is a SurfaceContainerHigh panel with the same soft OutlineVariant outline a Material card uses, so it reads as a container floating over the data rather than the default white box. Type runs on the same roles the LiveCharts2 theme uses: TitleMedium for the chart title, LabelLarge for axis names and legend entries, LabelMedium for tick labels, all in the family the Md.Sys.Typeface.Plain token names. Series take the eight-role palette through the plot's own plottable adder." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Notes" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="This is the second Material theme in the repository that is not an Avalonia style collection at all - there is no Styles or ControlTheme in the package, only a plot-level entry point. ScottPlot keeps the axis frames, tick generation, layout and interaction exactly as it ships; the theme writes colours, sizes and the palette, and a plot that is left alone keeps ScottPlot's own defaults. The theme reads Md.Sys.Color.* for the variant it is asked for, so light/dark follow the application; an application that does not register MaterialTheme gets the M3 baseline values the package carries instead. MdChart in the core package stays provider neutral and keeps drawing through whichever chart engine an application picks." />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

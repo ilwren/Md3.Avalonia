@@ -37,6 +37,12 @@
          (LiveChartsSettings.AddDefaultTheme, the Theme rule builders, the SkiaSharp paints) was
          read at the commit the 2.1.0-dev-798 build was cut from. -->
     <PackageVersion Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.1.0-dev-798" />
+    <!-- ScottPlot's Avalonia control: 5.1.59 targets net8.0/net10.0 and declares Avalonia >=
+         12.0.0 and ScottPlot >= 5.1.59, so it restores against this repository's 12.1.2
+         baseline. Bump the two together: the API this theme uses (Plot.FigureBackground and
+         DataBackground, Plot.Axes.Color, Plot.Grid, Plot.Legend, LabelStyle and the
+         IPalette/Palettes.Custom seam) was read at the tag this build was cut from. -->
+    <PackageVersion Include="ScottPlot.Avalonia" Version="5.1.59" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.2" />
     <PackageVersion Include="MaterialColorUtilities" Version="0.3.0" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />

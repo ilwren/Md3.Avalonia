@@ -30,6 +30,15 @@ This document is the public entry point for the `0.4.1-preview.1` API. Preview A
      that pulls in Markdown.Avalonia.Tight. Unlike every other theme package it is not registered
      in Application.Styles - see the Markdown section below: -->
 <PackageReference Include="Md3.Avalonia.Markdown" Version="0.4.1-preview.1" />
+<!-- Optional Material theme for LiveCharts2 charts; likewise the only package that pulls in
+     LiveChartsCore.SkiaSharpView.Avalonia. Like the Markdown package it is not registered in
+     Application.Styles - it is configured once through LiveCharts.Configure; see the LiveCharts2
+     section below: -->
+<PackageReference Include="Md3.Avalonia.LiveCharts2" Version="0.4.1-preview.1" />
+<!-- Optional Material theme for ScottPlot charts; likewise the only package that pulls in
+     ScottPlot.Avalonia. It is a plot-level entry point rather than a style collection, so it is not
+     registered in Application.Styles either; see the ScottPlot section below: -->
+<PackageReference Include="Md3.Avalonia.ScottPlot" Version="0.4.1-preview.1" />
 ```
 
 ```xml
@@ -703,9 +712,61 @@ dark-variant reads that would move.
 `MdChart` in the core package stays provider neutral: it keeps drawing through whichever chart
 engine an application picks, and this package only styles LiveCharts2.
 
+## ScottPlot
+
+For plots drawn with [ScottPlot](https://github.com/ScottPlot/ScottPlot), use the opt-in
+`Md3.Avalonia.ScottPlot` package. It is the only package that depends on `ScottPlot.Avalonia`, and -
+like the LiveCharts2 package - it is not an Avalonia style collection at all, because ScottPlot has
+no style seam either: a `Plot` carries its own colours and its own type, so there is nothing to
+register in `Application.Styles` and nothing that could leak into a chart this package was not asked
+to style.
+
+```csharp
+// Once, in the page or window that owns the control. The theme follows the application's variant
+// from there, because ScottPlot bakes colours into a plot when they are set.
+MaterialScottPlotTheme.Follow(avaPlot);
+
+// A plot that never reaches the screen takes the rules directly.
+MaterialScottPlotTheme.Apply(plot, dark: false);
+```
+
+`MaterialScottPlotTheme.Follow` applies the rules for the variant the control actually has and
+re-applies them from the control's own `ActualThemeVariantChanged` event, so the subscription lives
+exactly as long as the control does. The instance `Apply` methods and `Apply(Plot, bool)` are for an
+application that knows the variant itself, including plots that are drawn off screen.
+
+What the theme writes, and the token each value comes from:
+
+- Surfaces: the figure and the data area are both `Surface`, so a chart inside a card blends with the
+  card instead of sitting on ScottPlot's white default.
+- Ink: `Plot.Axes.Color` paints the frame, the tick marks, the tick labels, the axis names and the
+  title in `OnSurfaceVariant` in one call.
+- Grid: major lines are `OutlineVariant` and minor lines are switched off, so the grid reads as one
+  divider weight.
+- Legend: a `SurfaceContainerHigh` panel with an `OutlineVariant` outline and `OnSurfaceVariant`
+  text - a surface container floating over the data rather than upstream's white box.
+- Type scale: `TitleMedium` for the chart title, `LabelLarge` for axis names and legend entries, and
+  `LabelMedium` for tick labels, all in the family the `Md.Sys.Typeface.Plain` token names.
+- Series: the same eight-role palette the LiveCharts2 theme walks - `Primary`, `Tertiary`,
+  `Secondary`, `Error`, `PrimaryContainer`, `TertiaryContainer`, `InversePrimary`, `Outline` - set
+  through the plot's own plottable adder, so every plottable added afterwards takes it.
+
+Everything upstream decides stays as it ships - axis frames, tick generation, layout, interaction -
+and a plot this package was not handed keeps every ScottPlot default. Nothing is process-wide: the
+theme never assigns `Fonts.Default`, so it cannot change the type of plots it was not asked to style.
+
+The pinned version is **5.1.59**: it targets `net8.0`/`net10.0` and declares `Avalonia >= 12.0.0` and
+`ScottPlot >= 5.1.59`, which restores against this repository's 12.1.2 baseline. Upgrading the
+package means re-reading `Plot.cs`, `Primitives/PlotStyle.cs`, `Primitives/LabelStyle.cs` and the
+`ScottPlot.Avalonia` `AvaPlot` control; `MdScottPlotThemeTests` pins the palette, the rules, the
+variant tracking, the baselines and the fact that a plot that was not asked for keeps its defaults.
+
+`MdChart` in the core package stays provider neutral: it keeps drawing through whichever chart
+engine an application picks, and this package only styles ScottPlot.
+
 ## Trimming
 
-All twelve packages set `IsTrimmable`, so an application that publishes with
+All thirteen packages set `IsTrimmable`, so an application that publishes with
 `PublishTrimmed=true` can trim them, and they build with the IL2xxx analyzer on, so a new
 reflective call fails the build rather than breaking a trimmed app quietly.
 

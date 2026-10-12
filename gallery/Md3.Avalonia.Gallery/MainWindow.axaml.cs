@@ -51,7 +51,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             BeforeAfterNav, CalendarNav, CascaderNav, ChartNav,
             ChatNav, CommandPaletteNav, DataGridNav, DensityNav,
             HoverCardNav, MasonryNav, PagedItemsNav, PinInputNav,
-            PopoverNav, RatingNav, ResultViewNav, RichEditorNav, DockNav, DraggableTabsNav, MarkdownNav, LiveChartsNav,
+            PopoverNav, RatingNav, ResultViewNav, RichEditorNav, DockNav, DraggableTabsNav, MarkdownNav, LiveChartsNav, ScottPlotNav,
             TextEditorNav, HexEditorNav,
             SkeletonNav, SlidableNav, SpinKitNav, StaggeredPanelNav,
             TagInputNav, TimelineNav, TransferNav, TreeViewNav,
@@ -133,6 +133,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Draggable tabs", "draggable tabs tab strip reorder tear out detach attach tabalonia theme", DraggableTabsNav, () => new DraggableTabsGalleryPage()),
             Entry("Markdown", "markdown document renderer heading prose link list quote code block table note rule typography markdown.avalonia", MarkdownNav, () => new MarkdownGalleryPage()),
             Entry("LiveCharts2 charts", "livecharts2 charts series axis legend tooltip palette line column pie donut gauge scatter candlestick skia", LiveChartsNav, () => new LiveChartsGalleryPage()),
+            Entry("ScottPlot charts", "scottplot charts series axis legend tooltip grid palette surface signal bars scatter skia theme", ScottPlotNav, () => new ScottPlotGalleryPage()),
             Entry("Text editor", "code editor syntax highlighting line numbers find replace completion avaloniedit theme", TextEditorNav, () => new TextEditorGalleryPage()),
             Entry("Hex editor", "hex binary bytes dump offsets ascii editor avaloniahex theme", HexEditorNav, () => new HexEditorGalleryPage()),
             Entry("Skeleton", "skeleton shimmer placeholder loading", SkeletonNav, () => new SkeletonGalleryPage()),
@@ -274,6 +275,8 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
     private void ShowMarkdown(object? s, RoutedEventArgs e) => Navigate(new MarkdownGalleryPage(), MarkdownNav);
 
     private void ShowLiveCharts(object? s, RoutedEventArgs e) => Navigate(new LiveChartsGalleryPage(), LiveChartsNav);
+
+    private void ShowScottPlot(object? s, RoutedEventArgs e) => Navigate(new ScottPlotGalleryPage(), ScottPlotNav);
     private void ShowTextEditor(object? s, RoutedEventArgs e) => Navigate(new TextEditorGalleryPage(), TextEditorNav);
     private void ShowHexEditor(object? s, RoutedEventArgs e) => Navigate(new HexEditorGalleryPage(), HexEditorNav);
     private void ShowSkeleton(object? s, RoutedEventArgs e) => Navigate(new SkeletonGalleryPage(), SkeletonNav);
