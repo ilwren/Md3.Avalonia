@@ -34,17 +34,21 @@ public sealed class MdFileExplorerTests
         File.WriteAllText(Path.Combine(directory.Path, ".private"), "hidden");
         var provider = new MdLocalFileSystemProvider([new MdFileLocation("home", "Home", directory.Path)]);
 
-        var ordinary = await provider.GetEntriesAsync("home", string.Empty);
-        var withHidden = await provider.GetEntriesAsync("home", string.Empty, includeHidden: true);
+        var ordinary = await provider.GetEntriesAsync("home", string.Empty,
+            cancellationToken: TestContext.Current.CancellationToken);
+        var withHidden = await provider.GetEntriesAsync("home", string.Empty, includeHidden: true,
+            cancellationToken: TestContext.Current.CancellationToken);
         Assert.Contains(ordinary, entry => entry.Name == "Docs" && entry.CanNavigate);
         Assert.DoesNotContain(ordinary, entry => entry.Name == ".private");
         Assert.Contains(withHidden, entry => entry.Name == ".private" && entry.IsHidden);
         await Assert.ThrowsAsync<UnauthorizedAccessException>(async () =>
         {
-            await provider.GetEntriesAsync("home", "../outside");
+            await provider.GetEntriesAsync("home", "../outside",
+                cancellationToken: TestContext.Current.CancellationToken);
         });
         var rootDelete = await provider.ExecuteAsync(new MdFileOperationRequest(
-            MdFileOperationKind.Delete, "home", "."));
+            MdFileOperationKind.Delete, "home", "."),
+            cancellationToken: TestContext.Current.CancellationToken);
         Assert.False(rootDelete.Succeeded);
         Assert.True(Directory.Exists(directory.Path));
     }
@@ -57,30 +61,35 @@ public sealed class MdFileExplorerTests
         var provider = new MdLocalFileSystemProvider([new MdFileLocation("home", "Home", directory.Path)]);
 
         var firstFolder = await provider.ExecuteAsync(new MdFileOperationRequest(
-            MdFileOperationKind.CreateDirectory, "home", string.Empty, NewName: "New folder"));
+            MdFileOperationKind.CreateDirectory, "home", string.Empty, NewName: "New folder"),
+            cancellationToken: TestContext.Current.CancellationToken);
         var secondFolder = await provider.ExecuteAsync(new MdFileOperationRequest(
             MdFileOperationKind.CreateDirectory, "home", string.Empty, NewName: "New folder",
-            ConflictPolicy: MdFileConflictPolicy.KeepBoth));
+            ConflictPolicy: MdFileConflictPolicy.KeepBoth),
+            cancellationToken: TestContext.Current.CancellationToken);
         Assert.True(firstFolder.Succeeded);
         Assert.True(secondFolder.Succeeded);
         Assert.Equal("New folder (2)", secondFolder.ResultPath);
         Assert.True(Directory.Exists(Path.Combine(directory.Path, "New folder (2)")));
 
         var collision = await provider.ExecuteAsync(new MdFileOperationRequest(
-            MdFileOperationKind.Copy, "home", "notes.txt", "home", string.Empty));
+            MdFileOperationKind.Copy, "home", "notes.txt", "home", string.Empty),
+            cancellationToken: TestContext.Current.CancellationToken);
         Assert.True(collision.HasConflict);
         Assert.Equal("notes.txt", collision.ResultPath);
 
         var copy = await provider.ExecuteAsync(new MdFileOperationRequest(
             MdFileOperationKind.Copy, "home", "notes.txt", "home", string.Empty,
-            ConflictPolicy: MdFileConflictPolicy.KeepBoth));
+            ConflictPolicy: MdFileConflictPolicy.KeepBoth),
+            cancellationToken: TestContext.Current.CancellationToken);
         Assert.True(copy.Succeeded);
         Assert.Equal("notes (2).txt", copy.ResultPath);
         Assert.Equal("hello file browser", File.ReadAllText(Path.Combine(directory.Path, "notes (2).txt")));
 
         var failedReplacement = await provider.ExecuteAsync(new MdFileOperationRequest(
             MdFileOperationKind.Copy, "home", "missing.txt", "home", string.Empty,
-            ConflictPolicy: MdFileConflictPolicy.Overwrite));
+            ConflictPolicy: MdFileConflictPolicy.Overwrite),
+            cancellationToken: TestContext.Current.CancellationToken);
         Assert.False(failedReplacement.Succeeded);
         Assert.Equal("hello file browser", File.ReadAllText(Path.Combine(directory.Path, "notes.txt")));
         Assert.DoesNotContain(Directory.GetFiles(directory.Path), path => Path.GetFileName(path).EndsWith(".md3backup", StringComparison.Ordinal));
@@ -95,9 +104,11 @@ public sealed class MdFileExplorerTests
         using (var output = File.Create(imagePath))
             image.CopyTo(output);
         var provider = new MdLocalFileSystemProvider([new MdFileLocation("photos", "Photos", directory.Path)]);
-        var entry = (await provider.GetEntriesAsync("photos", string.Empty)).Single();
+        var entry = (await provider.GetEntriesAsync("photos", string.Empty,
+            cancellationToken: TestContext.Current.CancellationToken)).Single();
 
-        var thumbnail = Assert.IsType<Bitmap>(await provider.GetThumbnailAsync("photos", entry));
+        var thumbnail = Assert.IsType<Bitmap>(await provider.GetThumbnailAsync("photos", entry,
+            cancellationToken: TestContext.Current.CancellationToken));
 
         Assert.Equal(256, thumbnail.PixelSize.Width);
         Assert.True(thumbnail.PixelSize.Height < 200);
@@ -173,35 +184,41 @@ public sealed class MdFileExplorerTests
         Directory.CreateSymbolicLink(Path.Combine(directory.Path, "dangling"), danglingTarget);
         var provider = new MdLocalFileSystemProvider([new MdFileLocation("home", "Home", directory.Path)]);
 
-        var entries = await provider.GetEntriesAsync("home", "Source");
+        var entries = await provider.GetEntriesAsync("home", "Source",
+            cancellationToken: TestContext.Current.CancellationToken);
         var link = Assert.Single(entries, entry => entry.Name == "outside");
         Assert.True(link.IsSymbolicLink);
         Assert.False(link.CanNavigate);
         var unlinkResult = await provider.ExecuteAsync(new MdFileOperationRequest(
-            MdFileOperationKind.Delete, "home", "Source/linked-secret.txt"));
+            MdFileOperationKind.Delete, "home", "Source/linked-secret.txt"),
+            cancellationToken: TestContext.Current.CancellationToken);
         Assert.True(unlinkResult.Succeeded);
         Assert.False(File.Exists(removableLink));
         Assert.Equal("outside the root", File.ReadAllText(Path.Combine(external.Path, "secret.txt")));
         await Assert.ThrowsAsync<UnauthorizedAccessException>(async () =>
         {
-            await provider.GetEntriesAsync("home", "Source/outside");
+            await provider.GetEntriesAsync("home", "Source/outside",
+                cancellationToken: TestContext.Current.CancellationToken);
         });
 
         var copy = await provider.ExecuteAsync(new MdFileOperationRequest(
-            MdFileOperationKind.Copy, "home", "Source", "home", "Destination"));
+            MdFileOperationKind.Copy, "home", "Source", "home", "Destination"),
+            cancellationToken: TestContext.Current.CancellationToken);
         Assert.False(copy.Succeeded);
         Assert.Contains("symbolic link", copy.ErrorMessage ?? string.Empty, StringComparison.OrdinalIgnoreCase);
         Assert.False(Directory.Exists(Path.Combine(destination, "Source")));
         Assert.Equal("outside the root", File.ReadAllText(Path.Combine(external.Path, "secret.txt")));
 
         var deleteLinkContainer = await provider.ExecuteAsync(new MdFileOperationRequest(
-            MdFileOperationKind.Delete, "home", "Source"));
+            MdFileOperationKind.Delete, "home", "Source"),
+            cancellationToken: TestContext.Current.CancellationToken);
         Assert.True(deleteLinkContainer.Succeeded);
         Assert.False(Directory.Exists(source));
         Assert.Equal("outside the root", File.ReadAllText(Path.Combine(external.Path, "secret.txt")));
 
         var createThroughDanglingLink = await provider.ExecuteAsync(new MdFileOperationRequest(
-            MdFileOperationKind.CreateDirectory, "home", string.Empty, NewName: "dangling"));
+            MdFileOperationKind.CreateDirectory, "home", string.Empty, NewName: "dangling"),
+            cancellationToken: TestContext.Current.CancellationToken);
         Assert.False(createThroughDanglingLink.Succeeded);
         Assert.False(Directory.Exists(danglingTarget));
     }
@@ -216,7 +233,8 @@ public sealed class MdFileExplorerTests
         var provider = new MdLocalFileSystemProvider([new MdFileLocation("home", "Home", directory.Path)]);
 
         var result = await provider.ExecuteAsync(new MdFileOperationRequest(
-            MdFileOperationKind.Copy, "home", "Source", "home", "Source"));
+            MdFileOperationKind.Copy, "home", "Source", "home", "Source"),
+            cancellationToken: TestContext.Current.CancellationToken);
 
         Assert.False(result.Succeeded);
         Assert.Contains("descendant", result.ErrorMessage ?? string.Empty, StringComparison.OrdinalIgnoreCase);
@@ -235,15 +253,18 @@ public sealed class MdFileExplorerTests
             new MdFileLocation("source", "Source", source.Path),
             new MdFileLocation("destination", "Destination", destination.Path)
         ]);
-        var entry = (await provider.GetEntriesAsync("source", string.Empty)).Single();
-        var preview = await provider.GetPreviewAsync("source", entry);
+        var entry = (await provider.GetEntriesAsync("source", string.Empty,
+            cancellationToken: TestContext.Current.CancellationToken)).Single();
+        var preview = await provider.GetPreviewAsync("source", entry,
+            cancellationToken: TestContext.Current.CancellationToken);
         Assert.NotNull(preview?.Text);
         Assert.True(preview!.Text!.Length < 16_500);
         Assert.EndsWith("…", preview!.Text!);
 
         var result = await provider.ExecuteAsync(new MdFileOperationRequest(
             MdFileOperationKind.Move, "source", "large.txt", "destination", string.Empty),
-            new InlineProgress<MdFileOperationProgress>(_ => throw new InvalidOperationException("Progress observer failure.")));
+            new InlineProgress<MdFileOperationProgress>(_ => throw new InvalidOperationException("Progress observer failure.")),
+            TestContext.Current.CancellationToken);
         Assert.True(result.Succeeded);
         Assert.Equal("large.txt", result.ResultPath);
         Assert.False(File.Exists(Path.Combine(source.Path, "large.txt")));
