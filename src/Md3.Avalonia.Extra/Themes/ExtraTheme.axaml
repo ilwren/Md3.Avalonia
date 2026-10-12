@@ -5,6 +5,7 @@
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="avares://Md3.Avalonia.Extra/Themes/ExtraControls.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia.Extra/Themes/FileExplorerControls.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia.Extra/Themes/AdvancedControls.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia.Extra/Themes/WaveFControls.axaml" />
       </ResourceDictionary.MergedDictionaries>

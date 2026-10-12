@@ -132,6 +132,7 @@
             <md:MdButton x:Name="FormValidationNav" Content="Form validation" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFormValidation" />
             <md:MdButton x:Name="GridTileNav" Content="Grid tiles" Variant="Text" HorizontalContentAlignment="Left" Click="ShowGridTiles" />
             <md:MdButton x:Name="ListNav" Content="Lists" Variant="Text" HorizontalContentAlignment="Left" Click="ShowLists" />
+            <md:MdButton x:Name="FileExplorerNav" Content="File explorer" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFileExplorer" />
             <md:MdButton x:Name="LoadingNav" Content="Loading" Variant="Text" HorizontalContentAlignment="Left" Click="ShowLoading" />
             <md:MdButton x:Name="ProgressNav" Content="Progress" Variant="Text" HorizontalContentAlignment="Left" Click="ShowProgress" />
             <md:MdButton x:Name="RefreshNav" Content="Pull to refresh" Variant="Text" HorizontalContentAlignment="Left" Click="ShowRefresh" />

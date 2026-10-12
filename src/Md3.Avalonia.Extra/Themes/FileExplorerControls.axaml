@@ -1,0 +1,77 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls"
+                    xmlns:eco="using:Md3.Avalonia.Extra.Controls">
+  <ControlTheme x:Key="MdFileItemContainerTheme" TargetType="ListBoxItem">
+    <Setter Property="MinHeight" Value="56" />
+    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ListBoxItem">
+        <Border Background="{TemplateBinding Background}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                ClipToBounds="True">
+          <Grid>
+            <ContentPresenter Margin="{TemplateBinding Padding}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Foreground="{TemplateBinding Foreground}" />
+            <Border x:Name="PART_StateLayer"
+                    Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                    IsHitTestVisible="False"
+                    Opacity="0" />
+            <md:MdRipplePresenter RippleBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:selected">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_StateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Focus.Opacity}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type eco:MdFileItemsView}" TargetType="eco:MdFileItemsView">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="ItemContainerTheme" Value="{StaticResource MdFileItemContainerTheme}" />
+    <Setter Property="ItemsPanel">
+      <ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate>
+    </Setter>
+    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdFileItemsView">
+        <md:MdScrollViewer HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                           VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
+          <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
+        </md:MdScrollViewer>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:grid">
+      <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+      <Setter Property="ItemsPanel">
+        <ItemsPanelTemplate><WrapPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="^:details">
+      <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>
