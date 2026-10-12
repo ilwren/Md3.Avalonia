@@ -92,7 +92,7 @@
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Usage" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Add the theme after MaterialTheme and keep using Dock as usual - the package carries Dock.Avalonia and Dock.Avalonia.Themes.Fluent, and DockFluentTheme must not be included as well. Registering it on a page, as this demo does, keeps the implicit Button theme it brings inside the dock's subtree." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Add the theme after MaterialTheme and keep using Dock as usual - the package carries Dock.Avalonia and Dock.Avalonia.Themes.Fluent, and DockFluentTheme must not be included as well. This demo registers it in the page's own styles rather than in the application's." />
         <gallery:CodeExample XamlCode="&lt;themes:MaterialTheme /&gt;&#10;&lt;themes:MaterialDockTheme /&gt;   &lt;!-- opt-in package, after MaterialTheme --&gt;"
                             CSharpCode="var factory = new Factory();&#10;var documents = new DocumentDock { Id = &quot;Documents&quot; };&#10;var root = new RootDock { Id = &quot;Root&quot; };&#10;&#10;root.VisibleDockables = factory.CreateList&lt;IDockable&gt;(documents);&#10;root.ActiveDockable = documents;&#10;&#10;dockControl.Factory = factory;&#10;dockControl.Layout = root;" />
       </StackPanel>

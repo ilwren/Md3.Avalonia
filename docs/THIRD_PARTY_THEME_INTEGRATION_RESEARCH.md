@@ -155,8 +155,9 @@ Markdown.Avalonia（417★）+ LiveMarkdown.Avalonia（176★）。
 - **一个无法回避的隐式主题**：`ButtonCreateDocument`/`ChromeButton`/`DockDrawnCaptionButton` 都
   `BasedOn="{StaticResource {x:Type Button}}"`，而核心 `MaterialTheme` 不碰 Avalonia 原生控件、这里也不引入
   `FluentTheme`，所以包里必须自带 `Themes/Controls/MaterialButton.axaml`（Material 文本按钮），这是该包唯一
-  会影响的原生类型，`MdDockThemeTests` 把这条边界钉住。（也因此 AvaloniaEdit/AvaloniaHex 的「不替换原生主题」
-  测试改为只断言各自相关的类型，Button 归 Dock 的测试管。）
+  会影响的原生类型，`MdDockThemeTests` 把这条边界钉住；按文档推荐的 `Application.Styles` 用法，应用自己的普通 Button
+  也会拿到这个文本按钮外观，这是 Dock 在没有 `FluentTheme` 时能工作的代价。（也因此
+  AvaloniaEdit/AvaloniaHex 的「不替换原生主题」测试改为只断言各自相关的类型，Button 归 Dock 的测试管。）
 - 版本：仓库基线 Avalonia 12.1.2，而 Dock 12.1.0.7 要求 Avalonia ≥ 12.1.3，因此固定 **12.1.0.6**（要求
   12.1.1；accent 键集与 12.1.0.7 完全一致），`Directory.Packages.props` 里注明两者要一起升。
 - 风险：Dock 迭代很快（当天仍有提交），主题包需要跟版本对齐，建议固定上游版本号并在 README 标注适配范围。

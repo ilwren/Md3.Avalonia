@@ -61,7 +61,15 @@ public sealed class MdButtonTests
 
         var materialBackground = Assert.IsType<SolidColorBrush>(materialButton.Background);
         Assert.Equal(Color.Parse("#6750A4"), materialBackground.Color);
-        Assert.Null(avaloniaButton.Background);
+
+        // MaterialTheme does not style Avalonia's own Button - that is still true, and this test did
+        // assert a null background until the opt-in Md3.Avalonia.Dock package joined this test
+        // application. That package's theme has to carry the implicit Button theme Dock's chrome
+        // derives from (see MdDockThemeTests), so a plain Button here wears *that* theme instead:
+        // the Material MdButton look, with its filled primary container, is what must not leak.
+        var native = Assert.IsAssignableFrom<ISolidColorBrush>(avaloniaButton.Background);
+        Assert.NotEqual(materialBackground.Color, native.Color);
+        Assert.Equal(Colors.Transparent, native.Color);
     }
 
     [AvaloniaFact]

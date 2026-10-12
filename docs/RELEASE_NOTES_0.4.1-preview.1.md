@@ -79,9 +79,11 @@ surface，调用方仍可覆盖。
   仍然归 Dock 维护，升级不会漂移；另外，Dock 的 `ButtonCreateDocument`/`ChromeButton`/
   `DockDrawnCaptionButton` 都是 `BasedOn="{StaticResource {x:Type Button}}"`，而既不引入
   `FluentTheme`、核心 `MaterialTheme` 又不碰 Avalonia 原生控件，所以包里还带了一份无法回避的
-  隐式原生主题 `Themes/Controls/MaterialButton.axaml`（Material 文本按钮），它只影响注册该主题的范围
-  （注册在 `Application.Styles` 就是整个应用，注册在页面/面板就只在那个子树里），其余原生控件仍交由
-  宿主应用自行决定；
+  隐式原生主题 `Themes/Controls/MaterialButton.axaml`（Material 文本按钮）：按文档推荐的
+  `Application.Styles` 用法，这也是应用自己的普通 `Button` 会拿到的外观——这是 Dock 无需
+  `FluentTheme` 也能工作的代价；其余原生控件仍交由宿主应用自行决定（所以其他 opt-in 主题包的隔离测试
+  改为只断言各自的控件类型）。若想让应用自己的按钮保持宿主主题，可把该主题注册在 Dock 所在的范围内
+  （Gallery 的停靠页就放在 `UserControl.Styles`）里；
 - **原生 AOT 已验证可用。** 九个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
   IL3xxx 分析器。`.github/workflows/aot-probe.yml` 用 `PublishAot=true` 发布桌面 Gallery，并且
   **不把「步骤成功」当作答案**：它断言产物是原生 ELF 可执行文件、输出目录里没有托管 dll 残留（防止

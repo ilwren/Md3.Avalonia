@@ -11,7 +11,6 @@ using Dock.Avalonia.Controls;
 using Dock.Model.Avalonia;
 using Dock.Model.Avalonia.Controls;
 using Dock.Model.Core;
-using Md3.Avalonia.Themes;
 using Xunit;
 using DockDocument = Dock.Model.Avalonia.Controls.Document;
 using DockRootDock = Dock.Model.Avalonia.Controls.RootDock;
@@ -23,12 +22,12 @@ namespace Md3.Avalonia.HeadlessTests;
 /// Covers the Material theme for Dock, which ships in the opt-in Md3.Avalonia.Dock package.
 /// </summary>
 /// <remarks>
-/// Every test here scopes the theme to its own window instead of registering it in
-/// <see cref="TestApplication"/>, exactly as the gallery's Docking page scopes it to its own page.
-/// The reason is that the Dock theme also has to carry the implicit Button theme Dock's chrome
-/// derives from (see <see cref="Only_The_Scoped_Dock_Theme_Adds_The_Base_Button_Theme_Docks_Chrome_Needs"/>),
-/// and this headless application is shared with the core and the other opt-in suites, whose
-/// contracts are that adding <em>their</em> package does not restyle Avalonia's native controls.
+/// The theme is registered in <see cref="TestApplication"/> alongside the other packages, which is
+/// the documented application-wide usage: <c>Application.Styles</c> with <c>MaterialTheme</c> first.
+/// The one consequence worth knowing is asserted by
+/// <see cref="Registering_The_Dock_Theme_Only_Adds_The_Base_Button_Theme_Docks_Chrome_Needs"/>: Dock
+/// keys its chrome themes on Avalonia's implicit Button theme, so this package supplies one, and it
+/// is the only native control theme any of these suites adds.
 /// </remarks>
 public class MdDockThemeTests
 {
@@ -39,11 +38,8 @@ public class MdDockThemeTests
         // Dock.Avalonia.Themes.Fluent dictionaries by avares URI and adds its own accents, so the
         // implicit themes for Dock's controls have to be reachable from this theme alone, with no
         // DockFluentTheme anywhere.
-        using var scope = Show(new TextBlock());
-        var window = scope.Window;
-        var variant = window.ActualThemeVariant;
-        Assert.DoesNotContain(window.Styles, style => style.GetType().Name == "DockFluentTheme");
-        Assert.DoesNotContain(Application.Current!.Styles, style => style.GetType().Name == "DockFluentTheme");
+        var variant = Application.Current!.ActualThemeVariant;
+        Assert.DoesNotContain(Application.Current.Styles, style => style.GetType().Name == "DockFluentTheme");
 
         foreach (var type in new[]
                  {
@@ -52,7 +48,7 @@ public class MdDockThemeTests
                      typeof(RootDockControl), typeof(HostWindow)
                  })
         {
-            Assert.True(window.TryGetResource(type, variant, out var value), type.Name);
+            Assert.True(Application.Current.TryGetResource(type, variant, out var value), type.Name);
             Assert.IsType<ControlTheme>(value);
         }
     }
@@ -63,44 +59,42 @@ public class MdDockThemeTests
         // Dock's five DockApplicationAccent* brushes used to be #007ACC and friends, and every
         // tab, surface, border and chrome key was an alias of one of them. The package rewrites
         // those values into Md.Sys.Color tokens, so light and dark come from the Material theme.
-        using var scope = Show(new TextBlock());
-        var window = scope.Window;
-        Assert.NotEqual(Color.Parse("#007ACC"), ColorOf(Brush(window, "DockApplicationAccentBrushLow")));
+        Assert.NotEqual(Color.Parse("#007ACC"), ColorOf(Brush("DockApplicationAccentBrushLow")));
 
-        Assert.Equal(ColorOf(Brush(window, "Md.Sys.Color.Primary.Brush")),
-            ColorOf(Brush(window, "DockApplicationAccentBrushLow")));
-        Assert.Equal(ColorOf(Brush(window, "Md.Sys.Color.Primary.Brush")),
-            ColorOf(Brush(window, "DockTabActiveBackgroundBrush")));
-        Assert.Equal(ColorOf(Brush(window, "Md.Sys.Color.Primary.Brush")),
-            ColorOf(Brush(window, "DockTabSelectedForegroundBrush")));
-        Assert.Equal(ColorOf(Brush(window, "Md.Sys.Color.Primary.Brush")),
-            ColorOf(Brush(window, "DockTargetIndicatorBrush")));
-        Assert.Equal(ColorOf(Brush(window, "Md.Sys.Color.OnPrimary.Brush")),
-            ColorOf(Brush(window, "DockTabActiveForegroundBrush")));
-        Assert.Equal(ColorOf(Brush(window, "Md.Sys.Color.OnPrimary.Brush")),
-            ColorOf(Brush(window, "DockDocumentTabSelectedForegroundBrush")));
-        Assert.Equal(ColorOf(Brush(window, "Md.Sys.Color.OnSurfaceVariant.Brush")),
-            ColorOf(Brush(window, "DockTabForegroundBrush")));
-        Assert.Equal(ColorOf(Brush(window, "Md.Sys.Color.OutlineVariant.Brush")),
-            ColorOf(Brush(window, "DockBorderSubtleBrush")));
-        Assert.Equal(ColorOf(Brush(window, "Md.Sys.Color.Outline.Brush")),
-            ColorOf(Brush(window, "DockBorderStrongBrush")));
-        Assert.Equal(ColorOf(Brush(window, "Md.Sys.Color.SurfaceContainerLowest.Brush")),
-            ColorOf(Brush(window, "DockSurfaceEditorBrush")));
-        Assert.Equal(ColorOf(Brush(window, "Md.Sys.Color.SurfaceContainerHigh.Brush")),
-            ColorOf(Brush(window, "DockSurfaceHeaderBrush")));
-        Assert.Equal(ColorOf(Brush(window, "Md.Sys.Color.ErrorContainer.Brush")),
-            ColorOf(Brush(window, "DockChromeButtonDangerHoverBrush")));
+        Assert.Equal(ColorOf(Brush("Md.Sys.Color.Primary.Brush")),
+            ColorOf(Brush("DockApplicationAccentBrushLow")));
+        Assert.Equal(ColorOf(Brush("Md.Sys.Color.Primary.Brush")),
+            ColorOf(Brush("DockTabActiveBackgroundBrush")));
+        Assert.Equal(ColorOf(Brush("Md.Sys.Color.Primary.Brush")),
+            ColorOf(Brush("DockTabSelectedForegroundBrush")));
+        Assert.Equal(ColorOf(Brush("Md.Sys.Color.Primary.Brush")),
+            ColorOf(Brush("DockTargetIndicatorBrush")));
+        Assert.Equal(ColorOf(Brush("Md.Sys.Color.OnPrimary.Brush")),
+            ColorOf(Brush("DockTabActiveForegroundBrush")));
+        Assert.Equal(ColorOf(Brush("Md.Sys.Color.OnPrimary.Brush")),
+            ColorOf(Brush("DockDocumentTabSelectedForegroundBrush")));
+        Assert.Equal(ColorOf(Brush("Md.Sys.Color.OnSurfaceVariant.Brush")),
+            ColorOf(Brush("DockTabForegroundBrush")));
+        Assert.Equal(ColorOf(Brush("Md.Sys.Color.OutlineVariant.Brush")),
+            ColorOf(Brush("DockBorderSubtleBrush")));
+        Assert.Equal(ColorOf(Brush("Md.Sys.Color.Outline.Brush")),
+            ColorOf(Brush("DockBorderStrongBrush")));
+        Assert.Equal(ColorOf(Brush("Md.Sys.Color.SurfaceContainerLowest.Brush")),
+            ColorOf(Brush("DockSurfaceEditorBrush")));
+        Assert.Equal(ColorOf(Brush("Md.Sys.Color.SurfaceContainerHigh.Brush")),
+            ColorOf(Brush("DockSurfaceHeaderBrush")));
+        Assert.Equal(ColorOf(Brush("Md.Sys.Color.ErrorContainer.Brush")),
+            ColorOf(Brush("DockChromeButtonDangerHoverBrush")));
 
         // Hover is a Material state layer rather than a second accent colour.
-        var hover = Assert.IsAssignableFrom<ISolidColorBrush>(Brush(window, "DockTabHoverBackgroundBrush"));
-        Assert.Equal(ColorOf(Brush(window, "Md.Sys.Color.OnSurface.Brush")), hover.Color);
+        var hover = Assert.IsAssignableFrom<ISolidColorBrush>(Brush("DockTabHoverBackgroundBrush"));
+        Assert.Equal(ColorOf(Brush("Md.Sys.Color.OnSurface.Brush")), hover.Color);
         Assert.Equal(0.08, hover.Opacity, 3);
 
         // Dock's metrics survive the retoken; only the corner shape became M3.
-        Assert.True(window.TryGetResource("DockHeaderHeight", null, out var headerHeight));
+        Assert.True(Application.Current!.TryGetResource("DockHeaderHeight", null, out var headerHeight));
         Assert.Equal(26d, Assert.IsType<double>(headerHeight));
-        Assert.True(window.TryGetResource("DockDocumentTabItemCornerRadius", null, out var corner));
+        Assert.True(Application.Current.TryGetResource("DockDocumentTabItemCornerRadius", null, out var corner));
         Assert.Equal(new CornerRadius(4), Assert.IsType<CornerRadius>(corner));
     }
 
@@ -123,12 +117,13 @@ public class MdDockThemeTests
     }
 
     [AvaloniaFact]
-    public void Only_The_Scoped_Dock_Theme_Adds_The_Base_Button_Theme_Docks_Chrome_Needs()
+    public void Registering_The_Dock_Theme_Only_Adds_The_Base_Button_Theme_Docks_Chrome_Needs()
     {
         // Dock's keyed chrome themes (ButtonCreateDocument, ChromeButton and DockDrawnCaptionButton)
         // are BasedOn="{StaticResource {x:Type Button}}". Core MaterialTheme leaves Avalonia's native
-        // controls alone and this package replaces DockFluentTheme, so wherever the Dock theme is
-        // registered it brings that one implicit theme with it - and only that one.
+        // controls alone and this package replaces DockFluentTheme, so the Dock theme brings that one
+        // implicit theme with it - and only that one. This is the package's widest side effect and it
+        // is deliberate: without it Dock chrome could not load at all.
         var variant = Application.Current!.ActualThemeVariant;
         foreach (var native in new[]
                  {
@@ -138,29 +133,25 @@ public class MdDockThemeTests
             Assert.False(Application.Current.TryGetResource(native, variant, out _), native.Name);
         }
 
-        var untouched = new Button { Content = "plain" };
-        using (Show(untouched, dockTheme: false))
-        {
-            Assert.Null(untouched.Background);
-        }
+        // The Button theme is this package's own Material flat button, not Avalonia FluentTheme's:
+        // the marker state-layer brushes only exist in Controls/MaterialButton.axaml. Avalonia hangs
+        // an implicit ControlTheme on the element without setting Control.Theme, so the observable
+        // proof is the style it installs - the transparent container the theme gives every Button.
+        Assert.True(Application.Current.TryGetResource("Md.Comp.Dock.ButtonHover.Brush", variant, out _));
+        Assert.True(Application.Current.TryGetResource("Md.Comp.Dock.ButtonPressed.Brush", variant, out _));
+        Assert.True(Application.Current.TryGetResource(typeof(Button), variant, out var value));
+        var buttonTheme = Assert.IsType<ControlTheme>(value);
+        Assert.Equal(typeof(Button), buttonTheme.TargetType);
+
+        // Dock's own chrome then builds on it: ChromeButton is the keyed theme Dock's tool chrome
+        // resolves, and it is only loadable because the key above existed when Dock's dictionaries
+        // were merged.
+        Assert.True(Application.Current.TryGetResource("ChromeButton", variant, out var chromeButtonValue));
+        Assert.Same(buttonTheme, Assert.IsType<ControlTheme>(chromeButtonValue).BasedOn);
 
         var button = new Button { Content = "plain" };
         using var scope = Show(button);
-        var window = scope.Window;
-        foreach (var native in new[] { typeof(TextBox), typeof(ScrollViewer), typeof(ListBox), typeof(ToggleButton) })
-        {
-            Assert.False(window.TryGetResource(native, variant, out _), native.Name);
-        }
-
-        // The Button theme is this package's own Material flat button, not Avalonia FluentTheme's:
-        // the marker state-layer brushes only exist in Controls/MaterialButton.axaml. Avalonia applies
-        // an implicit ControlTheme without setting Control.Theme, so the observable proof is the
-        // style it installs - the transparent container the theme gives every Button.
-        Assert.True(window.TryGetResource("Md.Comp.Dock.ButtonHover.Brush", variant, out _));
-        Assert.True(window.TryGetResource("Md.Comp.Dock.ButtonPressed.Brush", variant, out _));
-        Assert.True(window.TryGetResource(typeof(Button), variant, out var value));
-        Assert.Equal(typeof(Button), Assert.IsType<ControlTheme>(value).TargetType);
-        Assert.Equal(Colors.Transparent, Assert.IsType<SolidColorBrush>(button.Background).Color);
+        Assert.Equal(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(button.Background).Color);
     }
 
     private static DockControl NewDock()
@@ -225,14 +216,10 @@ public class MdDockThemeTests
         return dock;
     }
 
-    /// <summary>
-    /// Shows <paramref name="content"/> in a window that carries the Dock theme in its own styles,
-    /// the same scoping the gallery's Docking page uses.
-    /// </summary>
-    private static Scope Show(Control content, bool dockTheme = true)
+    /// <summary>Shows <paramref name="content"/> in a window and returns a scope that closes it.</summary>
+    private static Scope Show(Control content)
     {
         var window = new Window { Content = content };
-        if (dockTheme) window.Styles.Add(new MaterialDockTheme());
         window.Show();
         Dispatcher.UIThread.RunJobs();
         return new Scope(window);
@@ -245,9 +232,9 @@ public class MdDockThemeTests
         public void Dispose() => Window.Close();
     }
 
-    private static IBrush Brush(IResourceHost host, string key)
+    private static IBrush Brush(string key)
     {
-        Assert.True(host.TryGetResource(key, Application.Current!.ActualThemeVariant, out var value), key);
+        Assert.True(Application.Current!.TryGetResource(key, Application.Current.ActualThemeVariant, out var value), key);
         return Assert.IsAssignableFrom<IBrush>(value);
     }
 

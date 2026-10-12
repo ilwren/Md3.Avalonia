@@ -18,6 +18,7 @@ public sealed class TestApplication : Application
         Styles.Add(new MaterialRichEditorTheme());
         Styles.Add(new MaterialAvaloniaEditTheme());
         Styles.Add(new MaterialAvaloniaHexTheme());
+        Styles.Add(new MaterialDockTheme());
     }
 }
 

@@ -500,14 +500,15 @@ keyed chrome themes (`ButtonCreateDocument`, `ChromeButton`, `DockDrawnCaptionBu
 native controls alone) nor an absent `FluentTheme` supplies that key, so
 `Themes/Controls/MaterialButton.axaml` adds a Material text-button theme for `Button`.
 
-`Button` is the only native type that theme touches, and where the theme is registered decides how
-far it reaches: in `Application.Styles` the application's own plain `Button`s get the Material
-text-button look too, while registering it on a page or panel - `UserControl.Styles`, which is what
-the gallery's Docking page does - keeps the effect inside the dock's subtree and leaves the rest of
-the application on whatever theme it had. `TextBox`, `ScrollViewer`, `ListBox` and the other native
-controls are never touched either way, and
-`Only_The_Scoped_Dock_Theme_Adds_The_Base_Button_Theme_Docks_Chrome_Needs` in the headless suite
-pins both halves of that contract. Three Dock window types (`DockAdornerWindow`,
+`Button` is the only native type that theme touches, so in the documented application-wide setup the
+application's own plain `Button`s pick up that Material text-button look too - that is the price of
+Dock chrome working without Avalonia's `FluentTheme`. Nothing else changes: `TextBox`,
+`ScrollViewer`, `ListBox` and the other native controls are never touched, and
+`Registering_The_Dock_Theme_Only_Adds_The_Base_Button_Theme_Docks_Chrome_Needs` in the headless
+suite pins both halves of that contract (which is also why the isolation tests of the other opt-in
+packages check their own types rather than `Button`). Keep Dock's chrome in a scope of its own - the
+gallery page registers the theme in `UserControl.Styles` rather than in `Application.Styles` - if
+you would rather have the application's own buttons keep the host theme. Three Dock window types (`DockAdornerWindow`,
 `DragPreviewWindow`, `PinnedDockWindow`) base themselves on the `{x:Type Window}` theme, which
 comes from the core `MaterialTheme`.
 

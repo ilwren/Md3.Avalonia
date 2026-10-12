@@ -29,9 +29,9 @@
   (`ButtonCreateDocument`, `ChromeButton`, `DockDrawnCaptionButton`) are
   `BasedOn="{StaticResource {x:Type Button}}"` and neither `MaterialTheme` nor an absent
   `FluentTheme` supplies that key, it also ships the one implicit native theme it cannot avoid -
-  a Material text button in `Themes/Controls/MaterialButton.axaml`, which reaches exactly as far as
-  the theme is registered (application-wide in `Application.Styles`, or scoped to a page); every
-  other native control is still left to the host application.
+  a Material text button in `Themes/Controls/MaterialButton.axaml` - the one native theme the
+  package adds, and by design: without it Dock's chrome cannot load when no `FluentTheme` is
+  present. Every other native control is still left to the host application.
 - **Native AOT.** All nine packages declare `IsAotCompatible` and build with the IL3xxx analyzers
   on alongside the existing IL2xxx trimming ones. `.github/workflows/aot-probe.yml` publishes the
   desktop gallery with `PublishAot=true` and does not accept a green step as the answer: it
