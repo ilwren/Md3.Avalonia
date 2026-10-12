@@ -178,13 +178,20 @@ public sealed class MdDesktopPopupAndComparisonTests
         {
             Dispatcher.UIThread.RunJobs();
             var label = Descendant<Border>(cascader, "PART_Label");
+            var labelText = Descendant<TextBlock>(cascader, "PART_LabelText");
             Assert.True(label.IsVisible);
+            Assert.True(labelText.IsVisible);
 
             var topLeft = label.TranslatePoint(new Point(0, 0), cascader);
+            var textTopLeft = labelText.TranslatePoint(new Point(0, 0), cascader);
             Assert.NotNull(topLeft);
-            Assert.True(topLeft!.Value.Y >= 0,
-                $"the label starts at y={topLeft.Value.Y} inside the cascader, so its top is outside the control.");
+            Assert.NotNull(textTopLeft);
+            Assert.True(topLeft!.Value.Y >= 8,
+                $"the label starts at y={topLeft.Value.Y} inside the cascader, without enough room above it.");
             Assert.True(topLeft.Value.Y + label.Bounds.Height <= cascader.Bounds.Height + .5);
+            Assert.True(textTopLeft!.Value.Y >= 0 && textTopLeft.Value.Y + labelText.Bounds.Height <= cascader.Bounds.Height + .5,
+                $"the label text bounds {textTopLeft.Value.Y:0.##}..{textTopLeft.Value.Y + labelText.Bounds.Height:0.##} " +
+                $"fall outside the cascader height {cascader.Bounds.Height:0.##}.");
         }
         finally { window.Close(); }
     }
@@ -201,7 +208,7 @@ public sealed class MdDesktopPopupAndComparisonTests
             Dispatcher.UIThread.RunJobs();
             Assert.False(Descendant<Border>(bare, "PART_Label").IsVisible);
             Assert.Equal(0, Descendant<Grid>(bare, "PART_Fields").Margin.Top);
-            Assert.True(Descendant<Grid>(labelled, "PART_Fields").Margin.Top > 0);
+            Assert.Equal(16, Descendant<Grid>(labelled, "PART_Fields").Margin.Top);
         }
         finally { window.Close(); }
     }
@@ -541,10 +548,9 @@ public sealed class MdDesktopPopupAndComparisonTests
     {
         // Measured on the real page, because the reported truncation is about where the dropdown
         // lands in a scrolling page rather than about the control in isolation.
-        // Hosted in MainWindow rather than shown bare: the navigation rail is what pushes the
-        // page off the left edge, and a popup clamped against the window edge loses the negative
-        // offset that cancels its bleed margin. Showing the page on its own puts the anchor at
-        // x=0 and manufactures exactly that clamp.
+        // Hosted in MainWindow rather than shown bare so the test includes the desktop shell,
+        // scrolling page, and the actual Cascader gallery data. The popup is forced into the
+        // owner window's overlay layer because native desktop popup windows clipped this surface.
         var window = new MainWindow { Width = 1400, Height = 900 };
         window.Show();
         try
@@ -560,7 +566,10 @@ public sealed class MdDesktopPopupAndComparisonTests
             Dispatcher.UIThread.RunJobs();
 
             var popup = Descendant<Popup>(cascader, "PART_Popup");
+            Assert.True(popup.ShouldUseOverlayLayer,
+                "The Cascader dropdown must use the owner window's overlay layer rather than a clipped desktop popup window.");
             var surface = Assert.IsAssignableFrom<Border>(popup.Child);
+            Assert.True(surface.IsVisible);
             PointerInput.AssertReachable(surface);
 
             var anchor = Descendant<Button>(cascader, "PART_Anchor");

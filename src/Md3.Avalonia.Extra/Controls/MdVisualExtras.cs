@@ -29,8 +29,7 @@ public sealed class MdBeforeAfter : TemplatedControl
     private Control? _thumb;
     private bool _dragging;
     private const double GrabTolerance = 22;
-    private Point _dragOrigin;
-    private double _dragStartPosition;
+    private double _dragPointerOffset;
 
     /// <summary>How far a click on the image away from the handle nudges the divider.</summary>
     private const double TrackStep = .1;
@@ -115,37 +114,36 @@ public sealed class MdBeforeAfter : TemplatedControl
         // control, every reachable pixel is on the same side of the divider, and the offset the
         // press picks up is both one-directional and as large as half the handle. Holding on to
         // it for the rest of the drag is the gap between cursor and handle in the report.
-        BeginDrag(e.GetPosition(this));
+        BeginDrag(e);
         e.Pointer.Capture(this);
         e.Handled = true;
     }
 
-    private void BeginDrag(Point origin)
+    private void BeginDrag(PointerPressedEventArgs e)
     {
+        // Establish focus before taking the drag origin. On the first interaction a desktop
+        // scroll host can bring the focused comparison into view, changing its local pointer
+        // coordinates. If the origin is captured first, that one-time offset is applied to the
+        // entire drag; subsequent drags do not reproduce it because the control is already focused.
+        if (Focusable) Focus();
+        var origin = e.GetPosition(this);
         _dragging = true;
 
-        // Track the delta rather than the absolute pointer: grabbing the handle off-centre must
-        // not snap the divider under the cursor.
-        //
-        // That only holds where the grab could have landed either side of centre. At an extreme
-        // half the handle is clipped outside the control, so every reachable pixel is on the
-        // same side of the divider and the offset the press picks up is one-directional and as
-        // large as half the handle - kept for the whole drag, it is the gap between cursor and
-        // handle in the report. Allow no more offset than the divider's own distance to the
-        // nearer edge, which is zero exactly where the handle is clipped.
+        // Retain the grab offset in control coordinates, but limit it at the clipped extremes.
+        // The offset is applied to each new pointer position rather than to a delta from the
+        // initial layout: focusing the control can scroll its parent, and that changes the local
+        // pointer coordinate once on the first drag. Absolute local tracking absorbs that
+        // re-layout instead of treating it as pointer motion.
         var extent = Orientation == MdComparisonOrientation.Horizontal
             ? Math.Max(1, Bounds.Width)
             : Math.Max(1, Bounds.Height);
         var along = Orientation == MdComparisonOrientation.Horizontal ? origin.X : origin.Y;
         var divider = Math.Clamp(Position, 0, 1) * extent;
         var reach = Math.Min(divider, extent - divider);
-        var offset = Math.Clamp(along - divider, -reach, reach);
-        Position = Math.Clamp((along - offset) / extent, 0, 1);
+        _dragPointerOffset = Math.Clamp(along - divider, -reach, reach);
+        Position = Math.Clamp((along - _dragPointerOffset) / extent, 0, 1);
 
-        _dragOrigin = origin;
-        _dragStartPosition = Math.Clamp(Position, 0, 1);
         PseudoClasses.Set(":dragging", true);
-        if (Focusable) Focus();
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -172,7 +170,7 @@ public sealed class MdBeforeAfter : TemplatedControl
             // there, so the pointer cannot reach its centre. Keeping that offset left the
             // divider trailing the cursor by up to the full 22 dip tolerance for the whole
             // drag, which is what the comparison slider was reported for.
-            BeginDrag(point);
+            BeginDrag(e);
             e.Pointer.Capture(this);
             e.Handled = true;
             return;
@@ -193,10 +191,11 @@ public sealed class MdBeforeAfter : TemplatedControl
         if (_dragging)
         {
             var point = e.GetPosition(this);
-            var delta = Orientation == MdComparisonOrientation.Horizontal
-                ? (point.X - _dragOrigin.X) / Math.Max(1, Bounds.Width)
-                : (point.Y - _dragOrigin.Y) / Math.Max(1, Bounds.Height);
-            Position = _dragStartPosition + delta;
+            var extent = Orientation == MdComparisonOrientation.Horizontal
+                ? Math.Max(1, Bounds.Width)
+                : Math.Max(1, Bounds.Height);
+            var along = Orientation == MdComparisonOrientation.Horizontal ? point.X : point.Y;
+            Position = Math.Clamp((along - _dragPointerOffset) / extent, 0, 1);
             e.Handled = true;
         }
         base.OnPointerMoved(e);
