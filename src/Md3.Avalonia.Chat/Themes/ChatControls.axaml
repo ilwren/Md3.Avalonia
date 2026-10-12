@@ -177,7 +177,7 @@
                    SelectionMode="Multiple" Background="Transparent" Padding="8,4"
                    AutomationProperties.Name="{TemplateBinding MessagesText}">
             <ListBox.ItemTemplate>
-              <DataTemplate>
+              <DataTemplate x:DataType="chat:MdChatRow">
                 <chat:MdChatMessagePresenter Message="{Binding Message}"
                     MarkdownProvider="{Binding MarkdownProvider, RelativeSource={RelativeSource AncestorType=chat:MdChatView}}"
                     ImageProvider="{Binding ImageProvider, RelativeSource={RelativeSource AncestorType=chat:MdChatView}}"
