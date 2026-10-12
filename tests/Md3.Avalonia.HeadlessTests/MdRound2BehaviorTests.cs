@@ -117,6 +117,10 @@ public sealed class MdRound2BehaviorTests
         window.Show();
         Dispatcher.UIThread.RunJobs();
 
+        // The snackbar template materializes when a message is presented.
+        host.Show(new MdSnackbarMessage("Saved"));
+        Dispatcher.UIThread.RunJobs();
+
         // M3: md.comp.snackbar.container.shape = 4dp, not a 24dp pill.
         var container = host.GetVisualDescendants().OfType<global::Avalonia.Controls.Border>()
             .First(border => border.Name == "PART_Container");
