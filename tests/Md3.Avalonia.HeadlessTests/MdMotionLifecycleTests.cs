@@ -237,13 +237,15 @@ public sealed class MdMotionLifecycleTests
             // A native desktop popup is a second window. Pointer leave/enter events can arrive in
             // different orders there and cause a false hide/reopen loop while crossing the gap.
             var popup = Assert.Single(host.GetVisualDescendants().OfType<Popup>());
-            Assert.True(popup.ShouldUseOverlayLayer);
-            Assert.True(popup.IsUsingOverlayLayer);
+            Assert.True(popup.ShouldUseOverlayLayer,
+                "rich tooltip popup should request the owner's overlay layer");
+            Assert.True(popup.IsUsingOverlayLayer,
+                "the test Window should provide the overlay host used by a rich tooltip");
 
             // Opening an interactive popup can move keyboard focus. That focus transition must
             // not arm a hide timer while the pointer is still on the trigger.
             host.RaiseEvent(new FocusChangedEventArgs(InputElement.LostFocusEvent));
-            Assert.True(host.IsOpen);
+            Assert.True(host.IsOpen, "the attended rich tooltip should remain open after focus changes");
             Assert.False(host.IsHideDelayPending);
 
             var tooltipPoint = tooltip.TranslatePoint(
@@ -253,14 +255,14 @@ public sealed class MdMotionLifecycleTests
             Dispatcher.UIThread.RunJobs();
             Assert.True(tooltip.IsPointerOver,
                 "moving into the rich surface should transfer pointer presence to the tooltip");
-            Assert.True(host.IsOpen);
+            Assert.True(host.IsOpen, "the rich tooltip closed while the pointer was over its surface");
             Assert.False(host.IsHideDelayPending);
 
             // Moving back to the trigger is still attended, and only leaving both regions starts
             // the grace timer. This is not a sticky tooltip.
             window.MouseMove(point.Value, RawInputModifiers.None);
             Dispatcher.UIThread.RunJobs();
-            Assert.True(host.IsPointerOver);
+            Assert.True(host.IsPointerOver, "moving back to the trigger should restore anchor presence");
             Assert.False(host.IsHideDelayPending);
             window.MouseMove(new Point(window.ClientSize.Width - 2, window.ClientSize.Height - 2),
                 RawInputModifiers.None);
