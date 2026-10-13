@@ -84,80 +84,103 @@ public sealed class MdComparisonDragTests
     }
 
     [AvaloniaFact]
-    public void First_Gallery_Drag_From_An_Edge_Tracks_The_Pointer_Before_Focus_Has_Been_Established()
+    public void First_Gallery_Drag_From_Left_And_Top_Edges_Defers_Focus_Until_Release()
     {
-        // Exercise the real desktop gallery tree, not just an isolated control: its scroll host
-        // and the first pointer-to-keyboard-focus transition are part of the first edge gesture.
-        var window = new MainWindow { Width = 1400, Height = 900 };
-        window.Show();
-        try
+        foreach (var orientation in new[]
+                 {
+                     MdComparisonOrientation.Horizontal,
+                     MdComparisonOrientation.Vertical,
+                 })
         {
-            Dispatcher.UIThread.RunJobs();
-            window.GetVisualDescendants().OfType<MdButton>()
-                .Single(button => button.Name == "BeforeAfterNav")
-                .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            Dispatcher.UIThread.RunJobs();
-
-            var comparison = window.GetVisualDescendants().OfType<MdBeforeAfter>()
-                .Single(control => control.Orientation == MdComparisonOrientation.Vertical);
-            var pageScroll = comparison.GetVisualAncestors().OfType<MdScrollViewer>().First();
-            var extent = comparison.Bounds.Height;
-            Assert.True(extent > 100, "The gallery comparison never got a desktop-sized layout.");
-            Assert.False(comparison.IsKeyboardFocusWithin,
-                "The regression must cover the first pointer press before the comparison has focus.");
-
-            // Put the vertical comparison partly below the page viewport. On first focus the
-            // ScrollViewer brings it into view, changing the pointer's local Y coordinate while
-            // the mouse is down - exactly the one-time shift that a delta-only drag loses.
-            var viewportBottom = pageScroll.TranslatePoint(
-                new Point(0, pageScroll.Bounds.Height), window)!.Value.Y;
-            var comparisonTop = comparison.TranslatePoint(default, window)!.Value.Y;
-            var scrollDistance = comparisonTop - (viewportBottom - 20);
-            if (scrollDistance > 0)
-                pageScroll.Offset = new Vector(pageScroll.Offset.X, pageScroll.Offset.Y + scrollDistance);
-            Dispatcher.UIThread.RunJobs();
-
-            // Move to the top edge after the gallery has completed layout. This matches the
-            // runtime geometry update before the first edge drag rather than initializing at 0.
-            comparison.Position = 0;
-            Dispatcher.UIThread.RunJobs();
-            var startAlong = 18d;
-            var startWindow = comparison.TranslatePoint(
-                new Point(comparison.Bounds.Width / 2, startAlong), window)!.Value;
-            var viewportTop = pageScroll.TranslatePoint(default, window)!.Value.Y;
-            Assert.True(startWindow.Y >= viewportTop && startWindow.Y < viewportBottom,
-                "The first edge press must land in the visible part of the scrolled comparison.");
-            var topBeforeFocus = comparison.TranslatePoint(default, window)!.Value.Y;
-            window.MouseDown(startWindow, MouseButton.Left, RawInputModifiers.None);
-            Dispatcher.UIThread.RunJobs();
-            var topAfterFocus = comparison.TranslatePoint(default, window)!.Value.Y;
-            Assert.True(topAfterFocus < topBeforeFocus - 1,
-                "Focusing the partly clipped comparison must scroll it into view so the first-drag regression is exercised.");
-
-            var worstGap = 0d;
-            var worstAt = 0d;
-            foreach (var delta in new[] { -1d, -4d, -10d, -18d })
+            var window = new MainWindow { Width = 1400, Height = 900 };
+            window.Show();
+            try
             {
-                var pointerWindow = startWindow + new Vector(0, delta);
-                window.MouseMove(pointerWindow, RawInputModifiers.None);
+                Dispatcher.UIThread.RunJobs();
+                window.GetVisualDescendants().OfType<MdButton>()
+                    .Single(button => button.Name == "BeforeAfterNav")
+                    .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                 Dispatcher.UIThread.RunJobs();
 
-                var controlOrigin = comparison.TranslatePoint(default, window)!.Value;
-                var pointerLocal = pointerWindow.Y - controlOrigin.Y;
-                var gap = Math.Abs(comparison.Position * extent - pointerLocal);
-                if (gap > worstGap) { worstGap = gap; worstAt = delta; }
+                var comparison = window.GetVisualDescendants().OfType<MdBeforeAfter>()
+                    .Single(control => control.IsInteractive && control.Orientation == orientation);
+                var pageScroll = comparison.GetVisualAncestors().OfType<MdScrollViewer>().First();
+                var extent = orientation == MdComparisonOrientation.Horizontal
+                    ? comparison.Bounds.Width
+                    : comparison.Bounds.Height;
+                Assert.True(extent > 100, $"{orientation}: the comparison never got a desktop-sized layout.");
+                Assert.False(comparison.IsKeyboardFocusWithin,
+                    $"{orientation}: the first pointer interaction must start unfocused.");
+
+                // Put the left/top handle just inside the page viewport while the control itself
+                // is partly clipped. Focusing it here would make the scroll host move the control
+                // underneath the stationary mouse, which is the one-time first-drag failure.
+                var viewportTop = pageScroll.TranslatePoint(default, window)!.Value.Y;
+                var viewportBottom = pageScroll.TranslatePoint(
+                    new Point(0, pageScroll.Bounds.Height), window)!.Value.Y;
+                var controlTop = comparison.TranslatePoint(default, window)!.Value.Y;
+                var desiredTop = orientation == MdComparisonOrientation.Horizontal
+                    ? viewportTop + 20 - comparison.Bounds.Height / 2
+                    : viewportBottom - 20;
+                var maxOffset = Math.Max(0, pageScroll.Extent.Height - pageScroll.Viewport.Height);
+                var offsetY = Math.Clamp(pageScroll.Offset.Y + controlTop - desiredTop, 0, maxOffset);
+                pageScroll.Offset = new Vector(pageScroll.Offset.X, offsetY);
+                comparison.Position = 0;
+                Dispatcher.UIThread.RunJobs();
+
+                controlTop = comparison.TranslatePoint(default, window)!.Value.Y;
+                var startLocal = orientation == MdComparisonOrientation.Horizontal
+                    ? new Point(18, comparison.Bounds.Height / 2)
+                    : new Point(comparison.Bounds.Width / 2, 18);
+                var startWindow = comparison.TranslatePoint(startLocal, window)!.Value;
+                if (orientation == MdComparisonOrientation.Horizontal)
+                    Assert.True(controlTop < viewportTop,
+                        "the horizontal comparison must be partly clipped at the top of the viewport");
+                else
+                    Assert.True(controlTop + comparison.Bounds.Height > viewportBottom,
+                        "the vertical comparison must be partly clipped at the bottom of the viewport");
+                Assert.InRange(startWindow.Y, viewportTop, viewportBottom - 1);
+
+                var scrollBeforePress = pageScroll.Offset;
+                window.MouseDown(startWindow, MouseButton.Left, RawInputModifiers.None);
+                Dispatcher.UIThread.RunJobs();
+
+                Assert.False(comparison.IsKeyboardFocusWithin,
+                    $"{orientation}: pointer-down must not trigger first-focus scrolling during the drag.");
+                Assert.Equal(scrollBeforePress, pageScroll.Offset);
+                Assert.InRange(comparison.Position, 0, .1);
+
+                var axis = orientation == MdComparisonOrientation.Horizontal
+                    ? new Vector(1, 0)
+                    : new Vector(0, 1);
+                var lastWindowPoint = startWindow;
+                var worstGap = 0d;
+                foreach (var delta in new[] { -1d, -4d, -10d, -18d })
+                {
+                    lastWindowPoint = startWindow + axis * delta;
+                    window.MouseMove(lastWindowPoint, RawInputModifiers.None);
+                    Dispatcher.UIThread.RunJobs();
+
+                    var currentOrigin = comparison.TranslatePoint(default, window)!.Value;
+                    var pointerLocal = lastWindowPoint - currentOrigin;
+                    var pointerAlong = orientation == MdComparisonOrientation.Horizontal
+                        ? pointerLocal.X
+                        : pointerLocal.Y;
+                    var gap = Math.Abs(comparison.Position * extent - pointerAlong);
+                    worstGap = Math.Max(worstGap, gap);
+                    Assert.Equal(scrollBeforePress, pageScroll.Offset);
+                }
+
+                window.MouseUp(lastWindowPoint, MouseButton.Left, RawInputModifiers.None);
+                Dispatcher.UIThread.RunJobs();
+
+                Assert.True(comparison.IsKeyboardFocusWithin,
+                    $"{orientation}: the comparison should receive focus after the drag ends.");
+                Assert.True(worstGap <= 1,
+                    $"{orientation}: the first edge drag left the divider {worstGap:0.##} dip from the pointer.");
+                Assert.Equal(0, comparison.Position, 3);
             }
-
-            var endWindow = startWindow + new Vector(0, -18);
-            window.MouseUp(endWindow, MouseButton.Left, RawInputModifiers.None);
-            Dispatcher.UIThread.RunJobs();
-
-            Assert.True(comparison.IsKeyboardFocusWithin,
-                "The pointer press should establish keyboard focus without shifting the first drag origin.");
-            Assert.True(worstGap <= 1,
-                $"the first gallery edge drag trailed the pointer by {worstGap:0.##} dip at " +
-                $"{worstAt:0} (position {comparison.Position:0.###} of {extent:0}).");
+            finally { window.Close(); }
         }
-        finally { window.Close(); }
     }
 }

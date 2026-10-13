@@ -121,19 +121,16 @@ public sealed class MdBeforeAfter : TemplatedControl
 
     private void BeginDrag(PointerPressedEventArgs e)
     {
-        // Establish focus before taking the drag origin. On the first interaction a desktop
-        // scroll host can bring the focused comparison into view, changing its local pointer
-        // coordinates. If the origin is captured first, that one-time offset is applied to the
-        // entire drag; subsequent drags do not reproduce it because the control is already focused.
-        if (Focusable) Focus();
+        // Do not focus while the pointer is down. On first focus a desktop ScrollViewer may
+        // BringIntoView this control and move it under the stationary pointer; recalculating the
+        // pointer in the new local coordinate space then teleports the divider (often to center).
+        // Focus is deferred until release, after pointer tracking has ended.
         var origin = e.GetPosition(this);
         _dragging = true;
 
         // Retain the grab offset in control coordinates, but limit it at the clipped extremes.
-        // The offset is applied to each new pointer position rather than to a delta from the
-        // initial layout: focusing the control can scroll its parent, and that changes the local
-        // pointer coordinate once on the first drag. Absolute local tracking absorbs that
-        // re-layout instead of treating it as pointer motion.
+        // Track each move from the pointer's current local position so ordinary layout changes
+        // during a drag are reflected in the thumb position rather than accumulated as a delta.
         var extent = Orientation == MdComparisonOrientation.Horizontal
             ? Math.Max(1, Bounds.Width)
             : Math.Max(1, Bounds.Height);
@@ -202,8 +199,22 @@ public sealed class MdBeforeAfter : TemplatedControl
     }
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
-        if (_dragging) { _dragging = false; PseudoClasses.Set(":dragging", false); e.Pointer.Capture(null); e.Handled = true; }
+        var focusAfterRelease = _dragging && Focusable;
+        if (_dragging)
+        {
+            _dragging = false;
+            PseudoClasses.Set(":dragging", false);
+            e.Pointer.Capture(null);
+            e.Handled = true;
+        }
+
         base.OnPointerReleased(e);
+
+        // A first focus can scroll the containing desktop ScrollViewer. Request it after the
+        // release route completes so that scroll cannot change the pointer-to-control coordinates
+        // while they are being used to place the divider.
+        if (focusAfterRelease)
+            Dispatcher.UIThread.Post(() => { Focus(); }, DispatcherPriority.Input);
     }
     protected override void OnKeyDown(KeyEventArgs e)
     {
