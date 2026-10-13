@@ -197,6 +197,18 @@ public sealed class MdBeforeAfter : TemplatedControl
         }
         base.OnPointerMoved(e);
     }
+    protected override void OnGettingFocus(FocusChangingEventArgs e)
+    {
+        // Avalonia's FocusManager focuses the nearest focusable ancestor on mouse-down before
+        // pointer handlers run. Reject that pointer-originated focus: it makes the parent
+        // ScrollViewer bring this partly clipped control into view in the middle of the drag.
+        // Keyboard/tab focus and our explicit post-release focus remain available.
+        if (e.NavigationMethod == NavigationMethod.Pointer)
+            e.TryCancel();
+
+        base.OnGettingFocus(e);
+    }
+
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         var focusAfterRelease = _dragging && Focusable;
