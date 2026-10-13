@@ -137,6 +137,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("LiveCharts2 charts", () => new LiveChartsGalleryPage());
         AddPage("ScottPlot charts", () => new ScottPlotGalleryPage());
         AddPage("Property grid", () => new PropertyGridGalleryPage());
+        AddPage("Node editor", () => new NodifyMGalleryPage());
         AddPage("Hex editor", () => new HexEditorGalleryPage());
         AddPage("Density", () => new DensityGalleryPage());
         AddPage("Hover cards", () => new HoverCardGalleryPage());

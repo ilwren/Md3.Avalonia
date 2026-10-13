@@ -278,7 +278,7 @@ LiveCharts 尚未分配的槽位（`ISeries.SeriesId` 默认为 `-1`）当作第
 
 ### 4.3 Wave 3（按需）
 
-- `Md3.Avalonia.NodifyM`、`Md3.Avalonia.Mapsui`（外壳 + 图层配色）、Avalonia.Labs 剩余控件。
+- ~~`Md3.Avalonia.NodifyM`~~（已落地，见下）、`Md3.Avalonia.Mapsui`（外壳 + 图层配色）、Avalonia.Labs 剩余控件。
 
 **已落地（2026-10-12，`Md3.Avalonia.PropertyGrid`）**：`Md3.Avalonia.Themes.MaterialPropertyGridTheme : Styles`，
 在 `src/Md3.Avalonia.PropertyGrid/`。这里修正本文件对成本与做法的预估：**不需要「逐个替换 11 个内嵌控件样式」**，
@@ -315,6 +315,42 @@ LiveCharts 尚未分配的槽位（`ISeries.SeriesId` 默认为 `-1`）当作第
   Jc.PopupView、RangeSlider）：**优先用仓库自身的 `MdDialogHost` / `MdSnackbar` / `MdSlider`**；
   只有当使用者的既有代码必须保留第三方 API 形态时，才值得单独出主题包。
 - 无需主题、只需登记的：`Svg.Controls.Skia.Avalonia`、`PanAndZoom`、`UVtools.AvaloniaControls`。
+
+**已落地（2026-10-15，`Md3.Avalonia.NodifyM`）**：`Md3.Avalonia.Themes.MaterialNodifyMTheme : Styles`，
+在 `src/Md3.Avalonia.NodifyM/`。这里修正本文件「单文件集中样式 → 中等成本」的预估：成本不在改样式，
+而在**谁应答那些画刷键**。
+
+- 上游 `Styles/ControlStyles.axaml` 同时装两样东西：`Styles.Resources`（Light/Dark 的 42 个 `*.Color`、
+  `Nodify.axaml` 的 6 个 DataTemplate、`Brushes.axaml` 的 44 个画刷）和 11 个 `StyleInclude`
+  （`Controls/{Node,NodifyEditor,Connector,NodeInput,NodeOutput,Connection,LineConnection,
+  CircuitConnection,PendingConnection,BaseConnection,KnotNode}.axaml`）。模板用 `StaticResource`
+  读画刷，而 `StaticResource` 是**从写它的那个文件往外**找资源——所以整体 `StyleInclude` 那个文件，
+  它的模板就会拿到它自己 `Styles.Resources` 里的上游画刷，我们的配色字典永远轮不到。
+- 做法因此是「拆两半」：11 个单控件样式表按上游顺序逐个 `StyleInclude`（它们的 `Styles.Resources`
+  仍自带 `ConnectorThumbTemplate`/`FadeOpacityMask`/`DefaultConnectorTemplate`），本主题自己的
+  `Styles.Resources` 按 [上游 `Nodify.axaml`, 上游 `Brushes.axaml`, 我们的 `Accents/Material.axaml`]
+  合并——`ResourceDictionary` 是**倒序**查合并字典的（`Count-1 → 0`，见 Avalonia
+  `ResourceDictionary.TryGetResource`），所以最后合并的配色字典替上游应答 43 个画刷键，唯一没重写的
+  `ItemContainer.HighlightBrush`（棋盘格 `DrawingBrush`，包内无模板读取）落回上游。
+- 覆盖 `*.Brush` 而不是 `*.Color`：画刷的值写成 `Color="{DynamicResource Md.Sys.Color.<Role>}"`，
+  明暗由核心主题变体驱动，字典自身不需要 `ThemeDictionaries`；反过来把 `*.Color` 指向 token 不可行
+  （`Color` 资源没法承载一个 DynamicResource）。
+- 真正需要附加样式的是「上游设成字面量、任何配色字典都够不到」的取值：`Controls/Node.axaml` 的
+  `Foreground="White"` 与 `[IsSelected=False]:pointerover` 的 `LightBlue`／`[IsSelected=True]` 的
+  `Orange`；`NodifyEditor.axaml` 的 `Background="Azure"`；`NodeGroup.axaml` 内联的
+  `#3E3E42`/`White`/`#1E1E1E`/`Transparent`（因此上游自己定义的 `GroupingNode.*` 四个键从没被读过）；
+  `LargeGridLine.Brush` 的 C# 默认值 `Gainsboro`（默认 `GridLineTemplate` 从不设画刷，所以
+  `GridLinesColorBrush` 这个键上游其实没人读）；以及 `NodifyEditorMinimap` 的六个画刷与
+  `Rectangle#SelectionRent` 的填充/描边——这七处是包内仅有的、绕过画刷字典直接用
+  `Color="{DynamicResource *.Color}"` 现搓画刷的地方。模板 part 名实测为
+  `HeaderContentPresenter`/`FooterContentPresenter`（`/template/` 选择器可达）。
+- 留在上游：节点模板里写死的 `CornerRadius="3"`（外框／标题 `3 3 0 0`／页脚 `0 0 3 3`）；
+  `ItemContainer.HighlightBrush` 的棋盘格图案（无消费者，不做翻译）。
+- 版本：固定 **`NodifyM.Avalonia` 12.0.0**（NuGet 最新版，`net8.0`，`IsAotCompatible=true`，声明
+  `Avalonia >= 12.0.2` + `CommunityToolkit.Mvvm >= 8.2.2` + `System.Reactive >= 6.0.1`，低于本仓库
+  12.1.2 基线）。升级时要重读 `ResourceDictionaries/Brushes.axaml`（键增删）与 `Controls/*.axaml`
+  （模板与 part 名）；`MdNodifyMThemeTests` 钉住了实例化控件上的画刷取值、附加样式、变体切换与
+  「同窗口内普通控件仍无主题」。
 
 ---
 

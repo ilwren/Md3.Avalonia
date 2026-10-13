@@ -843,9 +843,48 @@ means re-reading `Controls/*.axaml` and the built-in cell-edit factories for new
 part names; `MdPropertyGridThemeTests` pins the cell editors, the chrome, the date flyout's parts
 and the editing behaviour that would move.
 
+## Node editor
+
+For a graph or node editor built with
+[NodifyM.Avalonia](https://github.com/Maklith/NodifyM.Avalonia), use the opt-in
+`Md3.Avalonia.NodifyM` package. It is the only package that depends on `NodifyM.Avalonia`, and like
+the property grid it is an ordinary style collection:
+
+```xml
+<Application.Styles>
+  <themes:MaterialTheme />
+  <themes:MaterialNodifyMTheme />
+</Application.Styles>
+```
+
+It can also be registered on the `Styles` of the window or page that owns the editor, which is what
+the gallery does. Registering it replaces `NodifyM.Avalonia`'s own `Styles/ControlStyles.axaml`, so
+do not include that as well.
+
+Upstream's single style file carries both the brushes its templates read and the eleven sheets that
+style its controls. This theme takes the two halves apart: it style-includes the eleven per-control
+sheets as upstream lists them, and its own resources merge upstream's data templates and brush
+dictionary followed by `Themes/Accents/Material.axaml`, which redeclares 43 of the 44 brushes against
+`Md.Sys.Color.*`. Dictionaries are searched last-merged first, so the accent answers in upstream's
+place and the templates keep reading the keys they were written against. Nothing here is a control
+theme, and NodifyM's controls are all its own types, so no native control theme is replaced anywhere
+in the application.
+
+The values upstream sets as literals rather than brush keys are set again by additive styles: a
+node's ink, the borders it paints on hover and when selected, the background behind its items, a node
+group's four inline colours, the grid rule's brush and the six brushes the minimap builds from raw
+colour keys. The node's 3 DIP corner radius stays upstream's - it is baked into the template.
+
+The pinned version is **12.0.0**: it targets `net8.0` and declares `Avalonia >= 12.0.2`,
+`CommunityToolkit.Mvvm >= 8.2.2` and `System.Reactive >= 6.0.1`, so it restores against this
+repository's 12.1.2 baseline. Upgrading it means re-reading `ResourceDictionaries/Brushes.axaml` for
+new keys and `Controls/*.axaml` for new templates and part names; `MdNodifyMThemeTests` pins the
+brushes the realized controls actually use, the additive styles and the variant switch that would
+move.
+
 ## Trimming
 
-All fourteen packages set `IsTrimmable`, so an application that publishes with
+All fifteen packages set `IsTrimmable`, so an application that publishes with
 `PublishTrimmed=true` can trim them, and they build with the IL2xxx analyzer on, so a new
 reflective call fails the build rather than breaking a trimmed app quietly.
 

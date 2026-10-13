@@ -134,7 +134,31 @@
   ships is keyed rather than implicit, that a control outside a grid stays unthemed, the date
   flyout's parts and its confirm path, the options menu, and that the grid still edits, filters and
   writes values back.
-- **Native AOT.** All fourteen packages declare `IsAotCompatible` and build with the IL3xxx analyzers
+- **`Md3.Avalonia.NodifyM`**, an opt-in Material Design 3 theme for
+  [NodifyM.Avalonia](https://github.com/Maklith/NodifyM.Avalonia), the node editor that follows the
+  property grid in Wave 3. It is the only package that pulls in that dependency (pinned at
+  `12.0.0`, which declares `Avalonia >= 12.0.2`), bringing the set to fifteen. Upstream ships a
+  single style file that carries both the brushes its templates read and the eleven sheets that
+  style its controls, and `MaterialNodifyMTheme` takes those two halves apart: the eleven sheets are
+  style-included exactly as upstream lists them, while this theme's resources merge upstream's own
+  data templates and brush dictionary followed by an accent of ours that redeclares 43 of the 44
+  brushes against `Md.Sys.Color.*`. Dictionaries are searched last-merged first, so the accent
+  answers in upstream's place while the templates keep reading the keys they were written against -
+  and because both variants resolve through `Md.Sys.Color.*`, the dictionary carries no
+  `ThemeDictionaries` of its own. The canvas becomes a surface ruled in `OutlineVariant`; a node is
+  a `SurfaceContainerHigh` card with a `SecondaryContainer` header and a `SurfaceContainer` footer;
+  input pins are `SecondaryContainer` and output pins `PrimaryContainer`, so a wire's two ends are
+  distinguishable without labels; wires take `OnSurfaceVariant`, with the circuit variant and the
+  pending drag in `Primary`; and the marquee, the alignment guides and the selection frame all take
+  the same `Primary`. Additive styles cover the values no accent dictionary can reach, because
+  upstream sets them as literals: a node's `White` ink, the `LightBlue` and `Orange` borders it
+  paints on hover and when selected, the `Azure` behind its items, a node group's four inline
+  colours and the `Gainsboro` the grid rule's property registers with. Upstream keeps the node's
+  3 DIP corner radius, which is baked into its template. `MdNodifyMThemeTests` reads the brushes
+  back off realized controls - the canvas, the node and both pin directions, the pending wire, the
+  grid rule, all six minimap brushes and the marquee - then pins the selection frame, the variant
+  switch, and that a plain control in the same window keeps no theme.
+- **Native AOT.** All fifteen packages declare `IsAotCompatible` and build with the IL3xxx analyzers
   on alongside the existing IL2xxx trimming ones. `.github/workflows/aot-probe.yml` publishes the
   desktop gallery with `PublishAot=true` and does not accept a green step as the answer: it
   asserts the output is a native ELF executable with no managed assembly beside it, then runs that

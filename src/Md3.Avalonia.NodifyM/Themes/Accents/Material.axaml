@@ -1,0 +1,116 @@
+<!--
+  Material Design 3 tokens for NodifyM.Avalonia.
+
+  Derived from NodifyM.Avalonia 12.0.0 ResourceDictionaries/Brushes.axaml (MIT, see
+  THIRD-PARTY-NOTICES.md). Upstream defines 42 colors in Light/Dark theme dictionaries and turns
+  them into 44 brushes; the control templates read the brushes with StaticResource. Forty-three of
+  those brushes are redeclared here against Md.Sys.Color.*, so light and dark come from the core Material theme
+  variant and this file carries no ThemeDictionaries of its own. MaterialNodifyMTheme.axaml merges
+  this dictionary after upstream's own Brushes.axaml, and dictionaries are searched last-merged
+  first, so these answer in its place - the one key left out below simply falls through to
+  upstream's.
+
+  The mapping keeps upstream's information structure, which is what a node editor needs: the canvas
+  is a surface, a node is a raised container, and the three roles that have to be told apart at a
+  glance - selected, connected, dragging - are Primary, Secondary and Tertiary respectively.
+
+  * Canvas: Surface, with grid rules on OutlineVariant and the marquee, alignment guides and
+    selection frame on Primary. The marquee fill keeps upstream's translucent treatment at the 0.12
+    the Md.Sys.State.* tokens use for a container.
+  * Node: a SurfaceContainerHigh card with a SecondaryContainer header, the pairing core's own
+    MdCards use. The body ink is OnSurface rather than the literal White upstream's style sets.
+  * StateNode (the filled variant) is a Tertiary container, so a graph can mark a node as special
+    without borrowing the selection colour.
+  * GroupingNode sits below the canvas containers (SurfaceContainerLow) because it holds other
+    nodes rather than competing with them.
+  * Connectors are the one place the palette splits by direction: inputs on SecondaryContainer and
+    outputs on PrimaryContainer, so a wire's two ends are distinguishable without labels. Upstream
+    leaves both pins transparent with a single border colour.
+  * Wires are OnSurfaceVariant, which stays legible on the canvas without shouting; the circuit
+    variant and the pending (dragging) wire are Primary, since both are the active gesture.
+
+  ItemContainer.HighlightBrush is deliberately not overridden: upstream tiles a checkered pattern
+    from ItemContainer.BorderBrush - which this file does override - and no template in the package
+    reads the key. Upstream's own checkered brush stays reachable for anything that does ask.
+-->
+
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/2006/xaml">
+
+  <!-- Canvas -->
+
+  <SolidColorBrush x:Key="NodifyEditor.BackgroundBrush" Color="{DynamicResource Md.Sys.Color.Surface}" />
+  <SolidColorBrush x:Key="NodifyEditor.ForegroundBrush" Color="{DynamicResource Md.Sys.Color.OnSurface}" />
+  <SolidColorBrush x:Key="NodifyEditor.SelectionRectangleStrokeBrush" Color="{DynamicResource Md.Sys.Color.Primary}" />
+  <SolidColorBrush x:Key="NodifyEditor.SelectionRectangleBackgroundBrush"
+                   Color="{DynamicResource Md.Sys.Color.Primary}" Opacity="0.12" />
+  <SolidColorBrush x:Key="NodifyEditor.AlignmentLineBrush" Color="{DynamicResource Md.Sys.Color.Primary}" />
+  <SolidColorBrush x:Key="GridLinesColorBrush" Color="{DynamicResource Md.Sys.Color.OutlineVariant}" />
+
+  <!-- Item container: the frame a node gets when the editor selects it -->
+
+  <SolidColorBrush x:Key="ItemContainer.BorderBrush" Color="{DynamicResource Md.Sys.Color.Primary}" />
+  <SolidColorBrush x:Key="ItemContainer.SelectedBrush"
+                   Color="{DynamicResource Md.Sys.Color.Primary}" Opacity="0.12" />
+
+  <!-- Node -->
+
+  <SolidColorBrush x:Key="Node.BackgroundBrush" Color="{DynamicResource Md.Sys.Color.SurfaceContainerHigh}" />
+  <SolidColorBrush x:Key="Node.ContentBrush" Color="{DynamicResource Md.Sys.Color.SurfaceContainerHigh}" />
+  <SolidColorBrush x:Key="Node.ForegroundBrush" Color="{DynamicResource Md.Sys.Color.OnSurface}" />
+  <SolidColorBrush x:Key="Node.BorderBrush" Color="{DynamicResource Md.Sys.Color.OutlineVariant}" />
+  <SolidColorBrush x:Key="Node.HeaderBrush" Color="{DynamicResource Md.Sys.Color.SecondaryContainer}" />
+  <SolidColorBrush x:Key="Node.HeaderForegroundBrush" Color="{DynamicResource Md.Sys.Color.OnSecondaryContainer}" />
+  <SolidColorBrush x:Key="Node.FooterBrush" Color="{DynamicResource Md.Sys.Color.SurfaceContainer}" />
+
+  <!-- StateNode: the filled variant, for a node the graph wants to single out -->
+
+  <SolidColorBrush x:Key="StateNode.BackgroundBrush" Color="{DynamicResource Md.Sys.Color.TertiaryContainer}" />
+  <SolidColorBrush x:Key="StateNode.ForegroundBrush" Color="{DynamicResource Md.Sys.Color.OnTertiaryContainer}" />
+  <SolidColorBrush x:Key="StateNode.BorderBrush" Color="{DynamicResource Md.Sys.Color.Outline}" />
+  <SolidColorBrush x:Key="StateNode.HighlightBrush" Color="{DynamicResource Md.Sys.Color.Primary}" />
+
+  <!-- GroupingNode: a region that holds other nodes, so it sits below them -->
+
+  <SolidColorBrush x:Key="GroupingNode.BackgroundBrush" Color="{DynamicResource Md.Sys.Color.SurfaceContainerLow}" />
+  <SolidColorBrush x:Key="GroupingNode.ForegroundBrush" Color="{DynamicResource Md.Sys.Color.OnSurfaceVariant}" />
+  <SolidColorBrush x:Key="GroupingNode.HeaderBrush" Color="{DynamicResource Md.Sys.Color.SurfaceContainer}" />
+  <SolidColorBrush x:Key="GroupingNode.BorderBrush" Color="{DynamicResource Md.Sys.Color.OutlineVariant}" />
+
+  <!-- KnotNode: a bare connector on the canvas -->
+
+  <SolidColorBrush x:Key="KnotNode.BackgroundBrush" Color="{DynamicResource Md.Sys.Color.SurfaceContainerHighest}" />
+  <SolidColorBrush x:Key="KnotNode.ForegroundBrush" Color="{DynamicResource Md.Sys.Color.OnSurface}" />
+  <SolidColorBrush x:Key="KnotNode.BorderBrush" Color="{DynamicResource Md.Sys.Color.Outline}" />
+
+  <!-- Connector: the anchor a wire attaches to -->
+
+  <SolidColorBrush x:Key="Connector.BackgroundBrush" Color="{DynamicResource Md.Sys.Color.SurfaceContainerHighest}" />
+  <SolidColorBrush x:Key="Connector.ForegroundBrush" Color="{DynamicResource Md.Sys.Color.OnSurfaceVariant}" />
+  <SolidColorBrush x:Key="Connector.BorderBrush" Color="{DynamicResource Md.Sys.Color.Outline}" />
+
+  <!-- Pins: direction is the thing to read at a glance, so the two ends differ -->
+
+  <SolidColorBrush x:Key="NodeInput.BackgroundBrush" Color="{DynamicResource Md.Sys.Color.SecondaryContainer}" />
+  <SolidColorBrush x:Key="NodeInput.ForegroundBrush" Color="{DynamicResource Md.Sys.Color.OnSecondaryContainer}" />
+  <SolidColorBrush x:Key="NodeInput.BorderBrush" Color="{DynamicResource Md.Sys.Color.Outline}" />
+
+  <SolidColorBrush x:Key="NodeOutput.BackgroundBrush" Color="{DynamicResource Md.Sys.Color.PrimaryContainer}" />
+  <SolidColorBrush x:Key="NodeOutput.ForegroundBrush" Color="{DynamicResource Md.Sys.Color.OnPrimaryContainer}" />
+  <SolidColorBrush x:Key="NodeOutput.BorderBrush" Color="{DynamicResource Md.Sys.Color.Outline}" />
+
+  <!-- Wires -->
+
+  <SolidColorBrush x:Key="Connection.StrokeBrush" Color="{DynamicResource Md.Sys.Color.OnSurfaceVariant}" />
+  <SolidColorBrush x:Key="Connection.TextColorBrush" Color="{DynamicResource Md.Sys.Color.OnSurface}" />
+  <SolidColorBrush x:Key="LineConnection.StrokeBrush" Color="{DynamicResource Md.Sys.Color.OnSurfaceVariant}" />
+  <SolidColorBrush x:Key="CircuitConnection.StrokeBrush" Color="{DynamicResource Md.Sys.Color.Primary}" />
+
+  <!-- Pending connection: the wire being dragged -->
+
+  <SolidColorBrush x:Key="PendingConnection.StrokeBrush" Color="{DynamicResource Md.Sys.Color.Primary}" />
+  <SolidColorBrush x:Key="PendingConnection.BorderBrush" Color="{DynamicResource Md.Sys.Color.Outline}" />
+  <SolidColorBrush x:Key="PendingConnection.ForegroundBrush" Color="{DynamicResource Md.Sys.Color.OnSurface}" />
+  <SolidColorBrush x:Key="PendingConnection.BackgroundBrush" Color="{DynamicResource Md.Sys.Color.SurfaceContainerHigh}" />
+
+</ResourceDictionary>

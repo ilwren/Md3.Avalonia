@@ -60,6 +60,12 @@
          cell editors the built-in factories build) was read at the commit this build was cut
          from, and the grid iterates quickly. -->
     <PackageVersion Include="bodong.Avalonia.PropertyGrid" Version="12.1.1.1" />
+    <!-- The node editor: 12.0.0 targets net8.0 and declares Avalonia >= 12.0.2,
+         CommunityToolkit.Mvvm >= 8.2.2 and System.Reactive >= 6.0.1, so it restores against
+         this repository's 12.1.2 baseline. Bump it with the theme's expectations: the brush
+         keys Themes/Accents/Material.axaml redeclares are upstream's own dictionary, read at
+         the commit this build was cut from. -->
+    <PackageVersion Include="NodifyM.Avalonia" Version="12.0.0" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.2" />
     <PackageVersion Include="MaterialColorUtilities" Version="0.3.0" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />

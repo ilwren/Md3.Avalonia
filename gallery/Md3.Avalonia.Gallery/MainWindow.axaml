@@ -185,6 +185,7 @@
             <md:MdButton x:Name="LiveChartsNav" Content="LiveCharts2 charts" Variant="Text" HorizontalContentAlignment="Left" Click="ShowLiveCharts" />
             <md:MdButton x:Name="ScottPlotNav" Content="ScottPlot charts" Variant="Text" HorizontalContentAlignment="Left" Click="ShowScottPlot" />
             <md:MdButton x:Name="PropertyGridNav" Content="Property grid" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPropertyGrid" />
+            <md:MdButton x:Name="NodifyMNav" Content="Node editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNodifyM" />
             <md:MdButton x:Name="TextEditorNav" Content="Text editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTextEditor" />
             <md:MdButton x:Name="HexEditorNav" Content="Hex editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowHexEditor" />
             <md:MdButton x:Name="SkeletonNav" Content="Skeleton" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSkeleton" />

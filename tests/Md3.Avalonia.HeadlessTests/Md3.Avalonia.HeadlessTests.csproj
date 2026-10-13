@@ -38,6 +38,7 @@
     <ProjectReference Include="../../src/Md3.Avalonia.LiveCharts2/Md3.Avalonia.LiveCharts2.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.ScottPlot/Md3.Avalonia.ScottPlot.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.PropertyGrid/Md3.Avalonia.PropertyGrid.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.NodifyM/Md3.Avalonia.NodifyM.csproj" />
     <ProjectReference Include="../../gallery/Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" />
   </ItemGroup>
 </Project>

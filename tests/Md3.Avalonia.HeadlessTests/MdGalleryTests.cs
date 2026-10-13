@@ -98,6 +98,7 @@ public sealed class MdGalleryTests
             new LiveChartsGalleryPage(),
             new ScottPlotGalleryPage(),
             new PropertyGridGalleryPage(),
+            new NodifyMGalleryPage(),
             new MasonryPanelGalleryPage(),
             new PagedItemsGalleryPage(),
             new AsyncSelectGalleryPage(),

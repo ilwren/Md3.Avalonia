@@ -184,7 +184,23 @@ surface，调用方仍可覆盖。
   `Avalonia.Controls.ColorPicker >= 12.1.1` 与 `bodong.PropertyModels >= 12.0.0`）。
   headless 测试钉住：单元格与外壳拿到的主题、包内所有控件主题都是键控而非隐式、网格外的控件仍然没有主题、
   日期浮层的必需 part 与确认回写、选项菜单，以及网格的编辑、筛选与写回行为未变。
-- **原生 AOT 已验证可用。** 十四个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
+- **`Md3.Avalonia.NodifyM`** —— [NodifyM.Avalonia](https://github.com/Maklith/NodifyM.Avalonia)
+  节点编辑器的 Material Design 3 主题，opt-in，唯一引入 `NodifyM.Avalonia` 依赖的包，包总数到十五个。
+  上游把「模板读取的画刷」和「给控件下发样式的十一个样式表」放在同一个 `Styles/ControlStyles.axaml` 里，
+  而 `MaterialNodifyMTheme` 把这两半拆开：十一个单控件样式表原样 `StyleInclude`，本主题自己的资源里
+  先合并上游的数据模板与画刷字典、再合并我们的 `Themes/Accents/Material.axaml`（把 44 个画刷中的 43 个
+  重新指向 `Md.Sys.Color.*`）。字典按「后合并者优先」查找，所以配色字典替上游应答这些键，而模板仍然
+  读取它们原本写的那些键；明暗两套变体都经由 `Md.Sys.Color.*` 解析，因此字典自身不带
+  `ThemeDictionaries`。画布是 `Surface` 并以 `OutlineVariant` 画网格线；节点是 `SurfaceContainerHigh`
+  卡片，标题栏 `SecondaryContainer`、页脚 `SurfaceContainer`；输入引脚是 `SecondaryContainer`、
+  输出引脚是 `PrimaryContainer`，一根连线的两端因此无需标签即可区分；连线走 `OnSurfaceVariant`，
+  circuit 变体与拖拽中的 pending 连线走 `Primary`；框选、对齐参考线与选中边框共用同一个 `Primary`。
+  上游以字面量设置、配色字典够不到的取值由附加样式重设：节点的 `White` 前景、悬停时的 `LightBlue`
+  与选中时的 `Orange` 边框、条目背后的 `Azure`、分组节点内联的四种颜色，以及网格线属性自带的
+  `Gainsboro`。节点模板里写死的 3 DIP 圆角留给上游。`MdNodifyMThemeTests` 从真正实例化的控件上把画刷
+  读回来核对（画布、节点、两个方向的引脚、pending 连线、网格线、小地图六个画刷、框选矩形），再钉住
+  选中边框、变体切换，以及同一窗口内的普通控件仍然没有主题。
+- **原生 AOT 已验证可用。** 十五个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
   IL3xxx 分析器。`.github/workflows/aot-probe.yml` 用 `PublishAot=true` 发布桌面 Gallery，并且
   **不把「步骤成功」当作答案**：它断言产物是原生 ELF 可执行文件、输出目录里没有托管 dll 残留（防止
   apphost 冒充），然后在 xvfb 下把那个二进制真正跑起来。原生 AOT 是在运行期因反射元数据被裁而失败的，
