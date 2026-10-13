@@ -263,6 +263,10 @@
 
 ### Testing
 
+- `MdGalleryLocalizationTests` exercises `GalleryLocalization.Apply`, which nothing did before. The
+  translation table is built in a static initialiser, so a key written twice throws the first time a
+  page is localized - and the duplicate `Navigation` key above is exactly that. The tests translate a
+  page into Chinese and back, and assert every page they are given both changes and restores.
 - Rendered pixels are now actually read. `UseHeadlessDrawing=false` means these tests run real
   Skia, but every one of the thirty-odd `CaptureRenderedFrame()` calls asserted only that the
   frame was not null. Corner rounding had been written off as untestable headless on that basis;
