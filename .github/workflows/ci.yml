@@ -138,6 +138,30 @@ jobs:
             tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
             "Headless tests"
 
+      # The node editor theme tests are run on their own first, and under a hard timeout. A test that
+      # stalls the dispatcher never reaches a result, so the only thing a per-test timeout can buy is
+      # a name; what actually bounds the damage is killing the runner and moving on. Running them
+      # first, apart from the rest of the suite, means a stall there is visible as a five-minute step
+      # that produced no result, and the suite that follows still reports in full.
+      - name: Probe the node editor theme tests
+        id: nodifym-probe
+        continue-on-error: true
+        run: |
+          timeout --signal=KILL 300 dotnet test \
+            tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
+            -c Release --no-build --no-restore \
+            --filter "FullyQualifiedName~MdNodifyMThemeTests" \
+            --logger "trx;LogFileName=nodifym.trx" \
+            --logger "console;verbosity=normal"
+
+      # Summarizes whichever .trx exists at this point, which is the probe's. The script exits non-zero
+      # on failures, and the suite still has to run, so the exit is swallowed here and the probe's own
+      # outcome is what fails the job at the end.
+      - name: Summarize node editor probe results
+        if: always()
+        continue-on-error: true
+        run: python3 scripts/report-test-results.py
+
       - name: Run headless tests
         id: tests
         env:
@@ -147,6 +171,7 @@ jobs:
         run: |
           dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
             -c Release --no-build --no-restore \
+            --filter "FullyQualifiedName!~MdNodifyMThemeTests" \
             --logger "trx;LogFileName=results.trx" \
             --logger "console;verbosity=normal"
 
@@ -169,6 +194,7 @@ jobs:
           name: headless-test-results
           path: |
             **/results.trx
+            **/nodifym.trx
             artifacts/spec/
           if-no-files-found: warn
 
@@ -179,3 +205,12 @@ jobs:
           name: documentation-previews
           path: tests/Md3.Avalonia.HeadlessTests/bin/Release/net10.0/*.png
           if-no-files-found: ignore
+
+      # The probe is allowed to fail so that the rest of the suite still runs and still reports; the
+      # job should not stay green because of it. This is the last step, so it runs after the evidence
+      # above has been uploaded either way.
+      - name: Fail the job if the node editor probe did not pass
+        if: always() && steps.nodifym-probe.outcome == 'failure'
+        run: |
+          echo "::error::The node editor theme tests did not pass inside the probe's five minutes"
+          exit 1
