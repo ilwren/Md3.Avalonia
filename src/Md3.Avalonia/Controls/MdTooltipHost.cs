@@ -11,7 +11,7 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>Hosts a tooltip trigger and coordinates hover, focus, long-press and direct open state.</summary>
 [TemplatePart("PART_Popup", typeof(Popup))]
-[PseudoClasses(":open", ":closed", ":present", ":reduced-motion", ":no-motion")]
+[PseudoClasses(":open", ":closed", ":present", ":rich", ":reduced-motion", ":no-motion")]
 public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
 {
     public static readonly StyledProperty<MdTooltip?> TooltipProperty =
@@ -244,6 +244,7 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
             oldTooltip.PointerExited -= TooltipPointerExited;
             oldTooltip.GotFocus -= TooltipGotFocus;
             oldTooltip.LostFocus -= TooltipLostFocus;
+            oldTooltip.PropertyChanged -= OnTooltipPropertyChanged;
         }
         if (newTooltip is not null)
         {
@@ -251,9 +252,20 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
             newTooltip.PointerExited += TooltipPointerExited;
             newTooltip.GotFocus += TooltipGotFocus;
             newTooltip.LostFocus += TooltipLostFocus;
+            newTooltip.PropertyChanged += OnTooltipPropertyChanged;
             newTooltip.SetCurrentValue(MdTooltip.IsOpenProperty, IsOpen);
         }
+        UpdateRichPseudoClass();
     }
+
+    private void OnTooltipPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property == MdTooltip.VariantProperty)
+            UpdateRichPseudoClass();
+    }
+
+    private void UpdateRichPseudoClass() =>
+        PseudoClasses.Set(":rich", Tooltip?.Variant == MdTooltipVariant.Rich);
 
     private void TooltipPointerEntered(object? sender, PointerEventArgs e)
     {

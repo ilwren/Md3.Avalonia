@@ -232,6 +232,13 @@ public sealed class MdMotionLifecycleTests
             window.MouseMove(point!.Value, RawInputModifiers.None);
             Assert.True(host.IsPointerOver, "moving onto the trigger should establish pointer presence");
             host.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            // A native desktop popup is a second window. Pointer leave/enter events can arrive in
+            // different orders there and cause a false hide/reopen loop while crossing the gap.
+            var popup = Assert.Single(host.GetVisualDescendants().OfType<Popup>());
+            Assert.True(popup.ShouldUseOverlayLayer);
+            Assert.True(popup.IsUsingOverlayLayer);
 
             // Opening an interactive popup can move keyboard focus. That focus transition must
             // not arm a hide timer while the pointer is still on the trigger.
@@ -239,8 +246,22 @@ public sealed class MdMotionLifecycleTests
             Assert.True(host.IsOpen);
             Assert.False(host.IsHideDelayPending);
 
-            // Once neither side of the rich-tooltip bridge is attended, the normal grace period
-            // is still scheduled; this is not a sticky tooltip.
+            var tooltipPoint = tooltip.TranslatePoint(
+                new Point(tooltip.Bounds.Width / 2, tooltip.Bounds.Height / 2), window);
+            Assert.NotNull(tooltipPoint);
+            window.MouseMove(tooltipPoint!.Value, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(tooltip.IsPointerOver,
+                "moving into the rich surface should transfer pointer presence to the tooltip");
+            Assert.True(host.IsOpen);
+            Assert.False(host.IsHideDelayPending);
+
+            // Moving back to the trigger is still attended, and only leaving both regions starts
+            // the grace timer. This is not a sticky tooltip.
+            window.MouseMove(point.Value, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(host.IsPointerOver);
+            Assert.False(host.IsHideDelayPending);
             window.MouseMove(new Point(window.ClientSize.Width - 2, window.ClientSize.Height - 2),
                 RawInputModifiers.None);
             Assert.True(host.IsHideDelayPending,

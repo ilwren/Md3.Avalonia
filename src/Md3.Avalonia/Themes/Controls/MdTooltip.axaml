@@ -43,5 +43,10 @@
         </Grid>
       </ControlTemplate>
     </Setter>
+    <!-- Rich tips are interactive. Keep their popup in the owner Window's overlay so desktop pointer
+         transitions between trigger and surface never cross separate native popup windows. -->
+    <Style Selector="^:rich /template/ Popup#PART_Popup">
+      <Setter Property="ShouldUseOverlayLayer" Value="True" />
+    </Style>
   </ControlTheme>
 </ResourceDictionary>
