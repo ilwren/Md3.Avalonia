@@ -206,7 +206,7 @@ public sealed class MdMapsuiThemeTests
 
         // Mapsui has no style tree to reach, so this package must not carry one: no style, no control
         // theme, nothing that could leak into an application that never asked for it.
-        Assert.DoesNotContain(assembly.GetTypes(), type => typeof(Avalonia.Styling.IStyle).IsAssignableFrom(type));
+        Assert.DoesNotContain(assembly.GetTypes(), type => typeof(global::Avalonia.Styling.IStyle).IsAssignableFrom(type));
         Assert.DoesNotContain(assembly.GetTypes(), type => typeof(ControlTheme).IsAssignableFrom(type));
 
         // The one-shot calls an application uses really are public.
