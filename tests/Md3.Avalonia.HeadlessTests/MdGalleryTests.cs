@@ -138,7 +138,7 @@ public sealed class MdGalleryTests
                 host.Show();
                 Assert.True(page.Bounds.Width > 0);
 
-                RenderTargetBitmap? pageFrame;
+                WriteableBitmap? pageFrame;
                 try
                 {
                     pageFrame = host.CaptureRenderedFrame();
