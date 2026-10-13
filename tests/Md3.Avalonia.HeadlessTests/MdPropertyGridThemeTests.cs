@@ -155,15 +155,17 @@ public class MdPropertyGridThemeTests
         var presenter = Assert.IsType<DatePickerPresenter>(popup.Child);
         Assert.Same(Keyed(grid, "Md.Comp.PropertyGrid.DatePanelTheme"), presenter.Theme);
 
-        // Realizing it is the point of the test: the presenter resolves its container, its three
-        // panels and its accept button with NameScope.Get, so a template missing one of them throws
-        // here rather than degrading.
+        // Applying the template is the point of the test: the presenter resolves its container, its
+        // three panels and its accept button with NameScope.Get, so a template missing one of them
+        // throws here rather than degrading. Headless only lays the new popup host out on a later
+        // frame, so the template is applied directly rather than waiting for it.
+        presenter.ApplyTemplate();
         using var frame = host.Window.CaptureRenderedFrame();
 
-        Assert.NotNull(presenter.GetLogicalDescendants().OfType<Grid>().SingleOrDefault(panel => panel.Name == "PART_PickerContainer"));
-        Assert.Equal(3, presenter.GetLogicalDescendants().OfType<DateTimePickerPanel>().Count());
+        Assert.NotNull(presenter.GetVisualDescendants().OfType<Grid>().SingleOrDefault(panel => panel.Name == "PART_PickerContainer"));
+        Assert.Equal(3, presenter.GetVisualDescendants().OfType<DateTimePickerPanel>().Count());
 
-        var accept = presenter.GetLogicalDescendants().OfType<Button>().Single(button => button.Name == "PART_AcceptButton");
+        var accept = presenter.GetVisualDescendants().OfType<Button>().Single(button => button.Name == "PART_AcceptButton");
         accept.RaiseEvent(new RoutedEventArgs(Button.ClickEvent, accept));
         Dispatcher.UIThread.RunJobs();
 
