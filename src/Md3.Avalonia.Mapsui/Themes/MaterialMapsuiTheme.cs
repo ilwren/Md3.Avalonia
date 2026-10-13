@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+// Avalonia.Styling is here for ThemeVariant and carries an IStyle of its own, so the one a layer
+// carries is written out in full wherever it is named.
 using Avalonia.Styling;
 using Mapsui;
 using Mapsui.Layers;
@@ -150,7 +152,7 @@ public sealed class MaterialMapsuiTheme
     /// Anything that is not a vector style - a label style, a symbol style, a collection of them - is
     /// somebody's choice by definition.
     /// </remarks>
-    private static bool IsMapsuiDefault(IStyle? style)
+    private static bool IsMapsuiDefault(Mapsui.Styles.IStyle? style)
     {
         if (style is null)
         {
