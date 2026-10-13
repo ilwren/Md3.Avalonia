@@ -94,9 +94,11 @@ jobs:
     name: Build & Test
     needs: static-checks
     runs-on: ubuntu-latest
-    # The suite runs in well under two minutes. A generous margin still catches a deadlocked
-    # test quickly instead of letting it occupy a runner all day.
-    timeout-minutes: 8
+    # Most of this is restore and build - the shared graph, fifteen packages, the gallery and the
+    # test project - with the headless suite on top. It measured 6m35s at fourteen packages and
+    # crossed 8m when the fifteenth landed, so the margin here is a deadlock guard, not a
+    # performance budget: a hung test still costs a quarter of an hour instead of a runner-day.
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
