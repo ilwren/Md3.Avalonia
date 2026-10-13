@@ -234,24 +234,21 @@ public sealed class MdMotionLifecycleTests
             host.Show();
             Dispatcher.UIThread.RunJobs();
 
-            // A native desktop popup is a second window. Pointer leave/enter events can arrive in
-            // different orders there and cause a false hide/reopen loop while crossing the gap.
-            var popup = Assert.Single(host.GetVisualDescendants().OfType<Popup>());
-            Assert.True(popup.ShouldUseOverlayLayer,
-                "rich tooltip popup should request the owner's overlay layer");
-            Assert.True(popup.IsUsingOverlayLayer,
-                "the test Window should provide the overlay host used by a rich tooltip");
-
+            // Keep Avalonia's default native/overlay popup choice. Desktop rich-tooltip pointer
+            // tracking must tolerate enter/leave events arriving from separate popup roots.
             // Opening an interactive popup can move keyboard focus. That focus transition must
             // not arm a hide timer while the pointer is still on the trigger.
             host.RaiseEvent(new FocusChangedEventArgs(InputElement.LostFocusEvent));
             Assert.True(host.IsOpen, "the attended rich tooltip should remain open after focus changes");
             Assert.False(host.IsHideDelayPending);
 
+            var tooltipRoot = TopLevel.GetTopLevel(tooltip);
+            Assert.NotNull(tooltipRoot);
             var tooltipPoint = tooltip.TranslatePoint(
-                new Point(tooltip.Bounds.Width / 2, tooltip.Bounds.Height / 2), window);
+                new Point(tooltip.Bounds.Width / 2, tooltip.Bounds.Height / 2), tooltipRoot!);
             Assert.NotNull(tooltipPoint);
-            window.MouseMove(tooltipPoint!.Value, RawInputModifiers.None);
+            // Native popups are separate TopLevels, so send this move through the popup root.
+            tooltipRoot!.MouseMove(tooltipPoint!.Value, RawInputModifiers.None);
             Dispatcher.UIThread.RunJobs();
             Assert.True(tooltip.IsPointerOver,
                 "moving into the rich surface should transfer pointer presence to the tooltip");
@@ -259,10 +256,22 @@ public sealed class MdMotionLifecycleTests
             Assert.False(host.IsHideDelayPending);
 
             // Moving back to the trigger is still attended, and only leaving both regions starts
-            // the grace timer. This is not a sticky tooltip.
-            window.MouseMove(point.Value, RawInputModifiers.None);
+            // the grace timer. Recompute after opening the popup in case popup placement changed
+            // the visual transform used to map the original trigger point into the Window.
+            var returnPoint = anchor.TranslatePoint(
+                new Point(anchor.Bounds.Width / 2, anchor.Bounds.Height / 2), window);
+            Assert.NotNull(returnPoint);
+            window.MouseMove(returnPoint!.Value, RawInputModifiers.None);
             Dispatcher.UIThread.RunJobs();
-            Assert.True(host.IsPointerOver, "moving back to the trigger should restore anchor presence");
+            var hitTestTargets = string.Join(" / ", window.GetVisualsAt(returnPoint.Value)
+                .Take(8).Select(visual => visual.GetType().Name));
+            Assert.True(host.IsPointerOver,
+                $"moving back to the trigger should restore anchor presence; host={host.IsPointerOver}, " +
+                $"anchor={anchor.IsPointerOver}, tooltip={tooltip.IsPointerOver}, " +
+                $"anchorOrigin={anchor.TranslatePoint(default, window)}, " +
+                $"tooltipOrigin={tooltip.TranslatePoint(default, window)}, " +
+                $"hostBounds={host.Bounds}, anchorBounds={anchor.Bounds}, tooltipBounds={tooltip.Bounds}, " +
+                $"hitTest={hitTestTargets}");
             Assert.False(host.IsHideDelayPending);
             window.MouseMove(new Point(window.ClientSize.Width - 2, window.ClientSize.Height - 2),
                 RawInputModifiers.None);

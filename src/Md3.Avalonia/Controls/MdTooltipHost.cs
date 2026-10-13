@@ -45,6 +45,7 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
     private readonly DispatcherTimer _longPressTimer;
     private readonly MdPresenceController _presence;
     private Popup? _popup;
+    private TopLevel? _tooltipPopupRoot;
     private bool _isPopupOpen;
     private bool _longPressTriggered;
     private Point _pressOrigin;
@@ -146,6 +147,7 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        UpdateTooltipPopupRoot();
         UpdateOpenState();
     }
 
@@ -155,6 +157,7 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
         _hideTimer.Stop();
         _longPressTimer.Stop();
         _presence.Stop();
+        SetTooltipPopupRoot(null);
         base.OnDetachedFromVisualTree(e);
     }
 
@@ -234,12 +237,16 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
     {
         if (IsOpen) SetCurrentValue(IsOpenProperty, false);
         _presence.Initialize(false);
+        SetTooltipPopupRoot(null);
     }
 
     private void OnTooltipChanged(MdTooltip? oldTooltip, MdTooltip? newTooltip)
     {
+        SetTooltipPopupRoot(null);
         if (oldTooltip is not null)
         {
+            oldTooltip.AttachedToVisualTree -= TooltipAttachedToVisualTree;
+            oldTooltip.DetachedFromVisualTree -= TooltipDetachedFromVisualTree;
             oldTooltip.PointerEntered -= TooltipPointerEntered;
             oldTooltip.PointerExited -= TooltipPointerExited;
             oldTooltip.GotFocus -= TooltipGotFocus;
@@ -247,12 +254,59 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
         }
         if (newTooltip is not null)
         {
+            newTooltip.AttachedToVisualTree += TooltipAttachedToVisualTree;
+            newTooltip.DetachedFromVisualTree += TooltipDetachedFromVisualTree;
             newTooltip.PointerEntered += TooltipPointerEntered;
             newTooltip.PointerExited += TooltipPointerExited;
             newTooltip.GotFocus += TooltipGotFocus;
             newTooltip.LostFocus += TooltipLostFocus;
             newTooltip.SetCurrentValue(MdTooltip.IsOpenProperty, IsOpen);
         }
+        UpdateTooltipPopupRoot();
+    }
+
+    private void TooltipAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e) =>
+        UpdateTooltipPopupRoot();
+
+    private void TooltipDetachedFromVisualTree(object? sender, VisualTreeAttachmentEventArgs e) =>
+        SetTooltipPopupRoot(null);
+
+    private void UpdateTooltipPopupRoot()
+    {
+        var tooltipRoot = Tooltip is { } tooltip ? TopLevel.GetTopLevel(tooltip) : null;
+        if (ReferenceEquals(tooltipRoot, TopLevel.GetTopLevel(this)))
+            tooltipRoot = null;
+        SetTooltipPopupRoot(tooltipRoot);
+    }
+
+    private void SetTooltipPopupRoot(TopLevel? value)
+    {
+        if (ReferenceEquals(_tooltipPopupRoot, value))
+            return;
+
+        if (_tooltipPopupRoot is { } oldRoot)
+            oldRoot.PropertyChanged -= TooltipPopupRootPropertyChanged;
+
+        _tooltipPopupRoot = value;
+        if (_tooltipPopupRoot is { } newRoot)
+        {
+            newRoot.PropertyChanged += TooltipPopupRootPropertyChanged;
+            if (newRoot.IsPointerOver)
+                _hideTimer.Stop();
+        }
+    }
+
+    // The child can leave its Popup before the owner receives its next move event. Observe the
+    // popup root itself so its final PointerOver=false transition can arm the hide grace period.
+    private void TooltipPopupRootPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property != InputElement.IsPointerOverProperty)
+            return;
+
+        if (e.GetNewValue<bool>())
+            _hideTimer.Stop();
+        else
+            ScheduleHideIfUnattended();
     }
 
     private void TooltipPointerEntered(object? sender, PointerEventArgs e)
@@ -261,10 +315,8 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
         _hideTimer.Stop();
     }
 
-    private void TooltipPointerExited(object? sender, PointerEventArgs e)
-    {
+    private void TooltipPointerExited(object? sender, PointerEventArgs e) =>
         ScheduleHideIfUnattended();
-    }
 
     private void TooltipGotFocus(object? sender, FocusChangedEventArgs e) =>
         _hideTimer.Stop();
@@ -275,6 +327,7 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
     private bool HasPointerOrKeyboardPresence =>
         IsPointerOver ||
         Tooltip?.IsPointerOver == true ||
+        _tooltipPopupRoot?.IsPointerOver == true ||
         IsKeyboardFocusWithin ||
         Tooltip?.IsKeyboardFocusWithin == true;
 
@@ -287,7 +340,8 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
         }
 
         _showTimer.Stop();
-        Schedule(_hideTimer, EffectiveHideDelay);
+        if (!_hideTimer.IsEnabled)
+            Schedule(_hideTimer, EffectiveHideDelay);
     }
 
     private void HideIfUnattended()
