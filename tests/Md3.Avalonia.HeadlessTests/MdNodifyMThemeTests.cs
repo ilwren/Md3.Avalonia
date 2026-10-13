@@ -71,10 +71,14 @@ public class MdNodifyMThemeTests
     [AvaloniaFact(Timeout = 60_000)]
     public void The_Pins_Split_By_Direction_And_The_Dragged_Wire_Is_Primary()
     {
-        var input = new NodeInput { Header = "Rows" };
-        var output = new NodeOutput { Header = "Kept" };
+        var node = NewNode();
         var pending = new PendingConnection();
-        using var scope = Show(new StackPanel { Children = { input, output, pending } });
+        using var scope = Show(new StackPanel { Children = { node, pending } });
+
+        // A connector throws "Connector must be placed inside a BaseNode" if it is realized on its
+        // own, so the pins are read off the ones the node builds from its Input and Output.
+        var input = node.GetVisualDescendants().OfType<NodeInput>().Single();
+        var output = node.GetVisualDescendants().OfType<NodeOutput>().Single();
 
         // The one place the palette deliberately breaks upstream's symmetry, which leaves both pins
         // transparent with one border colour: an input pin is a secondary container and an output
@@ -175,14 +179,12 @@ public class MdNodifyMThemeTests
     }
 
     [AvaloniaFact(Timeout = 60_000)]
-    public void The_Canvas_And_The_Marquee_Take_The_Surface_And_Primary_Brushes()
+    public void The_Editor_Canvas_Takes_The_Surface_Brush()
     {
-        // Two of the editor's own colours are literals rather than brush keys upstream paints over -
-        // the Azure canvas that sits behind its items, and the marquee it fills with a node group's
-        // colours - so the canvas is re-pointed at a brush key and the marquee is set again by an
-        // additive style, which also gives the control a Background of its own. Both come back off a
-        // real editor, templated but not laid out: the dispatcher is not pumped after it is shown
-        // (see the remarks on this class).
+        // The editor's items host is painted with a literal Azure, so the canvas under it is
+        // re-pointed at a brush key and the control gets a Background of its own to match. Both come
+        // back off a real editor, templated but not laid out: the dispatcher is not pumped after it
+        // is shown (see the remarks on this class).
         var editor = new NodifyEditor { Width = 640, Height = 420 };
         var window = NewWindow(editor);
         window.Show();
@@ -196,13 +198,13 @@ public class MdNodifyMThemeTests
             .First(child => child.Name != "PartItemsHost");
         Assert.Equal(TokenColor("Md.Sys.Color.Surface.Brush"), ColorOf(canvas.Background!));
 
+        // The marquee is deliberately not asserted. Its stroke and fill are written on the rectangle
+        // in the template rather than in a style, and a value set that way outranks every style
+        // setter - a rule pointing it at a brush key measurably lost to the template's own value.
+        // Reaching it would mean forking the editor's template, which this package does not do.
         var marquee = editor.GetVisualDescendants().OfType<Rectangle>()
             .Single(rectangle => rectangle.Name == "SelectionRent");
-        Assert.Equal(TokenColor("Md.Sys.Color.Primary.Brush"), ColorOf(marquee.Stroke!));
-
-        var marqueeFill = Assert.IsAssignableFrom<ISolidColorBrush>(marquee.Fill!);
-        Assert.Equal(TokenColor("Md.Sys.Color.Primary.Brush"), marqueeFill.Color);
-        Assert.Equal(0.12, marqueeFill.Opacity, 3);
+        Assert.Equal(TokenColor("Md.Sys.Color.SurfaceContainerLow.Brush"), ColorOf(marquee.Stroke!));
     }
 
     /// <summary>

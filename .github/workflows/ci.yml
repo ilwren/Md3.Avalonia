@@ -138,11 +138,31 @@ jobs:
             tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
             "Headless tests"
 
+      # The markdown and hex editor tests ask for Consolas, which no runner has, so whether they pass
+      # depends on which libSkiaSharp the test output carries: Avalonia's build enumerates system
+      # fonts and falls back to a family that exists, while the NoDependencies build ScottPlot pulls
+      # in cannot, and fails to create a glyph typeface instead. When those tests go red this is the
+      # first thing to read, so it is reported as an annotation rather than left in the log.
+      - name: Report the Skia native build the tests will use
+        run: |
+          for so in $(find tests/Md3.Avalonia.HeadlessTests/bin -name 'libSkiaSharp.so' | sort); do
+            links=$(ldd "$so" 2>/dev/null | grep -ci fontconfig || true)
+            echo "::notice::Skia native ${so#tests/Md3.Avalonia.HeadlessTests/bin/}: fontconfig links=$links md5=$(md5sum "$so" | cut -d' ' -f1)"
+          done
+          if command -v fc-list > /dev/null; then
+            echo "::notice::Runner fonts: $(fc-list | wc -l) families, $(fc-list | grep -ci consolas || true) named Consolas"
+          else
+            echo "::notice::Runner has no fc-list, so no fontconfig to enumerate system fonts with"
+          fi
+
       # The node editor theme tests are run on their own first, and under a hard timeout. A test that
       # stalls the dispatcher never reaches a result, so the only thing a per-test timeout can buy is
       # a name; what actually bounds the damage is killing the runner and moving on. Running them
       # first, apart from the rest of the suite, means a stall there is visible as a five-minute step
-      # that produced no result, and the suite that follows still reports in full.
+      # that produced no result, and the suite that follows still reports in full. A separate
+      # invocation is also a separate process, which matters: a test that throws part way through a
+      # pumped dispatcher leaves the shared UI thread in a state the rest of the suite cannot run
+      # in, and every later class fails or stalls on someone else's mistake.
       - name: Probe the node editor theme tests
         id: nodifym-probe
         continue-on-error: true

@@ -33,11 +33,14 @@
   at the brushes the canvas itself uses. Node thickness drops from 2 to 1 because an
   M3 hairline is what a filled card carries.
 
-  Two things stay upstream's and are not ported. The node's 3 DIP corner radius is baked into its
+  Three things stay upstream's and are not ported. The node's 3 DIP corner radius is baked into its
   template - retokenizing it would mean forking the template, and a node editor's corners are not
-  worth owning an upstream file for. And upstream's checkered ItemContainer.HighlightBrush has no
-  counterpart here: no template in the package reads the key, and a hover tile wants its own
-  decision rather than a translation of a pattern.
+  worth owning an upstream file for. The marquee you drag on empty canvas is the same case with a
+  sharper edge: its stroke and fill are set on the rectangle itself in the template rather than in a
+  style, and a value written that way outranks any style setter, so the SelectionRectangle brushes
+  this file redeclares answer the minimap's viewport and nothing else. And upstream's checkered
+  ItemContainer.HighlightBrush has no counterpart here: no template in the package reads the key, and
+  a hover tile wants its own decision rather than a translation of a pattern.
 
   Register it after MaterialTheme. It replaces NodifyM's own ControlStyles, so do not include that
   as well.
@@ -104,14 +107,6 @@
        the surface brush, so the host gets the same one and the two agree. -->
   <Style Selector="nod|NodifyEditor">
     <Setter Property="Background" Value="{StaticResource NodifyEditor.BackgroundBrush}" />
-  </Style>
-
-  <!-- The marquee you drag on empty canvas is the one rectangle upstream builds from raw colour
-       keys, and it borrows a node group's colours for it. A drag in progress gets the same Primary
-       frame and Primary-at-0.12 fill the selection uses. -->
-  <Style Selector="nod|NodifyEditor /template/ Rectangle#SelectionRent">
-    <Setter Property="Stroke" Value="{StaticResource NodifyEditor.SelectionRectangleStrokeBrush}" />
-    <Setter Property="Fill" Value="{StaticResource NodifyEditor.SelectionRectangleBackgroundBrush}" />
   </Style>
 
   <!-- The grid rules are the one surface colour upstream never put in a brush key at all: the

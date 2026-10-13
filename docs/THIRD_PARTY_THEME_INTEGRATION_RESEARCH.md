@@ -340,10 +340,14 @@ LiveCharts 尚未分配的槽位（`ISeries.SeriesId` 默认为 `-1`）当作第
   `Orange`；`NodifyEditor.axaml` 的 `Background="Azure"`；`NodeGroup.axaml` 内联的
   `#3E3E42`/`White`/`#1E1E1E`/`Transparent`（因此上游自己定义的 `GroupingNode.*` 四个键从没被读过）；
   `LargeGridLine.Brush` 的 C# 默认值 `Gainsboro`（默认 `GridLineTemplate` 从不设画刷，所以
-  `GridLinesColorBrush` 这个键上游其实没人读）；以及 `NodifyEditorMinimap` 的六个画刷与
-  `Rectangle#SelectionRent` 的填充/描边——这七处是包内仅有的、绕过画刷字典直接用
-  `Color="{DynamicResource *.Color}"` 现搓画刷的地方。模板 part 名实测为
-  `HeaderContentPresenter`/`FooterContentPresenter`（`/template/` 选择器可达）。
+  `GridLinesColorBrush` 这个键上游其实没人读）；以及 `NodifyEditorMinimap` 的六个画刷——这六处是
+  包内仅有的、绕过画刷字典直接用 `Color="{DynamicResource *.Color}"` 现搓画刷、又能被样式改到的
+  地方。模板 part 名实测为 `HeaderContentPresenter`/`FooterContentPresenter`（`/template/` 选择器
+  可达）。
+- 例外：`Rectangle#SelectionRent` 的 `Stroke` 是 `StaticResource GroupingNode.BackgroundBrush`、
+  `Fill` 是内联的 `SolidColorBrush`，两者都写在模板元素上而不是样式里。这样的取值优先级高于任何
+  style setter，实测附加样式确实输了（描边停在 `GroupingNode.BackgroundBrush` 解析出的
+  `SurfaceContainerLow`，说明字典生效、样式没生效）；要改只能 fork 模板，本包不做。
 - 留在上游：节点模板里写死的 `CornerRadius="3"`（外框／标题 `3 3 0 0`／页脚 `0 0 3 3`）；
   `ItemContainer.HighlightBrush` 的棋盘格图案（无消费者，不做翻译）。
 - 版本：固定 **`NodifyM.Avalonia` 12.0.0**（NuGet 最新版，`net8.0`，`IsAotCompatible=true`，声明
