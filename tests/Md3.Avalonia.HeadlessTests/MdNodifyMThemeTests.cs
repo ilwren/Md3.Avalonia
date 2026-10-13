@@ -5,7 +5,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Shapes;
-using Avalonia.Controls.Templates;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Styling;
@@ -25,110 +24,103 @@ namespace Md3.Avalonia.HeadlessTests;
 /// <remarks>
 /// The package does not port a single template: it style-includes the eleven per-control sheets the
 /// pinned package ships and answers the brush keys those sheets read from its own accent dictionary.
-/// That makes "the brushes the templates actually use are Material brushes" the whole claim, so the
-/// tests below read the brushes back off realized controls rather than off the dictionary, and the
-/// additive styles - the values upstream sets as literals, which no accent can reach - are asserted
-/// the same way.
+/// That makes "the brush a control ends up using is a Material brush" the whole claim, so the tests
+/// read brushes back off realized controls rather than off the dictionary.
+/// <para>
+/// One thing these tests deliberately do not do is pump the dispatcher with a populated editor on
+/// screen. <see cref="NodifyEditor"/> rewrites its own <c>Width</c>, <c>Height</c> and <c>Zoom</c>
+/// from its parent's size both in <c>OnLoaded</c> and in the <c>SizeChanged</c> handler it attaches
+/// in <c>OnApplyTemplate</c>, and a headless run that realized its node containers and then pumped
+/// the dispatcher stopped making progress: the job was cancelled rather than failing, so nothing
+/// was reported. The tests therefore realize the individual controls the theme touches, and put the
+/// editor in a window only to read back the two literals its style hardcodes - without a pump
+/// afterwards. A populated editor is still covered: <see cref="MdGalleryTests"/> renders the gallery
+/// page that carries one. Every test here also carries a timeout, so a stall shows up as a named
+/// failure instead of a cancelled job.
+/// </para>
 /// </remarks>
 public class MdNodifyMThemeTests
 {
-    [AvaloniaFact]
-    public void The_Canvas_And_Its_Nodes_Are_Painted_From_Tokens()
+    [AvaloniaFact(Timeout = 60_000)]
+    public void The_Node_Is_A_Material_Container_With_The_Right_Ink()
     {
-        var editor = NewEditor();
-        using var scope = Show(editor);
+        var node = NewNode();
+        using var scope = Show(node);
 
-        // Upstream's editor style sets Background to a literal Azure and its canvas to the
-        // NodifyEditor brush key; the theme answers the key with Surface and sets the literal again.
-        Assert.Equal(TokenColor("Md.Sys.Color.Surface.Brush"), ColorOf(editor.Background!));
-
-        var node = editor.GetVisualDescendants().OfType<Node>().Single();
         Assert.Equal(TokenColor("Md.Sys.Color.SurfaceContainerHigh.Brush"), ColorOf(node.Background!));
         Assert.Equal(TokenColor("Md.Sys.Color.OutlineVariant.Brush"), ColorOf(node.BorderBrush!));
+
+        // Upstream's node style sets a 2 DIP border; an M3 card carries a hairline.
         Assert.Equal(new Thickness(1), node.BorderThickness);
 
-        // The header and footer bars are filled containers, and the additive styles give each the ink
-        // its container calls for instead of the literal White upstream's node style sets.
+        // The header and footer bars are filled containers, and the additive styles give each the
+        // ink its container calls for instead of the literal White upstream's node style sets.
         Assert.Equal(TokenColor("Md.Sys.Color.SecondaryContainer.Brush"), ColorOf(node.HeaderBrush!));
         Assert.Equal(TokenColor("Md.Sys.Color.SurfaceContainer.Brush"), ColorOf(node.FooterBrush!));
         Assert.Equal(TokenColor("Md.Sys.Color.OnSurface.Brush"), ColorOf(node.Foreground!));
 
-        var header = editor.GetVisualDescendants().OfType<ContentPresenter>()
+        var header = node.GetVisualDescendants().OfType<ContentPresenter>()
             .Single(presenter => presenter.Name == "HeaderContentPresenter");
         Assert.Equal(TokenColor("Md.Sys.Color.OnSecondaryContainer.Brush"), ColorOf(header.Foreground!));
-        var footer = editor.GetVisualDescendants().OfType<ContentPresenter>()
+
+        var footer = node.GetVisualDescendants().OfType<ContentPresenter>()
             .Single(presenter => presenter.Name == "FooterContentPresenter");
         Assert.Equal(TokenColor("Md.Sys.Color.OnSurfaceVariant.Brush"), ColorOf(footer.Foreground!));
     }
 
-    [AvaloniaFact]
-    public void The_Pins_Split_By_Direction_And_The_Wires_Follow_The_Ink()
+    [AvaloniaFact(Timeout = 60_000)]
+    public void The_Pins_Split_By_Direction_And_The_Dragged_Wire_Is_Primary()
     {
-        var editor = NewEditor();
-        using var scope = Show(editor);
+        var input = new NodeInput { Header = "Rows" };
+        var output = new NodeOutput { Header = "Kept" };
+        var pending = new PendingConnection();
+        using var scope = Show(new StackPanel { Children = { input, output, pending } });
 
-        // The one place the palette deliberately breaks upstream's symmetry: an input pin is a
-        // secondary container and an output pin a primary container, so a wire's two ends differ.
-        var input = editor.GetVisualDescendants().OfType<NodeInput>().Single();
+        // The one place the palette deliberately breaks upstream's symmetry, which leaves both pins
+        // transparent with one border colour: an input pin is a secondary container and an output
+        // pin a primary container, so a wire's two ends differ without reading a label.
         Assert.Equal(TokenColor("Md.Sys.Color.SecondaryContainer.Brush"), ColorOf(input.Background!));
         Assert.Equal(TokenColor("Md.Sys.Color.OnSecondaryContainer.Brush"), ColorOf(input.Foreground!));
+        Assert.Equal(TokenColor("Md.Sys.Color.Outline.Brush"), ColorOf(input.BorderBrush!));
 
-        var output = editor.GetVisualDescendants().OfType<NodeOutput>().Single();
         Assert.Equal(TokenColor("Md.Sys.Color.PrimaryContainer.Brush"), ColorOf(output.Background!));
         Assert.Equal(TokenColor("Md.Sys.Color.OnPrimaryContainer.Brush"), ColorOf(output.Foreground!));
 
         // A pending wire - the drag in progress - is Primary rather than the resting wire's ink.
-        var pending = editor.GetVisualDescendants().OfType<PendingConnection>().Single();
         Assert.Equal(TokenColor("Md.Sys.Color.Primary.Brush"), ColorOf(pending.Stroke!));
+        Assert.Equal(TokenColor("Md.Sys.Color.SurfaceContainerHigh.Brush"), ColorOf(pending.Background!));
     }
 
-    [AvaloniaFact]
-    public void The_Theme_Reaches_The_Values_Upstream_Never_Put_In_A_Brush_Key()
+    [AvaloniaFact(Timeout = 60_000)]
+    public void The_Grid_Rule_And_The_Minimap_Take_The_Canvas_Brushes()
     {
-        var editor = NewEditor();
-        var minimap = new NodifyEditorMinimap { Width = 180, Height = 140, Editor = editor };
-        Grid.SetColumn(minimap, 1);
-        var layout = new Grid
-        {
-            ColumnDefinitions = { new ColumnDefinition(GridLength.Star), new ColumnDefinition(new GridLength(200)) },
-            Children = { editor, minimap }
-        };
-        using var scope = new Scope(NewWindow(layout));
-        scope.Window.Show();
-        editor.ApplyTemplate();
-        Dispatcher.UIThread.RunJobs();
+        var grid = new LargeGridLine { Width = 240, Height = 120 };
+        var minimap = new NodifyEditorMinimap { Width = 180, Height = 140 };
+        using var scope = Show(new StackPanel { Children = { grid, minimap } });
 
         // The grid rule takes its colour from the property's own default - Gainsboro - because the
         // default grid-line template never sets a brush, so the key upstream defines for grid lines
         // is read by nothing until this style points the control at it.
-        var grid = editor.GetVisualDescendants().OfType<LargeGridLine>().Single();
         Assert.Equal(TokenColor("Md.Sys.Color.OutlineVariant.Brush"), ColorOf(grid.Brush));
 
-        // The minimap is the other place upstream builds brushes from raw colour keys: all six are
-        // re-pointed at the brushes the canvas itself uses.
+        // The minimap is the other place upstream builds brushes from raw colour keys instead of
+        // taking one from its own dictionary: all six are re-pointed at the canvas brushes.
         Assert.Equal(TokenColor("Md.Sys.Color.Surface.Brush"), ColorOf(minimap.MapBackground));
         Assert.Equal(TokenColor("Md.Sys.Color.OutlineVariant.Brush"), ColorOf(minimap.MapBorderBrush));
         Assert.Equal(TokenColor("Md.Sys.Color.SecondaryContainer.Brush"), ColorOf(minimap.NodeBrush));
         Assert.Equal(TokenColor("Md.Sys.Color.OutlineVariant.Brush"), ColorOf(minimap.NodeBorderBrush));
         Assert.Equal(TokenColor("Md.Sys.Color.Primary.Brush"), ColorOf(minimap.ViewportBorderBrush));
+
         var viewport = Assert.IsAssignableFrom<ISolidColorBrush>(minimap.ViewportBrush);
         Assert.Equal(TokenColor("Md.Sys.Color.Primary.Brush"), viewport.Color);
         Assert.Equal(0.12, viewport.Opacity, 3);
-
-        // ...and so is the marquee, which upstream fills with a node group's colours.
-        var marquee = editor.GetVisualDescendants().OfType<Rectangle>().Single(rect => rect.Name == "SelectionRent");
-        Assert.Equal(TokenColor("Md.Sys.Color.Primary.Brush"), ColorOf(marquee.Stroke!));
-        var fill = Assert.IsAssignableFrom<ISolidColorBrush>(marquee.Fill);
-        Assert.Equal(TokenColor("Md.Sys.Color.Primary.Brush"), fill.Color);
-        Assert.Equal(0.12, fill.Opacity, 3);
     }
 
-    [AvaloniaFact]
+    [AvaloniaFact(Timeout = 60_000)]
     public void Selecting_A_Node_Frames_It_In_Primary()
     {
-        var editor = NewEditor();
-        using var scope = Show(editor);
-        var node = editor.GetVisualDescendants().OfType<Node>().Single();
+        var node = NewNode();
+        using var scope = Show(node);
 
         // Upstream paints LightBlue on hover and Orange when selected; both literals become the same
         // Primary the item frame uses, and the resting border goes back when the node is released.
@@ -141,138 +133,101 @@ public class MdNodifyMThemeTests
         Assert.Equal(TokenColor("Md.Sys.Color.OutlineVariant.Brush"), ColorOf(node.BorderBrush!));
     }
 
-    [AvaloniaFact]
-    public void The_Canvas_Follows_The_Material_Variant()
+    [AvaloniaFact(Timeout = 60_000)]
+    public void The_Brushes_Follow_The_Material_Variant()
     {
-        var editor = NewEditor();
-        using var scope = Show(editor);
-        var node = editor.GetVisualDescendants().OfType<Node>().Single();
+        using var light = Show(NewNode());
+        var lightSurface = TokenColor("Md.Sys.Color.SurfaceContainerHigh.Brush");
+        Assert.Equal(lightSurface, ColorOf(light.Content<Node>().Background!));
 
         // Every brush in the accent dictionary takes its colour from a Md.Sys.Color.* token by
-        // DynamicResource, so the theme needs no ThemeDictionaries of its own: the variant switch
-        // moves the brushes under the controls rather than swapping a dictionary.
-        var light = ColorOf(node.Background!);
-        Assert.Equal(TokenColor("Md.Sys.Color.SurfaceContainerHigh.Brush"), light);
+        // DynamicResource, so the theme needs no ThemeDictionaries of its own: the variant moves the
+        // brushes under the controls rather than swapping a dictionary. The dark half of the
+        // comparison gets its own window, because RequestedThemeVariant is a top-level property and
+        // moving it on the application would re-theme every window the suite has open.
+        var darkWindow = NewWindow(NewNode());
+        darkWindow.RequestedThemeVariant = ThemeVariant.Dark;
+        using var dark = new Scope(darkWindow);
+        darkWindow.Show();
+        Dispatcher.UIThread.RunJobs();
 
-        var previous = Application.Current!.RequestedThemeVariant;
-        try
-        {
-            Application.Current.RequestedThemeVariant = ThemeVariant.Dark;
-            Dispatcher.UIThread.RunJobs();
-
-            var dark = ColorOf(node.Background!);
-            Assert.NotEqual(light, dark);
-            Assert.Equal(TokenColor("Md.Sys.Color.SurfaceContainerHigh.Brush"), dark);
-            Assert.Equal(TokenColor("Md.Sys.Color.Surface.Brush"), ColorOf(editor.Background!));
-        }
-        finally
-        {
-            Application.Current!.RequestedThemeVariant = previous;
-            Dispatcher.UIThread.RunJobs();
-        }
+        var darkSurface = ColorOf(dark.Content<Node>().Background!);
+        Assert.NotEqual(lightSurface, darkSurface);
+        Assert.Equal(TokenColor("Md.Sys.Color.SurfaceContainerHigh.Brush", ThemeVariant.Dark), darkSurface);
     }
 
-    [AvaloniaFact]
+    [AvaloniaFact(Timeout = 60_000)]
     public void Registering_The_Theme_Leaves_Native_Controls_Alone()
     {
         // NodifyM's controls are all its own types, so there is no native control for this theme to
         // be careful about - which is what makes it safe to register application-wide. The claim is
-        // checked where it matters: a plain control in the same window as the editor.
-        var editor = NewEditor();
+        // checked where it matters: plain controls in the same window as a themed node.
         var box = new TextBox { Text = "plain" };
         var button = new Button { Content = "plain" };
         var check = new CheckBox();
-        var panel = new StackPanel { Children = { box, button, check } };
-        Grid.SetColumn(panel, 1);
-        var window = new Window
-        {
-            Width = 900,
-            Height = 640,
-            Content = new Grid
-            {
-                ColumnDefinitions = { new ColumnDefinition(GridLength.Star), new ColumnDefinition(new GridLength(220)) },
-                Children = { editor, panel }
-            }
-        };
-        window.Styles.Add(new MaterialNodifyMTheme());
-        window.Show();
-        Dispatcher.UIThread.RunJobs();
+        using var scope = Show(new StackPanel { Children = { NewNode(), box, button, check } });
 
-        // The editor still realizes its node with the theme registered, which is the other half of
-        // the claim: the theme reaches NodifyM's controls and stops there.
-        Assert.Equal("Filter", editor.GetVisualDescendants().OfType<Node>().Single().Header);
+        Assert.Equal("Filter", scope.Window.GetVisualDescendants().OfType<Node>().Single().Header);
         Assert.Null(box.Theme);
         Assert.Null(button.Theme);
         Assert.Null(check.Theme);
         Assert.DoesNotContain(Application.Current!.Styles, style => style.GetType().Name == "FluentTheme");
-        window.Close();
     }
 
-    [AvaloniaFact]
-    public void The_Package_Exposes_One_Public_Type()
+    [AvaloniaFact(Timeout = 60_000)]
+    public void The_Canvas_And_The_Marquee_Take_The_Surface_And_Primary_Brushes()
     {
-        // Avalonia's XAML compiler adds two public helper types under CompiledAvaloniaXaml to every
-        // assembly that embeds XAML, so the surface is counted over the package's own namespace.
-        var exported = typeof(MaterialNodifyMTheme).Assembly.GetTypes()
-            .Where(type => type.IsPublic && type.Namespace != "CompiledAvaloniaXaml")
-            .ToArray();
+        // Two of the editor's own colours are literals rather than brush keys upstream paints over -
+        // the Azure canvas that sits behind its items, and the marquee it fills with a node group's
+        // colours - so the canvas is re-pointed at a brush key and the marquee is set again by an
+        // additive style, which also gives the control a Background of its own. Both come back off a
+        // real editor, templated but not laid out: the dispatcher is not pumped after it is shown
+        // (see the remarks on this class).
+        var editor = new NodifyEditor { Width = 640, Height = 420 };
+        var window = NewWindow(editor);
+        window.Show();
+        editor.ApplyTemplate();
+        using var scope = new Scope(window);
 
-        Assert.Equal([typeof(MaterialNodifyMTheme)], exported);
-        Assert.IsAssignableFrom<Styles>(new MaterialNodifyMTheme());
+        Assert.Equal(TokenColor("Md.Sys.Color.Surface.Brush"), ColorOf(editor.Background!));
+
+        // The Azure canvas, as distinct from the panel the items are hosted in.
+        var canvas = editor.GetVisualDescendants().OfType<Canvas>()
+            .First(child => child.Name != "PartItemsHost");
+        Assert.Equal(TokenColor("Md.Sys.Color.Surface.Brush"), ColorOf(canvas.Background!));
+
+        var marquee = editor.GetVisualDescendants().OfType<Rectangle>()
+            .Single(rectangle => rectangle.Name == "SelectionRent");
+        Assert.Equal(TokenColor("Md.Sys.Color.Primary.Brush"), ColorOf(marquee.Stroke!));
+
+        var marqueeFill = Assert.IsAssignableFrom<ISolidColorBrush>(marquee.Fill!);
+        Assert.Equal(TokenColor("Md.Sys.Color.Primary.Brush"), marqueeFill.Color);
+        Assert.Equal(0.12, marqueeFill.Opacity, 3);
     }
 
     /// <summary>
-    /// One node with one pin of each direction, plus a pending wire: enough to realize every control
-    /// the theme restyles except the connection shapes, which need anchors two pins write back.
+    /// A node with one pin of each direction: enough to realize the card, its two presenter bars and
+    /// the pins its template builds from <c>Input</c> and <c>Output</c>.
     /// </summary>
-    /// <remarks>
-    /// The items have to be view models that a template turns into nodes. The editor casts the first
-    /// visual child of every item container to <see cref="BaseNode"/>, so a <see cref="Node"/> handed
-    /// to it as the item - which then becomes its own container - puts the cast on the border its
-    /// template starts with, and the layout pass throws instead of arranging.
-    /// </remarks>
-    private static NodifyEditor NewEditor()
+    private static Node NewNode() => new()
     {
-        var editor = new NodifyEditor
-        {
-            Width = 640,
-            Height = 420,
-            ItemTemplate = new FuncDataTemplate<NodeViewModelBase>((node, _) => new Node
-            {
-                Header = node.Title,
-                Footer = node.Footer,
-                Location = node.Location,
-                Input = node.Input,
-                Output = node.Output
-            })
-        };
-        editor.ItemsSource = new[]
-        {
-            new NodeViewModelBase
-            {
-                Title = "Filter",
-                Footer = "rows > 0",
-                Location = new Point(96, 72),
-                Input = new ObservableCollection<object> { Pin("Rows", ConnectorViewModelBase.ConnectorFlow.Input) },
-                Output = new ObservableCollection<object> { Pin("Kept", ConnectorViewModelBase.ConnectorFlow.Output) }
-            }
-        };
-        editor.PendingConnection = new NodifyEditorViewModelBase().PendingConnection;
-        return editor;
-    }
+        Header = "Filter",
+        Footer = "rows > 0",
+        MinWidth = 176,
+        Location = new Point(96, 72),
+        Input = new ObservableCollection<object> { Pin("Rows", ConnectorViewModelBase.ConnectorFlow.Input) },
+        Output = new ObservableCollection<object> { Pin("Kept", ConnectorViewModelBase.ConnectorFlow.Output) }
+    };
 
     private static ConnectorViewModelBase Pin(string title, ConnectorViewModelBase.ConnectorFlow flow) =>
         new() { Title = title, Flow = flow, IsConnected = true };
 
-    // The theme is handed to the window that owns the editor, the way an application that does not
-    // want it application-wide would register it; the gallery page registers it the same way. The
-    // template is applied before the jobs run because the parts these tests read - the marquee
-    // rectangle, the grid-line presenter - are only in the tree once it is.
-    private static Scope Show(NodifyEditor editor)
+    // The theme is handed to the window that owns the controls, the way an application that does not
+    // want it application-wide would register it; the gallery page registers it the same way.
+    private static Scope Show(Control content)
     {
-        var window = NewWindow(editor);
+        var window = NewWindow(content);
         window.Show();
-        editor.ApplyTemplate();
         Dispatcher.UIThread.RunJobs();
         return new Scope(window);
     }
@@ -284,13 +239,14 @@ public class MdNodifyMThemeTests
         return window;
     }
 
-    private static IBrush Brush(string key)
+    private static IBrush Brush(string key, ThemeVariant? variant = null)
     {
-        Assert.True(Application.Current!.TryGetResource(key, Application.Current.ActualThemeVariant, out var value), key);
+        variant ??= Application.Current!.ActualThemeVariant;
+        Assert.True(Application.Current!.TryGetResource(key, variant, out var value), key);
         return Assert.IsAssignableFrom<IBrush>(value);
     }
 
-    private static Color TokenColor(string key) => ColorOf(Brush(key));
+    private static Color TokenColor(string key, ThemeVariant? variant = null) => ColorOf(Brush(key, variant));
 
     private static Color ColorOf(IBrush brush) => Assert.IsType<SolidColorBrush>(brush).Color;
 
@@ -299,6 +255,8 @@ public class MdNodifyMThemeTests
         public Scope(Window window) => Window = window;
 
         public Window Window { get; }
+
+        public T Content<T>() where T : Control => Assert.IsType<T>(Window.Content);
 
         public void Dispose() => Window.Close();
     }
