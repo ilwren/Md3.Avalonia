@@ -210,7 +210,7 @@ public sealed class MdBeforeAfter : TemplatedControl
 
     private void FocusWithoutScrollingAncestors()
     {
-        var scrollViewers = GetVisualAncestors().OfType<ScrollViewer>().ToArray();
+        var scrollViewers = this.GetVisualAncestors().OfType<ScrollViewer>().ToArray();
         var previousValues = new bool[scrollViewers.Length];
         for (var i = 0; i < scrollViewers.Length; i++)
         {
