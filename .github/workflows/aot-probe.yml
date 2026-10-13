@@ -3,7 +3,10 @@ name: AOT probe
 on:
   workflow_dispatch:
   push:
-    branches: [arena/01a104af-md3-avalonia]
+    # This named a branch from an earlier session, so the probe could not run at all and the AOT
+    # claim in docs/GALLERY_DEFECTS.md was resting on a workflow nothing triggered. Editing this file
+    # is what re-arms it on a branch; a full publish is too expensive to run on every push.
+    branches: [arena/3fd923bf-md3-avalonia]
     paths: ['.github/workflows/aot-probe.yml']
 
 jobs:
