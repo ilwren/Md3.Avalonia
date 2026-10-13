@@ -145,10 +145,18 @@ jobs:
       # first thing to read, so it is reported as an annotation rather than left in the log.
       - name: Report the Skia native build the tests will use
         run: |
-          for so in $(find tests/Md3.Avalonia.HeadlessTests/bin -name 'libSkiaSharp.so' | sort); do
+          # The copy that matters is the one flattened next to the test assembly for this RID, not
+          # the runtimes/<rid> folders, which hold every RID the graph offers.
+          so=tests/Md3.Avalonia.HeadlessTests/bin/Release/net10.0/libSkiaSharp.so
+          if [ -f "$so" ]; then
             links=$(ldd "$so" 2>/dev/null | grep -ci fontconfig || true)
-            echo "::notice::Skia native ${so#tests/Md3.Avalonia.HeadlessTests/bin/}: fontconfig links=$links md5=$(md5sum "$so" | cut -d' ' -f1)"
-          done
+            echo "::notice::Loaded libSkiaSharp.so: fontconfig links=$links md5=$(md5sum "$so" | cut -d' ' -f1) bytes=$(stat -c%s "$so")"
+          else
+            echo "::notice::No libSkiaSharp.so beside the test assembly"
+          fi
+          dotnet list tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj package \
+            --include-transitive | grep -i skia | sed 's/^ *//' | sort -u \
+            | while read -r line; do echo "::notice::Skia package: $line"; done
           if command -v fc-list > /dev/null; then
             echo "::notice::Runner fonts: $(fc-list | wc -l) families, $(fc-list | grep -ci consolas || true) named Consolas"
           else
@@ -181,6 +189,22 @@ jobs:
         if: always()
         continue-on-error: true
         run: python3 scripts/report-test-results.py
+
+      # The markdown and hex editor tests fail on a font the runner does not have, and they have only
+      # ever been seen failing inside the full suite. Running the class by itself, in a process of its
+      # own, is what separates the two explanations: alone it either passes, which makes the full-suite
+      # failure contamination between classes, or it fails the same way, which makes it the font
+      # environment - and the answer decides where to look next.
+      - name: Probe the markdown theme tests alone
+        continue-on-error: true
+        run: |
+          timeout --signal=KILL 300 dotnet test \
+            tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
+            -c Release --no-build --no-restore \
+            --filter "FullyQualifiedName~MdMarkdownThemeTests" \
+            --logger "trx;LogFileName=markdown.trx" \
+            --logger "console;verbosity=normal" || true
+          python3 -c "import glob,xml.etree.ElementTree as ET; ns={'ns':'http://microsoft.com/schemas/VisualStudio/TeamTest/2010'}; rs=[r for t in glob.glob('**/markdown.trx', recursive=True) for r in ET.parse(t).getroot().findall('.//ns:UnitTestResult', ns)]; f=[r.get('testName') for r in rs if r.get('outcome')=='Failed']; print('::notice::Markdown tests alone: %d run, %d failed -> %s' % (len(rs), len(f), ', '.join(f)))"
 
       - name: Run headless tests
         id: tests
