@@ -278,7 +278,7 @@ LiveCharts 尚未分配的槽位（`ISeries.SeriesId` 默认为 `-1`）当作第
 
 ### 4.3 Wave 3（按需）
 
-- ~~`Md3.Avalonia.NodifyM`~~（已落地，见下）、`Md3.Avalonia.Mapsui`（外壳 + 图层配色）、Avalonia.Labs 剩余控件。
+- ~~`Md3.Avalonia.NodifyM`~~、~~`Md3.Avalonia.Mapsui`~~（均已落地，见下）、Avalonia.Labs 剩余控件。
 
 **已落地（2026-10-12，`Md3.Avalonia.PropertyGrid`）**：`Md3.Avalonia.Themes.MaterialPropertyGridTheme : Styles`，
 在 `src/Md3.Avalonia.PropertyGrid/`。这里修正本文件对成本与做法的预估：**不需要「逐个替换 11 个内嵌控件样式」**，
@@ -361,6 +361,32 @@ LiveCharts 尚未分配的槽位（`ISeries.SeriesId` 默认为 `-1`）当作第
   12.1.2 基线）。升级时要重读 `ResourceDictionaries/Brushes.axaml`（键增删）与 `Controls/*.axaml`
   （模板与 part 名）；`MdNodifyMThemeTests` 钉住了实例化控件上的画刷取值、附加样式、变体切换与
   「同窗口内普通控件仍无主题」。
+
+**已落地（2026-10-13，`Md3.Avalonia.Mapsui`）**：`Md3.Avalonia.Themes.MaterialMapsuiTheme`（sealed
+类，不是 `Styles`），在 `src/Md3.Avalonia.Mapsui/`。这里也修正本文件的预估：**「外壳」并不存在**——
+`MapControl : UserControl` 没有任何 `.axaml`，它把整块画布交给 Skia，按 `Map.BackColor` 与图层样式
+自绘，Avalonia 的 `Background` 根本不会被看到。可主题化的只有三处：
+- `Map.BackColor`（上游默认 `Color.White`）→ `Surface`；改这个值上游会自动触发重绘。
+- 图层样式：`VectorStyle.Line/Outline/Fill` 与 `LabelStyle` 的 `ForeColor`/`BackColor`/`BorderColor`/
+  `BorderThickness`/`CornerRounding`/`Font`。区域填充用 12% 的 `Primary`——Mapsui 的 `Brush` 只有
+  `Color` 没有 opacity，淡色只能混进颜色。只对「还带着 `BaseLayer` 构造函数给的那个默认样式」的图层下发
+  （`BaseLayer.cs:31` 让每个图层的 `Style` 一开始就是 `new VectorStyle()`，所以 `is null` 永远不成立）；
+  判定用 `Pen`/`Brush` 的值相等逐字段比对一个新造的默认值——`VectorStyle` 与 `BaseStyle` 自身不重写
+  `Equals`，而 `Pen`/`Brush` 重写。图层样式属于其内容，只换颜色，`Opacity`/`MinVisible`/`MaxVisible`/
+  `Enabled` 原样带走。
+- 调色板：与 LiveCharts2/ScottPlot 同序的八个 `Md.Sys.Color` 角色，供专题地图分级取色。
+- 变体：Mapsui 在赋值时写死颜色，因此 `Follow(MapControl)` 订阅控件自身的
+  `ActualThemeVariantChanged` 重新下发（做法与 `MaterialScottPlotTheme.Follow` 一致）。
+- 留在上游：投影、瓦片拉取、导航、命中测试、动画；以及 `BaseConnection` 之类**不属于本包依赖**的东西。
+  另外核心 Mapsui 的 `Features` 只有 `PointFeature`/`RasterFeature`，线与多边形在 `Mapsui.Nts`
+  （不是 `Mapsui.Avalonia12` 的依赖），所以画廊示例是点与标注。
+- 宿主注意：`Map.Navigator.CenterOnAndZoomTo(MPoint, resolution)` 可以在控件尚未布局时设定初始视野；
+  `ZoomToBox` 需要视口尺寸，构造期调用会算出 0 分辨率。
+- 版本：固定 **`Mapsui.Avalonia12` 5.1.0**（NuGet 最新版，`net8.0`/`net9.0`，声明 `Avalonia >= 12.0.2`
+  + `Avalonia.Skia >= 12.0.2` + `SkiaSharp >= 3.119.4`，与本仓库 12.1.2 / 3.119.4 的钉子相容；
+  `Mapsui.Avalonia` 是 Avalonia 11 那一支，XAML 与 C# 完全相同，因此不是选项）。升级时要重读
+  `Mapsui.UI.Shared/MapControl.cs`、`Map.cs` 与 `Mapsui/Styles/*`；`MdMapsuiThemeTests` 钉住了配色顺序、
+  画布、两个样式、字号与圆角令牌、暗色读取，以及「包里只有一个公开类型、没有 Styles/ControlTheme」。
 
 ---
 

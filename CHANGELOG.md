@@ -162,7 +162,26 @@
   `MdNodifyMThemeTests` reads the brushes back off realized controls - the canvas, the node and both
   pin directions, the pending wire, the grid rule and all six minimap brushes - then pins the
   selection frame, the variant switch, and that a plain control in the same window keeps no theme.
-- **Native AOT.** All fifteen packages declare `IsAotCompatible` and build with the IL3xxx analyzers
+- **`Md3.Avalonia.Mapsui`.** A Material 3 theme for maps drawn with
+  [Mapsui](https://github.com/Mapsui/Mapsui), the last item in Wave 3. It is the only package that
+  pulls in that dependency (pinned at `Mapsui.Avalonia12` `5.1.0`, the Avalonia 12 build, which
+  declares `Avalonia >= 12.0.2`, `Avalonia.Skia >= 12.0.2` and `SkiaSharp >= 3.119.4`), bringing the
+  set to sixteen. Mapsui has no style seam at all - `MapControl` draws its own surface from the
+  colours a `Map` and its layers carry - so, like the two chart providers, this package is an entry
+  point rather than a `Styles` collection. `MaterialMapsuiTheme` writes the canvas (`Surface`, where
+  Mapsui ships white), the vector style an unstyled layer is given - an `Outline` hairline for a
+  boundary, a heavier `OnSurfaceVariant` stroke for a line, `Primary` at twelve percent for a region,
+  mixed into the colour because Mapsui's brush takes a colour rather than an opacity - and a label
+  chip in `SurfaceContainer` with an `OutlineVariant` border, the `ExtraSmall` corner radius and
+  `OnSurface` ink at `LabelMedium`. A layer whose style was chosen keeps it - and that is not the same as a null
+  style, because `BaseLayer`'s constructor gives every layer a grey outline, a black line and a white
+  fill, so a layer counts as unstyled while it still carries that default. Only the colours are
+  replaced: a layer's own opacity and visible range travel across. `Follow(MapControl)` keeps a map in
+  step with the light/dark switch, and `SeriesPalette(dark)` hands a thematic map the same eight
+  Material roles both chart providers walk. Projection, tile fetching, navigation, hit testing and
+  animation stay upstream's. `MdMapsuiThemeTests` pins the palette, the canvas, both styles, the
+  type scale, the corner token and the dark-variant reads.
+- **Native AOT.** All sixteen packages declare `IsAotCompatible` and build with the IL3xxx analyzers
   on alongside the existing IL2xxx trimming ones. `.github/workflows/aot-probe.yml` publishes the
   desktop gallery with `PublishAot=true` and does not accept a green step as the answer: it
   asserts the output is a native ELF executable with no managed assembly beside it, then runs that

@@ -194,13 +194,29 @@ surface，调用方仍可覆盖。
   `ThemeDictionaries`。画布是 `Surface` 并以 `OutlineVariant` 画网格线；节点是 `SurfaceContainerHigh`
   卡片，标题栏 `SecondaryContainer`、页脚 `SurfaceContainer`；输入引脚是 `SecondaryContainer`、
   输出引脚是 `PrimaryContainer`，一根连线的两端因此无需标签即可区分；连线走 `OnSurfaceVariant`，
-  circuit 变体与拖拽中的 pending 连线走 `Primary`；框选、对齐参考线与选中边框共用同一个 `Primary`。
+  circuit 变体与拖拽中的 pending 连线走 `Primary`；对齐参考线与选中边框共用同一个 `Primary`。
   上游以字面量设置、配色字典够不到的取值由附加样式重设：节点的 `White` 前景、悬停时的 `LightBlue`
   与选中时的 `Orange` 边框、条目背后的 `Azure`、分组节点内联的四种颜色，以及网格线属性自带的
   `Gainsboro`。节点模板里写死的 3 DIP 圆角留给上游。`MdNodifyMThemeTests` 从真正实例化的控件上把画刷
-  读回来核对（画布、节点、两个方向的引脚、pending 连线、网格线、小地图六个画刷、框选矩形），再钉住
+  读回来核对（画布、节点、两个方向的引脚、pending 连线、网格线、小地图六个画刷），再钉住
   选中边框、变体切换，以及同一窗口内的普通控件仍然没有主题。
-- **原生 AOT 已验证可用。** 十五个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
+- **`Md3.Avalonia.Mapsui`** —— [Mapsui](https://github.com/Mapsui/Mapsui)
+  地图的 Material Design 3 主题，opt-in，唯一引入 `Mapsui.Avalonia12` 依赖的包，包总数到十六个，
+  Wave 3 至此收尾。Mapsui 根本没有样式接缝：`MapControl` 用 `Map` 与图层自带的颜色自绘整个画布，
+  不向任何资源宿主取值，所以本包与两个图表 provider 一样是**地图级入口**而不是 `Styles` 集合。
+  `MaterialMapsuiTheme` 写入：画布 `Surface`（上游默认是白色）；未设样式的图层拿到的矢量样式——
+  多边形边界是 `Outline` 的 1 DIP 细线、线要素是 `OnSurfaceVariant` 的 1.5 DIP 一笔、区域填充为
+  12% 的 `Primary`（Mapsui 的画刷只收颜色不收不透明度，所以这层淡色是混进颜色里的）；以及标注小片
+  ——`SurfaceContainer` 底、`OutlineVariant` 边框、`Md.Sys.Shape.Corner.ExtraSmall` 圆角、
+  `OnSurface` 墨色，按 `LabelMedium` 与 `Md.Sys.Typeface.Plain` 指定的字族排版。**样式是别人挑过的图层
+  保持原样**：这不等于「样式为 null」——`BaseLayer` 的构造函数给每个图层都装了灰色描边、黑色线与白色填充的默认
+  样式，因此只要图层还带着这个默认值就视作无人设过样式；专题地图按要素逐条取色，主题不该从外面覆盖别人挑的样式。
+  被替换的只有颜色，图层自身的透明度与可见比例区间原样带走。`Follow(MapControl)`
+  让地图跟随应用的明暗切换（Mapsui 在赋值时就把颜色写死，不会自行重新解析），`SeriesPalette(dark)`
+  给出与两个图表 provider 同序的八个 Material 角色。投影、瓦片拉取、导航、命中测试与动画全部归上游；
+  核心 Mapsui 通过 `Mapsui.Nts` 画线与多边形，而本包不依赖它，因此画廊示例是点与标注，且要素存在内存里
+  （本页从不拉瓦片）。`MdMapsuiThemeTests` 钉住配色顺序、画布、两个样式、字号阶梯、圆角令牌与暗色读取。
+- **原生 AOT 已验证可用。** 十六个包全部声明 `IsAotCompatible`，在原有 IL2xxx 裁剪分析器之外打开了
   IL3xxx 分析器。`.github/workflows/aot-probe.yml` 用 `PublishAot=true` 发布桌面 Gallery，并且
   **不把「步骤成功」当作答案**：它断言产物是原生 ELF 可执行文件、输出目录里没有托管 dll 残留（防止
   apphost 冒充），然后在 xvfb 下把那个二进制真正跑起来。原生 AOT 是在运行期因反射元数据被裁而失败的，

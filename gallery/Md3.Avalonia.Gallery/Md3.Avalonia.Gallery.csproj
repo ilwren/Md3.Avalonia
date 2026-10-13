@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>Md3.Avalonia.Gallery</RootNamespace>
@@ -27,6 +27,7 @@
     <ProjectReference Include="../../src/Md3.Avalonia.ScottPlot/Md3.Avalonia.ScottPlot.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.PropertyGrid/Md3.Avalonia.PropertyGrid.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.NodifyM/Md3.Avalonia.NodifyM.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.Mapsui/Md3.Avalonia.Mapsui.csproj" />
     <AvaloniaResource Include="Assets/Media/**" />
   </ItemGroup>
 </Project>

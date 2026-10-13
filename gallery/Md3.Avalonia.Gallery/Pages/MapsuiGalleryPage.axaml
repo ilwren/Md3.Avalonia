@@ -1,0 +1,85 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:mapsui="using:Mapsui.UI.Avalonia"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.MapsuiGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Map" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A Mapsui map wearing the opt-in Md3.Avalonia.Mapsui theme: the canvas is a Material surface, a layer nobody has styled is drawn with the theme's vector style, labels are surface container chips typeset from the type scale, and a thematic layer takes the same eight Material roles the chart providers use." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h3" Text="Themed map" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The control below is a stock Mapsui MapControl. The page calls the theme once and the theme keeps the map in step with the application's light/dark switch - Mapsui writes colours into a map when they are set, so a themed map does not re-resolve them the way an Avalonia style would. The page rebuilds the layer's own styles for the variant too, for the same reason. Its four points live in memory: this page never fetches a tile, so it renders the same offline as it does online." />
+        <Border CornerRadius="12" Padding="4" ClipToBounds="True"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
+          <Border CornerRadius="8" ClipToBounds="True"
+                  Background="{DynamicResource Md.Sys.Color.Surface.Brush}">
+            <mapsui:MapControl x:Name="DemoMap" Height="420" />
+          </Border>
+        </Border>
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The canvas, the markers' fill and hairline outline and the label chips all come from Md.Sys.* tokens. A marker is the accent at twelve percent with an Outline boundary, which is what the theme's vector style writes; a label is a SurfaceContainer chip with the soft OutlineVariant border and the ExtraSmall corner a Material badge carries." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Layer palette" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Eight Material roles carry the palette a thematic map takes its classes from, in the same order the ScottPlot and LiveCharts2 themes walk them: the first four give a palette of four hues, and the remaining four are further tones of the same accent hues, so a map with more than four classes still reads as Material instead of inventing colours." />
+        <WrapPanel Orientation="Horizontal">
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="Primary" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.Tertiary.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="Tertiary" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.Secondary.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="Secondary" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.Error.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="Error" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="PrimaryContainer" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="TertiaryContainer" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.InversePrimary.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="InversePrimary" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.Outline.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="Outline" />
+          </StackPanel>
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Mapsui has no per-control styles either: a map carries its own colours, so there is nothing to register in Application.Styles and nothing that could leak into a map this package was not asked to style. Follow() themes the map a control draws for the variant it actually has and keeps it in step; the vector and label styles are handed to a layer, because a layer's style is its content's business and a style somebody chose is left alone." />
+        <gallery:CodeExample XamlCode="&lt;mapsui:MapControl x:Name=&quot;DemoMap&quot; Height=&quot;420&quot; /&gt;"
+                            CSharpCode="var theme = new MaterialMapsuiTheme(dark: false);&#10;&#10;// A layer takes the styles it is drawn with; a label reads its text off the feature.&#10;DemoMap.Map.Layers.Add(new MemoryLayer&#10;{&#10;    Name = &quot;Places&quot;,&#10;    Features = features,&#10;    Style = new StyleCollection { Styles = { theme.VectorStyle(), theme.LabelStyle() } },&#10;});&#10;&#10;// Once, in the page or window that owns the control.&#10;MaterialMapsuiTheme.Follow(DemoMap);" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Mapping" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The canvas is Surface, so a map inside a card blends with the card. A layer nobody has styled is given the theme's vector style: a polygon boundary is a hairline in Outline, a line feature a heavier stroke in the OnSurfaceVariant ink, and a region is filled with Primary at twelve percent - the tint a Material container lays over a surface, mixed here because Mapsui's brush takes a colour rather than an opacity. A label is a SurfaceContainer chip with an OutlineVariant border, the ExtraSmall corner radius and OnSurface ink, typeset at LabelMedium in the family the Md.Sys.Typeface.Plain token names. A layer whose style was chosen keeps it: every layer Mapsui creates starts with a grey outline and a white fill, and it is that default the theme answers." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Notes" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="This is the third Material theme in the repository that is not an Avalonia style collection at all - there is no Styles or ControlTheme in the package, only a map-level entry point, the way the ScottPlot and LiveCharts2 providers work. Mapsui keeps its projection, tile fetching, navigation, hit testing and animation exactly as it ships; the theme writes colours, sizes and the palette. The theme reads Md.Sys.Color.* for the variant it is asked for, so light and dark follow the application; an application that does not register MaterialTheme gets the M3 baseline values the package carries instead. Core Mapsui draws lines and polygons through Mapsui.Nts, which this package does not depend on, so the demo here is points and labels." />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

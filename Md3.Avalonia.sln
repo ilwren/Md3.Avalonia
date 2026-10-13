@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.PropertyGrid",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.NodifyM", "src\Md3.Avalonia.NodifyM\Md3.Avalonia.NodifyM.csproj", "{4C7D1E92-6B58-4F3A-9D21-7E0A8C3F5B64}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.Mapsui", "src\Md3.Avalonia.Mapsui\Md3.Avalonia.Mapsui.csproj", "{89248EDE-B7B9-4BB6-B67B-5E859214CD2E}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gallery", "gallery", "{3DD3B10C-2DE9-B2B9-1F65-9DB874E2084B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.Gallery", "gallery\Md3.Avalonia.Gallery\Md3.Avalonia.Gallery.csproj", "{C2DFFDDB-03C1-4352-B084-CA158168E859}"

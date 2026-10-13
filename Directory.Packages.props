@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
@@ -66,6 +66,13 @@
          keys Themes/Accents/Material.axaml redeclares are upstream's own dictionary, read at
          the commit this build was cut from. -->
     <PackageVersion Include="NodifyM.Avalonia" Version="12.0.0" />
+    <!-- The map control: Mapsui.Avalonia12 5.1.0 targets net8.0 and declares Avalonia >= 12.0.2
+         and Avalonia.Skia >= 12.0.2, so it restores against this repository's 12.1.2 baseline, and
+         its SkiaSharp >= 3.119.4 floor is the version already pinned here. It is the Avalonia 12
+         package; Mapsui.Avalonia is the Avalonia 11 one. Bump it with the theme's expectations: the
+         Map, layer and style members Themes/MaterialMapsuiTheme.cs writes are upstream's own API,
+         read at the tag this build was cut from. -->
+    <PackageVersion Include="Mapsui.Avalonia12" Version="5.1.0" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.2" />
     <PackageVersion Include="MaterialColorUtilities" Version="0.3.0" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />

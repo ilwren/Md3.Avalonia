@@ -882,9 +882,72 @@ new keys and `Controls/*.axaml` for new templates and part names; `MdNodifyMThem
 brushes the realized controls actually use, the additive styles and the variant switch that would
 move.
 
+## Map
+
+For maps drawn with [Mapsui](https://github.com/Mapsui/Mapsui), use the opt-in `Md3.Avalonia.Mapsui`
+package. It is the only package that depends on `Mapsui.Avalonia12`, and - like the two chart
+providers - it is not an Avalonia style collection at all: `MapControl` draws its own surface from
+the colours a `Map` and its layers carry, and asks no resource host for anything, so there is nothing
+to register in `Application.Styles` and nothing that could leak into a map this package was not asked
+to style.
+
+```csharp
+var theme = new MaterialMapsuiTheme(dark: false);
+
+// A layer takes the styles it is drawn with. Both in one collection, so a feature is drawn as a
+// marker and labelled.
+map.Layers.Add(new MemoryLayer
+{
+    Name = "Sensors",
+    Features = features,
+    Style = new StyleCollection { Styles = { theme.VectorStyle(), theme.LabelStyle() } },
+});
+
+// Once, in the page or window that owns the control.
+MaterialMapsuiTheme.Follow(mapControl);
+```
+
+`MaterialMapsuiTheme.Follow` applies the rules for the variant the control actually has and
+re-applies them from the control's own `ActualThemeVariantChanged` event, so the subscription lives
+exactly as long as the control does. The instance `Apply` methods and `Apply(Map, bool)` are for an
+application that knows the variant itself, including a map that is rendered off screen. `Apply` on a
+`Map` sets the canvas and styles the layers nobody has styled. That is not the same as a null style -
+`BaseLayer`'s constructor gives every layer a grey outline, a black line and a white fill - so a layer
+counts as unstyled while its style is still that default, and a layer whose style was chosen keeps it:
+a layer's style is its content's business and a thematic map picks per feature. Only the colours are
+replaced; what a layer shows, and at which resolutions, travels across.
+
+What the theme writes, and the token each value comes from:
+
+- Canvas: `Map.BackColor` is `Surface`, so a map inside a card blends with the card instead of
+  sitting on Mapsui's white default.
+- Boundary: a polygon's outline is a 1 DIP hairline in `Outline`, the weight a Material divider
+  carries.
+- Line: a line feature is a 1.5 DIP stroke in `OnSurfaceVariant`, the medium-emphasis ink.
+- Region: a polygon's fill is `Primary` at twelve percent - the tint a Material container lays over a
+  surface, mixed into the colour because Mapsui's brush takes a colour rather than an opacity.
+- Label: a `SurfaceContainer` chip with an `OutlineVariant` border, the `Md.Sys.Shape.Corner.ExtraSmall`
+  radius and `OnSurface` ink, typeset at `LabelMedium` in the family the `Md.Sys.Typeface.Plain` token
+  names.
+- Classes: the same eight-role palette the chart providers walk - `Primary`, `Tertiary`, `Secondary`,
+  `Error`, `PrimaryContainer`, `TertiaryContainer`, `InversePrimary`, `Outline` - as
+  `SeriesPalette(dark)`, for a thematic map that needs more colours than the vector style carries.
+
+Everything upstream decides stays as it ships - projection, tile fetching, navigation, hit testing,
+animation - and a map this package was not handed keeps every Mapsui default. Core Mapsui draws lines
+and polygons through `Mapsui.Nts`, which this package does not depend on; the gallery demo is points
+and labels for that reason, and it holds its features in memory so the page never fetches a tile.
+
+The pinned version is **`Mapsui.Avalonia12` 5.1.0**: the Avalonia 12 package (`net8.0`, declaring
+`Avalonia >= 12.0.2`, `Avalonia.Skia >= 12.0.2` and `SkiaSharp >= 3.119.4`, all of which restore
+against this repository's 12.1.2 and 3.119.4 pins). `Mapsui.Avalonia` is the Avalonia 11 build with
+identical XAML and C#, so it is not an option here. Upgrading the package means re-reading
+`Mapsui.UI.Shared/MapControl.cs`, `Map.cs` and `Mapsui/Styles`; `MdMapsuiThemeTests` pins the
+palette, the canvas, both styles and the dark-variant reads that would move.
+
 ## Trimming
 
-All fifteen packages set `IsTrimmable`, so an application that publishes with
+All sixteen packages set `IsTrimmable`, so an application that publishes with
 `PublishTrimmed=true` can trim them, and they build with the IL2xxx analyzer on, so a new
 reflective call fails the build rather than breaking a trimmed app quietly.
 

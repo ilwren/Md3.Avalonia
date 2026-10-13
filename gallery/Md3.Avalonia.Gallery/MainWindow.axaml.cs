@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
@@ -52,6 +52,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             ChatNav, CommandPaletteNav, DataGridNav, DensityNav,
             HoverCardNav, MasonryNav, PagedItemsNav, PinInputNav,
             PopoverNav, RatingNav, ResultViewNav, RichEditorNav, DockNav, DraggableTabsNav, MarkdownNav, LiveChartsNav, ScottPlotNav, PropertyGridNav, NodifyMNav,
+ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             TextEditorNav, HexEditorNav,
             SkeletonNav, SlidableNav, SpinKitNav, StaggeredPanelNav,
             TagInputNav, TimelineNav, TransferNav, TreeViewNav,
@@ -136,6 +137,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("ScottPlot charts", "scottplot charts series axis legend tooltip grid palette surface signal bars scatter skia theme", ScottPlotNav, () => new ScottPlotGalleryPage()),
             Entry("Property grid", "property grid inspector settings object properties categories filter cell editors combo checkbox slider numeric date time avalonia.propertygrid theme", PropertyGridNav, () => new PropertyGridGalleryPage()),
             Entry("Node editor", "node editor graph diagram wire connector pin pending connection knot minimap nodify nodifym.avalonia theme", NodifyMNav, () => new NodifyMGalleryPage()),
+            Entry("Map", "map mapsui gis cartography tiles layer feature geometry vector label palette canvas mapsui.avalonia12 theme", MapsuiNav, () => new MapsuiGalleryPage()),
             Entry("Text editor", "code editor syntax highlighting line numbers find replace completion avaloniedit theme", TextEditorNav, () => new TextEditorGalleryPage()),
             Entry("Hex editor", "hex binary bytes dump offsets ascii editor avaloniahex theme", HexEditorNav, () => new HexEditorGalleryPage()),
             Entry("Skeleton", "skeleton shimmer placeholder loading", SkeletonNav, () => new SkeletonGalleryPage()),
@@ -282,6 +284,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
 
     private void ShowPropertyGrid(object? s, RoutedEventArgs e) => Navigate(new PropertyGridGalleryPage(), PropertyGridNav);
     private void ShowNodifyM(object? s, RoutedEventArgs e) => Navigate(new NodifyMGalleryPage(), NodifyMNav);
+    private void ShowMapsui(object? s, RoutedEventArgs e) => Navigate(new MapsuiGalleryPage(), MapsuiNav);
     private void ShowTextEditor(object? s, RoutedEventArgs e) => Navigate(new TextEditorGalleryPage(), TextEditorNav);
     private void ShowHexEditor(object? s, RoutedEventArgs e) => Navigate(new HexEditorGalleryPage(), HexEditorNav);
     private void ShowSkeleton(object? s, RoutedEventArgs e) => Navigate(new SkeletonGalleryPage(), SkeletonNav);

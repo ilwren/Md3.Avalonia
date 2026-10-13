@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
@@ -138,6 +138,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("ScottPlot charts", () => new ScottPlotGalleryPage());
         AddPage("Property grid", () => new PropertyGridGalleryPage());
         AddPage("Node editor", () => new NodifyMGalleryPage());
+        AddPage("Map", () => new MapsuiGalleryPage());
         AddPage("Hex editor", () => new HexEditorGalleryPage());
         AddPage("Density", () => new DensityGalleryPage());
         AddPage("Hover cards", () => new HoverCardGalleryPage());

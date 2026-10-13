@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -99,6 +99,7 @@ public sealed class MdGalleryTests
             new ScottPlotGalleryPage(),
             new PropertyGridGalleryPage(),
             new NodifyMGalleryPage(),
+            new MapsuiGalleryPage(),
             new MasonryPanelGalleryPage(),
             new PagedItemsGalleryPage(),
             new AsyncSelectGalleryPage(),

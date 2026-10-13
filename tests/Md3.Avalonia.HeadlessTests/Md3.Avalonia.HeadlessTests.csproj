@@ -16,7 +16,9 @@
          and whichever copy wins decides whether the process can enumerate system fonts at all:
          with the NoDependencies one, every family this suite does not embed - Consolas in the
          markdown and hex editor font stacks - fails to shape. Declaring the package here with no
-         assets keeps Avalonia's build the only one in the output. -->
+         assets keeps Avalonia's build the only one in the output, whichever package in this suite's
+         graph brings it - a direct reference wins over a transitive one, so the guard holds for any
+         Skia-based theme package the suite grows next. -->
     <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" ExcludeAssets="all" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit.v3" />
@@ -39,6 +41,7 @@
     <ProjectReference Include="../../src/Md3.Avalonia.ScottPlot/Md3.Avalonia.ScottPlot.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.PropertyGrid/Md3.Avalonia.PropertyGrid.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.NodifyM/Md3.Avalonia.NodifyM.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.Mapsui/Md3.Avalonia.Mapsui.csproj" />
     <ProjectReference Include="../../gallery/Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" />
   </ItemGroup>
 </Project>
