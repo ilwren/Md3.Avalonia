@@ -41,9 +41,9 @@ public sealed class NodifyDemoGraph : NodifyEditorViewModelBase
             knot
         };
 
-        Connections.Add(new ConnectionViewModelBase(this, loadOut, filterIn, "1 024"));
+        Connections.Add(new ConnectionViewModelBase(this, loadOut, filterIn));
         Connections.Add(new ConnectionViewModelBase(this, filterOut, knot.Connector));
-        Connections.Add(new ConnectionViewModelBase(this, knot.Connector, renderIn, "612"));
+        Connections.Add(new ConnectionViewModelBase(this, knot.Connector, renderIn));
 
         foreach (var pin in new[] { loadOut, filterIn, filterOut, renderIn, renderOut, knot.Connector })
         {

@@ -154,9 +154,11 @@
   upstream sets them as literals: a node's `White` ink, the `LightBlue` and `Orange` borders it
   paints on hover and when selected, the `Azure` behind its items, a node group's four inline
   colours and the `Gainsboro` the grid rule's property registers with. Upstream keeps the node's
-  3 DIP corner radius, which is baked into its template, and the marquee's stroke and fill, which
-  are written on the rectangle itself rather than in a style - a value set that way outranks every
-  style setter, so the selection-rectangle brushes answer the minimap's viewport and nothing else.
+  3 DIP corner radius, which is baked into its template; the marquee's stroke and fill, which are
+  written on the rectangle itself rather than in a style - a value set that way outranks every style
+  setter, so the selection-rectangle brushes answer the minimap's viewport and nothing else; and the
+  label a connection can carry, whose geometry upstream builds in C# from a hardcoded `Inter`
+  typeface, so the gallery's wire template binds no `Text`.
   `MdNodifyMThemeTests` reads the brushes back off realized controls - the canvas, the node and both
   pin directions, the pending wire, the grid rule and all six minimap brushes - then pins the
   selection frame, the variant switch, and that a plain control in the same window keeps no theme.

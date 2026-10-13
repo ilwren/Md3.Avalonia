@@ -349,7 +349,10 @@ LiveCharts 尚未分配的槽位（`ISeries.SeriesId` 默认为 `-1`）当作第
   style setter，实测附加样式确实输了（描边停在 `GroupingNode.BackgroundBrush` 解析出的
   `SurfaceContainerLow`，说明字典生效、样式没生效）；要改只能 fork 模板，本包不做。
 - 留在上游：节点模板里写死的 `CornerRadius="3"`（外框／标题 `3 3 0 0`／页脚 `0 0 3 3`）；
-  `ItemContainer.HighlightBrush` 的棋盘格图案（无消费者，不做翻译）。
+  `ItemContainer.HighlightBrush` 的棋盘格图案（无消费者，不做翻译）；以及连线的文字标签——
+  `BaseConnection.CreateDefiningTextGeometry` 在 C# 里用 `new Typeface("Inter")` 现造 `FormattedText`，
+  既够不到、也没有 `FontFamily` 属性可设，而宿主没有该字体时这次查找会在渲染过程里失败，所以画廊的
+  连线模板不绑 `Text`（`Connection.TextColorBrush` 仍留在配色字典里，只是本仓库没有消费者）。
 - 版本：固定 **`NodifyM.Avalonia` 12.0.0**（NuGet 最新版，`net8.0`，`IsAotCompatible=true`，声明
   `Avalonia >= 12.0.2` + `CommunityToolkit.Mvvm >= 8.2.2` + `System.Reactive >= 6.0.1`，低于本仓库
   12.1.2 基线）。升级时要重读 `ResourceDictionaries/Brushes.axaml`（键增删）与 `Controls/*.axaml`

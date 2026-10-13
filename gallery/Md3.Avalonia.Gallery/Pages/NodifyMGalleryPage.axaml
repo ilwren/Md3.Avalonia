@@ -19,11 +19,11 @@
     <nodconv:FlowToDirectionConverter x:Key="FlowToDirection" />
 
     <DataTemplate x:Key="MdConnectionTemplate" x:DataType="nodvm:ConnectionViewModelBase">
+      <!-- No wire label: upstream builds the label's geometry in C# from a hardcoded Inter typeface,
+           which no brush key and no style can reach, and a lookup for a family the host does not
+           have fails inside the render pass. -->
       <nod:Connection Source="{Binding Source.Anchor}"
                       Target="{Binding Target.Anchor}"
-                      Text="{Binding Text}"
-                      TextPoint="50%,50%"
-                      TextBrush="{DynamicResource Connection.TextColorBrush}"
                       Direction="{Binding ., Converter={StaticResource FlowToDirection}}"
                       DisconnectCommand="{Binding DisconnectConnectionCommand}"
                       SplitCommand="{Binding SplitConnectionCommand}" />
@@ -86,7 +86,7 @@
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Node editor" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="A node editor wearing the opt-in Md3.Avalonia.NodifyM theme. The canvas is a Material surface ruled with outlineVariant grid lines, nodes are surface containers with a secondary container header, input pins are secondary containers and output pins primary containers, so the two ends of a wire are distinguishable without reading a label - and the marquee, the alignment guides and the selection frame all use the same primary." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A node editor wearing the opt-in Md3.Avalonia.NodifyM theme. The canvas is a Material surface ruled with outlineVariant grid lines, nodes are surface containers with a secondary container header, input pins are secondary containers and output pins primary containers, so the two ends of a wire are distinguishable without reading a label - and the alignment guides and the selection frame use the same primary." />
       </StackPanel>
 
       <StackPanel Spacing="12">
