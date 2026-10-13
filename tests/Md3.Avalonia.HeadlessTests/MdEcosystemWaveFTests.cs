@@ -78,8 +78,8 @@ public sealed class MdEcosystemWaveFTests
             Dispatcher.UIThread.RunJobs();
             Assert.NotNull(window.CaptureRenderedFrame());
 
-            var content = Assert.Single(tree.GetVisualDescendants().OfType<ContentControl>()
-                .Where(control => Equals(control.Content, summary)));
+            var content = Assert.Single(tree.GetVisualDescendants().OfType<ContentControl>(),
+                control => Equals(control.Content, summary));
             var text = Assert.Single(content.GetVisualDescendants().OfType<TextBlock>());
             Assert.Equal(summary, text.Text);
         }
