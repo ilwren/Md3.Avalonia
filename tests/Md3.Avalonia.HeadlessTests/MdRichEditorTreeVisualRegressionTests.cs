@@ -10,6 +10,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaRichEditor.Controls;
@@ -81,6 +82,63 @@ public sealed class MdRichEditorTreeVisualRegressionTests
         finally
         {
             window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void RichEditor_Gallery_Text_Is_Light_In_Dark_Theme()
+    {
+        var application = Application.Current!;
+        var previousVariant = application.RequestedThemeVariant;
+        application.RequestedThemeVariant = ThemeVariant.Dark;
+
+        var page = new RichEditorGalleryPage();
+        var window = new Window { Width = 1100, Height = 760, Content = page };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(1d, window.RenderScaling);
+
+            var editor = Assert.Single(page.GetVisualDescendants().OfType<RichEditor>());
+            Assert.True(application.TryGetResource(
+                "Md.Sys.Color.OnSurface.Brush", ThemeVariant.Dark, out var onSurface));
+            Assert.Equal(onSurface, editor.DefaultForeground);
+
+            using var frame = window.CaptureRenderedFrame();
+            Assert.NotNull(frame);
+            var pixels = ReadPixels(frame!, out var pixelSize);
+            var origin = editor.TranslatePoint(default, window);
+            Assert.NotNull(origin);
+            var left = (int)Math.Floor(origin!.Value.X);
+            var top = (int)Math.Floor(origin.Value.Y);
+            var right = (int)Math.Ceiling(origin.Value.X + editor.Bounds.Width);
+            var bottom = (int)Math.Ceiling(origin.Value.Y + editor.Bounds.Height);
+            var lightInkPixels = 0;
+
+            // The editor has no chrome of its own; the surrounding Gallery Border supplies the
+            // dark surface. Bright pixels inside the document viewport therefore come from the
+            // actual default-styled glyphs, not a label or toolbar.
+            for (var y = Math.Max(0, top); y < Math.Min(pixelSize.Height, bottom); y++)
+            {
+                for (var x = Math.Max(0, left); x < Math.Min(pixelSize.Width, right); x++)
+                {
+                    var rgb = pixels[y * pixelSize.Width + x] & 0x00ffffff;
+                    var red = (rgb >> 16) & 0xff;
+                    var green = (rgb >> 8) & 0xff;
+                    var blue = rgb & 0xff;
+                    if (red + green + blue > 450) lightInkPixels++;
+                }
+            }
+
+            Assert.True(lightInkPixels > 20,
+                $"Expected the default-styled RichEditor text to rasterize brightly on a dark surface; found {lightInkPixels} bright pixels.");
+        }
+        finally
+        {
+            window.Close();
+            application.RequestedThemeVariant = previousVariant;
+            Dispatcher.UIThread.RunJobs();
         }
     }
 

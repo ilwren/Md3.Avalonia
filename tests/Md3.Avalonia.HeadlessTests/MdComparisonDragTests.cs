@@ -84,7 +84,7 @@ public sealed class MdComparisonDragTests
     }
 
     [AvaloniaFact]
-    public void First_Gallery_Drag_From_Left_And_Top_Edges_Defers_Focus_Until_Release()
+    public void First_Gallery_Drag_From_Left_And_Top_Edges_Does_Not_Focus_Or_Scroll_During_Drag()
     {
         foreach (var orientation in new[]
                  {
@@ -175,7 +175,8 @@ public sealed class MdComparisonDragTests
                 Dispatcher.UIThread.RunJobs();
 
                 Assert.True(comparison.IsKeyboardFocusWithin,
-                    $"{orientation}: the comparison should receive focus after the drag ends.");
+                    $"{orientation}: keyboard focus should be assigned after pointer tracking ends.");
+                Assert.Equal(scrollBeforePress, pageScroll.Offset);
                 Assert.True(worstGap <= 1,
                     $"{orientation}: the first edge drag left the divider {worstGap:0.##} dip from the pointer.");
                 Assert.Equal(0, comparison.Position, 3);

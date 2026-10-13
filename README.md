@@ -48,7 +48,7 @@ dotnet add package Md3.Avalonia --version 0.4.5-preview.1
 | `Md3.Avalonia.Icons.Lite` | 精简的 Material Symbols Rounded 字体子集；与完整 Icons provider 二选一 |
 | `Md3.Avalonia.Extra` | Flutter-inspired 扩展控件；需额外注册 `ExtraTheme` |
 | `Md3.Avalonia.DataGrid` | Avalonia 原生 `DataGrid` 的 Material 主题；需注册 `MaterialDataGridTheme` |
-| `Md3.Avalonia.RichEditor` | AvaloniaRichEditor 的 Material 主题；需注册 `MaterialRichEditorTheme` |
+| `Md3.Avalonia.RichEditor` | AvaloniaRichEditor 维护版的 Material 主题（正文支持明暗主题）；需注册 `MaterialRichEditorTheme` |
 
 在各包版本一致的情况下，可用 `dotnet add package <包名> --version 0.4.5-preview.1` 添加对应包。核心包不强制依赖图标 provider、DataGrid 或富文本编辑器引擎。
 
@@ -165,7 +165,7 @@ dotnet add package Md3.Avalonia --version 0.4.5-preview.1
 
 - Material/Flutter 常见模式：`MdBanner`、`MdExpansionPanelList`、`MdDataTable`、`MdStepper`、`MdRefreshIndicator`、`MdPaginatedDataTable`、`MdReorderableList`、`MdGridTile`、`MdDismissible` 和交互式 `MdScrollBar`；
 - 表单与平台体验：`MdForm`/`MdFormField`、`MdDropdownFormField`、`MdSimpleDialog`、`MdAboutDialog`、`MdLicensePage`、`MdPickerRestorationStore`、`MdDraggableScrollableSheet`、`MdAdaptiveSwitch`、`MdAdaptiveProgressIndicator`、`MdHero`、`MdFocusTraversalGroup` 与 `MdShortcutScope`；
-- 富文本有两种选择：`MdRichEditor`（Extra）只提供 Material 命令面，文档交给适配器，不往库里塞编辑器引擎；需要真实编辑能力（行内格式、表格、图片、分页、HTML/JSON/RTF 往返）时，请用 opt-in 的 `Md3.Avalonia.RichEditor` 主题包搭配 AvaloniaRichEditor——该控件自绘文档、不暴露 chrome（没有 `Background`/`CornerRadius`/`Padding`），所以主题只负责墨水（选区、光标、默认字号），容器由宿主提供；另注意它的 `DefaultFontSize` 单位是**磅**而非 DIP；
+- 富文本有两种选择：`MdRichEditor`（Extra）只提供 Material 命令面，文档交给适配器，不往库里塞编辑器引擎；需要真实编辑能力（行内格式、表格、图片、分页、HTML/JSON/RTF 往返）时，请用 opt-in 的 `Md3.Avalonia.RichEditor` 主题包搭配 AvaloniaRichEditor——该控件自绘文档、不暴露 chrome（没有 `Background`/`CornerRadius`/`Padding`），所以主题只负责墨水（正文默认前景、选区、光标、字号），容器由宿主提供；默认正文前景随 M3 `OnSurface` 令深色模式保持可读，`DefaultFontSize` 单位是**磅**而非 DIP；
 - 表格有两种选择：`MdDataGrid`（Extra）是 Material 数据表；需要完整电子表格能力（列宽调整、列重排、冻结列、分组、自动生成列）时，请用 Avalonia 原生 `DataGrid` 搭配 opt-in 的 `Md3.Avalonia.DataGrid` 主题包——控件是原生的，只有外观是 Material 的；
 - 独立 `Md3.Avalonia.Extra` 包包含 `MdAvatar`/`MdAvatarGroup`、fractional `MdRating`、`MdBreadcrumb`、`MdBeforeAfter`、`MdAnimatedText`、`MdSpinKit` 与 `MdStaggeredPanel`，并通过 opt-in `ExtraTheme` 复用核心 Material tokens；其中 `MdChart` 保持 provider-neutral，不内置第三方图表引擎；
 - Ecosystem Waves A–C：density/overlay/async/shortcut contracts、`MdPopover`、`MdHoverCard`、`MdCommandPalette`、`MdSlidableItem`、`MdPagedItemsView`、`MdMasonryPanel`、`MdDataGrid`、`MdAsyncSelect`、`MdCalendar`、`MdTimeline`、`MdResultView`、`MdCascader` 与 `MdTransfer`；
@@ -266,7 +266,7 @@ python3 scripts/check-api-doc-coverage.py    # docs/API.md 是否覆盖全部公
 </Application>
 ```
 
-六个可独立 pack 的 NuGet 包统一为 `0.4.5-preview.1`，选择说明见上方包表。`Md3.Avalonia.DataGrid` 和 `Md3.Avalonia.RichEditor` 是 opt-in 主题包，分别引入 Avalonia 原生 DataGrid 和 AvaloniaRichEditor 依赖；核心包不会因此拉入这些可选依赖。六个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
+六个可独立 pack 的 NuGet 包统一为 `0.4.5-preview.1`，选择说明见上方包表。`Md3.Avalonia.DataGrid` 和 `Md3.Avalonia.RichEditor` 是 opt-in 主题包，分别引入 Avalonia 原生 DataGrid 和保留 `AvaloniaRichEditor` 程序集/API 的维护版编辑器依赖；核心包不会因此拉入这些可选依赖。六个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
 
 任意 seed 主题可在启动时或运行时应用：
 

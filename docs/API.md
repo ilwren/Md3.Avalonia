@@ -19,7 +19,7 @@ All six packages are versioned together. Add only the optional packages your app
 | `Md3.Avalonia.Icons.Lite` | Reduced Material Symbols Rounded subset | Discovered automatically; use instead of `Icons` |
 | `Md3.Avalonia.Extra` | Optional ecosystem controls | `ExtraTheme` after `MaterialTheme` |
 | `Md3.Avalonia.DataGrid` | Material theme for Avalonia's native `DataGrid` | `MaterialDataGridTheme` |
-| `Md3.Avalonia.RichEditor` | Material theme for `AvaloniaRichEditor` | `MaterialRichEditorTheme` |
+| `Md3.Avalonia.RichEditor` | Material theme for the API-compatible MIT-maintained `AvaloniaRichEditor` fork | `MaterialRichEditorTheme` |
 
 For explicit project-file references, use the same version for each package:
 
@@ -154,7 +154,7 @@ The Extra support contracts are also public: `IMdPageProvider<T>`, `MdPageReques
 
 ### Rich-text editor theme package
 
-`Md3.Avalonia.RichEditor` themes the third-party `AvaloniaRichEditor.Controls.RichEditor`; it does not replace the engine or supply an editor document. The host supplies the surface/chrome, and the application can load or export HTML through the editor API:
+`Md3.Avalonia.RichEditor` themes `AvaloniaRichEditor.Controls.RichEditor` without replacing its engine or supplying a document. It sets the default run foreground to the active M3 `OnSurface` token (including live light/dark changes), alongside the selection, caret and type scale. The host supplies the surface/chrome, and the application can load or export HTML through the editor API:
 
 ```xml
 <UserControl xmlns="https://github.com/avaloniaui"

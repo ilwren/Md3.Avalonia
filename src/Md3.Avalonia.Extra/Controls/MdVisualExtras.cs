@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
@@ -121,10 +122,9 @@ public sealed class MdBeforeAfter : TemplatedControl
 
     private void BeginDrag(PointerPressedEventArgs e)
     {
-        // Do not focus while the pointer is down. On first focus a desktop ScrollViewer may
-        // BringIntoView this control and move it under the stationary pointer; recalculating the
-        // pointer in the new local coordinate space then teleports the divider (often to center).
-        // Focus is deferred until release, after pointer tracking has ended.
+        // Do not focus from a pointer gesture. A containing desktop ScrollViewer can bring this
+        // control into view on first focus and move it under the stationary pointer, which turns
+        // a layout change into an apparent divider jump.
         var origin = e.GetPosition(this);
         _dragging = true;
 
@@ -179,7 +179,6 @@ public sealed class MdBeforeAfter : TemplatedControl
             Position = target > current
                 ? Math.Min(current + TrackStep, target)
                 : Math.Max(current - TrackStep, target);
-        if (Focusable) Focus();
         e.Handled = true;
     }
 
@@ -202,11 +201,33 @@ public sealed class MdBeforeAfter : TemplatedControl
         // Avalonia's FocusManager focuses the nearest focusable ancestor on mouse-down before
         // pointer handlers run. Reject that pointer-originated focus: it makes the parent
         // ScrollViewer bring this partly clipped control into view in the middle of the drag.
-        // Keyboard/tab focus and our explicit post-release focus remain available.
+        // Keyboard/tab focus remains available; pointer focus is deferred until release.
         if (e.NavigationMethod == NavigationMethod.Pointer)
             e.TryCancel();
 
         base.OnGettingFocus(e);
+    }
+
+    private void FocusWithoutScrollingAncestors()
+    {
+        var scrollViewers = GetVisualAncestors().OfType<ScrollViewer>().ToArray();
+        var previousValues = new bool[scrollViewers.Length];
+        for (var i = 0; i < scrollViewers.Length; i++)
+        {
+            previousValues[i] = ScrollViewer.GetBringIntoViewOnFocusChange(scrollViewers[i]);
+            scrollViewers[i].SetCurrentValue(ScrollViewer.BringIntoViewOnFocusChangeProperty, false);
+        }
+
+        try
+        {
+            Focus();
+        }
+        finally
+        {
+            for (var i = 0; i < scrollViewers.Length; i++)
+                scrollViewers[i].SetCurrentValue(
+                    ScrollViewer.BringIntoViewOnFocusChangeProperty, previousValues[i]);
+        }
     }
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
@@ -222,11 +243,11 @@ public sealed class MdBeforeAfter : TemplatedControl
 
         base.OnPointerReleased(e);
 
-        // A first focus can scroll the containing desktop ScrollViewer. Request it after the
-        // release route completes so that scroll cannot change the pointer-to-control coordinates
-        // while they are being used to place the divider.
+        // Focus only after pointer tracking ends, and temporarily keep ancestor ScrollViewers from
+        // bringing this clipped control into view. Restoring their original settings immediately
+        // afterwards preserves the host's normal focus behavior for every later interaction.
         if (focusAfterRelease)
-            Dispatcher.UIThread.Post(() => { Focus(); }, DispatcherPriority.Input);
+            Dispatcher.UIThread.Post(FocusWithoutScrollingAncestors, DispatcherPriority.Input);
     }
     protected override void OnKeyDown(KeyEventArgs e)
     {

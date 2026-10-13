@@ -2,7 +2,10 @@
 
 ## [Unreleased]
 
-_No unreleased changes._
+### Fixed
+
+- `MdBeforeAfter` now rejects Avalonia's automatic pointer focus during a drag and applies keyboard focus after release with ancestor `BringIntoViewOnFocusChange` temporarily suppressed. This prevents a clipped comparison from scrolling under the stationary pointer while preserving keyboard focus; the Gallery regression checks first left-edge and top-edge drags through release.
+- `MaterialRichEditorTheme` now sets the editor's default run foreground from the live M3 `OnSurface` token, so unstyled document text remains readable in dark mode. The opt-in package uses the MIT-maintained `OlivierJC.AvaloniaRichEditor` fork until the corresponding upstream package release is available.
 
 ## [0.4.5-preview.1] - 2026-10-12
 
