@@ -191,11 +191,13 @@ jobs:
       # gallery is the other half of that pair, and the node editor page is the newest thing in it,
       # so this is where the search starts.
       #
-      # One such cause is now known: a failing test can leave the process unable to shape text. When
-      # the overview index test failed on a page that was indexed but not linked, the two gallery
-      # tests that walk every page failed on Consolas beside it, and all three passed again once the
-      # index was fixed. A font failure reported beside another failure is worth reading as
-      # collateral before it is read as a font problem.
+      # The two gallery tests that walk every page now name the page that threw, and it is the one
+      # that renders a Markdown.Avalonia document, asking for Consolas - and it is measured before
+      # the map page in both loops, so nothing after it is implicated. It is also not reproducible:
+      # the same gallery code passes this probe on one run and fails it on the next, with nothing
+      # between them but a comment and a step that runs afterwards. So this is the intermittent
+      # failure the paragraph above describes; it is not a font that went missing, and it is not
+      # collateral from a neighbouring failure, which it was read as once and is not.
       - name: Probe the markdown theme tests alone
         continue-on-error: true
         run: scripts/probe-tests.sh MdMarkdownThemeTests markdown.trx
