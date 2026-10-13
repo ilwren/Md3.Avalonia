@@ -146,6 +146,7 @@
             <md:MdButton Content="Chart" Tag="Chart" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="LiveCharts2 charts" Tag="LiveCharts2 charts" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="ScottPlot charts" Tag="ScottPlot charts" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Map" Tag="Map" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Timeline" Tag="Timeline" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Pull to refresh" Tag="Pull to refresh" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Chat view" Tag="Chat view" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />

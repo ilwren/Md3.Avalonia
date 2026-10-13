@@ -133,11 +133,24 @@ public sealed class MdGalleryTests
                                (userPage.Content as Grid)?.Children.OfType<MdScrollViewer>().FirstOrDefault();
             Assert.NotNull(pageScroller);
             var host = new Window { Width = 1100, Height = 760, Content = page };
-            host.Show();
             try
             {
+                host.Show();
                 Assert.True(page.Bounds.Width > 0);
-                var pageFrame = host.CaptureRenderedFrame();
+
+                RenderTargetBitmap? pageFrame;
+                try
+                {
+                    pageFrame = host.CaptureRenderedFrame();
+                }
+                catch (Exception exception)
+                {
+                    // A shaping or renderer failure names the typeface it could not build, not the
+                    // page that asked for it, and a hundred pages go through this loop. The
+                    // annotation is the only part of a run that can be read back, so name the page.
+                    throw new InvalidOperationException($"capturing a rendered frame of {page.GetType().Name}", exception);
+                }
+
                 Assert.NotNull(pageFrame);
                 MdPreviewAssets.Save(pageFrame, $"{page.GetType().Name}.png");
             }

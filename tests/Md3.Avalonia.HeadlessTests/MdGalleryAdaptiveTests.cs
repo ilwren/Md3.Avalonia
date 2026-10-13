@@ -61,9 +61,9 @@ public sealed class MdGalleryAdaptiveTests
             }
 
             var window = new Window { Width = NarrowWidth, Height = 900, Content = page };
-            window.Show();
             try
             {
+                window.Show();
                 Dispatcher.UIThread.RunJobs();
                 window.Measure(new Size(NarrowWidth, 900));
                 window.Arrange(new Rect(0, 0, NarrowWidth, 900));
@@ -91,6 +91,13 @@ public sealed class MdGalleryAdaptiveTests
                 {
                     tooWide.Add($"{type.Name} ({worst.Control.GetType().Name} reaches {worst.Right:0})");
                 }
+            }
+            catch (Exception exception)
+            {
+                // Measuring a page shapes its text, so a typeface the host does not have throws here
+                // rather than in the page's own test - and this loop covers every page there is. Name
+                // the one that threw; the annotation is the only evidence a run leaves behind.
+                throw new InvalidOperationException($"measuring {type.Name} in a {NarrowWidth} dip window", exception);
             }
             finally { window.Close(); }
         }
