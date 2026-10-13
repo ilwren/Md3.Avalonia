@@ -249,6 +249,17 @@
   `MaxWidth` in about 50 places. The five that still do not are pinned in the test with a
   two-way assertion, so they cannot be quietly forgotten or quietly fixed.
 - 366 Chinese strings added to the localisation table.
+- The localisation table now covers every prose string the Gallery shows. A sweep of all 107 pages
+  found 198 heading and body strings with no entry; `Translate` falls back to the English source
+  when a key is missing, so those pages were silently half-translated and nothing failed. The table
+  went from 813 unique keys to 990, and a duplicate `Navigation` key - which made the first of its
+  two translations dead, since an indexer initialiser silently overwrites - is removed. Sample data,
+  colour role names and shortcuts stay English on purpose: translating `TertiaryContainer` or
+  `Ctrl+N` would misdescribe the API on screen. `scripts/check-gallery-localization.py` reports
+  prose separately from data and runs with `--strict` in CI, so a new page that ships untranslated
+  now fails the build.
+- The same sweep could not reproduce the empty Usage sections: every page carrying a `Usage` heading
+  also carries a `CodeExample` with XAML or C# attached.
 
 ### Testing
 

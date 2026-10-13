@@ -57,6 +57,13 @@ jobs:
         # 80 public types. This is static, so it costs nothing to hold the line.
         run: python3 scripts/check-api-doc-coverage.py
 
+      - name: Check Gallery localization coverage
+        # Defect #29: the Gallery translates by key match, so an entry that was never written leaves
+        # a page quietly half-English and nothing fails. This measures the gap and fails on a
+        # duplicate key, which silently kills whichever of two translations came first. --strict is
+        # on because prose coverage is complete: a new page that ships untranslated now fails.
+        run: python3 scripts/check-gallery-localization.py --strict
+
       - name: Check the specification oracle against pinned upstream sources
         # Network-dependent and advisory by design: upstream moving is a re-baselining
         # decision for a human, not a build failure. --soft keeps it off the critical path.
