@@ -6,6 +6,7 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Md3.Avalonia.Extra.Controls;
 using Xunit;
 
@@ -58,6 +59,35 @@ public sealed class MdEcosystemWaveFTests
         Assert.Single(tree.VisibleRows);
         tree.ExpandAll();
         Assert.Equal(2, tree.VisibleRows.Count);
+    }
+
+    [AvaloniaFact]
+    public void TreeView_Renders_String_Row_Data_Without_Rebinding_It_As_A_Tree_Row()
+    {
+        const string summary = "Windows, macOS and Linux";
+        var tree = new MdTreeView
+        {
+            Width = 420,
+            Height = 180,
+            Roots = [new MdTreeNode("desktop", "Desktop", data: summary)]
+        };
+        var window = new Window { Width = 480, Height = 240, Content = tree };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.NotNull(window.CaptureRenderedFrame());
+
+            var content = Assert.Single(tree.GetVisualDescendants().OfType<ContentControl>()
+                .Where(control => Equals(control.Content, summary)));
+            var text = Assert.Single(content.GetVisualDescendants().OfType<TextBlock>());
+            Assert.Equal(summary, text.Text);
+        }
+        finally
+        {
+            window.Close();
+            Dispatcher.UIThread.RunJobs();
+        }
     }
 
     [AvaloniaFact]
