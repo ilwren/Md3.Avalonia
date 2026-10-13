@@ -32,8 +32,9 @@
     cells, LabelLarge for table headers, all read from Md.Sys.TypeScale.*.Size/LineHeight. Weights
     follow the same roles as MdText's own ControlTheme - Regular for the Display/Headline/TitleLarge
     roles, Medium for the TitleMedium/TitleSmall and LabelLarge roles - instead of Fluent's Light;
-  * the document is typeset in Md.Sys.Typeface.Plain rather than inheriting the host's font, and the
-    code block in a mono stack Material has no token for;
+  * the document is typeset in Md.Sys.Typeface.Plain rather than inheriting the host's font, and code
+    in a mono family list of this collection's own - Material has no mono typeface token, and the list
+    has to be a list: see the inline code rule;
   * selection is Md.Sys.Color.PrimarySelection.Brush, the same wash the AvaloniaEdit, AvaloniaHex,
     TextBox and Search themes use. Upstream's collections define a MarkdownScrollViewer.SelectionBrush
     resource because they have no token to point at; a DynamicResource setter reaches ours directly
@@ -130,7 +131,19 @@
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Tertiary.Brush}" />
   </Style>
 
+  <!-- Inline code. The family has to be set on MonospaceFontFamily rather than on FontFamily:
+       CCode's constructor binds FontFamily to that property, and a binding outranks a style
+       setter, so a FontFamily setter here (or upstream's own, in MarkdownStyleDefaultTheme) never
+       reaches an inline code span. Left to itself the property defaults to whatever
+       FontFamilyCollector.TryGetMonospace() returned - the first entry in the system font
+       collection whose name contains one of eight substrings, in enumeration order rather than
+       preference order - and a family taken from that collection carries the fonts:SystemFonts key.
+       FontManager gives a keyed single family no fallback, so one the machine advertises but cannot
+       shape throws at measure time; that is the intermittent "Could not create glyphTypeface. Font
+       family: Consolas" the gallery's markdown page produced. A list is a composite key, and a
+       composite key does fall back to the default font, so code cannot fail to shape. -->
   <Style Selector=".Markdown_Avalonia_MarkdownViewer ctxt|CCode">
+    <Setter Property="MonospaceFontFamily" Value="Cascadia Mono,Consolas,Menlo,DejaVu Sans Mono,Liberation Mono,Noto Sans Mono,monospace" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
     <Setter Property="CornerRadius" Value="4" />
@@ -159,8 +172,11 @@
     <Setter Property="Margin" Value="5,0,5,0" />
   </Style>
   <Style Selector=".Markdown_Avalonia_MarkdownViewer TextBlock.CodeBlock">
+    <!-- Upstream's list is all lowercase; the match against an installed family's own name is
+         ordinal, so none of it matched on a machine that calls the family "DejaVu Sans Mono" and
+         code fell back to the proportional default. The names are cased as the families are. -->
     <Setter Property="FontFamily"
-            Value="menlo,monaco,consolas,droid sans mono,inconsolata,courier new,monospace,dejavu sans mono" />
+            Value="Cascadia Mono,Consolas,Menlo,DejaVu Sans Mono,Liberation Mono,Noto Sans Mono,monospace" />
     <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" />
     <Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.LineHeight}" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />

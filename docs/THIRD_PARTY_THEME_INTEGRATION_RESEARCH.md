@@ -235,6 +235,21 @@ Markdown.Avalonia（417★）+ LiveMarkdown.Avalonia（176★）。
 - 仍未做：`LiveMarkdown.Avalonia`（Apache-2.0，仓内直接引用 Avalonia 12.0.0 + Markdig 1.1.2 +
   TextMateSharp 2.0.0），是「实时渲染 + LLM」场景的另一套控件，可在同一形状下另开一个集合。
 
+**补记（2026-10-13，markdown 的等宽字体）**：画廊的 markdown 页在 CI 里**间歇**抛
+`Could not create glyphTypeface. Font family: Consolas (key: fonts:SystemFonts)`，同一份代码有时通过、
+有时失败。链路读通后是上游的一处默认值：`ColorTextBlock.Avalonia` 的 `CCode` 把
+`MonospaceFontFamily` 的默认值设成 `FontFamilyCollector.TryGetMonospace()`，而它是在
+`FontManager.Current.SystemFonts` 里挑**名字包含**八个子串之一的**第一个**——按系统枚举顺序，不是按
+偏好顺序，所以不同机器/不同进程挑到的字族不同（间歇性的来源）。从系统集合拿到的 `FontFamily` 带
+`fonts:SystemFonts` 键，而 `FontManager.TryGetGlyphTypeface` 对**带键的单一字族不给回退**
+（`FontManager.cs:150-158` 直接 `return false`），于是「系统宣告了但 Skia 造不出」的字族在 measure
+时就抛；逗号列表会生成 `CompositeFontFamilyKey`（`FontFamily.cs:64-82`），而复合键在没有命中时
+**回退到默认字体**（`FontManager.cs:170-176`），所以列表永远不会抛。另外 `CCode` 构造函数里
+`Bind(FontFamilyProperty, MonospaceFontFamily)`，绑定优先级高于样式 setter，因此上游自己在
+`MarkdownStyleDefaultTheme.axaml:133` 写的那串字体（且全小写、而候选匹配是序数比较）根本到不了 span。
+`MaterialMarkdownTheme` 现在把 `MonospaceFontFamily` 设成一份大小写正确的字族列表，
+`MdMarkdownThemeTests` 钉住它，并断言 `new Typeface(family).GlyphTypeface` 可以取到。
+
 **G. 图表 provider 主题** —— 与「`MdChart` provider-neutral、不捆绑图表引擎」的定位一致：
 
 - `Md3.Avalonia.LiveCharts2`：实现一个 `LiveCharts` 主题（LvcThemeKind + ColorPalletes + 字体），

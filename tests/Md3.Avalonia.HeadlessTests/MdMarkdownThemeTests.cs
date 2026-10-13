@@ -205,10 +205,11 @@ public class MdMarkdownThemeTests
         Assert.Equal(new Thickness(12, 10), code.Padding);
         Assert.Equal(new Thickness(5, 0, 5, 0), code.Margin);
         var codeText = code.GetVisualDescendants().OfType<TextBlock>().Single(text => text.Classes.Contains("CodeBlock"));
-        // The whole fallback stack is carried over: Material has no mono typeface token. FontFamily.Name
-        // is only the first family, so the assert reads the collection.
-        Assert.Equal("menlo,monaco,consolas,droid sans mono,inconsolata,courier new,monospace,dejavu sans mono",
-            string.Join(",", codeText.FontFamily.FamilyNames));
+        // The mono stack is the collection's own rather than upstream's: Material has no mono typeface
+        // token, and the names are cased as the families are, because the candidate match is ordinal
+        // and upstream's lowercase list matched nothing on a machine called "DejaVu Sans Mono".
+        // FontFamily.Name is only the first family, so the assert reads the collection.
+        Assert.Equal(MonoStack, string.Join(",", codeText.FontFamily.FamilyNames));
         Assert.Equal(Size("Md.Sys.TypeScale.BodyMedium.Size"), codeText.FontSize);
         Assert.Equal(Size("Md.Sys.TypeScale.BodyMedium.LineHeight"), codeText.LineHeight);
         Assert.Equal(ColorOf(Brush("Md.Sys.Color.OnSurface.Brush")), ColorOf(codeText.Foreground!));
@@ -273,6 +274,35 @@ public class MdMarkdownThemeTests
     }
 
     [AvaloniaFact]
+    public void Code_Takes_A_Family_List_So_A_Family_The_Host_Cannot_Shape_Falls_Back()
+    {
+        using var scope = ShowDocument();
+        var viewer = scope.Viewer;
+
+        // CCode binds FontFamily to MonospaceFontFamily in its constructor and a binding outranks a
+        // style setter, so the source property is the only way in - and the reason upstream's own
+        // FontFamily stack, set on the same span in MarkdownStyleDefaultTheme, never took effect.
+        var codes = viewer.GetLogicalDescendants().OfType<CCode>().ToArray();
+        Assert.NotEmpty(codes);
+        Assert.All(codes, code => Assert.Equal(MonoStack, string.Join(",", code.FontFamily.FamilyNames)));
+
+        // The property that the gallery failed on. A family taken from the system collection carries
+        // the fonts:SystemFonts key, and FontManager gives a keyed single family no fallback: one the
+        // machine advertises but cannot shape throws the moment a typeface is asked for. A list is a
+        // composite key, and a composite key falls back to the default font, so this cannot throw -
+        // which is the whole point of setting it here rather than leaving the property's default.
+        Assert.All(codes, code => Assert.NotNull(new Typeface(code.FontFamily).GlyphTypeface));
+
+        // A fenced block is an ordinary TextBlock, so the ordinary property reaches it; it carries the
+        // same list, cased as the families themselves are named, because the match against an
+        // installed family's name is ordinal and upstream's lowercase list never matched.
+        var blocks = viewer.GetVisualDescendants().OfType<TextBlock>()
+            .Where(text => text.Classes.Contains("CodeBlock")).ToArray();
+        Assert.NotEmpty(blocks);
+        Assert.All(blocks, block => Assert.Equal(MonoStack, string.Join(",", block.FontFamily.FamilyNames)));
+    }
+
+    [AvaloniaFact]
     public void Assigning_The_Collection_Leaves_The_Application_And_Native_Controls_Alone()
     {
         // The collection lives in one viewer's Styles and every selector in it is scoped to that
@@ -308,6 +338,14 @@ public class MdMarkdownThemeTests
     /// block with no handler, and a rule. The table cells are deliberately plain text so that the
     /// inline-code and hyperlink roles have exactly one instance each to look at.
     /// </summary>
+    /// <summary>
+    /// The mono family list the collection sets for code. A list, and not one family, is the point:
+    /// FontManager gives a keyed single family no fallback, while a composite key falls back to the
+    /// default font, so a family the host advertises but cannot shape cannot throw.
+    /// </summary>
+    private const string MonoStack =
+        "Cascadia Mono,Consolas,Menlo,DejaVu Sans Mono,Liberation Mono,Noto Sans Mono,monospace";
+
     private const string Document = """
         # Heading one
 

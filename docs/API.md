@@ -617,7 +617,19 @@ ControlTheme uses - rather than Fluent's Light, and the document is typeset in
 except where Material has a shape of its own: the code block is a `SurfaceContainerLow` card with an
 8 DIP radius and 12/10 DIP padding instead of Fluent's two hairlines, table cells get 10/6 DIP
 padding instead of 2, and the `Error` marker on an unhandled `:::` container is a 3 DIP frame. The
-code block's mono font stack has no token and is carried over verbatim.
+code block's mono font is a family list of the collection's own - Material has no mono typeface
+token - and it has to be a list. An inline code span takes its family from
+`ColorTextBlock.Avalonia.CCode.MonospaceFontFamily`, whose default is whichever family
+`FontFamilyCollector.TryGetMonospace()` picked: the first entry of the system font collection whose
+name contains one of eight substrings, in enumeration order rather than preference order, and
+therefore a different family on a different machine. A family taken from that collection carries the
+`fonts:SystemFonts` key, and `FontManager` gives a keyed single family no fallback - one the machine
+advertises but cannot shape throws at measure time, which is the intermittent
+`Could not create glyphTypeface. Font family: Consolas` this page used to produce in CI. A list is a
+composite key, and a composite key falls back to the default font, so code cannot fail to shape. The
+list also has to be set on `MonospaceFontFamily` rather than on `FontFamily`: `CCode`'s constructor
+binds `FontFamily` to that property, and a binding outranks a style setter, so upstream's own stack -
+lowercase, and matched ordinally against family names that are not - never reached a span.
 
 Three gaps the built-in collections leave are filled here, and each is asserted by the headless
 suite:

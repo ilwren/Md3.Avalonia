@@ -123,6 +123,16 @@ surface，调用方仍可覆盖。
   卡片、8 圆角与 12/10 内边距（取代上游上下两条细线），表格单元格内边距 10/6（上游为 2），未处理
   `:::` 容器的 `Error` 标记为 3 宽边框。它不引用 `SyntaxHigh` 插件（代码块是 Tight 的普通 `TextBlock`）；应用若自行再加该插件，需要自己补它的 appendix 样式
   （`avedit|TextEditor`/`Label.LangInfo`/`Button.CopyButton`），因为插件只为上游具名集合注入这些样式。
+- **`Md3.Avalonia.Markdown` 的等宽字体（2026-10-13 补）** —— 画廊的 markdown 页曾在 CI 里
+  **间歇**抛 `Could not create glyphTypeface. Font family: Consolas (key: fonts:SystemFonts)`。
+  原因是上游 `CCode` 把 `MonospaceFontFamily` 的默认值交给 `FontFamilyCollector.TryGetMonospace()`，
+  后者按**系统枚举顺序**（而非偏好顺序）挑第一个名字包含八个子串之一的字族，因此不同机器、不同进程
+  挑到的字族不同；而从系统集合取到的字族带 `fonts:SystemFonts` 键，`FontManager` 对带键的单一字族
+  **不给回退**，宿主宣告却造不出的字族就在 measure 时抛。逗号列表是复合键、未命中时回退默认字体，
+  所以 `MaterialMarkdownTheme` 现在把该属性设成一份大小写正确的字族列表（候选匹配是序数比较，上游
+  那份全小写的列表在 Linux 上一个都匹配不上）。只能设在 `MonospaceFontFamily` 上：`CCode` 构造函数里
+  把 `FontFamily` 绑定到它，绑定优先级高于样式 setter，这也是上游自己的字体列表从未生效的原因。
+  `MdMarkdownThemeTests` 钉住列表内容，并断言该字族的 glyph typeface 可以取到。
 - **`Md3.Avalonia.LiveCharts2`** —— [LiveCharts2](https://github.com/Live-Charts/LiveCharts2) 图表的
   Material Design 3 主题，opt-in，唯一引入 `LiveChartsCore.SkiaSharpView.Avalonia` 依赖的包，包总数到十二个。
   它也是仓库里唯一**完全不是 Avalonia 样式集合**的 Material 主题：包内没有任何 `Styles` 或 `ControlTheme`，

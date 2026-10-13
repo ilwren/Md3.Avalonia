@@ -191,13 +191,15 @@ jobs:
       # gallery is the other half of that pair, and the node editor page is the newest thing in it,
       # so this is where the search starts.
       #
-      # The two gallery tests that walk every page now name the page that threw, and it is the one
-      # that renders a Markdown.Avalonia document, asking for Consolas - and it is measured before
-      # the map page in both loops, so nothing after it is implicated. It is also not reproducible:
-      # the same gallery code passes this probe on one run and fails it on the next, with nothing
-      # between them but a comment and a step that runs afterwards. So this is the intermittent
-      # failure the paragraph above describes; it is not a font that went missing, and it is not
-      # collateral from a neighbouring failure, which it was read as once and is not.
+      # Found, and it is the markdown page's inline code. Markdown.Avalonia's CCode defaults its
+      # MonospaceFontFamily to FontFamilyCollector.TryGetMonospace(), which returns the first entry
+      # of the system font collection whose name contains one of eight substrings - in enumeration
+      # order, not preference order, so the pick differs between machines and between processes,
+      # which is why the same code passed this probe on one run and failed it on the next. A family
+      # from that collection carries the fonts:SystemFonts key, and FontManager gives a keyed single
+      # family no fallback, so one the machine advertises but cannot shape throws at measure time.
+      # MaterialMarkdownTheme now sets the property to a family list, which is a composite key and
+      # does fall back; MdMarkdownThemeTests pins it. What is left here is a canary, not a symptom.
       - name: Probe the markdown theme tests alone
         continue-on-error: true
         run: scripts/probe-tests.sh MdMarkdownThemeTests markdown.trx

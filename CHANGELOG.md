@@ -193,6 +193,19 @@
 
 ### Fixed
 
+- **Markdown code could fail to shape, intermittently, on a host that advertises a font it cannot
+  build.** The gallery's markdown page threw `Could not create glyphTypeface. Font family: Consolas
+  (key: fonts:SystemFonts)` in CI on some runs and not others. `ColorTextBlock.Avalonia`'s `CCode`
+  defaults its `MonospaceFontFamily` to whichever family `FontFamilyCollector.TryGetMonospace()`
+  picked - the first system family whose name contains one of eight substrings, in enumeration order
+  rather than preference order, so the pick differs between machines and between processes - and a
+  family from that collection carries the `fonts:SystemFonts` key, for which `FontManager` has no
+  fallback: a single family the host cannot shape throws at measure time. A family list is a
+  composite key and does fall back, so `MaterialMarkdownTheme` now sets the property to one, cased as
+  the families are named because the candidate match is ordinal. It has to be set on
+  `MonospaceFontFamily` and not on `FontFamily`: `CCode` binds the latter to the former in its
+  constructor, and a binding outranks a style setter, which is also why upstream's own stack never
+  reached a span.
 - **Two of the theme projects were missing from the solution's build configuration.** The Dock
   entry lost its `EndProject` line when Tabalonia was added after it, which swallowed Tabalonia's
   project block, and neither theme project had a `ProjectConfigurationPlatforms` entry - so
