@@ -24,13 +24,15 @@
             </eco:MdBeforeAfter.After>
           </eco:MdBeforeAfter>
         </Border>
-        <StackPanel Orientation="Horizontal" Spacing="16" MaxWidth="640" HorizontalAlignment="Left">
-          <TextBlock Classes="body" Opacity="0.78" VerticalAlignment="Center" Text="Ungraded" />
+        <!-- The live value is the part that overran: 70 + 280 + 55 + the value, with 16 dip between
+             each, lands near 493 dip. Wrapping moves the value under the slider instead of off screen. -->
+        <WrapPanel Orientation="Horizontal" MaxWidth="640" HorizontalAlignment="Left">
+          <TextBlock Classes="body" Opacity="0.78" VerticalAlignment="Center" Margin="0,0,16,8" Text="Ungraded" />
           <md:MdSlider x:Name="PositionSlider" Width="280" Minimum="0" Maximum="1" VerticalAlignment="Center"
-                       Value="{Binding #PhotoCompare.Position, Mode=TwoWay}" />
-          <TextBlock Classes="body" Opacity="0.78" VerticalAlignment="Center" Text="Graded" />
-          <TextBlock x:Name="PositionValue" Classes="body" VerticalAlignment="Center" />
-        </StackPanel>
+                       Margin="0,0,16,8" Value="{Binding #PhotoCompare.Position, Mode=TwoWay}" />
+          <TextBlock Classes="body" Opacity="0.78" VerticalAlignment="Center" Margin="0,0,16,8" Text="Graded" />
+          <TextBlock x:Name="PositionValue" Classes="body" VerticalAlignment="Center" Margin="0,0,16,8" />
+        </WrapPanel>
         <TextBlock Classes="body" TextWrapping="Wrap" Opacity="0.78" Text="Position is two-way bindable: the slider and the divider drive each other." />
       </StackPanel>
 

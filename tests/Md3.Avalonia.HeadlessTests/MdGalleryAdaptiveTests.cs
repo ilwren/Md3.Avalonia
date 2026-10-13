@@ -107,14 +107,11 @@ public sealed class MdGalleryAdaptiveTests
         // that were declared at a fixed 820, 760 or 720 dip fixed twenty-eight of them. These
         // five are still outstanding and are listed by name rather than waved through with a
         // tolerance, so the set can only shrink: a new offender fails the test immediately.
-        var known = new HashSet<string>(StringComparer.Ordinal)
-        {
-            "BeforeAfterGalleryPage",      // a caption overruns by 22 dip
-            "DateRangePickerGalleryPage",  // two pickers side by side, 20 dip over
-            "PickerRestorationGalleryPage",// a horizontal row of pickers that does not wrap
-            "RadioButtonGalleryPage",      // a horizontal row of options that does not wrap
-            "SwitchGalleryPage",           // a row of switches overruns by 4 dip
-        };
+        // Emptied: the three that were page-level - a horizontal row that should have wrapped - are
+        // fixed. What is left is being measured rather than guessed at, because this assertion names
+        // the offending control and how far past the edge it reaches, and that is the only way to
+        // tell a page-layout defect from one inside a control's own template.
+        var known = new HashSet<string>(StringComparer.Ordinal);
 
         var regressions = tooWide
             .Where(entry => !known.Contains(entry.Split(' ')[0]))
