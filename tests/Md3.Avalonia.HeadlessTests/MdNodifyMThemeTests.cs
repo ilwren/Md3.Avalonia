@@ -1,9 +1,11 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Shapes;
+using Avalonia.Controls.Templates;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Styling;
@@ -223,17 +225,38 @@ public class MdNodifyMThemeTests
     /// One node with one pin of each direction, plus a pending wire: enough to realize every control
     /// the theme restyles except the connection shapes, which need anchors two pins write back.
     /// </summary>
+    /// <remarks>
+    /// The items have to be view models that a template turns into nodes. The editor casts the first
+    /// visual child of every item container to <see cref="BaseNode"/>, so a <see cref="Node"/> handed
+    /// to it as the item - which then becomes its own container - puts the cast on the border its
+    /// template starts with, and the layout pass throws instead of arranging.
+    /// </remarks>
     private static NodifyEditor NewEditor()
     {
-        var editor = new NodifyEditor { Width = 640, Height = 420 };
-        editor.Items.Add(new Node
+        var editor = new NodifyEditor
         {
-            Header = "Filter",
-            Footer = "rows > 0",
-            Location = new Point(96, 72),
-            Input = new[] { Pin("Rows", ConnectorViewModelBase.ConnectorFlow.Input) },
-            Output = new[] { Pin("Kept", ConnectorViewModelBase.ConnectorFlow.Output) }
-        });
+            Width = 640,
+            Height = 420,
+            ItemTemplate = new FuncDataTemplate<NodeViewModelBase>((node, _) => new Node
+            {
+                Header = node.Title,
+                Footer = node.Footer,
+                Location = node.Location,
+                Input = node.Input,
+                Output = node.Output
+            })
+        };
+        editor.ItemsSource = new[]
+        {
+            new NodeViewModelBase
+            {
+                Title = "Filter",
+                Footer = "rows > 0",
+                Location = new Point(96, 72),
+                Input = new ObservableCollection<object> { Pin("Rows", ConnectorViewModelBase.ConnectorFlow.Input) },
+                Output = new ObservableCollection<object> { Pin("Kept", ConnectorViewModelBase.ConnectorFlow.Output) }
+            }
+        };
         editor.PendingConnection = new NodifyEditorViewModelBase().PendingConnection;
         return editor;
     }
