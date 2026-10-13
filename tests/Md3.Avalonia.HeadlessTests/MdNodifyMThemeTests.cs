@@ -87,7 +87,7 @@ public class MdNodifyMThemeTests
         Grid.SetColumn(minimap, 1);
         var layout = new Grid
         {
-            ColumnDefinitions = [new ColumnDefinition(GridLength.Star), new ColumnDefinition(new GridLength(200))],
+            ColumnDefinitions = { new ColumnDefinition(GridLength.Star), new ColumnDefinition(new GridLength(200)) },
             Children = { editor, minimap }
         };
         using var scope = new Scope(NewWindow(layout));
@@ -187,7 +187,7 @@ public class MdNodifyMThemeTests
             Height = 640,
             Content = new Grid
             {
-                ColumnDefinitions = [new ColumnDefinition(GridLength.Star), new ColumnDefinition(new GridLength(220))],
+                ColumnDefinitions = { new ColumnDefinition(GridLength.Star), new ColumnDefinition(new GridLength(220)) },
                 Children = { editor, panel }
             }
         };

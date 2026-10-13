@@ -43,7 +43,7 @@
   as well.
 -->
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/2006/xaml"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:nod="using:NodifyM.Avalonia.Controls"
         x:Class="Md3.Avalonia.Themes.MaterialNodifyMTheme">
   <Styles.Resources>
