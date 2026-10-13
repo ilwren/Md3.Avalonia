@@ -107,11 +107,24 @@ public sealed class MdGalleryAdaptiveTests
         // that were declared at a fixed 820, 760 or 720 dip fixed twenty-eight of them. These
         // five are still outstanding and are listed by name rather than waved through with a
         // tolerance, so the set can only shrink: a new offender fails the test immediately.
-        // Emptied: the three that were page-level - a horizontal row that should have wrapped - are
-        // fixed. What is left is being measured rather than guessed at, because this assertion names
-        // the offending control and how far past the edge it reaches, and that is the only way to
-        // tell a page-layout defect from one inside a control's own template.
-        var known = new HashSet<string>(StringComparer.Ordinal);
+        // Down from five. RadioButton, PickerRestoration and BeforeAfter were page-level - a
+        // horizontal StackPanel of fixed-width children that should have been a WrapPanel - and are
+        // fixed. The two below were measured rather than guessed at, by emptying this list and
+        // reading what the assertion reported:
+        //
+        //   DateRangePickerGalleryPage (MdDatePicker reaches 500)
+        //   SwitchGalleryPage (Border reaches 484)
+        //
+        // Neither is a page layout any more. The date range picker arranges two MdDatePicker fields
+        // side by side inside its own template, and the switch page has no horizontal row at all -
+        // its only Border is capped and stretches, and the identical CodeExample hosting passes on
+        // every other page, so that Border belongs to a control. Both are template-level, and this
+        // sweep is page-level, so they stay listed with what was measured.
+        var known = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "DateRangePickerGalleryPage",  // MdDatePicker reaches 500: two fields side by side in the template
+            "SwitchGalleryPage",           // a Border reaches 484; not the page's own capped Border
+        };
 
         var regressions = tooWide
             .Where(entry => !known.Contains(entry.Split(' ')[0]))

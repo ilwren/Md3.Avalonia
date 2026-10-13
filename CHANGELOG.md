@@ -258,6 +258,14 @@
   `Ctrl+N` would misdescribe the API on screen. `scripts/check-gallery-localization.py` reports
   prose separately from data and runs with `--strict` in CI, so a new page that ships untranslated
   now fails the build.
+- Three more pages now reflow below a 480 DIP window, taking the outstanding count from five to
+  two. RadioButton, PickerRestoration and BeforeAfter each held a horizontal `StackPanel` of
+  fixed-width children - five option labels at 32 DIP gaps, two 280 DIP pickers, a slider flanked by
+  two labels and a live value - none of which could shrink, with nothing on the page scrolling
+  sideways, so the tail of each row was off screen. All three are `WrapPanel` now. The two that
+  remain were measured instead of guessed at: `MdDatePicker` reaches 500 on the date range page and
+  a `Border` reaches 484 on the switch page, and both belong to a control's template rather than to
+  the page.
 - The same sweep could not reproduce the empty Usage sections: every page carrying a `Usage` heading
   also carries a `CodeExample` with XAML or C# attached.
 
