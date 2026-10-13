@@ -222,6 +222,14 @@ jobs:
         continue-on-error: true
         run: scripts/probe-tests.sh MdMapsuiThemeTests mapsui.trx
 
+      # The localization sweep rewrote a table built in a static initialiser, and until these tests
+      # existed nothing in the suite called GalleryLocalization at all - so this probe is the only
+      # evidence that the path runs, and that a key defined twice would be caught at run time
+      # rather than by the static checker alone.
+      - name: Probe the gallery localization tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdGalleryLocalizationTests localization.trx
+
       # Bounded, because an unbounded stall costs the job's whole timeout and takes the run's
       # annotations with it: the suite measures about four and a half minutes, so ten is a wall it
       # only reaches by hanging, and a hang reported as a failed step still lets every step after
