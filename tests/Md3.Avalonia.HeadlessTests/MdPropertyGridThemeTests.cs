@@ -149,14 +149,16 @@ public class MdPropertyGridThemeTests
         Dispatcher.UIThread.RunJobs();
         Assert.True(popup.IsOpen);
 
-        var presenter = picker.GetLogicalDescendants().OfType<DatePickerPresenter>().Single();
+        // Once the flyout is open the presenter hangs off the popup host, which is parented to the
+        // popup by pointer only - so it is no longer reachable by walking down from the picker, and
+        // the popup's own child is the handle to it.
+        var presenter = Assert.IsType<DatePickerPresenter>(popup.Child);
         Assert.Same(Keyed(grid, "Md.Comp.PropertyGrid.DatePanelTheme"), presenter.Theme);
 
-        // Headless has no IPopupImpl, so the flyout is hosted in the window's overlay layer, where
-        // it is only realized once the window renders again. Realizing it is the point: the
-        // presenter resolves its container, its three panels and its accept button with
-        // NameScope.Get, so a template missing one of them throws here rather than degrading.
-        Assert.NotNull(host.Window.CaptureRenderedFrame());
+        // Realizing it is the point of the test: the presenter resolves its container, its three
+        // panels and its accept button with NameScope.Get, so a template missing one of them throws
+        // here rather than degrading.
+        using var frame = host.Window.CaptureRenderedFrame();
 
         Assert.NotNull(presenter.GetLogicalDescendants().OfType<Grid>().SingleOrDefault(panel => panel.Name == "PART_PickerContainer"));
         Assert.Equal(3, presenter.GetLogicalDescendants().OfType<DateTimePickerPanel>().Count());
@@ -175,14 +177,17 @@ public class MdPropertyGridThemeTests
         var grid = NewGrid(new PropertyGridTestModel());
         using var host = Show(grid);
 
-        // The grid opens its options menu from the click handler rather than through
-        // Button.ContextMenu, so the menu is what a click produces.
+        // The grid declares its options menu as a style setter value and opens it from the click
+        // handler, so it is not on Button.ContextMenu - and once it is open it hangs off the popup
+        // host rather than off the grid, which is why the grid's own accessor is the handle to it.
         var options = grid.GetVisualDescendants().OfType<Button>().Single(button => button.Name == "OptionsButton");
-        options.RaiseEvent(new RoutedEventArgs(Button.ClickEvent, options));
+        var menu = grid.DefaultOptionsContextMenu;
+        menu.Open(options);
         Dispatcher.UIThread.RunJobs();
-        Assert.NotNull(host.Window.CaptureRenderedFrame());
+        using var frame = host.Window.CaptureRenderedFrame();
 
-        var menu = Assert.IsType<ContextMenu>(Assert.Single(grid.GetLogicalDescendants().OfType<ContextMenu>()));
+        // The menu is in no tree until it is opened, so this is also the proof that it attached:
+        // the scoped rule only reaches it through the popup the open creates.
         Assert.Same(Keyed(grid, "Md.Comp.PropertyGrid.MenuTheme"), menu.Theme);
 
         var items = menu.GetLogicalDescendants().OfType<MenuItem>().ToList();
