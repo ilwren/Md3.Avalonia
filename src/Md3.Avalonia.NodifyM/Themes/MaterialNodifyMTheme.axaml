@@ -48,6 +48,13 @@
   redeclared here, because the accent answers upstream's whole key set whether or not a template in
   this repository reads it.
 
+  One thing to know when hosting the editor, which cost a CI run to find: NodifyEditor writes its
+  own Width and Height from its parent's size, in OnLoaded and again in the SizeChanged handler
+  OnApplyTemplate attaches. A parent that sizes itself to the editor therefore hands it a value that
+  includes its own padding, every layout pass makes the editor that much taller, and the layout never
+  settles. Give it a frame with a fixed size - the gallery's does - and the loop has nothing to feed
+  on.
+
   Register it after MaterialTheme. It replaces NodifyM's own ControlStyles, so do not include that
   as well.
 -->

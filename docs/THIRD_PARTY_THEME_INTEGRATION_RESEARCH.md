@@ -348,6 +348,9 @@ LiveCharts 尚未分配的槽位（`ISeries.SeriesId` 默认为 `-1`）当作第
   `Fill` 是内联的 `SolidColorBrush`，两者都写在模板元素上而不是样式里。这样的取值优先级高于任何
   style setter，实测附加样式确实输了（描边停在 `GroupingNode.BackgroundBrush` 解析出的
   `SurfaceContainerLow`，说明字典生效、样式没生效）；要改只能 fork 模板，本包不做。
+- 宿主注意：`NodifyEditor` 会在 `OnLoaded` 与 `OnApplyTemplate` 挂上的 `SizeChanged` 里，用**父级**尺寸
+  反写自己的 `Width`/`Height`。父容器若随编辑器自适应，交给它的值就含了自己的 padding，每次布局都让
+  编辑器更高，布局永远收敛不了（画廊页因此给外框写死 `Height`）。
 - 留在上游：节点模板里写死的 `CornerRadius="3"`（外框／标题 `3 3 0 0`／页脚 `0 0 3 3`）；
   `ItemContainer.HighlightBrush` 的棋盘格图案（无消费者，不做翻译）；以及连线的文字标签——
   `BaseConnection.CreateDefiningTextGeometry` 在 C# 里用 `new Typeface("Inter")` 现造 `FormattedText`，

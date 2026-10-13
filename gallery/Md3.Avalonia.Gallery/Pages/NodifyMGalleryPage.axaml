@@ -93,13 +93,18 @@
         <TextBlock Classes="h3" Text="Themed editor" />
         <TextBlock Classes="body" TextWrapping="Wrap" Text="Drag a node to move it, drag from a pin onto another to wire them, drag on empty canvas to marquee-select, and scroll to zoom. The minimap in the corner is the same editor's own control, wearing the same brushes." />
         <Grid ColumnDefinitions="*,220">
-          <Border Grid.Column="0" CornerRadius="12" Padding="4" ClipToBounds="True"
+          <!-- The frame's height is fixed, and that is not a styling choice. NodifyEditor writes its
+               own Width and Height from its parent's size - in OnLoaded and again in the
+               SizeChanged handler OnApplyTemplate attaches - so a frame that sizes itself to the
+               editor hands it a value that includes its own padding, and every layout pass makes
+               the editor that much taller. A fixed frame breaks the loop. -->
+          <Border Grid.Column="0" Height="528" CornerRadius="12" Padding="4" ClipToBounds="True"
                   Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
                   BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
             <!-- The five bindings below are the editor's own contract, so the data type is the view
                  model base rather than this page's demo graph: compiled bindings are on for the
                  whole gallery, and every member named here exists on the base. -->
-            <nod:NodifyEditor x:Name="DemoEditor" Height="520" x:DataType="nodvm:NodifyEditorViewModelBase"
+            <nod:NodifyEditor x:Name="DemoEditor" x:DataType="nodvm:NodifyEditorViewModelBase"
                               ConnectionTemplate="{StaticResource MdConnectionTemplate}"
                               PendingConnectionTemplate="{StaticResource MdPendingConnectionTemplate}"
                               ItemTemplate="{StaticResource MdNodeTemplates}"
