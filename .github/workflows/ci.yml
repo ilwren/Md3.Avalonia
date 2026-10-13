@@ -190,6 +190,12 @@ jobs:
       # not the cause: something earlier in the suite leaves the process unable to shape text. The
       # gallery is the other half of that pair, and the node editor page is the newest thing in it,
       # so this is where the search starts.
+      #
+      # One such cause is now known: a failing test can leave the process unable to shape text. When
+      # the overview index test failed on a page that was indexed but not linked, the two gallery
+      # tests that walk every page failed on Consolas beside it, and all three passed again once the
+      # index was fixed. A font failure reported beside another failure is worth reading as
+      # collateral before it is read as a font problem.
       - name: Probe the markdown theme tests alone
         continue-on-error: true
         run: scripts/probe-tests.sh MdMarkdownThemeTests markdown.trx
@@ -197,6 +203,13 @@ jobs:
       - name: Probe the gallery tests alone
         continue-on-error: true
         run: scripts/probe-tests.sh MdGallery gallery.trx
+
+      # The map theme is the newest package and the only one that reaches a third-party Skia text
+      # stack, so its eight tests are run on their own as well: the notice is what says they ran and
+      # how many, which the main suite's summary cannot be read back for.
+      - name: Probe the map theme tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdMapsuiThemeTests mapsui.trx
 
       # Bounded, because an unbounded stall costs the job's whole timeout and takes the run's
       # annotations with it: the suite measures about four and a half minutes, so ten is a wall it
