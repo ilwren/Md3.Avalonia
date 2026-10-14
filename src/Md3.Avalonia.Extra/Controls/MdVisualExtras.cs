@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -31,6 +32,8 @@ public sealed class MdBeforeAfter : TemplatedControl
     private bool _dragging;
     private const double GrabTolerance = 22;
     private double _dragPointerOffset;
+    private IPointer? _dragFocusScrollPointer;
+    private (ScrollViewer Viewer, bool BringIntoViewOnFocusChange)[]? _dragFocusScrollState;
 
     /// <summary>How far a click on the image away from the handle nudges the divider.</summary>
     private const double TrackStep = .1;
@@ -47,6 +50,18 @@ public sealed class MdBeforeAfter : TemplatedControl
         OrientationProperty.Changed.AddClassHandler<MdBeforeAfter>((control, _) => control.UpdateOrientation());
         IsInteractiveProperty.Changed.AddClassHandler<MdBeforeAfter>((control, _) => control.UpdateInteractivity());
     }
+
+    public MdBeforeAfter()
+    {
+        // FocusManager promotes a primary pointer press to focus during the tunnel route, before
+        // the drag starts in the bubbling handler. Suppress ancestor ScrollViewer auto-scroll for
+        // a divider grab before that focus attempt, so a first press cannot move the control
+        // underneath the stationary pointer.
+        AddHandler(InputElement.PointerPressedEvent, OnPointerPressedPreview, RoutingStrategies.Tunnel);
+        AddHandler(InputElement.PointerReleasedEvent, OnPointerReleasedForFocusScroll,
+            RoutingStrategies.Bubble, handledEventsToo: true);
+    }
+
     public object? Before { get => GetValue(BeforeProperty); set => SetValue(BeforeProperty, value); }
     public object? After { get => GetValue(AfterProperty); set => SetValue(AfterProperty, value); }
     public double Position { get => GetValue(PositionProperty); set => SetValue(PositionProperty, Math.Clamp(value, 0, 1)); }
@@ -142,6 +157,56 @@ public sealed class MdBeforeAfter : TemplatedControl
 
         PseudoClasses.Set(":dragging", true);
     }
+
+    private void OnPointerPressedPreview(object? sender, PointerPressedEventArgs e)
+    {
+        if (!IsInteractive || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            return;
+
+        var point = e.GetPosition(this);
+        var extent = Orientation == MdComparisonOrientation.Horizontal
+            ? Math.Max(1, Bounds.Width)
+            : Math.Max(1, Bounds.Height);
+        var along = Orientation == MdComparisonOrientation.Horizontal ? point.X : point.Y;
+        if (Math.Abs(along - Math.Clamp(Position, 0, 1) * extent) > GrabTolerance)
+            return;
+
+        SuppressAncestorBringIntoView(e.Pointer);
+    }
+
+    private void SuppressAncestorBringIntoView(IPointer pointer)
+    {
+        if (_dragFocusScrollState is not null)
+            return;
+
+        _dragFocusScrollPointer = pointer;
+        _dragFocusScrollState = GetVisualAncestors().OfType<ScrollViewer>()
+            .Select(viewer => (Viewer: viewer,
+                BringIntoViewOnFocusChange: ScrollViewer.GetBringIntoViewOnFocusChange(viewer)))
+            .ToArray();
+
+        foreach (var state in _dragFocusScrollState)
+            state.Viewer.SetCurrentValue(ScrollViewer.BringIntoViewOnFocusChangeProperty, false);
+    }
+
+    private void RestoreAncestorBringIntoView(IPointer? pointer = null)
+    {
+        if (pointer is not null && _dragFocusScrollPointer is not null &&
+            !ReferenceEquals(pointer, _dragFocusScrollPointer))
+            return;
+
+        _dragFocusScrollPointer = null;
+        if (_dragFocusScrollState is not { } state)
+            return;
+
+        _dragFocusScrollState = null;
+        foreach (var entry in state)
+            entry.Viewer.SetCurrentValue(
+                ScrollViewer.BringIntoViewOnFocusChangeProperty, entry.BringIntoViewOnFocusChange);
+    }
+
+    private void OnPointerReleasedForFocusScroll(object? sender, PointerReleasedEventArgs e) =>
+        RestoreAncestorBringIntoView(e.Pointer);
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
@@ -242,6 +307,7 @@ public sealed class MdBeforeAfter : TemplatedControl
         }
 
         base.OnPointerReleased(e);
+        RestoreAncestorBringIntoView(e.Pointer);
 
         // Focus only after pointer tracking ends, and temporarily keep ancestor ScrollViewers from
         // bringing this clipped control into view. Restoring their original settings immediately
@@ -249,6 +315,25 @@ public sealed class MdBeforeAfter : TemplatedControl
         if (focusAfterRelease)
             Dispatcher.UIThread.Post(FocusWithoutScrollingAncestors, DispatcherPriority.Input);
     }
+    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+    {
+        base.OnPointerCaptureLost(e);
+        if (_dragging)
+        {
+            _dragging = false;
+            PseudoClasses.Set(":dragging", false);
+        }
+        RestoreAncestorBringIntoView();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        _dragging = false;
+        PseudoClasses.Set(":dragging", false);
+        RestoreAncestorBringIntoView();
+        base.OnDetachedFromVisualTree(e);
+    }
+
     protected override void OnKeyDown(KeyEventArgs e)
     {
         // IsInteractive used to gate the pointer only, so a comparison meant to be display-only

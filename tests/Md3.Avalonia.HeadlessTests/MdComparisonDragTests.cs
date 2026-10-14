@@ -121,7 +121,7 @@ public sealed class MdComparisonDragTests
                 var controlTop = comparison.TranslatePoint(default, window)!.Value.Y;
                 var desiredTop = orientation == MdComparisonOrientation.Horizontal
                     ? viewportTop + 20 - comparison.Bounds.Height / 2
-                    : viewportBottom - 20;
+                    : viewportTop - 10;
                 var maxOffset = Math.Max(0, pageScroll.Extent.Height - pageScroll.Viewport.Height);
                 var offsetY = Math.Clamp(pageScroll.Offset.Y + controlTop - desiredTop, 0, maxOffset);
                 pageScroll.Offset = new Vector(pageScroll.Offset.X, offsetY);
@@ -137,14 +137,17 @@ public sealed class MdComparisonDragTests
                     Assert.True(controlTop < viewportTop,
                         "the horizontal comparison must be partly clipped at the top of the viewport");
                 else
-                    Assert.True(controlTop + comparison.Bounds.Height > viewportBottom,
-                        "the vertical comparison must be partly clipped at the bottom of the viewport");
+                    Assert.True(controlTop < viewportTop && controlTop + 20 > viewportTop,
+                        "the vertical handle must straddle the top of the viewport");
                 Assert.InRange(startWindow.Y, viewportTop, viewportBottom - 1);
 
                 var scrollBeforePress = pageScroll.Offset;
+                Assert.True(ScrollViewer.GetBringIntoViewOnFocusChange(pageScroll));
                 window.MouseDown(startWindow, MouseButton.Left, RawInputModifiers.None);
                 Dispatcher.UIThread.RunJobs();
 
+                Assert.False(ScrollViewer.GetBringIntoViewOnFocusChange(pageScroll),
+                    $"{orientation}: the parent scroll host must not move the control during its first drag");
                 Assert.False(comparison.IsKeyboardFocusWithin,
                     $"{orientation}: pointer-down must not trigger first-focus scrolling during the drag.");
                 Assert.Equal(scrollBeforePress, pageScroll.Offset);
@@ -155,7 +158,7 @@ public sealed class MdComparisonDragTests
                     : new Vector(0, 1);
                 var lastWindowPoint = startWindow;
                 var worstGap = 0d;
-                foreach (var delta in new[] { -1d, -4d, -10d, -18d })
+                foreach (var delta in new[] { 1d, 4d, 10d, 18d, 12d, 6d })
                 {
                     lastWindowPoint = startWindow + axis * delta;
                     window.MouseMove(lastWindowPoint, RawInputModifiers.None);
@@ -176,10 +179,17 @@ public sealed class MdComparisonDragTests
 
                 Assert.True(comparison.IsKeyboardFocusWithin,
                     $"{orientation}: keyboard focus should be assigned after pointer tracking ends.");
+                Assert.True(ScrollViewer.GetBringIntoViewOnFocusChange(pageScroll),
+                    $"{orientation}: restore the scroll host's original focus behavior after release");
                 Assert.Equal(scrollBeforePress, pageScroll.Offset);
                 Assert.True(worstGap <= 1,
                     $"{orientation}: the first edge drag left the divider {worstGap:0.##} dip from the pointer.");
-                Assert.Equal(0, comparison.Position, 3);
+                var finalOrigin = comparison.TranslatePoint(default, window)!.Value;
+                var finalPointerLocal = lastWindowPoint - finalOrigin;
+                var finalPointerAlong = orientation == MdComparisonOrientation.Horizontal
+                    ? finalPointerLocal.X
+                    : finalPointerLocal.Y;
+                Assert.Equal(Math.Clamp(finalPointerAlong / extent, 0, 1), comparison.Position, 3);
             }
             finally { window.Close(); }
         }

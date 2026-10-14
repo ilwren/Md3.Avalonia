@@ -37,7 +37,7 @@ Keep these scenarios in the headless suite; a generic focused-control drag or a 
 - `MdReportedIssuesTests.Carousel_Clicking_A_Collapsed_Card_Makes_It_The_Focal_Keyline`: the first click on a collapsed Carousel keyline focuses and expands that card.
 - `MdDialogAndSnackbarHostTests.Gallery_Simple_Dialog_Scrim_Covers_The_Whole_Desktop_Window`: the SimpleDialog scrim spans the Gallery's entire desktop root, including the app bar and navigation rail.
 - `MdMotionLifecycleTests.Rich_Tooltip_Does_Not_Start_Hide_Delay_While_The_Anchor_Is_Hovered`: rich-tooltip hover/focus transitions do not prematurely arm dismissal; leaving both sides starts the normal grace period.
-- `MdComparisonDragTests.First_Gallery_Drag_From_An_Edge_Tracks_The_Pointer_Before_Focus_Has_Been_Established`: exercise the first drag before focus, with the Gallery ScrollViewer bringing the partly clipped control into view; desktop confirmation remains pending.
+- `MdComparisonDragTests.First_Gallery_Drag_From_Left_And_Top_Edges_Does_Not_Focus_Or_Scroll_During_Drag`: exercise the first inward-and-return drag from clipped left/top handles in both orientations, while checking the Gallery ScrollViewer stays fixed and restores its focus behavior; desktop confirmation remains pending.
 - `MdRichEditorTreeVisualRegressionTests.RichEditor_Gallery_Starts_With_Rasterized_Sample_Content` and `TreeView_Chevron_Painted_Ink_Is_Centered_In_The_Transparent_State_Target`: verify actual rendered pixels and the chevron's rasterized-ink centroid inside its transparent state area.
 
 Picker stale-field behavior and Cascader label/dropdown clipping have headless/CI coverage, but their actual desktop appearance still requires manual confirmation. Do not infer desktop sign-off from the headless result.
