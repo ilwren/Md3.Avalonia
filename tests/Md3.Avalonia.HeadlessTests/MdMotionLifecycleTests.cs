@@ -225,6 +225,10 @@ public sealed class MdMotionLifecycleTests
         try
         {
             Dispatcher.UIThread.RunJobs();
+            var popup = host.GetVisualDescendants().OfType<Popup>()
+                .Single(control => control.Name == "PART_Popup");
+            Assert.False(popup.TakesFocusFromNativeControl,
+                "showing a native hover popup must not activate it and deactivate the owner window");
             var anchor = Assert.IsType<MdButton>(host.Content);
             var point = anchor.TranslatePoint(
                 new Point(anchor.Bounds.Width / 2, anchor.Bounds.Height / 2), window);

@@ -30,8 +30,9 @@
       <ControlTemplate TargetType="md:MdTooltipHost">
         <Grid>
           <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+          <!-- Keep hover popups from taking native focus, which can deactivate the owner window. -->
           <!-- The light-dismiss overlay spans the owner window; keep the trigger subtree hit-testable beneath it. -->
-          <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}" IsLightDismissEnabled="True" OverlayDismissEventPassThrough="True" OverlayInputPassThroughElement="{Binding RelativeSource={RelativeSource TemplatedParent}}" Placement="{TemplateBinding Placement}" PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}" HorizontalOffset="{TemplateBinding HorizontalOffset}" VerticalOffset="{TemplateBinding VerticalOffset}" InheritsTransform="True" WindowManagerAddShadowHint="False">
+          <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}" IsLightDismissEnabled="True" TakesFocusFromNativeControl="False" OverlayDismissEventPassThrough="True" OverlayInputPassThroughElement="{Binding RelativeSource={RelativeSource TemplatedParent}}" Placement="{TemplateBinding Placement}" PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}" HorizontalOffset="{TemplateBinding HorizontalOffset}" VerticalOffset="{TemplateBinding VerticalOffset}" InheritsTransform="True" WindowManagerAddShadowHint="False">
             <Popup.Styles>
               <Style Selector="PopupRoot">
                 <Setter Property="Background" Value="Transparent" />
