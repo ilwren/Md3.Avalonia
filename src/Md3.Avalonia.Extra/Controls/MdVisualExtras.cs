@@ -180,7 +180,7 @@ public sealed class MdBeforeAfter : TemplatedControl
             return;
 
         _dragFocusScrollPointer = pointer;
-        _dragFocusScrollState = GetVisualAncestors().OfType<ScrollViewer>()
+        _dragFocusScrollState = this.GetVisualAncestors().OfType<ScrollViewer>()
             .Select(viewer => (Viewer: viewer,
                 BringIntoViewOnFocusChange: ScrollViewer.GetBringIntoViewOnFocusChange(viewer)))
             .ToArray();
