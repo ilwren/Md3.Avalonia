@@ -490,6 +490,21 @@ pointer immediately showed that was half the problem - at 18 dip from the edge t
 landing on the clipped handle, not the track. A synthetic event could not have told the two
 apart, because neither one does any hit testing.
 
+### Follow-up - BeforeAfter first-arrange handle jump (Windows 11, 150%)
+
+**Status: geometry correction added; desktop verification pending.** The latest repro on `22488b5`
+shows `Position = 0.5` while the horizontal and vertical handles are drawn at the left/top. The
+first movement changes `Position` and makes the handle jump toward the middle, leaving the cursor
+offset (reported final value about `0.52`). The focus/scroll guard did not resolve this report.
+
+The layout-order defect is in `MdBeforeAfter.ArrangeOverride`: Avalonia assigns the control's new
+`Bounds` only after `ArrangeOverride` returns, but the old override arranged its template children
+first and then calculated their geometry from the still-stale `Bounds`. On the initial pass this
+left the handle at the origin until `Position` changed. The override now calculates from
+`finalSize` before arranging the template children. A headless regression checks the initial 0.5
+handle position for both axes before any pointer input; that does not replace the required Windows
+11 / 150% desktop re-test.
+
 ### Review 14 item 6 - carousel
 
 **Reproduced and fixed, after first being wrongly cleared.** What follows is the failed first

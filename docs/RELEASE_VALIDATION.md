@@ -37,7 +37,8 @@ Keep these scenarios in the headless suite; a generic focused-control drag or a 
 - `MdReportedIssuesTests.Carousel_Clicking_A_Collapsed_Card_Makes_It_The_Focal_Keyline`: the first click on a collapsed Carousel keyline focuses and expands that card.
 - `MdDialogAndSnackbarHostTests.Gallery_Simple_Dialog_Scrim_Covers_The_Whole_Desktop_Window`: the SimpleDialog scrim spans the Gallery's entire desktop root, including the app bar and navigation rail.
 - `MdMotionLifecycleTests.Rich_Tooltip_Does_Not_Start_Hide_Delay_While_The_Anchor_Is_Hovered`: rich-tooltip hover/focus transitions do not prematurely arm dismissal; leaving both sides starts the normal grace period.
-- `MdComparisonDragTests.First_Gallery_Drag_From_Left_And_Top_Edges_Does_Not_Focus_Or_Scroll_During_Drag`: exercise the first inward-and-return drag from clipped left/top handles in both orientations, while checking the Gallery ScrollViewer stays fixed and restores its focus behavior; desktop confirmation remains pending.
+- `MdDesktopPopupAndComparisonTests.Comparison_First_Arrange_Uses_Final_Size_For_Initial_Position`: before any pointer input or Position change, check that the default 0.5 handle is centered after the first arrange in both orientations.
+- `MdComparisonDragTests.First_Gallery_Drag_From_Left_And_Top_Edges_Does_Not_Focus_Or_Scroll_During_Drag`: exercise the first inward-and-return drag from clipped left/top handles in both orientations, while checking the Gallery ScrollViewer stays fixed and restores its focus behavior. The focus/scroll guard in `22488b5` still failed on the reported Windows 11 / 150% setup; the initial-geometry correction now has headless coverage, but physical desktop confirmation remains pending.
 - `MdRichEditorTreeVisualRegressionTests.RichEditor_Gallery_Starts_With_Rasterized_Sample_Content` and `TreeView_Chevron_Painted_Ink_Is_Centered_In_The_Transparent_State_Target`: verify actual rendered pixels and the chevron's rasterized-ink centroid inside its transparent state area.
 
 Picker stale-field behavior and Cascader label/dropdown clipping have headless/CI coverage, but their actual desktop appearance still requires manual confirmation. Do not infer desktop sign-off from the headless result.
@@ -46,7 +47,7 @@ Picker stale-field behavior and Cascader label/dropdown clipping have headless/C
 
 Do not mark an item complete without recording device/OS, assistive technology version, tester and date.
 
-- [ ] Windows x64: pointer, keyboard-only, 100/150/200% scale, Narrator.
+- [ ] Windows x64: pointer, keyboard-only, 100/150/200% scale, Narrator. Specifically recheck `MdBeforeAfter` at 150%: the latest report on `22488b5` showed Position 0.5 with the horizontal/vertical handle at the left/top and a first-drag jump; no desktop sign-off yet.
 - [ ] Windows ARM64: launch, Gallery navigation, popup/picker/dialog smoke.
 - [ ] macOS Apple Silicon: keyboard, trackpad, VoiceOver, Light/Dark/System.
 - [ ] Linux x64: Wayland/X11 launch, keyboard, Orca, font fallback.

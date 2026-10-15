@@ -224,6 +224,58 @@ public sealed class MdDesktopPopupAndComparisonTests
     };
 
     [AvaloniaFact]
+    public void Comparison_First_Arrange_Uses_Final_Size_For_Initial_Position()
+    {
+        // ArrangeOverride runs before Layoutable updates Bounds. The initial Position must be
+        // reflected in the very first arranged handle, without waiting for a later value change.
+        foreach (var orientation in new[]
+                 {
+                     MdComparisonOrientation.Horizontal,
+                     MdComparisonOrientation.Vertical,
+                 })
+        {
+            var control = new MdBeforeAfter
+            {
+                Orientation = orientation,
+                Before = new Border { Width = 400, Height = 200, Background = Brushes.Black },
+                After = new Border { Width = 400, Height = 200, Background = Brushes.White },
+            };
+            var window = new Window { Width = 480, Height = 300, Content = control };
+            window.Show();
+            try
+            {
+                Dispatcher.UIThread.RunJobs();
+                Assert.Equal(.5, control.Position);
+
+                // Force a known old size, then arrange from zero to a different final size. This
+                // makes the test independent of the window's initial layout pass while preserving
+                // the same stale-Bounds ordering as the first template arrange.
+                control.Measure(new Size(600, 300));
+                control.Arrange(new Rect(0, 0, 600, 300));
+                Assert.Equal(new Size(600, 300), control.Bounds.Size);
+                control.Arrange(new Rect(0, 0, 0, 0));
+                Assert.Equal(new Size(0, 0), control.Bounds.Size);
+                control.Arrange(new Rect(0, 0, 400, 200));
+                Assert.Equal(new Size(400, 200), control.Bounds.Size);
+
+                var thumb = Descendant<Border>(control, "PART_Thumb");
+                var centre = thumb.TranslatePoint(
+                    new Point(thumb.Bounds.Width / 2, thumb.Bounds.Height / 2), control);
+                Assert.NotNull(centre);
+                var actual = orientation == MdComparisonOrientation.Horizontal
+                    ? centre!.Value.X
+                    : centre!.Value.Y;
+                var extent = orientation == MdComparisonOrientation.Horizontal ? 400 : 200;
+                var expected = extent * control.Position;
+                Assert.True(Math.Abs(actual - expected) < 1.5,
+                    $"{orientation}: the initial handle is at {actual} instead of Position .5 " +
+                    $"in a {extent}-dip arrange.");
+            }
+            finally { window.Close(); }
+        }
+    }
+
+    [AvaloniaFact]
     public void Comparison_Keeps_Both_Layers_Registered_As_The_Divider_Moves()
     {
         // The revealed layer was sized to the whole control but left to centre itself inside the

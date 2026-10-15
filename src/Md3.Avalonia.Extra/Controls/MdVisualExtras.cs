@@ -84,9 +84,11 @@ public sealed class MdBeforeAfter : TemplatedControl
     }
     protected override Size ArrangeOverride(Size finalSize)
     {
-        var result = base.ArrangeOverride(finalSize);
-        UpdateGeometry();
-        return result;
+        // Bounds is assigned by Layoutable.ArrangeCore only after this override returns. Use
+        // finalSize here so the first arrange places the divider from the real control size,
+        // instead of leaving it at the origin until Position changes on the first pointer drag.
+        UpdateGeometry(finalSize);
+        return base.ArrangeOverride(finalSize);
     }
     private void UpdateOrientation()
     {
@@ -94,27 +96,28 @@ public sealed class MdBeforeAfter : TemplatedControl
         PseudoClasses.Set(":vertical", Orientation == MdComparisonOrientation.Vertical);
         UpdateGeometry();
     }
-    private void UpdateGeometry()
+    private void UpdateGeometry(Size? arrangedSize = null)
     {
         if (_afterClip is null) return;
+        var size = arrangedSize ?? Bounds.Size;
         var position = Math.Clamp(Position, 0, 1);
         if (Orientation == MdComparisonOrientation.Horizontal)
         {
-            _afterClip.Width = Bounds.Width * position;
+            _afterClip.Width = size.Width * position;
             _afterClip.Height = double.NaN;
             _afterClip.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left;
             _afterClip.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Stretch;
-            if (_divider is not null) { _divider.Width = DividerThickness; _divider.Height = double.NaN; _divider.Margin = new Thickness(Bounds.Width * position - DividerThickness / 2, 0, 0, 0); _divider.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left; }
-            if (_thumb is not null) { _thumb.Margin = new Thickness(Bounds.Width * position - ThumbExtent(_thumb.Width, _thumb.Bounds.Width) / 2, 0, 0, 0); _thumb.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left; _thumb.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center; }
+            if (_divider is not null) { _divider.Width = DividerThickness; _divider.Height = double.NaN; _divider.Margin = new Thickness(size.Width * position - DividerThickness / 2, 0, 0, 0); _divider.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left; }
+            if (_thumb is not null) { _thumb.Margin = new Thickness(size.Width * position - ThumbExtent(_thumb.Width, _thumb.Bounds.Width) / 2, 0, 0, 0); _thumb.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left; _thumb.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center; }
         }
         else
         {
-            _afterClip.Height = Bounds.Height * position;
+            _afterClip.Height = size.Height * position;
             _afterClip.Width = double.NaN;
             _afterClip.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Stretch;
             _afterClip.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top;
-            if (_divider is not null) { _divider.Height = DividerThickness; _divider.Width = double.NaN; _divider.Margin = new Thickness(0, Bounds.Height * position - DividerThickness / 2, 0, 0); _divider.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top; }
-            if (_thumb is not null) { _thumb.Margin = new Thickness(0, Bounds.Height * position - ThumbExtent(_thumb.Height, _thumb.Bounds.Height) / 2, 0, 0); _thumb.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Center; _thumb.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top; }
+            if (_divider is not null) { _divider.Height = DividerThickness; _divider.Width = double.NaN; _divider.Margin = new Thickness(0, size.Height * position - DividerThickness / 2, 0, 0); _divider.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top; }
+            if (_thumb is not null) { _thumb.Margin = new Thickness(0, size.Height * position - ThumbExtent(_thumb.Height, _thumb.Bounds.Height) / 2, 0, 0); _thumb.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Center; _thumb.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top; }
         }
     }
     // The handle is the drag target, as in the comparison sliders this control is modelled on.
@@ -348,8 +351,8 @@ public sealed class MdBeforeAfter : TemplatedControl
     // A pseudo-class, not SetCurrentValue on Focusable: SetCurrentValue does not establish a
     // local value, so the theme's Focusable setter wins back the moment the theme is applied on
     // attach. The theme keys the override off this instead.
-    // The template gives the handle an explicit size; Bounds is still zero on the first arrange,
-    // which would park it half a handle off the divider until something invalidated layout again.
+    // Use the template's declared handle size before its first arrange; Bounds is not populated
+    // until after this control's ArrangeOverride returns.
     private static double ThumbExtent(double declared, double measured) => double.IsNaN(declared) ? measured : declared;
 
     private void UpdateInteractivity() => PseudoClasses.Set(":non-interactive", !IsInteractive);
