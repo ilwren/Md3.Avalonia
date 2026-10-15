@@ -138,6 +138,46 @@ public sealed class MdParityHardeningTests
     }
 
     [AvaloniaFact]
+    public void Timeline_Appending_Items_Reopens_The_Previously_Last_Connector()
+    {
+        // Live timelines often receive entries over time. A presenter that was last when it
+        // attached must stop hiding its lower connector once a later item is appended.
+        var items = new ObservableCollection<MdTimelineItem>
+        {
+            new("First"),
+            new("Second"),
+        };
+        var timeline = new MdTimeline { ItemsSource = items };
+        using var host = Show(timeline, 520, 320);
+        Dispatcher.UIThread.RunJobs();
+
+        Border AfterConnector(MdTimelineItemPresenter presenter) =>
+            presenter.GetVisualDescendants().OfType<Border>()
+                .Single(border => border.Name == "PART_VAfter");
+
+        var presenters = timeline.GetVisualDescendants().OfType<MdTimelineItemPresenter>().ToArray();
+        Assert.Equal(2, presenters.Length);
+        var secondAfter = AfterConnector(presenters[1]);
+        Assert.False(secondAfter.IsVisible);
+
+        items.Add(new MdTimelineItem("Third"));
+        Dispatcher.UIThread.RunJobs();
+        presenters = timeline.GetVisualDescendants().OfType<MdTimelineItemPresenter>().ToArray();
+        Assert.Equal(3, presenters.Length);
+        Assert.True(secondAfter.IsVisible);
+        var thirdAfter = AfterConnector(presenters[2]);
+        Assert.False(thirdAfter.IsVisible);
+
+        items.Add(new MdTimelineItem("Fourth"));
+        Dispatcher.UIThread.RunJobs();
+        presenters = timeline.GetVisualDescendants().OfType<MdTimelineItemPresenter>().ToArray();
+        Assert.Equal(4, presenters.Length);
+        Assert.True(secondAfter.IsVisible);
+        Assert.True(thirdAfter.IsVisible);
+        Assert.False(AfterConnector(presenters[3]).IsVisible);
+    }
+
+    [AvaloniaFact]
     public void Breadcrumb_Direct_Invoke_Raises_Command_Path_Once()
     {
         var breadcrumb = new MdBreadcrumb { ItemsSource = new[] { "Home", "Components" } };
