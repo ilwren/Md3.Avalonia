@@ -60,11 +60,10 @@ public sealed class MdGalleryIndexTests
             Assert.Equal(indexedTitles.OrderBy(title => title, StringComparer.OrdinalIgnoreCase), indexedTitles);
             Assert.Contains("Numeric input", indexedTitles);
 
-            var sidebar = window.GetLogicalDescendants().OfType<TextBlock>()
-                .Single(text => text.Text == "ALL COMPONENTS").LogicalParent as StackPanel;
-            Assert.NotNull(sidebar);
-            var allComponentsHeader = Assert.Single(sidebar!.Children.OfType<TextBlock>(),
-                text => text.Text == "ALL COMPONENTS");
+            var allComponentsHeader = window.GetLogicalDescendants().OfType<TextBlock>()
+                .Single(text => text.Text == "ALL COMPONENTS");
+            var sidebar = allComponentsHeader.GetLogicalAncestors().OfType<StackPanel>()
+                .First(stack => stack.Children.Contains(allComponentsHeader));
             var allComponentsStart = sidebar.Children.IndexOf(allComponentsHeader);
             var navigationTitles = sidebar.Children.Skip(allComponentsStart + 1)
                 .OfType<MdButton>()

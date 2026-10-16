@@ -41,7 +41,8 @@
     <Compile Remove="Platforms/Desktop/**/*.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="README.md" Pack="true" PackagePath="/" />
+    <None Remove="README.md" />
+    <None Include="README.md" Pack="true" PackagePath="/" Link="README.md" />
     <None Include="../../assets/logo-128.png" Pack="true" PackagePath="/" Link="logo-128.png" />
     <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />
   </ItemGroup>
