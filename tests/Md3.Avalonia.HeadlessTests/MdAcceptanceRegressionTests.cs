@@ -195,6 +195,83 @@ public sealed class MdAcceptanceRegressionTests
             Assert.InRange(origin.Value.Y, 0, leftContainer.Bounds.Height - button.Bounds.Height);
             Assert.True(origin.Value.X < leftContainer.Bounds.Width / 2);
         }
+
+        var textPresenter = leftNumeric.GetVisualDescendants().OfType<TextPresenter>()
+            .Single(presenter => presenter.Name == "PART_TextPresenter");
+        var textOrigin = textPresenter.TranslatePoint(default, leftContainer);
+        Assert.NotNull(textOrigin);
+        var spinnerRightEdge = leftButtons.Max(button =>
+        {
+            var origin = button.TranslatePoint(default, leftContainer);
+            Assert.NotNull(origin);
+            return origin.Value.X + button.Bounds.Width;
+        });
+        Assert.True(textOrigin!.Value.X >= spinnerRightEdge + 4,
+            $"the numeric input text starts at x={textOrigin.Value.X:0.##}, overlapping the left spinner " +
+            $"which ends at x={spinnerRightEdge:0.##} inside the field.");
+    }
+
+    [AvaloniaFact]
+    public void Numeric_Box_Mouse_Wheel_Spins_Only_When_Focused_And_Unfocused_Wheel_Scrolls_Page()
+    {
+        var numeric = new MdNumericBox
+        {
+            Width = 260,
+            Value = 5,
+            Minimum = 0,
+            Maximum = 10,
+            Increment = 2
+        };
+        var focusTarget = new Button { Content = "Other control", Width = 120, Height = 40 };
+        var page = new MdScrollViewer
+        {
+            Width = 400,
+            Height = 180,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            Content = new StackPanel
+            {
+                Spacing = 12,
+                Children = { numeric, focusTarget, new Border { Height = 720 } }
+            }
+        };
+        var window = new Window { Width = 420, Height = 200, Content = page };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(page.Extent.Height > page.Viewport.Height);
+            Assert.True(focusTarget.Focus());
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(focusTarget.IsFocused);
+            Assert.False(numeric.IsKeyboardFocusWithin);
+
+            var point = numeric.TranslatePoint(
+                new Point(numeric.Bounds.Width / 2, numeric.Bounds.Height / 2), window);
+            Assert.NotNull(point);
+            var initialPageOffset = page.Offset.Y;
+            window.MouseWheel(point!.Value, new Vector(0, -1), RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(5m, numeric.Value);
+            Assert.False(numeric.IsKeyboardFocusWithin);
+            Assert.True(page.Offset.Y > initialPageOffset,
+                "an unfocused numeric field must not steal the page's mouse-wheel scroll");
+
+            page.Offset = default;
+            Dispatcher.UIThread.RunJobs();
+            var textBox = numeric.GetVisualDescendants().OfType<TextBox>().Single();
+            Assert.True(textBox.Focus());
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(numeric.IsKeyboardFocusWithin);
+            point = numeric.TranslatePoint(
+                new Point(numeric.Bounds.Width / 2, numeric.Bounds.Height / 2), window);
+            Assert.NotNull(point);
+            var focusedPageOffset = page.Offset.Y;
+            window.MouseWheel(point!.Value, new Vector(0, 1), RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(7m, numeric.Value);
+            Assert.Equal(focusedPageOffset, page.Offset.Y);
+        }
+        finally { window.Close(); }
     }
 
     [AvaloniaFact]

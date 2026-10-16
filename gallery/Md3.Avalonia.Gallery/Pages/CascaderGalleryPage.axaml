@@ -13,7 +13,10 @@
       </StackPanel>
 
       <StackPanel Spacing="12">
-        <eco:MdCascader x:Name="Cascader" MaxWidth="520" HorizontalAlignment="Left" SelectionChanged="CascaderSelectionChanged" />
+        <Border MaxWidth="568" Padding="24" HorizontalAlignment="Left"
+                Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" CornerRadius="16">
+          <eco:MdCascader x:Name="Cascader" MaxWidth="520" HorizontalAlignment="Left" SelectionChanged="CascaderSelectionChanged" />
+        </Border>
         <TextBlock x:Name="CascaderStatus" Classes="body" Text="Open the hierarchy and choose a leaf destination." />
       </StackPanel>
 

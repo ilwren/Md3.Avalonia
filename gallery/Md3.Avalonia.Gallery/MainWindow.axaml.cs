@@ -45,7 +45,7 @@ public partial class MainWindow : Window
             ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, BreadcrumbNav, TextFieldNav,
             CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, ColorPickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
-            NavigationDrawerNav, AdaptiveNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
+            NavigationDrawerNav, AdaptiveNav, NotificationsNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
             SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, BorderlessWindowNav,
 AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             BeforeAfterNav, CalendarNav, CascaderNav, ChartNav,
@@ -92,6 +92,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Navigation bar", "navigation bar destination flexible", NavigationBarNav, () => new NavigationBarGalleryPage()),
             Entry("Navigation drawer", "navigation drawer modal standard", NavigationDrawerNav, () => new NavigationDrawerGalleryPage()),
             Entry("Adaptive layout", "navigation rail adaptive responsive breakpoint", AdaptiveNav, () => new AdaptiveGalleryPage()),
+            Entry("Notifications", "system notifications native operating system toast alert permission", NotificationsNav, () => new NotificationsGalleryPage()),
             Entry("Search", "search bar view suggestions", SearchNav, () => new SearchGalleryPage()),
             Entry("Settings cards", "settings card preference group expander android tile", SettingsCardNav, () => new SettingsCardGalleryPage()),
             Entry("Sheets", "bottom side sheet", SheetNav, () => new SheetGalleryPage()),
@@ -159,6 +160,8 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Adaptive controls", "adaptive switch progress cupertino ios platform", AdaptiveControlsNav, () => new AdaptiveControlsGalleryPage()),
             Entry("Focus, shortcut, Hero", "focus traversal shortcut keybinding hero transition", FocusHeroNav, () => new FocusShortcutHeroGalleryPage())
         ];
+        Array.Sort(_galleryIndex, static (left, right) =>
+            StringComparer.OrdinalIgnoreCase.Compare(left.Title, right.Title));
 
         ThemeSelector.ItemsSource = new[] { "Light", "Dark", "System" };
         ThemeSelector.SelectedIndex = 2;
@@ -225,6 +228,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
     private void ShowNavigationBar(object? s, RoutedEventArgs e) => Navigate(new NavigationBarGalleryPage(), NavigationBarNav);
     private void ShowNavigationDrawer(object? s, RoutedEventArgs e) => Navigate(new NavigationDrawerGalleryPage(), NavigationDrawerNav);
     private void ShowAdaptive(object? s, RoutedEventArgs e) => Navigate(new AdaptiveGalleryPage(), AdaptiveNav);
+    private void ShowNotifications(object? s, RoutedEventArgs e) => Navigate(new NotificationsGalleryPage(), NotificationsNav);
     private void ShowSearch(object? s, RoutedEventArgs e) => Navigate(new SearchGalleryPage(), SearchNav);
     private void ShowSettingsCard(object? s, RoutedEventArgs e) => Navigate(new SettingsCardGalleryPage(), SettingsCardNav);
     private void ShowSheets(object? s, RoutedEventArgs e) => Navigate(new SheetGalleryPage(), SheetNav);
@@ -573,16 +577,35 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             GalleryLocalization.Apply(page, _culture);
     }
 
-    private void ThemeSelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        var variant = ThemeSelector.SelectedIndex switch { 0 => ThemeVariant.Light, 1 => ThemeVariant.Dark, _ => ThemeVariant.Default };
-        if (Application.Current is not { } application) return;
-        application.RequestedThemeVariant = variant;
-        var mode = ThemeSelector.SelectedIndex switch
+    private void ThemeSelectionChanged(object? sender, SelectionChangedEventArgs e) =>
+        ApplyThemeMode(ThemeSelector.SelectedIndex switch
         {
             0 => MdThemeMode.Light,
             1 => MdThemeMode.Dark,
             _ => MdThemeMode.System
+        });
+
+    /// <summary>
+    /// Applies a light/dark/system theme and keeps the shell selector in sync, so pages can
+    /// toggle the theme (e.g. the settings samples' "Dark theme" switch) without the shell UI
+    /// diverging from the actual appearance.
+    /// </summary>
+    public void ApplyThemeMode(MdThemeMode mode)
+    {
+        if (Application.Current is not { } application) return;
+        var wantedIndex = mode switch { MdThemeMode.Light => 0, MdThemeMode.Dark => 1, _ => 2 };
+        if (ThemeSelector.SelectedIndex != wantedIndex)
+        {
+            // Raising SelectionChanged routes back into ApplyThemeMode with the selector aligned.
+            ThemeSelector.SelectedIndex = wantedIndex;
+            return;
+        }
+
+        application.RequestedThemeVariant = mode switch
+        {
+            MdThemeMode.Light => ThemeVariant.Light,
+            MdThemeMode.Dark => ThemeVariant.Dark,
+            _ => ThemeVariant.Default
         };
         var options = MdThemeManager.Current with { ThemeMode = mode };
         var dark = mode == MdThemeMode.Dark || mode == MdThemeMode.System && application.ActualThemeVariant == ThemeVariant.Dark;

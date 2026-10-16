@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -9,12 +10,14 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Extra.Controls;
 using Md3.Avalonia.Gallery;
 using Md3.Avalonia.Gallery.Pages;
+using Md3.Avalonia.Motion;
 using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
@@ -178,13 +181,20 @@ public sealed class MdDesktopPopupAndComparisonTests
         {
             Dispatcher.UIThread.RunJobs();
             var label = Descendant<Border>(cascader, "PART_Label");
+            var labelText = Descendant<TextBlock>(cascader, "PART_LabelText");
             Assert.True(label.IsVisible);
+            Assert.True(labelText.IsVisible);
 
             var topLeft = label.TranslatePoint(new Point(0, 0), cascader);
+            var textTopLeft = labelText.TranslatePoint(new Point(0, 0), cascader);
             Assert.NotNull(topLeft);
-            Assert.True(topLeft!.Value.Y >= 0,
-                $"the label starts at y={topLeft.Value.Y} inside the cascader, so its top is outside the control.");
+            Assert.NotNull(textTopLeft);
+            Assert.True(topLeft!.Value.Y >= 8,
+                $"the label starts at y={topLeft.Value.Y} inside the cascader, without enough room above it.");
             Assert.True(topLeft.Value.Y + label.Bounds.Height <= cascader.Bounds.Height + .5);
+            Assert.True(textTopLeft!.Value.Y >= 0 && textTopLeft.Value.Y + labelText.Bounds.Height <= cascader.Bounds.Height + .5,
+                $"the label text bounds {textTopLeft.Value.Y:0.##}..{textTopLeft.Value.Y + labelText.Bounds.Height:0.##} " +
+                $"fall outside the cascader height {cascader.Bounds.Height:0.##}.");
         }
         finally { window.Close(); }
     }
@@ -201,7 +211,53 @@ public sealed class MdDesktopPopupAndComparisonTests
             Dispatcher.UIThread.RunJobs();
             Assert.False(Descendant<Border>(bare, "PART_Label").IsVisible);
             Assert.Equal(0, Descendant<Grid>(bare, "PART_Fields").Margin.Top);
-            Assert.True(Descendant<Grid>(labelled, "PART_Fields").Margin.Top > 0);
+            Assert.Equal(16, Descendant<Grid>(labelled, "PART_Fields").Margin.Top);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Cascader_Floating_Label_Is_Transparent_Over_A_Non_Surface_Background()
+    {
+        var accent = Color.FromRgb(54, 126, 154);
+        var backgroundBrush = new SolidColorBrush(accent);
+        var cascader = new MdCascader { Label = "Destination", Width = 320 };
+        var backdrop = new Border
+        {
+            Background = backgroundBrush,
+            Padding = new Thickness(24),
+            Child = cascader,
+        };
+        var window = new Window { Width = 480, Height = 240, Background = backgroundBrush, Content = backdrop };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var label = Descendant<Border>(cascader, "PART_Label");
+            var outline = Descendant<MdOutlinedFieldBorder>(cascader, "PART_AnchorOutline");
+            var labelBrush = Assert.IsAssignableFrom<ISolidColorBrush>(label.Background);
+
+            Assert.Equal((byte)0, labelBrush.Color.A);
+            Assert.True(outline.IsNotched,
+                "the outline should draw a real gap beneath the label instead of a fixed-colour patch");
+            Assert.Same(label, outline.NotchTarget);
+            Assert.Same(backgroundBrush, backdrop.Background);
+
+            // Compare actual rendered pixels: the clear part of the notch must show the colored
+            // host surface, not a baked-in light/dark Surface patch.
+            using var frame = window.CaptureRenderedFrame();
+            Assert.NotNull(frame);
+            var labelOrigin = label.TranslatePoint(default, window);
+            var outlineOrigin = outline.TranslatePoint(default, window);
+            var backdropOrigin = backdrop.TranslatePoint(default, window);
+            Assert.NotNull(labelOrigin);
+            Assert.NotNull(outlineOrigin);
+            Assert.NotNull(backdropOrigin);
+            var notchPixel = ReadPixel(frame!,
+                new Point(labelOrigin!.Value.X + 1, outlineOrigin!.Value.Y + .5), window.RenderScaling);
+            var hostPixel = ReadPixel(frame!,
+                new Point(backdropOrigin!.Value.X + 6, backdropOrigin.Value.Y + 6), window.RenderScaling);
+            Assert.Equal(hostPixel, notchPixel);
         }
         finally { window.Close(); }
     }
@@ -215,6 +271,58 @@ public sealed class MdDesktopPopupAndComparisonTests
         Before = new Border { Background = Brushes.Black },
         After = new Border { Background = Brushes.White },
     };
+
+    [AvaloniaFact]
+    public void Comparison_First_Arrange_Uses_Final_Size_For_Initial_Position()
+    {
+        // ArrangeOverride runs before Layoutable updates Bounds. The initial Position must be
+        // reflected in the very first arranged handle, without waiting for a later value change.
+        foreach (var orientation in new[]
+                 {
+                     MdComparisonOrientation.Horizontal,
+                     MdComparisonOrientation.Vertical,
+                 })
+        {
+            var control = new MdBeforeAfter
+            {
+                Orientation = orientation,
+                Before = new Border { Width = 400, Height = 200, Background = Brushes.Black },
+                After = new Border { Width = 400, Height = 200, Background = Brushes.White },
+            };
+            var window = new Window { Width = 480, Height = 300, Content = control };
+            window.Show();
+            try
+            {
+                Dispatcher.UIThread.RunJobs();
+                Assert.Equal(.5, control.Position);
+
+                // Force a known old size, then arrange from zero to a different final size. This
+                // makes the test independent of the window's initial layout pass while preserving
+                // the same stale-Bounds ordering as the first template arrange.
+                control.Measure(new Size(600, 300));
+                control.Arrange(new Rect(0, 0, 600, 300));
+                Assert.Equal(new Size(600, 300), control.Bounds.Size);
+                control.Arrange(new Rect(0, 0, 0, 0));
+                Assert.Equal(new Size(0, 0), control.Bounds.Size);
+                control.Arrange(new Rect(0, 0, 400, 200));
+                Assert.Equal(new Size(400, 200), control.Bounds.Size);
+
+                var thumb = Descendant<Border>(control, "PART_Thumb");
+                var centre = thumb.TranslatePoint(
+                    new Point(thumb.Bounds.Width / 2, thumb.Bounds.Height / 2), control);
+                Assert.NotNull(centre);
+                var actual = orientation == MdComparisonOrientation.Horizontal
+                    ? centre!.Value.X
+                    : centre!.Value.Y;
+                var extent = orientation == MdComparisonOrientation.Horizontal ? 400 : 200;
+                var expected = extent * control.Position;
+                Assert.True(Math.Abs(actual - expected) < 1.5,
+                    $"{orientation}: the initial handle is at {actual} instead of Position .5 " +
+                    $"in a {extent}-dip arrange.");
+            }
+            finally { window.Close(); }
+        }
+    }
 
     [AvaloniaFact]
     public void Comparison_Keeps_Both_Layers_Registered_As_The_Divider_Moves()
@@ -541,10 +649,9 @@ public sealed class MdDesktopPopupAndComparisonTests
     {
         // Measured on the real page, because the reported truncation is about where the dropdown
         // lands in a scrolling page rather than about the control in isolation.
-        // Hosted in MainWindow rather than shown bare: the navigation rail is what pushes the
-        // page off the left edge, and a popup clamped against the window edge loses the negative
-        // offset that cancels its bleed margin. Showing the page on its own puts the anchor at
-        // x=0 and manufactures exactly that clamp.
+        // Hosted in MainWindow rather than shown bare so the test includes the desktop shell,
+        // scrolling page, and the actual Cascader gallery data. The popup is forced into the
+        // owner window's overlay layer because native desktop popup windows clipped this surface.
         var window = new MainWindow { Width = 1400, Height = 900 };
         window.Show();
         try
@@ -560,7 +667,10 @@ public sealed class MdDesktopPopupAndComparisonTests
             Dispatcher.UIThread.RunJobs();
 
             var popup = Descendant<Popup>(cascader, "PART_Popup");
+            Assert.True(popup.ShouldUseOverlayLayer,
+                "The Cascader dropdown must use the owner window's overlay layer rather than a clipped desktop popup window.");
             var surface = Assert.IsAssignableFrom<Border>(popup.Child);
+            Assert.True(surface.IsVisible);
             PointerInput.AssertReachable(surface);
 
             var anchor = Descendant<Button>(cascader, "PART_Anchor");
@@ -587,6 +697,163 @@ public sealed class MdDesktopPopupAndComparisonTests
                 $"the bottom of the window; chain: {chain}");
         }
         finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Cascader_First_Open_Is_Aligned_And_Clicking_A_Path_Updates_The_Visible_Field()
+    {
+        // Exercise the actual Gallery tree and pointer selection, not just MdCascader.Select:
+        // the user-visible defect was that the status line updated while the anchor stayed blank.
+        var window = new MainWindow { Width = 1400, Height = 900 };
+        MdMotion.SetScheme(window, MdMotionScheme.None);
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            window.GetVisualDescendants().OfType<MdButton>()
+                .Single(button => button.Name == "CascaderNav")
+                .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+
+            var cascader = window.GetVisualDescendants().OfType<MdCascader>().First();
+            var rootItems = Assert.IsAssignableFrom<IEnumerable<MdCascaderItem>>(cascader.ItemsSource).ToArray();
+            var design = rootItems.Single(item => Equals(item.Value, "design"));
+            var material = design.Children!.Single(item => Equals(item.Value, "material"));
+            var controls = material.Children!.Single(item => Equals(item.Value, "controls"));
+            MdMotion.SetScheme(cascader, MdMotionScheme.None);
+
+            var displayText = Descendant<TextBlock>(cascader, "PART_DisplayText");
+            Assert.Equal(cascader.PlaceholderText, displayText.Text);
+            var displayOrigin = displayText.TranslatePoint(default, window);
+            Assert.NotNull(displayOrigin);
+            var displayBounds = new Rect(displayOrigin!.Value, displayText.Bounds.Size);
+            using var initialFieldFrame = window.CaptureRenderedFrame();
+            Assert.NotNull(initialFieldFrame);
+
+            // Check the very first open frame before interacting with the popup. The surface
+            // must be visible, hittable, below the field, and inside the real Gallery window.
+            cascader.IsDropDownOpen = true;
+            Dispatcher.UIThread.RunJobs();
+            var popup = Descendant<Popup>(cascader, "PART_Popup");
+            var surface = Assert.IsAssignableFrom<Border>(popup.Child);
+            Assert.True(popup.IsUsingOverlayLayer);
+            Assert.True(surface.IsVisible);
+            PointerInput.AssertReachable(surface);
+
+            var anchor = Descendant<Button>(cascader, "PART_Anchor");
+            var anchorBottomLeft = anchor.TranslatePoint(new Point(0, anchor.Bounds.Height), window);
+            var surfaceTopLeft = surface.TranslatePoint(default, window);
+            Assert.NotNull(anchorBottomLeft);
+            Assert.NotNull(surfaceTopLeft);
+            Assert.InRange(Math.Abs(surfaceTopLeft!.Value.X - anchorBottomLeft!.Value.X), 0, 1);
+            Assert.InRange(Math.Abs(surfaceTopLeft.Value.Y - anchorBottomLeft.Value.Y), 0, 1);
+            Assert.True(surfaceTopLeft.Value.X >= 0 &&
+                        surfaceTopLeft.Value.X + surface.Bounds.Width <= window.ClientSize.Width + .5,
+                "the newly opened Cascader surface should not be clipped by either horizontal window edge");
+            Assert.True(surfaceTopLeft.Value.Y + surface.Bounds.Height <= window.ClientSize.Height + .5,
+                "the newly opened Cascader surface should fit in the owner window on its first frame");
+            Assert.Single(surface.GetVisualDescendants().OfType<ListBox>());
+
+            void ClickItem(int column, MdCascaderItem item)
+            {
+                Dispatcher.UIThread.RunJobs();
+                var lists = surface.GetVisualDescendants().OfType<ListBox>()
+                    .OrderBy(list => list.TranslatePoint(default, window)!.Value.X)
+                    .ToArray();
+                Assert.True(column < lists.Length, $"expected Cascader column {column}, got {lists.Length}");
+                var index = cascader.Columns[column].ToList().FindIndex(candidate => ReferenceEquals(candidate, item));
+                Assert.True(index >= 0, $"'{item.Label}' is not in Cascader column {column}");
+                var row = Assert.IsAssignableFrom<Control>(lists[column].ContainerFromIndex(index));
+                PointerInput.AssertReachable(row);
+                var point = row.TranslatePoint(new Point(row.Bounds.Width / 2, row.Bounds.Height / 2), window);
+                Assert.NotNull(point);
+                window.MouseMove(point!.Value, RawInputModifiers.None);
+                window.MouseDown(point.Value, MouseButton.Left, RawInputModifiers.None);
+                window.MouseUp(point.Value, MouseButton.Left, RawInputModifiers.None);
+                Dispatcher.UIThread.RunJobs();
+            }
+
+            ClickItem(0, design);
+            Assert.Equal(2, cascader.Columns.Count);
+            Assert.Equal(design.Label, displayText.Text);
+            Assert.Equal(design.Label, cascader.DisplayText);
+
+            ClickItem(1, material);
+            Assert.Equal(3, cascader.Columns.Count);
+            Assert.Equal(string.Join(cascader.PathSeparator, design.Label, material.Label), displayText.Text);
+            Assert.True(surface.Bounds.Width >= 3 * 160,
+                "the expanded path should expose all three columns instead of remaining under the anchor");
+
+            ClickItem(2, controls);
+            var expectedPath = string.Join(cascader.PathSeparator, design.Label, material.Label, controls.Label);
+            Assert.False(cascader.IsDropDownOpen);
+            Assert.Equal(expectedPath, cascader.DisplayText);
+            Assert.Equal(expectedPath, displayText.Text);
+            Assert.Equal(new[] { design, material, controls }, cascader.SelectedPath);
+            var status = window.GetVisualDescendants().OfType<TextBlock>()
+                .Single(text => text.Name == "CascaderStatus");
+            Assert.Contains(controls.Label, status.Text);
+
+            using var selectedFieldFrame = window.CaptureRenderedFrame();
+            Assert.NotNull(selectedFieldFrame);
+            var changedFieldPixels = CountChangedPixels(
+                initialFieldFrame!, selectedFieldFrame!, displayBounds, window.RenderScaling);
+            Assert.True(changedFieldPixels > 12,
+                $"only {changedFieldPixels} pixels changed inside the Cascader field text bounds; " +
+                "the selected path may not have been painted in the control itself.");
+        }
+        finally { window.Close(); }
+    }
+
+    private static uint ReadPixel(Bitmap frame, Point logicalPoint, double scaling)
+    {
+        var pixels = ReadPixels(frame, out var size);
+        var x = Math.Clamp((int)Math.Floor(logicalPoint.X * scaling), 0, size.Width - 1);
+        var y = Math.Clamp((int)Math.Floor(logicalPoint.Y * scaling), 0, size.Height - 1);
+        return pixels[y * size.Width + x];
+    }
+
+    private static int CountChangedPixels(Bitmap before, Bitmap after, Rect logicalBounds, double scaling)
+    {
+        var beforePixels = ReadPixels(before, out var beforeSize);
+        var afterPixels = ReadPixels(after, out var afterSize);
+        if (beforeSize.Width != afterSize.Width || beforeSize.Height != afterSize.Height)
+            throw new InvalidOperationException("Rendered frames have different pixel sizes.");
+
+        var left = Math.Clamp((int)Math.Floor(logicalBounds.Left * scaling), 0, beforeSize.Width);
+        var top = Math.Clamp((int)Math.Floor(logicalBounds.Top * scaling), 0, beforeSize.Height);
+        var right = Math.Clamp((int)Math.Ceiling(logicalBounds.Right * scaling), left, beforeSize.Width);
+        var bottom = Math.Clamp((int)Math.Ceiling(logicalBounds.Bottom * scaling), top, beforeSize.Height);
+        var changed = 0;
+        for (var y = top; y < bottom; y++)
+        for (var x = left; x < right; x++)
+        {
+            var index = y * beforeSize.Width + x;
+            if (beforePixels[index] != afterPixels[index]) changed++;
+        }
+
+        return changed;
+    }
+
+    private static uint[] ReadPixels(Bitmap frame, out PixelSize size)
+    {
+        size = frame.PixelSize;
+        var pixels = new uint[size.Width * size.Height];
+        var handle = GCHandle.Alloc(pixels, GCHandleType.Pinned);
+        try
+        {
+            frame.CopyPixels(
+                new PixelRect(0, 0, size.Width, size.Height),
+                handle.AddrOfPinnedObject(),
+                pixels.Length * sizeof(uint),
+                size.Width * sizeof(uint));
+        }
+        finally
+        {
+            handle.Free();
+        }
+
+        return pixels;
     }
 
     private static IEnumerable<string> PseudoClassNames(StyledElement element) =>

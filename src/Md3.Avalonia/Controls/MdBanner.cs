@@ -105,6 +105,25 @@ public sealed class MdBanner : ContentControl
         }
         PseudoClasses.Set(":actions-below", ForceActionsBelow);
         PseudoClasses.Set(":inline-actions", !ForceActionsBelow);
+        UpdateActionsPlacement();
+    }
+
+    // A banner narrower than the compact breakpoint cannot fit icon, wrapped text, actions and
+    // dismiss on one row without squeezing the text into a sliver (the Android defect), so the
+    // actions row drops below the text automatically; ForceActionsBelow still wins either way.
+    private const double ActionsBelowWidthBreakpoint = 480;
+
+    protected override void OnSizeChanged(SizeChangedEventArgs e)
+    {
+        base.OnSizeChanged(e);
+        UpdateActionsPlacement();
+    }
+
+    private void UpdateActionsPlacement()
+    {
+        var below = ForceActionsBelow || (Bounds.Width > 0 && Bounds.Width < ActionsBelowWidthBreakpoint);
+        PseudoClasses.Set(":actions-below", below);
+        PseudoClasses.Set(":inline-actions", !below);
     }
 
     private void UpdateMotion()

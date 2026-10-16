@@ -20,6 +20,7 @@
     <ProjectReference Include="../../src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.Notifications/Md3.Avalonia.Notifications.csproj" />
     <ProjectReference Include="../../gallery/Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" />
   </ItemGroup>
 </Project>

@@ -3,8 +3,14 @@ name: AOT probe
 on:
   workflow_dispatch:
   push:
-    branches: [arena/01a104af-md3-avalonia]
-    paths: ['.github/workflows/aot-probe.yml']
+    branches:
+      - main
+      - 'arena/**'
+    paths:
+      - '.github/workflows/aot-probe.yml'
+      - 'scripts/publish-gallery-aot.sh'
+      - 'src/**'
+      - 'gallery/**'
 
 jobs:
   publish-aot:
@@ -16,48 +22,16 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       - name: Install the native toolchain ILC links against
-        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
-      - name: Publish the desktop gallery with native AOT
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev xvfb libx11-6 libice6 libsm6 libfontconfig1
+      # The script is the single source of truth for the AOT publish: it asserts the output is a
+      # native executable with no managed app assembly beside it, then smoke-runs it under xvfb.
+      - name: Publish, verify and smoke the native AOT gallery
         run: |
-          dotnet publish gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj \
-            -c Release -r linux-x64 \
-            -p:PublishAot=true \
-            -p:TreatWarningsAsErrors=false \
-            -o /tmp/aot-out 2>&1 | tee /tmp/aot.log
-      - name: Prove the output is actually native
-        run: |
-          BIN=/tmp/aot-out/Md3.Avalonia.Gallery.Desktop
-          echo "### AOT publish output" >> $GITHUB_STEP_SUMMARY
-          ls -la /tmp/aot-out | head -20 | sed 's/^/    /' >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          test -f "$BIN" || { echo "no native binary was produced"; exit 1; }
-          DESC=$(file -b "$BIN")
-          echo "    $DESC" >> $GITHUB_STEP_SUMMARY
-          echo "    size: $(stat -c%s "$BIN") bytes" >> $GITHUB_STEP_SUMMARY
-          case "$DESC" in
-            *ELF*executable*) echo "native binary confirmed" ;;
-            *) echo "not a native binary: $DESC"; exit 1 ;;
-          esac
-          # A native-AOT publish does not ship the app as a managed assembly.
-          if [ -f /tmp/aot-out/Md3.Avalonia.Gallery.Desktop.dll ]; then
-            echo "managed assembly still present - this was not an AOT publish"; exit 1
-          fi
-      - name: Start the native binary and see if it survives
-        run: |
-          sudo apt-get install -y xvfb libx11-6 libice6 libsm6 libfontconfig1 >/dev/null
-          set +e
-          xvfb-run -a timeout 25 /tmp/aot-out/Md3.Avalonia.Gallery.Desktop > /tmp/run.log 2>&1
-          CODE=$?
-          set -e
-          echo "### Runtime smoke" >> $GITHUB_STEP_SUMMARY
-          echo "    exit code $CODE (124 = still running when the timeout fired, which is a pass)" >> $GITHUB_STEP_SUMMARY
-          tail -20 /tmp/run.log | sed 's/^/    /' >> $GITHUB_STEP_SUMMARY
-          # ILC compiling the app says nothing about reflection that is missing at runtime,
-          # which is how AOT normally fails. A window that is still up after 25 seconds has
-          # loaded the themes, the XAML and the icon font.
-          if [ "$CODE" != "124" ]; then
-            echo "the AOT binary exited on its own with $CODE:"; cat /tmp/run.log; exit 1
-          fi
+          bash scripts/publish-gallery-aot.sh --rid linux-x64 --output /tmp/aot-out --smoke 2>&1 | tee /tmp/aot.log
+          {
+            echo "### AOT publish output"
+            ls -la /tmp/aot-out | head -20 | sed 's/^/    /'
+          } >> $GITHUB_STEP_SUMMARY
       - name: Count trim and AOT diagnostics
         if: always()
         run: |

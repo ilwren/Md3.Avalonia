@@ -18,7 +18,7 @@
     <Setter Property="IsVisible" Value="False" /><Setter Property="Opacity" Value="0" /><Setter Property="RenderTransform" Value="translate(0px,16px)" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdSnackbar">
-        <Border x:Name="PART_Container" MinHeight="{TemplateBinding MinHeight}" Padding="16,0,8,0" Background="{DynamicResource Md.Sys.Color.InverseSurface.Brush}" BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}" CornerRadius="24">
+        <Border x:Name="PART_Container" MinHeight="{TemplateBinding MinHeight}" Padding="16,0,8,0" Background="{DynamicResource Md.Sys.Color.InverseSurface.Brush}" BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}" CornerRadius="{DynamicResource Md.Comp.Snackbar.Container.Shape}">
           <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="4">
             <ContentPresenter Grid.Column="0" Margin="0,14" VerticalAlignment="Center" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" FontSize="14" Foreground="{TemplateBinding Foreground}" />
             <md:MdButton x:Name="PART_ActionButton" Grid.Column="1" VerticalAlignment="Center"

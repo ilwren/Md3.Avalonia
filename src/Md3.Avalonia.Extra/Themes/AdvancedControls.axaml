@@ -58,7 +58,7 @@
     <Style Selector="^:pointerover /template/ Border#PART_ThumbState"><Setter Property="Opacity" Value="0.08" /></Style>
     <!-- Pressed: the chevrons spread outwards, the Material read of "this is what you are holding". -->
     <Style Selector="^:dragging /template/ Border#PART_Thumb"><Setter Property="RenderTransform" Value="scale(1.1)" /></Style>
-    <Style Selector="^:dragging /template/ Border#PART_ThumbState"><Setter Property="Opacity" Value="0.12" /></Style>
+    <Style Selector="^:dragging /template/ Border#PART_ThumbState"><Setter Property="Opacity" Value="0.16" /></Style>
     <Style Selector="^:dragging /template/ Path#PART_ChevronLeft"><Setter Property="RenderTransform" Value="translate(-2px,0px)" /></Style>
     <Style Selector="^:dragging /template/ Path#PART_ChevronRight"><Setter Property="RenderTransform" Value="translate(2px,0px)" /></Style>
     <Style Selector="^:focus-visible /template/ Border#PART_Thumb"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="3" /></Style>
@@ -83,7 +83,7 @@
       </ControlTemplate>
     </Setter>
     <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
-    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.12" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.10" /></Style>
     <Style Selector="^:focus-visible /template/ Border#PART_State"><Setter Property="Opacity" Value="0.10" /></Style>
     <Style Selector="^:selected"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /></Style>
   </ControlTheme>
@@ -120,7 +120,7 @@
     <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Outline.Brush}" /><Setter Property="BorderThickness" Value="1" />
     <Setter Property="Template"><ControlTemplate TargetType="Button"><Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="20"><Grid><ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" /><Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.Primary.Brush}" CornerRadius="20" Opacity="0" /></Grid></Border></ControlTemplate></Setter>
     <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
-    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.12" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.10" /></Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type eco:MdPopover}" TargetType="eco:MdPopover">
@@ -144,7 +144,13 @@
     <Style Selector="^:open /template/ Border#PART_Surface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
     <Style Selector="^:reduced-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
   </ControlTheme>
-  <ControlTheme x:Key="{x:Type eco:MdHoverCard}" TargetType="eco:MdHoverCard" BasedOn="{StaticResource {x:Type eco:MdPopover}}" />
+  <ControlTheme x:Key="{x:Type eco:MdHoverCard}" TargetType="eco:MdHoverCard" BasedOn="{StaticResource {x:Type eco:MdPopover}}">
+    <!-- Apply this at template creation so a card opened before its first render also uses the
+         owner's overlay (the code-behind setting runs after template parts are discovered). -->
+    <Style Selector="^ /template/ Popup#PART_Popup">
+      <Setter Property="ShouldUseOverlayLayer" Value="True" />
+    </Style>
+  </ControlTheme>
 
   <ControlTheme x:Key="{x:Type eco:MdCommandPalette}" TargetType="eco:MdCommandPalette">
     <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -351,7 +357,7 @@
       </ControlTemplate>
     </Setter>
     <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
-    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.12" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_State"><Setter Property="Opacity" Value="0.10" /></Style>
     <Style Selector="^:focus-visible /template/ Border#PART_Focus"><Setter Property="IsVisible" Value="True" /></Style>
   </ControlTheme>
 
@@ -360,38 +366,41 @@
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdCascader">
         <Grid>
-          <!-- PART_Fields reserves the room the floating label overhangs into. Without it the
-               label is laid out above the control's own box and the top of the glyphs is cut off
-               by whatever clips the parent. The :has-label style below drops the reserve when
-               there is no label to show. -->
+          <!-- PART_Fields gives the floating label a full line of breathing room inside the
+               control's bounds. The :has-label style below drops the reserve when no label is
+               present, so the unlabelled field keeps its compact height. -->
           <Grid Name="PART_Fields">
-            <Button Name="PART_Anchor" Theme="{StaticResource EcoCascaderAnchorTheme}">
+            <Button Name="PART_Anchor" Theme="{StaticResource EcoCascaderAnchorTheme}"
+                    BorderBrush="Transparent" BorderThickness="0">
               <Grid ColumnDefinitions="*,48">
-                <TextBlock VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Text="{TemplateBinding DisplayText}" />
+                <TextBlock Name="PART_DisplayText" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Text="{TemplateBinding DisplayText}" />
                 <Viewbox Grid.Column="1" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Center">
                   <Path x:Name="PART_Arrow" Width="12" Height="8" Data="M1,1 L6,6 L11,1" Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" StrokeThickness="1.8" StrokeLineCap="Round" StrokeJoin="Round" RenderTransform="rotate(0deg)" RenderTransformOrigin="50%,50%" />
                 </Viewbox>
+                <md:MdOutlinedFieldBorder Name="PART_AnchorOutline" Grid.ColumnSpan="2"
+                                          OutlineBrush="{DynamicResource Md.Sys.Color.Outline.Brush}"
+                                          OutlineThickness="1" CornerRadius="4"
+                                          NotchTarget="{Binding #PART_Label}" />
               </Grid>
             </Button>
             <Border Name="PART_Label" Margin="12,-7,0,0" Padding="4,0" HorizontalAlignment="Left" VerticalAlignment="Top"
-                    Background="{DynamicResource Md.Sys.Color.Surface.Brush}" IsHitTestVisible="False">
-              <TextBlock FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{TemplateBinding Label}" />
+                    Background="Transparent" IsHitTestVisible="False">
+              <TextBlock Name="PART_LabelText" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{TemplateBinding Label}" />
             </Border>
           </Grid>
-          <!-- A popup window is sized to its child's layout box, so the elevation shadow and the
-               entrance offset below would be clipped by the window edge on desktop. The surface
-               carries that bleed as margin and the offsets here cancel it, so the dropdown lands
-               where it did before with its top edge and shadow intact. -->
+          <!-- Desktop-native popup windows clipped the surface's shadow and entrance transform.
+               Render this dropdown in the owner window's overlay layer instead; the outer margin
+               still reserves space for the shadow/entrance and the offsets cancel it at the anchor. -->
           <Popup Name="PART_Popup" IsOpen="{TemplateBinding IsPopupOpen}"
                  Placement="BottomEdgeAlignedLeft" PlacementTarget="{Binding #PART_Anchor}"
-                 HorizontalOffset="-12" VerticalOffset="-14"
+                 HorizontalOffset="-12" VerticalOffset="-14" ShouldUseOverlayLayer="True"
                  IsLightDismissEnabled="True" WindowManagerAddShadowHint="False">
             <Popup.Styles><Style Selector="PopupRoot"><Setter Property="Background" Value="Transparent" /><Setter Property="TransparencyLevelHint" Value="Transparent" /><Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /></Style></Popup.Styles>
             <Border Name="PART_Surface" Margin="12,14,12,16" Padding="4"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
                     BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1"
                     CornerRadius="12" BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}" ClipToBounds="True"
-                    Opacity="0" RenderTransform="scale(0.96) translate(0px,-8px)" RenderTransformOrigin="50%,0%">
+                    Opacity="0" RenderTransform="scale(0.96) translate(0px,8px)" RenderTransformOrigin="0%,0%">
               <ItemsControl Name="PART_Columns" Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding Columns}">
                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
@@ -409,11 +418,13 @@
     </Setter>
     <Style Selector="^ /template/ Border#PART_Label"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:has-label /template/ Border#PART_Label"><Setter Property="IsVisible" Value="True" /></Style>
-    <Style Selector="^:has-label /template/ Grid#PART_Fields"><Setter Property="Margin" Value="0,8,0,0" /></Style>
+    <Style Selector="^:has-label /template/ md|MdOutlinedFieldBorder#PART_AnchorOutline"><Setter Property="IsNotched" Value="True" /></Style>
+    <Style Selector="^:has-label /template/ Grid#PART_Fields"><Setter Property="Margin" Value="0,16,0,0" /></Style>
     <Style Selector="^:present /template/ Border#PART_Surface"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:open /template/ Border#PART_Surface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
     <Style Selector="^:open /template/ Path#PART_Arrow"><Setter Property="RenderTransform" Value="rotate(180deg)" /></Style>
     <Style Selector="^:reduced-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
+    <Style Selector="^:no-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type eco:MdTransfer}" TargetType="eco:MdTransfer">
@@ -609,7 +620,7 @@
         </Grid>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.06" /></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Opacity" Value="0.08" /></Style>
     <Style Selector="^:selected /template/ Border#PART_Bubble"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="2.5" /></Style>
     <Style Selector="^:reply /template/ Border#PART_Reply"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:text-content /template/ ContentPresenter#PART_RichContent"><Setter Property="IsVisible" Value="False" /></Style>
