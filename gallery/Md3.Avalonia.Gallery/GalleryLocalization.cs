@@ -134,7 +134,7 @@ internal static class GalleryLocalization
         ["Notification request sent. Check the operating system's notification center."]="系统通知请求已提交，请检查操作系统的通知中心。", ["Could not send the notification:"]="无法发送系统通知：",
         ["Platform setup"]="平台配置", ["Usage"]="用法",
         ["Send a native operating-system notification. Unlike a snackbar, it is delivered outside the app window and follows the user's notification settings."]="发送原生操作系统通知。与 Snackbar 不同，它显示在应用窗口之外，并遵循用户的通知设置。",
-        ["Linux needs libnotify and a running desktop notification service. Android 13+ needs POST_NOTIFICATIONS permission. Windows desktop toasts need a Windows target and a registered AppUserModelID; macOS delivery follows system notification settings."]="Linux 需要 libnotify 和正在运行的桌面通知服务。Android 13+ 需要 POST_NOTIFICATIONS 权限。Windows 桌面 Toast 需要 Windows 目标框架和已注册的 AppUserModelID；macOS 通知受系统设置控制。";
+        ["Linux needs libnotify and a running desktop notification service. Android 13+ needs POST_NOTIFICATIONS permission. Windows desktop toasts need a Windows target and a registered AppUserModelID; macOS delivery follows system notification settings."]="Linux 需要 libnotify 和正在运行的桌面通知服务。Android 13+ 需要 POST_NOTIFICATIONS 权限。Windows 桌面 Toast 需要 Windows 目标框架和已注册的 AppUserModelID；macOS 通知受系统设置控制。",
         ["Open basic dialog"]="打开基础对话框", ["Open full-screen"]="全屏打开", ["Open menu"]="打开菜单", ["Open now"]="营业中", ["Optional semantic elevation."]="可选的语义化高程。",
         ["Outlined card"]="描边卡片", ["Outlined label"]="描边标签", ["Overview page content"]="概览页内容", ["PIN and OTP input"]="PIN 与验证码输入", ["Page body"]="页面正文",
         ["Page content"]="页面内容", ["Paged items"]="分页项", ["Paged items view"]="分页项视图", ["Paginated data table"]="分页数据表", ["Paginated table"]="分页表格",
