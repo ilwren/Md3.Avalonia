@@ -245,7 +245,7 @@ internal static class GalleryLocalization
         ["1 · Reference"]="1 · 引用",
         ["2 · Install the opt-in resources"]="2 · 安装可选资源",
         ["3 · Build a screen"]="3 · 构建一个界面",
-        ["93 pages, one per component. Every entry below opens its own page; MdGalleryIndexTests fails the build if any of them stops resolving."]="93 个页面，每个组件一个。下列每一项都会打开自己的页面；任一页面无法解析时 MdGalleryIndexTests 会让构建失败。",
+        ["108 indexed pages. Every entry below opens its own page; MdGalleryIndexTests fails the build if any of them stops resolving."]="108 个已索引页面。下列每一项都会打开自己的页面；任一页面无法解析时 MdGalleryIndexTests 会让构建失败。",
         ["A Material banner carries a persistent message with up to two actions. It stays until an action is taken rather than timing out like a snackbar."]="Material 横幅承载持续存在的消息，最多带两个操作。它会一直保留直到用户处理，而不像 Snackbar 那样超时消失。",
         ["A Material data table with sortable column headers. Sorting is reported to the host, which owns the ordering of ItemsSource."]="带可排序列头的 Material 数据表格。排序结果上报给宿主，由宿主负责 ItemsSource 的排列。",
         ["A Material text field with a stepper. The increment and decrement targets are centred on the field's input row, so they stay aligned when supporting text adds height underneath."]="带步进器的 Material 文本框。增减按钮以输入框的输入行为中心，因此在下方出现辅助文本增加高度时仍保持对齐。",
@@ -419,6 +419,17 @@ internal static class GalleryLocalization
         ["Virtual keyboard inactive (height: 0dp)."]="虚拟键盘未激活（高度：0dp）。",
         ["When a selection is committed"]="选择被确认时",
         ["When you need the full spreadsheet control — column resizing and reordering, frozen columns, grouping, auto-generated columns — use Avalonia's own DataGrid with the opt-in Md3.Avalonia.DataGrid theme package. This one is the stock control; only the theme is ours."]="当你需要完整的电子表格能力 —— 列宽调整与重排、冻结列、分组、自动生成列 —— 请使用 Avalonia 自带的 DataGrid 并选装 Md3.Avalonia.DataGrid 主题包。这里是原生控件，只有主题是我们的。",
+
+        // MdWaveform gallery page (2026-10-16).
+        ["Waveform"]="波形图",
+        ["A peak-driven waveform: the played part in Primary, the rest in SurfaceContainerHighest, the same split a Material 3 slider makes between its active and inactive track. The control draws peaks and does not decode audio, so the host keeps its own decoder, threading and buffer lifetime."]="由峰值驱动的波形图：已播放部分使用 Primary，其余使用 SurfaceContainerHighest，与 Material 3 滑块在活动轨道与非活动轨道之间的划分一致。控件只绘制峰值，不解码音频，因此解码器、线程与缓冲区生命周期仍由宿主掌握。",
+        ["Scrubbing"]="拖动定位",
+        ["Drag anywhere to seek, or focus the waveform and use the arrow keys, Home and End. Position is two-way bindable, so a player view model drives the playhead during playback and receives seeks back."]="在任意位置拖动即可定位，或聚焦波形后使用方向键、Home 与 End。位置支持双向绑定，因此播放器的视图模型可在播放时驱动播放头，并接收回传的定位。",
+        ["Level history"]="电平历史",
+        ["IsMirrored=false grows the bars up from the bottom instead of around the centre line, which reads as a level history rather than a waveform. Same control, same tokens, no separate meter."]="IsMirrored=false 让条形自底部向上生长，而不是围绕中线对称，读起来是电平历史而非波形。同一个控件、同一套令牌，无需单独的仪表控件。",
+        ["Display only"]="仅展示",
+        ["IsInteractive=false keeps the shape without the scrub: no pointer capture and no tab stop, for a waveform that only reports where playback is."]="IsInteractive=false 保留形状但不支持拖动：不捕获指针，也不参与 Tab 焦点循环，适用于只报告播放位置的波形。",
+        ["With no peaks yet the control draws just its baseline, so a page can lay the space out before the host has produced anything to draw."]="还没有峰值时，控件只绘制中线基准，因此页面可以先占好位置，等宿主产出可绘制的内容。",
     };
 
     public static void Apply(Control root, CultureInfo culture)

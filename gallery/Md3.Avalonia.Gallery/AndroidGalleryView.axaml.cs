@@ -128,6 +128,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Calendar", () => new CalendarGalleryPage());
         AddPage("Cascader", () => new CascaderGalleryPage());
         AddPage("Chart", () => new ChartGalleryPage());
+        AddPage("Waveform", () => new WaveformGalleryPage());
         AddPage("Chat view", () => new ChatViewGalleryPage());
         AddPage("Command palette", () => new CommandPaletteGalleryPage());
         AddPage("Data grids", () => new DataGridGalleryPage());

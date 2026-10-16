@@ -66,6 +66,22 @@
   <ControlTheme x:Key="{x:Type eco:MdAnimatedText}" TargetType="eco:MdAnimatedText">
     <Setter Property="Template"><ControlTemplate><TextBlock x:Name="PART_Text" TextWrapping="Wrap" /></ControlTemplate></Setter>
   </ControlTheme>
+  <!-- Waveform: the played/unplayed split is the same one a Material 3 slider makes between its
+       active and inactive track, so it borrows Primary and SurfaceContainerHighest rather than
+       inventing a pair. There is no template: the control draws itself, and the theme only supplies
+       the brushes and the shape token it draws with. It lives in this dictionary rather than
+       ExtraControls because AdvancedControls is the one both ExtraTheme and EcosystemTheme merge,
+       so a host gets the same waveform whichever of the two it installs. -->
+  <ControlTheme x:Key="{x:Type eco:MdWaveform}" TargetType="eco:MdWaveform">
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="MinHeight" Value="48" />
+    <Setter Property="PlayedBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="UnplayedBrush" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+    <Setter Property="PlayheadBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="BaselineBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Setter Property="BarCornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.ExtraSmall}" />
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" /></Style>
+  </ControlTheme>
   <ControlTheme x:Key="{x:Type eco:MdSpinKit}" TargetType="eco:MdSpinKit" />
   <ControlTheme x:Key="{x:Type eco:MdStaggeredPanel}" TargetType="eco:MdStaggeredPanel" />
   <ControlTheme x:Key="EcoItemsHostTheme" TargetType="ItemsControl">

@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.WaveformGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Waveform" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A peak-driven waveform: the played part in Primary, the rest in SurfaceContainerHighest, the same split a Material 3 slider makes between its active and inactive track. The control draws peaks and does not decode audio, so the host keeps its own decoder, threading and buffer lifetime." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Scrubbing" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Drag anywhere to seek, or focus the waveform and use the arrow keys, Home and End. Position is two-way bindable, so a player view model drives the playhead during playback and receives seeks back." />
+        <eco:MdWaveform x:Name="Waveform" Height="96" HorizontalAlignment="Stretch" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdButton x:Name="Playback" Variant="Filled" Click="TogglePlayback" Margin="0,0,24,8" />
+          <TextBlock x:Name="PositionReadout" Classes="body" VerticalAlignment="Center" Margin="0,0,0,8" />
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Level history" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="IsMirrored=false grows the bars up from the bottom instead of around the centre line, which reads as a level history rather than a waveform. Same control, same tokens, no separate meter." />
+        <eco:MdWaveform x:Name="Meter" Height="64" IsMirrored="False" BarGap="1" HorizontalAlignment="Stretch" />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Display only" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="IsInteractive=false keeps the shape without the scrub: no pointer capture and no tab stop, for a waveform that only reports where playback is." />
+        <eco:MdWaveform x:Name="Static" Height="48" IsInteractive="False" ShowPlayhead="False" HorizontalAlignment="Stretch" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="With no peaks yet the control draws just its baseline, so a page can lay the space out before the host has produced anything to draw." />
+        <eco:MdWaveform Height="48" HorizontalAlignment="Stretch" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdWaveform Peaks=&quot;{Binding Peaks}&quot;&#10;             PlayheadPosition=&quot;{Binding Position, Mode=TwoWay}&quot; /&gt;"
+                             CSharpCode="// Peaks are normalized magnitudes, one per bar; the helper reduces a sample buffer.&#10;var peaks = MdWaveform.PeaksFromSamples(samples, barCount: 240);&#10;waveform.Peaks = peaks;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

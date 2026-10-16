@@ -91,7 +91,7 @@ All component themes are scoped to `Md*` types. Registering `MaterialTheme` does
 - Optional Ecosystem Wave E: `MdSkeleton`, `MdSkeletonGroup`, `MdAnimationSequence`.
 - Optional Ecosystem Wave F: `MdPinInput`, `MdPinCell`, `MdTreeView`, `MdTreeNode`, `MdTreeRow`, `MdTagInput`, `MdTagEntry`, `MdTagChangedEventArgs`.
 - Existing optional Ecosystem controls: `MdAvatar`, `MdAvatarGroup`, `MdRating`, `MdBreadcrumb`, `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, and `MdStaggeredPanel`.
-- `MdBeforeAfter` provides draggable horizontal/vertical content comparison; `MdAnimatedText` provides typewriter/fade/pop-friendly text reveal; `MdSpinKit` contains optional non-Material loading recipes; `MdStaggeredPanel` provides cancelable staggered entrance motion. These are Extra controls; core `MdChart` remains provider-neutral and does not bundle a chart engine.
+- `MdBeforeAfter` provides draggable horizontal/vertical content comparison; `MdAnimatedText` provides typewriter/fade/pop-friendly text reveal; `MdSpinKit` contains optional non-Material loading recipes; `MdStaggeredPanel` provides cancelable staggered entrance motion. `MdWaveform` draws peak-driven audio waveforms with a scrubbable Material playhead and no bundled decoder. These are Extra controls; core `MdChart` remains provider-neutral and does not bundle a chart engine.
 
 ## Complete component catalog
 
@@ -147,7 +147,7 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 | **Selection and transfer** | `MdAsyncSelect`, `MdCalendar`, `MdCascader`, `MdCascaderItem`, `MdTransfer`, `MdColorPicker`, `MdColorPickerButton` |
 | **Feedback and identity** | `MdAvatar`, `MdAvatarGroup`, `MdRating`, `MdResultView`, `MdSkeleton`, `MdSkeletonGroup`, `MdPinInput`, `MdPinCell`, `MdTagInput`, `MdTagEntry` |
 | **Data visualization and editing** | `MdChart`, `MdChartSeries`, `MdChartPoint`, `MdRichEditor`, `MdRichTextEditor`, `MdChatView`, `MdChatMessage`, `MdTimeline`, `MdTimelineItem` |
-| **Motion and visual extras** | `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, `MdStaggeredPanel`, `MdAnimationSequence`, `MdAnimatedVisibility`, `MdContainerTransform`, `MdFadeThrough`, `MdSharedAxis`, `MdRevealHost`, `MdMorphPanel` |
+| **Motion and visual extras** | `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, `MdStaggeredPanel`, `MdWaveform`, `MdAnimationSequence`, `MdAnimatedVisibility`, `MdContainerTransform`, `MdFadeThrough`, `MdSharedAxis`, `MdRevealHost`, `MdMorphPanel` |
 | **Navigation/content** | `MdBreadcrumb`, `MdBreadcrumbItem`, `MdGridTile`-style content helpers |
 
 `MdPagedItemsView.ItemTemplate` sets the presentation of each loaded record; `MdDataGrid` is a narrower surface than Avalonia `DataGrid` and is not a drop-in replacement for it.
@@ -302,9 +302,12 @@ The optional `Md3.Avalonia.Extra` package contains visual and ecosystem controls
 <extra:MdStaggeredPanel AutoPlay="True" Stagger="0:0:0.06">
   <Border /><Border /><Border />
 </extra:MdStaggeredPanel>
+<extra:MdWaveform Peaks="{Binding Peaks}" PlayheadPosition="{Binding Position, Mode=TwoWay}" />
 ```
 
 `MdBeforeAfter.Position` is a two-way value in the `0..1` range and supports pointer dragging plus keyboard adjustment. `MdAnimatedText` exposes `Start()`, `Stop()`, `IsPlaying`, `DisplayText` and `Completed`. `MdSpinKit` is an optional collection of non-Material loading recipes; use `MdLoadingIndicator` for the Material 3 indicator. `MdStaggeredPanel.PlayAsync()` is cancelable and snaps to the final state under Reduced/None motion.
+
+`MdWaveform` draws an audio waveform from peaks and nothing else: `Peaks` is one normalized magnitude per bar, `PlayheadPosition` is two-way in the `0..1` range and moves by pointer drag or by Left, Right, Home and End, `IsMirrored` chooses a centre-mirrored waveform over bottom-anchored bars, and `IsInteractive`, `ShowPlayhead`, `BarGap`, `BarCornerRadius` and `PlayheadThickness` shape the rest. The theme fills `PlayedBrush`, `UnplayedBrush`, `PlayheadBrush` and `BaselineBrush` from `Md.Sys.Color` roles - Primary over SurfaceContainerHighest, the split a Material 3 slider already makes - and `BarCornerRadius` from the shape scale. It deliberately owns no decoder: a waveform that decoded audio would also own a file format, a threading model and a buffer lifetime, none of which is presentation. `MdWaveform.PeaksFromSamples(samples, barCount)` reduces a sample buffer to bars for hosts that have one; with no peaks set the control draws only its baseline, so a page can reserve the space before anything is playable.
 
 `MdChart` is deliberately provider-neutral. It exposes `Series`, `Provider`, `BuildAccessibleTable()` and pointer selection, but does not bundle a chart engine. Applications may wrap a third-party chart control with Material surfaces and tokens instead of adopting a second chart data model.
 

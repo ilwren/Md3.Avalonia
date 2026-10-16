@@ -230,6 +230,12 @@ jobs:
         continue-on-error: true
         run: scripts/probe-tests.sh MdGalleryLocalizationTests localization.trx
 
+      # A control that draws itself has no template to assert on, so its probe is the evidence that
+      # the peak reduction, the scrub and the painted played/unplayed split actually ran.
+      - name: Probe the waveform tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdWaveformTests waveform.trx
+
       # Bounded, because an unbounded stall costs the job's whole timeout and takes the run's
       # annotations with it: the suite measures about four and a half minutes, so ten is a wall it
       # only reaches by hanging, and a hang reported as a failed step still lets every step after

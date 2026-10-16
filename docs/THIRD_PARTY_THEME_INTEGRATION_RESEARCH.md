@@ -441,6 +441,24 @@ LiveCharts 尚未分配的槽位（`ISeries.SeriesId` 默认为 `-1`）当作第
 
 ---
 
+## 补记（2026-10-16）：音频波形图为什么是自研而不是主题化
+
+需求是加一个音乐波形图，并优先走「主题化第三方控件」这条路。按 §6 的核查纪律检索后没有可接入的对象：
+`waveform`、`audio visualizer`、`audio spectrum`、`vu meter` 配合 `topic:avalonia` 只返回
+`rarepops/Spektra`（5 星），而它是一个桌面应用而不是控件库，没有可引用的主题缝。因此按 §4 的骨架在
+`Md3.Avalonia.Extra` 自研 `MdWaveform`，并遵守同一组约束：
+
+- **不做数据管道。** 控件只画峰值（`Peaks`，每根一条归一化幅值），不解码音频。解码会带来文件格式、
+  线程模型与缓冲区生命周期，这些都不是表现层的事；`PeaksFromSamples` 只负责把宿主已有的采样降到条。
+- **令牌而不是硬编码。** 已播放/未播放沿用 Material 3 滑块在活动轨道与非活动轨道之间的划分
+  （`Primary` / `SurfaceContainerHighest`），圆角取 `Md.Sys.Shape.Corner.ExtraSmall`。为此
+  `BarCornerRadius` 的类型是 `CornerRadius` 而非 `double`：`double` 接不住 shape 令牌。
+- **主题放在 `AdvancedControls.axaml`。** 该字典同时被 `ExtraTheme` 与 `EcosystemTheme` 合并，
+  自绘控件（`MdSpinKit`、`MdBeforeAfter`）都在这里，一处注册即可覆盖两种宿主，不必像 `MdRating`
+  那样在两个字典里各写一份。
+
+---
+
 ## 7. 数据来源
 
 - GitHub REST API（星标、最近提交、许可证、归档状态、仓库树、文件内容），2026-10-11。

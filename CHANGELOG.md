@@ -187,6 +187,18 @@
   asserts the output is a native ELF executable with no managed assembly beside it, then runs that
   binary under xvfb. Native AOT fails at runtime on reflection that was trimmed away, not at
   compile time, so the smoke run is the part that carries the claim.
+- **`MdWaveform`**, a Material audio waveform in `Md3.Avalonia.Extra`. One bar per peak, mirrored
+  around the centre line by default, played bars in `Primary` and the rest in
+  `SurfaceContainerHighest` - the split a Material 3 slider already makes between its active and
+  inactive track, so a custom scheme recolours it for free. `PlayheadPosition` is two-way and moves
+  by pointer drag or by Left, Right, Home and End; `IsMirrored`, `IsInteractive`, `ShowPlayhead`,
+  `BarGap`, `BarCornerRadius` and `PlayheadThickness` shape the rest, and `BarCornerRadius` is a
+  `CornerRadius` rather than a double precisely so the theme can hand it a shape token. It bundles
+  no decoder: `Peaks` is one normalized magnitude per bar, and `MdWaveform.PeaksFromSamples` reduces
+  a sample buffer for hosts that already have one. No third-party Avalonia waveform control turned up
+  worth theming - the only candidate on GitHub is a desktop application, not a control - so this one
+  is in-house. Its theme lives in `AdvancedControls.axaml`, the dictionary both `ExtraTheme` and
+  `EcosystemTheme` merge, so a host gets the same waveform whichever it installs.
 - `MdBreadcrumb` gains a `Powerline` variant.
 - [`docs/DIALOG_SERVICE.md`](docs/DIALOG_SERVICE.md): how to show dialogs from a view model
   through `IMdDialogService`, including the composition-root wiring.
