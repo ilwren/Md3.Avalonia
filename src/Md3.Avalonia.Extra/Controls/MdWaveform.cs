@@ -265,7 +265,13 @@ public sealed class MdWaveform : Control
             var rect = new Rect(x, mirrored ? centre - span / 2 : height - span, barWidth, span);
             // A bar is played once the playhead is past its middle, which is how a slider decides
             // too; splitting a straddling bar would leave a sliver of colour nobody can read.
-            context.DrawRectangle(x + barWidth / 2 <= splitAt ? played : unplayed, null, rect, radius);
+            //
+            // DrawRectangle has no CornerRadius overload - its fourth argument is a double radiusX,
+            // and RoundedRect has no (Rect, CornerRadius) constructor either, so the corners are
+            // mapped by hand. That is worth saying out loud: passing the CornerRadius straight
+            // through compiles against the wrong overload in every direction but this one.
+            context.DrawRectangle(x + barWidth / 2 <= splitAt ? played : unplayed, null,
+                new RoundedRect(rect, radius.TopLeft, radius.TopRight, radius.BottomRight, radius.BottomLeft));
         }
 
         if (!ShowPlayhead) return;
@@ -274,7 +280,7 @@ public sealed class MdWaveform : Control
         var thickness = Math.Max(1, PlayheadThickness);
         var at = position * width;
         context.DrawRectangle(playhead, null,
-            new Rect(at - thickness / 2, 0, thickness, height), new CornerRadius(thickness / 2));
+            new RoundedRect(new Rect(at - thickness / 2, 0, thickness, height), thickness / 2));
 
         // Material's slider carries a handle on its thumb. Here the handle appears only while the
         // waveform is held, so the resting state stays a hairline instead of competing with the bars.
