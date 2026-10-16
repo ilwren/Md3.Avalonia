@@ -147,7 +147,7 @@ jobs:
           # Documentation preview bitmaps are asset generation, not verification. They are
           # produced only on main, where the artefact is actually published.
           MD3_WRITE_PREVIEWS: ${{ github.ref == 'refs/heads/main' && '1' || '0' }}
-          MD3_TEST_FILTER: ${{ inputs.test_filter || 'FullyQualifiedName~DialogHost_Does_Not_Adopt_SimpleDialog_In_Main_Content' }}
+          MD3_TEST_FILTER: ${{ inputs.test_filter }}
         run: |
           test_args=(
             tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj

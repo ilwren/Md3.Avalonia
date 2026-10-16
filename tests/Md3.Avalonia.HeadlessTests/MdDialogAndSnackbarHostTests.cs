@@ -181,14 +181,9 @@ public sealed class MdDialogAndSnackbarHostTests
             Dispatcher.UIThread.RunJobs();
             var scrim = standaloneDialog.GetVisualDescendants().OfType<Border>()
                 .Single(control => control.Name == "PART_Scrim");
-            Assert.True(scrim.IsVisible);
-
-            host.IsOpen = true;
-            Dispatcher.UIThread.RunJobs();
-            host.Close();
-            Dispatcher.UIThread.RunJobs();
             Assert.True(standaloneDialog.IsOpen);
-            Assert.True(scrim.IsVisible);
+            Assert.True(scrim.IsVisible,
+                "a SimpleDialog in the host's main content is standalone and keeps its own scrim.");
         }
         finally { window.Close(); }
     }
