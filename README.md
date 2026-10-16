@@ -39,7 +39,7 @@ dotnet add package Md3.Avalonia --version 0.4.5-preview.1
 
 ### 按需添加可选包
 
-六个包的版本统一为 `0.4.5-preview.1`；只安装所需能力。图标字体 provider 二选一，其余主题包也是 opt-in：
+七个包的版本统一为 `0.4.5-preview.1`；只安装所需能力。图标字体 provider 二选一，其余能力包也是 opt-in：
 
 | NuGet 包 | 提供能力 |
 |---|---|
@@ -49,6 +49,7 @@ dotnet add package Md3.Avalonia --version 0.4.5-preview.1
 | `Md3.Avalonia.Extra` | Flutter-inspired 扩展控件；需额外注册 `ExtraTheme` |
 | `Md3.Avalonia.DataGrid` | Avalonia 原生 `DataGrid` 的 Material 主题；需注册 `MaterialDataGridTheme` |
 | `Md3.Avalonia.RichEditor` | AvaloniaRichEditor 维护版的 Material 主题（正文支持明暗主题）；需注册 `MaterialRichEditorTheme` |
+| `Md3.Avalonia.Notifications` | Windows、macOS、Linux、Android 系统通知的统一 .NET API；独立于 Avalonia 控件主题 |
 
 在各包版本一致的情况下，可用 `dotnet add package <包名> --version 0.4.5-preview.1` 添加对应包。核心包不强制依赖图标 provider、DataGrid 或富文本编辑器引擎。
 
@@ -57,7 +58,7 @@ dotnet add package Md3.Avalonia --version 0.4.5-preview.1
 - 每个交互控件使用独立的 `Md*` CLR 类型和 scoped `ControlTheme`；不全局覆盖 Avalonia 原生控件；
 - 核心包不依赖 Fluent/Simple theme，尽量复用 Avalonia 原生行为、绑定、键盘和选择模型；
 - Material 颜色、字体、形状、状态层、阴影和 motion 通过 token 与 `DynamicResource` 消费；
-- Core、Icons、Icons.Lite、Extra、DataGrid、RichEditor 六个包可以独立发布；Extra 和图表能力不强制绑定第三方 vendor；
+- Core、Icons、Icons.Lite、Extra、DataGrid、RichEditor、Notifications 七个包可以独立发布；Notifications 不依赖 Avalonia UI；Extra 和图表能力不强制绑定第三方 vendor；
 - RTL、现有 accessibility 和多平台适配代码会持续保留；当前开发优先级暂不把完整 RTL/多语种布局和屏幕阅读器人工验收作为预览版阻塞项。
 
 | Dark components and app bar | Dark outlined fields |
@@ -207,7 +208,7 @@ python3 scripts/verify-fonts.py
 
 验证器会核对完整字体与 Lite 子集 checksum、真实 variable-font tables 和 glyph 数量，拒绝缺失、占位矩形或被替换的二进制。Apache-2.0 字体许可证同时打入两个 Icons 包。
 
-打包脚本要求 .NET 10 SDK；`scripts/build-nuget.sh` 与 `scripts/build-nuget.ps1` 都会构建六个正式包，并在 `artifacts/nuget`（或自定义输出目录）生成六个 `.nupkg` 和六个 `.snupkg`。Bash 使用 `--output`，PowerShell 使用 `-Output` 修改输出目录。
+打包脚本要求 .NET 10 SDK、Java 17 和 Android workload（`dotnet workload install android`）；`scripts/build-nuget.sh` 与 `scripts/build-nuget.ps1` 都会构建七个正式包，并在 `artifacts/nuget`（或自定义输出目录）生成七个 `.nupkg` 和七个 `.snupkg`。Bash 使用 `--output`，PowerShell 使用 `-Output` 修改输出目录。系统通知包用法与平台前置条件见 [`src/Md3.Avalonia.Notifications/README.md`](src/Md3.Avalonia.Notifications/README.md)。
 
 同时引用 Core 与 Icons 后不需要手动调用 `ConfigureFonts`：`MdSymbols` 和核心 `MdSymbolPresenter` 会自动发现 Icons provider、注册程序集内嵌字体，验证 internal family、typeface 和官方 `search` glyph，再注入核心 `Md.Icon.*` resources。验证失败时 symbol glyph 保持隐藏，不使用 Unicode 仿制图标。
 
@@ -233,6 +234,7 @@ src/Md3.Avalonia/                 # 官方 Flutter Material 对齐核心包；�
    └─ Controls/                    # 每类控件的 scoped ControlTheme
 src/Md3.Avalonia.Icons/           # 可选 Symbols catalog/loader；内嵌完整官方 TTF
 src/Md3.Avalonia.Extra/           # 第三方 Flutter clean-room 控件；依赖核心，不依赖 Icons
+src/Md3.Avalonia.Notifications/   # Windows/macOS/Linux/Android 原生系统通知，独立于 Avalonia UI
 
 gallery/Md3.Avalonia.Gallery/     # 组件、Theme Lab、资源与字体图标页面
 gallery/Md3.Avalonia.Gallery.Android/ # net10.0-android single-view host
@@ -266,7 +268,7 @@ python3 scripts/check-api-doc-coverage.py    # docs/API.md 是否覆盖全部公
 </Application>
 ```
 
-六个可独立 pack 的 NuGet 包统一为 `0.4.5-preview.1`，选择说明见上方包表。`Md3.Avalonia.DataGrid` 和 `Md3.Avalonia.RichEditor` 是 opt-in 主题包，分别引入 Avalonia 原生 DataGrid 和保留 `AvaloniaRichEditor` 程序集/API 的维护版编辑器依赖；核心包不会因此拉入这些可选依赖。六个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
+七个可独立 pack 的 NuGet 包统一为 `0.4.5-preview.1`，选择说明见上方包表。`Md3.Avalonia.DataGrid` 和 `Md3.Avalonia.RichEditor` 是 opt-in 主题包，分别引入 Avalonia 原生 DataGrid 和保留 `AvaloniaRichEditor` 程序集/API 的维护版编辑器依赖；核心包不会因此拉入这些可选依赖。七个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
 
 任意 seed 主题可在启动时或运行时应用：
 
@@ -412,7 +414,7 @@ await snackbarService.ShowAsync(new MdSnackbarMessage("Draft archived")
 
 ```bash
 python3 scripts/verify-fonts.py
-scripts/build-nuget.sh   # 构建六个 .nupkg/.snupkg
+bash scripts/build-nuget.sh   # 构建七个 .nupkg/.snupkg (需要 Java 17 + Android workload)
 
 dotnet build gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj -c Release
 dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release
@@ -435,7 +437,7 @@ bash scripts/publish-gallery-aot.sh --rid linux-x64 --smoke   # 或 win-x64 / os
 
 脚本会断言产物是原生可执行文件且旁边没有托管 dll，`--smoke` 在 xvfb 下实际启动该二进制确认运行时未因裁剪丢失反射元数据而崩溃；默认清理 bin/obj。`.github/workflows/aot-probe.yml` 在 main 与 arena 分支上运行同一脚本。
 
-当前发布门禁会构建六个包并严格检查六个 `.nupkg`、六个 `.snupkg`、统一版本和已内嵌官方字体。仓库不保留普通构建产物。测试覆盖 Light/Dark Gallery screenshots、任意 HCT seed golden vectors、49 roles、三档 contrast、主题 JSON round-trip、五档 breakpoint、搜索索引、LTR/RTL 渲染、CommunityToolkit.Mvvm、Automation/live-region、虚拟化和主题生命周期、AvaloniaEdit 双语言编辑器、真实 ScrollViewer extent/viewport/wheel offset、Autocomplete/Numeric input、adaptive breakpoints、Flexible NavigationBar、official chip/item 类型、popup 非强制 OverlayLayer、Tabs/Toolbars/Tooltips、Menus/Drawer/Rail/Search/Sheets/Slider/Snackbar/Switch 的渲染与直接 API，以及 Dialog、Lists、contained Loading/Progress、popup 互斥、文化日期网格、一分钟 TimePicker、state layer、buttons、fields、Carousel/Card/Chips、AppBar、Symbols、Radio、Badge、ripple/motion。
+当前发布门禁会构建七个包并严格检查七个 `.nupkg`、七个 `.snupkg`、统一版本和已内嵌官方字体。仓库不保留普通构建产物。测试覆盖 Light/Dark Gallery screenshots、任意 HCT seed golden vectors、49 roles、三档 contrast、主题 JSON round-trip、五档 breakpoint、搜索索引、LTR/RTL 渲染、CommunityToolkit.Mvvm、Automation/live-region、虚拟化和主题生命周期、AvaloniaEdit 双语言编辑器、真实 ScrollViewer extent/viewport/wheel offset、Autocomplete/Numeric input、adaptive breakpoints、Flexible NavigationBar、official chip/item 类型、popup 非强制 OverlayLayer、Tabs/Toolbars/Tooltips、Menus/Drawer/Rail/Search/Sheets/Slider/Snackbar/Switch 的渲染与直接 API，以及 Dialog、Lists、contained Loading/Progress、popup 互斥、文化日期网格、一分钟 TimePicker、state layer、buttons、fields、Carousel/Card/Chips、AppBar、Symbols、Radio、Badge、ripple/motion。
 
 每一次 build、test 或 pack 命令结束后必须立即清理编译产物，再继续后续实现或验证。Workspace 不交付 `bin/`、`obj/`、`TestResults/`、DLL、PDB、NuGet、APK 或 AAB；`docs/*.png` 是保留的文档参考图。
 
@@ -445,7 +447,7 @@ bash scripts/publish-gallery-aot.sh --rid linux-x64 --smoke   # 或 win-x64 / os
 - HCT dynamic theme、49 个当前 Material role、Theme Lab 与 JSON round-trip 已完成；`MdTextBox.IsPassword` 已覆盖密码输入与 reveal 行为；
 - Android 系统返回键／预测性返回已接入（`MdBackNavigation`，覆盖 dialog、sheet、drawer、search、menu、FAB menu 与两个 picker），安全区内缩已提供按边控制（`MdSafeArea`）；两者的 headless 行为有回归测试，真机手势动画与挖孔几何仍需人工验收；
 - Android Gallery 已纳入 solution，CI 会构建 APK；这不代表物理设备、旋转、生命周期或 TalkBack 验收已签署，人工结果仍以 [`docs/RELEASE_VALIDATION.md`](docs/RELEASE_VALIDATION.md) 的记录为准；
-- 六个包均声明 `IsTrimmable` + `IsAotCompatible` 并启用相应分析器；主题 JSON 使用源生成序列化，`MdDataGrid`/`MdAsyncSelect`/`MdSearchView` 的字符串属性路径也提供免反射 selector（见 [API 参考的 Trimming 一节](docs/API.md#trimming)）。Linux x64 原生 AOT Gallery 已发布并在 xvfb 下 smoke-run；AOT workflow 会报告诊断，但这不表示诊断数为零，也不替代 Windows/macOS/Android 或使用方应用的 AOT 验收；
+- 七个包均声明 `IsTrimmable` + `IsAotCompatible` 并启用相应分析器；主题 JSON 使用源生成序列化，`MdDataGrid`/`MdAsyncSelect`/`MdSearchView` 的字符串属性路径也提供免反射 selector（见 [API 参考的 Trimming 一节](docs/API.md#trimming)）。Linux x64 原生 AOT Gallery 已发布并在 xvfb 下 smoke-run；AOT workflow 会报告诊断，但这不表示诊断数为零，也不替代 Windows/macOS/Android 或使用方应用的 AOT 验收；
 - Narrator、VoiceOver 和 Orca 必须由具备对应 OS/辅助技术的人员按发布清单人工验收；
 - 完整 Material Symbols Rounded variable TTF 与真实 Lite 子集已提交并自动打包；CI 以固定 upstream commit、SHA-256、variable tables 和 glyph 数量阻止占位或替代字体混入发布。
 

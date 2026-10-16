@@ -21,9 +21,13 @@ The runtime library references only `Avalonia` and `MaterialColorUtilities`. It 
 - Avalonia minor-version upgrades are validated by Release build, headless tests, package validation and the platform matrix before the supported baseline changes.
 - The public `Md*` control types, styled properties, enums, theme JSON fields and resource-key names form the compatibility surface.
 
+## Native notification package
+
+`Md3.Avalonia.Notifications` is a standalone package targeting `net10.0` for macOS/Linux, `net10.0-windows10.0.19041.0` for Windows, and `net10.0-android` for Android. It provides title-and-body notifications without referencing Avalonia. Windows calls WinRT toast APIs directly, macOS uses AppKit's legacy/deprecated `NSUserNotificationCenter`, Linux calls the native `libnotify` library, and Android uses `NotificationManager`; no external helper processes are launched. Linux still requires libnotify and a D-Bus notification service. See the [package README](../src/Md3.Avalonia.Notifications/README.md) for registration, native-library, and permission requirements. The implementation is new and still requires manual display/permission verification on each operating system; no device or desktop sign-off is claimed.
+
 ## Android boundary
 
-`gallery/Md3.Avalonia.Gallery.Android` is deliberately kept outside the desktop solution so developers without the Android workload can build the library and desktop Gallery. Validate it with an installed .NET Android workload:
+`gallery/Md3.Avalonia.Gallery.Android` is deliberately kept outside the desktop solution so developers without the Android workload can build the library and desktop Gallery. Validate it with Java 17 and an installed .NET Android workload:
 
 ```bash
 dotnet workload install android

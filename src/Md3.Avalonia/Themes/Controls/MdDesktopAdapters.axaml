@@ -221,12 +221,7 @@
                         Text="{TemplateBinding Text}" PlaceholderText="{TemplateBinding PlaceholderText}"
                         IsReadOnly="{TemplateBinding IsReadOnly}" TextAlignment="{TemplateBinding TextAlignment}"
                         VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}">
-            <md:MdTextBox.TrailingIcon>
-              <Border Width="32" Height="24" Background="Transparent"
-                      IsVisible="{TemplateBinding ShowButtonSpinner}" />
-            </md:MdTextBox.TrailingIcon>
-          </md:MdTextBox>
+                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
         </ButtonSpinner>
       </ControlTemplate>
     </Setter>

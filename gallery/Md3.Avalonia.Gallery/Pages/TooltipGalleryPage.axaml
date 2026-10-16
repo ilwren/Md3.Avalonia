@@ -27,7 +27,7 @@
             <md:MdTooltipHost.Tooltip><md:MdTooltip Content="Share this item" /></md:MdTooltipHost.Tooltip>
             <md:MdIconButton Icon="{x:Static md:MdSymbols.Share}" Variant="Tonal" />
           </md:MdTooltipHost>
-          <md:MdTooltipHost Placement="Bottom" OpenOnClick="True">
+          <md:MdTooltipHost Placement="Bottom" ShowDelay="0:0:0.35">
             <md:MdTooltipHost.Tooltip>
               <md:MdTooltip Variant="Rich" Title="About visibility" Content="Anyone with the link can view this item.">
                 <md:MdTooltip.ActionContent><md:MdButton Content="Manage access" Variant="Text" /></md:MdTooltip.ActionContent>
@@ -36,7 +36,7 @@
             <md:MdButton Content="Rich tooltip" Variant="Outlined" />
           </md:MdTooltipHost>
         </WrapPanel>
-        <TextBlock Classes="body" Text="The rich example also opens on click and dismisses with Escape or an outside press." />
+        <TextBlock Classes="body" Text="Hover the rich trigger, then move onto its action without leaving the tooltip. Escape or an outside press dismisses it." />
       </StackPanel>
 
       <StackPanel Spacing="10">

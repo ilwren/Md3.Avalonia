@@ -444,6 +444,61 @@ public sealed class MdMotionLifecycleTests
     }
 
     [AvaloniaFact]
+    public void HoverCard_Uses_Owner_Overlay_And_Bridges_Anchor_To_Content()
+    {
+        var content = new StackPanel
+        {
+            Width = 240,
+            Spacing = 8,
+            Children =
+            {
+                new TextBlock { Text = "Profile preview" },
+                new MdButton { Content = "Open profile", Variant = MdButtonVariant.Text }
+            }
+        };
+        var card = new MdHoverCard
+        {
+            Anchor = "Hover or focus",
+            PopoverContent = content,
+            Margin = new Thickness(24),
+            OpenDelay = TimeSpan.Zero,
+            CloseDelay = TimeSpan.FromMilliseconds(300)
+        };
+        using var scope = Show(card, 640, 360);
+        Dispatcher.UIThread.RunJobs();
+
+        var popup = card.GetVisualDescendants().OfType<Popup>()
+            .Single(control => control.Name == "PART_Popup");
+        Assert.True(popup.ShouldUseOverlayLayer,
+            "a hover card must use the owner's overlay to avoid native-popup deactivation during pointer transfer");
+        var anchor = card.GetVisualDescendants().OfType<Button>()
+            .Single(control => control.Name == "PART_AnchorButton");
+        var anchorPoint = anchor.TranslatePoint(
+            new Point(anchor.Bounds.Width / 2, anchor.Bounds.Height / 2), scope.Window);
+        Assert.NotNull(anchorPoint);
+        scope.Window.MouseMove(anchorPoint!.Value, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(card.IsOpen, "hovering the anchor should open the card after its configured delay");
+        Assert.True(popup.IsUsingOverlayLayer);
+        Assert.True(ReferenceEquals(scope.Window, TopLevel.GetTopLevel(content)),
+            "the anchor and hover-card content must remain in the same native TopLevel");
+
+        var contentPoint = content.TranslatePoint(
+            new Point(content.Bounds.Width / 2, content.Bounds.Height / 2), scope.Window);
+        Assert.NotNull(contentPoint);
+        scope.Window.MouseMove(contentPoint!.Value, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(content.IsPointerOver);
+        Assert.True(card.IsOpen, "moving into the card must cancel the anchor's close timer");
+
+        scope.Window.MouseMove(anchorPoint.Value, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(anchor.IsPointerOver);
+        Assert.True(card.IsOpen, "moving back to the anchor must win over a stale content-exit event");
+    }
+
+    [AvaloniaFact]
     public void Simple_Dialog_Keeps_Surface_Present_Through_Exit()
     {
         var dialog = new MdSimpleDialog { Title = "Choose", ItemsSource = new[] { "One", "Two" }, IsOpen = true };

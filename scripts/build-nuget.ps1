@@ -1,4 +1,5 @@
-# Build the release NuGet packages for all six Md3.Avalonia packages.
+# Build the release NuGet packages for all seven Md3.Avalonia packages.
+# Requires Java 17 and the .NET Android workload: dotnet workload install android.
 [CmdletBinding()]
 param(
     [string]$Output = "$PSScriptRoot/../artifacts/nuget",
@@ -21,7 +22,8 @@ $projects = @(
     (Join-Path $root "src/Md3.Avalonia.Icons.Lite/Md3.Avalonia.Icons.Lite.csproj"),
     (Join-Path $root "src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj"),
     (Join-Path $root "src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj"),
-    (Join-Path $root "src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj")
+    (Join-Path $root "src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.Notifications/Md3.Avalonia.Notifications.csproj")
 )
 
 if ($SkipFontCheck) {

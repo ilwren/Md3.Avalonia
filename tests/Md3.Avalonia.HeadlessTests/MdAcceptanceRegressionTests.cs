@@ -195,6 +195,64 @@ public sealed class MdAcceptanceRegressionTests
             Assert.InRange(origin.Value.Y, 0, leftContainer.Bounds.Height - button.Bounds.Height);
             Assert.True(origin.Value.X < leftContainer.Bounds.Width / 2);
         }
+
+        var textPresenter = leftNumeric.GetVisualDescendants().OfType<TextPresenter>()
+            .Single(presenter => presenter.Name == "PART_TextPresenter");
+        var textOrigin = textPresenter.TranslatePoint(default, leftContainer);
+        Assert.NotNull(textOrigin);
+        var spinnerRightEdge = leftButtons.Max(button =>
+        {
+            var origin = button.TranslatePoint(default, leftContainer);
+            Assert.NotNull(origin);
+            return origin.Value.X + button.Bounds.Width;
+        });
+        Assert.True(textOrigin!.Value.X >= spinnerRightEdge + 4,
+            $"the numeric input text starts at x={textOrigin.Value.X:0.##}, overlapping the left spinner " +
+            $"which ends at x={spinnerRightEdge:0.##} inside the field.");
+    }
+
+    [AvaloniaFact]
+    public void Numeric_Box_Mouse_Wheel_Spins_Without_Requiring_Keyboard_Focus()
+    {
+        var numeric = new MdNumericBox
+        {
+            Width = 260,
+            Value = 5,
+            Minimum = 0,
+            Maximum = 10,
+            Increment = 2
+        };
+        var focusTarget = new Button { Content = "Other control", Width = 120, Height = 40 };
+        var window = new Window
+        {
+            Width = 400,
+            Height = 200,
+            Content = new StackPanel { Spacing = 12, Children = { numeric, focusTarget } }
+        };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(focusTarget.Focus());
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(focusTarget.IsFocused);
+            Assert.False(numeric.IsKeyboardFocusWithin);
+            var point = numeric.TranslatePoint(
+                new Point(numeric.Bounds.Width / 2, numeric.Bounds.Height / 2), window);
+            Assert.NotNull(point);
+
+            // Avalonia's ButtonSpinner normally ignores wheel input unless the field is focused.
+            // Scrolling over an unfocused Material numeric field should still use its increment.
+            window.MouseWheel(point!.Value, new Vector(0, 1), RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(7m, numeric.Value);
+            Assert.False(numeric.IsKeyboardFocusWithin);
+
+            window.MouseWheel(point.Value, new Vector(0, -1), RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(5m, numeric.Value);
+        }
+        finally { window.Close(); }
     }
 
     [AvaloniaFact]

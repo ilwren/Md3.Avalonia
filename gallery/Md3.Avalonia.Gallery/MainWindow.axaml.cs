@@ -159,6 +159,8 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Adaptive controls", "adaptive switch progress cupertino ios platform", AdaptiveControlsNav, () => new AdaptiveControlsGalleryPage()),
             Entry("Focus, shortcut, Hero", "focus traversal shortcut keybinding hero transition", FocusHeroNav, () => new FocusShortcutHeroGalleryPage())
         ];
+        Array.Sort(_galleryIndex, static (left, right) =>
+            StringComparer.OrdinalIgnoreCase.Compare(left.Title, right.Title));
 
         ThemeSelector.ItemsSource = new[] { "Light", "Dark", "System" };
         ThemeSelector.SelectedIndex = 2;

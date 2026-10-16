@@ -9,14 +9,21 @@
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Hover card" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="A hover card opens after a deliberate delay on hover or focus, so a pointer crossing the anchor does not flash it open." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A hover card opens after a deliberate delay on hover or focus. Move from the anchor into the card: it should stay open while either side is attended." />
       </StackPanel>
 
       <StackPanel Spacing="12">
         <eco:MdHoverCard Anchor="Hover or focus" HorizontalAlignment="Left"
-                         PopoverContent="Hover cards open after a deliberate delay and never remain over later sections."
-                         Opened="HoverCardOpened" Closed="OverlayClosed" />
-        <TextBlock x:Name="OverlayStatus" Classes="body" TextWrapping="Wrap" Text="Hover or focus the anchor, then move away to dismiss." />
+                         Opened="HoverCardOpened" Closed="OverlayClosed">
+          <eco:MdHoverCard.PopoverContent>
+            <StackPanel Width="240" Spacing="8">
+              <TextBlock FontWeight="Medium" Text="Profile preview" />
+              <TextBlock TextWrapping="Wrap" Text="Move the pointer between the anchor and this card. The card remains available until you leave both." />
+              <md:MdButton Content="Open profile" Variant="Text" HorizontalAlignment="Left" />
+            </StackPanel>
+          </eco:MdHoverCard.PopoverContent>
+        </eco:MdHoverCard>
+        <TextBlock x:Name="OverlayStatus" Classes="body" TextWrapping="Wrap" Text="Hover or focus the anchor, then move into the card before leaving the whole surface." />
       </StackPanel>
 
       <StackPanel Spacing="10">

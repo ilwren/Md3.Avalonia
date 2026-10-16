@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added the standalone `Md3.Avalonia.Notifications` package with one title/body API for Windows, macOS, Linux and Android. Windows uses WinRT toast APIs from its Windows-specific .NET target, Linux calls libnotify directly (no helper processes), macOS uses AppKit interop, and Android uses `NotificationManager`; Windows AppUserModelID registration and Android 13+ runtime permission remain host responsibilities. Platform delivery still needs manual verification.
+
 ### Fixed
 
 - `MdBeforeAfter` now rejects Avalonia's automatic pointer focus during a drag and applies keyboard focus after release with ancestor `BringIntoViewOnFocusChange` temporarily suppressed. This prevents a clipped comparison from scrolling under the stationary pointer while preserving keyboard focus; the Gallery regression checks first left-edge and top-edge drags through release.

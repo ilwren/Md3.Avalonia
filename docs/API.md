@@ -10,7 +10,7 @@ Start with the core package:
 dotnet add package Md3.Avalonia --version 0.4.5-preview.1
 ```
 
-All six packages are versioned together. Add only the optional packages your application uses; choose **one** icon provider:
+All seven packages are versioned together. Add only the optional packages your application uses; choose **one** icon provider:
 
 | NuGet package | Purpose | Theme/resource registration |
 |---|---|---|
@@ -20,6 +20,7 @@ All six packages are versioned together. Add only the optional packages your app
 | `Md3.Avalonia.Extra` | Optional ecosystem controls | `ExtraTheme` after `MaterialTheme` |
 | `Md3.Avalonia.DataGrid` | Material theme for Avalonia's native `DataGrid` | `MaterialDataGridTheme` |
 | `Md3.Avalonia.RichEditor` | Material theme for the API-compatible MIT-maintained `AvaloniaRichEditor` fork | `MaterialRichEditorTheme` |
+| `Md3.Avalonia.Notifications` | Unified Windows, macOS, Linux and Android system notifications; independent of Avalonia themes | `IMdSystemNotificationService` / `MdSystemNotificationService` |
 
 For explicit project-file references, use the same version for each package:
 
@@ -31,6 +32,7 @@ For explicit project-file references, use the same version for each package:
 <PackageReference Include="Md3.Avalonia.Extra" Version="0.4.5-preview.1" />
 <PackageReference Include="Md3.Avalonia.DataGrid" Version="0.4.5-preview.1" />
 <PackageReference Include="Md3.Avalonia.RichEditor" Version="0.4.5-preview.1" />
+<PackageReference Include="Md3.Avalonia.Notifications" Version="0.4.5-preview.1" />
 ```
 
 Register the core theme; register optional themes only when their packages are referenced:
@@ -51,6 +53,26 @@ Register the core theme; register optional themes only when their packages are r
 
 All component themes are scoped to `Md*` types. Registering `MaterialTheme` does not replace Avalonia's built-in `Button`, `TextBox`, `ComboBox`, `ScrollViewer`, or other native themes. The DataGrid and rich-editor themes are opt-in and do not add those third-party controls to the core package.
 
+## System notifications
+
+`Md3.Avalonia.Notifications` is a standalone package (no Avalonia dependency) that exposes `IMdSystemNotificationService`, `MdSystemNotificationService`, `MdSystemNotification`, and `MdSystemNotificationOptions`:
+
+```csharp
+using Md3.Avalonia.Notifications;
+
+var notifications = MdSystemNotificationService.CreateDefault(new MdSystemNotificationOptions
+{
+    ApplicationName = "My App",
+    WindowsAppUserModelId = "com.example.myapp",
+    AndroidChannelId = "updates",
+    AndroidChannelName = "Updates",
+});
+
+await notifications.ShowAsync(new MdSystemNotification("Ready", "The export has finished."));
+```
+
+`ShowAsync(title, body, cancellationToken)` is also available. For native Windows notifications, target the Windows host at `net10.0-windows10.0.19041.0`; classic desktop toast still requires the supplied AppUserModelID to be registered by the host app. Linux calls `libnotify` directly and requires its shared library plus a running D-Bus notification service (it does not launch `notify-send`). Android 13+ requires the host to declare `POST_NOTIFICATIONS` and request runtime permission before calling the service. Missing Android permission throws `MdSystemNotificationPermissionException`. Platform failures are reported as `MdSystemNotificationException`. The initial API supports title and body only (no click callback or actions); see the [package README](../src/Md3.Avalonia.Notifications/README.md) for all platform requirements.
+
 ## Namespaces
 
 | Namespace | Purpose |
@@ -64,6 +86,7 @@ All component themes are scoped to `Md*` types. Registering `MaterialTheme` does
 | `Md3.Avalonia.Extra.Controls` | Optional clean-room ecosystem controls |
 | `Md3.Avalonia.Extra.Infrastructure` | Density, paging, async-state, shortcut, overlay and focus-return contracts |
 | `Md3.Avalonia.Extra.Themes` | Opt-in `ExtraTheme` resource provider |
+| `Md3.Avalonia.Notifications` | Standalone native system-notification service and models |
 
 ## Components
 
@@ -463,7 +486,7 @@ scrollbars, and a cell editor that no longer derives from Fluent's `TextBox` the
 
 ## Trimming
 
-All six packages declare `IsTrimmable` and `IsAotCompatible` and build with the IL2xxx/IL3xxx analyzers enabled. This describes the library assemblies; application-owned reflection, dynamic XAML, and third-party code may still require preservation or selectors in the consuming app.
+All seven packages declare `IsTrimmable` and `IsAotCompatible` and build with the IL2xxx/IL3xxx analyzers enabled. This describes the library assemblies; application-owned reflection, dynamic XAML, and third-party code may still require preservation or selectors in the consuming app.
 
 The Linux x64 AOT probe publishes the desktop Gallery with `PublishAot=true`, checks that the output is a native executable without a managed Gallery assembly beside it, and smoke-runs that binary under xvfb. It reports linker diagnostics but does not claim zero diagnostics for every downstream app or validate Windows, macOS, or Android AOT.
 
