@@ -480,7 +480,8 @@ public sealed class MdMotionLifecycleTests
         Dispatcher.UIThread.RunJobs();
 
         Assert.True(card.IsOpen, "hovering the anchor should open the card after its configured delay");
-        Assert.True(popup.IsUsingOverlayLayer);
+        Assert.True(popup.IsUsingOverlayLayer,
+            "the hover card popup must be hosted in the owner's overlay layer");
         Assert.True(ReferenceEquals(scope.Window, TopLevel.GetTopLevel(content)),
             "the anchor and hover-card content must remain in the same native TopLevel");
 
@@ -489,12 +490,14 @@ public sealed class MdMotionLifecycleTests
         Assert.NotNull(contentPoint);
         scope.Window.MouseMove(contentPoint!.Value, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
-        Assert.True(content.IsPointerOver);
+        Assert.True(content.IsPointerOver,
+            "moving into the hover card overlay must report pointer presence on its content");
         Assert.True(card.IsOpen, "moving into the card must cancel the anchor's close timer");
 
         scope.Window.MouseMove(anchorPoint.Value, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
-        Assert.True(anchor.IsPointerOver);
+        Assert.True(anchor.IsPointerOver,
+            "moving back from the hover card overlay must report pointer presence on the anchor");
         Assert.True(card.IsOpen, "moving back to the anchor must win over a stale content-exit event");
     }
 
