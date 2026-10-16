@@ -1,10 +1,12 @@
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Templates;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -41,7 +43,21 @@ public sealed class MdDialogAndSnackbarHostTests
 
             var dialogHost = window.DialogHost;
             Assert.True(dialogHost.IsOpen);
-            Assert.IsType<MdSimpleDialog>(dialogHost.Dialog);
+            var simpleDialog = Assert.IsType<MdSimpleDialog>(dialogHost.Dialog);
+            var dialogPresenter = dialogHost.GetVisualDescendants().OfType<ContentPresenter>()
+                .Single(presenter => presenter.Name == "PART_DialogPresenter");
+            var simpleDialogOverlay = simpleDialog.GetVisualDescendants().OfType<Grid>()
+                .Single(grid => grid.Name == "PART_Overlay");
+            var simpleDialogScrim = simpleDialog.GetVisualDescendants().OfType<Border>()
+                .Single(border => border.Name == "PART_Scrim");
+            Assert.Equal(dialogHost.Bounds.Width, dialogPresenter.Bounds.Width, 1);
+            Assert.Equal(dialogHost.Bounds.Height, dialogPresenter.Bounds.Height, 1);
+            Assert.Equal(dialogHost.Bounds.Width, simpleDialogOverlay.Bounds.Width, 1);
+            Assert.Equal(dialogHost.Bounds.Height, simpleDialogOverlay.Bounds.Height, 1);
+            Assert.True(simpleDialogOverlay.IsVisible);
+            Assert.False(simpleDialogScrim.IsVisible,
+                "MdDialogHost owns the full-window scrim; the nested SimpleDialog must not paint a partial second one.");
+
             var overlay = dialogHost.GetVisualDescendants().OfType<Grid>()
                 .Single(grid => grid.Name == "PART_Overlay" &&
                                 grid.Children.Any(child => child.Name == "PART_DialogPresenter"));
@@ -84,6 +100,96 @@ public sealed class MdDialogAndSnackbarHostTests
         {
             window.Close();
         }
+    }
+
+    [AvaloniaFact]
+    public void DialogHost_SimpleDialog_Uses_One_Full_Screen_Scrim_And_Synchronizes_Close()
+    {
+        var dialog = new MdSimpleDialog
+        {
+            Title = "Choose account",
+            ItemsSource = new[] { "One", "Two" },
+            IsOpen = true
+        };
+        var host = new MdDialogHost
+        {
+            Content = new Border { Background = Brushes.White },
+            Dialog = dialog,
+            IsOpen = true
+        };
+        var window = new Window { Width = 640, Height = 480, Content = host };
+        object? selected = null;
+        var dismissals = 0;
+        dialog.ItemSelected += (_, item) =>
+        {
+            selected = item;
+            host.Close(item);
+        };
+        dialog.Dismissed += (_, _) => dismissals++;
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(dialog.IsOpen);
+            var presenter = host.GetVisualDescendants().OfType<ContentPresenter>()
+                .Single(control => control.Name == "PART_DialogPresenter");
+            var overlay = dialog.GetVisualDescendants().OfType<Grid>()
+                .Single(control => control.Name == "PART_Overlay");
+            var scrim = dialog.GetVisualDescendants().OfType<Border>()
+                .Single(control => control.Name == "PART_Scrim");
+            Assert.Equal(host.Bounds.Width, presenter.Bounds.Width, 1);
+            Assert.Equal(host.Bounds.Height, presenter.Bounds.Height, 1);
+            Assert.Equal(host.Bounds.Width, overlay.Bounds.Width, 1);
+            Assert.Equal(host.Bounds.Height, overlay.Bounds.Height, 1);
+            Assert.False(scrim.IsVisible);
+
+            var items = dialog.GetVisualDescendants().OfType<SelectingItemsControl>()
+                .Single(control => control.Name == "PART_ItemsHost");
+            items.SelectedIndex = 1;
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal("Two", selected);
+            Assert.False(dialog.IsOpen);
+            Assert.False(host.IsOpen);
+            Assert.Equal(0, dismissals);
+
+            host.IsOpen = true;
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(dialog.IsOpen);
+            host.Close();
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(dialog.IsOpen);
+            Assert.Equal(1, dismissals);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void DialogHost_Does_Not_Adopt_SimpleDialog_In_Main_Content()
+    {
+        var standaloneDialog = new MdSimpleDialog
+        {
+            Title = "Standalone",
+            ItemsSource = new[] { "One" },
+            IsOpen = true
+        };
+        var host = new MdDialogHost { Content = standaloneDialog };
+        var window = new Window { Width = 640, Height = 480, Content = host };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var scrim = standaloneDialog.GetVisualDescendants().OfType<Border>()
+                .Single(control => control.Name == "PART_Scrim");
+            Assert.True(scrim.IsVisible);
+
+            host.IsOpen = true;
+            Dispatcher.UIThread.RunJobs();
+            host.Close();
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(standaloneDialog.IsOpen);
+            Assert.True(scrim.IsVisible);
+        }
+        finally { window.Close(); }
     }
 
     private static uint ReadPixel(Bitmap frame, Point logicalPoint, double scaling)

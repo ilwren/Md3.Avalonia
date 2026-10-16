@@ -6,7 +6,9 @@
       <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="avares://Md3.Avalonia.Extra/Themes/EcosystemControls.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia.Extra/Themes/AdvancedControls.axaml" />
-        <ResourceInclude Source="avares://Md3.Avalonia.Extra/Themes/WaveFControls.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia.Extra/Themes/MdPinInput.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia.Extra/Themes/MdTreeView.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia.Extra/Themes/MdTagInput.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>

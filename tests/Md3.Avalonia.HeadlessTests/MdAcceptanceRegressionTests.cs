@@ -212,7 +212,7 @@ public sealed class MdAcceptanceRegressionTests
     }
 
     [AvaloniaFact]
-    public void Numeric_Box_Mouse_Wheel_Spins_Without_Requiring_Keyboard_Focus()
+    public void Numeric_Box_Mouse_Wheel_Spins_Only_When_Focused_And_Unfocused_Wheel_Scrolls_Page()
     {
         var numeric = new MdNumericBox
         {
@@ -223,34 +223,53 @@ public sealed class MdAcceptanceRegressionTests
             Increment = 2
         };
         var focusTarget = new Button { Content = "Other control", Width = 120, Height = 40 };
-        var window = new Window
+        var page = new MdScrollViewer
         {
             Width = 400,
-            Height = 200,
-            Content = new StackPanel { Spacing = 12, Children = { numeric, focusTarget } }
+            Height = 180,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            Content = new StackPanel
+            {
+                Spacing = 12,
+                Children = { numeric, focusTarget, new Border { Height = 720 } }
+            }
         };
+        var window = new Window { Width = 420, Height = 200, Content = page };
         window.Show();
         try
         {
             Dispatcher.UIThread.RunJobs();
+            Assert.True(page.Extent.Height > page.Viewport.Height);
             Assert.True(focusTarget.Focus());
             Dispatcher.UIThread.RunJobs();
             Assert.True(focusTarget.IsFocused);
             Assert.False(numeric.IsKeyboardFocusWithin);
+
             var point = numeric.TranslatePoint(
                 new Point(numeric.Bounds.Width / 2, numeric.Bounds.Height / 2), window);
             Assert.NotNull(point);
+            var initialPageOffset = page.Offset.Y;
+            window.MouseWheel(point!.Value, new Vector(0, -1), RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(5m, numeric.Value);
+            Assert.False(numeric.IsKeyboardFocusWithin);
+            Assert.True(page.Offset.Y > initialPageOffset,
+                "an unfocused numeric field must not steal the page's mouse-wheel scroll");
 
-            // Avalonia's ButtonSpinner normally ignores wheel input unless the field is focused.
-            // Scrolling over an unfocused Material numeric field should still use its increment.
+            page.Offset = default;
+            Dispatcher.UIThread.RunJobs();
+            var textBox = numeric.GetVisualDescendants().OfType<TextBox>().Single();
+            Assert.True(textBox.Focus());
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(numeric.IsKeyboardFocusWithin);
+            point = numeric.TranslatePoint(
+                new Point(numeric.Bounds.Width / 2, numeric.Bounds.Height / 2), window);
+            Assert.NotNull(point);
+            var focusedPageOffset = page.Offset.Y;
             window.MouseWheel(point!.Value, new Vector(0, 1), RawInputModifiers.None);
             Dispatcher.UIThread.RunJobs();
             Assert.Equal(7m, numeric.Value);
-            Assert.False(numeric.IsKeyboardFocusWithin);
-
-            window.MouseWheel(point.Value, new Vector(0, -1), RawInputModifiers.None);
-            Dispatcher.UIThread.RunJobs();
-            Assert.Equal(5m, numeric.Value);
+            Assert.Equal(focusedPageOffset, page.Offset.Y);
         }
         finally { window.Close(); }
     }

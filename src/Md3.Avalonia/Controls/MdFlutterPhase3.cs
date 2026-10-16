@@ -231,6 +231,7 @@ public sealed class MdSimpleDialog : TemplatedControl
     private Grid? _overlay;
     private Border? _scrim;
     private Border? _surface;
+    private MdDialogHost? _externalDialogHost;
     private readonly MdPresenceController _presence;
     private readonly MdModalFocusController _modalFocus;
     private readonly MdBackScope _backScope;
@@ -296,6 +297,7 @@ public sealed class MdSimpleDialog : TemplatedControl
         _cancelButton = e.NameScope.Find<Button>("PART_CancelButton");
         _scrim = e.NameScope.Find<Border>("PART_Scrim");
         _surface = e.NameScope.Find<Border>("PART_Surface");
+        UpdateDialogHostAssociation();
         if (_itemsHost is not null) _itemsHost.SelectionChanged += OnSelectionChanged;
         if (_cancelButton is not null) _cancelButton.Click += OnCancel;
         if (_scrim is not null) _scrim.PointerPressed += OnScrimPressed;
@@ -309,14 +311,58 @@ public sealed class MdSimpleDialog : TemplatedControl
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        UpdateDialogHostAssociation();
         UpdateModalFocus();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
+        DetachDialogHostAssociation();
         _presence.Stop();
         _modalFocus.Deactivate();
         base.OnDetachedFromVisualTree(e);
+    }
+
+    private void UpdateDialogHostAssociation()
+    {
+        var host = this.GetVisualAncestors().OfType<MdDialogHost>()
+            .FirstOrDefault(candidate => candidate.IsHostedDialogContent(this));
+        if (ReferenceEquals(host, _externalDialogHost))
+        {
+            UpdateScrimVisibility();
+            return;
+        }
+
+        if (_externalDialogHost is not null)
+            _externalDialogHost.PropertyChanged -= OnExternalDialogHostPropertyChanged;
+        _externalDialogHost = host;
+        if (_externalDialogHost is not null)
+            _externalDialogHost.PropertyChanged += OnExternalDialogHostPropertyChanged;
+        UpdateScrimVisibility();
+    }
+
+    private void DetachDialogHostAssociation()
+    {
+        if (_externalDialogHost is not null)
+            _externalDialogHost.PropertyChanged -= OnExternalDialogHostPropertyChanged;
+        _externalDialogHost = null;
+        UpdateScrimVisibility();
+    }
+
+    private void OnExternalDialogHostPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property != MdDialogHost.IsOpenProperty) return;
+        if (_externalDialogHost?.IsOpen == true && !IsOpen)
+            Show();
+        else if (_externalDialogHost?.IsOpen == false && IsOpen)
+            Dismiss();
+    }
+
+    private void UpdateScrimVisibility()
+    {
+        // A MdDialogHost already owns a full-viewport scrim. This control still supplies its
+        // centered surface, but must not paint a smaller, nested backdrop on top of that host.
+        if (_scrim is not null) _scrim.IsVisible = _externalDialogHost is null;
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -403,10 +449,10 @@ public sealed class MdSimpleDialog : TemplatedControl
     private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (_itemsHost?.SelectedItem is not { } selected) return;
+        Close(notifyDismissed: false);
         SetCurrentValue(SelectedItemProperty, selected);
         if (SelectionCommand?.CanExecute(selected) == true) SelectionCommand.Execute(selected);
         ItemSelected?.Invoke(this, selected);
-        Close(notifyDismissed: false);
     }
 }
 

@@ -260,13 +260,20 @@ public sealed class MdDialogHost : ContentControl, IMdDialogService
                 _displayedDialog.PropertyChanged += OnDisplayedDialogPropertyChanged;
         }
 
-        PseudoClasses.Set(":full-screen-dialog", displayedDialog?.Variant == MdDialogVariant.FullScreen);
+        var displaysSimpleDialog = Dialog is MdSimpleDialog ||
+            _dialogPresenter?.GetVisualDescendants().OfType<MdSimpleDialog>().Any() == true;
+        PseudoClasses.Set(":full-screen-dialog",
+            displayedDialog?.Variant == MdDialogVariant.FullScreen || displaysSimpleDialog);
     }
 
     private void OnDisplayedDialogPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (e.Property == MdDialog.VariantProperty) UpdateDialogState();
     }
+
+    internal bool IsHostedDialogContent(Visual visual) =>
+        ReferenceEquals(Dialog, visual) ||
+        _dialogPresenter?.GetVisualDescendants().Any(descendant => ReferenceEquals(descendant, visual)) == true;
 
     private void UpdateOpenState()
     {
