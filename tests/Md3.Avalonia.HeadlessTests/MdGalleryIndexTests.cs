@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.LogicalTree;
+using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Gallery;
 using Md3.Avalonia.Gallery.Pages;
