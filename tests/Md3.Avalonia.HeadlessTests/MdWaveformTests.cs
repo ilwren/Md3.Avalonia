@@ -128,20 +128,20 @@ public sealed class MdWaveformTests
         {
             Dispatcher.UIThread.RunJobs();
 
-            Key(waveform, Key.Right);
-            Key(waveform, Key.Right);
+            Press(waveform, Key.Right);
+            Press(waveform, Key.Right);
             Assert.Equal(.2, waveform.PlayheadPosition, 3);
 
-            Key(waveform, Key.End);
+            Press(waveform, Key.End);
             Assert.Equal(1, waveform.PlayheadPosition, 3);
-            Key(waveform, Key.Right);
+            Press(waveform, Key.Right);
             Assert.Equal(1, waveform.PlayheadPosition, 3);
 
-            Key(waveform, Key.Home);
+            Press(waveform, Key.Home);
             Assert.Equal(0, waveform.PlayheadPosition, 3);
 
             waveform.IsInteractive = false;
-            Key(waveform, Key.Right);
+            Press(waveform, Key.Right);
             Assert.Equal(0, waveform.PlayheadPosition, 3);
         }
         finally { window.Close(); }
@@ -192,7 +192,7 @@ public sealed class MdWaveformTests
         finally { window.Close(); }
     }
 
-    private static void Key(Control target, Key key)
+    private static void Press(Control target, Key key)
     {
         target.RaiseEvent(new KeyEventArgs
         {
