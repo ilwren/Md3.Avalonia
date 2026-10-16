@@ -35,9 +35,12 @@ public sealed class MdWaveform : Control
         AvaloniaProperty.Register<MdWaveform, IReadOnlyList<float>?>(nameof(Peaks));
 
     /// <summary>How far playback has got, 0 to 1. Two-way, so scrubbing reports back.</summary>
+    // Coerced rather than clamped in the setter: a binding writes the property directly and would
+    // otherwise park it outside 0..1, where the playhead draws past the end of the waveform.
     public static readonly StyledProperty<double> PlayheadPositionProperty =
         AvaloniaProperty.Register<MdWaveform, double>(nameof(PlayheadPosition), 0,
-            defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
+            defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay,
+            coerce: static (_, value) => Math.Clamp(value, 0, 1));
 
     /// <summary>Whether pointer and keyboard input move the playhead.</summary>
     public static readonly StyledProperty<bool> IsInteractiveProperty =
@@ -89,6 +92,14 @@ public sealed class MdWaveform : Control
     private static readonly IBrush FallbackUnplayed = new SolidColorBrush(Color.FromRgb(202, 196, 208));
 
     private bool _pressed;
+
+    public MdWaveform()
+    {
+        // A Control with no Background is not hit-testable, so without this the pointer never
+        // arrives and the waveform cannot be scrubbed at all - the keyboard path would still work,
+        // which is exactly the kind of half-broken that reads as "dragging is flaky".
+        Background = Brushes.Transparent;
+    }
 
     static MdWaveform()
     {
