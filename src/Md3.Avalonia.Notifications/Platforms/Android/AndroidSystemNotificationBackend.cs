@@ -1,7 +1,6 @@
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using Android.OS;
 
 namespace Md3.Avalonia.Notifications;
 
@@ -23,7 +22,7 @@ internal sealed class AndroidSystemNotificationBackend : IMdSystemNotificationBa
         var manager = _context.GetSystemService(Context.NotificationService) as NotificationManager
             ?? throw new MdSystemNotificationException("Android NotificationManager is unavailable.");
 
-        if (Build.VERSION.SdkInt >= BuildVersionCodes.Tiramisu &&
+        if (OperatingSystem.IsAndroidVersionAtLeast(33) &&
             _context.CheckSelfPermission(Android.Manifest.Permission.PostNotifications) != Permission.Granted)
         {
             throw new MdSystemNotificationPermissionException(
@@ -32,7 +31,7 @@ internal sealed class AndroidSystemNotificationBackend : IMdSystemNotificationBa
 
         try
         {
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.O &&
+            if (OperatingSystem.IsAndroidVersionAtLeast(26) &&
                 manager.GetNotificationChannel(_options.AndroidChannelId) is null)
             {
                 var channel = new NotificationChannel(
@@ -47,9 +46,11 @@ internal sealed class AndroidSystemNotificationBackend : IMdSystemNotificationBa
 
             var icon = _options.AndroidSmallIconResourceId ?? _context.ApplicationInfo?.Icon ?? 0;
             if (icon == 0) icon = Android.Resource.Drawable.IcDialogInfo;
-            var builder = Build.VERSION.SdkInt >= BuildVersionCodes.O
-                ? new Notification.Builder(_context, _options.AndroidChannelId)
-                : new Notification.Builder(_context);
+            Notification.Builder builder;
+            if (OperatingSystem.IsAndroidVersionAtLeast(26))
+                builder = new Notification.Builder(_context, _options.AndroidChannelId);
+            else
+                builder = new Notification.Builder(_context);
             var nativeNotification = builder
                 .SetContentTitle(notification.Title)
                 .SetContentText(notification.Body)

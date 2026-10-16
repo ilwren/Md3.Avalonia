@@ -31,7 +31,7 @@ internal sealed class LinuxSystemNotificationBackend : IMdSystemNotificationBack
                 IntPtr error = IntPtr.Zero;
                 try
                 {
-                    if (!LibNotify.NotificationShow(nativeNotification, out error))
+                    if (LibNotify.NotificationShow(nativeNotification, out error) == 0)
                     {
                         var detail = ReadErrorMessage(error);
                         throw new MdSystemNotificationException(
@@ -69,7 +69,7 @@ internal sealed class LinuxSystemNotificationBackend : IMdSystemNotificationBack
         lock (InitializationLock)
         {
             if (_isInitialized) return;
-            if (!LibNotify.Initialize(applicationName))
+            if (LibNotify.Initialize(applicationName) == 0)
             {
                 throw new MdSystemNotificationException(
                     "libnotify could not connect to a desktop notification service. Check that a desktop session and D-Bus notification daemon are running.");
