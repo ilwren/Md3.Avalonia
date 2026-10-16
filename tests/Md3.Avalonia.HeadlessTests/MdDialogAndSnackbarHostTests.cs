@@ -109,8 +109,7 @@ public sealed class MdDialogAndSnackbarHostTests
         var dialog = new MdSimpleDialog
         {
             Title = "Choose account",
-            ItemsSource = new[] { "One", "Two" },
-            IsOpen = true
+            ItemsSource = new[] { "One", "Two" }
         };
         var host = new MdDialogHost
         {

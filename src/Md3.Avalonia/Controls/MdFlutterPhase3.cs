@@ -339,6 +339,8 @@ public sealed class MdSimpleDialog : TemplatedControl
         if (_externalDialogHost is not null)
             _externalDialogHost.PropertyChanged += OnExternalDialogHostPropertyChanged;
         UpdateScrimVisibility();
+        if (_externalDialogHost?.IsOpen == true && !IsOpen)
+            Show();
     }
 
     private void DetachDialogHostAssociation()
