@@ -93,6 +93,9 @@ public class MdPopover : TemplatedControl
         if (_popup is not null)
         {
             _popup.ShouldUseOverlayLayer = UseOverlayLayerForPopup;
+            // The light-dismiss overlay spans the owner. Keep the trigger interactive when a
+            // pointer returns from an overlay-hosted card or popover.
+            _popup.OverlayInputPassThroughElement = _anchorButton;
             _popup.Closed += OnPopupClosed;
         }
         AttachOwnerScrollHandler();
