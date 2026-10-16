@@ -9,11 +9,6 @@ on:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      test_filter:
-        description: Optional xUnit filter expression for a targeted headless test run.
-        required: false
-        type: string
 
 # A new push makes the previous run's answer irrelevant. Cancelling it frees the runner
 # immediately instead of letting two builds of the same branch compete for it.
@@ -147,18 +142,11 @@ jobs:
           # Documentation preview bitmaps are asset generation, not verification. They are
           # produced only on main, where the artefact is actually published.
           MD3_WRITE_PREVIEWS: ${{ github.ref == 'refs/heads/main' && '1' || '0' }}
-          MD3_TEST_FILTER: ${{ inputs.test_filter }}
         run: |
-          test_args=(
-            tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj
-            -c Release --no-build --no-restore
-            --logger "trx;LogFileName=results.trx"
+          dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
+            -c Release --no-build --no-restore \
+            --logger "trx;LogFileName=results.trx" \
             --logger "console;verbosity=normal"
-          )
-          if [[ -n "$MD3_TEST_FILTER" ]]; then
-            test_args+=(--filter "$MD3_TEST_FILTER")
-          fi
-          dotnet test "${test_args[@]}"
 
       # Only meaningful once the test runner actually produced a .trx. Running it after a
       # compile failure would add a second red step that says nothing about the real cause.
