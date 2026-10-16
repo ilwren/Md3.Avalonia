@@ -75,7 +75,7 @@ public sealed class MdNumericBox : NumericUpDown
         PseudoClasses.Set(":has-label", Label is not null);
         PseudoClasses.Set(":has-supporting-text", SupportingText is not null);
         PseudoClasses.Set(":spinner-left", ShowButtonSpinner &&
-            ButtonSpinnerLocation == global::Avalonia.Controls.Primitives.Location.Left);
+            ButtonSpinnerLocation == global::Avalonia.Controls.Location.Left);
         UpdateSpinnerReservation();
     }
 
@@ -85,7 +85,7 @@ public sealed class MdNumericBox : NumericUpDown
 
         var showSpinner = ShowButtonSpinner;
         var spinnerOnLeft = showSpinner &&
-            ButtonSpinnerLocation == global::Avalonia.Controls.Primitives.Location.Left;
+            ButtonSpinnerLocation == global::Avalonia.Controls.Location.Left;
         _textBox.SetCurrentValue(MdTextBox.LeadingIconProperty, spinnerOnLeft ? _leadingSpinnerSpacer : null);
         _textBox.SetCurrentValue(MdTextBox.TrailingIconProperty,
             showSpinner && !spinnerOnLeft ? _trailingSpinnerSpacer : null);

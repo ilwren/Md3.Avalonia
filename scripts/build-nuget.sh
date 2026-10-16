@@ -102,16 +102,24 @@ cleanup_intermediate
 rm -rf "$OUTPUT"
 mkdir -p "$OUTPUT"
 
+project_args_for() {
+  if [[ "$1" == "$ROOT/src/Md3.Avalonia.Notifications/Md3.Avalonia.Notifications.csproj" ]]; then
+    printf '%s\n' '-p:IncludeAndroidTarget=true'
+  fi
+}
+
 if ((RESTORE)); then
   for proj in "${PROJECTS[@]}"; do
-    dotnet restore "$proj" --nologo
+    mapfile -t PROJECT_ARGS < <(project_args_for "$proj")
+    dotnet restore "$proj" --nologo "${PROJECT_ARGS[@]}"
   done
 fi
 
 NO_RESTORE=(--no-restore)
 for proj in "${PROJECTS[@]}"; do
-  dotnet build "$proj" -c "$CONFIGURATION" "${NO_RESTORE[@]}" --nologo
-  dotnet pack "$proj" -c "$CONFIGURATION" --no-build --no-restore --nologo -o "$OUTPUT"
+  mapfile -t PROJECT_ARGS < <(project_args_for "$proj")
+  dotnet build "$proj" -c "$CONFIGURATION" "${NO_RESTORE[@]}" --nologo "${PROJECT_ARGS[@]}"
+  dotnet pack "$proj" -c "$CONFIGURATION" --no-build --no-restore --nologo -o "$OUTPUT" "${PROJECT_ARGS[@]}"
 done
 
 VERSION="$(sed -n 's:.*<Version>\([^<]*\)</Version>.*:\1:p' "${PROJECTS[0]}" | head -1)"

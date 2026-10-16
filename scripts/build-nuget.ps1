@@ -52,13 +52,24 @@ if (-not (Test-Path $outputDir)) {
 }
 
 foreach ($proj in $projects) {
+    $projectArgs = @()
+    if ($proj -eq (Join-Path $root "src/Md3.Avalonia.Notifications/Md3.Avalonia.Notifications.csproj")) {
+        # Include the Android TFM only in release packaging, after the script's documented
+        # Android workload prerequisite has been satisfied.
+        $projectArgs = @("-p:IncludeAndroidTarget=true")
+    }
+
     if (-not $NoRestore) {
-        dotnet restore $proj --nologo
+        $restoreArgs = @("restore", $proj, "--nologo") + $projectArgs
+        dotnet @restoreArgs
         if ($LASTEXITCODE -ne 0) { throw "Restore failed for $proj" }
     }
-    dotnet build $proj -c $Configuration --no-restore --nologo $versionArgs
+    $buildArgs = @("build", $proj, "-c", $Configuration, "--no-restore", "--nologo") + $projectArgs + $versionArgs
+    dotnet @buildArgs
     if ($LASTEXITCODE -ne 0) { throw "Build failed for $proj" }
-    dotnet pack $proj -c $Configuration --no-build --no-restore --nologo -o $outputDir $versionArgs
+
+    $packArgs = @("pack", $proj, "-c", $Configuration, "--no-build", "--no-restore", "--nologo", "-o", $outputDir) + $projectArgs + $versionArgs
+    dotnet @packArgs
     if ($LASTEXITCODE -ne 0) { throw "Pack failed for $proj" }
 }
 

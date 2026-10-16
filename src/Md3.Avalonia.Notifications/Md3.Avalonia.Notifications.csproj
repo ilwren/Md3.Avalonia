@@ -1,6 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net10.0;net10.0-android;net10.0-windows10.0.19041.0</TargetFrameworks>
+    <!-- Keep ordinary solution restore/build independent of the optional Android workload. The
+         release pack scripts opt into the Android TFM after installing that workload. -->
+    <TargetFrameworks>net10.0;net10.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(IncludeAndroidTarget)' == 'true'">net10.0;net10.0-windows10.0.19041.0;net10.0-android</TargetFrameworks>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net10.0-android'">23</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net10.0-windows10.0.19041.0'">10.0.10240.0</SupportedOSPlatformVersion>
