@@ -93,14 +93,6 @@ public sealed class MdWaveform : Control
 
     private bool _pressed;
 
-    public MdWaveform()
-    {
-        // A Control with no Background is not hit-testable, so without this the pointer never
-        // arrives and the waveform cannot be scrubbed at all - the keyboard path would still work,
-        // which is exactly the kind of half-broken that reads as "dragging is flaky".
-        Background = Brushes.Transparent;
-    }
-
     static MdWaveform()
     {
         AffectsRender<MdWaveform>(PeaksProperty, PlayheadPositionProperty, ShowPlayheadProperty, IsMirroredProperty,
@@ -238,6 +230,13 @@ public sealed class MdWaveform : Control
         var width = Bounds.Width;
         var height = Bounds.Height;
         if (width <= 0 || height <= 0) return;
+
+        // Avalonia hit-tests the recorded drawing, not the bounds: CompositionDrawListVisual.HitTest
+        // is DrawList?.HitTest(pt) ?? false. Without this transparent rect a click that lands in the
+        // gap between two bars - or above a short one - hits nothing and the scrub silently does
+        // nothing, which reads as a flaky drag rather than as a two-dip dead zone. MdRating draws
+        // the same rect for the same reason.
+        context.DrawRectangle(Brushes.Transparent, null, new Rect(Bounds.Size));
 
         var peaks = Peaks;
         var position = Math.Clamp(PlayheadPosition, 0, 1);
