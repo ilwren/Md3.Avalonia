@@ -481,6 +481,33 @@ GitHub 上没有可引用的 Avalonia 瀑布流控件，也没有把「收起为
   代价是收起时内容仍在视觉树里（退场动画需要它），所以 `IsHitTestVisible` 必须跟着状态走，否则页面上
   会压着一块看不见的可点击区域。这一条有专门的测试，因为属性转储看不出它。
 
+## 补记（2026-10-17 之二）：样式这一轮参考了 Flutter 的什么
+
+三个控件的第一版可用但不好看。这一轮按 §6 的纪律去 Flutter 生态取了**实测取值**，而不是凭印象模仿。
+
+- **波形图取 `audio_waveforms`（SimformSolutionsPvtLtd）的 `PlayerWaveStyle` 默认值。** 直接读它的
+  源码得到：`waveCap: StrokeCap.round`、`waveThickness: 3.0`、`spacing: 5`（并断言
+  `waveThickness < spacing`）、`seekLineThickness: 2.0`。据此改了两处：`BarCornerRadius` 主题值换成
+  `Md.Sys.Shape.Corner.Full`，控件内部把它夹到音条宽度的一半——这正是 `StrokeCap.round` 的圆头，
+  也是它的音条看起来像胶囊而不是柱状图的原因；播放头维持 2dp 细线，但补了一个按住时变大的圆柄，
+  因为一条贯穿全高的线读起来像分隔线而不像位置。圆柄的状态层用 `PushOpacity` 压暗而不是另配一支浅色
+  画刷，这样 `PlayheadBrush` 是渐变时也不会算错。
+- **律动效果没有对应的 Flutter 控件可抄，走的是本仓库自己的动效缝。** `IsAnimating` 由
+  `TopLevel.RequestAnimationFrame` 驱动而不是计时器：前者只在真的出帧时才回调，因此被隐藏、最小化或
+  关掉的波形零开销，也不存在控件销毁后还在跑的计时器。起伏按每根音条自身的峰值缩放，所以安静段落不会
+  和副歌一样猛。它属于装饰性动效，因此 `MdMotion` 方案说了算：Reduced 与 None 下必须**完全静止**，
+  而不是变慢——这一条有逐像素的测试。
+- **瀑布流的重排动画用 FLIP，且只在列数变化时触发。** Flutter 侧的 masonry（如
+  `flutter_staggered_grid_view`）本身不负责动画，动效来自 implicit animation；这里等价的做法是
+  先按差值把子元素挪回原位、挂上 transition、再放手。关键约束是**不要**在每一帧重排时都触发：窗口
+  连续 resize 时子元素本来就在逐帧跟随，每帧重启 transition 会让它永远追不上指针。所以只在列数这个
+  离散事件上动画，宽度变化本身不触发。
+- **半圆把手是自研，但指针目标的修法沿用本仓库 FAB 已有的做法。** Flutter 的 `SideSheet` 是模态的，
+  没有"收起成贴边把手"这种形态，所以没有样式可参考。把手 24dp 宽低于 Material 的 48dp 指针目标下限，
+  处理方式与 `MdFab.axaml` 里小尺寸 FAB 的注释所述完全一致：外层透明容器撑住 48dp，把手放在里面。
+  没有改 `MdFloatingActionButton` 本身——它的容器是 `Width=Height=ContainerSize` 的正方形，做不出
+  24×56 的半圆，硬改会波及所有 FAB 尺寸。
+
 ## 7. 数据来源
 
 - GitHub REST API（星标、最近提交、许可证、归档状态、仓库树、文件内容），2026-10-11。

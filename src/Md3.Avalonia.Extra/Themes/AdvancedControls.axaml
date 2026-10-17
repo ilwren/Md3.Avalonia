@@ -79,7 +79,10 @@
     <Setter Property="UnplayedBrush" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
     <Setter Property="PlayheadBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
     <Setter Property="BaselineBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
-    <Setter Property="BarCornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.ExtraSmall}" />
+    <!-- A full-radius shape token: MdWaveform clamps it to half a bar, which is the round cap
+         Flutter's audio_waveforms gets from StrokeCap.round and the reason its bars read as
+         capsules rather than as a bar chart. -->
+    <Setter Property="BarCornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.Full}" />
     <Style Selector="^:disabled"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Disabled.ContentOpacity}" /></Style>
   </ControlTheme>
   <ControlTheme x:Key="{x:Type eco:MdSpinKit}" TargetType="eco:MdSpinKit" />
@@ -95,7 +98,8 @@
         <eco:MdWaterfallPanel Columns="{Binding $parent[eco:MdWaterfall].Columns}"
                               MinColumnWidth="{Binding $parent[eco:MdWaterfall].MinColumnWidth}"
                               ColumnSpacing="{Binding $parent[eco:MdWaterfall].ColumnSpacing}"
-                              ItemSpacing="{Binding $parent[eco:MdWaterfall].ItemSpacing}" />
+                              ItemSpacing="{Binding $parent[eco:MdWaterfall].ItemSpacing}"
+                              AnimateLayout="{Binding $parent[eco:MdWaterfall].AnimateLayout}" />
       </ItemsPanelTemplate>
     </Setter>
     <Setter Property="Template">
@@ -111,6 +115,39 @@
        the sheet, not a child: the sheet clips to its own rounded bounds while it grows, and a button
        inside those bounds would be clipped away mid-animation. The chevron points out from the edge
        the sheet is pinned to and turns around once the sheet is open. -->
+  <!-- The collapse handle. A floating action button is a 56dp disc that sits clear of the edge; a
+       sheet wants a small half-round tab flush with it, which is a different shape and not something
+       the FAB's square container can be coaxed into, so it gets its own theme. It keeps the FAB's
+       shape of fix for the pointer target: the tab is 24dp wide, under Material's 48dp minimum, so a
+       transparent container holds that minimum and the tab sits inside it. -->
+  <ControlTheme x:Key="MdSideSheetTabTheme" TargetType="Button">
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" />
+    <Setter Property="CornerRadius" Value="0,28,28,0" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Button">
+        <Grid MinWidth="48" MinHeight="48" Background="Transparent">
+          <Border x:Name="PART_Handle" Width="24" Height="56"
+                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center"
+                  Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}"
+                  ClipToBounds="True">
+            <Grid>
+              <Border x:Name="PART_StateLayer" Background="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}"
+                      CornerRadius="{TemplateBinding CornerRadius}" IsHitTestVisible="False" Opacity="0" />
+              <md:MdSymbolPresenter Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Grid>
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Hover.Opacity}" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" /></Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Focus.Opacity}" /></Style>
+  </ControlTheme>
+
   <ControlTheme x:Key="{x:Type eco:MdSideSheet}" TargetType="eco:MdSideSheet">
     <Setter Property="SheetBrush" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
@@ -130,20 +167,24 @@
                                 IsVisible="False" Opacity="0" RenderTransform="translate(-8px, 0px)" />
             </DockPanel>
           </Border>
-          <md:MdFloatingActionButton x:Name="PART_Toggle" Icon="{TemplateBinding ToggleIcon}"
-                                     HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"
-                                     AutomationProperties.Name="Toggle the side sheet"
-                                     RenderTransform="rotate(0deg)" RenderTransformOrigin="50%,50%" />
+          <Button x:Name="PART_Toggle" Theme="{StaticResource MdSideSheetTabTheme}"
+                  Content="{TemplateBinding ToggleIcon}"
+                  HorizontalAlignment="Left" VerticalAlignment="Center"
+                  AutomationProperties.Name="Toggle the side sheet" />
         </Panel>
       </ControlTemplate>
     </Setter>
     <Style Selector="^:right"><Setter Property="ToggleIcon" Value="{DynamicResource Md.Icon.ChevronLeft}" /></Style>
     <Style Selector="^:right /template/ Border#PART_Sheet"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
-    <Style Selector="^:right /template/ md|MdFloatingActionButton#PART_Toggle"><Setter Property="HorizontalAlignment" Value="Right" /><Setter Property="Margin" Value="0,0,8,0" /></Style>
+    <Style Selector="^:right /template/ Button#PART_Toggle">
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="HorizontalContentAlignment" Value="Right" />
+      <Setter Property="CornerRadius" Value="28,0,0,28" />
+    </Style>
     <Style Selector="^:open /template/ Border#PART_Sheet"><Setter Property="Width" Value="{TemplateBinding ExpandedWidth}" /></Style>
     <Style Selector="^:content-present /template/ ContentPresenter#PART_SheetContent"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:open /template/ ContentPresenter#PART_SheetContent"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="translate(0px, 0px)" /></Style>
-    <Style Selector="^:open /template/ md|MdFloatingActionButton#PART_Toggle"><Setter Property="RenderTransform" Value="rotate(180deg)" /></Style>
+    <Style Selector="^:open /template/ Button#PART_Toggle"><Setter Property="RenderTransform" Value="rotate(180deg)" /></Style>
     <Style Selector="^:reduced-motion /template/ ContentPresenter#PART_SheetContent"><Setter Property="RenderTransform" Value="translate(0px, 0px)" /></Style>
   </ControlTheme>
   <ControlTheme x:Key="EcoItemsHostTheme" TargetType="ItemsControl">

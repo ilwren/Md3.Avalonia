@@ -9,10 +9,6 @@ public partial class SideSheetGalleryPage : UserControl
     {
         InitializeComponent();
 
-        LeftSheet.Header = L("Filters", "筛选");
-        RightSheet.Header = L("Details", "详情");
-        ExternalSheet.Header = L("Details", "详情");
-
         UpdateToggleLabel();
         ExternalSheet.IsOpenChanged += (_, _) => UpdateToggleLabel();
     }

@@ -13,6 +13,7 @@ using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Md3.Avalonia.Extra.Controls;
+using Md3.Avalonia.Motion;
 using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
@@ -307,6 +308,47 @@ public sealed class MdWaveformTests
         writer.Flush();
         stream.Position = 0;
         return stream;
+    }
+
+    [AvaloniaFact]
+    public void An_Animating_Waveform_Holds_Still_When_Motion_Is_Off()
+    {
+        // IsAnimating is decorative motion, so the ambient scheme decides it. Under None the bars must
+        // draw exactly as they do with the pulse switched off - not merely more slowly, but identically,
+        // because a pulse that merely slowed down would still be motion somebody asked not to see.
+        var peaks = new float[40];
+        Array.Fill(peaks, .5f);
+
+        MdWaveform Build(bool animating)
+        {
+            var waveform = new MdWaveform
+            {
+                Width = 400,
+                Height = 200,
+                Peaks = peaks,
+                IsAnimating = animating,
+                ShowPlayhead = false,
+                BarGap = 0,
+                BarCornerRadius = new CornerRadius(0),
+                HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left,
+                VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top,
+            };
+            MdMotion.SetScheme(waveform, MdMotionScheme.None);
+            return waveform;
+        }
+
+        var window = new Window { Width = 400, Height = 200, Content = Build(false) };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var still = ReadPixels(window, out _);
+
+            window.Content = Build(true);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(still, ReadPixels(window, out _));
+        }
+        finally { window.Close(); }
     }
 
     private static void Press(Control target, Key key)

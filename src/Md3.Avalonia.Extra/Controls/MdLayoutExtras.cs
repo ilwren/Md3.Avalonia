@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
@@ -6,6 +7,7 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Md3.Avalonia.Motion;
 using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Extra.Controls;
@@ -30,6 +32,9 @@ namespace Md3.Avalonia.Extra.Controls;
 /// </remarks>
 public class MdWaterfallPanel : Panel
 {
+    private readonly Dictionary<Control, Rect> _placed = new();
+    private int _columns;
+
     public static readonly StyledProperty<int> ColumnsProperty =
         AvaloniaProperty.Register<MdWaterfallPanel, int>(nameof(Columns));
     public static readonly StyledProperty<double> MinColumnWidthProperty =
@@ -38,6 +43,8 @@ public class MdWaterfallPanel : Panel
         AvaloniaProperty.Register<MdWaterfallPanel, double>(nameof(ColumnSpacing), 12);
     public static readonly StyledProperty<double> ItemSpacingProperty =
         AvaloniaProperty.Register<MdWaterfallPanel, double>(nameof(ItemSpacing), 12);
+    public static readonly StyledProperty<bool> AnimateLayoutProperty =
+        AvaloniaProperty.Register<MdWaterfallPanel, bool>(nameof(AnimateLayout), true);
 
     static MdWaterfallPanel() => AffectsMeasure<MdWaterfallPanel>(
         ColumnsProperty, MinColumnWidthProperty, ColumnSpacingProperty, ItemSpacingProperty);
@@ -53,6 +60,16 @@ public class MdWaterfallPanel : Panel
 
     /// <summary>Vertical space between items in the same column.</summary>
     public double ItemSpacing { get => GetValue(ItemSpacingProperty); set => SetValue(ItemSpacingProperty, value); }
+
+    /// <summary>
+    /// Whether children glide to their new places when the column count changes.
+    /// </summary>
+    /// <remarks>
+    /// Only a change of column count is animated. A resize that keeps the count has the children
+    /// tracking it frame by frame already, and starting a transition on every one of those frames
+    /// would restart it before it finished, leaving each child permanently lagging the pointer.
+    /// </remarks>
+    public bool AnimateLayout { get => GetValue(AnimateLayoutProperty); set => SetValue(AnimateLayoutProperty, value); }
 
     protected override Size MeasureOverride(Size availableSize)
     {
@@ -89,16 +106,68 @@ public class MdWaterfallPanel : Panel
         var heights = new double[columns];
         var rtl = FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft;
 
+        var reflowed = AnimateLayout && _columns > 0 && columns != _columns && CanAnimate;
+        var from = reflowed ? new Dictionary<Control, Rect>(_placed) : null;
+        _columns = columns;
+
+        var to = new Dictionary<Control, Rect>(Children.Count);
         foreach (var child in Children)
         {
             var column = Shortest(heights);
             var x = column * (columnWidth + ColumnSpacing);
             if (rtl) x = finalSize.Width - x - columnWidth;
-            child.Arrange(new Rect(x, heights[column], columnWidth, child.DesiredSize.Height));
+            var rect = new Rect(x, heights[column], columnWidth, child.DesiredSize.Height);
+            child.Arrange(rect);
+            to[child] = rect;
             heights[column] += child.DesiredSize.Height + ItemSpacing;
         }
 
+        _placed.Clear();
+        foreach (var pair in to) _placed[pair.Key] = pair.Value;
+
+        if (from is not null)
+        {
+            foreach (var pair in to)
+            {
+                if (!from.TryGetValue(pair.Key, out var was)) continue;
+                var dx = pair.Value.X - was.X;
+                var dy = pair.Value.Y - was.Y;
+                // A child that did not move - and one that arrived after the previous pass, so has no
+                // previous place to come from - is left alone rather than flown in from nowhere.
+                if (Math.Abs(dx) < 0.5 && Math.Abs(dy) < 0.5) continue;
+                Glide(pair.Key, dx, dy);
+            }
+        }
+
         return finalSize;
+    }
+
+    /// <summary>
+    /// Carries a child from where it was to where the layout has just put it. This is the same
+    /// first-last-invert-play shape an implicit animation uses: put the child back by the difference,
+    /// attach the transition, then let go. Setting the transform before the transition is attached is
+    /// what makes the second assignment animate instead of snapping.
+    /// </summary>
+    /// <remarks>
+    /// This writes the child's <c>RenderTransform</c> and <c>Transitions</c>, which a host that
+    /// animates its own children will want to know about; turning <see cref="AnimateLayout"/> off
+    /// leaves both untouched.
+    /// </remarks>
+    private void Glide(Control child, double dx, double dy)
+    {
+        child.RenderTransform = new TranslateTransform(-dx, -dy);
+        child.Transitions = MdMotionTransitions.Collect(
+            MdMotionTransitions.CreateTransform(this, RenderTransformProperty, MdMotionKind.Spatial));
+        child.RenderTransform = null;
+    }
+
+    private bool CanAnimate
+    {
+        get
+        {
+            var scheme = MdMotion.GetScheme(this);
+            return scheme != MdMotionScheme.None && scheme != MdMotionScheme.Reduced;
+        }
     }
 
     private int ResolveColumns(double width)
@@ -148,6 +217,8 @@ public class MdWaterfall : ItemsControl
         AvaloniaProperty.Register<MdWaterfall, double>(nameof(ColumnSpacing), 12);
     public static readonly StyledProperty<double> ItemSpacingProperty =
         AvaloniaProperty.Register<MdWaterfall, double>(nameof(ItemSpacing), 12);
+    public static readonly StyledProperty<bool> AnimateLayoutProperty =
+        AvaloniaProperty.Register<MdWaterfall, bool>(nameof(AnimateLayout), true);
 
     /// <summary>An explicit column count. Zero, the default, derives the count from <see cref="MinColumnWidth"/>.</summary>
     public int Columns { get => GetValue(ColumnsProperty); set => SetValue(ColumnsProperty, value); }
@@ -160,6 +231,9 @@ public class MdWaterfall : ItemsControl
 
     /// <summary>Vertical space between items in the same column.</summary>
     public double ItemSpacing { get => GetValue(ItemSpacingProperty); set => SetValue(ItemSpacingProperty, value); }
+
+    /// <summary>Whether children glide to their new places when the column count changes.</summary>
+    public bool AnimateLayout { get => GetValue(AnimateLayoutProperty); set => SetValue(AnimateLayoutProperty, value); }
 }
 
 /// <summary>The window edge a <see cref="MdSideSheet"/> is pinned to and slides out from.</summary>
@@ -170,19 +244,18 @@ public enum MdSideSheetAnchor
 }
 
 /// <summary>
-/// A sheet pinned to the left or right edge of a window, collapsed to a floating button and opened
-/// from it: the button stays where it is, the sheet grows out from behind it, and the content it was
-/// holding fades and slides in.
+/// A sheet pinned to the left or right edge of a window, collapsed to a small half-round handle flush
+/// with that edge and opened from it: the handle stays where it is, the sheet grows out from behind
+/// it, and the content it was holding fades and slides in.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Collapsing a side panel to a single floating button is what keeps a secondary surface - filters,
-/// a layer list, a chat thread - available without spending width on it. The sheet is a sibling of
-/// the content it overlays rather than a replacement for it, so opening one never re-lays-out the
-/// page underneath.
+/// Collapsing a side panel to a handle is what keeps a secondary surface - filters, a layer list, a
+/// chat thread - available without spending width on it. The sheet is a sibling of the content it
+/// overlays rather than a replacement for it, so opening one never re-lays-out the page underneath.
 /// </para>
 /// <para>
-/// Width, opacity and the button's rotation are animated through the <see cref="MdMotion"/> tokens,
+/// Width, opacity and the handle's rotation are animated through the <see cref="MdMotion"/> tokens,
 /// so the sheet follows the same scheme and reduced-motion settings as everything else instead of
 /// carrying its own timings.
 /// </para>
@@ -198,7 +271,7 @@ public class MdSideSheet : HeaderedContentControl
     public static readonly StyledProperty<double> ExpandedWidthProperty =
         AvaloniaProperty.Register<MdSideSheet, double>(nameof(ExpandedWidth), 320);
     public static readonly StyledProperty<double> CollapsedWidthProperty =
-        AvaloniaProperty.Register<MdSideSheet, double>(nameof(CollapsedWidth), 72);
+        AvaloniaProperty.Register<MdSideSheet, double>(nameof(CollapsedWidth), 24);
     public static readonly StyledProperty<object?> ToggleIconProperty =
         AvaloniaProperty.Register<MdSideSheet, object?>(nameof(ToggleIcon));
     public static readonly StyledProperty<bool> IsToggleVisibleProperty =
@@ -244,13 +317,13 @@ public class MdSideSheet : HeaderedContentControl
     /// <summary>The sheet's width once open.</summary>
     public double ExpandedWidth { get => GetValue(ExpandedWidthProperty); set => SetValue(ExpandedWidthProperty, value); }
 
-    /// <summary>The width the sheet keeps while closed, which is the room the floating button needs.</summary>
+    /// <summary>The width the sheet keeps while closed, which is the room the handle needs.</summary>
     public double CollapsedWidth { get => GetValue(CollapsedWidthProperty); set => SetValue(CollapsedWidthProperty, value); }
 
-    /// <summary>The icon shown on the floating button.</summary>
+    /// <summary>The glyph shown on the handle.</summary>
     public object? ToggleIcon { get => GetValue(ToggleIconProperty); set => SetValue(ToggleIconProperty, value); }
 
-    /// <summary>Whether the floating button is shown. Turn it off when something else drives <see cref="IsOpen"/>.</summary>
+    /// <summary>Whether the handle is shown. Turn it off when something else drives <see cref="IsOpen"/>.</summary>
     public bool IsToggleVisible { get => GetValue(IsToggleVisibleProperty); set => SetValue(IsToggleVisibleProperty, value); }
 
     /// <summary>The sheet's surface. Defaults to a Material surface container role.</summary>

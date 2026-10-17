@@ -25,6 +25,7 @@ public partial class WaveformGalleryPage : UserControl
             Waveform.Peaks = peaks;
             Meter.Peaks = MdWaveform.PeaksFromSamples(_track.Samples, 96);
             Static.Peaks = peaks;
+            Live.Peaks = peaks;
         }
         catch (Exception exception)
         {
@@ -45,6 +46,9 @@ public partial class WaveformGalleryPage : UserControl
     private void TogglePlayback(object? sender, RoutedEventArgs e)
     {
         if (_playback.IsEnabled) _playback.Stop(); else _playback.Start();
+        // The bars pulse only while something is actually playing, which is the difference between a
+        // waveform that looks alive and one that is merely twitching.
+        Waveform.IsAnimating = _playback.IsEnabled;
         Playback.Content = _playback.IsEnabled
             ? L("Pause", "暂停")
             : L("Play demo track", "播放示例音频");

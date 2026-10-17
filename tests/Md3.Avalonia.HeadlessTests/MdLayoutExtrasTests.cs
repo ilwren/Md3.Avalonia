@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Controls.Presenters;
@@ -187,6 +188,66 @@ public sealed class MdLayoutExtrasTests
             Assert.True(sheet.TryFindResource("Md.Sys.Elevation.Level3", sheet.ActualThemeVariant, out var token),
                 "the elevation token the theme binds Elevation to is missing");
             Assert.Equal((BoxShadows)token!, sheet.Elevation);
+        }
+    }
+
+    [AvaloniaFact]
+    public void Waterfall_Glides_Its_Children_Only_When_The_Column_Count_Changes()
+    {
+        var panel = new MdWaterfallPanel { Width = 400, MinColumnWidth = 180, ColumnSpacing = 0, ItemSpacing = 0 };
+        for (var i = 0; i < 4; i++) panel.Children.Add(new Border { Height = 60 });
+
+        using (Show(panel))
+        {
+            Dispatcher.UIThread.RunJobs();
+            // Two columns fit in 400. Nothing has reflowed, so nothing should be mid-glide: a resize
+            // that keeps the column count has the children tracking it already, and animating every
+            // one of those frames would restart the transition before it finished.
+            Assert.All(panel.Children, child => Assert.Null(child.Transitions));
+
+            panel.Width = 600;
+            Dispatcher.UIThread.RunJobs();
+            // Three columns fit in 600, so the children have new places and get carried to them.
+            Assert.Contains(panel.Children, child => child.Transitions is { Count: > 0 });
+        }
+    }
+
+    [AvaloniaFact]
+    public void Waterfall_Leaves_Children_Alone_When_Animation_Is_Off_Or_Motion_Is_Reduced()
+    {
+        var panel = new MdWaterfallPanel
+        {
+            Width = 400, MinColumnWidth = 180, ColumnSpacing = 0, ItemSpacing = 0, AnimateLayout = false
+        };
+        for (var i = 0; i < 4; i++) panel.Children.Add(new Border { Height = 60 });
+        using (Show(panel))
+        {
+            Dispatcher.UIThread.RunJobs();
+            panel.Width = 600;
+            Dispatcher.UIThread.RunJobs();
+            Assert.All(panel.Children, child => Assert.Null(child.Transitions));
+        }
+
+        var reduced = new MdWaterfallPanel { Width = 400, MinColumnWidth = 180, ColumnSpacing = 0, ItemSpacing = 0 };
+        for (var i = 0; i < 4; i++) reduced.Children.Add(new Border { Height = 60 });
+        MdMotion.SetScheme(reduced, MdMotionScheme.Reduced);
+        using (Show(reduced))
+        {
+            Dispatcher.UIThread.RunJobs();
+            reduced.Width = 600;
+            Dispatcher.UIThread.RunJobs();
+            Assert.All(reduced.Children, child => Assert.Null(child.Transitions));
+        }
+    }
+
+    [AvaloniaFact]
+    public void Side_Sheet_Hides_Its_Handle_When_The_Host_Owns_The_State()
+    {
+        var sheet = new MdSideSheet { Width = 400, Height = 300, IsToggleVisible = false };
+        using (Show(sheet))
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(Toggle(sheet).IsVisible);
         }
     }
 
