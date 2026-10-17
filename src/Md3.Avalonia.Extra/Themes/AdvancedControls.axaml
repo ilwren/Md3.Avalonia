@@ -172,15 +172,17 @@
                               Content="{TemplateBinding Content}"
                               ContentTemplate="{TemplateBinding ContentTemplate}"
                               Padding="{TemplateBinding Padding}" />
-            <Control x:Name="PART_ResizeGrip"
-                     Grid.Row="1"
-                     Width="18"
-                     Height="18"
-                     HorizontalAlignment="Right"
-                     VerticalAlignment="Bottom"
-                     Background="Transparent"
-                     Cursor="SizeNorthWestSouthEast"
-                     IsVisible="{TemplateBinding CanResize}" />
+            <!-- A Border rather than a Control: Control has no Background, and a transparent one
+                 is what makes the grip a pointer target at all. -->
+            <Border x:Name="PART_ResizeGrip"
+                    Grid.Row="1"
+                    Width="18"
+                    Height="18"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Background="Transparent"
+                    Cursor="SizeNorthWestSouthEast"
+                    IsVisible="{TemplateBinding CanResize}" />
           </Grid>
         </Border>
       </ControlTemplate>
