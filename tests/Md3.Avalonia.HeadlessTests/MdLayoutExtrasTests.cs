@@ -99,7 +99,7 @@ public sealed class MdLayoutExtrasTests
         {
             Dispatcher.UIThread.RunJobs();
             Assert.Equal(
-                TokenColor(feed, "Md.Sys.Color.SurfaceContainerLowest"),
+                TokenColor(feed, "Md.Sys.Color.SurfaceContainerLowest.Brush"),
                 Assert.IsType<SolidColorBrush>(feed.Background).Color);
         }
     }
@@ -181,7 +181,7 @@ public sealed class MdLayoutExtrasTests
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(
-                TokenColor(sheet, "Md.Sys.Color.SurfaceContainerLow"),
+                TokenColor(sheet, "Md.Sys.Color.SurfaceContainerLow.Brush"),
                 Assert.IsType<SolidColorBrush>(sheet.SheetBrush).Color);
 
             Assert.True(sheet.TryFindResource("Md.Sys.Elevation.Level3", sheet.ActualThemeVariant, out var token),
