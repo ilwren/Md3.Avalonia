@@ -44,8 +44,10 @@ public sealed class MdWaveformTests
             Assert.Equal(TokenColor(waveform, "Md.Sys.Color.OutlineVariant.Brush"), BrushColor(waveform.BaselineBrush));
 
             // The radius comes from the shape scale, which is why the property is a CornerRadius
-            // and not a double: a double could not take the token.
-            Assert.True(waveform.TryFindResource("Md.Sys.Shape.Corner.ExtraSmall", waveform.ActualThemeVariant, out var token),
+            // and not a double: a double could not take the token. It is the full-radius token
+            // because the control clamps it to half a bar, and a full-radius bar is the round cap
+            // Flutter's audio_waveforms gets from StrokeCap.round.
+            Assert.True(waveform.TryFindResource("Md.Sys.Shape.Corner.Full", waveform.ActualThemeVariant, out var token),
                 "the shape token the theme binds BarCornerRadius to is missing");
             Assert.Equal(Assert.IsType<CornerRadius>(token), waveform.BarCornerRadius);
             Assert.True(waveform.Focusable, "a scrubbable waveform has to be reachable by keyboard");
@@ -232,7 +234,8 @@ public sealed class MdWaveformTests
         var page = new WaveformGalleryPage();
         var waveforms = page.GetLogicalDescendants().OfType<MdWaveform>().ToList();
 
-        Assert.Equal(4, waveforms.Count);
+        // Four examples plus the one that pulses while the demo track plays.
+        Assert.Equal(5, waveforms.Count);
 
         // The fourth waveform on the page is the deliberate empty one, which shares every
         // default with the scrubbing example, so the peaks are what tell them apart.
