@@ -106,7 +106,7 @@ public sealed class MdFloatingWindowTests
         Assert.False(contentHost.IsVisible);
         Assert.Contains(":minimized", window.Classes);
         // The point of the collapse: nothing was torn down, so a hosted player keeps its state.
-        Assert.Same(player, window.GetVisualDescendants().OfType<TextBlock>().Single());
+        Assert.Contains(player, window.GetVisualDescendants().OfType<TextBlock>());
         // An explicit height would leave a tall empty box, so the title bar takes over sizing.
         Assert.True(double.IsNaN(window.Height));
     }

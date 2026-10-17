@@ -9,8 +9,8 @@ namespace Md3.Avalonia.Gallery.Pages;
 public partial class FloatingWindowGalleryPage : UserControl
 {
     // Where the window starts, and where "Reset position" puts it back.
-    private const double HomeX = 330;
-    private const double HomeY = 36;
+    private const double HomeX = 140;
+    private const double HomeY = 28;
 
     // Fast enough to look like playback, slow enough that the playhead is visibly a step at a time.
     private readonly DispatcherTimer _playback = new() { Interval = TimeSpan.FromMilliseconds(50) };
