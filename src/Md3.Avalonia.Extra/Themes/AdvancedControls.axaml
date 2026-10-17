@@ -366,11 +366,12 @@
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdCascader">
         <Grid>
-          <!-- Keep the field outline and label together in the owner surface. The label's surface
-               background cleanly masks the outline behind it without introducing a second outline
-               layer over the clickable anchor. -->
+          <!-- Reserve a label line inside the control and draw the notch over the clickable
+               anchor as a transparent, non-hit-testable sibling. Its target shares this template's
+               namescope, so the outline can cut a real gap without painting a host-colored patch. -->
           <Grid Name="PART_Fields">
-            <Button Name="PART_Anchor" Theme="{StaticResource EcoCascaderAnchorTheme}">
+            <Button Name="PART_Anchor" Theme="{StaticResource EcoCascaderAnchorTheme}"
+                    BorderBrush="Transparent" BorderThickness="0">
               <Grid ColumnDefinitions="*,48">
                 <TextBlock Name="PART_DisplayText" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Text="{TemplateBinding DisplayText}" />
                 <Viewbox Grid.Column="1" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Center">
@@ -378,8 +379,12 @@
                 </Viewbox>
               </Grid>
             </Button>
+            <md:MdOutlinedFieldBorder Name="PART_AnchorOutline"
+                                      OutlineBrush="{DynamicResource Md.Sys.Color.Outline.Brush}"
+                                      OutlineThickness="1" CornerRadius="4"
+                                      NotchTarget="{Binding #PART_Label}" />
             <Border Name="PART_Label" Margin="12,-7,0,0" Padding="4,0" HorizontalAlignment="Left" VerticalAlignment="Top"
-                    Background="{DynamicResource Md.Sys.Color.Surface.Brush}" IsHitTestVisible="False">
+                    Background="Transparent" IsHitTestVisible="False">
               <TextBlock Name="PART_LabelText" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{TemplateBinding Label}" />
             </Border>
           </Grid>
@@ -413,7 +418,8 @@
     </Setter>
     <Style Selector="^ /template/ Border#PART_Label"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:has-label /template/ Border#PART_Label"><Setter Property="IsVisible" Value="True" /></Style>
-    <Style Selector="^:has-label /template/ Grid#PART_Fields"><Setter Property="Margin" Value="0,8,0,0" /></Style>
+    <Style Selector="^:has-label /template/ md|MdOutlinedFieldBorder#PART_AnchorOutline"><Setter Property="IsNotched" Value="True" /></Style>
+    <Style Selector="^:has-label /template/ Grid#PART_Fields"><Setter Property="Margin" Value="0,16,0,0" /></Style>
     <Style Selector="^:present /template/ Border#PART_Surface"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:open /template/ Border#PART_Surface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
     <Style Selector="^:open /template/ Path#PART_Arrow"><Setter Property="RenderTransform" Value="rotate(180deg)" /></Style>

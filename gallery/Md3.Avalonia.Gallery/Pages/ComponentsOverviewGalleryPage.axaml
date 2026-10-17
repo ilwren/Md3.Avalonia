@@ -10,6 +10,8 @@
                    Text="Components are interactive building blocks for creating a user interface. They can be organized into categories based on their purpose: action, containment, communication, navigation, selection, and text input." />
         <TextBlock Classes="body" TextWrapping="Wrap" Opacity="0.72"
                    Text="94 pages, one per component. Every entry below opens its own page; MdGalleryIndexTests fails the build if any of them stops resolving." />
+        <md:MdButton Content="Notifications" Tag="Notifications" Variant="Tonal"
+                     HorizontalAlignment="Left" Click="OpenComponent" />
       </StackPanel>
 
       <WrapPanel Orientation="Horizontal">
@@ -33,7 +35,6 @@
           <StackPanel Spacing="12">
             <TextBlock Classes="h2" FontSize="24" Text="Communication" />
             <TextBlock Classes="body" FontSize="14" TextWrapping="Wrap" Text="Status, progress, prompts, and transient messages." />
-            <md:MdButton Content="Notifications" Tag="Notifications" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="About and licenses" Tag="About and licenses" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Badges" Tag="Badges" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Banner" Tag="Banner" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
