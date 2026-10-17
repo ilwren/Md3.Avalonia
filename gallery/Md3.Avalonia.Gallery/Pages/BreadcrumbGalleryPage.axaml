@@ -4,6 +4,9 @@
              xmlns:extra="using:Md3.Avalonia.Extra.Controls"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.BreadcrumbGalleryPage">
+  <UserControl.Resources>
+    <extra:MdBreadcrumbPathConverter x:Key="BreadcrumbPathConverter" />
+  </UserControl.Resources>
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Spacing="28">
       <StackPanel Spacing="8">
@@ -15,7 +18,9 @@
         <TextBlock Classes="h2" Text="Interactive breadcrumb" />
         <TextBlock Classes="body" TextWrapping="Wrap" Text="Clicking a parent segment navigates to it and drops everything below, which is what a breadcrumb is for. The trailing segment is the current location: it has no hover state and no hand cursor." />
         <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
-          <extra:MdBreadcrumb x:Name="DemoBreadcrumb" Separator="›" ItemInvoked="OnBreadcrumbItemInvoked" />
+          <extra:MdBreadcrumb x:Name="DemoBreadcrumb"
+                              ItemsSource="{Binding CurrentPath, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BreadcrumbPathConverter}}"
+                              Separator="›" ItemInvoked="OnBreadcrumbItemInvoked" />
         </Border>
         <StackPanel Orientation="Horizontal" Spacing="12">
           <md:MdButton Content="Reset path" Variant="Outlined" Click="OnResetPath" />
@@ -53,7 +58,7 @@
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
-        <gallery:CodeExample XamlCode="&lt;extra:MdBreadcrumb ItemsSource=&quot;{Binding PathSegments}&quot;&#10;                 Separator=&quot;›&quot;&#10;                 ItemInvoked=&quot;OnBreadcrumbInvoked&quot; /&gt;"
+        <gallery:CodeExample XamlCode="&lt;extra:MdBreadcrumb&#10;    ItemsSource=&quot;{Binding CurrentPath, Converter={StaticResource BreadcrumbPathConverter}}&quot;&#10;    ItemInvokedCommand=&quot;{Binding NavigateToBreadcrumbCommand}&quot;&#10;    Separator=&quot;›&quot; /&gt;"
                              CSharpCode="var breadcrumb = new MdBreadcrumb&#10;{&#10;    ItemsSource = new[] { &quot;Home&quot;, &quot;Documents&quot;, &quot;Projects&quot;, &quot;Material 3&quot; },&#10;    Separator = &quot;›&quot;&#10;};&#10;breadcrumb.ItemInvoked += (_, item) =&gt; NavigateTo(item);" />
       </StackPanel>
     </StackPanel>

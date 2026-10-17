@@ -514,6 +514,25 @@ public sealed class MdReportedIssuesTests
     }
 
     [AvaloniaFact]
+    public void Breadcrumb_Uses_Primary_Accent_For_Ancestors_But_Not_Current_Item()
+    {
+        var converter = new MdBreadcrumbPathConverter();
+        var items = (IEnumerable<MdBreadcrumbItem>)converter.Convert(
+            "Home/Settings/Security", typeof(IEnumerable<MdBreadcrumbItem>), null, CultureInfo.InvariantCulture)!;
+        var breadcrumb = new MdBreadcrumb { ItemsSource = items };
+
+        using var host = Show(breadcrumb, 520, 100);
+        Dispatcher.UIThread.RunJobs();
+
+        var containers = breadcrumb.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
+        Assert.Equal(3, containers.Length);
+        Assert.Contains("accent", containers[0].Classes);
+        Assert.Contains("accent", containers[1].Classes);
+        Assert.Contains("current", containers[^1].Classes);
+        Assert.DoesNotContain("accent", containers[^1].Classes);
+    }
+
+    [AvaloniaFact]
     public void Breadcrumb_SeparatorTemplate_And_Trailing_Separator_Are_Explicit()
     {
         var breadcrumb = new MdBreadcrumb

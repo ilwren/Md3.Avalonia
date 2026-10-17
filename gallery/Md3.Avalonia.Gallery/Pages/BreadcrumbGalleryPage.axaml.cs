@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Extra.Controls;
@@ -9,36 +9,39 @@ namespace Md3.Avalonia.Gallery.Pages;
 
 public partial class BreadcrumbGalleryPage : UserControl
 {
-    // A breadcrumb is a navigation control, so the demo has to actually navigate. Showing a
-    // status line alone made the control look inert: the path never changed, which is the one
-    // response a user expects from clicking a parent segment.
     private static readonly string[] FullPath = ["Home", "Settings", "Account", "Security", "Two-factor"];
 
-    private readonly ObservableCollection<string> _path = new(FullPath);
+    public static readonly StyledProperty<string> CurrentPathProperty =
+        AvaloniaProperty.Register<BreadcrumbGalleryPage, string>(nameof(CurrentPath), string.Join("/", FullPath));
+
     private readonly ObservableCollection<MdBreadcrumbItem> _iconPath = new();
 
     public BreadcrumbGalleryPage()
     {
         InitializeComponent();
 
-        DemoBreadcrumb.ItemsSource = _path;
         ResetIconPath();
         IconBreadcrumb.ItemsSource = _iconPath;
         DeepBreadcrumb.ItemsSource = new[] { "Root", "usr", "local", "share", "fonts", "MaterialSymbols.ttf" };
         PowerlineBreadcrumb.ItemsSource = new[] { "kg@KW", "~/iterm-test", "master" };
     }
 
+    public string CurrentPath
+    {
+        get => GetValue(CurrentPathProperty);
+        private set => SetValue(CurrentPathProperty, value);
+    }
+
     private void OnBreadcrumbItemInvoked(object? sender, object? item)
     {
-        if (item is not string segment) return;
-        NavigateTo(_path, segment);
-        BreadcrumbStatus.Text = $"Navigated to: {segment} — the trailing segments were dropped.";
+        if (item is not MdBreadcrumbItem model || model.CommandParameter is not string path) return;
+        CurrentPath = path;
+        BreadcrumbStatus.Text = $"Navigated to: {model.Label} — the trailing segments were dropped.";
     }
 
     private void OnResetPath(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
     {
-        _path.Clear();
-        foreach (var segment in FullPath) _path.Add(segment);
+        CurrentPath = string.Join("/", FullPath);
         BreadcrumbStatus.Text = "Click any breadcrumb segment to navigate to it.";
     }
 
@@ -60,13 +63,6 @@ public partial class BreadcrumbGalleryPage : UserControl
 
     private void OnDeepBreadcrumbInvoked(object? sender, object? item)
         => BreadcrumbStatus.Text = $"Jumped to directory: {item}";
-
-    private static void NavigateTo(IList<string> path, string segment)
-    {
-        var index = path.IndexOf(segment);
-        if (index < 0) return;
-        while (path.Count > index + 1) path.RemoveAt(path.Count - 1);
-    }
 
     private void ResetIconPath()
     {

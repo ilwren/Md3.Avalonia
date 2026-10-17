@@ -51,6 +51,8 @@ public class MdBreadcrumbItem : AvaloniaObject
         AvaloniaProperty.Register<MdBreadcrumbItem, string?>(nameof(Href));
     public static readonly StyledProperty<bool> IsCurrentProperty =
         AvaloniaProperty.Register<MdBreadcrumbItem, bool>(nameof(IsCurrent));
+    public static readonly StyledProperty<bool> UseAccentColorProperty =
+        AvaloniaProperty.Register<MdBreadcrumbItem, bool>(nameof(UseAccentColor), true);
     public static readonly StyledProperty<bool> IsEnabledProperty =
         AvaloniaProperty.Register<MdBreadcrumbItem, bool>(nameof(IsEnabled), true);
 
@@ -60,6 +62,8 @@ public class MdBreadcrumbItem : AvaloniaObject
     public object? CommandParameter { get => GetValue(CommandParameterProperty); set => SetValue(CommandParameterProperty, value); }
     public string? Href { get => GetValue(HrefProperty); set => SetValue(HrefProperty, value); }
     public bool IsCurrent { get => GetValue(IsCurrentProperty); set => SetValue(IsCurrentProperty, value); }
+    /// <summary>Use the theme's primary text colour for this navigable ancestor item.</summary>
+    public bool UseAccentColor { get => GetValue(UseAccentColorProperty); set => SetValue(UseAccentColorProperty, value); }
     public bool IsEnabled { get => GetValue(IsEnabledProperty); set => SetValue(IsEnabledProperty, value); }
 
     public override string ToString() => Label?.ToString() ?? string.Empty;
@@ -185,6 +189,7 @@ public sealed class MdBreadcrumb : ListBox
         listItem.Classes.Set("last", isLast);
         listItem.Classes.Set("has-icon", !isOverflow && model?.Icon is not null);
         listItem.Classes.Set("current", !isOverflow && isCurrent);
+        listItem.Classes.Set("accent", !isOverflow && !isCurrent && (model?.UseAccentColor ?? true));
         listItem.Classes.Set("overflow", isOverflow);
         listItem.IsVisible = isVisible;
         listItem.IsEnabled = isOverflow || model?.IsEnabled != false;

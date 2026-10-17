@@ -4,6 +4,7 @@
 
 ### Added
 
+- Added `MdBreadcrumbPathConverter` for binding slash-separated route paths directly to `MdBreadcrumb`; navigable ancestors use the theme's primary text color, while the current item and separators stay neutral.
 - Added the standalone `Md3.Avalonia.Notifications` package with one title/body API for Windows, macOS, Linux and Android. Windows uses WinRT toast APIs from its Windows-specific .NET target, Linux calls libnotify directly (no helper processes), macOS uses AppKit interop, and Android uses `NotificationManager`; Windows AppUserModelID registration and Android 13+ runtime permission remain host responsibilities. Platform delivery still needs manual verification.
 
 ### Fixed
