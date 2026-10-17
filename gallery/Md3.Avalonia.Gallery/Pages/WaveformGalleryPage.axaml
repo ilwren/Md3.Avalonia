@@ -24,8 +24,8 @@
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="While it plays" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="IsAnimating makes the bars pulse in place, so the same peak buffer reads as a track that is playing rather than a picture of one. The pulse travels along the bars and is scaled by each bar's own peak, so a quiet passage stays quiet instead of thumping as loudly as the drop; AnimationAmplitude and AnimationSpeed shape it. It runs on the render loop rather than a timer, so a waveform that is hidden or switched off costs nothing, and it holds still under the Reduced and None motion schemes. The waveform above pulses while the demo track is playing, and its playhead carries a knob that grows while it is held, the way a Material slider's handle does." />
-        <eco:MdWaveform x:Name="Live" Height="80" IsAnimating="True" IsInteractive="False" ShowPlayhead="False" HorizontalAlignment="Stretch" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="IsPulsing makes the bars pulse in place, so the same peak buffer reads as a track that is playing rather than a picture of one. The pulse travels along the bars and is scaled by each bar's own peak, so a quiet passage stays quiet instead of thumping as loudly as the drop; AnimationAmplitude and AnimationSpeed shape it. It runs on the render loop rather than a timer, so a waveform that is hidden or switched off costs nothing, and it holds still under the Reduced and None motion schemes. The waveform above pulses while the demo track is playing, and its playhead carries a knob that grows while it is held, the way a Material slider's handle does." />
+        <eco:MdWaveform x:Name="Live" Height="80" IsPulsing="True" IsInteractive="False" ShowPlayhead="False" HorizontalAlignment="Stretch" />
       </StackPanel>
 
       <StackPanel Spacing="12">

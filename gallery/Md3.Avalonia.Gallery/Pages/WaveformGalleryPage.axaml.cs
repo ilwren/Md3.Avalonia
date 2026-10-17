@@ -48,7 +48,7 @@ public partial class WaveformGalleryPage : UserControl
         if (_playback.IsEnabled) _playback.Stop(); else _playback.Start();
         // The bars pulse only while something is actually playing, which is the difference between a
         // waveform that looks alive and one that is merely twitching.
-        Waveform.IsAnimating = _playback.IsEnabled;
+        Waveform.IsPulsing = _playback.IsEnabled;
         Playback.Content = _playback.IsEnabled
             ? L("Pause", "暂停")
             : L("Play demo track", "播放示例音频");

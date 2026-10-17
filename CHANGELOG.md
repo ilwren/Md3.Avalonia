@@ -198,7 +198,7 @@
   a sample buffer for hosts that already have one. Two defaults follow Flutter's `audio_waveforms`:
   bars end in the round cap that package gets from `StrokeCap.round`, and the seek line is the 2dp it
   uses, carrying a knob that grows while held rather than a bare full-height line that reads as a
-  divider. `IsAnimating` pulses the bars in place so a static peak buffer reads as a track that is
+  divider. `IsPulsing` pulses the bars in place so a static peak buffer reads as a track that is
   playing, scaled by each bar's own peak so a quiet passage stays quiet; it runs on
   `TopLevel.RequestAnimationFrame` rather than a timer, so a hidden waveform costs nothing, and it
   holds still - identically, not merely more slowly - under the Reduced and None motion schemes. No third-party Avalonia waveform control turned up

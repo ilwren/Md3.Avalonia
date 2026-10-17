@@ -313,7 +313,7 @@ public sealed class MdWaveformTests
     [AvaloniaFact]
     public void An_Animating_Waveform_Holds_Still_When_Motion_Is_Off()
     {
-        // IsAnimating is decorative motion, so the ambient scheme decides it. Under None the bars must
+        // IsPulsing is decorative motion, so the ambient scheme decides it. Under None the bars must
         // draw exactly as they do with the pulse switched off - not merely more slowly, but identically,
         // because a pulse that merely slowed down would still be motion somebody asked not to see.
         var peaks = new float[40];
@@ -326,7 +326,7 @@ public sealed class MdWaveformTests
                 Width = 400,
                 Height = 200,
                 Peaks = peaks,
-                IsAnimating = animating,
+                IsPulsing = animating,
                 ShowPlayhead = false,
                 BarGap = 0,
                 BarCornerRadius = new CornerRadius(0),

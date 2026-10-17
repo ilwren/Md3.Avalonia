@@ -8,7 +8,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Md3.Avalonia.Motion;
-using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Extra.Controls;
 
@@ -157,7 +156,7 @@ public class MdWaterfallPanel : Panel
     {
         child.RenderTransform = new TranslateTransform(-dx, -dy);
         child.Transitions = MdMotionTransitions.Collect(
-            MdMotionTransitions.CreateTransform(this, RenderTransformProperty, MdMotionKind.Spatial));
+            MdMotionTransitions.CreateTransform(this, RenderTransformProperty));
         child.RenderTransform = null;
     }
 

@@ -94,8 +94,8 @@ public sealed class MdWaveform : Control
 
     /// <summary>Whether the bars pulse in place, which is what makes a static peak buffer read as a
     /// track that is playing rather than a picture of one.</summary>
-    public static readonly StyledProperty<bool> IsAnimatingProperty =
-        AvaloniaProperty.Register<MdWaveform, bool>(nameof(IsAnimating));
+    public static readonly StyledProperty<bool> IsPulsingProperty =
+        AvaloniaProperty.Register<MdWaveform, bool>(nameof(IsPulsing));
 
     /// <summary>How far a bar dips at the trough of the pulse, as a fraction of its own height.</summary>
     public static readonly StyledProperty<double> AnimationAmplitudeProperty =
@@ -123,7 +123,7 @@ public sealed class MdWaveform : Control
             UnplayedBrushProperty, PlayheadBrushProperty, BaselineBrushProperty, ShowPlayheadKnobProperty,
             AnimationAmplitudeProperty, AnimationSpeedProperty);
         IsInteractiveProperty.Changed.AddClassHandler<MdWaveform>((waveform, _) => waveform.UpdatePseudoClasses());
-        IsAnimatingProperty.Changed.AddClassHandler<MdWaveform>((waveform, _) => waveform.UpdateAnimation());
+        IsPulsingProperty.Changed.AddClassHandler<MdWaveform>((waveform, _) => waveform.UpdateAnimation());
         PeaksProperty.Changed.AddClassHandler<MdWaveform>((waveform, _) => waveform.UpdateAnimation());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdWaveform>((waveform, _) => waveform.UpdateAnimation());
     }
@@ -228,10 +228,10 @@ public sealed class MdWaveform : Control
     }
 
     /// <summary>Whether the bars pulse in place.</summary>
-    public bool IsAnimating
+    public bool IsPulsing
     {
-        get => GetValue(IsAnimatingProperty);
-        set => SetValue(IsAnimatingProperty, value);
+        get => GetValue(IsPulsingProperty);
+        set => SetValue(IsPulsingProperty, value);
     }
 
     /// <summary>How far a bar dips at the trough of the pulse, as a fraction of its own height.</summary>
@@ -339,7 +339,7 @@ public sealed class MdWaveform : Control
                 // One pulse travelling along the bars, phase-shifted per bar, and scaled by the bar's
                 // own peak - so a quiet passage stays quiet instead of thumping as loud as the drop.
                 var trough = 0.5 + 0.5 * Math.Sin(_phase - i * 0.35);
-                magnitude *= 1 - amplitude * trough;
+                magnitude *= (float)(1 - amplitude * trough);
             }
 
             var span = magnitude * height;
@@ -388,7 +388,7 @@ public sealed class MdWaveform : Control
     {
         get
         {
-            if (!IsAnimating || AnimationAmplitude <= 0 || Peaks is not { Count: > 0 } || !IsEffectivelyVisible)
+            if (!IsPulsing || AnimationAmplitude <= 0 || Peaks is not { Count: > 0 } || !IsEffectivelyVisible)
                 return false;
             // A pulse is decorative motion, so the ambient scheme decides: Reduced and None both
             // mean the bars hold still, and the control still draws the same peaks either way.
