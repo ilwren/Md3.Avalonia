@@ -121,7 +121,6 @@ public sealed class MdFloatingWindow : ContentControl
         // would let a page centre the window and silently break every position it reports.
         HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left;
         VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top;
-        TransformOrigin = RelativePoint.Center;
         Transitions = MdMotionTransitions.Collect(
             MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects, MdMotionSpeed.Default),
             MdMotionTransitions.CreateTransform(this, RenderTransformProperty, MdMotionSpeed.Default));
@@ -357,7 +356,7 @@ public sealed class MdFloatingWindow : ContentControl
     /// </summary>
     private void BeginGesture(PointerPressedEventArgs e, Control? captureTarget, bool dragging)
     {
-        _dragHost = VisualParent as Visual ?? this;
+        _dragHost = this.GetVisualParent() as Visual ?? this;
         _pressPosition = e.GetPosition(_dragHost);
         if (dragging) _dragging = true;
         else _resizing = true;
@@ -366,7 +365,7 @@ public sealed class MdFloatingWindow : ContentControl
         e.Handled = true;
     }
 
-    private void EndGesture(Pointer? pointer, bool dragging)
+    private void EndGesture(IPointer? pointer, bool dragging)
     {
         if (dragging) _dragging = false;
         else _resizing = false;
@@ -381,7 +380,7 @@ public sealed class MdFloatingWindow : ContentControl
     /// </summary>
     private Point ClampToHost(Point position)
     {
-        var host = VisualParent as Visual;
+        var host = this.GetVisualParent() as Visual;
         var maxX = Math.Max(0, (host?.Bounds.Width ?? double.PositiveInfinity) - Bounds.Width);
         var maxY = Math.Max(0, (host?.Bounds.Height ?? double.PositiveInfinity) - Bounds.Height);
         return new Point(Math.Clamp(position.X, 0, maxX), Math.Clamp(position.Y, 0, maxY));
