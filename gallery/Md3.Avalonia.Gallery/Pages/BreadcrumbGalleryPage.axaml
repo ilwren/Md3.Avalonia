@@ -3,6 +3,7 @@
              xmlns:md="using:Md3.Avalonia.Controls"
              xmlns:extra="using:Md3.Avalonia.Extra.Controls"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             xmlns:pages="using:Md3.Avalonia.Gallery.Pages"
              x:Class="Md3.Avalonia.Gallery.Pages.BreadcrumbGalleryPage">
   <UserControl.Resources>
     <extra:MdBreadcrumbPathConverter x:Key="BreadcrumbPathConverter" />
@@ -19,7 +20,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap" Text="Clicking a parent segment navigates to it and drops everything below, which is what a breadcrumb is for. The trailing segment is the current location: it has no hover state and no hand cursor." />
         <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
           <extra:MdBreadcrumb x:Name="DemoBreadcrumb"
-                              ItemsSource="{Binding CurrentPath, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BreadcrumbPathConverter}}"
+                              ItemsSource="{Binding CurrentPath, RelativeSource={RelativeSource AncestorType=pages:BreadcrumbGalleryPage}, Converter={StaticResource BreadcrumbPathConverter}}"
                               Separator="›" ItemInvoked="OnBreadcrumbItemInvoked" />
         </Border>
         <StackPanel Orientation="Horizontal" Spacing="12">
