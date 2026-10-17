@@ -181,7 +181,7 @@
                     HorizontalAlignment="Right"
                     VerticalAlignment="Bottom"
                     Background="Transparent"
-                    Cursor="SizeNorthWestSouthEast"
+                    Cursor="BottomRightCorner"
                     IsVisible="{TemplateBinding CanResize}" />
           </Grid>
         </Border>
