@@ -236,6 +236,13 @@ jobs:
         continue-on-error: true
         run: scripts/probe-tests.sh MdWaveformTests waveform.trx
 
+      # A masonry panel and a collapsible sheet are both layout and state rather than paint: which
+      # column a child actually landed in, and whether a collapsed sheet is still catching clicks
+      # over the page it is supposed to be overlaying. Neither shows up in a property dump.
+      - name: Probe the layout extras tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdLayoutExtrasTests layout-extras.trx
+
       # Bounded, because an unbounded stall costs the job's whole timeout and takes the run's
       # annotations with it: the suite measures about four and a half minutes, so ten is a wall it
       # only reaches by hanging, and a hang reported as a failed step still lets every step after
