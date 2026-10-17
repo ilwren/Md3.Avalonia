@@ -275,6 +275,42 @@ public sealed class MdAcceptanceRegressionTests
     }
 
     [AvaloniaFact]
+    public void Gallery_Shell_Does_Not_Intercept_Focused_Numeric_Wheel_Input()
+    {
+        var gallery = new MainWindow { Width = 1440, Height = 900 };
+        gallery.Show();
+        try
+        {
+            Assert.True(gallery.NavigateToIndexedPage("Numeric input"));
+            Dispatcher.UIThread.RunJobs();
+
+            var numeric = gallery.GetVisualDescendants().OfType<MdNumericBox>()
+                .Single(control => control.Name == "QuantityBox");
+            var pageScroll = gallery.GetVisualDescendants().OfType<MdScrollViewer>()
+                .Single(viewer => viewer.Name == "PageScroll");
+            var textBox = numeric.GetVisualDescendants().OfType<TextBox>().Single();
+            Assert.True(textBox.Focus());
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(numeric.IsKeyboardFocusWithin);
+
+            pageScroll.Offset = new Vector(0, 40);
+            Dispatcher.UIThread.RunJobs();
+            var pageOffset = pageScroll.Offset.Y;
+            var value = numeric.Value;
+            var point = numeric.TranslatePoint(
+                new Point(numeric.Bounds.Width / 2, numeric.Bounds.Height / 2), gallery);
+            Assert.NotNull(point);
+
+            gallery.MouseWheel(point!.Value, new Vector(0, 1), RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(value + numeric.Increment, numeric.Value);
+            Assert.Equal(pageOffset, pageScroll.Offset.Y);
+        }
+        finally { gallery.Close(); }
+    }
+
+    [AvaloniaFact]
     public void Editing_Menu_Exposes_Gestures_And_Native_Editing_Shortcuts_Work()
     {
         var field = new MdTextBox { Text = "Material" };

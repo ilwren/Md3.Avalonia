@@ -168,7 +168,10 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
         LanguageSelector.ItemsSource = new[] { "English", "简体中文" };
         LanguageSelector.SelectedIndex = 0;
         MdLocalization.SetCulture(this, _culture);
-        PageScroll.AddHandler(InputElement.PointerWheelChangedEvent, OnPagePointerWheel, RoutingStrategies.Tunnel);
+        // Let focused controls handle wheel input before the shell's scroll fallback.
+        // The shell observes handled events only to chain at an inner scroller's boundary.
+        PageScroll.AddHandler(InputElement.PointerWheelChangedEvent, OnPagePointerWheel,
+            RoutingStrategies.Bubble, handledEventsToo: true);
         Navigate(new ComponentsOverviewGalleryPage(), ComponentsOverviewNav, ComponentsTopNav);
         Dispatcher.UIThread.Post(() =>
         {
@@ -534,18 +537,32 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
 
     private void OnPagePointerWheel(object? sender, PointerWheelEventArgs e)
     {
-        // Let an embedded material scrolling surface consume the wheel while it still has room.
-        // The shell takes over only at that surface's boundary, preserving normal scroll chaining.
-        var nested = (e.Source as Visual)?.GetVisualAncestors()
+        if (e.Delta.Y == 0) return;
+
+        var source = e.Source as Visual;
+        var numeric = source as MdNumericBox ?? source?.GetVisualAncestors().OfType<MdNumericBox>().FirstOrDefault();
+        if (numeric?.IsKeyboardFocusWithin == true)
+            return; // NumericUpDown owns the focused-wheel gesture; never scroll the page as well.
+
+        // Let an embedded scrolling surface consume the wheel while it still has room. Because
+        // this is a bubble handler, an inner ScrollViewer may already have marked the event
+        // handled; at its boundary the shell still chains the wheel to the page scroller.
+        var nested = source?.GetVisualAncestors()
             .OfType<ScrollViewer>()
             .FirstOrDefault(viewer => !ReferenceEquals(viewer, PageScroll));
+        var nestedAtBoundary = false;
         if (nested is not null)
         {
             var nestedMaximum = Math.Max(0, nested.Extent.Height - nested.Viewport.Height);
             var canConsume = e.Delta.Y > 0 && nested.Offset.Y > 0 ||
                              e.Delta.Y < 0 && nested.Offset.Y < nestedMaximum;
             if (canConsume) return;
+            nestedAtBoundary = true;
         }
+
+        // Do not override another control that consumed the gesture. The exception is an inner
+        // scroller at its boundary, where scroll chaining intentionally transfers it to the shell.
+        if (e.Handled && !nestedAtBoundary) return;
 
         var scroller = GetPageScroller();
         if (scroller is null || scroller.Extent.Height <= scroller.Viewport.Height) return;
