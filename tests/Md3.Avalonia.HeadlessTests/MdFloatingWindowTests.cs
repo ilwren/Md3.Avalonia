@@ -275,7 +275,7 @@ public sealed class MdFloatingWindowTests
         return Assert.IsType<CornerRadius>(value);
     }
 
-    private static IDisposable Show(Control content, double width, double height)
+    private static WindowScope Show(Control content, double width, double height)
     {
         MdMotion.SetScheme(content, MdMotionScheme.None);
         var window = new Window { Width = width, Height = height, Content = content };
