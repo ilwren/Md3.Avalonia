@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Avalonia;
 using Avalonia.Animation;
@@ -150,12 +150,6 @@ public sealed class MdLayoutExtrasTests
             Assert.All(reduced.Children, child => Assert.Null(child.Transitions));
         }
     }
-
-        sheet.GetVisualDescendants().OfType<Border>().Single(control => control.Name == "PART_Sheet");
-
-        sheet.GetVisualDescendants().OfType<ContentPresenter>().Single(control => control.Name == "PART_SheetContent");
-
-        sheet.GetVisualDescendants().OfType<Button>().Single(control => control.Name == "PART_Toggle");
 
     private static int ColumnsUsedFor(double width, double minWidth, int children)
     {
