@@ -48,7 +48,7 @@ Picker stale-field behavior and Cascader label/dropdown clipping have headless/C
 Do not mark an item complete without recording device/OS, assistive technology version, tester and date.
 
 - [ ] Windows x64: pointer, keyboard-only, 100/150/200% scale, Narrator. Specifically recheck `MdBeforeAfter` at 150%: the latest report on `22488b5` showed Position 0.5 with the horizontal/vertical handle at the left/top and a first-drag jump; no desktop sign-off yet.
-- [ ] System notifications: verify registered-AUMID Windows toast; macOS delivery/attribution; Linux X11 and Wayland with `notify-send`; Android API 32 vs 33+ with permission denied/granted, channel settings, and app-specific small icon. This new package currently has no platform sign-off.
+- [ ] System notifications: verify the Windows 11 24H2 Gallery's first-run per-user shortcut/AUMID registration, toast delivery, and notification settings; macOS delivery/attribution; Linux X11 and Wayland using the direct `libnotify` backend; Android API 32 vs 33+ with permission denied/granted, channel settings, and app-specific small icon. This package still needs platform sign-off.
 - [ ] Windows ARM64: launch, Gallery navigation, popup/picker/dialog smoke.
 - [ ] macOS Apple Silicon: keyboard, trackpad, VoiceOver, Light/Dark/System.
 - [ ] Linux x64: Wayland/X11 launch, keyboard, Orca, font fallback.

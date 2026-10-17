@@ -30,13 +30,13 @@
         <StackPanel Spacing="8">
           <TextBlock Classes="h3" Text="Platform setup" />
           <TextBlock Classes="body" TextWrapping="Wrap"
-                     Text="Linux needs libnotify and a running desktop notification service. Android 13+ needs POST_NOTIFICATIONS permission. Windows desktop toasts need a Windows target and a registered AppUserModelID; macOS delivery follows system notification settings." />
+                     Text="Linux needs libnotify and a running desktop notification service. Android 13+ needs POST_NOTIFICATIONS permission. The Windows Gallery registers its current-user Start-menu shortcut and AppUserModelID at launch; allow notifications for the app in Windows Settings. Other Windows desktop hosts must register their own AppUserModelID shortcut. macOS delivery follows system notification settings." />
         </StackPanel>
       </Border>
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
-        <gallery:CodeExample CSharpCode="var notifications = MdSystemNotificationService.CreateDefault(new MdSystemNotificationOptions&#10;{&#10;    ApplicationName = &quot;Material Design 3 Gallery&quot;&#10;});&#10;await notifications.ShowAsync(title, message);" />
+        <gallery:CodeExample CSharpCode="var notifications = MdSystemNotificationService.CreateDefault(new MdSystemNotificationOptions&#10;{&#10;    ApplicationName = &quot;Material Design 3 Gallery&quot;,&#10;    // On Windows, match the AppUserModelID on your registered Start-menu shortcut.&#10;    WindowsAppUserModelId = &quot;Contoso.Builder&quot;&#10;});&#10;await notifications.ShowAsync(title, message);" />
       </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>

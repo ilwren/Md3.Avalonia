@@ -1,7 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
+    <!-- Select the Windows-specific notifications asset for Windows builds; retain the portable
+         target on macOS/Linux so their native backends remain available. -->
     <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework Condition="'$(OS)' == 'Windows_NT'">net10.0-windows10.0.19041.0</TargetFramework>
     <RootNamespace>Md3.Avalonia.Gallery.Desktop</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Nullable>enable</Nullable>

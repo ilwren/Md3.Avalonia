@@ -1,6 +1,7 @@
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Md3.Avalonia.Gallery;
 using Md3.Avalonia.Notifications;
 
 namespace Md3.Avalonia.Gallery.Pages;
@@ -34,7 +35,8 @@ public partial class NotificationsGalleryPage : UserControl
         {
             _notificationService ??= MdSystemNotificationService.CreateDefault(new MdSystemNotificationOptions
             {
-                ApplicationName = "Material Design 3 Gallery"
+                ApplicationName = "Material Design 3 Gallery",
+                WindowsAppUserModelId = GalleryNotificationIdentity.WindowsAppUserModelId
             });
             await _notificationService.ShowAsync(new MdSystemNotification(title, BodyInput.Text ?? string.Empty));
             StatusText.Text = L(
@@ -45,7 +47,11 @@ public partial class NotificationsGalleryPage : UserControl
         {
             // Platform requirements (permissions, desktop services and app identity) vary by host.
             // Keep the gallery responsive and expose the backend's actionable diagnostic here.
-            StatusText.Text = $"{L("Could not send the notification:", "无法发送系统通知：")} {exception.Message}";
+            var registrationError = GalleryNotificationIdentity.WindowsRegistrationError;
+            var diagnostic = string.IsNullOrWhiteSpace(registrationError)
+                ? exception.Message
+                : $"{exception.Message} Windows AppUserModelID registration failed: {registrationError}";
+            StatusText.Text = $"{L("Could not send the notification:", "无法发送系统通知：")} {diagnostic}";
         }
         finally
         {
