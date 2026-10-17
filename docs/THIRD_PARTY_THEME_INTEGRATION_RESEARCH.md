@@ -1,4 +1,4 @@
-# 第三方 Avalonia 控件 —— Material 3 主题接入调研（2026-10-11）
+﻿# 第三方 Avalonia 控件 —— Material 3 主题接入调研（2026-10-11）
 
 本文件回答一个问题：**当前有哪些热度较高的「单个、第三方」Avalonia 控件，适合以 opt-in 主题包的形式接入
 Md3.Avalonia 做 Material 3 美化？** 结论先行，后面是数据与接入设计。
@@ -503,6 +503,30 @@ GitHub 上没有可引用的 Avalonia 瀑布流控件，也没有把「收起为
   连续 resize 时子元素本来就在逐帧跟随，每帧重启 transition 会让它永远追不上指针。所以只在列数这个
   离散事件上动画，宽度变化本身不触发。
 - **半圆把手曾经自研，随后按需求撤下。** Flutter 的 `SideSheet` 是模态的，没有"收起成贴边把手"这种形态，所以当时没有样式可参考；把手 24dp 宽低于 Material 的 48dp 指针目标下限，处理方式与 `MdFab.axaml` 里小尺寸 FAB 的注释所述一致（外层透明容器撑住 48dp，把手放在里面）。这些结论保留在此，控件本身（`MdSideSheet` 与 `MdSideSheetTabTheme`）已从代码库移除。
+
+## 补记（2026-10-17 之三）：灵动岛（Dynamic Island）有现成控件吗
+
+结论：**Avalonia 侧没有，Flutter 侧也没有可直接复用的控件。** 两边能搜到的东西分三类，
+没有一类是"拿来就能塞进应用里当组件用"的。
+
+- **Avalonia：零。** 只有 `Brozovec/NotchIsland-Windows` 和 `LaciaStudio/LaciaIsland`，
+  都是 0 star 的独立 Windows 桌面程序（把内容画在刘海下面），不是控件库，没有主题化接口。
+- **Flutter 里最热的其实是"接系统 API"而不是"自己画"。** `istornz/flutter_live_activities`
+  （285★，MIT，pub 包名 `live_activities`）是平台插件，转调 iOS 16.1+ 的 Live Activities，
+  画面由系统绘制，不能在自己的窗口里渲染，也就没有样式可抄。`appsfolder/livebridge`
+  （1128★）是**一个 Android 应用**而非 widget，作用是把普通通知转成 Android 16 的 Live
+  Updates，而且是 GPL-3.0（本仓库是 Apache-2.0，不可抄）。剩下的
+  `codingislove01/dynamic-island-animation-flutter`（15★）之类都是动画 demo。
+- **值得读的是原生实现的动效，不是代码。** `Ebullioscopic/Atoll`（4977★，macOS，Swift，
+  GPL-3.0）、`Lakr233/NotchDrop`（2127★，MIT）、`erha19/ping-island`（1130★，Apache-2.0）；
+  Android 侧 `1812z/HyperIsland`（589★，MIT）、`Angel-Studio/MaterialYou-Dynamic-Island`
+  （306★，Material 风格，但是独立 App）、`agupta07505/SmartIsland`（286★，GPL-3.0）。
+  其中 MIT/Apache-2.0 的可以看形态与缓动，GPL 的只作观感参考。
+
+也就是说，如果要做灵动岛，按既有规则（有第三方控件就主题化，没有就自研放进 Extra）应该
+**自研**。真正的难点不在画那个胶囊，而在宿主：iOS/Android 上它是系统级悬浮层，桌面端没有
+对应物，只能做成应用窗口内的贴边悬浮层——这一点与刚撤下的 `MdSideSheet` 遇到的问题是同
+一个（贴边 + 指针目标 48dp + 展开动画），所以那次踩到的经验可以直接复用。
 
 ## 7. 数据来源
 
