@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
              x:Class="Md3.Avalonia.Gallery.Pages.ComponentsOverviewGalleryPage">
@@ -9,7 +9,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap"
                    Text="Components are interactive building blocks for creating a user interface. They can be organized into categories based on their purpose: action, containment, communication, navigation, selection, and text input." />
         <TextBlock Classes="body" TextWrapping="Wrap" Opacity="0.72"
-                   Text="93 pages, one per component. Every entry below opens its own page; MdGalleryIndexTests fails the build if any of them stops resolving." />
+                   Text="110 indexed pages. Every entry below opens its own page; MdGalleryIndexTests fails the build if any of them stops resolving." />
       </StackPanel>
 
       <WrapPanel Orientation="Horizontal">
@@ -40,6 +40,9 @@
             <md:MdButton Content="Divider" Tag="Divider" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Expansion panels" Tag="Expansion panels" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Masonry panel" Tag="Masonry panel" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Docking" Tag="Docking" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Draggable tabs" Tag="Draggable tabs" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Markdown" Tag="Markdown" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Surfaces and type scale" Tag="Surfaces and type scale" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Settings cards" Tag="Settings cards" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Scrolling surface" Tag="Scrolling surface" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
@@ -122,6 +125,9 @@
             <md:MdButton Content="Combo box" Tag="Combo box" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Menus" Tag="Menus" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Rich editor" Tag="Rich editor" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Text editor" Tag="Text editor" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Property grid" Tag="Property grid" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Node editor" Tag="Node editor" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Keyboard avoidance" Tag="Keyboard avoidance" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Sheets" Tag="Sheets" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Draggable sheet" Tag="Draggable sheet" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
@@ -135,9 +141,16 @@
             <md:MdButton Content="Data table" Tag="Data table" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Paginated table" Tag="Paginated table" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Data grids" Tag="Data grids" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Hex editor" Tag="Hex editor" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Paged items" Tag="Paged items" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Chart" Tag="Chart" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="LiveCharts2 charts" Tag="LiveCharts2 charts" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="ScottPlot charts" Tag="ScottPlot charts" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Map" Tag="Map" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Timeline" Tag="Timeline" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Waterfall" Tag="Waterfall" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Waveform" Tag="Waveform" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Floating window" Tag="Floating window" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Pull to refresh" Tag="Pull to refresh" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Chat view" Tag="Chat view" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Avatar" Tag="Avatar" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />

@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             xmlns:themes="using:Md3.Avalonia.Themes"
+             xmlns:ae="using:AvaloniaEdit"
+             x:Class="Md3.Avalonia.Gallery.Pages.TextEditorGalleryPage">
+  <!-- The theme is loaded inside this page only. It registers ControlThemes for AvaloniaEdit's own
+       types, so nothing outside the editor's subtree changes - the same reason CodeExample scopes
+       it to its own preview. -->
+  <UserControl.Styles>
+    <themes:MaterialAvaloniaEditTheme />
+  </UserControl.Styles>
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Text editor" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="AvaloniaEdit wearing the opt-in Md3.Avalonia.AvaloniaEdit theme: line numbers, find and replace, completion, and the Material caret and selection ink. No Fluent resources anywhere in the app." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h3" Text="Themed editor" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The theme re-templates TextEditor, TextArea, the search panel and the completion list, and styles the controls the editor creates for itself with keyed Md.Comp.AvaloniaEdit.* themes, so the rest of the application keeps its own control themes." />
+        <Border CornerRadius="12" ClipToBounds="True" Padding="4"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
+          <ae:TextEditor x:Name="Editor" Height="280" ShowLineNumbers="True"
+                         HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
+        </Border>
+        <WrapPanel Orientation="Horizontal">
+          <md:MdButton Content="Open find panel" Variant="Outlined" Click="OpenFindPanel" Margin="0,0,8,8" />
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;themes:MaterialTheme /&gt;&#10;&lt;themes:MaterialAvaloniaEditTheme /&gt;   &lt;!-- opt-in package, after MaterialTheme --&gt;"
+                            CSharpCode="var editor = new TextEditor { ShowLineNumbers = true };&#10;editor.Text = File.ReadAllText(path);&#10;&#10;editor.SearchPanel.Open();&#10;editor.SearchPanel.SearchPattern = &quot;Material&quot;;&#10;editor.SearchPanel.FindNext();" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

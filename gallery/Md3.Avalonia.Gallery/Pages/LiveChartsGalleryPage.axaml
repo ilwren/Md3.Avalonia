@@ -1,0 +1,89 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.LiveChartsGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="LiveCharts2 charts" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="LiveCharts2 charts wearing the opt-in Md3.Avalonia.LiveCharts2 theme: series take the Material palette, axes and grids the theme's inks and type scale, tooltips and legends the inverse-surface card, and light/dark follow the core MaterialTheme variant." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h3" Text="Themed charts" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Both charts below are stock LiveCharts2 views: nothing on the controls was set, the fill, stroke, marker and corner rules all arrive from the one theme the process configured." />
+        <Border CornerRadius="12" Padding="4"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
+          <Border CornerRadius="8" Padding="12" ClipToBounds="True"
+                  Background="{DynamicResource Md.Sys.Color.Surface.Brush}">
+            <StackPanel Spacing="12">
+              <lvc:CartesianChart x:Name="Cartesian" Height="300" />
+              <lvc:PieChart x:Name="Pie" Height="300" />
+            </StackPanel>
+          </Border>
+        </Border>
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The line and column series, the donut, both legends and both tooltips are drawn from Md.Sys.* tokens; hover a point to see the tooltip as a Material inverse-surface card with a drop shadow." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Series palette" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Eight Material roles carry the series palette, in this order: the first four give a palette of four hues the way LiveCharts' own palette does, and the remaining four are further tones of the same accent hues, so a chart with more than four series still reads as Material instead of inventing colours." />
+        <WrapPanel Orientation="Horizontal">
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="Primary" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.Tertiary.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="Tertiary" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.Secondary.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="Secondary" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.Error.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="Error" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="PrimaryContainer" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="TertiaryContainer" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.InversePrimary.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="InversePrimary" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,18,10">
+            <Border Width="20" Height="20" CornerRadius="10" Background="{DynamicResource Md.Sys.Color.Outline.Brush}" />
+            <TextBlock Classes="body" VerticalAlignment="Center" Text="Outline" />
+          </StackPanel>
+        </WrapPanel>
+
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="LiveCharts has no per-control styles: every chart resolves its look from the one theme held by LiveCharts.DefaultSettings, so the theme is configured once, at startup, before the first chart view exists. Adding it on top of LiveCharts' own default theme keeps its tooltip and legend factories and its animations." />
+        <gallery:CodeExample XamlCode="&lt;lvc:CartesianChart Series=&quot;{Binding Series}&quot; XAxes=&quot;{Binding XAxes}&quot; YAxes=&quot;{Binding YAxes}&quot; /&gt;"
+                            CSharpCode="// Once, before the first chart is created.&#10;LiveCharts.Configure(settings =&gt; settings.AddMaterialTheme());&#10;&#10;// An application that already builds its own theme appends the rules instead:&#10;settings.HasTheme(theme =&gt; theme&#10;    .HasDefaultTooltip(() =&gt; new SKDefaultTooltip())&#10;    .HasDefaultLegend(() =&gt; new SKDefaultLegend())&#10;    .ApplyMaterialRules());" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Mapping" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Axes take the LabelMedium size and the OnSurfaceVariant ink, grid lines are OutlineVariant and the horizontal-only rule LiveCharts draws stays as it is. A line series is a 3 DIP stroke with 8 DIP markers ringed in the series colour over the surface, and upstream's area fill is cleared so a line chart reads as a line chart. Columns grow with a 4 DIP rounded end and sit 6 DIP apart, which is the one place the geometry moves away from upstream; a stacked bar keeps square corners so the segments read as one bar. A pie or donut is separated by the surface showing through, a gauge is a SurfaceContainerHighest track with a Primary indicator, and candlesticks take the third accent for rising and the error role for falling instead of upstream's green and red. Tooltips and legends are the inverse-surface card with the OnSurfaceVariant ink at LabelLarge, and a chart's canvas is cleared to the card's surface so a chart inside a card blends with it." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Notes" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="This is the one Material theme that is not an Avalonia style collection at all - LiveCharts' only seam is its global settings, and this package contains no Styles or ControlTheme that could reach an Avalonia style tree. A chart view's own overrides (its ChartTheme, its tooltip and legend paints) still win over the theme, and a series that sets a paint itself keeps it. The theme reads Md.Sys.Color.* for the variant each chart draws in, so light/dark follow the application; an application that does not register MaterialTheme gets the M3 baseline values the package carries instead. MdChart in the core package stays provider neutral and keeps drawing through whichever chart engine an application picks." />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

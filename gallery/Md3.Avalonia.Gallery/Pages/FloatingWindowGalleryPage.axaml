@@ -1,0 +1,73 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.FloatingWindowGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Floating window" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A window that floats inside the application instead of above it. Drag it by the title bar, resize it from the lower-right corner, or collapse it to its title bar - the content stays mounted either way, so a hosted player keeps playing and an editor keeps its undo history. The page underneath stays reachable, which is the difference between this and a dialog." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="It is deliberately not an operating-system window. A real window sits above the application, cannot be clipped by it and needs a compositor to move; this is a child that draws last, so it inherits the theme, the motion scheme and the accessibility tree of the page it floats over. The trade-off is that it is bounded by its host, and the control leans into that: dragging is clamped to the visual parent, so the window can be moved anywhere inside the panel below but never lost off it." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="A player, floating over the page" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Everything below is one page. The window is a sibling of the text it covers, so the surface takes the same corner and elevation tokens a dialog does, and it raises one level while the pointer is holding it. Try dragging it past an edge: it stops at the border rather than leaving the panel. Minimizing hides the content but leaves it mounted, so the track keeps its position and the waveform picks up where it stopped." />
+        <Border Height="440"
+                MaxWidth="440"
+                ClipToBounds="True"
+                CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Large}"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerLowest.Brush}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                BorderThickness="1">
+          <Grid>
+            <StackPanel Margin="20" Spacing="8" VerticalAlignment="Bottom">
+              <TextBlock Classes="h3" Text="The page underneath" />
+              <TextBlock Classes="body" TextWrapping="Wrap" Text="This text is not disabled and not behind a scrim. It is simply covered, and moving the window uncovers it again." />
+              <TextBlock Classes="body" TextWrapping="Wrap" Text="Because the window is a child of this panel rather than a separate window, it is clipped by the rounded border above it and it moves with the panel when the gallery is resized." />
+            </StackPanel>
+            <eco:MdFloatingWindow x:Name="Player"
+                                  X="140"
+                                  Y="28"
+                                  Width="280"
+                                  HeaderIcon="{DynamicResource Md.Icon.MusicNote}"
+                                  Closed="OnPlayerClosed">
+              <StackPanel Spacing="12">
+                <eco:MdWaveform x:Name="PlayerWave"
+                                Height="56"
+                                IsPulsing="True"
+                                IsInteractive="False"
+                                ShowPlayhead="False"
+                                HorizontalAlignment="Stretch" />
+                <WrapPanel Orientation="Horizontal">
+                  <md:MdButton x:Name="PlayerToggle" Variant="Tonal" Click="TogglePlayer" />
+                  <TextBlock x:Name="PlayerReadout" Classes="body" VerticalAlignment="Center" Margin="12,0,0,0" />
+                </WrapPanel>
+              </StackPanel>
+            </eco:MdFloatingWindow>
+          </Grid>
+        </Border>
+        <WrapPanel Orientation="Horizontal">
+          <md:MdButton x:Name="Reopen" Variant="Outlined" Click="ReopenPlayer" Margin="0,0,12,8" />
+          <md:MdButton x:Name="ResetPosition" Variant="Text" Click="ResetPlayerPosition" Margin="0,0,12,8" />
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="What it is not" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="This is not the operating-system Dynamic Island, and it does not try to be one. On iOS and Android that surface is drawn by the system above every application, so no toolkit can host it; what this gives you is the same idea one level down - a compact surface that stays out of the way, holds a little live content, and can be moved or collapsed by the person using the app." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Capabilities" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="CanDrag, CanResize, CanMinimize and CanClose each hide the affordance they name, for a host that wants a fixed panel rather than a window. Position is X and Y, and the control owns its Margin to realise them, so set the position through those two properties rather than through the margin." />
+        <StackPanel Spacing="10">
+          <gallery:CodeExample XamlCode="&lt;Border Height=&quot;440&quot;&gt;&#10;  &lt;Grid&gt;&#10;    &lt;!-- the page --&gt;&#10;    &lt;eco:MdFloatingWindow Title=&quot;Now playing&quot;&#10;                          X=&quot;140&quot; Y=&quot;28&quot; Width=&quot;280&quot;&#10;                          HeaderIcon=&quot;{DynamicResource Md.Icon.MusicNote}&quot;&gt;&#10;      &lt;eco:MdWaveform Height=&quot;56&quot; IsPulsing=&quot;True&quot; /&gt;&#10;    &lt;/eco:MdFloatingWindow&gt;&#10;  &lt;/Grid&gt;&#10;&lt;/Border&gt;"
+                               CSharpCode="player.IsMinimized = true;   // content stays mounted&#10;player.IsOpen = false;       // animates out, raises Closed&#10;player.Closed += (_, _) =&gt; Restore();&#10;player.X = 24; player.Y = 24;" />
+        </StackPanel>
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

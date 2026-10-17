@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
@@ -10,8 +10,69 @@
     <PackageVersion Include="Avalonia.Headless.XUnit" Version="12.1.2" />
     <PackageVersion Include="Avalonia.Skia" Version="12.1.2" />
     <PackageVersion Include="Avalonia.AvaloniaEdit" Version="12.0.0" />
+    <PackageVersion Include="AvaloniaHex" Version="0.1.13" />
     <PackageVersion Include="AvaloniaRichEditor" Version="1.2.1" />
-    <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.1.2" />
+    <!-- Dock 12.1.0.7 requires Avalonia 12.1.3; this repository is pinned to 12.1.2, so the
+         last Dock release that builds against that baseline is 12.1.0.6 (needs 12.1.1).
+         Bump both together. -->
+    <PackageVersion Include="Dock.Avalonia" Version="12.1.0.6" />
+    <PackageVersion Include="Dock.Avalonia.Themes.Fluent" Version="12.1.0.6" />
+    <PackageVersion Include="Dock.Model.Avalonia" Version="12.1.0.6" />
+    <!-- Tabalonia ships one package for both themes; 12.0.0 declares Avalonia 12.0.0, so it
+         restores fine against this repository's 12.1.2 baseline. -->
+    <PackageVersion Include="Tabalonia" Version="12.0.0" />
+    <!-- Markdown.Avalonia's Avalonia 12 line is a prerelease: Markdown.Avalonia.Tight 12.0.0-a3
+         targets net8.0/net10.0 and declares Avalonia >= 12.0.0, so it restores against this
+         repository's 12.1.2 baseline. It brings ColorTextBlock.Avalonia and ColorDocument.Avalonia
+         12.0.0-a3, whose types the theme's selectors name; bump the three together. The
+         metapackage (Markdown.Avalonia, with the SyntaxHigh plugin) is not used - see the
+         Markdown section of the root README for what that means for an app that adds it. -->
+    <PackageVersion Include="Markdown.Avalonia.Tight" Version="12.0.0-a3" />
+    <!-- LiveCharts2's Avalonia 12 line is the 2.1.0-dev builds: 2.1.0-dev-798 targets
+         net8.0/net10.0 and declares Avalonia >= 12.0.0, so it restores against this
+         repository's 12.1.2 baseline. The stable 2.0.x line (2.0.5 and older) is the Avalonia 11
+         build - it declares Avalonia >= 11.0.0, targets netstandard2.0/net6.0/net8.0 and does not
+         load against Avalonia 12 - so it is not an option here even though it sorts higher.
+         Bump the dev build and the theme's expectations together; the API this theme uses
+         (LiveChartsSettings.AddDefaultTheme, the Theme rule builders, the SkiaSharp paints) was
+         read at the commit the 2.1.0-dev-798 build was cut from. -->
+    <PackageVersion Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.1.0-dev-798" />
+    <!-- ScottPlot's Avalonia control: 5.1.59 targets net8.0/net10.0 and declares Avalonia >=
+         12.0.0 and ScottPlot >= 5.1.59, so it restores against this repository's 12.1.2
+         baseline. Bump the two together: the API this theme uses (Plot.FigureBackground and
+         DataBackground, Plot.Axes.Color, Plot.Grid, Plot.Legend, LabelStyle and the
+         IPalette/Palettes.Custom seam) was read at the tag this build was cut from. -->
+    <PackageVersion Include="ScottPlot.Avalonia" Version="5.1.59" />
+    <!-- ScottPlot 5.1.59 depends on SkiaSharp.NativeAssets.Linux.NoDependencies, a libSkiaSharp
+         built without fontconfig for minimal containers. It installs to the same
+         runtimes/linux-x64/native/libSkiaSharp.so path as the fontconfig build Avalonia.Skia
+         brings in (SkiaSharp.NativeAssets.Linux), and which of the two ends up in the output is
+         a coin flip: with the NoDependencies copy there is no system font enumeration at all, so
+         every family this repository does not embed - Consolas in the markdown and hex editor
+         font stacks - fails to shape with "Could not create glyphTypeface". It is versioned here
+         only so the runnable heads can exclude its assets; nothing in this repository wants the
+         fontconfig-less build. Bump it with ScottPlot. -->
+    <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.0" />
+    <!-- The property grid: 12.1.1.1 targets net8.0/net9.0/net10.0 and declares Avalonia >=
+         12.1.1, Avalonia.Controls.ColorPicker >= 12.1.1 and bodong.PropertyModels >= 12.0.0, so
+         it restores against this repository's 12.1.2 baseline. Bump it with the theme's
+         expectations: the control set this theme covers (the chrome in Controls/*.axaml and the
+         cell editors the built-in factories build) was read at the commit this build was cut
+         from, and the grid iterates quickly. -->
+    <PackageVersion Include="bodong.Avalonia.PropertyGrid" Version="12.1.1.1" />
+    <!-- The node editor: 12.0.0 targets net8.0 and declares Avalonia >= 12.0.2,
+         CommunityToolkit.Mvvm >= 8.2.2 and System.Reactive >= 6.0.1, so it restores against
+         this repository's 12.1.2 baseline. Bump it with the theme's expectations: the brush
+         keys Themes/Accents/Material.axaml redeclares are upstream's own dictionary, read at
+         the commit this build was cut from. -->
+    <PackageVersion Include="NodifyM.Avalonia" Version="12.0.0" />
+    <!-- The map control: Mapsui.Avalonia12 5.1.0 targets net8.0 and declares Avalonia >= 12.0.2
+         and Avalonia.Skia >= 12.0.2, so it restores against this repository's 12.1.2 baseline, and
+         its SkiaSharp >= 3.119.4 floor is the version already pinned here. It is the Avalonia 12
+         package; Mapsui.Avalonia is the Avalonia 11 one. Bump it with the theme's expectations: the
+         Map, layer and style members Themes/MaterialMapsuiTheme.cs writes are upstream's own API,
+         read at the tag this build was cut from. -->
+    <PackageVersion Include="Mapsui.Avalonia12" Version="5.1.0" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.2" />
     <PackageVersion Include="MaterialColorUtilities" Version="0.3.0" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />

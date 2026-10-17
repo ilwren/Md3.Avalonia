@@ -7,18 +7,265 @@
 - **`Md3.Avalonia.RichEditor`**, an opt-in Material Design 3 theme for the
   [AvaloniaRichEditor](https://github.com/centwon/AvaloniaRichEditor) control. It is the only
   package that pulls in that dependency, bringing the set to six packages.
-- **Native AOT.** All six packages declare `IsAotCompatible` and build with the IL3xxx analyzers
+- **`Md3.Avalonia.AvaloniaEdit`**, an opt-in Material Design 3 chrome theme for the
+  [AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit) text editor: `TextEditor`, `TextArea`,
+  the search and replace panel, the completion list and the completion tooltip, plus keyed
+  `Md.Comp.AvaloniaEdit.*` themes for the inner controls the editor instantiates. It is the only
+  package that pulls in that dependency, bringing the set to seven. The Gallery's `CodeExample`
+  now uses it instead of scoping Fluent resources to the preview, so no project in the repository
+  references `Avalonia.Themes.Fluent` any more.
+- **`Md3.Avalonia.AvaloniaHex`**, an opt-in Material Design 3 theme for the
+  [AvaloniaHex](https://github.com/Washi1337/AvaloniaHex) hex editor: `HexForegroundBase`,
+  `OffsetForeground`, the header, current-line, caret and selection brushes and pens are filled
+  from `Md.Sys` tokens, and the editor gets a Material surface, outline, corner and
+  `MdScrollViewer` scrollbars. It is the only package that pulls in that dependency, bringing
+  the set to eight.
+- **`Md3.Avalonia.Dock`**, an opt-in Material Design 3 theme for the
+  [Dock](https://github.com/wieslawsoltes/Dock) docking layout system. It retokenizes Dock's
+  accent, surface, tab and chrome brushes onto `Md.Sys.Color` tokens and includes Dock's own
+  control dictionaries by `avares://` URI instead of forking them, so Dock keeps owning its
+  templates and part names. It is the only package that pulls in `Dock.Avalonia` and
+  `Dock.Avalonia.Themes.Fluent`, bringing the set to nine. Because Dock's keyed chrome themes
+  (`ButtonCreateDocument`, `ChromeButton`, `DockDrawnCaptionButton`) are
+  `BasedOn="{StaticResource {x:Type Button}}"` and neither `MaterialTheme` nor an absent
+  `FluentTheme` supplies that key, it also ships the one implicit native theme it cannot avoid -
+  a Material text button in `Themes/Controls/MaterialButton.axaml` - the one native theme the
+  package adds, and by design: without it Dock's chrome cannot load when no `FluentTheme` is
+  present. Every other native control is still left to the host application.
+- **`Md3.Avalonia.Tabalonia`**, an opt-in Material Design 3 theme for
+  [Tabalonia](https://github.com/egorozh/Tabalonia) draggable tabs. It retokenizes the 19 brushes of
+  Tabalonia's `Themes/Custom` onto `Md.Sys.Color` tokens - strip on `Surface`, idle tab ink
+  `OnSurfaceVariant`, hover an `OnSurface` state layer, selected tab a `Primary` container with
+  `OnPrimary` ink - and supplies the six `TabItemHeader*` keys Tabalonia's Custom templates actually
+  read from Avalonia's `FluentTheme`, so the theme is standalone. Like the Dock theme it includes the
+  pinned package's dictionaries by `avares://` URI instead of forking templates. It is the only
+  package that pulls in `Tabalonia`, bringing the set to ten.
+- **`Md3.Avalonia.Markdown`**, an opt-in Material Design 3 style collection for
+  [Markdown.Avalonia](https://github.com/whistyun/Markdown.Avalonia) documents. It is shaped unlike
+  the other theme packages, because upstream is: `MarkdownScrollViewer` chooses a style collection
+  itself and inserts it into its own `Styles`, the five built-in collections are selected by
+  reflection over `MarkdownStyle`'s static properties, and the `INamedStyle` marker they implement
+  is internal - so neither `MarkdownStyleName` nor an application-level `StyleInclude` can restyle a
+  viewer. `MaterialMarkdownTheme : Styles` is therefore assigned to the viewer's `MarkdownStyle`
+  property (or `<md:MarkdownScrollViewer.MarkdownStyle>` in XAML) instead of being merged
+  application-wide, one instance per viewer like the built-in collections. It mirrors the selector
+  set of the package's `MarkdownStyleFluentTheme` retokenized onto `Md.Sys.*`: prose
+  `OnSurfaceVariant` on `Surface`, headings and code `OnSurface`, links `Primary` (`Tertiary` on
+  hover, where upstream asks for the complementary accent), the blockquote bar `Primary`, table
+  rules and dividers `OutlineVariant`, code blocks `SurfaceContainerLow`, notes and table headers
+  `SurfaceContainerHighest`, and the red marker upstream paints on an unhandled `:::` container the
+  `Error` role. Sizes come from `Md.Sys.TypeScale` - `HeadlineLarge` for h1 down to `TitleSmall`
+  for h6, `BodyLarge` for prose, `BodyMedium` for code and table cells, `LabelLarge` for table
+  headers - so h5 and h6, which no built-in collection styles at all, are filled in. Headings follow
+  the weights M3 gives those roles instead of Fluent's Light (Regular down to `TitleLarge`, Medium
+  for `TitleMedium`/`TitleSmall` and table headers), the document is typeset in
+  `Md.Sys.Typeface.Plain` rather than inheriting the host's font, and selection is
+  `Md.Sys.Color.PrimarySelection.Brush` - the same wash the editor, hex viewer and text field themes
+  use - so it never falls back to upstream's cyan; `mdc|Rule` gets the `OutlineVariant` foreground it
+  otherwise inherits from the window. Layout follows upstream except where Material has a shape of
+  its own: the code block is a `SurfaceContainerLow` card with an 8 DIP radius instead of Fluent's
+  two hairlines, table cells get 10/6 DIP padding instead of 2, and the `Error` marker on an
+  unhandled `:::` container is a 3 DIP frame. It is the only package that pulls in
+  `Markdown.Avalonia.Tight` (whose assembly is `Markdown.Avalonia`), bringing the set to eleven.
+- **`Md3.Avalonia.LiveCharts2`**, an opt-in Material Design 3 theme for
+  [LiveCharts2](https://github.com/Live-Charts/LiveCharts2) charts. It is the only package that
+  pulls in `LiveChartsCore.SkiaSharpView.Avalonia` (pinned at `2.1.0-dev-798`, the Avalonia 12 line;
+  the stable `2.0.x` line is the Avalonia 11 build and does not load against Avalonia 12), bringing
+  the set to twelve. It is also the only Material theme in the repository that is *not* an Avalonia
+  style collection: LiveCharts has no per-control style seam, so the package's whole public surface
+  is a configuration entry point - `LiveCharts.Configure(settings => settings.AddMaterialTheme())`,
+  once, before the first chart view exists - and it contains no `Styles` or `ControlTheme` at all.
+  The plane and series rules are appended to LiveCharts' own default theme, so its tooltip and
+  legend factories, its animations and every geometry it already decides ship unchanged; what
+  changes is the Material part. (The label, needle and angular-tick rules take over the one slot
+  LiveCharts keeps for each visual-element type instead - it throws when a type is registered
+  twice, which its own default theme does for those three.) Series take an eight-role palette (`Primary`, `Tertiary`, `Secondary`, `Error`,
+  `PrimaryContainer`, `TertiaryContainer`, `InversePrimary`, `Outline` - the first four give a
+  four-hue palette the way upstream's own does, the rest are further tones of the same hues). Axes
+  use `LabelMedium`/`LabelLarge` in `OnSurfaceVariant` with an `OutlineVariant` grid at 12 DIP
+  padding; a line is a 3 DIP stroke with upstream's area fill cleared and 8 DIP surface-filled
+  markers ringed in the series colour; bars take a 4 DIP rounded end and 6 DIP between them while
+  stacked bars stay square; pie slices are separated by the surface showing through rather than a
+  border; a gauge is a `SurfaceContainerHighest` track with a `Primary` indicator and a needle in
+  `OnSurfaceVariant`; candlesticks use
+  `Tertiary` and `Error` instead of upstream's hardcoded green and red; tooltips and legends are
+  inverse-surface cards with a shadow at `LabelLarge`, and the canvas clears to `Surface`. Every
+  colour is read from `Md.Sys.Color.*` for the variant each chart draws in, so light/dark follow the
+  application, and an application that does not register `MaterialTheme` gets the M3 baseline values
+  the package carries. `MdChart` in the core package stays provider neutral.
+- **`Md3.Avalonia.ScottPlot`**, an opt-in Material Design 3 theme for
+  [ScottPlot](https://github.com/ScottPlot/ScottPlot) charts. It is the only package that pulls in
+  `ScottPlot.Avalonia` (pinned at `5.1.59`, whose dependencies declare `Avalonia >= 12.0.0` and
+  `ScottPlot >= 5.1.59`), bringing the set to thirteen. Like the LiveCharts2 package it is not an
+  Avalonia style collection: a ScottPlot `Plot` carries its own colours and its own type, so the
+  package's whole public surface is a plot-level entry point - `MaterialScottPlotTheme.Follow(avaPlot)`
+  applies the rules for the variant the control actually has and re-applies them from the control's
+  `ActualThemeVariantChanged` event, because ScottPlot bakes colours into a plot when they are set,
+  and `Apply(plot, dark)` / the instance `Apply` overloads style a plot directly. The figure and the
+  data background are both `Surface`; `Plot.Axes.Color` paints the frame, ticks, tick labels, axis
+  names and title in `OnSurfaceVariant` in one call; major grid lines are `OutlineVariant` while minor
+  lines are off; the legend is a `SurfaceContainerHigh` panel with an `OutlineVariant` outline and
+  `OnSurfaceVariant` text; the type scale is `TitleMedium` for the title, `LabelLarge` for axis names
+  and legend entries and `LabelMedium` for tick labels, all in the family `Md.Sys.Typeface.Plain`
+  names; and series take the same eight-role palette the LiveCharts2 theme walks. ScottPlot's frames,
+  tick generation, layout and interaction ship unchanged, a plot the theme was not handed keeps every
+  default, and nothing process-wide is rewritten - the theme never assigns `Fonts.Default`, so it
+  cannot change the type of plots it was not asked to style. `MdChart` in the core package stays
+  provider neutral.
+- **`Md3.Avalonia.PropertyGrid`**, an opt-in Material Design 3 theme for
+  [bodong.Avalonia.PropertyGrid](https://github.com/bodong1987/Avalonia.PropertyGrid), the first of
+  Wave 3. It is the only package that pulls in that dependency (pinned at `12.1.1.1`, which declares
+  `Avalonia >= 12.1.1`), bringing the set to fourteen. The grid sets no colours of its own - its 604
+  lines of embedded styles only lay out templates and host plain Avalonia controls - so in an
+  application that ships no native control theme it draws its chrome and none of its cells.
+  `MaterialPropertyGridTheme` supplies what is missing as 32 keyed `Md.Comp.PropertyGrid.*` control
+  themes: the pass-through containers every cell is wrapped in, Material filled fields, buttons,
+  filter chips, checkboxes, radio buttons, drop-downs and their items, the numeric field and its
+  spinners, sliders and their thumbs, progress bars, the date and time fields with their wheel
+  presenters, category expanders, the name/value splitter, the scroller, the context menu with its
+  items and separators, and tooltips. Each one is handed to a control by a style whose selector
+  requires a `PropertyGrid` ancestor, which is what keeps the package opt-in: registering it never
+  replaces a native control theme for the rest of the application, and the grid needs no
+  `FluentTheme`. Upstream keeps what only upstream can paint - the 0.5 DIP `Gray` hairlines its own
+  templates and its expandable-object factory set as local values, and Avalonia's `ColorPicker`,
+  whose style sheets the grid already loads for its own subtree - and the date and time presenters
+  keep the control's wheel mechanics rather than becoming a Material calendar.
+  `MdPropertyGridThemeTests` pins the cell and chrome themes, that every control theme the package
+  ships is keyed rather than implicit, that a control outside a grid stays unthemed, the date
+  flyout's parts and its confirm path, the options menu, and that the grid still edits, filters and
+  writes values back.
+- **`Md3.Avalonia.NodifyM`**, an opt-in Material Design 3 theme for
+  [NodifyM.Avalonia](https://github.com/Maklith/NodifyM.Avalonia), the node editor that follows the
+  property grid in Wave 3. It is the only package that pulls in that dependency (pinned at
+  `12.0.0`, which declares `Avalonia >= 12.0.2`), bringing the set to fifteen. Upstream ships a
+  single style file that carries both the brushes its templates read and the eleven sheets that
+  style its controls, and `MaterialNodifyMTheme` takes those two halves apart: the eleven sheets are
+  style-included exactly as upstream lists them, while this theme's resources merge upstream's own
+  data templates and brush dictionary followed by an accent of ours that redeclares 43 of the 44
+  brushes against `Md.Sys.Color.*`. Dictionaries are searched last-merged first, so the accent
+  answers in upstream's place while the templates keep reading the keys they were written against -
+  and because both variants resolve through `Md.Sys.Color.*`, the dictionary carries no
+  `ThemeDictionaries` of its own. The canvas becomes a surface ruled in `OutlineVariant`; a node is
+  a `SurfaceContainerHigh` card with a `SecondaryContainer` header and a `SurfaceContainer` footer;
+  input pins are `SecondaryContainer` and output pins `PrimaryContainer`, so a wire's two ends are
+  distinguishable without labels; wires take `OnSurfaceVariant`, with the circuit variant and the
+  pending drag in `Primary`; and the alignment guides and the selection frame take the same
+  `Primary`. Additive styles cover the values no accent dictionary can reach, because
+  upstream sets them as literals: a node's `White` ink, the `LightBlue` and `Orange` borders it
+  paints on hover and when selected, the `Azure` behind its items, a node group's four inline
+  colours and the `Gainsboro` the grid rule's property registers with. Upstream keeps the node's
+  3 DIP corner radius, which is baked into its template; the marquee's stroke and fill, which are
+  written on the rectangle itself rather than in a style - a value set that way outranks every style
+  setter, so the selection-rectangle brushes answer the minimap's viewport and nothing else; and the
+  label a connection can carry, whose geometry upstream builds in C# from a hardcoded `Inter`
+  typeface, so the gallery's wire template binds no `Text`.
+  `MdNodifyMThemeTests` reads the brushes back off realized controls - the canvas, the node and both
+  pin directions, the pending wire, the grid rule and all six minimap brushes - then pins the
+  selection frame, the variant switch, and that a plain control in the same window keeps no theme.
+- **`Md3.Avalonia.Mapsui`.** A Material 3 theme for maps drawn with
+  [Mapsui](https://github.com/Mapsui/Mapsui), the last item in Wave 3. It is the only package that
+  pulls in that dependency (pinned at `Mapsui.Avalonia12` `5.1.0`, the Avalonia 12 build, which
+  declares `Avalonia >= 12.0.2`, `Avalonia.Skia >= 12.0.2` and `SkiaSharp >= 3.119.4`), bringing the
+  set to sixteen. Mapsui has no style seam at all - `MapControl` draws its own surface from the
+  colours a `Map` and its layers carry - so, like the two chart providers, this package is an entry
+  point rather than a `Styles` collection. `MaterialMapsuiTheme` writes the canvas (`Surface`, where
+  Mapsui ships white), the vector style an unstyled layer is given - an `Outline` hairline for a
+  boundary, a heavier `OnSurfaceVariant` stroke for a line, `Primary` at twelve percent for a region,
+  mixed into the colour because Mapsui's brush takes a colour rather than an opacity - and a label
+  chip in `SurfaceContainer` with an `OutlineVariant` border, the `ExtraSmall` corner radius and
+  `OnSurface` ink at `LabelMedium`. A layer whose style was chosen keeps it - and that is not the same as a null
+  style, because `BaseLayer`'s constructor gives every layer a grey outline, a black line and a white
+  fill, so a layer counts as unstyled while it still carries that default. Only the colours are
+  replaced: a layer's own opacity and visible range travel across. `Follow(MapControl)` keeps a map in
+  step with the light/dark switch, and `SeriesPalette(dark)` hands a thematic map the same eight
+  Material roles both chart providers walk. Projection, tile fetching, navigation, hit testing and
+  animation stay upstream's. `MdMapsuiThemeTests` pins the palette, the canvas, both styles, the
+  type scale, the corner token and the dark-variant reads.
+- **Native AOT.** All sixteen packages declare `IsAotCompatible` and build with the IL3xxx analyzers
   on alongside the existing IL2xxx trimming ones. `.github/workflows/aot-probe.yml` publishes the
   desktop gallery with `PublishAot=true` and does not accept a green step as the answer: it
   asserts the output is a native ELF executable with no managed assembly beside it, then runs that
   binary under xvfb. Native AOT fails at runtime on reflection that was trimmed away, not at
   compile time, so the smoke run is the part that carries the claim.
+- **`MdWaveform`**, a Material audio waveform in `Md3.Avalonia.Extra`. One bar per peak, mirrored
+  around the centre line by default, played bars in `Primary` and the rest in
+  `SurfaceContainerHighest` - the split a Material 3 slider already makes between its active and
+  inactive track, so a custom scheme recolours it for free. `PlayheadPosition` is two-way and moves
+  by pointer drag or by Left, Right, Home and End; `IsMirrored`, `IsInteractive`, `ShowPlayhead`,
+  `BarGap`, `BarCornerRadius` and `PlayheadThickness` shape the rest, and `BarCornerRadius` is a
+  `CornerRadius` rather than a double precisely so the theme can hand it a shape token. It bundles
+  no decoder: `Peaks` is one normalized magnitude per bar, and `MdWaveform.PeaksFromSamples` reduces
+  a sample buffer for hosts that already have one. Two defaults follow Flutter's `audio_waveforms`:
+  bars end in the round cap that package gets from `StrokeCap.round`, and the seek line is the 2dp it
+  uses, carrying a knob that grows while held rather than a bare full-height line that reads as a
+  divider. `IsPulsing` pulses the bars in place so a static peak buffer reads as a track that is
+  playing, scaled by each bar's own peak so a quiet passage stays quiet; it runs on
+  `TopLevel.RequestAnimationFrame` rather than a timer, so a hidden waveform costs nothing, and it
+  holds still - identically, not merely more slowly - under the Reduced and None motion schemes. No third-party Avalonia waveform control turned up
+  worth theming - the only candidate on GitHub is a desktop application, not a control - so this one
+  is in-house. Its theme lives in `AdvancedControls.axaml`, the dictionary both `ExtraTheme` and
+  `EcosystemTheme` merge, so a host gets the same waveform whichever it installs.
+- **`MdWaterfallPanel`** and **`MdWaterfall`**, a masonry layout in `Md3.Avalonia.Extra`. Each child is
+  measured at the column width and then dropped into whichever column is currently shortest, so cards
+  of differing heights pack without the ragged gaps a grid leaves behind. `Columns` pins the count;
+  left at its default of `0` the count is derived from `MinColumnWidth` and capped at the number of
+  children, so one piece of markup is a single column on a phone and four on a desktop with no
+  breakpoint, and a two-item feed never reserves five empty columns. Placement is greedy and never
+  reorders children, because a feed's order is its content. `MdWaterfall` is the same panel behind an
+  items control and reads its four layout numbers back off the control, so a bound feed needs no
+  `ItemsPanelTemplate` of its own. `AnimateLayout` carries children to their new places when the
+  column count changes, timed by the motion tokens; only a change of count is animated, because a
+  resize that keeps the count has the children tracking it already and restarting a transition every
+  frame would leave them permanently lagging the pointer. No reusable masonry panel for Avalonia
+  turned up on GitHub, so both are in-house.
+- **`MdFloatingWindow`**, an in-app floating window in `Md3.Avalonia.Extra`. It is a child of the
+  panel it floats over rather than an operating-system window, so it inherits that page's theme,
+  motion scheme and accessibility tree, and the page underneath stays interactive - a dialog dims
+  and blocks, this only covers. The title bar drags and the lower-right grip resizes, and dragging
+  is clamped to the visual parent on every move, which is the trade an in-app surface makes for not
+  needing a compositor: the window can be parked anywhere in the panel but never lost off it.
+  Minimizing hides the content without unmounting it, so a hosted player or editor keeps its
+  bindings, media and undo history, and an explicit height is remembered rather than leaving a tall
+  empty box behind. Closing animates out and then unmounts through the same presence controller the
+  banner uses, so a close followed immediately by a reopen cancels the removal instead of
+  flickering. `CanDrag`, `CanResize`, `CanMinimize` and `CanClose` each remove one affordance, for a
+  host that wants a fixed panel rather than a window. No reusable Avalonia floating-window control
+  turned up on GitHub - the closest is a 1-star draggable layout panel with no title bar, elevation
+  or collapse, and everything else is a standalone overlay application - so this one is in-house,
+  and its theme lives in `AdvancedControls.axaml`.
 - `MdBreadcrumb` gains a `Powerline` variant.
 - [`docs/DIALOG_SERVICE.md`](docs/DIALOG_SERVICE.md): how to show dialogs from a view model
   through `IMdDialogService`, including the composition-root wiring.
 
 ### Fixed
 
+- **A pulsing `MdWaveform` never restarted after an ancestor hid it.** The frame loop lapses when
+  `ShouldAnimate` goes false, and that test includes `IsEffectivelyVisible` - but nothing told the
+  control when visibility came back. Avalonia exposes `IsEffectivelyVisible` only as a plain CLR
+  property and keeps its change event internal, so hiding a parent gives a child no notification at
+  all, and a loop that had already fallen idle stayed idle. A minimized floating window, a collapsed
+  expander or a switched-away tab would therefore freeze the pulse for good. The waveform now
+  subscribes to each visual ancestor's `IsVisible` while it is attached and re-evaluates on change;
+  Avalonia raises that after it has already propagated the new effective visibility to children, so
+  the re-check sees the truth rather than the previous frame's.
+- **Markdown code could fail to shape, intermittently, on a host that advertises a font it cannot
+  build.** The gallery's markdown page threw `Could not create glyphTypeface. Font family: Consolas
+  (key: fonts:SystemFonts)` in CI on some runs and not others. `ColorTextBlock.Avalonia`'s `CCode`
+  defaults its `MonospaceFontFamily` to whichever family `FontFamilyCollector.TryGetMonospace()`
+  picked - the first system family whose name contains one of eight substrings, in enumeration order
+  rather than preference order, so the pick differs between machines and between processes - and a
+  family from that collection carries the `fonts:SystemFonts` key, for which `FontManager` has no
+  fallback: a single family the host cannot shape throws at measure time. A family list is a
+  composite key and does fall back, so `MaterialMarkdownTheme` now sets the property to one, cased as
+  the families are named because the candidate match is ordinal. It has to be set on
+  `MonospaceFontFamily` and not on `FontFamily`: `CCode` binds the latter to the former in its
+  constructor, and a binding outranks a style setter, which is also why upstream's own stack never
+  reached a span.
+- **Two of the theme projects were missing from the solution's build configuration.** The Dock
+  entry lost its `EndProject` line when Tabalonia was added after it, which swallowed Tabalonia's
+  project block, and neither theme project had a `ProjectConfigurationPlatforms` entry - so
+  `dotnet build Md3.Avalonia.sln` silently skipped them and only the packaging script's per-project
+  builds kept them honest. Both are mapped now, with `Md3.Avalonia.Markdown` alongside them.
 - **The carousel ignored how wide it was.** The arrangement produced one large item and one medium
   one at every window size, so from the third item on everything collapsed to the 56 DIP small
   keyline: four items covering 584 DIP of an 1188 DIP track, with the rest empty. Correct on a
@@ -51,15 +298,52 @@
 
 ### Gallery
 
+- A new page, Waterfall, takes the index to 109. The waveform page gained a section that pulses, and
+  its scrubbing waveform now pulses only while the demo track is actually playing - the difference
+  between a waveform that looks alive and one merely twitching.
+- The waveform page now decodes a real recording instead of drawing an invented curve. A 20-second
+  excerpt of `Okay` from MDN's `dom-examples` (CC0 1.0) ships as 16 kHz mono PCM in
+  `Assets/Media/demo-track.wav`, a chunk-walking WAV reader in `DemoTrack` turns it into samples,
+  `PeaksFromSamples` reduces them, and a timer walks the playhead across the decoded length. Nothing
+  reaches an audio device, so the demo needs no output hardware, no codec and no new dependency.
 - Usage sections no longer show placeholder code. 32 pages carried XAML only and 7 carried C#
   only, and the absent tab rendered as an empty box; the missing tab is now hidden.
 - 29 of the 34 pages that overflowed a 480 DIP window now reflow, by replacing fixed `Width` with
   `MaxWidth` in about 50 places. The five that still do not are pinned in the test with a
   two-way assertion, so they cannot be quietly forgotten or quietly fixed.
 - 366 Chinese strings added to the localisation table.
+- The localisation table now covers every prose string the Gallery shows. A sweep of all 107 pages
+  found 198 heading and body strings with no entry; `Translate` falls back to the English source
+  when a key is missing, so those pages were silently half-translated and nothing failed. The table
+  went from 813 unique keys to 990, and a duplicate `Navigation` key - which made the first of its
+  two translations dead, since an indexer initialiser silently overwrites - is removed. Sample data,
+  colour role names and shortcuts stay English on purpose: translating `TertiaryContainer` or
+  `Ctrl+N` would misdescribe the API on screen. `scripts/check-gallery-localization.py` reports
+  prose separately from data and runs with `--strict` in CI, so a new page that ships untranslated
+  now fails the build.
+- Three more pages now reflow below a 480 DIP window, taking the outstanding count from five to
+  two. RadioButton, PickerRestoration and BeforeAfter each held a horizontal `StackPanel` of
+  fixed-width children - five option labels at 32 DIP gaps, two 280 DIP pickers, a slider flanked by
+  two labels and a live value - none of which could shrink, with nothing on the page scrolling
+  sideways, so the tail of each row was off screen. All three are `WrapPanel` now. The two that
+  remain were measured instead of guessed at: `MdDatePicker` reaches 500 on the date range page and
+  a `Border` reaches 484 on the switch page, and both belong to a control's template rather than to
+  the page.
+- The same sweep could not reproduce the empty Usage sections: every page carrying a `Usage` heading
+  also carries a `CodeExample` with XAML or C# attached.
 
 ### Testing
 
+- `MdLayoutExtrasTests` pins what the waterfall cannot show in a property dump: which column it
+  actually put each child in, that a derived column count never reserves an empty column, that the
+  panel measures to its tallest column rather than the sum of its children, that the items control
+  really does hand its own settings to the panel behind the template, that a reflow glides its
+  children while a resize that keeps the column count does not, and that `AnimateLayout=false` and
+  the Reduced scheme both leave children alone.
+- `MdGalleryLocalizationTests` exercises `GalleryLocalization.Apply`, which nothing did before. The
+  translation table is built in a static initialiser, so a key written twice throws the first time a
+  page is localized - and the duplicate `Navigation` key above is exactly that. The tests translate a
+  page into Chinese and back, and assert every page they are given both changes and restores.
 - Rendered pixels are now actually read. `UseHeadlessDrawing=false` means these tests run real
   Skia, but every one of the thirty-odd `CaptureRenderedFrame()` calls asserted only that the
   frame was not null. Corner rounding had been written off as untestable headless on that basis;

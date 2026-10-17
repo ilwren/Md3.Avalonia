@@ -1,0 +1,154 @@
+<!--
+  Material Design 3 theme for NodifyM.Avalonia.
+
+  Upstream ships one Styles file - Styles/ControlStyles.axaml - that carries both the resources its
+  templates read and the eleven style sheets that style its controls. This theme takes those two
+  halves apart rather than style-including the file as a whole, and the reason is how StaticResource
+  resolves: a template reaches a brush by walking outwards from the file it was written in, so a
+  StyleIncluded ControlStyles.axaml would answer its own templates from its own Styles.Resources -
+  upstream's brushes, not ours. Splitting the file means the resources live here, one level out from
+  the templates, where our accent dictionary answers first.
+
+  So: the eleven per-control sheets are style-included exactly as upstream lists them, and this
+  theme's resources merge upstream's own Nodify.axaml (the six shared data templates) and
+  Brushes.axaml, followed by our accent. Resource dictionaries are searched last-merged-first, so
+  the accent wins every key it defines - 43 of upstream's 44 brushes, each redeclared against
+  Md.Sys.Color.* - and upstream's dictionary stays as the answer for anything it does not, which is
+  why light and dark follow the core Material theme variant and this file carries no
+  ThemeDictionaries of its own. Themes/Accents/Material.axaml documents the mapping; nothing here
+  needs Avalonia's FluentTheme either.
+
+  NodifyM's controls are all its own types (Node, Connector, Connection and friends), so nothing
+  here can leak into a native control: unlike the property grid, there is no plain Avalonia control
+  for this theme to be careful about.
+
+  The styles below the includes cover the values that never go through a brush key, which no accent
+  dictionary can reach. There are three kinds. A node's ink is a literal White, the border it paints
+  on hover is LightBlue and the one it paints when selected is Orange; the editor's own background is
+  a literal Azure; a node group sets four colours inline (#3E3E42, #1E1E1E, White, Transparent) and
+  so never reads the GroupingNode.* keys upstream defines for it; and the grid rule takes the
+  Gainsboro its property registers with, because the default grid-line template never sets a brush.
+  Then the minimap and the editor's marquee build brushes from raw colour keys, bypassing upstream's
+  own brush dictionary, so those six setters, the marquee rectangle and the grid rule are re-pointed
+  at the brushes the canvas itself uses. Node thickness drops from 2 to 1 because an
+  M3 hairline is what a filled card carries.
+
+  Four things stay upstream's and are not ported. The node's 3 DIP corner radius is baked into its
+  template - retokenizing it would mean forking the template, and a node editor's corners are not
+  worth owning an upstream file for. The marquee you drag on empty canvas is the same case with a
+  sharper edge: its stroke and fill are set on the rectangle itself in the template rather than in a
+  style, and a value written that way outranks any style setter, so the SelectionRectangle brushes
+  this file redeclares answer the minimap's viewport and nothing else. And upstream's checkered
+  ItemContainer.HighlightBrush has no counterpart here: no template in the package reads the key, and
+  a hover tile wants its own decision rather than a translation of a pattern.
+  The fourth is the label a connection can carry: upstream builds its geometry in C# from a
+  hardcoded Inter typeface, so neither a brush key nor a style reaches it and there is no FontFamily
+  property to set, and a lookup for a family the host does not have fails inside the render pass -
+  which is why the gallery's own wire template binds no Text. Connection.TextColorBrush is still
+  redeclared here, because the accent answers upstream's whole key set whether or not a template in
+  this repository reads it.
+
+  One thing to know when hosting the editor, which cost a CI run to find: NodifyEditor writes its
+  own Width and Height from its parent's size, in OnLoaded and again in the SizeChanged handler
+  OnApplyTemplate attaches. A parent that sizes itself to the editor therefore hands it a value that
+  includes its own padding, every layout pass makes the editor that much taller, and the layout never
+  settles. Give it a frame with a fixed size - the gallery's does - and the loop has nothing to feed
+  on.
+
+  Register it after MaterialTheme. It replaces NodifyM's own ControlStyles, so do not include that
+  as well.
+-->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:nod="using:NodifyM.Avalonia.Controls"
+        x:Class="Md3.Avalonia.Themes.MaterialNodifyMTheme">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <!-- Upstream's two resource dictionaries first, our accent last: dictionaries are searched
+             in reverse merge order, so ours answers every key it redeclares. -->
+        <ResourceInclude Source="avares://NodifyM.Avalonia/ResourceDictionaries/Nodify.axaml" />
+        <ResourceInclude Source="avares://NodifyM.Avalonia/ResourceDictionaries/Brushes.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia.NodifyM/Themes/Accents/Material.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <!-- Upstream's own list, in upstream's own order: the per-control sheets without the resources
+       that used to travel with them. -->
+  <StyleInclude Source="avares://NodifyM.Avalonia/Controls/Node.axaml" />
+  <StyleInclude Source="avares://NodifyM.Avalonia/Controls/NodifyEditor.axaml" />
+  <StyleInclude Source="avares://NodifyM.Avalonia/Controls/Connector.axaml" />
+  <StyleInclude Source="avares://NodifyM.Avalonia/Controls/NodeInput.axaml" />
+  <StyleInclude Source="avares://NodifyM.Avalonia/Controls/NodeOutput.axaml" />
+  <StyleInclude Source="avares://NodifyM.Avalonia/Controls/Connection.axaml" />
+  <StyleInclude Source="avares://NodifyM.Avalonia/Controls/LineConnection.axaml" />
+  <StyleInclude Source="avares://NodifyM.Avalonia/Controls/CircuitConnection.axaml" />
+  <StyleInclude Source="avares://NodifyM.Avalonia/Controls/PendingConnection.axaml" />
+  <StyleInclude Source="avares://NodifyM.Avalonia/Controls/BaseConnection.axaml" />
+  <StyleInclude Source="avares://NodifyM.Avalonia/Controls/KnotNode.axaml" />
+
+  <!-- Upstream's node style sets Foreground to a literal White, which no brush key can reach, and
+       a 2 DIP border where an M3 card carries a hairline. Both are plain style setters, so this
+       style - later in the same collection, same specificity - simply sets them again. -->
+  <Style Selector="nod|Node">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+
+  <!-- ...as are the two selection colours: LightBlue on hover and Orange when selected. Both become
+       Primary, which is what the marquee, the alignment guides and the item frame already use, so a
+       canvas has one accent for "this is the thing you are acting on". -->
+  <Style Selector="nod|Node[IsSelected=False]:pointerover">
+    <Setter Property="BorderBrush" Value="{StaticResource ItemContainer.BorderBrush}" />
+  </Style>
+  <Style Selector="nod|Node[IsSelected=True]">
+    <Setter Property="BorderBrush" Value="{StaticResource ItemContainer.BorderBrush}" />
+  </Style>
+
+  <!-- The header and footer bars are filled - SecondaryContainer and SurfaceContainer - but upstream
+       inks both from the node's own Foreground. On a filled bar that is the wrong ink, so each gets
+       the pairing its container calls for. -->
+  <Style Selector="nod|Node /template/ ContentPresenter#HeaderContentPresenter">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
+  </Style>
+  <Style Selector="nod|Node /template/ ContentPresenter#FooterContentPresenter">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+  </Style>
+
+  <!-- The editor paints its items host with a literal Azure. The canvas underneath already carries
+       the surface brush, so the host gets the same one and the two agree. -->
+  <Style Selector="nod|NodifyEditor">
+    <Setter Property="Background" Value="{StaticResource NodifyEditor.BackgroundBrush}" />
+  </Style>
+
+  <!-- The grid rules are the one surface colour upstream never put in a brush key at all: the
+       default grid-line template creates a LargeGridLine and leaves its Brush at the Gainsboro the
+       property registers with, so the key upstream defines for grid lines is read by nothing. Point
+       the control at it, and a canvas is ruled in outlineVariant without the consumer knowing. -->
+  <Style Selector="nod|LargeGridLine">
+    <Setter Property="Brush" Value="{StaticResource GridLinesColorBrush}" />
+  </Style>
+
+  <!-- The minimap is the other place upstream reaches for raw colour keys - five of the six brushes
+       it sets are built there, with opacities, rather than taken from its brush dictionary. Re-point
+       them at the brushes the canvas uses and the small map agrees with the editor beside it. -->
+  <Style Selector="nod|NodifyEditorMinimap">
+    <Setter Property="MapBackground" Value="{StaticResource NodifyEditor.BackgroundBrush}" />
+    <Setter Property="MapBorderBrush" Value="{StaticResource GridLinesColorBrush}" />
+    <Setter Property="NodeBrush" Value="{StaticResource Node.HeaderBrush}" />
+    <Setter Property="NodeBorderBrush" Value="{StaticResource Node.BorderBrush}" />
+    <Setter Property="ViewportBrush" Value="{StaticResource ItemContainer.SelectedBrush}" />
+    <Setter Property="ViewportBorderBrush" Value="{StaticResource NodifyEditor.SelectionRectangleStrokeBrush}" />
+  </Style>
+
+  <!-- NodeGroup reads none of the GroupingNode.* brushes upstream defines: its style sets four
+       literals inline. Point it at the same keys, so a group is a Material region that sits below
+       the nodes it holds. -->
+  <Style Selector="nod|NodeGroup">
+    <Setter Property="Background" Value="{StaticResource GroupingNode.BackgroundBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource GroupingNode.ForegroundBrush}" />
+    <Setter Property="HeaderBrush" Value="{StaticResource GroupingNode.HeaderBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource GroupingNode.BorderBrush}" />
+  </Style>
+</Styles>

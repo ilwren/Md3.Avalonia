@@ -57,6 +57,13 @@ jobs:
         # 80 public types. This is static, so it costs nothing to hold the line.
         run: python3 scripts/check-api-doc-coverage.py
 
+      - name: Check Gallery localization coverage
+        # Defect #29: the Gallery translates by key match, so an entry that was never written leaves
+        # a page quietly half-English and nothing fails. This measures the gap and fails on a
+        # duplicate key, which silently kills whichever of two translations came first. --strict is
+        # on because prose coverage is complete: a new page that ships untranslated now fails.
+        run: python3 scripts/check-gallery-localization.py --strict
+
       - name: Check the specification oracle against pinned upstream sources
         # Network-dependent and advisory by design: upstream moving is a re-baselining
         # decision for a human, not a build failure. --soft keeps it off the critical path.
@@ -94,9 +101,11 @@ jobs:
     name: Build & Test
     needs: static-checks
     runs-on: ubuntu-latest
-    # The suite runs in well under two minutes. A generous margin still catches a deadlocked
-    # test quickly instead of letting it occupy a runner all day.
-    timeout-minutes: 8
+    # Most of this is restore and build - the shared graph, fifteen packages, the gallery and the
+    # test project - with the headless suite on top. It measured 6m35s at fourteen packages and
+    # crossed 8m when the fifteenth landed, so the margin here is a deadlock guard, not a
+    # performance budget: a hung test still costs a quarter of an hour instead of a runner-day.
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
@@ -136,6 +145,108 @@ jobs:
             tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
             "Headless tests"
 
+      # The markdown and hex editor tests ask for Consolas, which no runner has, so whether they pass
+      # depends on which libSkiaSharp the test output carries: Avalonia's build enumerates system
+      # fonts and falls back to a family that exists, while the NoDependencies build ScottPlot pulls
+      # in cannot, and fails to create a glyph typeface instead. When those tests go red this is the
+      # first thing to read, so it is reported as an annotation rather than left in the log.
+      - name: Report the Skia native build the tests will use
+        run: |
+          # The RID that matters on this runner is linux-x64; the runtimes folder also holds musl,
+          # bionic and arm builds that never load here, and reporting those instead pushes the
+          # answer past the annotation cap.
+          so=tests/Md3.Avalonia.HeadlessTests/bin/Release/net10.0/runtimes/linux-x64/native/libSkiaSharp.so
+          if [ -f "$so" ]; then
+            links=$(ldd "$so" 2>/dev/null | grep -ci fontconfig || true)
+            echo "::notice::Loaded libSkiaSharp.so: fontconfig links=$links md5=$(md5sum "$so" | cut -d' ' -f1) bytes=$(stat -c%s "$so")"
+          else
+            echo "::notice::No libSkiaSharp.so beside the test assembly"
+          fi
+          dotnet list tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj package \
+            --include-transitive | grep -i skia | sed 's/^ *//' | sort -u \
+            | while read -r line; do echo "::notice::Skia package: $line"; done
+          if command -v fc-list > /dev/null; then
+            echo "::notice::Runner fonts: $(fc-list | wc -l) families, $(fc-list | grep -ci consolas || true) named Consolas"
+          else
+            echo "::notice::Runner has no fc-list, so no fontconfig to enumerate system fonts with"
+          fi
+
+      # The node editor theme tests are run on their own first, and under a hard timeout. A test that
+      # stalls the dispatcher never reaches a result, so the only thing a per-test timeout can buy is
+      # a name; what actually bounds the damage is killing the runner and moving on. Running them
+      # first, apart from the rest of the suite, means a stall there is visible as a five-minute step
+      # that produced no result, and the suite that follows still reports in full. A separate
+      # invocation is also a separate process, which matters: a test that throws part way through a
+      # pumped dispatcher leaves the shared UI thread in a state the rest of the suite cannot run
+      # in, and every later class fails or stalls on someone else's mistake.
+      - name: Probe the node editor theme tests
+        id: nodifym-probe
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdNodifyMThemeTests nodifym.trx
+
+      # Summarizes whichever .trx exists at this point, which is the probe's. The script exits non-zero
+      # on failures, and the suite still has to run, so the exit is swallowed here and the probe's own
+      # outcome is what fails the job at the end.
+      - name: Summarize node editor probe results
+        if: always()
+        continue-on-error: true
+        run: python3 scripts/report-test-results.py
+
+      # The markdown and hex editor tests fail on a font no runner has, and the gallery tests fail
+      # the same way beside them - but the markdown class passes when it runs alone, so the font is
+      # not the cause: something earlier in the suite leaves the process unable to shape text. The
+      # gallery is the other half of that pair, and the node editor page is the newest thing in it,
+      # so this is where the search starts.
+      #
+      # Found, and it is the markdown page's inline code. Markdown.Avalonia's CCode defaults its
+      # MonospaceFontFamily to FontFamilyCollector.TryGetMonospace(), which returns the first entry
+      # of the system font collection whose name contains one of eight substrings - in enumeration
+      # order, not preference order, so the pick differs between machines and between processes,
+      # which is why the same code passed this probe on one run and failed it on the next. A family
+      # from that collection carries the fonts:SystemFonts key, and FontManager gives a keyed single
+      # family no fallback, so one the machine advertises but cannot shape throws at measure time.
+      # MaterialMarkdownTheme now sets the property to a family list, which is a composite key and
+      # does fall back; MdMarkdownThemeTests pins it. What is left here is a canary, not a symptom.
+      - name: Probe the markdown theme tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdMarkdownThemeTests markdown.trx
+
+      - name: Probe the gallery tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdGallery gallery.trx
+
+      # The map theme is the newest package and the only one that reaches a third-party Skia text
+      # stack, so its eight tests are run on their own as well: the notice is what says they ran and
+      # how many, which the main suite's summary cannot be read back for.
+      - name: Probe the map theme tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdMapsuiThemeTests mapsui.trx
+
+      # The localization sweep rewrote a table built in a static initialiser, and until these tests
+      # existed nothing in the suite called GalleryLocalization at all - so this probe is the only
+      # evidence that the path runs, and that a key defined twice would be caught at run time
+      # rather than by the static checker alone.
+      - name: Probe the gallery localization tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdGalleryLocalizationTests localization.trx
+
+      # A control that draws itself has no template to assert on, so its probe is the evidence that
+      # the peak reduction, the scrub and the painted played/unplayed split actually ran.
+      - name: Probe the waveform tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdWaveformTests waveform.trx
+
+      # A masonry panel and a collapsible sheet are both layout and state rather than paint: which
+      # column a child actually landed in, and whether a collapsed sheet is still catching clicks
+      # over the page it is supposed to be overlaying. Neither shows up in a property dump.
+      - name: Probe the layout extras tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdLayoutExtrasTests layout-extras.trx
+
+      # Bounded, because an unbounded stall costs the job's whole timeout and takes the run's
+      # annotations with it: the suite measures about four and a half minutes, so ten is a wall it
+      # only reaches by hanging, and a hang reported as a failed step still lets every step after
+      # this one publish what it found.
       - name: Run headless tests
         id: tests
         env:
@@ -143,10 +254,15 @@ jobs:
           # produced only on main, where the artefact is actually published.
           MD3_WRITE_PREVIEWS: ${{ github.ref == 'refs/heads/main' && '1' || '0' }}
         run: |
-          dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
+          if ! timeout --signal=KILL 600 dotnet test \
+            tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
             -c Release --no-build --no-restore \
+            --filter "FullyQualifiedName!~MdNodifyMThemeTests" \
             --logger "trx;LogFileName=results.trx" \
-            --logger "console;verbosity=normal"
+            --logger "console;verbosity=normal"; then
+            echo "::error::The headless suite did not finish inside ten minutes"
+            exit 1
+          fi
 
       # Only meaningful once the test runner actually produced a .trx. Running it after a
       # compile failure would add a second red step that says nothing about the real cause.
@@ -167,6 +283,7 @@ jobs:
           name: headless-test-results
           path: |
             **/results.trx
+            **/nodifym.trx
             artifacts/spec/
           if-no-files-found: warn
 
@@ -177,3 +294,12 @@ jobs:
           name: documentation-previews
           path: tests/Md3.Avalonia.HeadlessTests/bin/Release/net10.0/*.png
           if-no-files-found: ignore
+
+      # The probe is allowed to fail so that the rest of the suite still runs and still reports; the
+      # job should not stay green because of it. This is the last step, so it runs after the evidence
+      # above has been uploaded either way.
+      - name: Fail the job if the node editor probe did not pass
+        if: always() && steps.nodifym-probe.outcome == 'failure'
+        run: |
+          echo "::error::The node editor theme tests did not pass inside the probe's five minutes"
+          exit 1

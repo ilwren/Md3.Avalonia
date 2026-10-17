@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             xmlns:themes="using:Md3.Avalonia.Themes"
+             xmlns:mdm="using:Markdown.Avalonia"
+             x:Class="Md3.Avalonia.Gallery.Pages.MarkdownGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Markdown" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Markdown.Avalonia documents wearing the opt-in Md3.Avalonia.Markdown style collection: headings, prose, links, lists, quotes, code blocks, tables, notes and rules are all drawn from the Material type scale and colour roles, and light/dark follow the core MaterialTheme variant." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h3" Text="Rendered document" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The collection is built inside this page and assigned to this one viewer, so nothing outside it changes - a viewer whose MarkdownStyle is left alone keeps Markdown.Avalonia's own look." />
+        <Border CornerRadius="12" Padding="4"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
+          <Border CornerRadius="8" ClipToBounds="True"
+                  Background="{DynamicResource Md.Sys.Color.Surface.Brush}">
+            <mdm:MarkdownScrollViewer x:Name="DocumentViewer" Height="440">
+              <mdm:MarkdownScrollViewer.MarkdownStyle>
+                <themes:MaterialMarkdownTheme />
+              </mdm:MarkdownScrollViewer.MarkdownStyle>
+            </mdm:MarkdownScrollViewer>
+          </Border>
+        </Border>
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Select text in the document to see the Material selection tint; it is Md.Sys.Color.PrimarySelection.Brush, the same wash the editor, hex viewer and text field themes use, and without it the viewer falls back to a cyan selection." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="This is the one Material theme that is not registered in Application.Styles: MarkdownScrollViewer chooses the style collection it renders with itself and inserts it into its own Styles, and Markdown.Avalonia keeps its five built-in collections closed to third parties, so the collection is assigned to the viewer's MarkdownStyle property instead - one instance per viewer." />
+        <gallery:CodeExample XamlCode="&lt;md:MarkdownScrollViewer Markdown=&quot;{Binding Document}&quot;&gt;&#10;  &lt;md:MarkdownScrollViewer.MarkdownStyle&gt;&#10;    &lt;themes:MaterialMarkdownTheme /&gt;&#10;  &lt;/md:MarkdownScrollViewer.MarkdownStyle&gt;&#10;&lt;/md:MarkdownScrollViewer&gt;"
+                            CSharpCode="var viewer = new MarkdownScrollViewer&#10;{&#10;    Markdown = &quot;# Heading&quot;,&#10;    MarkdownStyle = new MaterialMarkdownTheme()&#10;};&#10;&#10;// MaterialTheme still supplies the tokens being read; the collection only maps&#10;// Markdown.Avalonia's own selector set onto them." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Mapping" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Every selector of the pinned package's own FluentTheme collection is re-tokenized with the same shape: prose is OnSurfaceVariant on Surface, headings and code are OnSurface, links are Primary and switch to Tertiary on hover, the blockquote bar is Primary, table and divider rules are OutlineVariant, code blocks sit on SurfaceContainerLow, and notes, table headers and inline code use SurfaceContainerHighest. Sizes come from Md.Sys.TypeScale - HeadlineLarge for h1 down to TitleSmall for h6, BodyLarge for prose, BodyMedium for code and table cells, LabelLarge for table headers - and headings follow the M3 role weights instead of Fluent's Light: Regular down to TitleLarge, Medium for TitleMedium, TitleSmall and table headers. Layout follows upstream except where Material has a shape of its own: the code block is a SurfaceContainerLow card with an 8 DIP radius and 12/10 DIP padding instead of two hairlines, table cells get 10/6 DIP padding instead of 2, and the Error marker on an unhandled ::: container is a 3 DIP frame." />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

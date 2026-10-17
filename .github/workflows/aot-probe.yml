@@ -3,8 +3,17 @@ name: AOT probe
 on:
   workflow_dispatch:
   push:
-    branches: [arena/01a104af-md3-avalonia]
-    paths: ['.github/workflows/aot-probe.yml']
+    # This named a branch from an earlier session, so the probe could not run at all and the AOT
+    # claim in docs/GALLERY_DEFECTS.md was resting on a workflow nothing triggered.
+    #
+    # The gallery and src paths are here because filtering to this file alone meant a change to
+    # compiled XAML or to a theme never reached the probe - exactly the changes most likely to break
+    # native AOT at runtime, where reflection that is not there fails after the publish succeeds.
+    branches: [arena/3fd923bf-md3-avalonia]
+    paths:
+      - '.github/workflows/aot-probe.yml'
+      - 'gallery/**'
+      - 'src/**'
 
 jobs:
   publish-aot:

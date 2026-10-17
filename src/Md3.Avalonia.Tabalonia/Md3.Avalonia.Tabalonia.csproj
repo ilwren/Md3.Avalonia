@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Md3.Avalonia.Themes</RootNamespace>
+    <AssemblyName>Md3.Avalonia.Tabalonia</AssemblyName>
+    <Description>Material Design 3 theme for Tabalonia. Opt-in package: it carries the Tabalonia dependency so the core Material packages do not have to.</Description>
+    <PackageId>Md3.Avalonia.Tabalonia</PackageId>
+    <Version>0.4.1-preview.1</Version>
+    <Authors>Md3.Avalonia contributors</Authors>
+    <PackageTags>avalonia;tabs;tabcontrol;draggable;tearout;theme;material-design-3</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IsPackable>true</IsPackable>
+    <!-- Declares the assembly safe to trim and turns the IL2xxx analyzer on, so a new
+         reflective call fails the build instead of silently breaking a trimmed app. -->
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Tabalonia" />
+    <ProjectReference Include="../Md3.Avalonia/Md3.Avalonia.csproj" />
+    <None Include="../../README.md" Pack="true" PackagePath="/" Link="README.md" />
+    <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />
+  </ItemGroup>
+</Project>

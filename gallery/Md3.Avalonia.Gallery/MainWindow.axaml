@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -179,6 +179,16 @@
             <md:MdButton x:Name="RatingNav" Content="Rating" Variant="Text" HorizontalContentAlignment="Left" Click="ShowRating" />
             <md:MdButton x:Name="ResultViewNav" Content="Result view" Variant="Text" HorizontalContentAlignment="Left" Click="ShowResultView" />
             <md:MdButton x:Name="RichEditorNav" Content="Rich editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowRichEditor" />
+            <md:MdButton x:Name="DockNav" Content="Docking" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDock" />
+            <md:MdButton x:Name="DraggableTabsNav" Content="Draggable tabs" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDraggableTabs" />
+            <md:MdButton x:Name="MarkdownNav" Content="Markdown" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMarkdown" />
+            <md:MdButton x:Name="LiveChartsNav" Content="LiveCharts2 charts" Variant="Text" HorizontalContentAlignment="Left" Click="ShowLiveCharts" />
+            <md:MdButton x:Name="ScottPlotNav" Content="ScottPlot charts" Variant="Text" HorizontalContentAlignment="Left" Click="ShowScottPlot" />
+            <md:MdButton x:Name="PropertyGridNav" Content="Property grid" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPropertyGrid" />
+            <md:MdButton x:Name="NodifyMNav" Content="Node editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNodifyM" />
+            <md:MdButton x:Name="MapsuiNav" Content="Map" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMapsui" />
+            <md:MdButton x:Name="TextEditorNav" Content="Text editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTextEditor" />
+            <md:MdButton x:Name="HexEditorNav" Content="Hex editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowHexEditor" />
             <md:MdButton x:Name="SkeletonNav" Content="Skeleton" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSkeleton" />
             <md:MdButton x:Name="SlidableNav" Content="Slidable item" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSlidableItem" />
             <md:MdButton x:Name="SpinKitNav" Content="Spin kit" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSpinKit" />
@@ -187,6 +197,9 @@
             <md:MdButton x:Name="TimelineNav" Content="Timeline" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTimeline" />
             <md:MdButton x:Name="TransferNav" Content="Transfer" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTransfer" />
             <md:MdButton x:Name="TreeViewNav" Content="Tree view" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTreeView" />
+            <md:MdButton x:Name="WaterfallNav" Content="Waterfall" Variant="Text" HorizontalContentAlignment="Left" Click="ShowWaterfall" />
+            <md:MdButton x:Name="WaveformNav" Content="Waveform" Variant="Text" HorizontalContentAlignment="Left" Click="ShowWaveform" />
+            <md:MdButton x:Name="FloatingWindowNav" Content="Floating window" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFloatingWindow" />
             <md:MdButton x:Name="BorderlessWindowNav" Content="Borderless windows" Variant="Text" HorizontalContentAlignment="Left" Click="ShowBorderlessWindows" />
               </StackPanel>
             </md:MdScrollViewer>

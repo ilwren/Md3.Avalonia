@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
@@ -128,9 +128,21 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Calendar", () => new CalendarGalleryPage());
         AddPage("Cascader", () => new CascaderGalleryPage());
         AddPage("Chart", () => new ChartGalleryPage());
+        AddPage("Waterfall", () => new WaterfallGalleryPage());
+        AddPage("Waveform", () => new WaveformGalleryPage());
+        AddPage("Floating window", () => new FloatingWindowGalleryPage());
         AddPage("Chat view", () => new ChatViewGalleryPage());
         AddPage("Command palette", () => new CommandPaletteGalleryPage());
         AddPage("Data grids", () => new DataGridGalleryPage());
+        AddPage("Docking", () => new DockGalleryPage());
+        AddPage("Draggable tabs", () => new DraggableTabsGalleryPage());
+        AddPage("Markdown", () => new MarkdownGalleryPage());
+        AddPage("LiveCharts2 charts", () => new LiveChartsGalleryPage());
+        AddPage("ScottPlot charts", () => new ScottPlotGalleryPage());
+        AddPage("Property grid", () => new PropertyGridGalleryPage());
+        AddPage("Node editor", () => new NodifyMGalleryPage());
+        AddPage("Map", () => new MapsuiGalleryPage());
+        AddPage("Hex editor", () => new HexEditorGalleryPage());
         AddPage("Density", () => new DensityGalleryPage());
         AddPage("Hover cards", () => new HoverCardGalleryPage());
         AddPage("Masonry panel", () => new MasonryPanelGalleryPage());
@@ -140,6 +152,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Rating", () => new RatingGalleryPage());
         AddPage("Result view", () => new ResultViewGalleryPage());
         AddPage("Rich editor", () => new RichEditorGalleryPage());
+        AddPage("Text editor", () => new TextEditorGalleryPage());
         AddPage("Skeleton", () => new SkeletonGalleryPage());
         AddPage("Slidable item", () => new SlidableItemGalleryPage());
         AddPage("Spin kit", () => new SpinKitGalleryPage());

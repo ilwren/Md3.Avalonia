@@ -1,0 +1,70 @@
+<!--
+  The implicit Button theme Dock's own dictionaries expect.
+
+  Dock's control dictionaries base three keyed themes on it - ButtonCreateDocument
+  (document tab strip), ChromeButton (tool chrome) and DockDrawnCaptionButton (window
+  decorations) all use BasedOn="{StaticResource {x:Type Button}}" - so a Dock theme cannot
+  even load in an application that has no implicit Button theme. Core MaterialTheme
+  intentionally leaves Avalonia's native controls alone (MdButton is a separate Md* type),
+  and Dock's Fluent theme relies on Avalonia's FluentTheme for this key, so the opt-in Dock
+  package provides it itself: that keeps the "no Fluent resources" promise and gives Dock's
+  chrome the Material flat-button look.
+
+  It is a plain Material text button - transparent container, Primary label, OnSurface state
+  layers, 4 DIP corner and a 32 DIP minimum height - because Dock's chrome buttons set their
+  own sizing, colours and templates on top of these defaults.
+-->
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <SolidColorBrush x:Key="Md.Comp.Dock.ButtonHover.Brush"
+                   Color="{DynamicResource Md.Sys.Color.OnSurface}"
+                   Opacity="0.08" />
+  <SolidColorBrush x:Key="Md.Comp.Dock.ButtonPressed.Brush"
+                   Color="{DynamicResource Md.Sys.Color.OnSurface}"
+                   Opacity="0.12" />
+
+  <ControlTheme x:Key="{x:Type Button}" TargetType="Button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="12,6" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_Root"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}">
+          <ContentPresenter x:Name="PART_ContentPresenter"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            RecognizesAccessKey="True" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover /template/ Border#PART_Root">
+      <Setter Property="Background" Value="{DynamicResource Md.Comp.Dock.ButtonHover.Brush}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_Root">
+      <Setter Property="Background" Value="{DynamicResource Md.Comp.Dock.ButtonPressed.Brush}" />
+    </Style>
+    <Style Selector="^:disabled /template/ Border#PART_Root">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.DisabledContent.Brush}" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

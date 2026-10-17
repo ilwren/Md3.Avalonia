@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.WaterfallGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Waterfall" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A masonry layout: every child goes into whichever column is currently shortest, so cards of different heights pack without the ragged gaps a grid leaves behind. The order is never rearranged - a feed's order is its content, and reordering it to save a few pixels would misrepresent it." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Derived columns" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="No column count is set here. The panel divides the width it is given by MinColumnWidth and uses as many columns as fit, so this same markup is one column on a phone and four on a desktop with no breakpoint. Resize the window and the count follows. It also never reserves more columns than there are children." />
+        <eco:MdWaterfallPanel MinColumnWidth="180" ColumnSpacing="12" ItemSpacing="12">
+          <md:MdCard Variant="Elevated" Height="120" />
+          <md:MdCard Variant="Filled" Height="190" />
+          <md:MdCard Variant="Outlined" Height="90" />
+          <md:MdCard Variant="Elevated" Height="160" />
+          <md:MdCard Variant="Filled" Height="110" />
+          <md:MdCard Variant="Outlined" Height="200" />
+          <md:MdCard Variant="Elevated" Height="140" />
+          <md:MdCard Variant="Filled" Height="100" />
+        </eco:MdWaterfallPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Fixed columns" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Setting Columns pins the count and MinColumnWidth is ignored, which is what a layout that has to line up with something else wants. ColumnSpacing and ItemSpacing are independent, so the gutters need not be square." />
+        <eco:MdWaterfallPanel Columns="3" ColumnSpacing="8" ItemSpacing="20">
+          <md:MdCard Variant="Filled" Height="130" />
+          <md:MdCard Variant="Elevated" Height="80" />
+          <md:MdCard Variant="Outlined" Height="170" />
+          <md:MdCard Variant="Filled" Height="100" />
+          <md:MdCard Variant="Elevated" Height="150" />
+          <md:MdCard Variant="Outlined" Height="90" />
+        </eco:MdWaterfallPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="From a collection" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="MdWaterfall is the same panel behind an items control, for a feed bound to a collection rather than one written out by hand. The panel reads its column settings back off the control, so there is no ItemsPanelTemplate to write." />
+        <eco:MdWaterfall x:Name="Feed" MinColumnWidth="160" ColumnSpacing="12" ItemSpacing="12" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdWaterfall MinColumnWidth=&quot;220&quot; ItemsSource=&quot;{Binding Cards}&quot; /&gt;&#10;&#10;&lt;!-- or the panel on its own --&gt;&#10;&lt;eco:MdWaterfallPanel Columns=&quot;3&quot; ItemSpacing=&quot;8&quot;&gt;&#10;  &lt;md:MdCard Height=&quot;120&quot; /&gt;&#10;&lt;/eco:MdWaterfallPanel&gt;"
+                             CSharpCode="// Columns = 0 (the default) derives the count from MinColumnWidth.&#10;// Set Columns to pin it and MinColumnWidth is ignored.&#10;feed.MinColumnWidth = 220;&#10;feed.ItemsSource = cards;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>
