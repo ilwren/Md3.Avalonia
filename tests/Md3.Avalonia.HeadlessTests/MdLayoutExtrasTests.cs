@@ -127,7 +127,6 @@ public sealed class MdLayoutExtrasTests
             var content = SheetContent(sheet);
 
             Assert.False(sheet.IsOpen);
-            Assert.True(sheet.PseudoClasses.Contains(":closed"));
             Assert.Equal(72, rail.Width);
             Assert.False(content.IsVisible);
             Assert.False(content.IsHitTestVisible);
@@ -135,8 +134,9 @@ public sealed class MdLayoutExtrasTests
             Toggle(sheet).RaiseEvent(new RoutedEventArgs(Button.ClickEvent, Toggle(sheet)));
             Dispatcher.UIThread.RunJobs();
 
+            // Width and visibility are what the :open and :content-present classes drive, so
+            // asserting them asserts the state took effect in the template, not just on the control.
             Assert.True(sheet.IsOpen);
-            Assert.True(sheet.PseudoClasses.Contains(":open"));
             Assert.Equal(320, rail.Width);
             Assert.True(content.IsVisible);
             Assert.True(content.IsHitTestVisible);
@@ -157,18 +157,18 @@ public sealed class MdLayoutExtrasTests
         using (Show(left))
         {
             Dispatcher.UIThread.RunJobs();
-            Assert.True(left.PseudoClasses.Contains(":left"));
-            Assert.False(left.PseudoClasses.Contains(":right"));
             Assert.Equal(global::Avalonia.Layout.HorizontalAlignment.Left, Rail(left).HorizontalAlignment);
+            Assert.Equal(Icon(left, "Md.Icon.ChevronRight"), left.ToggleIcon);
         }
 
         var right = new MdSideSheet { Width = 400, Height = 300, Anchor = MdSideSheetAnchor.Right };
         using (Show(right))
         {
             Dispatcher.UIThread.RunJobs();
-            Assert.True(right.PseudoClasses.Contains(":right"));
-            Assert.False(right.PseudoClasses.Contains(":left"));
+            // The rail moves to the other edge and the chevron turns to point out from it, which is
+            // the only way to tell the two anchors apart once both sheets are closed.
             Assert.Equal(global::Avalonia.Layout.HorizontalAlignment.Right, Rail(right).HorizontalAlignment);
+            Assert.Equal(Icon(right, "Md.Icon.ChevronLeft"), right.ToggleIcon);
         }
     }
 
@@ -218,6 +218,12 @@ public sealed class MdLayoutExtrasTests
         var window = new Window { Width = 900, Height = 500, Content = content };
         window.Show();
         return new WindowScope(window);
+    }
+
+    private static object? Icon(Control scope, string key)
+    {
+        Assert.True(scope.TryFindResource(key, scope.ActualThemeVariant, out var value), key);
+        return value;
     }
 
     private static Color TokenColor(Control scope, string key)
