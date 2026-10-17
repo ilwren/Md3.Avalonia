@@ -389,9 +389,14 @@ public sealed class MdWaveformTests
     private static void SetFramePending(MdWaveform waveform, bool value) =>
         FrameLoopField(waveform).SetValue(waveform, value);
 
-    private static FieldInfo FrameLoopField(MdWaveform waveform) =>
-        Assert.NotNull(waveform.GetType()
-            .GetField("_frameRequested", BindingFlags.Instance | BindingFlags.NonPublic));
+    private static FieldInfo FrameLoopField(MdWaveform waveform)
+    {
+        // Assert.NotNull returns void in this xunit version, so it cannot be the expression body.
+        var field = waveform.GetType()
+            .GetField("_frameRequested", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(field);
+        return field!;
+    }
 
     private static void Press(Control target, Key key)
     {
