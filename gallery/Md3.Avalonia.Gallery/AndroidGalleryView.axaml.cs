@@ -128,6 +128,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Calendar", () => new CalendarGalleryPage());
         AddPage("Cascader", () => new CascaderGalleryPage());
         AddPage("Chart", () => new ChartGalleryPage());
+        AddPage("Waterfall", () => new WaterfallGalleryPage());
         AddPage("Waveform", () => new WaveformGalleryPage());
         AddPage("Chat view", () => new ChatViewGalleryPage());
         AddPage("Command palette", () => new CommandPaletteGalleryPage());
@@ -155,6 +156,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Slidable item", () => new SlidableItemGalleryPage());
         AddPage("Spin kit", () => new SpinKitGalleryPage());
         AddPage("Staggered panel", () => new StaggeredPanelGalleryPage());
+        AddPage("Side sheet", () => new SideSheetGalleryPage());
         AddPage("Tag input", () => new TagInputGalleryPage());
         AddPage("Timeline", () => new TimelineGalleryPage());
         AddPage("Transfer", () => new TransferGalleryPage());

@@ -459,6 +459,28 @@ LiveCharts 尚未分配的槽位（`ISeries.SeriesId` 默认为 `-1`）当作第
 
 ---
 
+## 补记（2026-10-17）：瀑布流与边缘悬浮面板
+
+需求是两件事：瀑布流布局，以及贴在窗口左右两侧、点击后带动画展开的小悬浮图标。按 §6 的纪律先找可主题化的
+第三方对象：`masonry+avalonia`、`waterfall+avalonia`、`staggered+grid+avalonia` 三组检索均无结果，
+GitHub 上没有可引用的 Avalonia 瀑布流控件，也没有把「收起为悬浮按钮的边缘面板」做成控件的库。两者都在
+`Md3.Avalonia.Extra` 自研，并遵守同一组约束。
+
+- **不新造已经存在的东西。** 悬浮按钮直接用核心的 `MdFloatingActionButton`，动画沿用
+  `MdMotionTransitions` 与 `MdPresenceController`——也就是 `MdExpansionPanel` 已经在用的那一套，
+  而不是自带一组时长与缓动。宽度是 spatial 动效，透明度是 effects 动效，二者分别取各自的令牌，
+  因此Reduced/None 方案下面板会直接落位而不是慢慢滑。
+- **面板不抢布局参数的缝。** `MdWaterfall` 的四个布局数值通过主题里的
+  `$parent[eco:MdWaterfall]` 绑定交给 `MdWaterfallPanel`，与 `MdButtonGroup` 交给
+  `StackPanel.Spacing` 的做法一致，宿主因此不必自己写 `ItemsPanelTemplate`；替换 `ItemsPanel`
+  仍然允许，只是这四个属性随之失效，这一点写在文档注释里。
+- **瀑布流是贪心放置，不做重排。** 每个子元素量完高度后放进当前最短的一列，顺序永不改变：信息流的顺序
+  就是内容本身，为省几个像素重排它等于歪曲内容。列数默认由 `MinColumnWidth` 推导，并以子元素数量封顶，
+  因此两条数据的信息流不会预留五个空列。
+- **收起的面板要真正退出命中测试。** 面板是覆盖在邻居之上而不是替换它，展开不会让下层页面重新布局；
+  代价是收起时内容仍在视觉树里（退场动画需要它），所以 `IsHitTestVisible` 必须跟着状态走，否则页面上
+  会压着一块看不见的可点击区域。这一条有专门的测试，因为属性转储看不出它。
+
 ## 7. 数据来源
 
 - GitHub REST API（星标、最近提交、许可证、归档状态、仓库树、文件内容），2026-10-11。

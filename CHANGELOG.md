@@ -199,6 +199,27 @@
   worth theming - the only candidate on GitHub is a desktop application, not a control - so this one
   is in-house. Its theme lives in `AdvancedControls.axaml`, the dictionary both `ExtraTheme` and
   `EcosystemTheme` merge, so a host gets the same waveform whichever it installs.
+- **`MdWaterfallPanel`** and **`MdWaterfall`**, a masonry layout in `Md3.Avalonia.Extra`. Each child is
+  measured at the column width and then dropped into whichever column is currently shortest, so cards
+  of differing heights pack without the ragged gaps a grid leaves behind. `Columns` pins the count;
+  left at its default of `0` the count is derived from `MinColumnWidth` and capped at the number of
+  children, so one piece of markup is a single column on a phone and four on a desktop with no
+  breakpoint, and a two-item feed never reserves five empty columns. Placement is greedy and never
+  reorders children, because a feed's order is its content. `MdWaterfall` is the same panel behind an
+  items control and reads its four layout numbers back off the control, so a bound feed needs no
+  `ItemsPanelTemplate` of its own. No reusable masonry panel for Avalonia turned up on GitHub, so
+  both are in-house.
+- **`MdSideSheet`**, an edge-pinned sheet in `Md3.Avalonia.Extra` that collapses to a floating button.
+  The button stays where it is while the sheet grows out from behind it and the content it was holding
+  fades and slides in, which keeps a secondary surface - filters, a layer list, a thread - one click
+  away without spending width on it. `Anchor` picks the edge it is pinned to and turns the chevron to
+  match. `IsOpen` is two-way and `Open`, `Close` and `Toggle` are public, so with
+  `IsToggleVisible="false"` a toolbar or shortcut can own a sheet that has no button of its own. The
+  sheet overlays its neighbours instead of replacing them, so opening one never re-lays-out the page
+  underneath, and its collapsed content is kept out of hit testing so it cannot sit invisibly over
+  that page. Width, opacity and the chevron's turn come from the `Md.Sys.Motion` tokens rather than
+  private timings, so it follows the ambient scheme and snaps under Reduced/None motion. The button is
+  the existing `MdFloatingActionButton`, not a second one.
 - `MdBreadcrumb` gains a `Powerline` variant.
 - [`docs/DIALOG_SERVICE.md`](docs/DIALOG_SERVICE.md): how to show dialogs from a view model
   through `IMdDialogService`, including the composition-root wiring.
@@ -255,6 +276,10 @@
 
 ### Gallery
 
+- Two new pages, Waterfall and Side sheet, take the index to 110. The side sheet page puts a sheet on
+  both edges of one panel so the anchor and the chevron direction can be compared side by side, and a
+  third sheet with no button of its own is driven by an ordinary button to show the state is not
+  tied to the toggle.
 - The waveform page now decodes a real recording instead of drawing an invented curve. A 20-second
   excerpt of `Okay` from MDN's `dom-examples` (CC0 1.0) ships as 16 kHz mono PCM in
   `Assets/Media/demo-track.wav`, a chunk-walking WAV reader in `DemoTrack` turns it into samples,
@@ -288,6 +313,12 @@
 
 ### Testing
 
+- `MdLayoutExtrasTests` pins what neither control can show in a property dump: which column the
+  waterfall actually put each child in, that a derived column count never reserves an empty column,
+  that the panel measures to its tallest column rather than the sum of its children, that the items
+  control really does hand its own settings to the panel behind the template, and that a collapsed
+  side sheet is out of hit testing - a sheet that left its content clickable while closed would cover
+  the page with an invisible target and still report a perfectly healthy property set.
 - `MdGalleryLocalizationTests` exercises `GalleryLocalization.Apply`, which nothing did before. The
   translation table is built in a static initialiser, so a key written twice throws the first time a
   page is localized - and the duplicate `Navigation` key above is exactly that. The tests translate a

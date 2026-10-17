@@ -84,6 +84,68 @@
   </ControlTheme>
   <ControlTheme x:Key="{x:Type eco:MdSpinKit}" TargetType="eco:MdSpinKit" />
   <ControlTheme x:Key="{x:Type eco:MdStaggeredPanel}" TargetType="eco:MdStaggeredPanel" />
+
+  <!-- A masonry feed. The panel does the layout and the theme only supplies the surface it sits on.
+       The four layout numbers are bound back to the control through $parent so a feed configures
+       itself without writing its own ItemsPanelTemplate - the same seam MdButtonGroup uses. -->
+  <ControlTheme x:Key="{x:Type eco:MdWaterfall}" TargetType="eco:MdWaterfall">
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLowest.Brush}" />
+    <Setter Property="ItemsPanel">
+      <ItemsPanelTemplate>
+        <eco:MdWaterfallPanel Columns="{Binding $parent[eco:MdWaterfall].Columns}"
+                              MinColumnWidth="{Binding $parent[eco:MdWaterfall].MinColumnWidth}"
+                              ColumnSpacing="{Binding $parent[eco:MdWaterfall].ColumnSpacing}"
+                              ItemSpacing="{Binding $parent[eco:MdWaterfall].ItemSpacing}" />
+      </ItemsPanelTemplate>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdWaterfall">
+        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+          <ItemsPresenter x:Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- A sheet pinned to a window edge and collapsed to a floating button. The button is a sibling of
+       the sheet, not a child: the sheet clips to its own rounded bounds while it grows, and a button
+       inside those bounds would be clipped away mid-animation. The chevron points out from the edge
+       the sheet is pinned to and turns around once the sheet is open. -->
+  <ControlTheme x:Key="{x:Type eco:MdSideSheet}" TargetType="eco:MdSideSheet">
+    <Setter Property="SheetBrush" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Elevation" Value="{DynamicResource Md.Sys.Elevation.Level3}" />
+    <Setter Property="ToggleIcon" Value="{DynamicResource Md.Icon.ChevronRight}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdSideSheet">
+        <Panel>
+          <Border x:Name="PART_Sheet" Width="{TemplateBinding CollapsedWidth}" HorizontalAlignment="Left"
+                  Background="{TemplateBinding SheetBrush}" BoxShadow="{TemplateBinding Elevation}"
+                  CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Large}" ClipToBounds="True">
+            <DockPanel Margin="16">
+              <ContentPresenter DockPanel.Dock="Top" Margin="0,0,0,8" Content="{TemplateBinding Header}"
+                                ContentTemplate="{TemplateBinding HeaderTemplate}" Foreground="{TemplateBinding Foreground}" />
+              <ContentPresenter x:Name="PART_SheetContent" Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}"
+                                IsVisible="False" Opacity="0" RenderTransform="translate(-8px, 0px)" />
+            </DockPanel>
+          </Border>
+          <md:MdFloatingActionButton x:Name="PART_Toggle" Icon="{TemplateBinding ToggleIcon}"
+                                     HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0"
+                                     AutomationProperties.Name="Toggle the side sheet"
+                                     RenderTransform="rotate(0deg)" RenderTransformOrigin="50%,50%" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:right"><Setter Property="ToggleIcon" Value="{DynamicResource Md.Icon.ChevronLeft}" /></Style>
+    <Style Selector="^:right /template/ Border#PART_Sheet"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
+    <Style Selector="^:right /template/ md|MdFloatingActionButton#PART_Toggle"><Setter Property="HorizontalAlignment" Value="Right" /><Setter Property="Margin" Value="0,0,8,0" /></Style>
+    <Style Selector="^:open /template/ Border#PART_Sheet"><Setter Property="Width" Value="{TemplateBinding ExpandedWidth}" /></Style>
+    <Style Selector="^:content-present /template/ ContentPresenter#PART_SheetContent"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:open /template/ ContentPresenter#PART_SheetContent"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="translate(0px, 0px)" /></Style>
+    <Style Selector="^:open /template/ md|MdFloatingActionButton#PART_Toggle"><Setter Property="RenderTransform" Value="rotate(180deg)" /></Style>
+    <Style Selector="^:reduced-motion /template/ ContentPresenter#PART_SheetContent"><Setter Property="RenderTransform" Value="translate(0px, 0px)" /></Style>
+  </ControlTheme>
   <ControlTheme x:Key="EcoItemsHostTheme" TargetType="ItemsControl">
     <Setter Property="Template"><ControlTemplate TargetType="ItemsControl"><ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" /></ControlTemplate></Setter>
   </ControlTheme>

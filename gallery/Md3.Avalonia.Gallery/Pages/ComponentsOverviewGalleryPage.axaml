@@ -9,7 +9,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap"
                    Text="Components are interactive building blocks for creating a user interface. They can be organized into categories based on their purpose: action, containment, communication, navigation, selection, and text input." />
         <TextBlock Classes="body" TextWrapping="Wrap" Opacity="0.72"
-                   Text="108 indexed pages. Every entry below opens its own page; MdGalleryIndexTests fails the build if any of them stops resolving." />
+                   Text="110 indexed pages. Every entry below opens its own page; MdGalleryIndexTests fails the build if any of them stops resolving." />
       </StackPanel>
 
       <WrapPanel Orientation="Horizontal">
@@ -148,6 +148,7 @@
             <md:MdButton Content="ScottPlot charts" Tag="ScottPlot charts" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Map" Tag="Map" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Timeline" Tag="Timeline" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Waterfall" Tag="Waterfall" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Waveform" Tag="Waveform" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Pull to refresh" Tag="Pull to refresh" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Chat view" Tag="Chat view" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
@@ -163,6 +164,7 @@
             <md:MdButton Content="Animated text" Tag="Animated text" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Animation sequence" Tag="Animation sequence" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Staggered panel" Tag="Staggered panel" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Side sheet" Tag="Side sheet" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Before and after" Tag="Before and after" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Density" Tag="Density" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Theme Lab" Tag="Theme Lab" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
