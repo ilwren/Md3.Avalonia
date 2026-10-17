@@ -247,7 +247,7 @@ public sealed class MdWaveformTests
         // The readout reports the decoded length, so it can only show 00:20 if the track decoded.
         Assert.Contains(
             page.GetLogicalDescendants().OfType<TextBlock>(),
-            block => block.Text.Contains("00:20"));
+            block => block.Text?.Contains("00:20") == true);
     }
 
     [Fact]
