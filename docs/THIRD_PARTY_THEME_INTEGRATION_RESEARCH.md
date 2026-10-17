@@ -502,11 +502,7 @@ GitHub 上没有可引用的 Avalonia 瀑布流控件，也没有把「收起为
   先按差值把子元素挪回原位、挂上 transition、再放手。关键约束是**不要**在每一帧重排时都触发：窗口
   连续 resize 时子元素本来就在逐帧跟随，每帧重启 transition 会让它永远追不上指针。所以只在列数这个
   离散事件上动画，宽度变化本身不触发。
-- **半圆把手是自研，但指针目标的修法沿用本仓库 FAB 已有的做法。** Flutter 的 `SideSheet` 是模态的，
-  没有"收起成贴边把手"这种形态，所以没有样式可参考。把手 24dp 宽低于 Material 的 48dp 指针目标下限，
-  处理方式与 `MdFab.axaml` 里小尺寸 FAB 的注释所述完全一致：外层透明容器撑住 48dp，把手放在里面。
-  没有改 `MdFloatingActionButton` 本身——它的容器是 `Width=Height=ContainerSize` 的正方形，做不出
-  24×56 的半圆，硬改会波及所有 FAB 尺寸。
+- **半圆把手曾经自研，随后按需求撤下。** Flutter 的 `SideSheet` 是模态的，没有"收起成贴边把手"这种形态，所以当时没有样式可参考；把手 24dp 宽低于 Material 的 48dp 指针目标下限，处理方式与 `MdFab.axaml` 里小尺寸 FAB 的注释所述一致（外层透明容器撑住 48dp，把手放在里面）。这些结论保留在此，控件本身（`MdSideSheet` 与 `MdSideSheetTabTheme`）已从代码库移除。
 
 ## 7. 数据来源
 

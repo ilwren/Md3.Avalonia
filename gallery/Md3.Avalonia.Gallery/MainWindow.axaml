@@ -193,7 +193,6 @@
             <md:MdButton x:Name="SlidableNav" Content="Slidable item" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSlidableItem" />
             <md:MdButton x:Name="SpinKitNav" Content="Spin kit" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSpinKit" />
             <md:MdButton x:Name="StaggeredPanelNav" Content="Staggered panel" Variant="Text" HorizontalContentAlignment="Left" Click="ShowStaggeredPanel" />
-            <md:MdButton x:Name="SideSheetNav" Content="Side sheet" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSideSheet" />
             <md:MdButton x:Name="TagInputNav" Content="Tag input" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTagInput" />
             <md:MdButton x:Name="TimelineNav" Content="Timeline" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTimeline" />
             <md:MdButton x:Name="TransferNav" Content="Transfer" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTransfer" />

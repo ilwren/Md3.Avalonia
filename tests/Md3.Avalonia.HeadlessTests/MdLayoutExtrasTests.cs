@@ -4,8 +4,6 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
-using Avalonia.Controls.Presenters;
-using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -16,10 +14,9 @@ using Xunit;
 namespace Md3.Avalonia.HeadlessTests;
 
 /// <summary>
-/// Which column a waterfall puts a child in, and whether a collapsed side sheet still accepts clicks
-/// over the page, are both invisible in a property dump: a panel that packed children into the wrong
-/// column, or a sheet that left its content hit-testable while closed, would report a perfectly
-/// healthy property set.
+/// Which column a waterfall puts a child in, and which of its children it decides to glide, are both
+/// invisible in a property dump: a panel that packed children into the wrong column, or one that
+/// restarted a transition on every frame of a resize, would report a perfectly healthy property set.
 /// </summary>
 public sealed class MdLayoutExtrasTests
 {
@@ -106,92 +103,6 @@ public sealed class MdLayoutExtrasTests
     }
 
     [AvaloniaFact]
-    public void Side_Sheet_Opens_From_Its_Floating_Button_And_Hides_Its_Content_Again()
-    {
-        var sheet = new MdSideSheet
-        {
-            Width = 400,
-            Height = 300,
-            CollapsedWidth = 72,
-            ExpandedWidth = 320,
-            Header = "Filters",
-            Content = new TextBlock { Text = "Only unread" }
-        };
-        // Motion off, so the width lands on its target in the same pass instead of animating towards
-        // it and leaving the assertion reading a value that is still on its way.
-        MdMotion.SetScheme(sheet, MdMotionScheme.None);
-
-        using (Show(sheet))
-        {
-            Dispatcher.UIThread.RunJobs();
-            var rail = Rail(sheet);
-            var content = SheetContent(sheet);
-
-            Assert.False(sheet.IsOpen);
-            Assert.Equal(72, rail.Width);
-            Assert.False(content.IsVisible);
-            Assert.False(content.IsHitTestVisible);
-
-            Toggle(sheet).RaiseEvent(new RoutedEventArgs(Button.ClickEvent, Toggle(sheet)));
-            Dispatcher.UIThread.RunJobs();
-
-            // Width and visibility are what the :open and :content-present classes drive, so
-            // asserting them asserts the state took effect in the template, not just on the control.
-            Assert.True(sheet.IsOpen);
-            Assert.Equal(320, rail.Width);
-            Assert.True(content.IsVisible);
-            Assert.True(content.IsHitTestVisible);
-
-            sheet.Close();
-            Dispatcher.UIThread.RunJobs();
-
-            Assert.False(sheet.IsOpen);
-            Assert.Equal(72, rail.Width);
-            Assert.False(content.IsHitTestVisible);
-        }
-    }
-
-    [AvaloniaFact]
-    public void Side_Sheet_Anchor_Picks_The_Edge_It_Slides_From()
-    {
-        var left = new MdSideSheet { Width = 400, Height = 300 };
-        using (Show(left))
-        {
-            Dispatcher.UIThread.RunJobs();
-            Assert.Equal(global::Avalonia.Layout.HorizontalAlignment.Left, Rail(left).HorizontalAlignment);
-            Assert.Equal(Icon(left, "Md.Icon.ChevronRight"), left.ToggleIcon);
-        }
-
-        var right = new MdSideSheet { Width = 400, Height = 300, Anchor = MdSideSheetAnchor.Right };
-        using (Show(right))
-        {
-            Dispatcher.UIThread.RunJobs();
-            // The rail moves to the other edge and the chevron turns to point out from it, which is
-            // the only way to tell the two anchors apart once both sheets are closed.
-            Assert.Equal(global::Avalonia.Layout.HorizontalAlignment.Right, Rail(right).HorizontalAlignment);
-            Assert.Equal(Icon(right, "Md.Icon.ChevronLeft"), right.ToggleIcon);
-        }
-    }
-
-    [AvaloniaFact]
-    public void Side_Sheet_Takes_Its_Surface_And_Shadow_From_Material_Tokens()
-    {
-        var sheet = new MdSideSheet();
-        using (Show(sheet))
-        {
-            Dispatcher.UIThread.RunJobs();
-
-            Assert.Equal(
-                TokenColor(sheet, "Md.Sys.Color.SurfaceContainerLow.Brush"),
-                Assert.IsType<SolidColorBrush>(sheet.SheetBrush).Color);
-
-            Assert.True(sheet.TryFindResource("Md.Sys.Elevation.Level3", sheet.ActualThemeVariant, out var token),
-                "the elevation token the theme binds Elevation to is missing");
-            Assert.Equal((BoxShadows)token!, sheet.Elevation);
-        }
-    }
-
-    [AvaloniaFact]
     public void Waterfall_Glides_Its_Children_Only_When_The_Column_Count_Changes()
     {
         var panel = new MdWaterfallPanel { Width = 400, MinColumnWidth = 180, ColumnSpacing = 0, ItemSpacing = 0 };
@@ -240,24 +151,10 @@ public sealed class MdLayoutExtrasTests
         }
     }
 
-    [AvaloniaFact]
-    public void Side_Sheet_Hides_Its_Handle_When_The_Host_Owns_The_State()
-    {
-        var sheet = new MdSideSheet { Width = 400, Height = 300, IsToggleVisible = false };
-        using (Show(sheet))
-        {
-            Dispatcher.UIThread.RunJobs();
-            Assert.False(Toggle(sheet).IsVisible);
-        }
-    }
-
-    private static Border Rail(MdSideSheet sheet) =>
         sheet.GetVisualDescendants().OfType<Border>().Single(control => control.Name == "PART_Sheet");
 
-    private static ContentPresenter SheetContent(MdSideSheet sheet) =>
         sheet.GetVisualDescendants().OfType<ContentPresenter>().Single(control => control.Name == "PART_SheetContent");
 
-    private static Button Toggle(MdSideSheet sheet) =>
         sheet.GetVisualDescendants().OfType<Button>().Single(control => control.Name == "PART_Toggle");
 
     private static int ColumnsUsedFor(double width, double minWidth, int children)
@@ -279,12 +176,6 @@ public sealed class MdLayoutExtrasTests
         var window = new Window { Width = 900, Height = 500, Content = content };
         window.Show();
         return new WindowScope(window);
-    }
-
-    private static object? Icon(Control scope, string key)
-    {
-        Assert.True(scope.TryFindResource(key, scope.ActualThemeVariant, out var value), key);
-        return value;
     }
 
     private static Color TokenColor(Control scope, string key)

@@ -91,7 +91,7 @@ All component themes are scoped to `Md*` types. Registering `MaterialTheme` does
 - Optional Ecosystem Wave E: `MdSkeleton`, `MdSkeletonGroup`, `MdAnimationSequence`.
 - Optional Ecosystem Wave F: `MdPinInput`, `MdPinCell`, `MdTreeView`, `MdTreeNode`, `MdTreeRow`, `MdTagInput`, `MdTagEntry`, `MdTagChangedEventArgs`.
 - Existing optional Ecosystem controls: `MdAvatar`, `MdAvatarGroup`, `MdRating`, `MdBreadcrumb`, `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, and `MdStaggeredPanel`.
-- `MdBeforeAfter` provides draggable horizontal/vertical content comparison; `MdAnimatedText` provides typewriter/fade/pop-friendly text reveal; `MdSpinKit` contains optional non-Material loading recipes; `MdStaggeredPanel` provides cancelable staggered entrance motion. `MdWaveform` draws peak-driven audio waveforms with a scrubbable Material playhead and no bundled decoder. `MdWaterfallPanel` and `MdWaterfall` provide masonry placement, and `MdSideSheet` collapses an edge-pinned panel to a floating button. These are Extra controls; core `MdChart` remains provider-neutral and does not bundle a chart engine.
+- `MdBeforeAfter` provides draggable horizontal/vertical content comparison; `MdAnimatedText` provides typewriter/fade/pop-friendly text reveal; `MdSpinKit` contains optional non-Material loading recipes; `MdStaggeredPanel` provides cancelable staggered entrance motion. `MdWaveform` draws peak-driven audio waveforms with a scrubbable Material playhead and no bundled decoder. `MdWaterfallPanel` and `MdWaterfall` provide masonry placement. These are Extra controls; core `MdChart` remains provider-neutral and does not bundle a chart engine.
 
 ## Complete component catalog
 
@@ -147,7 +147,7 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 | **Selection and transfer** | `MdAsyncSelect`, `MdCalendar`, `MdCascader`, `MdCascaderItem`, `MdTransfer`, `MdColorPicker`, `MdColorPickerButton` |
 | **Feedback and identity** | `MdAvatar`, `MdAvatarGroup`, `MdRating`, `MdResultView`, `MdSkeleton`, `MdSkeletonGroup`, `MdPinInput`, `MdPinCell`, `MdTagInput`, `MdTagEntry` |
 | **Data visualization and editing** | `MdChart`, `MdChartSeries`, `MdChartPoint`, `MdRichEditor`, `MdRichTextEditor`, `MdChatView`, `MdChatMessage`, `MdTimeline`, `MdTimelineItem` |
-| **Motion and visual extras** | `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, `MdStaggeredPanel`, `MdWaveform`, `MdWaterfallPanel`, `MdWaterfall`, `MdSideSheet`, `MdAnimationSequence`, `MdAnimatedVisibility`, `MdContainerTransform`, `MdFadeThrough`, `MdSharedAxis`, `MdRevealHost`, `MdMorphPanel` |
+| **Motion and visual extras** | `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, `MdStaggeredPanel`, `MdWaveform`, `MdWaterfallPanel`, `MdWaterfall`, `MdAnimationSequence`, `MdAnimatedVisibility`, `MdContainerTransform`, `MdFadeThrough`, `MdSharedAxis`, `MdRevealHost`, `MdMorphPanel` |
 | **Navigation/content** | `MdBreadcrumb`, `MdBreadcrumbItem`, `MdGridTile`-style content helpers |
 
 `MdPagedItemsView.ItemTemplate` sets the presentation of each loaded record; `MdDataGrid` is a narrower surface than Avalonia `DataGrid` and is not a drop-in replacement for it.
@@ -315,7 +315,7 @@ Two of its defaults follow Flutter's `audio_waveforms`: `BarCornerRadius` is the
 
 ## Extra layout controls
 
-The same optional package carries two layout types for surfaces Material 3 describes in prose but does not ship as components:
+The same optional package carries a masonry layout, in the two forms a host is likely to want:
 
 ```xml
 <extra:MdWaterfall MinColumnWidth="220" ItemsSource="{Binding Cards}" />
@@ -323,11 +323,6 @@ The same optional package carries two layout types for surfaces Material 3 descr
 <extra:MdWaterfallPanel Columns="3" ColumnSpacing="8" ItemSpacing="20">
   <md:MdCard Height="120" /><md:MdCard Height="180" />
 </extra:MdWaterfallPanel>
-
-<extra:MdSideSheet Anchor="Left" IsOpen="{Binding FiltersOpen, Mode=TwoWay}"
-                   ExpandedWidth="320" Header="Filters">
-  <!-- whatever the sheet holds -->
-</extra:MdSideSheet>
 ```
 
 `MdWaterfallPanel` is a masonry layout: each child is measured at the column width and then placed into whichever column is currently shortest, so items of differing heights pack without the ragged gaps a grid leaves behind. `Columns` pins the count; left at its default of `0` the count is derived from `MinColumnWidth`, capped at the number of children so a short feed never reserves empty columns. `ColumnSpacing` and `ItemSpacing` are independent. Placement is greedy and never reorders children, which is the right trade for a feed, where the order is the content. Right-to-left flow mirrors the columns.
@@ -335,10 +330,6 @@ The same optional package carries two layout types for surfaces Material 3 descr
 `AnimateLayout`, on by default, carries children to their new places when the column count changes - the same first-last-invert-play shape an implicit animation uses, timed by the `Md.Sys.Motion` tokens. Only a change of count is animated: a resize that keeps the count has the children tracking it frame by frame already, and starting a transition on every one of those frames would restart it before it finished and leave each child permanently lagging the pointer. Gliding writes a child's `RenderTransform` and `Transitions`, so a host that animates its own children will want it off.
 
 `MdWaterfall` is that panel behind an items control, for a feed bound to a collection rather than one written out by hand. It re-exposes the same four layout numbers and the theme's panel reads them back off the control, so a host never writes an `ItemsPanelTemplate`; replacing `ItemsPanel` is still supported and simply leaves them unused. The theme fills `Background` from `Md.Sys.Color.SurfaceContainerLowest`.
-
-`MdSideSheet` is a sheet pinned to a window edge and collapsed to a floating button: the button stays put, the sheet grows out from behind it, and the content fades and slides in. `Anchor` (`MdSideSheetAnchor.Left` or `.Right`) picks the edge it is pinned to and slides out from and turns the chevron to match. `IsOpen` is two-way, `Open()`, `Close()` and `Toggle()` are public and `IsOpenChanged` reports the result, so a toolbar or shortcut can drive a sheet with `IsToggleVisible="false"` and no button of its own. `CollapsedWidth` defaults to the 24dp of the handle and `ExpandedWidth` is the width once open; `ToggleIcon`, `SheetBrush` and `Elevation` shape the rest, with the theme supplying `Md.Sys.Color.SurfaceContainerLow`, `Md.Sys.Elevation.Level3` and a chevron. Width, opacity and the handle's turn come from the `Md.Sys.Motion` tokens, so the sheet follows the ambient scheme and snaps under Reduced/None motion.
-
-The handle is its own `MdSideSheetTabTheme` rather than a restyled floating action button: a FAB is a 56dp disc that sits clear of the edge, and a sheet wants a small half-round tab flush with it. It keeps the FAB's fix for the pointer target - the tab is 24dp wide, under Material's 48dp minimum, so a transparent container holds that minimum and the tab sits inside it - and mirrors its rounding and chevron on the right edge. The sheet overlays its neighbours instead of replacing them, so opening one never re-lays-out the page underneath, and its collapsed content is kept out of hit testing so it cannot sit invisibly over that page.
 
 ## Borderless/chromeless windows
 

@@ -54,7 +54,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             PopoverNav, RatingNav, ResultViewNav, RichEditorNav, DockNav, DraggableTabsNav, MarkdownNav, LiveChartsNav, ScottPlotNav, PropertyGridNav, NodifyMNav,
 ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             TextEditorNav, HexEditorNav,
-            SkeletonNav, SlidableNav, SpinKitNav, StaggeredPanelNav, SideSheetNav,
+            SkeletonNav, SlidableNav, SpinKitNav, StaggeredPanelNav,
             TagInputNav, TimelineNav, TransferNav, TreeViewNav, WaterfallNav, WaveformNav,
             NumericNav, ThemeResourcesNav, SymbolsNav, MotionNav,
             BannerNav, DataTableNav, PaginatedTableNav, DismissibleNav, ExpansionPanelNav,
@@ -144,7 +144,6 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             Entry("Slidable item", "slidable swipe action row archive delete", SlidableNav, () => new SlidableItemGalleryPage()),
             Entry("Spin kit", "spinner loading indeterminate wave bounce busy", SpinKitNav, () => new SpinKitGalleryPage()),
             Entry("Staggered panel", "staggered entrance animation panel children", StaggeredPanelNav, () => new StaggeredPanelGalleryPage()),
-            Entry("Side sheet", "side sheet rail dock collapse expand floating button drawer anchor filters layers", SideSheetNav, () => new SideSheetGalleryPage()),
             Entry("Tag input", "tag chip input suggestion validator token", TagInputNav, () => new TagInputGalleryPage()),
             Entry("Timeline", "timeline step history activity feed state", TimelineNav, () => new TimelineGalleryPage()),
             Entry("Transfer", "transfer dual list shuttle move pick", TransferNav, () => new TransferGalleryPage()),
@@ -298,7 +297,6 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
     private void ShowTimeline(object? s, RoutedEventArgs e) => Navigate(new TimelineGalleryPage(), TimelineNav);
     private void ShowTransfer(object? s, RoutedEventArgs e) => Navigate(new TransferGalleryPage(), TransferNav);
     private void ShowTreeView(object? s, RoutedEventArgs e) => Navigate(new TreeViewGalleryPage(), TreeViewNav);
-    private void ShowSideSheet(object? s, RoutedEventArgs e) => Navigate(new SideSheetGalleryPage(), SideSheetNav);
     private void ShowWaterfall(object? s, RoutedEventArgs e) => Navigate(new WaterfallGalleryPage(), WaterfallNav);
     private void ShowWaveform(object? s, RoutedEventArgs e) => Navigate(new WaveformGalleryPage(), WaveformNav);
     private void ShowBorderlessWindows(object? s, RoutedEventArgs e) => Navigate(new BorderlessWindowGalleryPage(), BorderlessWindowNav);

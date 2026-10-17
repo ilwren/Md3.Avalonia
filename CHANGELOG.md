@@ -218,19 +218,6 @@
   resize that keeps the count has the children tracking it already and restarting a transition every
   frame would leave them permanently lagging the pointer. No reusable masonry panel for Avalonia
   turned up on GitHub, so both are in-house.
-- **`MdSideSheet`**, an edge-pinned sheet in `Md3.Avalonia.Extra` that collapses to a small half-round
-  handle flush with the edge. The handle stays where it is while the sheet grows out from behind it and
-  the content it was holding fades and slides in, which keeps a secondary surface - filters, a layer
-  list, a thread - one click away without spending width on it. `Anchor` picks the edge it is pinned to
-  and mirrors the handle and its chevron to match. The handle is its own theme rather than a restyled
-  `MdFloatingActionButton`: a FAB is a 56dp disc sitting clear of the edge, and it keeps the FAB's fix
-  for the pointer target, holding Material's 48dp minimum in a transparent container around a 24dp tab. `IsOpen` is two-way and `Open`, `Close` and `Toggle` are public, so with
-  `IsToggleVisible="false"` a toolbar or shortcut can own a sheet that has no handle of its own. The
-  sheet overlays its neighbours instead of replacing them, so opening one never re-lays-out the page
-  underneath, and its collapsed content is kept out of hit testing so it cannot sit invisibly over
-  that page. Width, opacity and the handle's turn come from the `Md.Sys.Motion` tokens rather than
-  private timings, so it follows the ambient scheme and snaps under Reduced/None motion. The button is
-  the existing `MdFloatingActionButton`, not a second one.
 - `MdBreadcrumb` gains a `Powerline` variant.
 - [`docs/DIALOG_SERVICE.md`](docs/DIALOG_SERVICE.md): how to show dialogs from a view model
   through `IMdDialogService`, including the composition-root wiring.
@@ -287,11 +274,9 @@
 
 ### Gallery
 
-- Two new pages, Waterfall and Side sheet, take the index to 110. The side sheet page puts a sheet on
-  both edges of one panel so the two handles can be compared side by side, and a third sheet with no
-  handle of its own is driven by an ordinary button to show the state is not tied to it. The waveform
-  page gained a section that pulses, and its scrubbing waveform now pulses only while the demo track
-  is actually playing - the difference between a waveform that looks alive and one merely twitching.
+- A new page, Waterfall, takes the index to 109. The waveform page gained a section that pulses, and
+  its scrubbing waveform now pulses only while the demo track is actually playing - the difference
+  between a waveform that looks alive and one merely twitching.
 - The waveform page now decodes a real recording instead of drawing an invented curve. A 20-second
   excerpt of `Okay` from MDN's `dom-examples` (CC0 1.0) ships as 16 kHz mono PCM in
   `Assets/Media/demo-track.wav`, a chunk-walking WAV reader in `DemoTrack` turns it into samples,
@@ -325,17 +310,12 @@
 
 ### Testing
 
-- `MdLayoutExtrasTests` pins what neither control can show in a property dump: which column the
-  waterfall actually put each child in, that a derived column count never reserves an empty column,
-  that the panel measures to its tallest column rather than the sum of its children, that the items
-  control really does hand its own settings to the panel behind the template, and that a collapsed
-  side sheet is out of hit testing - a sheet that left its content clickable while closed would cover
-  the page with an invisible target and still report a perfectly healthy property set. Added since:
-  that a reflow glides its children while a resize that keeps the column count does not, that
-  `AnimateLayout=false` and the Reduced scheme both leave children alone, that a hidden handle really
-  is hidden, and - pixel for pixel - that an animating waveform under the None scheme draws exactly
-  what a still one does, because a pulse that merely slowed down would still be motion somebody asked
-  not to see.
+- `MdLayoutExtrasTests` pins what the waterfall cannot show in a property dump: which column it
+  actually put each child in, that a derived column count never reserves an empty column, that the
+  panel measures to its tallest column rather than the sum of its children, that the items control
+  really does hand its own settings to the panel behind the template, that a reflow glides its
+  children while a resize that keeps the column count does not, and that `AnimateLayout=false` and
+  the Reduced scheme both leave children alone.
 - `MdGalleryLocalizationTests` exercises `GalleryLocalization.Apply`, which nothing did before. The
   translation table is built in a static initialiser, so a key written twice throws the first time a
   page is localized - and the duplicate `Navigation` key above is exactly that. The tests translate a

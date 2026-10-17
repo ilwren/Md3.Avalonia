@@ -156,7 +156,6 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Slidable item", () => new SlidableItemGalleryPage());
         AddPage("Spin kit", () => new SpinKitGalleryPage());
         AddPage("Staggered panel", () => new StaggeredPanelGalleryPage());
-        AddPage("Side sheet", () => new SideSheetGalleryPage());
         AddPage("Tag input", () => new TagInputGalleryPage());
         AddPage("Timeline", () => new TimelineGalleryPage());
         AddPage("Transfer", () => new TransferGalleryPage());
