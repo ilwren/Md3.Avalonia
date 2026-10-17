@@ -73,14 +73,21 @@ public sealed class MdGalleryIndexTests
             Assert.Equal(navigationTitles.OrderBy(title => title, StringComparer.OrdinalIgnoreCase), navigationTitles);
             Assert.Contains("Numeric input", navigationTitles);
 
+            var communicationHeader = Assert.Single(sidebar.Children.OfType<TextBlock>(),
+                text => text.Text == "COMMUNICATION");
+            var communicationStart = sidebar.Children.IndexOf(communicationHeader);
             var libraryHeader = Assert.Single(sidebar.Children.OfType<TextBlock>(),
                 text => text.Text == "LIBRARY EXTENSIONS");
             var libraryStart = sidebar.Children.IndexOf(libraryHeader);
+            var communicationButtons = sidebar.Children.Skip(communicationStart + 1)
+                .Take(libraryStart - communicationStart - 1).OfType<MdButton>().ToArray();
+            Assert.Contains(communicationButtons, button => button.Content?.ToString() == "Notifications");
             var libraryButtons = sidebar.Children.Skip(libraryStart + 1)
                 .Take(allComponentsStart - libraryStart - 1).OfType<MdButton>().ToArray();
             var libraryTitles = libraryButtons.Select(button => button.Content?.ToString() ?? string.Empty).ToArray();
             Assert.Equal(libraryTitles.OrderBy(title => title, StringComparer.OrdinalIgnoreCase), libraryTitles);
             Assert.DoesNotContain(libraryButtons, button => button.Name == "NumericNav");
+            Assert.DoesNotContain(libraryButtons, button => button.Content?.ToString() == "Notifications");
         }
         finally { window.Close(); }
 
@@ -103,6 +110,13 @@ public sealed class MdGalleryIndexTests
                     .Select(button => button.Content?.ToString() ?? string.Empty).ToArray();
                 Assert.Equal(links.OrderBy(title => title, StringComparer.OrdinalIgnoreCase), links);
             }
+
+            var notificationsButton = overview.GetLogicalDescendants().OfType<MdButton>()
+                .Single(button => button.Content?.ToString() == "Notifications");
+            var notificationsCard = notificationsButton.GetLogicalAncestors().OfType<Border>()
+                .Single(border => border.Classes.Contains("gallery-section"));
+            Assert.Equal("Communication", notificationsCard.GetLogicalDescendants().OfType<TextBlock>()
+                .Single(text => text.Classes.Contains("h2")).Text);
 
             var numericButton = overview.GetLogicalDescendants().OfType<MdButton>()
                 .Single(button => button.Content?.ToString() == "Numeric input");

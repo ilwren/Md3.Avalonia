@@ -19,7 +19,7 @@ internal static class GalleryLocalization
         ["Get started"]="开始使用", ["Develop"]="开发", ["Foundations"]="基础", ["Styles"]="样式", ["Components"]="组件",
         ["Avalonia component gallery"]="Avalonia 组件库", ["Headings are generated from the active page. Activate one to move it into view."]="目录根据当前页面的标题生成；激活一项即可将对应内容滚动到视图中。",
         ["Search components"]="搜索组件", ["Language"]="语言", ["Theme"]="主题", ["Light"]="浅色", ["Dark"]="深色", ["System"]="跟随系统",
-        ["COMPONENTS"]="组件", ["FOUNDATIONS"]="基础", ["Components overview"]="组件概览", ["SAMPLES & APPS"]="示例应用", ["LIBRARY EXTENSIONS"]="库扩展", ["ALL COMPONENTS"]="全部组件", ["On this page"]="本页内容", ["Overview"]="概览", ["Examples"]="示例", ["Usage"]="用法", ["API"]="API",
+        ["COMPONENTS"]="组件", ["FOUNDATIONS"]="基础", ["Components overview"]="组件概览", ["COMMUNICATION"]="沟通", ["SAMPLES & APPS"]="示例应用", ["LIBRARY EXTENSIONS"]="库扩展", ["ALL COMPONENTS"]="全部组件", ["On this page"]="本页内容", ["Overview"]="概览", ["Examples"]="示例", ["Usage"]="用法", ["API"]="API",
         ["Android settings"]="Android 设置", ["Clock app"]="时钟应用", ["Tasks & todo"]="任务待办", ["Settings cards"]="设置卡片", ["Breadcrumbs"]="面包屑导航",
         ["Components are interactive building blocks for creating a user interface. They can be organized into categories based on their purpose: Action, containment, communication, navigation, selection, and text input."]="组件是构建用户界面的交互式基础单元。它们可以按用途组织为操作、容器、沟通、导航、选择和文本输入等类别。",
         ["Action"]="操作", ["Containment"]="容器", ["Communication"]="沟通", ["Navigation"]="导航", ["Selection"]="选择", ["Text input"]="文本输入",

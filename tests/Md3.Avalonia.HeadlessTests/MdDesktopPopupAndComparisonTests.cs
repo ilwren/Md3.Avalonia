@@ -11,6 +11,7 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
@@ -31,6 +32,12 @@ public sealed class MdDesktopPopupAndComparisonTests
 {
     private static T Descendant<T>(Visual root, string name) where T : Visual =>
         root.GetVisualDescendants().OfType<T>().Single(v => (v as StyledElement)?.Name == name);
+
+    private static IBrush Brush(StyledElement scope, string key)
+    {
+        Assert.True(Application.Current!.TryGetResource(key, scope.ActualThemeVariant, out var value), key);
+        return Assert.IsAssignableFrom<IBrush>(value);
+    }
 
     // ---------------------------------------------------------------- dialog replacement
 
@@ -724,6 +731,8 @@ public sealed class MdDesktopPopupAndComparisonTests
 
             var displayText = Descendant<TextBlock>(cascader, "PART_DisplayText");
             Assert.Equal(cascader.PlaceholderText, displayText.Text);
+            Assert.Equal(16, displayText.FontSize);
+            Assert.Equal(Brush(cascader, "Md.Sys.Color.OnSurfaceVariant.Brush"), displayText.Foreground);
             var displayOrigin = displayText.TranslatePoint(default, window);
             Assert.NotNull(displayOrigin);
             var displayBounds = new Rect(displayOrigin!.Value, displayText.Bounds.Size);
@@ -738,7 +747,20 @@ public sealed class MdDesktopPopupAndComparisonTests
             var surface = Assert.IsAssignableFrom<Border>(popup.Child);
             Assert.True(popup.IsUsingOverlayLayer);
             Assert.True(surface.IsVisible);
+            Assert.Equal(new CornerRadius(0, 0, 4, 4), surface.CornerRadius);
+            Assert.Equal(new Thickness(4), surface.Padding);
+            Assert.Equal(328, surface.MaxHeight);
+            Assert.Equal(Brush(surface, "Md.Sys.Color.SurfaceContainerLow.Brush"), surface.Background);
+            Assert.True(Application.Current!.TryGetResource("Md.Sys.Elevation.Level2", surface.ActualThemeVariant, out var level2));
+            Assert.Equal(level2, surface.BoxShadow);
             PointerInput.AssertReachable(surface);
+
+            var menuList = surface.GetVisualDescendants().OfType<ListBox>().First();
+            var firstMenuItem = Assert.IsAssignableFrom<ListBoxItem>(menuList.ContainerFromIndex(0));
+            Assert.Equal(72, firstMenuItem.MinHeight);
+            Assert.Equal(new Thickness(0, 2), firstMenuItem.Margin);
+            Assert.Equal(new Thickness(16, 12), firstMenuItem.Padding);
+            Assert.Equal(16, firstMenuItem.FontSize);
 
             var anchor = Descendant<Button>(cascader, "PART_Anchor");
             var anchorBottomLeft = anchor.TranslatePoint(new Point(0, anchor.Bounds.Height), window);
@@ -789,6 +811,7 @@ public sealed class MdDesktopPopupAndComparisonTests
             Assert.False(cascader.IsDropDownOpen);
             Assert.Equal(expectedPath, cascader.DisplayText);
             Assert.Equal(expectedPath, displayText.Text);
+            Assert.Equal(Brush(cascader, "Md.Sys.Color.OnSurface.Brush"), displayText.Foreground);
             Assert.Equal(new[] { design, material, controls }, cascader.SelectedPath);
             var status = window.GetVisualDescendants().OfType<TextBlock>()
                 .Single(text => text.Name == "CascaderStatus");
