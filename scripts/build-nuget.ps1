@@ -4,6 +4,7 @@
 param(
     [string]$Output = "$PSScriptRoot/../artifacts/nuget",
     [string]$Configuration = "Release",
+    [string]$Version = "",
     [switch]$NoRestore,
     # Local iteration helper: every run stamps a unique version so NuGet cannot silently keep
     # serving a previously cached package of the same version from %USERPROFILE%\.nuget\packages.
@@ -36,8 +37,18 @@ if ($SkipFontCheck) {
     if ($LASTEXITCODE -ne 0) { throw "Official Material Symbols font verification failed." }
 }
 
+if ($Version -and $Local) {
+    throw "-Version and -Local cannot be combined."
+}
+if ($Version -and $Version -notmatch '^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$') {
+    throw "Invalid package version '$Version'. Use SemVer such as 0.4.6 or 0.4.6-preview.1."
+}
+
 $versionArgs = @()
-if ($Local) {
+if ($Version) {
+    $versionArgs = @("-p:Version=$Version")
+    Write-Host "Package version override: $Version" -ForegroundColor Cyan
+} elseif ($Local) {
     # Read the base version from the library csproj and stamp a unique local prerelease on top.
     [xml]$csproj = Get-Content (Join-Path $root "src/Md3.Avalonia/Md3.Avalonia.csproj")
     $base = $csproj.Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
@@ -60,7 +71,7 @@ foreach ($proj in $projects) {
     }
 
     if (-not $NoRestore) {
-        $restoreArgs = @("restore", $proj, "--nologo") + $projectArgs
+        $restoreArgs = @("restore", $proj, "--nologo") + $projectArgs + $versionArgs
         dotnet @restoreArgs
         if ($LASTEXITCODE -ne 0) { throw "Restore failed for $proj" }
     }
@@ -77,7 +88,7 @@ Write-Host ""
 Write-Host "Built packages:" -ForegroundColor Green
 Get-ChildItem $outputDir -Filter *.nupkg | Sort-Object LastWriteTime -Descending |
     Select-Object -First 8 | ForEach-Object { Write-Host "  $($_.FullName)" -ForegroundColor Green }
-if (-not $Local) {
+if (-not $Local -and -not $Version) {
     Write-Host ""
     Write-Host "WARNING: the version is unchanged. NuGet will keep restoring the previously cached" -ForegroundColor Yellow
     Write-Host "copy from %USERPROFILE%\.nuget\packages instead of this build. Either pass -Local, or" -ForegroundColor Yellow

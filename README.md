@@ -208,7 +208,7 @@ python3 scripts/verify-fonts.py
 
 验证器会核对完整字体与 Lite 子集 checksum、真实 variable-font tables 和 glyph 数量，拒绝缺失、占位矩形或被替换的二进制。Apache-2.0 字体许可证同时打入两个 Icons 包。
 
-打包脚本要求 .NET 10 SDK、Java 17 和 Android workload（`dotnet workload install android`）；`scripts/build-nuget.sh` 与 `scripts/build-nuget.ps1` 都会构建七个正式包，并在 `artifacts/nuget`（或自定义输出目录）生成七个 `.nupkg` 和七个 `.snupkg`。Bash 使用 `--output`，PowerShell 使用 `-Output` 修改输出目录。系统通知包用法与平台前置条件见 [`src/Md3.Avalonia.Notifications/README.md`](src/Md3.Avalonia.Notifications/README.md)。
+打包脚本要求 .NET 10 SDK、Java 17 和 Android workload（`dotnet workload install android`）；`scripts/build-nuget.sh` 与 `scripts/build-nuget.ps1` 都会构建七个正式包，并在 `artifacts/nuget`（或自定义输出目录）生成七个 `.nupkg` 和七个 `.snupkg`。Bash 使用 `--output`，PowerShell 使用 `-Output` 修改输出目录；发布构建可分别使用 `--version` / `-Version` 覆盖包版本。手动预览版/正式版发布流程见 [`docs/PUBLISHING.md`](docs/PUBLISHING.md)。系统通知包用法与平台前置条件见 [`src/Md3.Avalonia.Notifications/README.md`](src/Md3.Avalonia.Notifications/README.md)。
 
 同时引用 Core 与 Icons 后不需要手动调用 `ConfigureFonts`：`MdSymbols` 和核心 `MdSymbolPresenter` 会自动发现 Icons provider、注册程序集内嵌字体，验证 internal family、typeface 和官方 `search` glyph，再注入核心 `Md.Icon.*` resources。验证失败时 symbol glyph 保持隐藏，不使用 Unicode 仿制图标。
 

@@ -10,6 +10,7 @@ Md3.Avalonia.RichEditor and Md3.Avalonia.Notifications.
 Usage:
   scripts/build-nuget.sh [--output /absolute/or/relative/path]
                          [--configuration Release]
+                         [--version 0.4.6-preview.1]
                          [--no-restore]
                          [--keep-intermediate]
 
@@ -29,6 +30,7 @@ EOF
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONFIGURATION="Release"
 OUTPUT="$ROOT/artifacts/nuget"
+PACKAGE_VERSION=""
 RESTORE=1
 KEEP_INTERMEDIATE=0
 
@@ -40,6 +42,9 @@ while (($#)); do
     --configuration)
       [[ $# -ge 2 ]] || { echo "error: --configuration requires a value" >&2; exit 2; }
       CONFIGURATION="$2"; shift 2 ;;
+    --version)
+      [[ $# -ge 2 ]] || { echo "error: --version requires a value" >&2; exit 2; }
+      PACKAGE_VERSION="$2"; shift 2 ;;
     --no-restore)
       RESTORE=0; shift ;;
     --keep-intermediate)
@@ -54,6 +59,15 @@ while (($#)); do
 done
 
 if [[ "$OUTPUT" != /* ]]; then OUTPUT="$ROOT/$OUTPUT"; fi
+
+if [[ -n "$PACKAGE_VERSION" ]] && [[ ! "$PACKAGE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]; then
+  echo "error: invalid package version '$PACKAGE_VERSION' (expected SemVer such as 0.4.6 or 0.4.6-preview.1)" >&2
+  exit 2
+fi
+VERSION_ARGS=()
+if [[ -n "$PACKAGE_VERSION" ]]; then
+  VERSION_ARGS=("-p:Version=$PACKAGE_VERSION")
+fi
 
 command -v dotnet >/dev/null 2>&1 || { echo "error: dotnet was not found in PATH" >&2; exit 1; }
 SDK_VERSION="$(dotnet --version)"
@@ -111,18 +125,18 @@ project_args_for() {
 if ((RESTORE)); then
   for proj in "${PROJECTS[@]}"; do
     mapfile -t PROJECT_ARGS < <(project_args_for "$proj")
-    dotnet restore "$proj" --nologo "${PROJECT_ARGS[@]}"
+    dotnet restore "$proj" --nologo "${PROJECT_ARGS[@]}" "${VERSION_ARGS[@]}"
   done
 fi
 
 NO_RESTORE=(--no-restore)
 for proj in "${PROJECTS[@]}"; do
   mapfile -t PROJECT_ARGS < <(project_args_for "$proj")
-  dotnet build "$proj" -c "$CONFIGURATION" "${NO_RESTORE[@]}" --nologo "${PROJECT_ARGS[@]}"
-  dotnet pack "$proj" -c "$CONFIGURATION" --no-build --no-restore --nologo -o "$OUTPUT" "${PROJECT_ARGS[@]}"
+  dotnet build "$proj" -c "$CONFIGURATION" "${NO_RESTORE[@]}" --nologo "${PROJECT_ARGS[@]}" "${VERSION_ARGS[@]}"
+  dotnet pack "$proj" -c "$CONFIGURATION" --no-build --no-restore --nologo -o "$OUTPUT" "${PROJECT_ARGS[@]}" "${VERSION_ARGS[@]}"
 done
 
-VERSION="$(sed -n 's:.*<Version>\([^<]*\)</Version>.*:\1:p' "${PROJECTS[0]}" | head -1)"
+VERSION="${PACKAGE_VERSION:-$(sed -n 's:.*<Version>\([^<]*\)</Version>.*:\1:p' "${PROJECTS[0]}" | head -1)}"
 [[ -n "$VERSION" ]] || { echo "error: package version is missing" >&2; exit 1; }
 PACKAGE_IDS=(Md3.Avalonia Md3.Avalonia.Icons Md3.Avalonia.Icons.Lite Md3.Avalonia.Extra Md3.Avalonia.DataGrid Md3.Avalonia.RichEditor Md3.Avalonia.Notifications)
 for package_id in "${PACKAGE_IDS[@]}"; do
