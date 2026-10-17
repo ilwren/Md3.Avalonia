@@ -14,7 +14,7 @@ internal static class Program
 #if WINDOWS
         try
         {
-            WindowsToastRegistration.RegisterForCurrentUser();
+            GalleryNotificationIdentity.WindowsShortcutPath = WindowsToastRegistration.RegisterForCurrentUser();
             GalleryNotificationIdentity.WindowsRegistrationSucceeded = true;
         }
         catch (Exception exception)

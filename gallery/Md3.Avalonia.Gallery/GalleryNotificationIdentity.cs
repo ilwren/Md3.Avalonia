@@ -6,5 +6,7 @@ internal static class GalleryNotificationIdentity
 
     public static bool WindowsRegistrationSucceeded { get; set; }
 
+    public static string? WindowsShortcutPath { get; set; }
+
     public static string? WindowsRegistrationError { get; set; }
 }

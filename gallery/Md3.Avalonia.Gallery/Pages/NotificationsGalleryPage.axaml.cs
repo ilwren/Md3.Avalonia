@@ -54,7 +54,7 @@ public partial class NotificationsGalleryPage : UserControl
             // Keep the gallery responsive and expose the backend's actionable diagnostic here.
             var registrationError = GalleryNotificationIdentity.WindowsRegistrationError;
             var detail = exception is MdSystemNotificationException { InnerException: { } innerException }
-                ? $"{exception.Message} {innerException.Message}"
+                ? $"{exception.Message} [{innerException.GetType().Name}, HRESULT 0x{innerException.HResult:X8}: {innerException.Message}]"
                 : exception.Message;
             var diagnostic = string.IsNullOrWhiteSpace(registrationError)
                 ? detail
@@ -80,8 +80,8 @@ public partial class NotificationsGalleryPage : UserControl
             if (GalleryNotificationIdentity.WindowsRegistrationSucceeded)
             {
                 return L(
-                    $"Windows toast identity is ready ({GalleryNotificationIdentity.WindowsAppUserModelId}). Toasts appear outside this Gallery window; press Win+N to check Notification Center.",
-                    $"Windows Toast 身份已就绪（{GalleryNotificationIdentity.WindowsAppUserModelId}）。通知会显示在 Gallery 窗口之外；按 Win+N 打开通知中心。");
+                    $"Windows toast identity is ready ({GalleryNotificationIdentity.WindowsAppUserModelId}); Start-menu shortcut: {GalleryNotificationIdentity.WindowsShortcutPath}. Toasts appear outside this Gallery window; press Win+N to check Notification Center.",
+                    $"Windows Toast 身份已就绪（{GalleryNotificationIdentity.WindowsAppUserModelId}）；开始菜单快捷方式：{GalleryNotificationIdentity.WindowsShortcutPath}。通知会显示在 Gallery 窗口之外；按 Win+N 打开通知中心。");
             }
 
             return L(

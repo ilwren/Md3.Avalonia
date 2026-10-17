@@ -90,7 +90,7 @@
             <TextBlock Margin="14,4,14,8" FontSize="22" FontWeight="Medium" Text="Components" />
             <md:MdButton x:Name="ComponentsOverviewNav" Content="Components overview" Variant="Text" HorizontalContentAlignment="Left" Click="ShowComponents" />
             <Border Margin="0,12,0,4" Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
-            <TextBlock Margin="14,8,14,10" Classes="body" Text="COMMUNICATION" />
+            <TextBlock Margin="14,8,14,10" Classes="body" Text="COMMUNICATIONS" />
             <md:MdButton x:Name="NotificationsNav" Content="Notifications" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNotifications" />
             <Border Margin="0,12,0,4" Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
             <TextBlock Margin="14,8,14,10" Classes="body" Text="SAMPLES &amp; APPS" />
@@ -153,6 +153,7 @@
             <md:MdButton x:Name="NavigationBarNav" Content="Navigation bar" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNavigationBar" />
             <md:MdButton x:Name="NavigationDrawerNav" Content="Navigation drawer" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNavigationDrawer" />
             <md:MdButton x:Name="AdaptiveNav" Content="Navigation rail &amp; adaptive" Variant="Text" HorizontalContentAlignment="Left" Click="ShowAdaptive" />
+            <md:MdButton x:Name="NotificationsAllNav" Content="Notifications" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNotifications" />
             <md:MdButton x:Name="NumericNav" Content="Numeric input" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNumeric" />
             <md:MdButton x:Name="PagedItemsNav" Content="Paged items" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPagedItems" />
             <md:MdButton x:Name="PaginatedTableNav" Content="Paginated table" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPaginatedTable" />

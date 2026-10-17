@@ -474,10 +474,9 @@
                  IsOpen="{TemplateBinding IsPopupOpen}"
                  Placement="BottomEdgeAlignedLeft"
                  PlacementTarget="{Binding #PART_Anchor}"
-                 HorizontalOffset="0" VerticalOffset="-14"
+                 HorizontalOffset="-12" VerticalOffset="-14"
                  ShouldUseOverlayLayer="True"
                  IsLightDismissEnabled="True"
-                 OverlayDismissEventPassThrough="True"
                  WindowManagerAddShadowHint="False">
             <Popup.Styles>
               <Style Selector="PopupRoot">
@@ -487,7 +486,8 @@
               </Style>
             </Popup.Styles>
             <Border Name="PART_Surface"
-                    Margin="0,14,0,16"
+                    Margin="12,14,12,16"
+                    MinWidth="{Binding Bounds.Width, ElementName=PART_Anchor}"
                     MaxHeight="{DynamicResource Md.Comp.ComboBox.Menu.MaxHeight}"
                     HorizontalAlignment="Stretch"
                     Padding="{DynamicResource Md.Comp.ComboBox.Menu.Padding}"
@@ -499,7 +499,7 @@
                     RenderTransform="scale(0.8) translate(0px,-8px)"
                     RenderTransformOrigin="0%,0%">
               <ItemsControl Name="PART_Columns" Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding Columns}">
-                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                   <DataTemplate>
                     <ListBox Theme="{StaticResource EcoListTheme}"

@@ -747,6 +747,8 @@ public sealed class MdDesktopPopupAndComparisonTests
             var surface = Assert.IsAssignableFrom<Border>(popup.Child);
             Assert.True(popup.IsUsingOverlayLayer);
             Assert.True(surface.IsVisible);
+            Assert.Equal(new Thickness(12, 14, 12, 16), surface.Margin);
+            Assert.Equal(-12, popup.HorizontalOffset);
             Assert.Equal(new CornerRadius(0, 0, 4, 4), surface.CornerRadius);
             Assert.Equal(new Thickness(4), surface.Padding);
             Assert.Equal(328, surface.MaxHeight);
@@ -763,6 +765,8 @@ public sealed class MdDesktopPopupAndComparisonTests
             Assert.Equal(16, firstMenuItem.FontSize);
 
             var anchor = Descendant<Button>(cascader, "PART_Anchor");
+            Assert.True(surface.Bounds.Width >= anchor.Bounds.Width,
+                $"the open Cascader menu ({surface.Bounds.Width:0.##} DIP) should not be narrower than its field ({anchor.Bounds.Width:0.##} DIP)");
             var anchorBottomLeft = anchor.TranslatePoint(new Point(0, anchor.Bounds.Height), window);
             var surfaceTopLeft = surface.TranslatePoint(default, window);
             Assert.NotNull(anchorBottomLeft);

@@ -45,7 +45,7 @@ public partial class MainWindow : Window
             ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, BreadcrumbNav, TextFieldNav,
             CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, ColorPickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
-            NavigationDrawerNav, AdaptiveNav, NotificationsNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
+            NavigationDrawerNav, AdaptiveNav, NotificationsNav, NotificationsAllNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
             SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, BorderlessWindowNav,
 AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             BeforeAfterNav, CalendarNav, CascaderNav, ChartNav,
@@ -231,7 +231,8 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
     private void ShowNavigationBar(object? s, RoutedEventArgs e) => Navigate(new NavigationBarGalleryPage(), NavigationBarNav);
     private void ShowNavigationDrawer(object? s, RoutedEventArgs e) => Navigate(new NavigationDrawerGalleryPage(), NavigationDrawerNav);
     private void ShowAdaptive(object? s, RoutedEventArgs e) => Navigate(new AdaptiveGalleryPage(), AdaptiveNav);
-    private void ShowNotifications(object? s, RoutedEventArgs e) => Navigate(new NotificationsGalleryPage(), NotificationsNav);
+    private void ShowNotifications(object? s, RoutedEventArgs e) =>
+        Navigate(new NotificationsGalleryPage(), s as MdButton ?? NotificationsNav);
     private void ShowSearch(object? s, RoutedEventArgs e) => Navigate(new SearchGalleryPage(), SearchNav);
     private void ShowSettingsCard(object? s, RoutedEventArgs e) => Navigate(new SettingsCardGalleryPage(), SettingsCardNav);
     private void ShowSheets(object? s, RoutedEventArgs e) => Navigate(new SheetGalleryPage(), SheetNav);
@@ -498,6 +499,9 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
         var query = GallerySearch.Text?.Trim() ?? string.Empty;
         foreach (var entry in _galleryIndex)
             entry.Button.IsVisible = string.IsNullOrEmpty(query) || entry.Matches(query);
+        // Notifications is indexed through the Communications section, but remains duplicated in
+        // the alphabetical browse list so the "ALL COMPONENTS" index is genuinely complete.
+        NotificationsAllNav.IsVisible = NotificationsNav.IsVisible;
     }
 
     private void GallerySearchSubmitted(object? sender, string query)

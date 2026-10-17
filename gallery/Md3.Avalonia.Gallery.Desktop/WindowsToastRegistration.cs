@@ -15,8 +15,12 @@ internal static class WindowsToastRegistration
 {
     private static readonly Guid ShellLinkClassId = new("00021401-0000-0000-C000-000000000046");
     private static readonly Guid AppUserModelIdFormatId = new("9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3");
+    private const uint ShellChangeCreate = 0x00000002;
+    private const uint ShellChangeUpdateItem = 0x00002000;
+    private const uint ShellChangePathUnicode = 0x0005;
+    private const uint ShellChangeFlush = 0x1000;
 
-    public static void RegisterForCurrentUser()
+    public static string RegisterForCurrentUser()
     {
         ThrowIfFailed(SetCurrentProcessExplicitAppUserModelID(GalleryNotificationIdentity.WindowsAppUserModelId));
 
@@ -30,6 +34,7 @@ internal static class WindowsToastRegistration
 
         Directory.CreateDirectory(programsPath);
         var shortcutPath = Path.Combine(programsPath, "Material 3 for Avalonia Gallery.lnk");
+        var shortcutAlreadyExisted = File.Exists(shortcutPath);
         var linkType = Type.GetTypeFromCLSID(ShellLinkClassId, throwOnError: true)
             ?? throw new InvalidOperationException("Windows ShellLink is unavailable.");
         var shellLinkObject = Activator.CreateInstance(linkType)
@@ -63,6 +68,19 @@ internal static class WindowsToastRegistration
             if (Marshal.IsComObject(shellLinkObject))
                 Marshal.FinalReleaseComObject(shellLinkObject);
         }
+
+        if (!File.Exists(shortcutPath))
+            throw new IOException("Windows did not persist the Gallery Start-menu shortcut.");
+
+        // Notify the Windows shell immediately. Toast registration can fail if Explorer has not
+        // indexed a shortcut created during this launch yet, even though the .lnk was saved.
+        SHChangeNotify(
+            shortcutAlreadyExisted ? ShellChangeUpdateItem : ShellChangeCreate,
+            ShellChangePathUnicode | ShellChangeFlush,
+            shortcutPath,
+            IntPtr.Zero);
+
+        return shortcutPath;
     }
 
     private static void ThrowIfFailed(int hresult)
@@ -73,6 +91,13 @@ internal static class WindowsToastRegistration
     [DllImport("shell32.dll", ExactSpelling = true)]
     private static extern int SetCurrentProcessExplicitAppUserModelID(
         [MarshalAs(UnmanagedType.LPWStr)] string appId);
+
+    [DllImport("shell32.dll", ExactSpelling = true)]
+    private static extern void SHChangeNotify(
+        uint eventId,
+        uint flags,
+        [MarshalAs(UnmanagedType.LPWStr)] string path,
+        IntPtr item2);
 
     [ComImport]
     [Guid("000214F9-0000-0000-C000-000000000046")]

@@ -72,9 +72,10 @@ public sealed class MdGalleryIndexTests
                 .ToArray();
             Assert.Equal(navigationTitles.OrderBy(title => title, StringComparer.OrdinalIgnoreCase), navigationTitles);
             Assert.Contains("Numeric input", navigationTitles);
+            Assert.Contains("Notifications", navigationTitles);
 
             var communicationHeader = Assert.Single(sidebar.Children.OfType<TextBlock>(),
-                text => text.Text == "COMMUNICATION");
+                text => text.Text == "COMMUNICATIONS");
             var communicationStart = sidebar.Children.IndexOf(communicationHeader);
             var libraryHeader = Assert.Single(sidebar.Children.OfType<TextBlock>(),
                 text => text.Text == "LIBRARY EXTENSIONS");
@@ -115,7 +116,7 @@ public sealed class MdGalleryIndexTests
                 .Single(button => button.Content?.ToString() == "Notifications");
             var notificationsCard = notificationsButton.GetLogicalAncestors().OfType<Border>()
                 .Single(border => border.Classes.Contains("gallery-section"));
-            Assert.Equal("Communication", notificationsCard.GetLogicalDescendants().OfType<TextBlock>()
+            Assert.Equal("Communications", notificationsCard.GetLogicalDescendants().OfType<TextBlock>()
                 .Single(text => text.Classes.Contains("h2")).Text);
 
             var numericButton = overview.GetLogicalDescendants().OfType<MdButton>()
