@@ -255,6 +255,11 @@
 
 ### Gallery
 
+- The waveform page now decodes a real recording instead of drawing an invented curve. A 20-second
+  excerpt of `Okay` from MDN's `dom-examples` (CC0 1.0) ships as 16 kHz mono PCM in
+  `Assets/Media/demo-track.wav`, a chunk-walking WAV reader in `DemoTrack` turns it into samples,
+  `PeaksFromSamples` reduces them, and a timer walks the playhead across the decoded length. Nothing
+  reaches an audio device, so the demo needs no output hardware, no codec and no new dependency.
 - Usage sections no longer show placeholder code. 32 pages carried XAML only and 7 carried C#
   only, and the absent tab rendered as an empty box; the missing tab is now hidden.
 - 29 of the 34 pages that overflowed a 480 DIP window now reflow, by replacing fixed `Width` with

@@ -1,10 +1,15 @@
 using System;
+using Md3.Avalonia.Gallery.Pages;
+using Md3.Avalonia.Gallery;
+using System.Linq;
+using System.IO;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Md3.Avalonia.Extra.Controls;
@@ -190,6 +195,118 @@ public sealed class MdWaveformTests
             Assert.Equal(played, At(.1, .85));
         }
         finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void The_Bundled_Demo_Track_Decodes_To_Real_Samples()
+    {
+        // The gallery ships a real recording so the waveform demo is not a curve invented to look
+        // like one. If the asset stopped being packaged, or the reader stopped understanding it,
+        // the page would quietly draw an empty waveform instead of failing.
+        var track = DemoTrack.Load();
+
+        Assert.Equal(16000, track.SampleRate);
+        Assert.Equal(320000, track.Samples.Length);
+        Assert.Equal(TimeSpan.FromSeconds(20), track.Duration);
+
+        var peak = 0f;
+        var sumSquares = 0.0;
+        foreach (var sample in track.Samples)
+        {
+            Assert.InRange(sample, -1f, 1f);
+            var magnitude = MathF.Abs(sample);
+            if (magnitude > peak) peak = magnitude;
+            sumSquares += (double)sample * sample;
+        }
+
+        // A real mix is loud somewhere and quiet somewhere else. Silence would pass the range check
+        // above and still be a broken demo, so pin the level the track was normalized to.
+        Assert.InRange(peak, 0.5f, 1f);
+        Assert.InRange(Math.Sqrt(sumSquares / track.Samples.Length), 0.05, 0.9);
+    }
+
+    [AvaloniaFact]
+    public void The_Waveform_Page_Draws_From_The_Bundled_Track()
+    {
+        var page = new WaveformGalleryPage();
+        var waveforms = page.GetLogicalDescendants().OfType<MdWaveform>().ToList();
+
+        Assert.Equal(4, waveforms.Count);
+
+        // The fourth waveform on the page is the deliberate empty one, which shares every
+        // default with the scrubbing example, so the peaks are what tell them apart.
+        var main = waveforms.Single(control => control.IsInteractive && control.IsMirrored && control.Peaks is not null);
+        Assert.Equal(320, main.Peaks!.Count);
+        Assert.All(main.Peaks, peak => Assert.InRange(peak, 0f, 1f));
+        Assert.Contains(main.Peaks, peak => peak > 0.5f);
+
+        // The level history is a coarser reduction of the same buffer, not a second invented shape.
+        var meter = waveforms.Single(control => !control.IsMirrored);
+        Assert.Equal(96, meter.Peaks!.Count);
+
+        // The readout reports the decoded length, so it can only show 00:20 if the track decoded.
+        Assert.Contains(
+            page.GetLogicalDescendants().OfType<TextBlock>(),
+            block => block.Text.Contains("00:20"));
+    }
+
+    [Fact]
+    public void The_Wave_Reader_Averages_Stereo_And_Skips_Chunks_It_Does_Not_Need()
+    {
+        // A LIST chunk of odd length sits before fmt, which is what the chunk walk and its pad byte
+        // are for; a reader that assumed fixed offsets would read the format from the wrong place.
+        using var wave = BuildWave(2, 8000, [1000, -1000, -3000, 5000], withListChunk: true);
+        var track = DemoTrack.Load(wave);
+
+        Assert.Equal(8000, track.SampleRate);
+        Assert.Equal(2, track.Samples.Length);
+        Assert.Equal(0f, track.Samples[0], 4);
+        Assert.Equal(1000f / short.MaxValue, track.Samples[1], 4);
+    }
+
+    [Fact]
+    public void The_Wave_Reader_Rejects_A_Format_It_Cannot_Decode()
+    {
+        using var wave = BuildWave(1, 8000, [1, 2, 3], format: 3);
+        var error = Assert.Throws<InvalidDataException>(() => DemoTrack.Load(wave));
+        Assert.Contains("audio format 3", error.Message);
+    }
+
+    private static MemoryStream BuildWave(int channels, int sampleRate, short[] interleaved, ushort format = 1, bool withListChunk = false)
+    {
+        var data = new byte[interleaved.Length * 2];
+        Buffer.BlockCopy(interleaved, 0, data, 0, data.Length);
+
+        var stream = new MemoryStream();
+        var writer = new BinaryWriter(stream, System.Text.Encoding.UTF8, leaveOpen: true);
+        writer.Write(System.Text.Encoding.ASCII.GetBytes("RIFF"));
+        writer.Write(0);
+        writer.Write(System.Text.Encoding.ASCII.GetBytes("WAVE"));
+        if (withListChunk)
+        {
+            writer.Write(System.Text.Encoding.ASCII.GetBytes("LIST"));
+            writer.Write(5);
+            writer.Write(System.Text.Encoding.ASCII.GetBytes("INFO\0"));
+            writer.Write((byte)0);   // chunks are word aligned, so an odd one carries a pad byte
+        }
+        writer.Write(System.Text.Encoding.ASCII.GetBytes("fmt "));
+        writer.Write(16);
+        writer.Write(format);
+        writer.Write((ushort)channels);
+        writer.Write(sampleRate);
+        writer.Write(sampleRate * channels * 2);
+        writer.Write((ushort)(channels * 2));
+        writer.Write((ushort)16);
+        writer.Write(System.Text.Encoding.ASCII.GetBytes("data"));
+        writer.Write(data.Length);
+        writer.Write(data);
+
+        writer.Flush();
+        stream.Position = 4;
+        writer.Write((int)stream.Length - 8);
+        writer.Flush();
+        stream.Position = 0;
+        return stream;
     }
 
     private static void Press(Control target, Key key)
