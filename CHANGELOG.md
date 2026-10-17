@@ -149,8 +149,6 @@
 
 - CI jobs are bounded by a timeout; a deadlocked test previously held a runner for six hours.
 
-For details, see [`docs/RELEASE_NOTES_0.4.0-preview.1.md`](docs/RELEASE_NOTES_0.4.0-preview.1.md).
-
 ## [0.3.5-preview.1] - 2026-10-04
 
 Previously numbered `3.1.0-preview.1`, which was a typo for `0.3.1-preview.1`. The packages
@@ -198,8 +196,6 @@ leaving a version that reads as a major release.
 - Corrected the borderless-window icon default in both `README.md` and `docs/API.md`: a
   borderless window shows its icon by default, which both documents had stated backwards.
 - Refreshed the token-dictionary listing in `README.md`, which named 7 of the 11 dictionaries.
-
-For details, see [`docs/RELEASE_NOTES_0.3.5-preview.1.md`](docs/RELEASE_NOTES_0.3.5-preview.1.md).
 
 All notable changes follow Keep a Changelog. The project intends to use Semantic Versioning after the preview cycle.
 

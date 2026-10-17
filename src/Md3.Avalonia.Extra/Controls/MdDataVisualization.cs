@@ -114,7 +114,16 @@ public sealed class MdTimelineItemPresenter : ContentControl
 public enum MdChartKind { Line, Area, Bar }
 public sealed record MdChartPoint(double X, double Y, object? Label = null, object? Value = null);
 public sealed record MdChartSeries(string Name, IReadOnlyList<MdChartPoint> Points, IBrush? Brush = null);
-public interface IMdChartDataProvider { IReadOnlyList<MdChartSeries> GetSeries(); }
+/// <summary>Supplies series data to an <see cref="MdChart"/> on demand.</summary>
+/// <remarks>
+/// The chart does not subscribe to provider changes. Assign <see cref="MdChart.Provider"/> and call
+/// <see cref="MdChart.RefreshProvider"/> whenever the displayed series should be refreshed.
+/// </remarks>
+public interface IMdChartDataProvider
+{
+    /// <summary>Returns the series that should be rendered by the chart.</summary>
+    IReadOnlyList<MdChartSeries> GetSeries();
+}
 
 /// <summary>Provider-neutral lightweight chart. It owns presentation, axes, pointer hit-testing and selection—not a vendor data engine.</summary>
 public sealed class MdChart : Control
@@ -553,17 +562,35 @@ public static class MdRichEditorCommandConverters
     };
 }
 
+/// <summary>Connects <see cref="MdRichEditor"/> to an application-owned document engine.</summary>
+/// <remarks>
+/// Implementations own document storage and editing semantics. Raise <see cref="StateChanged"/>
+/// after document, selection, command availability, or formatting state changes so the editor can
+/// refresh its toolbar.
+/// </remarks>
 public interface IMdRichEditorAdapter
 {
+    /// <summary>Gets or replaces the adapter's document value.</summary>
     object? Document { get; set; }
+
+    /// <summary>Reports whether a command can be executed with the supplied parameter.</summary>
     bool CanExecute(MdRichEditorCommand command, object? parameter = null);
+
+    /// <summary>Executes a command against the current document and selection.</summary>
     void Execute(MdRichEditorCommand command, object? parameter = null);
+
+    /// <summary>Raised when document or command state changes.</summary>
     event EventHandler? StateChanged;
 }
 
-/// <summary>Optional formatting-state contract used by toggle-style rich-editor commands.</summary>
+/// <summary>Optional formatting-state contract for checked rich-editor toolbar commands.</summary>
+/// <remarks>
+/// An adapter may implement this alongside <see cref="IMdRichEditorAdapter"/>. Without it,
+/// toggle commands are presented as unchecked.
+/// </remarks>
 public interface IMdRichEditorStateAdapter
 {
+    /// <summary>Returns whether the requested toggle command is active at the current selection.</summary>
     bool IsCommandChecked(MdRichEditorCommand command);
 }
 

@@ -1,47 +1,34 @@
-# Release validation record
+# 发布验证清单
 
-Version: `0.4.1-preview.1`
-Automated baseline date: 2026-10-05
+本文记录发布前需要执行的自动化检查和人工平台验收。CI 结果与设备验收应基于准备发布的提交，不沿用历史运行结果。
 
-## Automated gates
+## 自动化检查
 
-| Gate | Command or evidence | Expected |
-|---|---|---|
-| Font provenance | `python3 scripts/verify-fonts.py` | Pinned complete Google variable TTF and real Lite subset pass SHA/table/glyph gates |
-| Restore | `dotnet restore Md3.Avalonia.sln` | Success |
-| Release compile | CI `Build Gallery Desktop` plus multi-platform Gallery workflow | 0 warnings, 0 errors for .NET 10 release projects |
-| Tests | `dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release` | 0 failed; no unexplained skipped tests |
-| Package | `bash scripts/build-nuget.sh` for Core, Icons, Icons.Lite, Extra and DataGrid | `.nupkg` and `.snupkg`; `0.4.1-preview.1` metadata/readme/notices/XML docs and one-way dependencies present |
-| Immediate artifact cleanup | after every build/test/pack, scan and remove `bin`, `obj`, `TestResults`, DLL/PDB and packages before continuing | No generated workspace artifacts |
-| Dynamic color | golden seed vectors, arbitrary seed/variant, contrast pairs, JSON round-trip | Pass |
-| Trim analysis | CI `Build tests` with `EnableTrimAnalyzer` on all five packages | 0 IL2xxx warnings; every suppression carries a written justification |
-| Trim escape hatches | `MdTrimmingTests` | Selector delegates on `MdDataGrid`, `MdAsyncSelect` and `MdSearchView` return without reflection; `IsTrimmable` present on shipped assemblies |
-| Responsive Gallery | 599/600/839/840/1199/1200/1599/1600 boundary behavior | Pass |
-| Visual directions/themes | LTR/RTL, Light/Dark, Standard/Medium/High | Render without exception |
-| Virtualization | large `MdList` and `MdCarousel` data sets | Bounded realized containers |
-| Lifecycle | repeated theme replacement and attach/detach | No resource-count/timer growth |
+CI 工作流覆盖以下项目：
 
-## Current automated result
+| 检查 | 命令或工作流 |
+|---|---|
+| 字体来源与二进制校验 | `python3 scripts/verify-fonts.py` |
+| API 类型与接口文档覆盖 | `python3 scripts/check-api-doc-coverage.py` |
+| 设计令牌检查 | `python3 scripts/lint-design-tokens.py` |
+| 桌面 Gallery 与 Headless 测试 | `.github/workflows/ci.yml` |
+| 六个 NuGet 包 | `scripts/build-nuget.sh`、`.github/workflows/build-nuget.yml` |
+| 多平台 Gallery 构建 | `.github/workflows/build-gallery.yml` |
+| Android UI 回归 | `.github/workflows/android-test.yml`，单独执行且不替代真机验收 |
 
-- GitHub CI builds the Desktop Gallery with warnings as errors, runs the complete xUnit v3 headless suite, emits named failure annotations, and verifies all NuGet packages.
-- The multi-platform workflow publishes Linux, Windows and macOS Desktop Gallery outputs and builds the Android APK with the .NET Android workload.
-- Independent package verification checks Core, Icons, Icons.Lite, Extra and DataGrid `0.4.1-preview.1` `.nupkg`/`.snupkg`, XML docs, README/notices and one-way dependencies. Temporary validation packages are deleted after inspection.
-- The final 0.3 preview run URL and exact test totals are recorded by GitHub Actions; release readiness requires **0 failed**. Do not copy historical 0.1 totals into this release record.
-- Android source/APK compilation is automated. Physical-device interaction is **not** inferred from compilation and remains in the unsigned matrix below.
+发布前核对当前提交上的 CI 结果，并确认包版本、包依赖、XML API 文档与第三方声明一致。规范验证的范围和限制见 [`SPEC_VERIFICATION.md`](SPEC_VERIFICATION.md)。
 
-## Manual platform matrix — not signed in this environment
+## 人工验收
 
-Do not mark an item complete without recording device/OS, assistive technology version, tester and date.
+对本次发布涉及的平台执行适用项目，并记录设备、系统版本、测试人员与日期。未执行的项目保持未签署状态。
 
-- [ ] Windows x64: pointer, keyboard-only, 100/150/200% scale, Narrator.
-- [ ] Windows ARM64: launch, Gallery navigation, popup/picker/dialog smoke.
-- [ ] macOS Apple Silicon: keyboard, trackpad, VoiceOver, Light/Dark/System.
-- [ ] Linux x64: Wayland/X11 launch, keyboard, Orca, font fallback.
-- [ ] Android ARM64 physical device API 26+: touch targets, scroll, IME, password reveal, popup light-dismiss, back, rotation, resume, low-memory recreation.
-- [ ] Android emulator compact/medium/expanded widths: theme switch and dynamic seed.
-- [ ] High-contrast/forced-color platform settings where exposed by the OS.
-- [ ] Localization review for English and Simplified Chinese, including picker culture behavior.
+- [ ] Android ARM64：安装启动、触摸与滚动、IME、弹层、系统返回、旋转及恢复。
+- [ ] Windows：窗口 chrome、键盘与指针操作、DPI 切换、Narrator。
+- [ ] macOS：窗口与输入行为、VoiceOver。
+- [ ] Linux：X11/Wayland 下的启动与输入、Orca。
+- [ ] Light、Dark、System 主题及中英文界面。
+- [ ] 高对比度与减少动态效果设置（适用时）。
 
-## Embedded official font gate
+## AOT 与裁剪
 
-The repository contains the complete Google Material Symbols Rounded variable TTF and a real-outline Lite subset. `scripts/verify-fonts.py` pins upstream commit `737e3324305806514d7909874fa1818ae1808232`, the full-font SHA-256, the deterministic Lite SHA-256, required variable-font tables, and minimum glyph counts. CI and both packaging scripts run this check; missing, placeholder, or substituted fonts fail before compilation. Both icon packages embed the applicable font and Apache-2.0 license. No look-alike Unicode fallback is used.
+六个包声明 `IsTrimmable` 与 `IsAotCompatible`。现有 AOT 探测工作流针对 Linux 桌面 Gallery；只有实际运行目标 RID 的发布与启动检查通过后，才记录该目标的 AOT 验证结果。不得将一个平台的结果推定为其他平台已验证。

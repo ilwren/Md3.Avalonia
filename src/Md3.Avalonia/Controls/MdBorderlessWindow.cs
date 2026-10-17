@@ -31,13 +31,29 @@ public sealed record MdWindowTemplateSettings(
     bool IsMaximized);
 
 /// <summary>Platform boundary for native-window operations; host applications may replace it.</summary>
+/// <remarks>
+/// Set a custom implementation through <see cref="MdBorderlessWindow.PlatformAdapter"/>.
+/// Deriving from <see cref="MdAvaloniaWindowPlatformAdapter"/> is an alternative when the
+/// Avalonia move/resize fallback is suitable.
+/// </remarks>
 public interface IMdWindowPlatformAdapter
 {
+    /// <summary>Identifies the platform this adapter targets.</summary>
     MdWindowPlatform Platform { get; }
+
+    /// <summary>Operations supported by this adapter.</summary>
     MdWindowCapabilities Capabilities { get; }
+
+    /// <summary>Applies window-decoration and title-bar settings to the supplied window.</summary>
     void Apply(MdBorderlessWindow window, MdBorderlessWindowOptions options);
+
+    /// <summary>Starts a native move operation; returns true when the adapter handled the press.</summary>
     bool TryBeginMove(MdBorderlessWindow window, PointerPressedEventArgs args);
+
+    /// <summary>Starts a native resize operation; returns true when the adapter handled the press.</summary>
     bool TryBeginResize(MdBorderlessWindow window, WindowEdge edge, PointerPressedEventArgs args);
+
+    /// <summary>Opens the platform system menu at a window-relative point when supported.</summary>
     bool TryShowSystemMenu(MdBorderlessWindow window, Point clientPoint);
 }
 

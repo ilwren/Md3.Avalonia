@@ -1,37 +1,25 @@
-# Compatibility and support policy
+# 兼容性与支持范围
 
-## Supported baseline
+## 当前基线
 
-| Area | Baseline | Status |
-|---|---|---|
-| .NET | .NET 8 and .NET 10 (`net8.0;net10.0`) | Both assets shipped by the three release packages |
-| Avalonia | 12.1.2 | Build and headless-test baseline |
-| Windows | x64/ARM64 hosts supported by Avalonia 12 | Library-compatible; device sign-off external |
-| macOS | x64/Apple Silicon hosts supported by Avalonia 12 | Library-compatible; VoiceOver sign-off external |
-| Linux | x64/ARM64 hosts supported by Avalonia 12 | Headless Linux tested; Orca sign-off external |
-| Android | `net8.0-android`, API 21 host project; release target API 26+ | Source host supplied; emulator/device sign-off external |
-| iOS/browser | Not a preview-release target | No support commitment |
+| 项目 | 基线 |
+|---|---|
+| .NET | `.NET 10`，控件包目标 `net10.0` |
+| Avalonia | `12.1.2` |
+| Desktop Gallery | Windows、macOS、Linux；CI 分别构建 |
+| Android Gallery | `net10.0-android`；构建需 .NET Android workload |
+| NuGet 版本 | `0.4.1-preview.1` |
 
-The runtime library references only `Avalonia` and `MaterialColorUtilities`. It does not reference Avalonia Desktop, Win32, X11, macOS, or a desktop-only theme package.
+所有 Avalonia 依赖版本集中定义于 [`Directory.Packages.props`](../Directory.Packages.props)。核心包使用 Avalonia 跨平台 API，不依赖桌面主题；可选 DataGrid 与 RichEditor 包分别增加其目标控件依赖。
 
-## Versioning
+## 平台验证边界
 
-- Preview packages may adjust API after a changelog entry and migration note.
-- Stable releases follow Semantic Versioning.
-- Avalonia minor-version upgrades are validated by Release build, headless tests, package validation and the platform matrix before the supported baseline changes.
-- The public `Md*` control types, styled properties, enums, theme JSON fields and resource-key names form the compatibility surface.
+桌面 Gallery 在 Linux、Windows 和 macOS CI 上构建；Android Gallery 由独立工作流构建。Android Emulator UI 回归为单独的可选工作流，构建成功不等同于真机验收。Windows 原生窗口 chrome、Android 生命周期和输入行为、屏幕阅读器及高 DPI 场景仍应按[发布验证清单](RELEASE_VALIDATION.md)在目标平台执行。
 
-## Android boundary
+当前预览版没有为 iOS 或浏览器/WASM 提供独立宿主与完整发布验收承诺。
 
-`samples/Md3.Avalonia.Gallery.Android` is deliberately kept outside the desktop solution so developers without the Android workload can build the library and desktop Gallery. Validate it with an installed .NET Android workload:
+## API 与裁剪
 
-```bash
-dotnet workload install android
-dotnet build samples/Md3.Avalonia.Gallery.Android -c Release
-```
+所有包均为预览版；升级前请检查 [`CHANGELOG.md`](../CHANGELOG.md)。每个包生成 XML API 文档，所有六个项目启用 `IsTrimmable` 和 `IsAotCompatible` 分析选项。它们不代表每个平台、每个 RID 都已完成裁剪或 AOT 发布验证；应用仍应使用其目标运行时执行发布测试。
 
-The host uses `ISingleViewApplicationLifetime` and `AndroidGalleryView`. Popup templates do not force `OverlayLayer`, preserving Avalonia's Android fallback behavior.
-
-## External acceptance still required
-
-The repository cannot substitute automation for ARM64 device behavior or assistive-technology review. Before a stable release, sign the checklist in `docs/RELEASE_VALIDATION.md` on physical or representative systems for Android touch/IME/rotation/lifecycle, Windows Narrator, macOS VoiceOver, and Linux Orca.
+公共控件类型、属性与主题资源属于预览 API。首次稳定发布前可能调整，届时会在变更记录中说明。

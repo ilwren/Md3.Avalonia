@@ -23,7 +23,20 @@ public sealed class MdDensity : AvaloniaObject
 /// <summary>Provider-neutral async page request used by paging, search, chat, and calendar adapters.</summary>
 public sealed record MdPageRequest(int PageKey, int PageSize, string? Query = null, CancellationToken CancellationToken = default);
 public sealed record MdPageResult<T>(IReadOnlyList<T> Items, int? NextPageKey, bool IsLastPage = false);
-public interface IMdPageProvider<T> { ValueTask<MdPageResult<T>> LoadPageAsync(MdPageRequest request); }
+
+/// <summary>Loads one page of application-owned data for an asynchronous collection adapter.</summary>
+/// <typeparam name="T">The item type returned by the provider.</typeparam>
+/// <remarks>
+/// The current <c>MdPagedItemsView</c> accepts a delegate rather than this interface;
+/// implementers can adapt <see cref="LoadPageAsync"/> to its <c>PageProvider</c> property.
+/// </remarks>
+public interface IMdPageProvider<T>
+{
+    /// <summary>Loads the requested page and observes its cancellation token.</summary>
+    /// <param name="request">Page index/key, requested size, optional query, and cancellation token.</param>
+    /// <returns>The items and continuation information for the page.</returns>
+    ValueTask<MdPageResult<T>> LoadPageAsync(MdPageRequest request);
+}
 
 /// <summary>Shared shortcut descriptor suitable for ICommand/CommunityToolkit.MVVM.</summary>
 public sealed record MdShortcutBinding(KeyGesture Gesture, ICommand Command, object? Parameter = null, string? Description = null);

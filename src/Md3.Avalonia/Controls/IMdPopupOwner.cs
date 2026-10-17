@@ -8,6 +8,7 @@ namespace Md3.Avalonia.Controls;
 /// <summary>Implemented by Material controls that own one temporary popup surface.</summary>
 public interface IMdPopupOwner
 {
+    /// <summary>Gets or sets whether this Material control's temporary popup is open.</summary>
     bool IsMaterialPopupOpen { get; set; }
 }
 
