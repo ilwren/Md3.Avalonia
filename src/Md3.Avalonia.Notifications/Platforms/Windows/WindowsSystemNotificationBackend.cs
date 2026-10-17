@@ -32,7 +32,17 @@ internal sealed class WindowsSystemNotificationBackend : IMdSystemNotificationBa
             var document = new XmlDocument();
             document.LoadXml(xml);
             var toast = new ToastNotification(document);
-            ToastNotificationManager.CreateToastNotifier(appUserModelId).Show(toast);
+            var notifier = ToastNotificationManager.CreateToastNotifier(appUserModelId);
+            var setting = notifier.Setting.ToString();
+            if (setting.StartsWith("Disabled", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(setting, "NotSupported", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(setting, "NotPresent", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new MdSystemNotificationException(
+                    $"Windows notifications are disabled for this app ({setting}). Enable notifications for the Gallery in Settings > System > Notifications.");
+            }
+
+            notifier.Show(toast);
             return Task.CompletedTask;
         }
         catch (Exception exception) when (exception is not MdSystemNotificationException)

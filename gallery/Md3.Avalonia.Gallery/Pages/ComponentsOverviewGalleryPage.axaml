@@ -33,13 +33,13 @@
           <StackPanel Spacing="12">
             <TextBlock Classes="h2" FontSize="24" Text="Communication" />
             <TextBlock Classes="body" FontSize="14" TextWrapping="Wrap" Text="Status, progress, prompts, and transient messages." />
+            <md:MdButton Content="Notifications" Tag="Notifications" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="About and licenses" Tag="About and licenses" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Badges" Tag="Badges" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Banner" Tag="Banner" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Dialogs" Tag="Dialogs" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Hover cards" Tag="Hover cards" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Loading" Tag="Loading" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
-            <md:MdButton Content="Notifications" Tag="Notifications" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Popover" Tag="Popover" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Progress" Tag="Progress" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Result view" Tag="Result view" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />

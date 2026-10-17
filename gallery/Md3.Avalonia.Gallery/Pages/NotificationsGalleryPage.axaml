@@ -20,6 +20,7 @@
                         AcceptsReturn="True" TextWrapping="Wrap" MinHeight="112" MaxWidth="560" />
           <md:MdButton x:Name="SendButton" Content="Send native notification" Variant="Filled"
                        HorizontalAlignment="Left" Click="SendNotification" />
+          <TextBlock x:Name="PlatformStatusText" Classes="body" TextWrapping="Wrap" />
           <TextBlock x:Name="StatusText" Classes="body" TextWrapping="Wrap"
                      Text="Ready to send a native notification." />
         </StackPanel>

@@ -15,6 +15,7 @@ internal static class Program
         try
         {
             WindowsToastRegistration.RegisterForCurrentUser();
+            GalleryNotificationIdentity.WindowsRegistrationSucceeded = true;
         }
         catch (Exception exception)
         {
