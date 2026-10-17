@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
@@ -469,15 +468,15 @@ public sealed class MdWaveform : Control
         UnsubscribeFromAncestorVisibility();
         foreach (var ancestor in this.GetVisualAncestors().OfType<Visual>())
         {
-            var handler = new PropertyChangedEventHandler(OnAncestorPropertyChanged);
+            var handler = new EventHandler<AvaloniaPropertyChangedEventArgs>(OnAncestorPropertyChanged);
             ancestor.PropertyChanged += handler;
             _ancestorVisibility.Add(new AncestorSubscription(ancestor, handler));
         }
     }
 
-    private void OnAncestorPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void OnAncestorPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
-        if (e.PropertyName == IsVisibleProperty.Name) UpdateAnimation();
+        if (e.Property == IsVisibleProperty) UpdateAnimation();
     }
 
     private void UnsubscribeFromAncestorVisibility()
@@ -486,7 +485,7 @@ public sealed class MdWaveform : Control
         _ancestorVisibility.Clear();
     }
 
-    private sealed class AncestorSubscription(Visual ancestor, PropertyChangedEventHandler handler) : IDisposable
+    private sealed class AncestorSubscription(Visual ancestor, EventHandler<AvaloniaPropertyChangedEventArgs> handler) : IDisposable
     {
         public void Dispose() => ancestor.PropertyChanged -= handler;
     }
