@@ -218,12 +218,36 @@
   resize that keeps the count has the children tracking it already and restarting a transition every
   frame would leave them permanently lagging the pointer. No reusable masonry panel for Avalonia
   turned up on GitHub, so both are in-house.
+- **`MdFloatingWindow`**, an in-app floating window in `Md3.Avalonia.Extra`. It is a child of the
+  panel it floats over rather than an operating-system window, so it inherits that page's theme,
+  motion scheme and accessibility tree, and the page underneath stays interactive - a dialog dims
+  and blocks, this only covers. The title bar drags and the lower-right grip resizes, and dragging
+  is clamped to the visual parent on every move, which is the trade an in-app surface makes for not
+  needing a compositor: the window can be parked anywhere in the panel but never lost off it.
+  Minimizing hides the content without unmounting it, so a hosted player or editor keeps its
+  bindings, media and undo history, and an explicit height is remembered rather than leaving a tall
+  empty box behind. Closing animates out and then unmounts through the same presence controller the
+  banner uses, so a close followed immediately by a reopen cancels the removal instead of
+  flickering. `CanDrag`, `CanResize`, `CanMinimize` and `CanClose` each remove one affordance, for a
+  host that wants a fixed panel rather than a window. No reusable Avalonia floating-window control
+  turned up on GitHub - the closest is a 1-star draggable layout panel with no title bar, elevation
+  or collapse, and everything else is a standalone overlay application - so this one is in-house,
+  and its theme lives in `AdvancedControls.axaml`.
 - `MdBreadcrumb` gains a `Powerline` variant.
 - [`docs/DIALOG_SERVICE.md`](docs/DIALOG_SERVICE.md): how to show dialogs from a view model
   through `IMdDialogService`, including the composition-root wiring.
 
 ### Fixed
 
+- **A pulsing `MdWaveform` never restarted after an ancestor hid it.** The frame loop lapses when
+  `ShouldAnimate` goes false, and that test includes `IsEffectivelyVisible` - but nothing told the
+  control when visibility came back. Avalonia exposes `IsEffectivelyVisible` only as a plain CLR
+  property and keeps its change event internal, so hiding a parent gives a child no notification at
+  all, and a loop that had already fallen idle stayed idle. A minimized floating window, a collapsed
+  expander or a switched-away tab would therefore freeze the pulse for good. The waveform now
+  subscribes to each visual ancestor's `IsVisible` while it is attached and re-evaluates on change;
+  Avalonia raises that after it has already propagated the new effective visibility to children, so
+  the re-check sees the truth rather than the previous frame's.
 - **Markdown code could fail to shape, intermittently, on a host that advertises a font it cannot
   build.** The gallery's markdown page threw `Could not create glyphTypeface. Font family: Consolas
   (key: fonts:SystemFonts)` in CI on some runs and not others. `ColorTextBlock.Avalonia`'s `CCode`

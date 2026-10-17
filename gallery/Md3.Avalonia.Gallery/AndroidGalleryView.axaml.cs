@@ -130,6 +130,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Chart", () => new ChartGalleryPage());
         AddPage("Waterfall", () => new WaterfallGalleryPage());
         AddPage("Waveform", () => new WaveformGalleryPage());
+        AddPage("Floating window", () => new FloatingWindowGalleryPage());
         AddPage("Chat view", () => new ChatViewGalleryPage());
         AddPage("Command palette", () => new CommandPaletteGalleryPage());
         AddPage("Data grids", () => new DataGridGalleryPage());

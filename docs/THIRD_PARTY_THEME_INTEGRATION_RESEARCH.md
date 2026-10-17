@@ -528,6 +528,36 @@ GitHub 上没有可引用的 Avalonia 瀑布流控件，也没有把「收起为
 对应物，只能做成应用窗口内的贴边悬浮层——这一点与刚撤下的 `MdSideSheet` 遇到的问题是同
 一个（贴边 + 指针目标 48dp + 展开动画），所以那次踩到的经验可以直接复用。
 
+## 补记（2026-10-17 之四）：应用内悬浮窗为什么是自研
+
+结论：**Avalonia 侧没有可主题化的悬浮窗控件。** `gh api search/repositories` 依次查
+`avalonia+floating+window`、`avalonia+draggable+panel`、`avalonia+picture-in-picture`、
+`avalonia+overlay+window+control`，能拿到的只有：`pureSaviour/DraggablePanel.Avalonia`（1★，MIT，
+README 为空，是个"带合成动画的可拖拽布局控件"，没有标题栏、阴影或折叠），其余全是独立应用
+（`Oiawlm/floating-transfer-station` 7★、`symoaka/soonish`、`INTICH082/ScreenSplitter` 3★ GPL-3.0
+这类贴在屏幕边缘或做 PiP 的桌面程序）。所以按既有规则自研，放进 `Md3.Avalonia.Extra`，控件名
+`MdFloatingWindow`。
+
+过程中确认下来的四件事，都不看源码就想当然会写错：
+
+- **`IsEffectivelyVisible` 不是 AvaloniaProperty。** Avalonia 12.1.2 的 `Visual.cs:209` 是
+  `public bool IsEffectivelyVisible { get; private set; } = true;`，变更事件
+  `IsEffectivelyVisibleChanged` 是 `internal`。也就是说祖先把自己藏起来时，子控件收不到任何
+  通知——`MdWaveform` 的脉冲帧循环因此会永久停在隐藏那一刻。可行的替代是订阅每个可视祖先的
+  `IsVisible`（它是 `StyledProperty`），并且顺序是安全的：`AvaloniaObject.RaisePropertyChanged`
+  先调 `OnPropertyChangedCore(e)`（`Visual` 在其中把新的有效可见性下发给子级），再
+  `_propertyChanged?.Invoke(...)`，所以订阅回调里读到的一定是已更新的值。
+- **`CreateTransform` 造的是 `TransformOperationsTransition`。** 值必须是 `TransformOperations`
+  而不是 `ScaleTransform`；Extra 里已经有 `MdContentPhaser.Scale(double)` 这个 internal 帮手，
+  用 `TransformOperations.Builder.AppendScale` 实现，同程序集可直接复用。
+- **模板部件上的本地值压过主题样式 setter。** 所以 `PART_Root` 的 `BoxShadow` 和最小化按钮的
+  `Icon` 都只能由 `^:dragging`、`^:minimized` 这类样式给出，不能在模板里写死，否则
+  "拖动时升一级阴影"和"折叠时换箭头"永远不生效。这与 `MdChip.axaml` 的注释是同一个坑。
+- **拖动的参考系必须是可视父级，不能是自己。** 窗口一边移动一边用 `GetPosition(this)` 算增量，
+  会追着指针跑并逐帧落后；`GetPosition(VisualParent)` 才是稳定的，也顺带给"不能拖出宿主"的钳制
+  提供了同一个坐标系。位置用 `X`/`Y` 表达、由控件自己写 `Margin` 实现，并在构造函数里把两个对齐
+  设成 `Left`/`Top`（本地值，故意压过主题，避免宿主居中导致上报位置失真）。
+
 ## 7. 数据来源
 
 - GitHub REST API（星标、最近提交、许可证、归档状态、仓库树、文件内容），2026-10-11。

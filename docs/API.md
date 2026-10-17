@@ -91,7 +91,7 @@ All component themes are scoped to `Md*` types. Registering `MaterialTheme` does
 - Optional Ecosystem Wave E: `MdSkeleton`, `MdSkeletonGroup`, `MdAnimationSequence`.
 - Optional Ecosystem Wave F: `MdPinInput`, `MdPinCell`, `MdTreeView`, `MdTreeNode`, `MdTreeRow`, `MdTagInput`, `MdTagEntry`, `MdTagChangedEventArgs`.
 - Existing optional Ecosystem controls: `MdAvatar`, `MdAvatarGroup`, `MdRating`, `MdBreadcrumb`, `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, and `MdStaggeredPanel`.
-- `MdBeforeAfter` provides draggable horizontal/vertical content comparison; `MdAnimatedText` provides typewriter/fade/pop-friendly text reveal; `MdSpinKit` contains optional non-Material loading recipes; `MdStaggeredPanel` provides cancelable staggered entrance motion. `MdWaveform` draws peak-driven audio waveforms with a scrubbable Material playhead and no bundled decoder. `MdWaterfallPanel` and `MdWaterfall` provide masonry placement. These are Extra controls; core `MdChart` remains provider-neutral and does not bundle a chart engine.
+- `MdBeforeAfter` provides draggable horizontal/vertical content comparison; `MdAnimatedText` provides typewriter/fade/pop-friendly text reveal; `MdSpinKit` contains optional non-Material loading recipes; `MdStaggeredPanel` provides cancelable staggered entrance motion. `MdWaveform` draws peak-driven audio waveforms with a scrubbable Material playhead and no bundled decoder. `MdWaterfallPanel` and `MdWaterfall` provide masonry placement. `MdFloatingWindow` is an in-app floating window: draggable within its host, resizable, and collapsible to its title bar with the hosted content left mounted. These are Extra controls; core `MdChart` remains provider-neutral and does not bundle a chart engine.
 
 ## Complete component catalog
 
@@ -147,7 +147,7 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 | **Selection and transfer** | `MdAsyncSelect`, `MdCalendar`, `MdCascader`, `MdCascaderItem`, `MdTransfer`, `MdColorPicker`, `MdColorPickerButton` |
 | **Feedback and identity** | `MdAvatar`, `MdAvatarGroup`, `MdRating`, `MdResultView`, `MdSkeleton`, `MdSkeletonGroup`, `MdPinInput`, `MdPinCell`, `MdTagInput`, `MdTagEntry` |
 | **Data visualization and editing** | `MdChart`, `MdChartSeries`, `MdChartPoint`, `MdRichEditor`, `MdRichTextEditor`, `MdChatView`, `MdChatMessage`, `MdTimeline`, `MdTimelineItem` |
-| **Motion and visual extras** | `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, `MdStaggeredPanel`, `MdWaveform`, `MdWaterfallPanel`, `MdWaterfall`, `MdAnimationSequence`, `MdAnimatedVisibility`, `MdContainerTransform`, `MdFadeThrough`, `MdSharedAxis`, `MdRevealHost`, `MdMorphPanel` |
+| **Motion and visual extras** | `MdBeforeAfter`, `MdAnimatedText`, `MdSpinKit`, `MdStaggeredPanel`, `MdWaveform`, `MdWaterfallPanel`, `MdWaterfall`, `MdFloatingWindow`, `MdAnimationSequence`, `MdAnimatedVisibility`, `MdContainerTransform`, `MdFadeThrough`, `MdSharedAxis`, `MdRevealHost`, `MdMorphPanel` |
 | **Navigation/content** | `MdBreadcrumb`, `MdBreadcrumbItem`, `MdGridTile`-style content helpers |
 
 `MdPagedItemsView.ItemTemplate` sets the presentation of each loaded record; `MdDataGrid` is a narrower surface than Avalonia `DataGrid` and is not a drop-in replacement for it.
@@ -330,6 +330,27 @@ The same optional package carries a masonry layout, in the two forms a host is l
 `AnimateLayout`, on by default, carries children to their new places when the column count changes - the same first-last-invert-play shape an implicit animation uses, timed by the `Md.Sys.Motion` tokens. Only a change of count is animated: a resize that keeps the count has the children tracking it frame by frame already, and starting a transition on every one of those frames would restart it before it finished and leave each child permanently lagging the pointer. Gliding writes a child's `RenderTransform` and `Transitions`, so a host that animates its own children will want it off.
 
 `MdWaterfall` is that panel behind an items control, for a feed bound to a collection rather than one written out by hand. It re-exposes the same four layout numbers and the theme's panel reads them back off the control, so a host never writes an `ItemsPanelTemplate`; replacing `ItemsPanel` is still supported and simply leaves them unused. The theme fills `Background` from `Md.Sys.Color.SurfaceContainerLowest`.
+
+## Floating windows
+
+```xml
+<Border Height="440">
+  <Grid>
+    <!-- the page, still interactive -->
+    <extra:MdFloatingWindow Title="Now playing" X="330" Y="36" Width="330"
+                            HeaderIcon="{DynamicResource Md.Icon.MusicNote}"
+                            Closed="OnPlayerClosed">
+      <extra:MdWaveform Height="56" IsPulsing="True" />
+    </extra:MdFloatingWindow>
+  </Grid>
+</Border>
+```
+
+`MdFloatingWindow` is a window inside the application rather than above it. It is a child of whatever panel it sits in, so it inherits that page's theme, motion scheme and accessibility tree, and it is clipped by the page the way any child is. The trade-off for not being an operating-system window is that it is bounded by its host, and the control leans into that: dragging is clamped to the visual parent on every move, so the window can be parked anywhere in the panel but never lost off it.
+
+The title bar drags, the lower-right grip resizes, and the minimize button collapses the window to its title bar. Minimizing hides the content without unmounting it, which is the whole point for a hosted player or editor: bindings, scroll position, media and undo history all survive the collapse, and an explicit `Height` is remembered and restored rather than leaving a tall empty box. `X` and `Y` hold the position and the control owns its `Margin` to realise them, so position it through those two properties rather than through the margin. `CanDrag`, `CanResize`, `CanMinimize` and `CanClose` each remove the affordance they name, for a host that wants a fixed panel rather than a window; the close button sets `IsOpen` to false and raises `Closed`.
+
+Closing animates out and then unmounts, and reopening inside that window cancels the removal, so a quick close/reopen does not flicker. The surface takes `Md.Sys.Shape.Corner.ExtraLarge` and `Md.Sys.Elevation.Level3`, and steps up to `Level5` while the pointer is holding it - the same raise a dragged card gets. Like everything else in Extra it is not the operating-system Dynamic Island and does not attempt to be one: on iOS and Android that surface is drawn by the system above every application, so no toolkit can host it.
 
 ## Borderless/chromeless windows
 

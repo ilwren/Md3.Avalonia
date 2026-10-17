@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Extra.Controls;
@@ -112,6 +114,15 @@ public sealed class MdWaveform : Control
 
     private bool _pressed;
     private bool _frameRequested;
+
+    /// <summary>
+    /// Subscriptions to each ancestor's IsVisible. Avalonia exposes IsEffectivelyVisible only as a
+    /// plain CLR property and keeps its change event internal, so a control is never told that an
+    /// ancestor hid it. Watching the ancestors directly is the reachable equivalent, and it is what
+    /// lets a pulse resume after a host - a collapsed floating window, a switched-away tab - shows
+    /// the waveform again.
+    /// </summary>
+    private readonly List<IDisposable> _ancestorVisibility = new();
     private bool _lastFrameValid;
     private TimeSpan _lastFrame;
     private double _phase;
@@ -441,8 +452,28 @@ public sealed class MdWaveform : Control
     protected override void OnAttachedToVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        SubscribeToAncestorVisibility();
         UpdatePseudoClasses();
         UpdateAnimation();
+    }
+
+    protected override void OnDetachedFromVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        UnsubscribeFromAncestorVisibility();
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    private void SubscribeToAncestorVisibility()
+    {
+        UnsubscribeFromAncestorVisibility();
+        foreach (var ancestor in this.GetVisualAncestors().OfType<Visual>())
+            _ancestorVisibility.Add(ancestor.GetObservable(IsVisibleProperty).Subscribe(_ => UpdateAnimation()));
+    }
+
+    private void UnsubscribeFromAncestorVisibility()
+    {
+        foreach (var subscription in _ancestorVisibility) subscription.Dispose();
+        _ancestorVisibility.Clear();
     }
 
     protected override void OnPointerEntered(PointerEventArgs e)

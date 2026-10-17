@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using Md3.Avalonia.Gallery.Pages;
 using Md3.Avalonia.Gallery;
 using System.Linq;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
@@ -353,6 +354,44 @@ public sealed class MdWaveformTests
         }
         finally { window.Close(); }
     }
+
+    [AvaloniaFact]
+    public void The_Pulse_Resumes_After_An_Ancestor_Hides_It()
+    {
+        // A waveform inside a collapsed floating window is hidden by an ancestor, not by itself.
+        // Avalonia exposes IsEffectivelyVisible only as a plain CLR property and keeps its change
+        // event internal, so the control is never told it went away - and a loop that stopped
+        // because it could not be seen would never restart on its own. Watching each ancestor's
+        // IsVisible is the reachable equivalent, and this is the case it exists for.
+        var waveform = new MdWaveform { Width = 320, Height = 96, IsPulsing = true, Peaks = new float[] { .5f, .9f, .3f, .7f } };
+        var host = new Border { Width = 320, Height = 96, Child = waveform };
+        var window = new Window { Width = 400, Height = 200, Content = host };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(FramePending(waveform));
+
+            host.IsVisible = false;
+            // Let the loop take the hint and fall idle, which is the state a hidden waveform is in.
+            SetFramePending(waveform, false);
+            Assert.False(FramePending(waveform));
+
+            host.IsVisible = true;
+            Assert.True(FramePending(waveform));
+        }
+        finally { window.Close(); }
+    }
+
+    private static bool FramePending(MdWaveform waveform) =>
+        (bool)FrameLoopField(waveform).GetValue(waveform)!;
+
+    private static void SetFramePending(MdWaveform waveform, bool value) =>
+        FrameLoopField(waveform).SetValue(waveform, value);
+
+    private static FieldInfo FrameLoopField(MdWaveform waveform) =>
+        Assert.NotNull(waveform.GetType()
+            .GetField("_frameRequested", BindingFlags.Instance | BindingFlags.NonPublic));
 
     private static void Press(Control target, Key key)
     {
