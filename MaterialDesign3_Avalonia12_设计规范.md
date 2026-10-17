@@ -133,33 +133,29 @@ Material 官网是持续更新的网站，浏览器和 Avalonia 的文字光栅�
 ```text
 Md3.Avalonia.sln
 ├─ src/
-│  ├─ Md3.Avalonia/                  # 控件、公共 API、AutomationPeer
-│  ├─ Md3.Avalonia.Themes/           # AXAML 模板、系统/组件令牌
-│  ├─ Md3.Avalonia.Color/            # HCT、配色生成、对比度校验
-│  ├─ Md3.Avalonia.Motion/           # 弹簧求解与 Composition 适配
-│  └─ Md3.Avalonia.Icons.MaterialSymbols/
-│                                     # 字体图标、SVG fallback、强类型目录
+│  ├─ Md3.Avalonia/                  # 控件、公共 API、Themes/令牌、HCT 动态主题、Motion
+│  ├─ Md3.Avalonia.Icons/            # 完整官方 Material Symbols 字体与强类型目录
+│  ├─ Md3.Avalonia.Icons.Lite/       # 官方字体真实轮廓子集
+│  ├─ Md3.Avalonia.Extra/            # Flutter 生态 clean-room 控件
+│  ├─ Md3.Avalonia.DataGrid/         # Avalonia 原生 DataGrid 的 Material 主题（opt-in）
+│  └─ Md3.Avalonia.RichEditor/       # AvaloniaRichEditor 的 Material 主题（opt-in）
 ├─ gallery/
 │  ├─ Md3.Avalonia.Gallery/          # 官网式桌面 Gallery，使用 CommunityToolkit.Mvvm
-│  └─ Md3.Avalonia.Gallery.Android/  # Android 宿主，共享 Gallery 页面/VM
+│  ├─ Md3.Avalonia.Gallery.Desktop/  # 桌面宿主
+│  └─ Md3.Avalonia.Gallery.Android/  # Android 宿主，共享 Gallery 页面/VM（solution 外）
 ├─ tests/
-│  ├─ Md3.Avalonia.Tests/
-│  ├─ Md3.Avalonia.HeadlessTests/
-│  ├─ Md3.Avalonia.VisualTests/
-│  └─ Md3.Avalonia.AccessibilityTests/
-├─ tools/
-│  ├─ MdTokenSync/                    # 官方令牌抓取/转换
-│  ├─ MdFontInstanceBuilder/          # 变量字体固定实例生成
-│  └─ MdGalleryCatalogGenerator/      # Gallery 元数据生成
-└─ spec-snapshot/                     # 冻结的来源清单、令牌和参考图
+│  └─ Md3.Avalonia.HeadlessTests/    # 含 Spec/ 分层规范一致性校验（L1/L2/L3/L5）
+└─ spec-snapshot/                     # 冻结的来源清单、令牌和一致性策略
 ```
 
-可发布包：
+可发布包（六个，均可独立 pack）：
 
-- `Md3.Avalonia`：核心控件与公共 API；
-- `Md3.Avalonia.Themes`：默认 Material 主题；
-- `Md3.Avalonia.Icons.MaterialSymbols`：完整图标资源；
-- `Md3.Avalonia.All`：引用上述包的便捷元包。
+- `Md3.Avalonia`：核心控件、主题、动态 HCT 配色、motion 与公共 API；
+- `Md3.Avalonia.Icons`：完整官方 Material Symbols Rounded 字体与强类型目录；
+- `Md3.Avalonia.Icons.Lite`：官方字体的真实轮廓子集；
+- `Md3.Avalonia.Extra`：依赖核心的 clean-room 扩展控件；
+- `Md3.Avalonia.DataGrid`：唯一引入 `Avalonia.Controls.DataGrid` 依赖的 opt-in 主题包；
+- `Md3.Avalonia.RichEditor`：唯一引入 AvaloniaRichEditor 依赖的 opt-in 主题包。
 
 ### 6.1 Android 工程约束
 
@@ -1112,7 +1108,7 @@ AvaloniaCompatibility: >= 12.0 < 13.0
 - 已增加 HCT golden vectors、主题 JSON round-trip、49 role/contrast、LTR/RTL、Light/Dark、三档 contrast、五种参考宽度渲染矩阵；
 - `MdList` / `MdCarousel` 改用 `VirtualizingStackPanel` 并增加大型数据集有界实现测试；重复主题替换和 attach/detach 生命周期纳入测试；
 - 原生基类 AutomationPeer 继续复用；Loading 使用 ProgressBar automation，Snackbar 使用 polite LiveSetting，ripple/state/focus 装饰层退出 automation control/content view；CommunityToolkit.Mvvm 双向绑定和 RelayCommand 已自动验证；
-- 已加入 `samples/Md3.Avalonia.Gallery.Android` single-view host、Gallery Android view 与 Android 生命周期分支；该工程刻意不加入 desktop solution；
+- 已加入 `gallery/Md3.Avalonia.Gallery.Android` single-view host、Gallery Android view 与 Android 生命周期分支；该工程刻意不加入 desktop solution；
 - NuGet metadata、XML docs、API 入口、Apache-2.0、第三方声明、CHANGELOG、兼容策略和发布验证清单已补齐；
 - 当前环境无法替代 Android ARM64 真机、Narrator、VoiceOver、Orca 人工验收，因此这些项目保留在 `docs/RELEASE_VALIDATION.md` 等待外部签署，不伪造完成结论。
 
@@ -1142,7 +1138,7 @@ AvaloniaCompatibility: >= 12.0 < 13.0
 - [x] Gallery 不直接使用 Avalonia 原生交互控件冒充 Material 控件；
 - [x] 完整 Light/Dark/System 和任意 seed color 生效；
 - [x] 颜色、字体、形状、间距、阴影、状态和 motion 资源字典齐全；
-- [ ] Material Symbols 字体图标可直接使用；**按明确要求临时移除 TTF；强类型 fallback、codepoint map 与许可仍在。此项是显式预发布例外。**
+- [x] Material Symbols 字体图标可直接使用；完整官方 variable TTF 与真实 Lite 子集已入库并随 Icons 包分发，`scripts/verify-fonts.py` 以固定 upstream commit、SHA-256、variable tables 与 glyph 数量门禁校验；
 - [x] CommunityToolkit.Mvvm 示例和直接操作示例均通过；
 - [x] 所有控件通过可自动执行的基础键盘与 Automation 测试；屏幕阅读器人工巡检见外部签署项；
 - [x] 自动视觉渲染矩阵无未审批差异；人工 OS/设备矩阵仍按发布记录签署；

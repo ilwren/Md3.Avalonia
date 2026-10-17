@@ -126,7 +126,9 @@
 - `MdTabView.axaml`
 - `MdTextBox.axaml`
 - `MdToggleButton.axaml`
-- `Md3.Avalonia.Ecosystem/Themes/WaveFControls.axaml`
+- `src/Md3.Avalonia.Extra/Themes/MdPinInput.axaml`
+- `src/Md3.Avalonia.Extra/Themes/MdTreeView.axaml`
+- `src/Md3.Avalonia.Extra/Themes/MdTagInput.axaml`
 
 `MdComboBox.axaml` 的 popup surface 本身另有 code-behind token-aware Transition，但 label/arrow 等内部固定 Transition 仍不遵循 scheme。
 

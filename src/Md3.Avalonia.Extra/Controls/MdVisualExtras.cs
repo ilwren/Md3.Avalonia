@@ -1,9 +1,11 @@
 using System.Globalization;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -29,8 +31,9 @@ public sealed class MdBeforeAfter : TemplatedControl
     private Control? _thumb;
     private bool _dragging;
     private const double GrabTolerance = 22;
-    private Point _dragOrigin;
-    private double _dragStartPosition;
+    private double _dragPointerOffset;
+    private IPointer? _dragFocusScrollPointer;
+    private (ScrollViewer Viewer, bool BringIntoViewOnFocusChange)[]? _dragFocusScrollState;
 
     /// <summary>How far a click on the image away from the handle nudges the divider.</summary>
     private const double TrackStep = .1;
@@ -47,6 +50,18 @@ public sealed class MdBeforeAfter : TemplatedControl
         OrientationProperty.Changed.AddClassHandler<MdBeforeAfter>((control, _) => control.UpdateOrientation());
         IsInteractiveProperty.Changed.AddClassHandler<MdBeforeAfter>((control, _) => control.UpdateInteractivity());
     }
+
+    public MdBeforeAfter()
+    {
+        // FocusManager promotes a primary pointer press to focus during the tunnel route, before
+        // the drag starts in the bubbling handler. Suppress ancestor ScrollViewer auto-scroll for
+        // a divider grab before that focus attempt, so a first press cannot move the control
+        // underneath the stationary pointer.
+        AddHandler(InputElement.PointerPressedEvent, OnPointerPressedPreview, RoutingStrategies.Tunnel);
+        AddHandler(InputElement.PointerReleasedEvent, OnPointerReleasedForFocusScroll,
+            RoutingStrategies.Bubble, handledEventsToo: true);
+    }
+
     public object? Before { get => GetValue(BeforeProperty); set => SetValue(BeforeProperty, value); }
     public object? After { get => GetValue(AfterProperty); set => SetValue(AfterProperty, value); }
     public double Position { get => GetValue(PositionProperty); set => SetValue(PositionProperty, Math.Clamp(value, 0, 1)); }
@@ -69,9 +84,11 @@ public sealed class MdBeforeAfter : TemplatedControl
     }
     protected override Size ArrangeOverride(Size finalSize)
     {
-        var result = base.ArrangeOverride(finalSize);
-        UpdateGeometry();
-        return result;
+        // Bounds is assigned by Layoutable.ArrangeCore only after this override returns. Use
+        // finalSize here so the first arrange places the divider from the real control size,
+        // instead of leaving it at the origin until Position changes on the first pointer drag.
+        UpdateGeometry(finalSize);
+        return base.ArrangeOverride(finalSize);
     }
     private void UpdateOrientation()
     {
@@ -79,27 +96,28 @@ public sealed class MdBeforeAfter : TemplatedControl
         PseudoClasses.Set(":vertical", Orientation == MdComparisonOrientation.Vertical);
         UpdateGeometry();
     }
-    private void UpdateGeometry()
+    private void UpdateGeometry(Size? arrangedSize = null)
     {
         if (_afterClip is null) return;
+        var size = arrangedSize ?? Bounds.Size;
         var position = Math.Clamp(Position, 0, 1);
         if (Orientation == MdComparisonOrientation.Horizontal)
         {
-            _afterClip.Width = Bounds.Width * position;
+            _afterClip.Width = size.Width * position;
             _afterClip.Height = double.NaN;
             _afterClip.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left;
             _afterClip.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Stretch;
-            if (_divider is not null) { _divider.Width = DividerThickness; _divider.Height = double.NaN; _divider.Margin = new Thickness(Bounds.Width * position - DividerThickness / 2, 0, 0, 0); _divider.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left; }
-            if (_thumb is not null) { _thumb.Margin = new Thickness(Bounds.Width * position - ThumbExtent(_thumb.Width, _thumb.Bounds.Width) / 2, 0, 0, 0); _thumb.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left; _thumb.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center; }
+            if (_divider is not null) { _divider.Width = DividerThickness; _divider.Height = double.NaN; _divider.Margin = new Thickness(size.Width * position - DividerThickness / 2, 0, 0, 0); _divider.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left; }
+            if (_thumb is not null) { _thumb.Margin = new Thickness(size.Width * position - ThumbExtent(_thumb.Width, _thumb.Bounds.Width) / 2, 0, 0, 0); _thumb.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left; _thumb.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center; }
         }
         else
         {
-            _afterClip.Height = Bounds.Height * position;
+            _afterClip.Height = size.Height * position;
             _afterClip.Width = double.NaN;
             _afterClip.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Stretch;
             _afterClip.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top;
-            if (_divider is not null) { _divider.Height = DividerThickness; _divider.Width = double.NaN; _divider.Margin = new Thickness(0, Bounds.Height * position - DividerThickness / 2, 0, 0); _divider.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top; }
-            if (_thumb is not null) { _thumb.Margin = new Thickness(0, Bounds.Height * position - ThumbExtent(_thumb.Height, _thumb.Bounds.Height) / 2, 0, 0); _thumb.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Center; _thumb.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top; }
+            if (_divider is not null) { _divider.Height = DividerThickness; _divider.Width = double.NaN; _divider.Margin = new Thickness(0, size.Height * position - DividerThickness / 2, 0, 0); _divider.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top; }
+            if (_thumb is not null) { _thumb.Margin = new Thickness(0, size.Height * position - ThumbExtent(_thumb.Height, _thumb.Bounds.Height) / 2, 0, 0); _thumb.HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Center; _thumb.VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top; }
         }
     }
     // The handle is the drag target, as in the comparison sliders this control is modelled on.
@@ -115,38 +133,83 @@ public sealed class MdBeforeAfter : TemplatedControl
         // control, every reachable pixel is on the same side of the divider, and the offset the
         // press picks up is both one-directional and as large as half the handle. Holding on to
         // it for the rest of the drag is the gap between cursor and handle in the report.
-        BeginDrag(e.GetPosition(this));
+        BeginDrag(e);
         e.Pointer.Capture(this);
         e.Handled = true;
     }
 
-    private void BeginDrag(Point origin)
+    private void BeginDrag(PointerPressedEventArgs e)
     {
+        // Do not focus from a pointer gesture. A containing desktop ScrollViewer can bring this
+        // control into view on first focus and move it under the stationary pointer, which turns
+        // a layout change into an apparent divider jump.
+        var origin = e.GetPosition(this);
         _dragging = true;
 
-        // Track the delta rather than the absolute pointer: grabbing the handle off-centre must
-        // not snap the divider under the cursor.
-        //
-        // That only holds where the grab could have landed either side of centre. At an extreme
-        // half the handle is clipped outside the control, so every reachable pixel is on the
-        // same side of the divider and the offset the press picks up is one-directional and as
-        // large as half the handle - kept for the whole drag, it is the gap between cursor and
-        // handle in the report. Allow no more offset than the divider's own distance to the
-        // nearer edge, which is zero exactly where the handle is clipped.
+        // Retain the grab offset in control coordinates, but limit it at the clipped extremes.
+        // Track each move from the pointer's current local position so ordinary layout changes
+        // during a drag are reflected in the thumb position rather than accumulated as a delta.
         var extent = Orientation == MdComparisonOrientation.Horizontal
             ? Math.Max(1, Bounds.Width)
             : Math.Max(1, Bounds.Height);
         var along = Orientation == MdComparisonOrientation.Horizontal ? origin.X : origin.Y;
         var divider = Math.Clamp(Position, 0, 1) * extent;
         var reach = Math.Min(divider, extent - divider);
-        var offset = Math.Clamp(along - divider, -reach, reach);
-        Position = Math.Clamp((along - offset) / extent, 0, 1);
+        _dragPointerOffset = Math.Clamp(along - divider, -reach, reach);
+        Position = Math.Clamp((along - _dragPointerOffset) / extent, 0, 1);
 
-        _dragOrigin = origin;
-        _dragStartPosition = Math.Clamp(Position, 0, 1);
         PseudoClasses.Set(":dragging", true);
-        if (Focusable) Focus();
     }
+
+    private void OnPointerPressedPreview(object? sender, PointerPressedEventArgs e)
+    {
+        if (!IsInteractive || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            return;
+
+        var point = e.GetPosition(this);
+        var extent = Orientation == MdComparisonOrientation.Horizontal
+            ? Math.Max(1, Bounds.Width)
+            : Math.Max(1, Bounds.Height);
+        var along = Orientation == MdComparisonOrientation.Horizontal ? point.X : point.Y;
+        if (Math.Abs(along - Math.Clamp(Position, 0, 1) * extent) > GrabTolerance)
+            return;
+
+        SuppressAncestorBringIntoView(e.Pointer);
+    }
+
+    private void SuppressAncestorBringIntoView(IPointer pointer)
+    {
+        if (_dragFocusScrollState is not null)
+            return;
+
+        _dragFocusScrollPointer = pointer;
+        _dragFocusScrollState = this.GetVisualAncestors().OfType<ScrollViewer>()
+            .Select(viewer => (Viewer: viewer,
+                BringIntoViewOnFocusChange: ScrollViewer.GetBringIntoViewOnFocusChange(viewer)))
+            .ToArray();
+
+        foreach (var state in _dragFocusScrollState)
+            state.Viewer.SetCurrentValue(ScrollViewer.BringIntoViewOnFocusChangeProperty, false);
+    }
+
+    private void RestoreAncestorBringIntoView(IPointer? pointer = null)
+    {
+        if (pointer is not null && _dragFocusScrollPointer is not null &&
+            !ReferenceEquals(pointer, _dragFocusScrollPointer))
+            return;
+
+        _dragFocusScrollPointer = null;
+        if (_dragFocusScrollState is not { } state)
+            return;
+
+        _dragFocusScrollState = null;
+        foreach (var entry in state)
+            entry.Viewer.SetCurrentValue(
+                ScrollViewer.BringIntoViewOnFocusChangeProperty, entry.BringIntoViewOnFocusChange);
+    }
+
+    private void OnPointerReleasedForFocusScroll(object? sender, PointerReleasedEventArgs e) =>
+        RestoreAncestorBringIntoView(e.Pointer);
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
@@ -172,7 +235,7 @@ public sealed class MdBeforeAfter : TemplatedControl
             // there, so the pointer cannot reach its centre. Keeping that offset left the
             // divider trailing the cursor by up to the full 22 dip tolerance for the whole
             // drag, which is what the comparison slider was reported for.
-            BeginDrag(point);
+            BeginDrag(e);
             e.Pointer.Capture(this);
             e.Handled = true;
             return;
@@ -184,7 +247,6 @@ public sealed class MdBeforeAfter : TemplatedControl
             Position = target > current
                 ? Math.Min(current + TrackStep, target)
                 : Math.Max(current - TrackStep, target);
-        if (Focusable) Focus();
         e.Handled = true;
     }
 
@@ -193,19 +255,88 @@ public sealed class MdBeforeAfter : TemplatedControl
         if (_dragging)
         {
             var point = e.GetPosition(this);
-            var delta = Orientation == MdComparisonOrientation.Horizontal
-                ? (point.X - _dragOrigin.X) / Math.Max(1, Bounds.Width)
-                : (point.Y - _dragOrigin.Y) / Math.Max(1, Bounds.Height);
-            Position = _dragStartPosition + delta;
+            var extent = Orientation == MdComparisonOrientation.Horizontal
+                ? Math.Max(1, Bounds.Width)
+                : Math.Max(1, Bounds.Height);
+            var along = Orientation == MdComparisonOrientation.Horizontal ? point.X : point.Y;
+            Position = Math.Clamp((along - _dragPointerOffset) / extent, 0, 1);
             e.Handled = true;
         }
         base.OnPointerMoved(e);
     }
+    protected override void OnGettingFocus(FocusChangingEventArgs e)
+    {
+        // Avalonia's FocusManager focuses the nearest focusable ancestor on mouse-down before
+        // pointer handlers run. Reject that pointer-originated focus: it makes the parent
+        // ScrollViewer bring this partly clipped control into view in the middle of the drag.
+        // Keyboard/tab focus remains available; pointer focus is deferred until release.
+        if (e.NavigationMethod == NavigationMethod.Pointer)
+            e.TryCancel();
+
+        base.OnGettingFocus(e);
+    }
+
+    private void FocusWithoutScrollingAncestors()
+    {
+        var scrollViewers = this.GetVisualAncestors().OfType<ScrollViewer>().ToArray();
+        var previousValues = new bool[scrollViewers.Length];
+        for (var i = 0; i < scrollViewers.Length; i++)
+        {
+            previousValues[i] = ScrollViewer.GetBringIntoViewOnFocusChange(scrollViewers[i]);
+            scrollViewers[i].SetCurrentValue(ScrollViewer.BringIntoViewOnFocusChangeProperty, false);
+        }
+
+        try
+        {
+            Focus();
+        }
+        finally
+        {
+            for (var i = 0; i < scrollViewers.Length; i++)
+                scrollViewers[i].SetCurrentValue(
+                    ScrollViewer.BringIntoViewOnFocusChangeProperty, previousValues[i]);
+        }
+    }
+
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
-        if (_dragging) { _dragging = false; PseudoClasses.Set(":dragging", false); e.Pointer.Capture(null); e.Handled = true; }
+        var focusAfterRelease = _dragging && Focusable;
+        if (_dragging)
+        {
+            _dragging = false;
+            PseudoClasses.Set(":dragging", false);
+            e.Pointer.Capture(null);
+            e.Handled = true;
+        }
+
         base.OnPointerReleased(e);
+        RestoreAncestorBringIntoView(e.Pointer);
+
+        // Focus only after pointer tracking ends, and temporarily keep ancestor ScrollViewers from
+        // bringing this clipped control into view. Restoring their original settings immediately
+        // afterwards preserves the host's normal focus behavior for every later interaction.
+        if (focusAfterRelease)
+            Dispatcher.UIThread.Post(FocusWithoutScrollingAncestors, DispatcherPriority.Input);
     }
+    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+    {
+        base.OnPointerCaptureLost(e);
+        if (_dragging)
+        {
+            _dragging = false;
+            PseudoClasses.Set(":dragging", false);
+        }
+        RestoreAncestorBringIntoView();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        _dragging = false;
+        PseudoClasses.Set(":dragging", false);
+        RestoreAncestorBringIntoView();
+        base.OnDetachedFromVisualTree(e);
+    }
+
     protected override void OnKeyDown(KeyEventArgs e)
     {
         // IsInteractive used to gate the pointer only, so a comparison meant to be display-only
@@ -220,8 +351,8 @@ public sealed class MdBeforeAfter : TemplatedControl
     // A pseudo-class, not SetCurrentValue on Focusable: SetCurrentValue does not establish a
     // local value, so the theme's Focusable setter wins back the moment the theme is applied on
     // attach. The theme keys the override off this instead.
-    // The template gives the handle an explicit size; Bounds is still zero on the first arrange,
-    // which would park it half a handle off the divider until something invalidated layout again.
+    // Use the template's declared handle size before its first arrange; Bounds is not populated
+    // until after this control's ArrangeOverride returns.
     private static double ThumbExtent(double declared, double measured) => double.IsNaN(declared) ? measured : declared;
 
     private void UpdateInteractivity() => PseudoClasses.Set(":non-interactive", !IsInteractive);

@@ -13,7 +13,7 @@
       </StackPanel>
 
       <StackPanel Spacing="12">
-        <eco:MdChatView x:Name="Chat" Height="440" MessageSubmitted="ChatSubmitted"
+        <eco:MdChatView x:Name="Chat" Height="560" MessageSubmitted="ChatSubmitted"
                         MessageSelectionChanged="ChatSelectionChanged" DeleteRequested="ChatDeleteRequested"
                         QuoteRequested="ChatQuoteRequested" RetryRequested="ChatRetryRequested" />
         <TextBlock x:Name="ChatStatus" Classes="body" TextWrapping="Wrap" Text="Select one or more bubbles to quote, cancel, or delete. Failed bubbles expose Retry; suggestions fill the composer." />

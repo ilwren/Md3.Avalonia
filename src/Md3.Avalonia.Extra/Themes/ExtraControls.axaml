@@ -60,8 +60,7 @@
                             TextElement.FontSize="16"
                             Margin="2,0,4,0"
                             VerticalAlignment="Center"
-                            Opacity="0.6"
-                            Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                            Foreground="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
         </StackPanel>
       </ControlTemplate>
     </Setter>
@@ -69,6 +68,7 @@
     <Style Selector="^:pressed /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Sys.State.Pressed.Opacity}" /></Style>
     <Style Selector="^:selected"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
     <Style Selector="^.current"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
+    <Style Selector="^.accent"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
     <Style Selector="^.has-icon /template/ Viewbox#PART_IconHost"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
     <!-- The current location is a label, not a link. It gets no pointer feedback and no hand
@@ -88,8 +88,8 @@
        constant no matter how long the label is; stretching one Path across the whole segment
        would flatten the arrow on long crumbs and sharpen it on short ones.
 
-       Colour follows M3 roles rather than a terminal palette: ancestors sit on a surface
-       container and the current crumb - the ListBox's selected item - takes the primary role. -->
+       Colour follows M3 roles rather than a terminal palette: navigable ancestors use the
+       primary text role on a neutral surface container; a transient selection uses primary/on-primary. -->
   <ControlTheme x:Key="MdBreadcrumbPowerlineItemTheme" TargetType="ListBoxItem">
     <Setter Property="Padding" Value="0" />
     <Setter Property="Margin" Value="-14,0,0,0" />
@@ -129,6 +129,9 @@
     <Style Selector="^:selected">
       <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
       <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" />
+    </Style>
+    <Style Selector="^.accent">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
     </Style>
     <!-- The first crumb has nothing to interlock with, so it keeps a flat left edge and sits
          flush with the control's own padding instead of being pulled back under a predecessor. -->

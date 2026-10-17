@@ -1,0 +1,47 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:eco="using:Md3.Avalonia.Extra.Controls"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+
+  <!-- Tag input: official Material input chips, wrapping, validation, and live suggestions. -->
+  <ControlTheme x:Key="{x:Type eco:MdTagInput}" TargetType="eco:MdTagInput">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="eco:MdTagInput">
+        <StackPanel Spacing="4">
+          <Border x:Name="PART_Container" MinHeight="64" Padding="8,4"
+                  Background="{DynamicResource Md.Sys.Color.Surface.Brush}"
+                  BorderBrush="{DynamicResource Md.Sys.Color.Outline.Brush}" BorderThickness="1" CornerRadius="8">
+            <WrapPanel VerticalAlignment="Center">
+              <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding Entries}" VerticalAlignment="Center">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="eco:MdTagEntry">
+                    <md:MdInputChip Content="{Binding Value}" IsRemovable="True" RemoveCommand="{Binding RemoveCommand}"
+                                    RemoveCommandParameter="{Binding Value}" Margin="4" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <md:MdTextBox x:Name="PART_Input" Width="176" MinWidth="120" Margin="4,0" Background="Transparent"
+                            Label="{x:Null}" PlaceholderText="{TemplateBinding PlaceholderText}" Text="{TemplateBinding Text, Mode=TwoWay}"
+                            ErrorText="{TemplateBinding ValidationMessage}" IsError="False" Variant="Filled" />
+            </WrapPanel>
+          </Border>
+          <TextBlock x:Name="PART_Error" IsVisible="False" Margin="12,0" FontSize="12"
+                     Foreground="{DynamicResource Md.Sys.Color.Error.Brush}" Text="{TemplateBinding ValidationMessage}" />
+          <ItemsControl x:Name="PART_Suggestions" Theme="{StaticResource EcoItemsHostTheme}" IsVisible="False"
+                        ItemsSource="{TemplateBinding FilteredSuggestions}" Margin="4,2,4,0">
+            <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:CompileBindings="False"><md:MdSuggestionChip x:Name="PART_Suggestion" Content="{Binding}" Margin="4" /></DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:focus-within /template/ Border#PART_Container"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="2" /></Style>
+    <Style Selector="^:md-error /template/ Border#PART_Container"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Error.Brush}" /><Setter Property="BorderThickness" Value="2" /></Style>
+    <Style Selector="^:md-error /template/ TextBlock#PART_Error"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:has-suggestions /template/ ItemsControl#PART_Suggestions"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:limit-reached /template/ md|MdTextBox#PART_Input"><Setter Property="IsEnabled" Value="False" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

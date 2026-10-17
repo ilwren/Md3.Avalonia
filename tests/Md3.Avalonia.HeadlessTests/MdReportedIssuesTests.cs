@@ -18,6 +18,7 @@ using Md3.Avalonia.Extra.Controls;
 using Md3.Avalonia.Extra.Infrastructure;
 using Md3.Avalonia.Gallery;
 using Md3.Avalonia.Gallery.Pages;
+using Md3.Avalonia.Motion;
 using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
@@ -103,7 +104,7 @@ public sealed class MdReportedIssuesTests
     }
 
     [AvaloniaFact]
-    public void Carousel_Tap_Selects_Content_Without_Changing_Keyline_Item_Sizes()
+    public void Carousel_Clicking_A_Collapsed_Card_Makes_It_The_Focal_Keyline()
     {
         var carousel = new MdCarousel
         {
@@ -115,21 +116,37 @@ public sealed class MdReportedIssuesTests
             SelectedIndex = 0,
             ItemsSource = new[] { "One", "Two", "Three", "Four" }
         };
+        // The assertion is about selection/layout logic rather than the width spring's clock.
+        MdMotion.SetScheme(carousel, MdMotionScheme.None);
         using var host = Show(carousel, 680, 280);
         Dispatcher.UIThread.RunJobs();
         var containers = carousel.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
-        var widthsBeforeTap = containers.Select(item => item.Bounds.Width).ToArray();
-        var second = containers[1];
-        var point = second.TranslatePoint(new Point(second.Bounds.Width / 2, second.Bounds.Height / 2), host.Window)!.Value;
+        var collapsed = containers
+            .Where(item => item.Bounds.Width < containers.Max(candidate => candidate.Bounds.Width) - 1)
+            .OrderBy(item => item.Bounds.Width)
+            .ThenBy(item => item.TranslatePoint(default, carousel)?.X ?? double.MaxValue)
+            .First();
+        var dataItem = Assert.IsType<string>(collapsed.DataContext);
+        var collapsedIndex = Array.IndexOf(new[] { "One", "Two", "Three", "Four" }, dataItem);
+        var widthBeforeTap = collapsed.Bounds.Width;
+        var largeWidth = containers.Max(item => item.Bounds.Width);
+        Assert.InRange(widthBeforeTap, 39, 56);
+        Assert.False(carousel.IsKeyboardFocusWithin,
+            "the regression must cover the initial pointer click before the Carousel has focus");
 
+        var point = collapsed.TranslatePoint(
+            new Point(collapsed.Bounds.Width / 2, collapsed.Bounds.Height / 2), host.Window)!.Value;
         host.Window.MouseMove(point, RawInputModifiers.None);
         host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
         host.Window.MouseUp(point, MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
 
-        Assert.Equal(1, carousel.SelectedIndex);
-        Assert.Equal(widthsBeforeTap, containers.Select(item => item.Bounds.Width).ToArray());
-        Assert.Contains(containers, item => Math.Abs(item.Bounds.Width - 56) < 0.01);
+        Assert.Equal(collapsedIndex, carousel.SelectedIndex);
+        Assert.True(carousel.IsKeyboardFocusWithin,
+            "the clicked collapsed card should receive keyboard focus before it becomes the focal keyline");
+        Assert.True(collapsed.Bounds.Width > widthBeforeTap + 100,
+            $"the clicked small keyline stayed at {collapsed.Bounds.Width} DIP instead of expanding");
+        Assert.Equal(largeWidth, collapsed.Bounds.Width, 1);
     }
 
     [AvaloniaFact]
@@ -494,6 +511,25 @@ public sealed class MdReportedIssuesTests
         var containers = breadcrumb.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
         Assert.Equal(3, containers.Length);
         Assert.Contains("current", containers[^1].Classes);
+    }
+
+    [AvaloniaFact]
+    public void Breadcrumb_Uses_Primary_Accent_For_Ancestors_But_Not_Current_Item()
+    {
+        var converter = new MdBreadcrumbPathConverter();
+        var items = (IEnumerable<MdBreadcrumbItem>)converter.Convert(
+            "Home/Settings/Security", typeof(IEnumerable<MdBreadcrumbItem>), null, CultureInfo.InvariantCulture)!;
+        var breadcrumb = new MdBreadcrumb { ItemsSource = items };
+
+        using var host = Show(breadcrumb, 520, 100);
+        Dispatcher.UIThread.RunJobs();
+
+        var containers = breadcrumb.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
+        Assert.Equal(3, containers.Length);
+        Assert.Contains("accent", containers[0].Classes);
+        Assert.Contains("accent", containers[1].Classes);
+        Assert.Contains("current", containers[^1].Classes);
+        Assert.DoesNotContain("accent", containers[^1].Classes);
     }
 
     [AvaloniaFact]

@@ -144,9 +144,9 @@ public sealed class MdTabs : ListBox
             return;
         }
 
-        var width = Variant == MdTabVariant.Secondary
-            ? Math.Max(0, selected.Bounds.Width - 32)
-            : 24;
+        // M3: the active indicator spans the full tab width in both variants (material-web
+        // anchors it with inset: auto 0 0 0).
+        var width = selected.Bounds.Width;
         var x = origin.Value.X + (selected.Bounds.Width - width) / 2;
         if (Math.Abs(x - _lastIndicatorX) < 0.01 && Math.Abs(width - _lastIndicatorWidth) < 0.01)
             return;
@@ -156,6 +156,8 @@ public sealed class MdTabs : ListBox
         _lastIndicatorWidth = width;
         _selectionIndicator.IsVisible = true;
         _selectionIndicator.Height = Variant == MdTabVariant.Secondary ? 2 : 3;
+        var indicatorRadius = Variant == MdTabVariant.Secondary ? 2 : 3;
+        _selectionIndicator.CornerRadius = new CornerRadius(indicatorRadius, indicatorRadius, 0, 0);
 
         var scheme = MdMotion.GetScheme(this);
         if (firstGeometry || scheme is MdMotionScheme.Reduced or MdMotionScheme.None)

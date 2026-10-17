@@ -20,7 +20,7 @@ need confirmation on a real desktop run.
 | 3 | Nav bar / rail: the pressed overlay has square corners over a rounded indicator | The ripple sat in a `Grid` with `ClipToBounds`, and a Grid clips to a **rectangle**. Now clipped by a `Border` carrying the pill's corner radius. Rail had the same template. | `0e30402` |
 | 4 | Expanded search: after choosing a result, clearing and retyping never reopens the list | `MdSearchView` only hooked `KeyDown`; nothing watched the text. `CommitResult` writes the chosen text and dismisses, so only a host `Show()` could reopen it. Now reopens on header `TextChanged`, guarded by focus and by the committed text. | `6ec505a`, `bb36f45` |
 | 6 | `FontSize` on a settings card / group / expander title does nothing | The templates wrote `FontSize="16"/"14"` **directly on the presenters**. A literal inside a template outranks any value from outside. Moved to `ControlTheme` setters + `{TemplateBinding FontSize}`; defaults unchanged, now overridable. | `0e30402` |
-| 11 | Rich tooltip disappears before it can be reached (same on focus) | `HideDelay` is 100 ms for every variant. A rich tooltip is interactive, so the pointer must cross the gap to reach it; the timer expired mid-flight. Leaving now starts a variant-aware countdown with a 600 ms bridge for rich tooltips. | `ecc3d5f` |
+| 11 | Rich tooltip flickers/disappears on desktop while moving from trigger to its interactive surface | The 600 ms grace delay was not sufficient because the template used a native `PopupRoot` with light dismiss. Avalonia closes that popup when the owner window deactivates/loses platform focus, bypassing the timer. Tooltip popups now use the owner's overlay layer; the regression asserts the trigger and rich surface share a `TopLevel` and that the pointer reaches the action. Real desktop confirmation is still pending. | working tree |
 | 14 | Simple dialog: clicking an item reports "cancelled" | Selection closed the dialog via `Dismiss()`, so one click raised **both** `ItemSelected` and `Dismissed`, and the cancel listener ran second and overwrote the result. A choice is no longer a dismissal. *(The styling half of this item is still open.)* | `ecc3d5f` |
 | 16 | "Move avatar": a fragment of the content shows for a few frames | The page revealed the destination hero and started the flight **in the same pass**, so `MdHero` measured a hero with no layout yet, photographed a zero-sized rectangle and abandoned the transition — then the source was hidden immediately, reflowing the row under a transition that had already recorded the geometry. Now: reveal, let one layout pass run, await the flight, then hide the source. | `6189b95` |
 | 18 | Load next page gives only a text message | Two causes. `MdPagedItemsView` had **no `ItemTemplate`**, so records rendered as bare `ToString` text, indistinguishable from the status label. And the demo provider returned synchronously, so the view went `Loading → Data` inside one dispatcher pass and the progress indicator was switched on and off before it could be painted. | `6189b95` |
@@ -67,7 +67,7 @@ synchronised both ways. Same split as Flutter's `TabBar`/`TabBarView`.
 wrong answer: Avalonia already ships that control, and a rename would not have changed what
 `MdDataGrid` can do. The decision taken was to theme the real thing. `Md3.Avalonia.DataGrid` is
 a new opt-in package carrying the `Avalonia.Controls.DataGrid` dependency alone, so the other
-four packages stay clean, and `MdDataGrid` keeps its job as a Material data table. The gallery
+five packages stay clean, and `MdDataGrid` keeps its job as a Material data table. The gallery
 now shows both, one above the other, with the boundary written between them.
 
 The theme is derived from the DataGrid package's own Fluent theme rather than hand-written,
@@ -490,6 +490,21 @@ pointer immediately showed that was half the problem - at 18 dip from the edge t
 landing on the clipped handle, not the track. A synthetic event could not have told the two
 apart, because neither one does any hit testing.
 
+### Follow-up - BeforeAfter first-arrange handle jump (Windows 11, 150%)
+
+**Status: geometry correction added; desktop verification pending.** The latest repro on `22488b5`
+shows `Position = 0.5` while the horizontal and vertical handles are drawn at the left/top. The
+first movement changes `Position` and makes the handle jump toward the middle, leaving the cursor
+offset (reported final value about `0.52`). The focus/scroll guard did not resolve this report.
+
+The layout-order defect is in `MdBeforeAfter.ArrangeOverride`: Avalonia assigns the control's new
+`Bounds` only after `ArrangeOverride` returns, but the old override arranged its template children
+first and then calculated their geometry from the still-stale `Bounds`. On the initial pass this
+left the handle at the origin until `Position` changed. The override now calculates from
+`finalSize` before arranging the template children. A headless regression checks the initial 0.5
+handle position for both axes before any pointer input; that does not replace the required Windows
+11 / 150% desktop re-test.
+
 ### Review 14 item 6 - carousel
 
 **Reproduced and fixed, after first being wrongly cleared.** What follows is the failed first
@@ -550,12 +565,13 @@ with which variant.
 
 ### AOT
 
-**Supported, and now declared.** All six packages carry `IsAotCompatible` and the IL3xxx
-analyzers report nothing. `.github/workflows/aot-probe.yml` publishes the desktop gallery with
-`PublishAot=true`, and rather than trusting a green step it asserts the output is a native ELF
-executable with no managed assembly beside it, then runs that binary under xvfb for 25 seconds.
-Compiling proves little on its own - native AOT fails at runtime, on reflection that is not
-there - so the smoke run is the part that matters: the window stays up, which means the themes,
-the compiled XAML and the icon font all resolved.
+**Supported, and now declared.** All six packages carry `IsAotCompatible` and enable the
+trim/AOT analyzers; package builds treat warnings as errors. The AOT probe is a separate,
+platform-limited integration check: `.github/workflows/aot-probe.yml` publishes the desktop
+Gallery with `PublishAot=true`, asserts the output is a native ELF executable with no managed
+assembly beside it, and smoke-runs it under xvfb for 25 seconds. The workflow reports linker
+and trim diagnostics; a successful smoke run means the Linux x64 Gallery stays alive through
+startup, not that every code path or glyph was exercised or that diagnostics are universally zero.
 
-Not covered: Windows and macOS publishes, and Android, which uses a different runtime model.
+Not covered: Windows and macOS publishes, Android's different runtime model, or trimming/AOT
+behavior in a consuming application.

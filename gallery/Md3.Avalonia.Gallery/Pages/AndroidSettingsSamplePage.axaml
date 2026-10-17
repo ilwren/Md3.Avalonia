@@ -55,7 +55,7 @@
                            IconBackground="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
                            IconForeground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}">
           <md:MdSettingsCard.Trailing>
-            <md:MdSwitch x:Name="DarkThemeSwitch" IsChecked="True" Click="OnSettingToggle" />
+            <md:MdSwitch x:Name="DarkThemeSwitch" IsCheckedChanged="DarkThemeSwitchChanged" />
           </md:MdSettingsCard.Trailing>
         </md:MdSettingsCard>
         <Border Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" Margin="72,0,0,0" />

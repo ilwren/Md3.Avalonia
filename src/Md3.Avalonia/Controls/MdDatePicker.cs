@@ -88,6 +88,7 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private string _headerText = "Choose date";
     private string _defaultLabelText = "Date";
     private Button? _anchorButton;
+    private TextBlock? _displayTextBlock;
     private Button? _previousButton;
     private Button? _nextButton;
     private Button? _todayButton;
@@ -119,6 +120,7 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         ModeProperty.Changed.AddClassHandler<MdDatePicker>((picker, _) => picker.UpdatePseudoClasses());
         IsOpenProperty.Changed.AddClassHandler<MdDatePicker>((picker, _) => picker.OnOpenStateChanged());
         DateFormatProperty.Changed.AddClassHandler<MdDatePicker>((picker, _) => picker.UpdateDisplayText());
+        DisplayTextProperty.Changed.AddClassHandler<MdDatePicker>((picker, _) => picker.InvalidateDisplayText());
         MdLocalization.CultureProperty.Changed.AddClassHandler<MdDatePicker>((picker, _) => picker.OnCultureChanged());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdDatePicker>((picker, _) => picker.UpdateMotion());
     }
@@ -232,6 +234,7 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         base.OnApplyTemplate(e);
 
         _anchorButton = e.NameScope.Find<Button>("PART_AnchorButton");
+        _displayTextBlock = e.NameScope.Find<TextBlock>("PART_DisplayText");
         _previousButton = e.NameScope.Find<Button>("PART_PreviousMonthButton");
         _nextButton = e.NameScope.Find<Button>("PART_NextMonthButton");
         _todayButton = e.NameScope.Find<Button>("PART_TodayButton");
@@ -266,6 +269,7 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
+        DetachAncestorScrollWatcher();
         _popupPresence.Stop();
         _monthCompletion.Stop();
         base.OnDetachedFromVisualTree(e);
@@ -416,6 +420,7 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private void OnOpenStateChanged()
     {
         _backScope.Update(IsOpen);
+        if (IsOpen) AttachAncestorScrollWatcher(); else DetachAncestorScrollWatcher();
         if (IsOpen)
         {
             _popupPresence.Update(true, TimeSpan.Zero);
@@ -435,6 +440,50 @@ public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         _popupPresence.Update(false, MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast));
         MdPopupCoordinator.NotifyStateChanged(this);
         Dispatcher.UIThread.Post(() => _anchorButton?.Focus(), DispatcherPriority.Input);
+    }
+
+
+    private void InvalidateDisplayText()
+    {
+        var textBlock = _displayTextBlock;
+        if (textBlock is null) return;
+        var text = DisplayText;
+        // Assign the committed string synchronously instead of leaning on the template binding
+        // to the read-only direct property: desktop builds were observed keeping the previous
+        // value on screen after a commit while the bound readout below was already correct.
+        // Writing the text directly and invalidating measure+render keeps the field in lockstep
+        // with DisplayText on every platform.
+        if (!string.Equals(textBlock.Text, text, System.StringComparison.Ordinal)) textBlock.Text = text;
+        textBlock.InvalidateMeasure();
+        textBlock.InvalidateVisual();
+        _anchorButton?.InvalidateVisual();
+    }
+
+    private ScrollViewer? _scrollAncestor;
+
+    private void AttachAncestorScrollWatcher()
+    {
+        DetachAncestorScrollWatcher();
+        if (this.GetVisualAncestors().OfType<ScrollViewer>().FirstOrDefault() is { } scroller)
+        {
+            _scrollAncestor = scroller;
+            _scrollAncestor.PropertyChanged += OnAncestorScrollOffsetChanged;
+        }
+    }
+
+    private void DetachAncestorScrollWatcher()
+    {
+        if (_scrollAncestor is not null) _scrollAncestor.PropertyChanged -= OnAncestorScrollOffsetChanged;
+        _scrollAncestor = null;
+    }
+
+    // A picker popup left open while the page behind it scrolls drifts away from its anchor, and
+    // every subsequent dial/calendar drag then lands offset. Material surfaces close on
+    // background scroll, so follow suit.
+    private void OnAncestorScrollOffsetChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property == ScrollViewer.OffsetProperty && IsOpen)
+            SetCurrentValue(IsOpenProperty, false);
     }
 
     private void OnDisplayDateChanged(AvaloniaPropertyChangedEventArgs change)

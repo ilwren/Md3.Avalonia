@@ -14,7 +14,7 @@
         <Border x:Name="PART_Root" Background="Transparent" ClipToBounds="True">
           <Grid RowDefinitions="*,3">
             <ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" />
-            <Border x:Name="PART_Indicator" Grid.Row="1" Width="24" Height="3" HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="Transparent" CornerRadius="3,3,0,0" />
+            <Border x:Name="PART_Indicator" Grid.Row="1" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="Transparent" CornerRadius="3,3,0,0" />
             <Border x:Name="PART_StateLayer" Grid.RowSpan="2" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsHitTestVisible="False" Opacity="0" />
             <md:MdRipplePresenter Grid.RowSpan="2" RippleBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
           </Grid>
@@ -46,8 +46,8 @@
               </Grid>
               <ContentPresenter x:Name="PART_Label" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" FontSize="14" FontWeight="Medium" Foreground="{TemplateBinding Foreground}" />
             </StackPanel>
-            <Border x:Name="PART_PrimaryIndicator" Grid.Row="1" Width="24" Height="3" HorizontalAlignment="Center" VerticalAlignment="Bottom" Background="Transparent" CornerRadius="3,3,0,0" />
-            <Border x:Name="PART_SecondaryIndicator" Grid.Row="1" Height="2" Margin="16,0" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="Transparent" IsVisible="False" />
+            <Border x:Name="PART_PrimaryIndicator" Grid.Row="1" Height="3" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="Transparent" CornerRadius="3,3,0,0" />
+            <Border x:Name="PART_SecondaryIndicator" Grid.Row="1" Height="2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Background="Transparent" IsVisible="False" />
             <Border x:Name="PART_StateLayer" Grid.RowSpan="2" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsHitTestVisible="False" Opacity="0" />
             <md:MdRipplePresenter Grid.RowSpan="2" RippleBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
           </Grid>

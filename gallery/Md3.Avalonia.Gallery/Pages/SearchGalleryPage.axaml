@@ -12,7 +12,7 @@
       </StackPanel>
       <StackPanel MaxWidth="680" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="h2" Text="Expanded search view"/>
-        <md:MdButton Width="190" HorizontalAlignment="Left" Content="Open search · Ctrl+K" Variant="Outlined" Click="OpenExpandedSearch" />
+        <md:MdButton x:Name="OpenSearchButton" Width="190" HorizontalAlignment="Left" Content="Open search · Ctrl+K" Variant="Outlined" Click="OpenExpandedSearch" />
         <md:MdSearchView x:Name="ExpandedSearchView" IsOpen="False">
           <md:MdSearchView.Header>
             <md:MdSearchBar x:Name="ExpandedSearchBar" PlaceholderText="Search files, folders, or types"
