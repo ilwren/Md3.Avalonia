@@ -303,15 +303,23 @@ jobs:
           # produced only on main, where the artefact is actually published.
           MD3_WRITE_PREVIEWS: ${{ github.ref == 'refs/heads/main' && '1' || '0' }}
         run: |
-          if ! timeout --signal=KILL 900 dotnet test \
+          status=0
+          timeout --signal=KILL 900 dotnet test \
             tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
             -c Release --no-build --no-restore \
             --filter "FullyQualifiedName!~MdNodifyMThemeTests" \
             --logger "trx;LogFileName=results.trx" \
-            --logger "console;verbosity=normal"; then
+            --logger "console;verbosity=normal" || status=$?
+
+          # timeout exits 124 when it kills the command, and that is the only case this step can
+          # honestly call a stall. Every other non-zero status is the suite reporting failures,
+          # and labelling that a timeout sends the next reader looking in the wrong place.
+          if (( status == 124 )); then
             echo "::error::The headless suite did not finish inside fifteen minutes"
-            exit 1
+          elif (( status != 0 )); then
+            echo "::error::The headless suite failed with exit code ${status}"
           fi
+          exit "$status"
 
       # Only meaningful once the test runner actually produced a .trx. Running it after a
       # compile failure would add a second red step that says nothing about the real cause.

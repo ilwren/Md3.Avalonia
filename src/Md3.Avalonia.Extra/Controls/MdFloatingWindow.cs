@@ -321,20 +321,27 @@ public sealed class MdFloatingWindow : ContentControl
         _contentPresence.Initialize(!IsMinimized);
         if (_contentHost is { } host) host.Opacity = IsMinimized ? 0d : 1d;
 
-        // An explicit height would leave a tall empty box behind, so the title bar decides the
-        // height while collapsed.
+        // The title bar decides the height while collapsed. It has to be written as an explicit
+        // height rather than handed back to auto sizing: the resize grip still sits in the content
+        // row, so a measuring window sizes the row to the grip's 18 and leaves a band of dead space
+        // under the bar. CollapsedHeight is NaN before the first measure, which falls back to the
+        // auto sizing this used to do.
         if (IsMinimized)
         {
+            // Record where to come back to the way Collapse does, so a window that was already
+            // minimized when its template landed still has somewhere to restore to.
+            _wasAutoSized = double.IsNaN(Height);
+            _expandedHeight = Height;
+
             RelaxMinHeightForCollapse();
-            SetHeightWithoutMotion(double.NaN);
+            SetHeightWithoutMotion(CollapsedHeight());
         }
         else
         {
             RestoreMinHeight();
+            _expandedHeight = double.NaN;
+            _wasAutoSized = false;
         }
-
-        _expandedHeight = double.NaN;
-        _wasAutoSized = false;
     }
 
     private void Collapse(Control host)
@@ -366,11 +373,13 @@ public sealed class MdFloatingWindow : ContentControl
         host.Opacity = 0d;
         Height = collapsed;
 
-        // Both the hide and the return to auto sizing wait for the travel to land. Hiding the
-        // content first would blank the surface mid-collapse; going auto-sized first would cancel
-        // the animation and snap.
+        // Both the hide and the landing of the height wait for the travel. Hiding the content
+        // first would blank the surface mid-collapse; settling first would cancel the animation
+        // and snap. The height lands on the collapsed value rather than on auto sizing, for the
+        // same reason as in ApplyMinimizedState: a measuring window would size the empty content
+        // row to the resize grip and grow back.
         _contentPresence.Update(false, ExitDuration());
-        ScheduleHeightSettle(double.NaN);
+        ScheduleHeightSettle(collapsed);
     }
 
     private void Expand(Control host)
@@ -387,19 +396,25 @@ public sealed class MdFloatingWindow : ContentControl
         _contentPresence.Update(true, TimeSpan.Zero);
         host.Opacity = 1d;
 
-        // The collapse ends by handing sizing back to the layout, which leaves Height at NaN - and
-        // a travel cannot leave from NaN, it just snaps. Freezing the measured height first gives
-        // the return journey a real number to start from, exactly as Collapse does before its own.
+        // Height is not always a usable starting point: the collapse writes a real one, but a
+        // window minimized before its first measure has none, and a travel cannot leave from NaN -
+        // it just snaps. Freezing the measured height gives the return journey a number to start
+        // from whatever the state turned out to be, the way Collapse does before its own.
         var current = Bounds.Height;
 
         RestoreMinHeight();
 
-        // Nothing to travel back to means the window is measuring itself, which is already the
-        // right answer, so the height is left alone rather than overwritten with a guess.
+        // With a height to go back to, that is the target. Without one the window was measuring
+        // itself before, so auto sizing is the answer - and it has to be written rather than left
+        // alone, because the collapsed state put an explicit strip in its place.
         if (expanded > 0)
         {
             SetHeightWithoutMotion(current);
             Height = expanded;
+        }
+        else if (wasAutoSized)
+        {
+            SetHeightWithoutMotion(double.NaN);
         }
 
         // A window that was measuring itself has to go back to it, but only once the travel lands.

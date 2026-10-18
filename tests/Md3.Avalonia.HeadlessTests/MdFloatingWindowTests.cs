@@ -377,6 +377,33 @@ public sealed class MdFloatingWindowTests
     }
 
     [AvaloniaFact]
+    public void A_Window_Minimized_Before_Its_Template_Landed_Still_Restores()
+    {
+        // ApplyMinimizedState runs from OnApplyTemplate, where there is no measured height to
+        // record. The collapsed state now writes an explicit height, so a restore has to fall back
+        // to auto sizing rather than leaving the window sitting on the strip it wrote.
+        var window = new MdFloatingWindow
+        {
+            Width = 280,
+            IsMinimized = true,
+            Content = new TextBlock { Text = "player" }
+        };
+        var host = new Grid { Width = 600, Height = 400, Children = { window } };
+        using var scope = Show(host, 600, 400);
+
+        var collapsed = window.Bounds.Height;
+        var bar = Part<Control>(window, "PART_TitleBar");
+        var border = window.BorderThickness;
+        Assert.Equal(bar.Bounds.Height + border.Top + border.Bottom, collapsed, 3);
+
+        window.IsMinimized = false;
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(window.Bounds.Height > collapsed, $"stayed collapsed at {window.Bounds.Height}");
+        Assert.True(double.IsNaN(window.Height));
+    }
+
+    [AvaloniaFact]
     public async Task Restoring_Travels_Rather_Than_Snapping_Back()
     {
         var window = new MdFloatingWindow { Width = 280, Height = 200, Content = new TextBlock { Text = "player" } };
@@ -390,12 +417,11 @@ public sealed class MdFloatingWindowTests
         var collapsed = window.Bounds.Height;
         Assert.True(collapsed < expanded / 2, $"collapsed to {collapsed} of {expanded}");
 
-        // The collapse ends by handing sizing back to the layout, so there is no Height left to
-        // travel from here - which is exactly why a restore has to freeze the measured height
-        // before it sets the one it is going back to. Polling for the whole travel instead of
-        // sampling once, because a single read at a guessed moment is the unreliable half of
-        // asserting a transition.
-        Assert.True(double.IsNaN(window.Height), "the collapse should have handed sizing back");
+        // The collapse lands on an explicit height, which is what gives the return journey a real
+        // number to leave from - the old code handed sizing back to the layout here, and a travel
+        // cannot start from NaN. Polling for the whole travel instead of sampling once, because a
+        // single read at a guessed moment is the unreliable half of asserting a transition.
+        Assert.Equal(collapsed, window.Height, 3);
 
         var seen = new List<double>();
         window.IsMinimized = false;
