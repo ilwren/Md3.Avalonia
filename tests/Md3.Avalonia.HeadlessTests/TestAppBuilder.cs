@@ -21,6 +21,7 @@ public sealed class TestApplication : Application
         Styles.Add(new MaterialAvaloniaHexTheme());
         Styles.Add(new MaterialDockTheme());
         Styles.Add(new MaterialTabaloniaTheme());
+        Styles.Add(new MaterialInkCanvasTheme());
 
         // LiveCharts is the one dependency whose theme is not an Avalonia style collection: every
         // chart resolves its look from one theme held by its global settings, so the test app

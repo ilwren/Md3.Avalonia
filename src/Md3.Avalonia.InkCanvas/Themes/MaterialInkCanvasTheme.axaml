@@ -8,9 +8,14 @@
        the signature pad built on top of it. The placeholder is hidden by default and shown by the
        :empty style rather than bound to a property, because the pad learns there is ink from an
        upstream event and not from a bindable count. -->
-  <!-- A keyed ControlTheme has to live in the resource dictionary: Styles itself only accepts
-       IStyle children, and a ControlTheme with an x:Key is a resource, not a style. -->
+  <!-- A keyed ControlTheme has to live in a resource dictionary, and in its own merged one: that
+       is the shape the AvaloniaHex theme uses for the HexEditor theme it supplies, which is the only
+       type-keyed ControlTheme in this repository that an opt-in package ships and that tests prove
+       gets applied. -->
   <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary>
   <ControlTheme x:Key="{x:Type md:MdSignaturePad}" TargetType="md:MdSignaturePad">
     <Setter Property="InkBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
     <Setter Property="InkThickness" Value="3" />
@@ -64,5 +69,8 @@
     <Style Selector="^:empty /template/ TextBlock#PART_Placeholder"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:erasing /template/ Border#PART_Baseline"><Setter Property="Opacity" Value="0.4" /></Style>
   </ControlTheme>
+        </ResourceDictionary>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
   </Styles.Resources>
 </Styles>
