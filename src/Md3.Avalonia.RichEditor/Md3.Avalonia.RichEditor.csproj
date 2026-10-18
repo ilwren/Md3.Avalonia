@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <!-- Unlike the other packages this one stays on net10.0: OlivierJC.AvaloniaRichEditor
+         1.2.1-fork.2 supports net10.0 only, so a net8.0 leg fails restore with NU1202. -->
+    <TargetFramework>net10.0</TargetFramework>
     <!-- Same reasoning as Md3.Avalonia.DataGrid: a namespace matching the themed control's own
          namespace shadows its types for every file under Md3.Avalonia.*. -->
     <RootNamespace>Md3.Avalonia.Themes</RootNamespace>

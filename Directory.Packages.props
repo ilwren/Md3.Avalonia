@@ -9,7 +9,7 @@
     <PackageVersion Include="Avalonia.Desktop" Version="12.1.2" />
     <PackageVersion Include="Avalonia.Headless.XUnit" Version="12.1.2" />
     <PackageVersion Include="Avalonia.Skia" Version="12.1.2" />
-    <PackageVersion Include="Avalonia.AvaloniaEdit" Version="12.1.2" />
+    <PackageVersion Include="Avalonia.AvaloniaEdit" Version="12.0.0" /> <!-- published from the AvaloniaEdit repository; 12.0.0 is its latest, it does not follow the Avalonia core version -->
     <PackageVersion Include="AvaloniaHex" Version="0.1.13" />
     <!-- Dock 12.1.0.7 requires Avalonia 12.1.3; this repository is pinned to 12.1.2, so the
          last Dock release that builds against that baseline is 12.1.0.6 (needs 12.1.1).
