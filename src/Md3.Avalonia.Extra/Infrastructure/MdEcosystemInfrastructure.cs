@@ -45,11 +45,11 @@ public sealed record MdPageResult<T>(IReadOnlyList<T> Items, int? NextPageKey, b
 /// <see cref="Md3.Avalonia.Extra.Controls.MdPagedItemsView.Error"/>, and
 /// <see cref="Md3.Avalonia.Extra.Controls.MdPagedItemsView.Items"/> properties.
 /// 实现者负责数据源、查询语义与取消行为，并通过 <see cref="MdPageResult{T}"/> 返回当前页数据及后续页信息。与 <see cref="Md3.Avalonia.Extra.Controls.MdPagedItemsView"/> 配合时，控件通过 <see cref="Md3.Avalonia.Extra.Controls.MdPagedItemsView.State"/>、<see cref="Md3.Avalonia.Extra.Controls.MdPagedItemsView.Error"/> 和 <see cref="Md3.Avalonia.Extra.Controls.MdPagedItemsView.Items"/> 属性提供加载状态。</para>
-/// <para><see cref="MdPagedItemsView"/> currently accepts a delegate of type
+/// <para><see cref="Md3.Avalonia.Extra.Controls.MdPagedItemsView"/> currently accepts a delegate of type
 /// <c>Func&lt;MdPageRequest, ValueTask&lt;MdPageResult&lt;object?&gt;&gt;&gt;</c>, not this interface
 /// directly. Adapt <see cref="LoadPageAsync"/> at the application boundary and convert the items
 /// to <see cref="object"/> as needed.</para>
-/// <para>目前 <see cref="MdPagedItemsView"/> 接收 <c>Func&lt;MdPageRequest, ValueTask&lt;MdPageResult&lt;object?&gt;&gt;&gt;</c> 委托，而非此接口本身。请在应用层适配 <see cref="LoadPageAsync"/>，并按需将数据项转换为 <see cref="object"/>。</para>
+/// <para>目前 <see cref="Md3.Avalonia.Extra.Controls.MdPagedItemsView"/> 接收 <c>Func&lt;MdPageRequest, ValueTask&lt;MdPageResult&lt;object?&gt;&gt;&gt;</c> 委托，而非此接口本身。请在应用层适配 <see cref="LoadPageAsync"/>，并按需将数据项转换为 <see cref="object"/>。</para>
 /// </remarks>
 /// <example>
 /// <para><c>Record</c>, <c>IRecordRepository</c>, and <c>repository</c> represent application-defined types and data.</para>
