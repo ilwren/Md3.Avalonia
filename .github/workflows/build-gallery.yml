@@ -60,6 +60,13 @@ jobs:
               tail -40 /tmp/publish.log | sed 's/^/    /'
             fi
           } >> "$GITHUB_STEP_SUMMARY"
+          grep -E 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/publish.log \
+            | sort -u | head -40 \
+            | while IFS= read -r line; do printf '::error title=publish::%s\n' "${line//%/%25}"; done
+          if ! grep -qE 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/publish.log; then
+            tail -25 /tmp/publish.log | while IFS= read -r line; do
+              printf '::error title=publish-tail::%s\n' "${line//%/%25}"; done
+          fi
           exit "$status"
 
       - name: Upload Desktop Artifacts
@@ -118,6 +125,15 @@ jobs:
             echo "    installed workloads:"
             dotnet workload list 2>&1 | sed 's/^/    /'
           } >> "$GITHUB_STEP_SUMMARY"
+          grep -E 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/android.log \
+            | sort -u | head -40 \
+            | while IFS= read -r line; do printf '::error title=android::%s\n' "${line//%/%25}"; done
+          if ! grep -qE 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/android.log; then
+            tail -25 /tmp/android.log | while IFS= read -r line; do
+              printf '::error title=android-tail::%s\n' "${line//%/%25}"; done
+          fi
+          dotnet workload list 2>&1 | head -20 \
+            | while IFS= read -r line; do printf '::notice title=workloads::%s\n' "${line//%/%25}"; done
           exit "$status"
 
       - name: Upload Android Artifacts
