@@ -47,8 +47,10 @@ jobs:
       - name: Prepare static Pages output
         run: touch _site/.nojekyll
 
+      # This repository has one shared Pages URL: the Arena branch is a temporary preview,
+      # and a deployment from main will replace it with the production version.
       - name: Upload GitHub Pages artifact
-        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/arena/7fa0e0b4-md3-avalonia' }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./_site
@@ -56,8 +58,12 @@ jobs:
 
   deploy:
     name: Deploy GitHub Pages
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/arena/7fa0e0b4-md3-avalonia' }}
     needs: build
+    # Preview and production share one Pages URL; serialize deployments without cancelling an active publish.
+    concurrency:
+      group: github-pages-deploy
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     permissions:
       pages: write
