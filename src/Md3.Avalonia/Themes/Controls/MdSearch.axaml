@@ -41,7 +41,7 @@
     <Style Selector="^:has-leading /template/ ContentPresenter#PART_Leading"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:has-trailing /template/ ContentPresenter#PART_Trailing"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:clear-visible /template/ Button#PART_ClearButton"><Setter Property="IsVisible" Value="True" /></Style>
-    <Style Selector="^:pointerover /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.04" /></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.08" /></Style>
     <Style Selector="^:focus-within"><Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /><Setter Property="BorderThickness" Value="2" /></Style>
   </ControlTheme>
 

@@ -45,7 +45,7 @@
                          ToolTip.Tip="Copy source code"
                          Click="CopyCode" />
       </Grid>
-      <Grid Grid.Row="1" Height="220">
+      <Grid Grid.Row="1">
         <avaloniaEdit:TextEditor x:Name="XamlEditor"
                                  Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
                                  Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"

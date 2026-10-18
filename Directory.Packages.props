@@ -5,13 +5,12 @@
   <ItemGroup>
     <PackageVersion Include="Avalonia" Version="12.1.2" />
     <PackageVersion Include="Avalonia.Android" Version="12.1.2" />
-    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="12.1.2" />
+    <PackageVersion Include="Avalonia.Controls.DataGrid" Version="12.1.2" /> <!-- 12.0.0 release is independently versioned in the DataGrid repository -->
     <PackageVersion Include="Avalonia.Desktop" Version="12.1.2" />
     <PackageVersion Include="Avalonia.Headless.XUnit" Version="12.1.2" />
     <PackageVersion Include="Avalonia.Skia" Version="12.1.2" />
-    <PackageVersion Include="Avalonia.AvaloniaEdit" Version="12.0.0" />
+    <PackageVersion Include="Avalonia.AvaloniaEdit" Version="12.1.2" />
     <PackageVersion Include="AvaloniaHex" Version="0.1.13" />
-    <PackageVersion Include="AvaloniaRichEditor" Version="1.2.1" />
     <!-- Dock 12.1.0.7 requires Avalonia 12.1.3; this repository is pinned to 12.1.2, so the
          last Dock release that builds against that baseline is 12.1.0.6 (needs 12.1.1).
          Bump both together. -->
@@ -82,6 +81,8 @@
          Themes/MaterialInkCanvasTheme writes, are upstream's own API, read at that tag. -->
     <PackageVersion Include="DotNetCampus.AvaloniaInkCanvas" Version="2.0.0" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.2" />
+    <PackageVersion Include="OlivierJC.AvaloniaRichEditor" Version="1.2.1-fork.2" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.1.2" />
     <PackageVersion Include="MaterialColorUtilities" Version="0.3.0" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />

@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- Keep ordinary solution restore/build independent of the optional Android workload. The
+         release pack scripts opt into the Android TFM after installing that workload. -->
+    <TargetFrameworks>net8.0;net10.0;net8.0-windows10.0.19041.0;net10.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(IncludeAndroidTarget)' == 'true'">net8.0;net10.0;net8.0-windows10.0.19041.0;net10.0-windows10.0.19041.0;net8.0-android;net10.0-android</TargetFrameworks>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net8.0-android' Or '$(TargetFramework)' == 'net10.0-android'">23</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net8.0-windows10.0.19041.0' Or '$(TargetFramework)' == 'net10.0-windows10.0.19041.0'">10.0.10240.0</SupportedOSPlatformVersion>
+    <RootNamespace>Md3.Avalonia.Notifications</RootNamespace>
+    <AssemblyName>Md3.Avalonia.Notifications</AssemblyName>
+    <Description>One API for native system notifications on Windows, macOS, Linux and Android.</Description>
+    <PackageId>Md3.Avalonia.Notifications</PackageId>
+    <Version>0.4.6-preview.1</Version>
+    <Authors>Md3.Avalonia contributors</Authors>
+    <PackageTags>avalonia;notifications;system-notifications;windows;macos;linux;android</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>logo-128.png</PackageIcon>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IsPackable>true</IsPackable>
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0' Or '$(TargetFramework)' == 'net10.0'">
+    <Compile Remove="Platforms/Android/**/*.cs" />
+    <Compile Remove="Platforms/Windows/**/*.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-android' Or '$(TargetFramework)' == 'net10.0-android'">
+    <Compile Remove="Platforms/Desktop/**/*.cs" />
+    <Compile Remove="Platforms/Windows/**/*.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows10.0.19041.0' Or '$(TargetFramework)' == 'net10.0-windows10.0.19041.0'">
+    <Compile Remove="Platforms/Android/**/*.cs" />
+    <Compile Remove="Platforms/Desktop/**/*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="README.md" />
+    <None Include="README.md" Pack="true" PackagePath="/" Link="README.md" />
+    <None Include="../../assets/logo-128.png" Pack="true" PackagePath="/" Link="logo-128.png" />
+    <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />
+  </ItemGroup>
+</Project>

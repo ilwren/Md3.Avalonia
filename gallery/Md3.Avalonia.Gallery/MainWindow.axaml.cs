@@ -45,7 +45,7 @@ public partial class MainWindow : Window
             ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, BreadcrumbNav, TextFieldNav,
             CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, ColorPickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
-            NavigationDrawerNav, AdaptiveNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
+            NavigationDrawerNav, AdaptiveNav, NotificationsNav, NotificationsAllNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
             SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, BorderlessWindowNav,
 AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             BeforeAfterNav, CalendarNav, CascaderNav, ChartNav,
@@ -96,6 +96,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             Entry("Navigation bar", "navigation bar destination flexible", NavigationBarNav, () => new NavigationBarGalleryPage()),
             Entry("Navigation drawer", "navigation drawer modal standard", NavigationDrawerNav, () => new NavigationDrawerGalleryPage()),
             Entry("Adaptive layout", "navigation rail adaptive responsive breakpoint", AdaptiveNav, () => new AdaptiveGalleryPage()),
+            Entry("Notifications", "system notifications native operating system toast alert permission", NotificationsNav, () => new NotificationsGalleryPage()),
             Entry("Search", "search bar view suggestions", SearchNav, () => new SearchGalleryPage()),
             Entry("Settings cards", "settings card preference group expander android tile", SettingsCardNav, () => new SettingsCardGalleryPage()),
             Entry("Sheets", "bottom side sheet", SheetNav, () => new SheetGalleryPage()),
@@ -177,13 +178,18 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             Entry("Adaptive controls", "adaptive switch progress cupertino ios platform", AdaptiveControlsNav, () => new AdaptiveControlsGalleryPage()),
             Entry("Focus, shortcut, Hero", "focus traversal shortcut keybinding hero transition", FocusHeroNav, () => new FocusShortcutHeroGalleryPage())
         ];
+        Array.Sort(_galleryIndex, static (left, right) =>
+            StringComparer.OrdinalIgnoreCase.Compare(left.Title, right.Title));
 
         ThemeSelector.ItemsSource = new[] { "Light", "Dark", "System" };
         ThemeSelector.SelectedIndex = 2;
         LanguageSelector.ItemsSource = new[] { "English", "简体中文" };
         LanguageSelector.SelectedIndex = 0;
         MdLocalization.SetCulture(this, _culture);
-        PageScroll.AddHandler(InputElement.PointerWheelChangedEvent, OnPagePointerWheel, RoutingStrategies.Tunnel);
+        // Let focused controls handle wheel input before the shell's scroll fallback.
+        // The shell observes handled events only to chain at an inner scroller's boundary.
+        PageScroll.AddHandler(InputElement.PointerWheelChangedEvent, OnPagePointerWheel,
+            RoutingStrategies.Bubble, handledEventsToo: true);
         Navigate(new ComponentsOverviewGalleryPage(), ComponentsOverviewNav, ComponentsTopNav);
         Dispatcher.UIThread.Post(() =>
         {
@@ -243,6 +249,8 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
     private void ShowNavigationBar(object? s, RoutedEventArgs e) => Navigate(new NavigationBarGalleryPage(), NavigationBarNav);
     private void ShowNavigationDrawer(object? s, RoutedEventArgs e) => Navigate(new NavigationDrawerGalleryPage(), NavigationDrawerNav);
     private void ShowAdaptive(object? s, RoutedEventArgs e) => Navigate(new AdaptiveGalleryPage(), AdaptiveNav);
+    private void ShowNotifications(object? s, RoutedEventArgs e) =>
+        Navigate(new NotificationsGalleryPage(), s as MdButton ?? NotificationsNav);
     private void ShowSearch(object? s, RoutedEventArgs e) => Navigate(new SearchGalleryPage(), SearchNav);
     private void ShowSettingsCard(object? s, RoutedEventArgs e) => Navigate(new SettingsCardGalleryPage(), SettingsCardNav);
     private void ShowSheets(object? s, RoutedEventArgs e) => Navigate(new SheetGalleryPage(), SheetNav);
@@ -527,6 +535,9 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
         var query = GallerySearch.Text?.Trim() ?? string.Empty;
         foreach (var entry in _galleryIndex)
             entry.Button.IsVisible = string.IsNullOrEmpty(query) || entry.Matches(query);
+        // Notifications is indexed through the Communications section, but remains duplicated in
+        // the alphabetical browse list so the "ALL COMPONENTS" index is genuinely complete.
+        NotificationsAllNav.IsVisible = NotificationsNav.IsVisible;
     }
 
     private void GallerySearchSubmitted(object? sender, string query)
@@ -566,18 +577,32 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
 
     private void OnPagePointerWheel(object? sender, PointerWheelEventArgs e)
     {
-        // Let an embedded material scrolling surface consume the wheel while it still has room.
-        // The shell takes over only at that surface's boundary, preserving normal scroll chaining.
-        var nested = (e.Source as Visual)?.GetVisualAncestors()
+        if (e.Delta.Y == 0) return;
+
+        var source = e.Source as Visual;
+        var numeric = source as MdNumericBox ?? source?.GetVisualAncestors().OfType<MdNumericBox>().FirstOrDefault();
+        if (numeric?.IsKeyboardFocusWithin == true)
+            return; // NumericUpDown owns the focused-wheel gesture; never scroll the page as well.
+
+        // Let an embedded scrolling surface consume the wheel while it still has room. Because
+        // this is a bubble handler, an inner ScrollViewer may already have marked the event
+        // handled; at its boundary the shell still chains the wheel to the page scroller.
+        var nested = source?.GetVisualAncestors()
             .OfType<ScrollViewer>()
             .FirstOrDefault(viewer => !ReferenceEquals(viewer, PageScroll));
+        var nestedAtBoundary = false;
         if (nested is not null)
         {
             var nestedMaximum = Math.Max(0, nested.Extent.Height - nested.Viewport.Height);
             var canConsume = e.Delta.Y > 0 && nested.Offset.Y > 0 ||
                              e.Delta.Y < 0 && nested.Offset.Y < nestedMaximum;
             if (canConsume) return;
+            nestedAtBoundary = true;
         }
+
+        // Do not override another control that consumed the gesture. The exception is an inner
+        // scroller at its boundary, where scroll chaining intentionally transfers it to the shell.
+        if (e.Handled && !nestedAtBoundary) return;
 
         var scroller = GetPageScroller();
         if (scroller is null || scroller.Extent.Height <= scroller.Viewport.Height) return;
@@ -609,16 +634,35 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             GalleryLocalization.Apply(page, _culture);
     }
 
-    private void ThemeSelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        var variant = ThemeSelector.SelectedIndex switch { 0 => ThemeVariant.Light, 1 => ThemeVariant.Dark, _ => ThemeVariant.Default };
-        if (Application.Current is not { } application) return;
-        application.RequestedThemeVariant = variant;
-        var mode = ThemeSelector.SelectedIndex switch
+    private void ThemeSelectionChanged(object? sender, SelectionChangedEventArgs e) =>
+        ApplyThemeMode(ThemeSelector.SelectedIndex switch
         {
             0 => MdThemeMode.Light,
             1 => MdThemeMode.Dark,
             _ => MdThemeMode.System
+        });
+
+    /// <summary>
+    /// Applies a light/dark/system theme and keeps the shell selector in sync, so pages can
+    /// toggle the theme (e.g. the settings samples' "Dark theme" switch) without the shell UI
+    /// diverging from the actual appearance.
+    /// </summary>
+    public void ApplyThemeMode(MdThemeMode mode)
+    {
+        if (Application.Current is not { } application) return;
+        var wantedIndex = mode switch { MdThemeMode.Light => 0, MdThemeMode.Dark => 1, _ => 2 };
+        if (ThemeSelector.SelectedIndex != wantedIndex)
+        {
+            // Raising SelectionChanged routes back into ApplyThemeMode with the selector aligned.
+            ThemeSelector.SelectedIndex = wantedIndex;
+            return;
+        }
+
+        application.RequestedThemeVariant = mode switch
+        {
+            MdThemeMode.Light => ThemeVariant.Light,
+            MdThemeMode.Dark => ThemeVariant.Dark,
+            _ => ThemeVariant.Default
         };
         var options = MdThemeManager.Current with { ThemeMode = mode };
         var dark = mode == MdThemeMode.Dark || mode == MdThemeMode.System && application.ActualThemeVariant == ThemeVariant.Dark;

@@ -2,7 +2,7 @@
 
 Status: **the documented Waves A–F scope is implemented** (hardened 2026-09-26). This is an Avalonia-native, provider-neutral subset; it is not a claim of API or feature completeness against every referenced Flutter package.
 
-This document is the implementation ledger for `Md3.Avalonia.Ecosystem`. It records behavior studied from public documentation, not copied implementation. The package depends on `Md3.Avalonia` and Avalonia only; it never requires `Md3.Avalonia.Icons`. Applications can inject their own glyphs, fonts, data engines and providers.
+This document is the implementation ledger for the ecosystem controls in `Md3.Avalonia.Extra`. It records behavior studied from public documentation, not copied implementation. The package depends on `Md3.Avalonia` and Avalonia only; it never requires `Md3.Avalonia.Icons`. Applications can inject their own glyphs, fonts, data engines and providers.
 
 ## Mandatory clean-room gate
 
@@ -12,7 +12,7 @@ For every external baseline:
 2. Record only public behavior, states, accessibility semantics and API concepts.
 3. Do not copy source, private assets, package-specific naming, shaders or generated code.
 4. Design an Avalonia-native API based on styled/direct properties, `ICommand`, events and provider interfaces.
-5. Apply Material 3 tokens through the opt-in `EcosystemTheme`.
+5. Apply Material 3 tokens through the opt-in `ExtraTheme`.
 6. Complete the visual/interaction gate in `COMPONENT_QUALITY_CHECKLIST.md`.
 
 Frozen initial baselines are GetWidget 7.0.2, flutter_rating_bar 4.0.1 and shadcn_ui 0.57.0. Later-wave controls use general public interaction conventions and provider-neutral contracts rather than cloned package code.

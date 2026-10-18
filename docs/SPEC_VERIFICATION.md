@@ -284,7 +284,7 @@ Changes made to shorten the critical path, none of which drop coverage:
 
 - **Packaging removed from `ci.yml`.** `build-nuget.yml` already runs `scripts/build-nuget.sh` from
   a clean tree on push to `main`/`arena/**` and on every PR to `main`. CI was paying for a second
-  full rebuild of all four packaged projects to get an identical answer.
+  full rebuild of all seven packaged projects to get an identical answer.
 - **Multi-OS gallery builds removed.** `build-gallery.yml` covers Linux, Windows and macOS on the
   same triggers. The Linux Desktop head is still built in CI because it is nearly free once the
   shared graph is compiled, and it is what produces the inline compiler annotations.

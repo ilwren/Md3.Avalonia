@@ -7,7 +7,7 @@ using Md3.Avalonia.Motion;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>Template part used by <see cref="MdSlider"/> to carry Material value-indicator state.</summary>
-[PseudoClasses(":show-value", ":reduced-motion", ":no-motion")]
+[PseudoClasses(":show-value", ":dragging", ":reduced-motion", ":no-motion")]
 public sealed class MdSliderThumb : Thumb
 {
     public static readonly StyledProperty<bool> ShowValueIndicatorProperty =
@@ -47,6 +47,9 @@ public sealed class MdSliderThumb : Thumb
     }
 
     private void UpdatePseudoClasses() => PseudoClasses.Set(":show-value", ShowValueIndicator);
+
+    /// <summary>Forwarded by the owning slider so the value indicator can follow the drag state.</summary>
+    public void SetDragging(bool value) => PseudoClasses.Set(":dragging", value);
 
     private void UpdateMotion()
     {

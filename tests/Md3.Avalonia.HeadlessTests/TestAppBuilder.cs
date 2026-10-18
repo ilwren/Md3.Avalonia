@@ -14,7 +14,7 @@ public sealed class TestApplication : Application
     public override void Initialize()
     {
         Styles.Add(new MaterialTheme());
-        Styles.Add(new EcosystemTheme());
+        Styles.Add(new ExtraTheme());
         Styles.Add(new MaterialDataGridTheme());
         Styles.Add(new MaterialRichEditorTheme());
         Styles.Add(new MaterialAvaloniaEditTheme());

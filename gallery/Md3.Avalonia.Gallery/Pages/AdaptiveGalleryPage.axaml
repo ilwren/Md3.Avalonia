@@ -37,7 +37,7 @@
           <md:MdButton Content="Expanded · 1040" Tag="1040" Variant="Outlined" Click="SetSuiteWidth" />
         </StackPanel>
         <TextBlock x:Name="SuiteStatus" Classes="body" Text="Medium viewport · navigation rail · Home destination." />
-        <md:MdNavigationSuite x:Name="DemoSuite" MaxWidth="760" Height="360" HorizontalAlignment="Stretch"
+        <md:MdNavigationSuite x:Name="DemoSuite" Height="360" HorizontalAlignment="Stretch"
                               Mode="Auto" RailBreakpoint="600" DrawerBreakpoint="1000">
           <md:MdNavigationSuite.NavigationBar>
             <md:MdNavigationBar SelectedIndex="0" SelectionChanged="SuiteDestinationChanged">

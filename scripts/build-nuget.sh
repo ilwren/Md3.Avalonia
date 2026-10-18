@@ -8,15 +8,16 @@ Md3.Avalonia.Icons.Lite, Md3.Avalonia.Extra, Md3.Avalonia.DataGrid,
 Md3.Avalonia.RichEditor, Md3.Avalonia.AvaloniaEdit, Md3.Avalonia.AvaloniaHex,
 Md3.Avalonia.Dock, Md3.Avalonia.Tabalonia, Md3.Avalonia.Markdown,
 Md3.Avalonia.LiveCharts2, Md3.Avalonia.ScottPlot,
-Md3.Avalonia.PropertyGrid, Md3.Avalonia.NodifyM, Md3.Avalonia.Mapsui and Md3.Avalonia.InkCanvas.
+Md3.Avalonia.PropertyGrid, Md3.Avalonia.NodifyM, Md3.Avalonia.Mapsui, Md3.Avalonia.InkCanvas and Md3.Avalonia.Notifications.
 
 Usage:
   scripts/build-nuget.sh [--output /absolute/or/relative/path]
                          [--configuration Release]
+                         [--version 0.4.6-preview.1]
                          [--no-restore]
                          [--keep-intermediate]
 
-By default the script deletes bin/ and obj/ for the twelve packaged projects before and
+By default the script deletes bin/ and obj/ for the eighteen packaged projects before and
 after packing, so a release artifact can never pick up a stale intermediate. Pass
 --keep-intermediate when a CI job has already produced the same configuration and the
 run is a packaging *check* rather than a release build; that reuses the existing
@@ -25,13 +26,14 @@ compilation instead of paying for a second full rebuild.
 The repository includes the pinned official Material Symbols Rounded fonts.
 Their provenance and checksums are verified before packaging.
 
-A .NET 10 SDK is required.
+A .NET 10 SDK, Java 17 and the .NET Android workload are required (dotnet workload install android).
 EOF
 }
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONFIGURATION="Release"
 OUTPUT="$ROOT/artifacts/nuget"
+PACKAGE_VERSION=""
 RESTORE=1
 KEEP_INTERMEDIATE=0
 
@@ -43,6 +45,9 @@ while (($#)); do
     --configuration)
       [[ $# -ge 2 ]] || { echo "error: --configuration requires a value" >&2; exit 2; }
       CONFIGURATION="$2"; shift 2 ;;
+    --version)
+      [[ $# -ge 2 ]] || { echo "error: --version requires a value" >&2; exit 2; }
+      PACKAGE_VERSION="$2"; shift 2 ;;
     --no-restore)
       RESTORE=0; shift ;;
     --keep-intermediate)
@@ -57,6 +62,15 @@ while (($#)); do
 done
 
 if [[ "$OUTPUT" != /* ]]; then OUTPUT="$ROOT/$OUTPUT"; fi
+
+if [[ -n "$PACKAGE_VERSION" ]] && [[ ! "$PACKAGE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]; then
+  echo "error: invalid package version '$PACKAGE_VERSION' (expected SemVer such as 0.4.6 or 0.4.6-preview.1)" >&2
+  exit 2
+fi
+VERSION_ARGS=()
+if [[ -n "$PACKAGE_VERSION" ]]; then
+  VERSION_ARGS=("-p:Version=$PACKAGE_VERSION")
+fi
 
 command -v dotnet >/dev/null 2>&1 || { echo "error: dotnet was not found in PATH" >&2; exit 1; }
 SDK_VERSION="$(dotnet --version)"
@@ -84,6 +98,7 @@ PROJECTS=(
   "$ROOT/src/Md3.Avalonia.NodifyM/Md3.Avalonia.NodifyM.csproj"
   "$ROOT/src/Md3.Avalonia.Mapsui/Md3.Avalonia.Mapsui.csproj"
   "$ROOT/src/Md3.Avalonia.InkCanvas/Md3.Avalonia.InkCanvas.csproj"
+  "$ROOT/src/Md3.Avalonia.Notifications/Md3.Avalonia.Notifications.csproj"
 )
 
 if command -v python3 >/dev/null 2>&1; then
@@ -117,6 +132,7 @@ cleanup_intermediate() {
        "$ROOT/src/Md3.Avalonia.NodifyM" \
        "$ROOT/src/Md3.Avalonia.Mapsui" \
        "$ROOT/src/Md3.Avalonia.InkCanvas" \
+       "$ROOT/src/Md3.Avalonia.Notifications" \
        -type d \( -name bin -o -name obj \) -prune -exec rm -rf {} + 2>/dev/null || true
 }
 trap cleanup_intermediate EXIT
@@ -125,21 +141,29 @@ cleanup_intermediate
 rm -rf "$OUTPUT"
 mkdir -p "$OUTPUT"
 
+project_args_for() {
+  if [[ "$1" == "$ROOT/src/Md3.Avalonia.Notifications/Md3.Avalonia.Notifications.csproj" ]]; then
+    printf '%s\n' '-p:IncludeAndroidTarget=true'
+  fi
+}
+
 if ((RESTORE)); then
   for proj in "${PROJECTS[@]}"; do
-    dotnet restore "$proj" --nologo
+    mapfile -t PROJECT_ARGS < <(project_args_for "$proj")
+    dotnet restore "$proj" --nologo "${PROJECT_ARGS[@]}" "${VERSION_ARGS[@]}"
   done
 fi
 
 NO_RESTORE=(--no-restore)
 for proj in "${PROJECTS[@]}"; do
-  dotnet build "$proj" -c "$CONFIGURATION" "${NO_RESTORE[@]}" --nologo
-  dotnet pack "$proj" -c "$CONFIGURATION" --no-build --no-restore --nologo -o "$OUTPUT"
+  mapfile -t PROJECT_ARGS < <(project_args_for "$proj")
+  dotnet build "$proj" -c "$CONFIGURATION" "${NO_RESTORE[@]}" --nologo "${PROJECT_ARGS[@]}" "${VERSION_ARGS[@]}"
+  dotnet pack "$proj" -c "$CONFIGURATION" --no-build --no-restore --nologo -o "$OUTPUT" "${PROJECT_ARGS[@]}" "${VERSION_ARGS[@]}"
 done
 
-VERSION="$(sed -n 's:.*<Version>\([^<]*\)</Version>.*:\1:p' "${PROJECTS[0]}" | head -1)"
+VERSION="${PACKAGE_VERSION:-$(sed -n 's:.*<Version>\([^<]*\)</Version>.*:\1:p' "${PROJECTS[0]}" | head -1)}"
 [[ -n "$VERSION" ]] || { echo "error: package version is missing" >&2; exit 1; }
-PACKAGE_IDS=(Md3.Avalonia Md3.Avalonia.Icons Md3.Avalonia.Icons.Lite Md3.Avalonia.Extra Md3.Avalonia.DataGrid Md3.Avalonia.RichEditor Md3.Avalonia.AvaloniaEdit Md3.Avalonia.AvaloniaHex Md3.Avalonia.Dock Md3.Avalonia.Tabalonia Md3.Avalonia.Markdown Md3.Avalonia.LiveCharts2 Md3.Avalonia.ScottPlot Md3.Avalonia.PropertyGrid Md3.Avalonia.NodifyM Md3.Avalonia.Mapsui Md3.Avalonia.InkCanvas)
+PACKAGE_IDS=(Md3.Avalonia Md3.Avalonia.Icons Md3.Avalonia.Icons.Lite Md3.Avalonia.Extra Md3.Avalonia.DataGrid Md3.Avalonia.RichEditor Md3.Avalonia.AvaloniaEdit Md3.Avalonia.AvaloniaHex Md3.Avalonia.Dock Md3.Avalonia.Tabalonia Md3.Avalonia.Markdown Md3.Avalonia.LiveCharts2 Md3.Avalonia.ScottPlot Md3.Avalonia.PropertyGrid Md3.Avalonia.NodifyM Md3.Avalonia.Mapsui Md3.Avalonia.InkCanvas Md3.Avalonia.Notifications)
 for package_id in "${PACKAGE_IDS[@]}"; do
   for extension in nupkg snupkg; do
     package="$OUTPUT/$package_id.$VERSION.$extension"

@@ -1,7 +1,7 @@
 # UI parity audit — Material Design 3 and Flutter Material
 
 **Audit date:** 2026-09-27  
-**Scope:** `Md3.Avalonia`, `Md3.Avalonia.Icons`, `Md3.Avalonia.Ecosystem`, Gallery shell and all Gallery component destinations  
+**Scope:** `Md3.Avalonia`, `Md3.Avalonia.Icons`, `Md3.Avalonia.Extra`, Gallery shell and all Gallery component destinations<br>
 **Baseline:** current Material Design 3 component site and Flutter 3.47 Material catalog/API
 
 ## 1. Executive conclusion
@@ -223,7 +223,7 @@ These are not all appropriate for the core library, but they are gaps if “Flut
 - Material page-route, predictive-back and route-transition services;
 - a Flutter-stable default-token compatibility theme.
 
-## 7. Ecosystem package audit
+## 7. Extra controls audit
 
 | Area | Current result | Remaining gap |
 |---|---|---|

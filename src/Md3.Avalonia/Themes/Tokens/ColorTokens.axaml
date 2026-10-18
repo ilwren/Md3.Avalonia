@@ -16,7 +16,7 @@
       <Color x:Key="Md.Sys.Color.OnTertiary">#FFFFFF</Color>
       <Color x:Key="Md.Sys.Color.TertiaryContainer">#FFD8E4</Color>
       <Color x:Key="Md.Sys.Color.OnTertiaryContainer">#31111D</Color>
-      <Color x:Key="Md.Sys.Color.Surface">#FFFBFE</Color>
+      <Color x:Key="Md.Sys.Color.Surface">#FEF7FF</Color>
       <Color x:Key="Md.Sys.Color.SurfaceContainer">#F3EDF7</Color>
       <Color x:Key="Md.Sys.Color.SurfaceContainerLow">#F7F2FA</Color>
       <Color x:Key="Md.Sys.Color.SurfaceContainerHigh">#ECE6F0</Color>

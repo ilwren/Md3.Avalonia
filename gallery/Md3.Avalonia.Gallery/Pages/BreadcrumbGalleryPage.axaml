@@ -3,6 +3,7 @@
              xmlns:md="using:Md3.Avalonia.Controls"
              xmlns:extra="using:Md3.Avalonia.Extra.Controls"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             xmlns:pages="using:Md3.Avalonia.Gallery.Pages"
              x:Class="Md3.Avalonia.Gallery.Pages.BreadcrumbGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Spacing="28">
@@ -15,7 +16,9 @@
         <TextBlock Classes="h2" Text="Interactive breadcrumb" />
         <TextBlock Classes="body" TextWrapping="Wrap" Text="Clicking a parent segment navigates to it and drops everything below, which is what a breadcrumb is for. The trailing segment is the current location: it has no hover state and no hand cursor." />
         <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
-          <extra:MdBreadcrumb x:Name="DemoBreadcrumb" Separator="›" ItemInvoked="OnBreadcrumbItemInvoked" />
+          <extra:MdBreadcrumb x:Name="DemoBreadcrumb"
+                              ItemsSource="{Binding CurrentPath, RelativeSource={RelativeSource AncestorType=pages:BreadcrumbGalleryPage}, Converter={StaticResource MdBreadcrumbPathConverter}}"
+                              Separator="›" ItemInvoked="OnBreadcrumbItemInvoked" />
         </Border>
         <StackPanel Orientation="Horizontal" Spacing="12">
           <md:MdButton Content="Reset path" Variant="Outlined" Click="OnResetPath" />
@@ -42,18 +45,20 @@
 
       <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="h2" Text="Powerline variant" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Set Variant to Powerline for the interlocking wedge segments used by terminal prompts. Each segment ends in an arrow that slots into the notch of the next one, so the strip reads as one continuous ribbon. Colours stay on Material 3 roles rather than terminal ANSI colours, and the selected segment takes the primary role." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Set Variant to Powerline for interlocking chevron segments. Each point slots into the next segment's notch, creating one continuous ribbon. This example uses MdBreadcrumbPathConverter too: selecting an ancestor updates the shared route, while ancestor and current-location colours stay on Material 3 roles." />
         <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
           <extra:MdBreadcrumb x:Name="PowerlineBreadcrumb" Variant="Powerline"
+                              ItemsSource="{Binding CurrentPath, RelativeSource={RelativeSource AncestorType=pages:BreadcrumbGalleryPage}, Converter={StaticResource MdBreadcrumbPathConverter}}"
                               HorizontalAlignment="Left"
                               ItemInvoked="OnPowerlineBreadcrumbInvoked" />
         </Border>
-        <TextBlock x:Name="PowerlineStatus" Classes="body" Text="Click any segment to select it." />
+        <TextBlock x:Name="PowerlineStatus" Classes="body" Text="Click a parent segment to navigate." />
       </StackPanel>
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
-        <gallery:CodeExample XamlCode="&lt;extra:MdBreadcrumb ItemsSource=&quot;{Binding PathSegments}&quot;&#10;                 Separator=&quot;›&quot;&#10;                 ItemInvoked=&quot;OnBreadcrumbInvoked&quot; /&gt;"
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="ExtraTheme registers MdBreadcrumbPathConverter as a resource named MdBreadcrumbPathConverter. Add ExtraTheme after MaterialTheme, then reference this resource from the ItemsSource binding." />
+        <gallery:CodeExample XamlCode="&lt;extra:MdBreadcrumb&#10;    Variant=&quot;Powerline&quot;&#10;    ItemsSource=&quot;{Binding CurrentPath, Converter={StaticResource MdBreadcrumbPathConverter}}&quot;&#10;    ItemInvokedCommand=&quot;{Binding NavigateToBreadcrumbCommand}&quot;&#10;    Separator=&quot;›&quot; /&gt;"
                              CSharpCode="var breadcrumb = new MdBreadcrumb&#10;{&#10;    ItemsSource = new[] { &quot;Home&quot;, &quot;Documents&quot;, &quot;Projects&quot;, &quot;Material 3&quot; },&#10;    Separator = &quot;›&quot;&#10;};&#10;breadcrumb.ItemInvoked += (_, item) =&gt; NavigateTo(item);" />
       </StackPanel>
     </StackPanel>

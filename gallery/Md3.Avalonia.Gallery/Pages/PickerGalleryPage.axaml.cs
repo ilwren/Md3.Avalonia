@@ -10,6 +10,13 @@ public partial class PickerGalleryPage : UserControl
     public PickerGalleryPage()
     {
         InitializeComponent();
+        if ((OperatingSystem.IsAndroid() || OperatingSystem.IsIOS()) && KeyboardHint is not null)
+        {
+            // Touch devices have no Escape/Enter/Tab keys; point at the on-screen actions instead.
+            KeyboardHint.Text = GalleryLocalization.Choose(
+                "Use Cancel to dismiss and OK to confirm; the input mode has its own confirm action. Popup state and selected values support two-way MVVM binding.",
+                "使用 Cancel 关闭、OK 确认；输入模式有独立的确认操作。弹出状态与选中值支持双向 MVVM 绑定。");
+        }
 
         // Defect #9 was reported as "the picker doesn't apply the selection". The page showed no
         // bound value anywhere, so neither outcome was observable: a committed selection and a

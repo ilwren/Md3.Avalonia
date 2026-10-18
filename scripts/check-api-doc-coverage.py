@@ -22,8 +22,9 @@ PACKAGES = ["Md3.Avalonia", "Md3.Avalonia.Extra", "Md3.Avalonia.Icons", "Md3.Ava
             "Md3.Avalonia.LiveCharts2",
             "Md3.Avalonia.ScottPlot", "Md3.Avalonia.PropertyGrid", "Md3.Avalonia.NodifyM",
             "Md3.Avalonia.Mapsui", "Md3.Avalonia.InkCanvas",
-            "Md3.Avalonia.DataGrid", "Md3.Avalonia.AvaloniaEdit"]
-# 16k lines of generated glyph constants; the catalog is documented as a whole, not per glyph.
+            "Md3.Avalonia.DataGrid", "Md3.Avalonia.AvaloniaEdit",
+            "Md3.Avalonia.RichEditor", "Md3.Avalonia.Notifications"]
+            # 16k lines of generated glyph constants; the catalog is documented as a whole, not per glyph.
 SKIP_FILES = {"MdSymbols.cs", "MdSymbolsLite.cs"}
 DOC = pathlib.Path("docs/API.md")
 

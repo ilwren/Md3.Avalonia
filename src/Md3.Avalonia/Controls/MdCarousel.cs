@@ -4,7 +4,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -14,9 +13,9 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>
 /// A horizontally scrolling Material 3 carousel. Direct manipulation remains 1:1; keyline
-/// navigation, keyboard and autoplay changes use a token-driven snap settle and resize the
-/// realized large, medium and small items without replacing their content. Tap selection does not
-/// move the keyline or resize cards.
+/// navigation, item selection, keyboard and autoplay changes use a token-driven snap settle and
+/// resize the realized large, medium and small items without replacing their content. Pointer
+/// selection promotes a compact card to the focal keyline.
 /// </summary>
 [PseudoClasses(":multi-browse", ":hero", ":center-aligned", ":uncontained", ":reduced-motion", ":no-motion")]
 public sealed class MdCarousel : ListBox
@@ -63,7 +62,6 @@ public sealed class MdCarousel : ListBox
     private ScrollViewer? _scrollViewer;
     private int _settleVersion;
     private int _layoutAnchorIndex;
-    private bool _isPointerSelection;
     private bool _updatingSelection;
 
     static MdCarousel()
@@ -114,12 +112,11 @@ public sealed class MdCarousel : ListBox
             _settleCleanupTimer.Stop();
             if (_scrollViewer is not null) _scrollViewer.Transitions = null;
         };
-        AddHandler(PointerPressedEvent, PreviewCarouselPointerPressed, RoutingStrategies.Tunnel);
         SelectionChanged += (_, _) =>
         {
-            // Material carousel taps invoke/select content but do not resize it. Geometry follows
-            // the keyline/scroll anchor, matching Flutter CarouselView.onTap semantics.
-            if (!_isPointerSelection && !_updatingSelection && SelectedIndex >= 0)
+            // Selecting a compact keyline (including a pointer tap) makes it the focal item so
+            // it expands into the large keyline, matching the native Android carousel behavior.
+            if (!_updatingSelection && SelectedIndex >= 0)
                 SetLayoutAnchor(SelectedIndex, settle: true);
             UpdateSelectionAnnouncement();
         };
@@ -169,15 +166,6 @@ public sealed class MdCarousel : ListBox
         UpdateMotion();
         UpdateRealizedContainers();
         ScheduleSelectedSettle();
-    }
-
-    private void PreviewCarouselPointerPressed(object? sender, PointerPressedEventArgs e)
-    {
-        _isPointerSelection = e.Source is Visual source && source.GetVisualAncestors()
-            .Prepend(source)
-            .OfType<ListBoxItem>()
-            .Any();
-        Dispatcher.UIThread.Post(() => _isPointerSelection = false, DispatcherPriority.Background);
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)

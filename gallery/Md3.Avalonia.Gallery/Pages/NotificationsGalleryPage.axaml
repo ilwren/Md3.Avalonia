@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.NotificationsGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Notifications" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="Send a native operating-system notification. Unlike a snackbar, it is delivered outside the app window and follows the user's notification settings." />
+      </StackPanel>
+
+      <Border MaxWidth="760" Padding="24" HorizontalAlignment="Stretch" CornerRadius="24"
+              Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+        <StackPanel Spacing="16">
+          <TextBlock Classes="h2" Text="Send a test notification" />
+          <md:MdTextBox x:Name="TitleInput" Label="Title" Text="Build complete" MaxWidth="560" />
+          <md:MdTextBox x:Name="BodyInput" Label="Message" Text="The gallery finished a sample task."
+                        AcceptsReturn="True" TextWrapping="Wrap" MinHeight="112" MaxWidth="560" />
+          <md:MdButton x:Name="SendButton" Content="Send native notification" Variant="Filled"
+                       HorizontalAlignment="Left" Click="SendNotification" />
+          <TextBlock x:Name="PlatformStatusText" Classes="body" TextWrapping="Wrap" />
+          <TextBlock x:Name="StatusText" Classes="body" TextWrapping="Wrap"
+                     Text="Ready to send a native notification." />
+        </StackPanel>
+      </Border>
+
+      <Border MaxWidth="760" Padding="20" HorizontalAlignment="Stretch" CornerRadius="20"
+              Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h3" Text="Platform setup" />
+          <TextBlock Classes="body" TextWrapping="Wrap"
+                     Text="Linux needs libnotify and a running desktop notification service. Android 13+ needs POST_NOTIFICATIONS permission. The Windows Gallery registers its current-user Start-menu shortcut and AppUserModelID at launch; allow notifications for the app in Windows Settings. Other Windows desktop hosts must register their own AppUserModelID shortcut. macOS delivery follows system notification settings." />
+        </StackPanel>
+      </Border>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample CSharpCode="var notifications = MdSystemNotificationService.CreateDefault(new MdSystemNotificationOptions&#10;{&#10;    ApplicationName = &quot;Material Design 3 Gallery&quot;,&#10;    // On Windows, match the AppUserModelID on your registered Start-menu shortcut.&#10;    WindowsAppUserModelId = &quot;Contoso.Builder&quot;&#10;});&#10;await notifications.ShowAsync(title, message);" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

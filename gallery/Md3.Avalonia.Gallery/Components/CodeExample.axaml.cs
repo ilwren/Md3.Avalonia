@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
+using System;
 using System.IO;
 using System.Xml;
 using AvaloniaEdit.Highlighting;
@@ -92,6 +93,19 @@ public partial class CodeExample : UserControl
 
     private bool HasCSharp => !string.IsNullOrWhiteSpace(EffectiveCSharp);
 
+    /// <summary>
+    /// Sizes the editors to their content so short snippets are not stranded at the top of a
+    /// fixed-height box; long snippets cap out and scroll internally.
+    /// </summary>
+    private void UpdateEditorHeights()
+    {
+        foreach (var editor in new[] { XamlEditor, CSharpEditor })
+        {
+            var lines = Math.Max(1, editor.Document?.LineCount ?? 1);
+            editor.Height = Math.Clamp(lines * 19.0 + 30, 80, 460);
+        }
+    }
+
     private void UpdateEditors()
     {
         if (XamlEditor is null || CSharpEditor is null)
@@ -101,6 +115,7 @@ public partial class CodeExample : UserControl
 
         XamlEditor.Text = EffectiveXaml;
         CSharpEditor.Text = EffectiveCSharp;
+        UpdateEditorHeights();
 
         var hasXaml = HasXaml;
         var hasCSharp = HasCSharp;
