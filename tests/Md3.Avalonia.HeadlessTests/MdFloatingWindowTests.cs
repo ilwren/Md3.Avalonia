@@ -274,12 +274,12 @@ public sealed class MdFloatingWindowTests
         // fading the whole window would read as blinking rather than as collapsing.
         Assert.NotNull(window.Transitions);
         Assert.Contains(window.Transitions!, transition =>
-            transition is DoubleTransition && transition.Property == MdFloatingWindow.HeightProperty);
+            transition is DoubleTransition height && height.Property == MdFloatingWindow.HeightProperty);
 
         var contentHost = Part<Control>(window, "PART_ContentHost");
         Assert.NotNull(contentHost.Transitions);
         Assert.Contains(contentHost.Transitions!, transition =>
-            transition is DoubleTransition && transition.Property == global::Avalonia.Visual.OpacityProperty);
+            transition is DoubleTransition fade && fade.Property == global::Avalonia.Visual.OpacityProperty);
     }
 
     [AvaloniaFact]
@@ -295,9 +295,10 @@ public sealed class MdFloatingWindowTests
         MdMotion.SetScheme(host, MdMotionScheme.Reduced);
         Dispatcher.UIThread.RunJobs();
 
-        Assert.DoesNotContain(window.Transitions!, transition => transition.Property == MdFloatingWindow.HeightProperty);
+        Assert.DoesNotContain(window.Transitions!,
+            transition => transition is DoubleTransition height && height.Property == MdFloatingWindow.HeightProperty);
         Assert.Contains(Part<Control>(window, "PART_ContentHost").Transitions!,
-            transition => transition.Property == global::Avalonia.Visual.OpacityProperty);
+            transition => transition is DoubleTransition fade && fade.Property == global::Avalonia.Visual.OpacityProperty);
     }
 
     [AvaloniaFact]
