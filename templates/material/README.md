@@ -1,5 +1,5 @@
-# DocFX Material theme overlay
+# Material Design 3 layer for DocFX Modern
 
-This project vendors the `material` CSS overlay from [ovasquez/docfx-material](https://github.com/ovasquez/docfx-material), pinned to upstream commit `5da131a2058d378b2892a8e1c85adf33f553ca06`.
+This is a small, repository-owned DocFX template extension. DocFX's built-in `default` and `modern` templates—and their `docfx.min.css` styles—remain the foundation. The custom `public/main.css` is loaded afterward and applies Md3.Avalonia's Material Design 3 palette, shape, typography, light/dark colors, and component treatments to the Modern template's existing Bootstrap components and page structure.
 
-The overlay is loaded after DocFX's built-in `default` and `modern` templates. The upstream MIT license is included in this directory. Update the pinned CSS deliberately rather than fetching a floating branch during the documentation build.
+Color roles are kept aligned with `src/Md3.Avalonia/Themes/Tokens/ColorTokens.axaml`; the landing-page components are documented in the root `index.md`. There is no vendored third-party theme stylesheet or build-time download. When upgrading DocFX, review the selectors in `public/main.css` against the Modern template's DOM and CSS variables.

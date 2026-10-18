@@ -35,9 +35,16 @@
         "dest": "api"
       }
     ],
+    "resource": [
+      {
+        "files": ["logo.png"]
+      }
+    ],
     "globalMetadata": {
       "_appTitle": "Md3.Avalonia",
       "_appName": "Md3.Avalonia",
+      "_appLogoPath": "logo.png",
+      "_appFaviconPath": "logo.png",
       "_enableSearch": true,
       "_lang": "en",
       "_appFooter": "<span>Generated from C# XML documentation and built with <a href=\"https://dotnet.github.io/docfx\">DocFX</a>.</span>"
