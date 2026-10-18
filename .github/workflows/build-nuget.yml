@@ -55,10 +55,10 @@ jobs:
               tail -40 /tmp/pack.log | sed 's/^/    /'
             fi
           } >> "$GITHUB_STEP_SUMMARY"
-          grep -E 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/pack.log \
-            | sort -u | head -40 \
-            | while IFS= read -r line; do printf '::error title=pack::%s\n' "${line//%/%25}"; done
-          if ! grep -qE 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/pack.log; then
+          if grep -qE 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/pack.log; then
+            grep -E 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/pack.log | sort -u | head -40 | while IFS= read -r line; do
+              printf '::error title=pack::%s\n' "${line//%/%25}"; done
+          else
             tail -25 /tmp/pack.log | while IFS= read -r line; do
               printf '::error title=pack-tail::%s\n' "${line//%/%25}"; done
           fi

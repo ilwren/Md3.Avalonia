@@ -155,10 +155,10 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           # Job summaries are not reachable from the API in this environment, but workflow
           # annotations are, so mirror the findings there as well.
-          grep -E 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/restore.log \
-            | sort -u | head -40 \
-            | while IFS= read -r line; do printf '::error title=restore::%s\n' "${line//%/%25}"; done
-          if ! grep -qE 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/restore.log; then
+          if grep -qE 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/restore.log; then
+            grep -E 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/restore.log | sort -u | head -40 | while IFS= read -r line; do
+              printf '::error title=restore::%s\n' "${line//%/%25}"; done
+          else
             tail -25 /tmp/restore.log | while IFS= read -r line; do
               printf '::error title=restore-tail::%s\n' "${line//%/%25}"; done
           fi
