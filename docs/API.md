@@ -1,48 +1,48 @@
 # Md3.Avalonia public API overview
 
-This document is the public entry point for the `0.4.1-preview.1` API. Preview APIs may still receive compatibility-preserving refinements before the first stable release. The NuGet package also emits `Md3.Avalonia.xml` from the source XML comments for IDE IntelliSense and API documentation generation.
+This document is the public entry point for the `0.5.0-preview.1` API. Preview APIs may still receive compatibility-preserving refinements before the first stable release. The NuGet package also emits `Md3.Avalonia.xml` from the source XML comments for IDE IntelliSense and API documentation generation.
 
 ## Install and register
 
 ```xml
-<PackageReference Include="Md3.Avalonia" Version="0.4.1-preview.1" />
+<PackageReference Include="Md3.Avalonia" Version="0.5.0-preview.1" />
 <!-- Optional symbol providers (choose one): -->
-<PackageReference Include="Md3.Avalonia.Icons" Version="0.4.1-preview.1" />
-<PackageReference Include="Md3.Avalonia.Icons.Lite" Version="0.4.1-preview.1" />
+<PackageReference Include="Md3.Avalonia.Icons" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia.Icons.Lite" Version="0.5.0-preview.1" />
 <!-- Optional clean-room third-party Flutter patterns (depends on core): -->
-<PackageReference Include="Md3.Avalonia.Extra" Version="0.4.1-preview.1" />
+<PackageReference Include="Md3.Avalonia.Extra" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for Avalonia's own DataGrid; the only package that pulls in
      Avalonia.Controls.DataGrid: -->
-<PackageReference Include="Md3.Avalonia.DataGrid" Version="0.4.1-preview.1" />
+<PackageReference Include="Md3.Avalonia.DataGrid" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for the AvaloniaEdit text editor; likewise the only package that
      pulls in Avalonia.AvaloniaEdit: -->
-<PackageReference Include="Md3.Avalonia.AvaloniaEdit" Version="0.4.1-preview.1" />
+<PackageReference Include="Md3.Avalonia.AvaloniaEdit" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for the AvaloniaHex hex editor; likewise the only package that
      pulls in AvaloniaHex: -->
-<PackageReference Include="Md3.Avalonia.AvaloniaHex" Version="0.4.1-preview.1" />
+<PackageReference Include="Md3.Avalonia.AvaloniaHex" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for the Dock docking layout system; likewise the only package
      that pulls in Dock.Avalonia and Dock.Avalonia.Themes.Fluent: -->
-<PackageReference Include="Md3.Avalonia.Dock" Version="0.4.1-preview.1" />
+<PackageReference Include="Md3.Avalonia.Dock" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for Tabalonia draggable tabs; likewise the only package that
      pulls in Tabalonia: -->
-<PackageReference Include="Md3.Avalonia.Tabalonia" Version="0.4.1-preview.1" />
+<PackageReference Include="Md3.Avalonia.Tabalonia" Version="0.5.0-preview.1" />
 <!-- Optional Material style collection for Markdown.Avalonia documents; likewise the only package
      that pulls in Markdown.Avalonia.Tight. Unlike every other theme package it is not registered
      in Application.Styles - see the Markdown section below: -->
-<PackageReference Include="Md3.Avalonia.Markdown" Version="0.4.1-preview.1" />
+<PackageReference Include="Md3.Avalonia.Markdown" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for LiveCharts2 charts; likewise the only package that pulls in
      LiveChartsCore.SkiaSharpView.Avalonia. Like the Markdown package it is not registered in
      Application.Styles - it is configured once through LiveCharts.Configure; see the LiveCharts2
      section below: -->
-<PackageReference Include="Md3.Avalonia.LiveCharts2" Version="0.4.1-preview.1" />
+<PackageReference Include="Md3.Avalonia.LiveCharts2" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for ScottPlot charts; likewise the only package that pulls in
      ScottPlot.Avalonia. It is a plot-level entry point rather than a style collection, so it is not
      registered in Application.Styles either; see the ScottPlot section below: -->
-<PackageReference Include="Md3.Avalonia.ScottPlot" Version="0.4.1-preview.1" />
+<PackageReference Include="Md3.Avalonia.ScottPlot" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for the Avalonia.PropertyGrid property grid; likewise the only package
      that pulls in bodong.Avalonia.PropertyGrid. It is a normal style collection - register it after
      MaterialTheme; see the Property grid section below: -->
-<PackageReference Include="Md3.Avalonia.PropertyGrid" Version="0.4.1-preview.1" />
+<PackageReference Include="Md3.Avalonia.PropertyGrid" Version="0.5.0-preview.1" />
 ```
 
 ```xml
