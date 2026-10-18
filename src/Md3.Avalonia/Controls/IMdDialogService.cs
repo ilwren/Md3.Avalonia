@@ -13,8 +13,8 @@ namespace Md3.Avalonia.Controls;
 /// cancel a queued or active request and completes it with <see langword="null"/>. Closing with
 /// <see cref="Close(object)"/> returns its result; scrim dismissal, Escape, and the Android back
 /// gesture complete with <see langword="null"/>.</para>
-/// <para>For model-based views, register a matching template in <see cref="MdDialogHost.DataTemplates"/>
-/// or another visible <c>DataTemplates</c> collection. For dependency injection, assign the same
+/// <para>For model-based views, register a matching template in the host's visible <c>DataTemplates</c>
+/// collection, or in another visible collection. For dependency injection, assign the same
 /// <see cref="MdDialogService"/> instance to <see cref="MdDialogHost.Service"/> and register it as
 /// <see cref="IMdDialogService"/>. The host can also use its private service when no shared service
 /// is assigned.</para>
@@ -22,7 +22,7 @@ namespace Md3.Avalonia.Controls;
 /// is a typed extension method, not an interface member; it returns the result as
 /// <c>TResult</c> or <see langword="default"/> when dismissed without a matching result.</para>
 /// <para>请求按顺序处理：已有对话框时，<see cref="ShowAsync(object, CancellationToken)"/> 会等待；宿主尚未附加时，请求会保留在队列中。取消令牌可以取消排队中或正在显示的请求，结果为 <see langword="null"/>。调用 <see cref="Close(object)"/> 会返回指定结果；点击遮罩、按 Escape 或使用 Android 返回手势关闭时，结果为 <see langword="null"/>。</para>
-/// <para>对于模型视图，请在 <see cref="MdDialogHost.DataTemplates"/> 或其他可见的 <c>DataTemplates</c> 集合中注册匹配模板。使用依赖注入时，将同一个 <see cref="MdDialogService"/> 实例赋给 <see cref="MdDialogHost.Service"/>，并注册为 <see cref="IMdDialogService"/>。若未指定共享服务，宿主也可以使用自己的私有服务。</para>
+/// <para>对于模型视图，请在宿主可见的 <c>DataTemplates</c> 集合或其他可见集合中注册匹配模板。使用依赖注入时，将同一个 <see cref="MdDialogService"/> 实例赋给 <see cref="MdDialogHost.Service"/>，并注册为 <see cref="IMdDialogService"/>。若未指定共享服务，宿主也可以使用自己的私有服务。</para>
 /// <para><see cref="MdDialogServiceExtensions.ShowAsync{TResult}(IMdDialogService, object, CancellationToken)"/> 是强类型扩展方法而非接口成员；它会将结果转换为 <c>TResult</c>，若关闭时没有匹配类型的结果则返回 <see langword="default"/>。</para>
 /// </remarks>
 /// <example>
