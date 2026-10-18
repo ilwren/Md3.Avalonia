@@ -424,15 +424,26 @@ public sealed class MdFloatingWindow : ContentControl
     /// <summary>
     /// What the collapsed window is: the title bar plus the root border. Taking it off the parts
     /// rather than naming a number keeps the strip exact if the title bar's own minimum changes.
-    /// NaN means the parts have not been measured yet, and the caller has to fall back.
+    /// NaN means there is no title bar to read yet, and the caller has to fall back.
     /// </summary>
     private double CollapsedHeight()
     {
-        var bar = _titleBar?.Bounds.Height ?? 0d;
-        if (bar <= 0) return double.NaN;
+        if (_titleBar is not { } bar) return double.NaN;
+
+        var height = bar.Bounds.Height;
+        if (height <= 0)
+        {
+            // Before the first layout the bounds are still empty, which is exactly when a window
+            // created already minimized asks for this. The bar's own minimum is known by then, so
+            // measure it rather than answering NaN and leaving the window un-collapsed.
+            bar.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            height = bar.DesiredSize.Height;
+        }
+
+        if (height <= 0) return double.NaN;
 
         var border = BorderThickness;
-        return bar + border.Top + border.Bottom;
+        return height + border.Top + border.Bottom;
     }
 
     /// <summary>

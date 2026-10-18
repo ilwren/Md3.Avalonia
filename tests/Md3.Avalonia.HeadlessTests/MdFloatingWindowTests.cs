@@ -110,8 +110,12 @@ public sealed class MdFloatingWindowTests
         Assert.Contains(":minimized", window.Classes);
         // The point of the collapse: nothing was torn down, so a hosted player keeps its state.
         Assert.Contains(player, window.GetVisualDescendants().OfType<TextBlock>());
-        // An explicit height would leave a tall empty box, so the title bar takes over sizing.
-        Assert.True(double.IsNaN(window.Height));
+        // The title bar still decides the collapsed height, but it is written explicitly rather
+        // than handed back to the layout: a measuring window sizes the empty content row to the
+        // resize grip and grows a band back under the bar.
+        var bar = Part<Control>(window, "PART_TitleBar");
+        var border = window.BorderThickness;
+        Assert.Equal(bar.Bounds.Height + border.Top + border.Bottom, window.Bounds.Height, 3);
     }
 
     [AvaloniaFact]
