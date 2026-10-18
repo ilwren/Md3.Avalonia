@@ -1,5 +1,190 @@
 # Changelog
 
+## [0.4.6-preview.1] - Pending publication
+
+> Source baseline entry; publication, multi-target build verification, and platform acceptance remain pending.
+
+### Added
+
+- Added `MdBreadcrumbPathConverter` for binding slash-separated route paths directly to `MdBreadcrumb`; navigable ancestors use the theme's primary text color, while the current item and separators stay neutral.
+- Added the standalone `Md3.Avalonia.Notifications` package with one title/body API for Windows, macOS, Linux and Android. Windows uses WinRT toast APIs from its Windows-specific .NET target, Linux calls libnotify directly (no helper processes), macOS uses AppKit interop, and Android uses `NotificationManager`; Windows AppUserModelID registration and Android 13+ runtime permission remain host responsibilities. Platform delivery still needs manual verification.
+
+### Changed
+
+- Consolidated Extra control resources under `ExtraTheme`; removed the obsolete `EcosystemTheme` name without a compatibility shim.
+- Added `net8.0` alongside `net10.0` for all seven NuGet packages and aligned Avalonia dependencies to the first stable Avalonia 12 release, `12.0.0` (including `Avalonia.Controls.DataGrid`). The Gallery remains .NET 10-only.
+
+### Verification pending
+
+- Updated `MdBeforeAfter` to defer keyboard focus until after a drag and suppress ancestor `BringIntoViewOnFocusChange` during that transition; headless regressions cover the first left-edge and top-edge drags through release. The reported desktop first-drag/position/scroll issue remains unverified and requires desktop re-test; this code/headless coverage is not desktop sign-off.
+
+### Fixed
+
+- `MaterialRichEditorTheme` now sets the editor's default run foreground from the live M3 `OnSurface` token, so unstyled document text remains readable in dark mode. The opt-in package uses the MIT-maintained `OlivierJC.AvaloniaRichEditor` fork until the corresponding upstream package release is available.
+
+## [0.4.5-preview.1] - 2026-10-12
+
+### Changed
+
+- Gallery code samples auto-size to their content instead of sitting in a fixed 220 px box,
+  removing the large blank strip under short snippets (tall snippets cap out and scroll).
+- Gallery "Dark theme" switches (settings card + Android settings sample) now actually switch
+  the app theme through a new `MainWindow.ApplyThemeMode`, staying in sync with the shell's
+  theme selector instead of being decorative controls with a hard-coded checked state.
+
+- `MdLinearProgressIndicator` indeterminate now runs the official M3 disjoint two-segment sweep
+  (1800 ms loop, per-edge delays/durations and bezier interpolators from
+  material-components-android) instead of a single gliding segment; wavy shape still applies.
+
+- `MdRichEditor` no longer renders Ctrl shortcut labels on Android/iOS - touch devices have no
+  modifier keys, so the chips were noise there. Gallery pages that advertise keyboard shortcuts
+  (search, slidable item) adapt their copy on touch platforms too.
+
+- `MdTabs` selection indicator now spans the full tab width in both variants (per the M3 spec /
+  material-web), replacing the 24 px primary bar and the margin-inset secondary bar; secondary
+  also gets the spec's 2 px top corner radius.
+
+- M3 compliance pass: the navigation bar active indicator is now the spec 64x32 dp pill (was
+  56x32), and the snackbar container uses the spec 4 dp corner (was 24) via a new
+  `Md.Comp.Snackbar.Container.Shape` token. Audited and confirmed compliant: switch 52x32 with
+  24/16 handles, chip 32/8/18, FAB 56/16, dialog 280-560/28, text field 56, card 12, button 40/20,
+  segmented button end radii, navigation bar height 80.
+
+- State layers normalized to the M3 table everywhere: hover 8%, focus 10%, pressed 10% (28
+  themes carried the Material 2 12% value, one used 14%), dragged 16%; chat/search hover
+  outliers (4%/6%) raised to the spec 8%.
+- Light `Surface`/`Background`/`SurfaceBright` updated to the 2023 M3 baseline `#FEF7FF` (were
+  the pre-2023 `#FFFBFE`), and dark `SurfaceBright` to `#36343B`; the rest of the baseline
+  palette audited and confirmed.
+
+- `MdNumericBox` defaults its +/- spinner column to the right (Avalonia's ButtonSpinner
+  defaults left, which collided with the trailing-icon space the field reserves).
+- `MdAboutDialog` stacks the icon above the text under 420 dp (`:compact`), fixing the
+  side-by-side squeeze on phones.
+- `MdSettingsExpander` now animates expand/collapse (spring height transition, chevron
+  rotation transition) instead of popping.
+- Gallery: dialog demos use shared/root-level hosts rather than a fixed-height demo panel; the
+  adaptive suite clamps its medium/expanded presets to the visible width on phones and the
+  expanded preset can finally reach 1040 dp.
+
+### Fixed
+
+- `MdCarousel` now gives focus to a clicked compact keyline and promotes it to the focal item,
+  so the first desktop click both focuses and expands the card just as touch selection does on
+  Android.
+- The Gallery's shared dialog host now overlays the entire window root, including the desktop
+  app bar and navigation rail; its scrim no longer stops at the content pane.
+- Rich tooltips remain open while the pointer or keyboard focus is on either the trigger or the
+  tooltip surface. A focus transition can no longer re-arm the exit timer during hover, and the
+  timer rechecks presence before dismissing.
+- `MdBanner` actions drop below the text automatically under the 480 dip compact breakpoint
+  (Android squeezed the wrapped text into a sliver); `ForceActionsBelow` still wins.
+- Pickers: the anchor field now force-invalidates when `DisplayText` changes (desktop could
+  paint a stale value while the bound readout was correct), and an open picker popup closes
+  when the surrounding page scrolls so dial/calendar drags can no longer land offset.
+- Pickers (desktop, follow-up): measure/visual invalidation alone still left the committed
+  date/time unpainted on real desktop builds (reproduced on 9b2213f). The field text is now
+  assigned directly from `DisplayText` (synchronously, without going through the template
+  binding) whenever it changes, so docked-calendar and dial commits repaint the field.
+- `MdSlider` value indicator follows the M3 rule - visible only while dragging or hovering when
+  enabled, instead of permanently.
+- Gallery motion demo: spring travel adapts to the realized row width and the section clips, so
+  the dots no longer slide out of the page on narrow screens.
+
+- `MdTabViewItem` reaches interaction parity with the `MdTabItem` family (style merge without
+  removing either control, so strip-only consumers who drive their own content keep working):
+  pressed state layer at 10%, ripple feedback, 38% disabled fade, and the hover/press state
+  layer no longer swallows hit testing. A new headless conformance audit asserts these through
+  real simulated input plus touch-target and WCAG AA contrast checks.
+
+- `MdScrollViewer` scrollbar drags are smooth again: the direct `Value` mirror (the first-frame
+  calibration workaround) is now one-shot - it writes only until the bar is calibrated once,
+  after which Avalonia's native Offset-to-Value binding is the single write path, so no second
+  path races the drag gesture or the wheel.
+
+### Added
+
+- **Tray icon menu** for the desktop Gallery: show/restore window, Light/Dark/System theme
+  radio items, and an Exit item that owns shutdown; closing the main window now hides it while
+  the tray is present. Desktop-only — the Android single-view lifetime never installs it.
+  Icon asset is `gallery/Md3.Avalonia.Gallery/Assets/tray-icon.png`.
+- **Native AOT publish scripts**: `scripts/publish-gallery-aot.sh` and
+  `scripts/publish-gallery-aot.ps1` publish the desktop Gallery with `PublishAot=true`, assert
+  the output is a native executable with no managed app assembly beside it, optionally
+  smoke-run it under xvfb (`--smoke`), and clean bin/obj afterwards.
+  `.github/workflows/aot-probe.yml` now runs the same script on `main` and `arena/**` instead
+  of being pinned to a stale session branch.
+- Regression tests pinning the `MdScrollViewer` scrollbar calibration on the first layout pass
+  (`MdScrollBarFirstFrameTests`): overflow, virtualized and no-overflow compositions must show
+  correct `Maximum`/`ViewportSize`/visibility without a window resize.
+
+### Fixed
+
+- The Gallery's third-party RichEditor now opens with a formatted HTML document instead of a
+  blank editing surface. The TreeView chevron's vector geometry now centers its painted ink—not
+  merely its `Path` control—in the 40×40 DIP transparent toggle target; raster-pixel regression
+  tests cover both visible editor content and chevron centroid.
+- `MdBeforeAfter` preserves the pointer origin on the first drag started at an edge, including the
+  Gallery's focus/scroll-into-view transition. The regression exercises that initial interaction;
+  desktop sign-off remains pending.
+- **`MdScrollViewer`'s scrollbar was wrong on the very first frame (desktop platforms; a window
+  resize repaired it).** The template relied solely on `ScrollBar.AttachToScrollViewer`, whose
+  self-bindings are created when the bar attaches to the visual tree; with unlucky ordering the
+  bar rendered RangeBase defaults (a full-track thumb) until the next invalidation — classically
+  a window resize. `MdScrollViewer` now mirrors `Maximum`/`Value`/`ViewportSize`/`Visibility`
+  onto both `MdScrollBar` parts directly and synchronously on every
+  Extent/Viewport/Offset/visibility change (plus once at template application), so the bars
+  track the owner from the very first frame on every platform, with no resize and no
+  binding/attach ordering involved; `AttachToScrollViewer` skips properties that are already
+  set, so the two mechanisms cannot fight. Regression tests cover the first layout pass and a
+  content-grows-after-layout resync.
+- **`MdTabView` now exposes `Variant` (`MdTabVariant.Primary`/`Secondary`)**, unifying the style
+  dimension previously spread across `MdTabs`/`MdTabsView`: primary renders the text-first M3
+  look with a full-width active indicator, secondary (default) keeps icon+label with the short
+  centered indicator. The value is pushed to every `MdTabViewItem` container.
+- **`MdTabView` works around upstream Avalonia issue #22094**: at non-100% Windows display
+  scaling (125/150/200%), `DockPanel.Dock="Bottom"` children render invisible on the first
+  frame - the fill sibling is arranged over the whole client area and paints above the strip,
+  while the strip's own bounds can look correct; only a manual resize repairs it. This is the
+  exact reported "bottom tab strip missing on open with Min/Max window constraints, appears
+  after resize" defect. Field reports show any real repaint or resize heals it and remote
+  diagnosis is not always possible, so `MdTabView` now repairs unconditionally right after the
+  first frame: a forced repaint of the strip/host/top level (plus a delayed second repaint) and
+  a short timer-paced alternating one-device-pixel width dance that provokes the same real
+  WM_SIZE-driven relayouts a manual resize would, restoring the original size at the end.
+  The strip now also carries `Panel.ZIndex` with an opaque surface background so it paints above
+  the fill sibling even when that one arranges stale/oversized, (an Avalonia 12.1.4 bump was evaluated and rejected: it regresses popup
+  alignment via the "ignore child margins when positioning a popup" change.) For offline diagnosis,
+  setting `MD3_DIAG=1` before launch makes `MdTabView` open a small always-on-top overlay with
+  the render scaling, window/tabView/strip/host bounds and repair activity.
+- **`MdTabView`'s tab strip now scrolls through an `MdScrollViewer`** instead of the native
+  `ScrollViewer`. The native control carries no template in apps that load only MaterialTheme,
+  which made the strip's first-frame desktop layout depend on whether the app merged a base
+  theme; the themed `MdScrollViewer` is deterministic and calibrated from its own first layout
+  pass.
+- **Tray icon right-click menu rendered empty** in apps that only load the Material themes: the
+  Win32 tray popup is a bare `Window` hosting a `MenuFlyoutPresenter` whose containers are
+  native `MenuItem`/`Separator` controls, and with no base theme those types had no
+  ControlTheme. `MdDesktopAdapters.axaml` now ships compact Material themes for
+  `MenuFlyoutPresenter`, `MenuItem` (incl. radio/checkbox indicators and submenus) and
+  `Separator`, so the Gallery tray menu (Show / theme radios / Exit) is visible.
+
+### Changed
+
+- All six NuGet packages now ship the repository logo as their package icon: the root
+  `logo.png` is downscaled to a 128×128 `assets/logo-128.png` and packed via `PackageIcon`
+  in every package.
+- Restored `Md3.Avalonia.Gallery.Android` to `Md3.Avalonia.sln`. The multi-platform Gallery
+  workflow builds the Android APK as well as Linux, Windows and macOS desktop outputs; physical
+  Android behavior remains a separate manual sign-off.
+- Documentation corrections: package counts updated to six (`Md3.Avalonia.RichEditor` was
+  missing), `samples/Md3.Avalonia.Gallery.Android` paths corrected to `gallery/`, the stale
+  `Md3.Avalonia.Themes`/`Color`/`Motion`/`tools` solution sketch in the design specification
+  replaced with the real structure, the Material Symbols DoD item closed (the official TTF is
+  committed and verified), and `docs/API.md` trimming section updated for `IsAotCompatible`.
+
+For details, see [`docs/RELEASE_NOTES_0.4.5-preview.1.md`](docs/RELEASE_NOTES_0.4.5-preview.1.md).
+
 ## [0.4.1-preview.1] - 2026-10-06
 
 ### Added

@@ -68,6 +68,7 @@ public class MdPopover : TemplatedControl
     public event EventHandler? Opened;
     public event EventHandler? Closed;
     protected virtual bool ShouldFocusPopoverContent => true;
+    protected virtual bool UseOverlayLayerForPopup => false;
     protected virtual void OnPopoverContentAttached(Control content) { }
     protected virtual void OnPopoverContentDetached(Control content) { }
     public void Show() => SetCurrentValue(IsOpenProperty, true);
@@ -89,7 +90,14 @@ public class MdPopover : TemplatedControl
         _popup = e.NameScope.Find<Popup>("PART_Popup");
         _surface = e.NameScope.Find<Border>("PART_Surface");
         if (_anchorButton is not null) _anchorButton.Click += OnAnchorClick;
-        if (_popup is not null) _popup.Closed += OnPopupClosed;
+        if (_popup is not null)
+        {
+            _popup.ShouldUseOverlayLayer = UseOverlayLayerForPopup;
+            // The light-dismiss overlay spans the owner. Keep the trigger interactive when a
+            // pointer returns from an overlay-hosted card or popover.
+            _popup.OverlayInputPassThroughElement = _anchorButton;
+            _popup.Closed += OnPopupClosed;
+        }
         AttachOwnerScrollHandler();
         _popupPresence.Initialize(IsOpen);
         UpdateMotion();
@@ -287,7 +295,7 @@ public class MdPopover : TemplatedControl
 public sealed class MdHoverCard : MdPopover
 {
     public static readonly StyledProperty<TimeSpan> OpenDelayProperty = AvaloniaProperty.Register<MdHoverCard, TimeSpan>(nameof(OpenDelay), TimeSpan.FromMilliseconds(400));
-    public static readonly StyledProperty<TimeSpan> CloseDelayProperty = AvaloniaProperty.Register<MdHoverCard, TimeSpan>(nameof(CloseDelay), TimeSpan.FromMilliseconds(120));
+    public static readonly StyledProperty<TimeSpan> CloseDelayProperty = AvaloniaProperty.Register<MdHoverCard, TimeSpan>(nameof(CloseDelay), TimeSpan.FromMilliseconds(300));
     private readonly DispatcherTimer _timer = new();
     private bool _pendingOpen;
     private bool _interactiveOpen;
@@ -299,16 +307,54 @@ public sealed class MdHoverCard : MdPopover
         _timer.Tick += (_, _) =>
         {
             _timer.Stop();
-            if (_pendingOpen) Show();
-            else if (!_pointerOverContent && !IsFocusWithinContent()) Dismiss();
+            if (_pendingOpen)
+            {
+                if (HasPointerOrFocusPresence) Show();
+            }
+            else if (!HasPointerOrFocusPresence)
+            {
+                Dismiss();
+            }
         };
-        PointerEntered += (_, _) => Schedule(true, false);
+        PointerEntered += (_, _) => OnAnchorPointerEntered();
         PointerExited += (_, _) => Schedule(false, false);
-        GotFocus += (_, _) => Schedule(true, true);
+        GotFocus += (_, _) => OnAnchorGotFocus();
         LostFocus += (_, _) => Schedule(false, true);
     }
 
     protected override bool ShouldFocusPopoverContent => _interactiveOpen;
+    protected override bool UseOverlayLayerForPopup => true;
+
+    private bool HasPointerOrFocusPresence =>
+        IsPointerOver ||
+        _pointerOverContent ||
+        _attachedContent?.IsPointerOver == true ||
+        IsKeyboardFocusWithin ||
+        IsFocusWithinContent();
+
+    private void OnAnchorPointerEntered()
+    {
+        if (IsOpen)
+        {
+            _pendingOpen = false;
+            _timer.Stop();
+            return;
+        }
+
+        Schedule(true, false);
+    }
+
+    private void OnAnchorGotFocus()
+    {
+        if (IsOpen)
+        {
+            _pendingOpen = false;
+            _timer.Stop();
+            return;
+        }
+
+        Schedule(true, true);
+    }
 
     protected override void OnPopoverContentAttached(Control content)
     {
@@ -343,7 +389,7 @@ public sealed class MdHoverCard : MdPopover
         if (_timer.Interval <= TimeSpan.Zero)
         {
             if (open) Show();
-            else if (!_pointerOverContent && !IsFocusWithinContent()) Dismiss();
+            else if (!HasPointerOrFocusPresence) Dismiss();
         }
         else _timer.Start();
     }
@@ -351,6 +397,7 @@ public sealed class MdHoverCard : MdPopover
     private void OnContentPointerEntered(object? sender, PointerEventArgs e)
     {
         _pointerOverContent = true;
+        _pendingOpen = false;
         _timer.Stop();
     }
 

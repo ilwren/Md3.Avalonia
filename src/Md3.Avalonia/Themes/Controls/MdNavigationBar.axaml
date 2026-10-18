@@ -23,7 +23,7 @@
         <Border x:Name="PART_Root" Background="Transparent" CornerRadius="16" ClipToBounds="True">
           <Grid>
             <StackPanel x:Name="PART_ItemLayout" Margin="4,6" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4">
-              <Grid Width="56" Height="32" ClipToBounds="True">
+              <Grid Width="64" Height="32" ClipToBounds="True">
                 <Border x:Name="PART_Indicator" Background="Transparent" CornerRadius="16"
                         Opacity="0" RenderTransform="scale(0.6)" RenderTransformOrigin="50%,50%" />
                 <Border x:Name="PART_StateLayer" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" CornerRadius="16" IsHitTestVisible="False" Opacity="0" />

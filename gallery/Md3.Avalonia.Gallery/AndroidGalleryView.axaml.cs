@@ -329,7 +329,7 @@ public partial class AndroidGalleryView : UserControl
                 Spacing = 10,
                 Children =
                 {
-                    new TextBlock { Text = "Md3.Avalonia v3.1.0-preview.1", FontSize = 18, FontWeight = global::Avalonia.Media.FontWeight.SemiBold },
+                    new TextBlock { Text = "Md3.Avalonia v0.4.6-preview.1", FontSize = 18, FontWeight = global::Avalonia.Media.FontWeight.SemiBold },
                     new TextBlock { Text = "Material Design 3 and Flutter ecosystem components for Avalonia UI.", TextWrapping = global::Avalonia.Media.TextWrapping.Wrap },
                     new MdLinearProgressIndicator { Value = 100 }
                 }

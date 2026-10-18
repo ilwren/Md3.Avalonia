@@ -1,16 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     <RootNamespace>Md3.Avalonia</RootNamespace>
     <AssemblyName>Md3.Avalonia</AssemblyName>
     <Description>Material Design 3 and Material 3 Expressive controls, dynamic HCT theming, motion, localization and desktop adapters for Avalonia 12.</Description>
     <PackageId>Md3.Avalonia</PackageId>
-    <Version>0.4.1-preview.1</Version>
+    <Version>0.4.6-preview.1</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;material-design;material-3;controls;android;desktop;hct;mvvm</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>0.3.0 preview: Android single-view popup hosting and complete Gallery navigation; audited accessibility, RTL, motion, responsive and localization fixes; configurable FAB menus and color-picker panels.</PackageReleaseNotes>
+    <PackageIcon>logo-128.png</PackageIcon>
+    <PackageReleaseNotes>0.4.6-preview.1: Restored .NET 8 assets alongside .NET 10 across the NuGet packages; added standalone Notifications and breadcrumb path conversion; unified Extra controls on ExtraTheme; improved RichEditor dark-mode text and updated BeforeAfter first-drag focus/scroll handling (desktop acceptance pending).</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
@@ -30,6 +31,7 @@
     <!-- Icon-font catalogs and font registration live in the optional Md3.Avalonia.Icons package.
          Core controls expose object icon slots and empty resource keys that any provider can fill. -->
     <None Include="../../README.md" Pack="true" PackagePath="/" Link="README.md" />
+    <None Include="../../assets/logo-128.png" Pack="true" PackagePath="/" Link="logo-128.png" />
     <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />
   </ItemGroup>
 </Project>

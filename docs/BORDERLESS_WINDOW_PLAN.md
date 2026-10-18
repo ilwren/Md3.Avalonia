@@ -2,7 +2,7 @@
 
 Status (2026-10-03): **W0–W2 complete; Windows W3 now preserves native DWM state-animation styles and exposes the native system menu; Snap Layout/DPI/backdrop and W4 real-platform sign-off remain open.**
 
-The custom-chrome feature is in the core `Md3.Avalonia` package. It introduces no dependency on the optional Icons or Ecosystem packages and uses Avalonia 12 window APIs.
+The custom-chrome feature is in the core `Md3.Avalonia` package. It introduces no dependency on the optional Icons or Extra packages and uses Avalonia 12 window APIs.
 
 ## W0 — contracts and platform boundary (complete)
 
@@ -40,6 +40,8 @@ Source comparison was repeated against FluentAvalonia commit `e6def96e6281b79cb8
 - `FAAppWindow` overrides `ExtendClientAreaToDecorationsHint` to `true` on Windows and retains the system frame; its Windows template explicitly avoids drawing a second frame.
 - `Win32WindowManager` subclasses the HWND procedure for right-click/Alt+Space system-menu behavior and posts the selected command as `WM_SYSCOMMAND`; it does not fake maximize/restore with an Avalonia animation.
 - FluentAvalonia leaves window-state changes on Avalonia's native backend. Avalonia 12.1 fixed the `WindowDecorations.Full` state-animation regression, while `BorderOnly` intentionally lacks the caption style bits used by DWM.
+
+The current package baseline is Avalonia `12.0.0`, so that 12.1 fix is not included. Revalidate `WindowDecorations.Full` state changes against 12.0.0 and preserve a workaround if needed; the 12.1 behavior is not evidence for this baseline.
 
 Accordingly, `MdWindowsWindowPlatformAdapter` now uses `WindowDecorations.Full` when `PreserveNativeBorder=true`, extends the client area, leaves maximize/restore on `Window.WindowState`, and uses `GetSystemMenu`/`TrackPopupMenu`/`PostMessage(WM_SYSCOMMAND)` for the title-bar context menu. No custom maximize animation is present. Because Avalonia 12 injects `WindowDrawnDecorations` outside the `Window` control template, `MdBorderlessWindow` also assigns a dedicated empty decorations theme; this suppresses Fluent/Simple title, caption and frame visuals without removing the native style bits.
 

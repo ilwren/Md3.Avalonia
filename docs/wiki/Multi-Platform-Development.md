@@ -1,6 +1,6 @@
 # Multi-Platform Development
 
-Md3.Avalonia targets **.NET 10.0** and runs seamlessly across Desktop (Windows, macOS, Linux) and Mobile (Android, iOS).
+The seven NuGet libraries target **.NET 8 and .NET 10** and use Avalonia 12.0.0. The desktop and Android Gallery hosts target .NET 10 only (`net10.0` / `net10.0-android`). The current preview support matrix covers Windows, macOS, Linux, and Android; iOS is not a release target.
 
 ---
 

@@ -118,9 +118,10 @@ public sealed class MdGalleryTests
         foreach (var page in pages)
         {
             var userPage = Assert.IsAssignableFrom<UserControl>(page);
-            var pageScroller = userPage.Content as MdScrollViewer ??
-                               (userPage.Content as MdDialogHost)?.Content as MdScrollViewer ??
-                               (userPage.Content as Grid)?.Children.OfType<MdScrollViewer>().FirstOrDefault();
+            var pageContent = userPage.Content;
+            while (pageContent is MdDialogHost dialogHost) pageContent = dialogHost.Content; // pages may nest hosts at the root
+            var pageScroller = pageContent as MdScrollViewer ??
+                               (pageContent as Grid)?.Children.OfType<MdScrollViewer>().FirstOrDefault();
             Assert.NotNull(pageScroller);
             var host = new Window { Width = 1100, Height = 760, Content = page };
             host.Show();

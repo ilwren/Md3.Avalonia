@@ -194,6 +194,100 @@ public sealed class MdMotionLifecycleTests
         Assert.False(tooltip.IsPopupOpen);
     }
 
+    [AvaloniaFact]
+    public void Rich_Tooltip_Does_Not_Start_Hide_Delay_While_The_Anchor_Is_Hovered()
+    {
+        var tooltip = new MdTooltip
+        {
+            Variant = MdTooltipVariant.Rich,
+            Title = "Keyboard shortcuts",
+            Content = "Use Command K to open search.",
+            ActionContent = new MdButton { Content = "View shortcuts" }
+        };
+        var host = new MdTooltipHost
+        {
+            Width = 160,
+            Height = 56,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top,
+            Margin = new Thickness(24),
+            Tooltip = tooltip,
+            Content = new MdButton
+            {
+                Content = "Rich tooltip",
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch
+            }
+        };
+        MdMotion.SetScheme(host, MdMotionScheme.None);
+        var window = new Window { Width = 420, Height = 240, Content = new Grid { Children = { host } } };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var popup = host.GetVisualDescendants().OfType<Popup>()
+                .Single(control => control.Name == "PART_Popup");
+            Assert.False(popup.TakesFocusFromNativeControl,
+                "showing a native hover popup must not activate it and deactivate the owner window");
+            var anchor = Assert.IsType<MdButton>(host.Content);
+            var point = anchor.TranslatePoint(
+                new Point(anchor.Bounds.Width / 2, anchor.Bounds.Height / 2), window);
+            Assert.NotNull(point);
+            window.MouseMove(point!.Value, RawInputModifiers.None);
+            Assert.True(host.IsPointerOver, "moving onto the trigger should establish pointer presence");
+            host.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            // Keep Avalonia's default native/overlay popup choice. Desktop rich-tooltip pointer
+            // tracking must tolerate enter/leave events arriving from separate popup roots.
+            // Opening an interactive popup can move keyboard focus. That focus transition must
+            // not arm a hide timer while the pointer is still on the trigger.
+            host.RaiseEvent(new FocusChangedEventArgs(InputElement.LostFocusEvent));
+            Assert.True(host.IsOpen, "the attended rich tooltip should remain open after focus changes");
+            Assert.False(host.IsHideDelayPending);
+
+            var tooltipRoot = TopLevel.GetTopLevel(tooltip);
+            Assert.NotNull(tooltipRoot);
+            var tooltipPoint = tooltip.TranslatePoint(
+                new Point(tooltip.Bounds.Width / 2, tooltip.Bounds.Height / 2), tooltipRoot!);
+            Assert.NotNull(tooltipPoint);
+            // Native popups are separate TopLevels, so send this move through the popup root.
+            tooltipRoot!.MouseMove(tooltipPoint!.Value, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(tooltip.IsPointerOver,
+                "moving into the rich surface should transfer pointer presence to the tooltip");
+            Assert.True(host.IsOpen, "the rich tooltip closed while the pointer was over its surface");
+            Assert.False(host.IsHideDelayPending);
+
+            // Moving back to the trigger is still attended, and only leaving both regions starts
+            // the grace timer. Recompute after opening the popup in case popup placement changed
+            // the visual transform used to map the original trigger point into the Window.
+            var returnPoint = anchor.TranslatePoint(
+                new Point(anchor.Bounds.Width / 2, anchor.Bounds.Height / 2), window);
+            Assert.NotNull(returnPoint);
+            window.MouseMove(returnPoint!.Value, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            var hitTestTargets = string.Join(" / ", window.GetVisualsAt(returnPoint.Value)
+                .Take(8).Select(visual => visual.GetType().Name));
+            Assert.True(host.IsPointerOver,
+                $"moving back to the trigger should restore anchor presence; host={host.IsPointerOver}, " +
+                $"anchor={anchor.IsPointerOver}, tooltip={tooltip.IsPointerOver}, " +
+                $"anchorOrigin={anchor.TranslatePoint(default, window)}, " +
+                $"tooltipOrigin={tooltip.TranslatePoint(default, window)}, " +
+                $"hostBounds={host.Bounds}, anchorBounds={anchor.Bounds}, tooltipBounds={tooltip.Bounds}, " +
+                $"hitTest={hitTestTargets}");
+            Assert.False(host.IsHideDelayPending);
+            window.MouseMove(new Point(window.ClientSize.Width - 2, window.ClientSize.Height - 2),
+                RawInputModifiers.None);
+            Assert.True(host.IsHideDelayPending,
+                "leaving both the trigger and tooltip should start the rich-tooltip grace timer");
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     [Fact]
     public void Combo_And_AutoComplete_Presence_Reverses_And_Replacement_Unmounts_Old_Host()
     {
@@ -347,6 +441,64 @@ public sealed class MdMotionLifecycleTests
 
         MdMotion.SetScheme(stale, MdMotionScheme.None);
         MdMotion.SetScheme(fresh, MdMotionScheme.None);
+    }
+
+    [AvaloniaFact]
+    public void HoverCard_Uses_Owner_Overlay_And_Bridges_Anchor_To_Content()
+    {
+        var content = new StackPanel
+        {
+            Width = 240,
+            Spacing = 8,
+            Children =
+            {
+                new TextBlock { Text = "Profile preview" },
+                new MdButton { Content = "Open profile", Variant = MdButtonVariant.Text }
+            }
+        };
+        var card = new MdHoverCard
+        {
+            Anchor = "Hover or focus",
+            PopoverContent = content,
+            Margin = new Thickness(24),
+            OpenDelay = TimeSpan.Zero,
+            CloseDelay = TimeSpan.FromMilliseconds(300)
+        };
+        using var scope = Show(card, 640, 360);
+        Dispatcher.UIThread.RunJobs();
+
+        var popup = card.GetVisualDescendants().OfType<Popup>()
+            .Single(control => control.Name == "PART_Popup");
+        Assert.True(popup.ShouldUseOverlayLayer,
+            "a hover card must use the owner's overlay to avoid native-popup deactivation during pointer transfer");
+        var anchor = card.GetVisualDescendants().OfType<Button>()
+            .Single(control => control.Name == "PART_AnchorButton");
+        var anchorPoint = anchor.TranslatePoint(
+            new Point(anchor.Bounds.Width / 2, anchor.Bounds.Height / 2), scope.Window);
+        Assert.NotNull(anchorPoint);
+        scope.Window.MouseMove(anchorPoint!.Value, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(card.IsOpen, "hovering the anchor should open the card after its configured delay");
+        Assert.True(popup.IsUsingOverlayLayer,
+            "the hover card popup must be hosted in the owner's overlay layer");
+        Assert.True(ReferenceEquals(scope.Window, TopLevel.GetTopLevel(content)),
+            "the anchor and hover-card content must remain in the same native TopLevel");
+
+        var contentPoint = content.TranslatePoint(
+            new Point(content.Bounds.Width / 2, content.Bounds.Height / 2), scope.Window);
+        Assert.NotNull(contentPoint);
+        scope.Window.MouseMove(contentPoint!.Value, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(content.IsPointerOver,
+            "moving into the hover card overlay must report pointer presence on its content");
+        Assert.True(card.IsOpen, "moving into the card must cancel the anchor's close timer");
+
+        scope.Window.MouseMove(anchorPoint.Value, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(anchor.IsPointerOver,
+            "moving back from the hover card overlay must report pointer presence on the anchor");
+        Assert.True(card.IsOpen, "moving back to the anchor must win over a stale content-exit event");
     }
 
     [AvaloniaFact]

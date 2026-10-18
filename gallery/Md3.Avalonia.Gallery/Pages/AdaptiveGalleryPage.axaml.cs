@@ -29,7 +29,12 @@ public partial class AdaptiveGalleryPage : UserControl
     private void SetSuiteWidth(object? sender, RoutedEventArgs e)
     {
         if ((sender as Control)?.Tag?.ToString() is not { } text || !double.TryParse(text, out var width)) return;
-        DemoSuite.Width = width;
+        // The page scrolls vertically only: a medium/expanded width beyond the viewport used to
+        // clip on phones. Clamp to what is actually visible, and lift the XAML MaxWidth so the
+        // expanded preset can really reach 1040 on wide screens.
+        var available = Bounds.Width > 0 ? Bounds.Width - 8 : width;
+        DemoSuite.MaxWidth = double.PositiveInfinity;
+        DemoSuite.Width = Math.Max(320, Math.Min(width, available));
         Dispatcher.UIThread.Post(UpdateSuiteStatus, DispatcherPriority.Loaded);
     }
 

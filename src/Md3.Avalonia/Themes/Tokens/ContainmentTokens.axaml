@@ -17,6 +17,8 @@
 
   <!-- Cards and dialogs: the two corner values most often mistaken for each other. -->
   <CornerRadius x:Key="Md.Comp.Card.Container.Shape">12</CornerRadius>
+  <!-- M3: md.comp.snackbar.container.shape = 4dp. -->
+  <CornerRadius x:Key="Md.Comp.Snackbar.Container.Shape">4</CornerRadius>
   <CornerRadius x:Key="Md.Comp.Dialog.Container.Shape">28</CornerRadius>
 
   <!--
