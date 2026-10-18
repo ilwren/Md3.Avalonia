@@ -45,6 +45,7 @@ jobs:
         run: docfx build docfx.json
 
       - name: Prepare static Pages output
+        # upload-pages-artifact archives dotfiles, so the marker is included without extra inputs.
         run: touch _site/.nojekyll
 
       # This repository has one shared Pages URL: the Arena branch is a temporary preview,
@@ -54,7 +55,6 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./_site
-          include-hidden-files: true
 
   deploy:
     name: Deploy GitHub Pages
