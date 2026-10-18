@@ -1,0 +1,54 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/v2.81.0/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": [
+            "src/Md3.Avalonia/Md3.Avalonia.csproj",
+            "src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj",
+            "src/Md3.Avalonia.Icons/Md3.Avalonia.Icons.csproj",
+            "src/Md3.Avalonia.Icons.Lite/Md3.Avalonia.Icons.Lite.csproj",
+            "src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj",
+            "src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj"
+          ],
+          "src": "."
+        }
+      ],
+      "dest": "api",
+      "filter": ".docfx/api-filter.yml"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": ["index.md", "toc.yml"]
+      },
+      {
+        "files": ["API.md", "DIALOG_SERVICE.md"],
+        "src": "docs",
+        "dest": "docs"
+      },
+      {
+        "files": ["**/*.yml"],
+        "src": "api",
+        "dest": "api"
+      }
+    ],
+    "globalMetadata": {
+      "_appTitle": "Md3.Avalonia",
+      "_appName": "Md3.Avalonia",
+      "_enableSearch": true,
+      "_lang": "en",
+      "_appFooter": "<span>Generated from C# XML documentation and built with <a href=\"https://dotnet.github.io/docfx\">DocFX</a>.</span>"
+    },
+    "postProcessors": ["ExtractSearchIndex"],
+    "sitemap": {
+      "baseUrl": "https://ilwren.github.io/Md3.Avalonia",
+      "priority": 0.5,
+      "changefreq": "weekly"
+    },
+    "output": "_site",
+    "template": "default"
+  }
+}

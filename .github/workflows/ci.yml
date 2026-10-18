@@ -53,7 +53,7 @@ jobs:
         run: python3 scripts/lint-design-tokens.py --github --summary
 
       - name: Check API documentation coverage
-        # Check the source-derived public type catalog and individual interface pages.
+        # Check that DocFX covers all packable projects and public interfaces have bilingual XML docs.
         run: python3 scripts/check-api-doc-coverage.py
 
       - name: Check the specification oracle against pinned upstream sources

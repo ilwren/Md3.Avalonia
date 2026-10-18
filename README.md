@@ -87,7 +87,7 @@ MdThemeManager.Apply(application, options, isDark);
 
 ## 文档
 
-- [API 参考](docs/API.md)：公共类型目录及每个公共接口的独立 API 页面；
+- [API Reference / API 参考](docs/API.md)：由 C# XML 注释生成的双语 API 参考；
 - [对话框服务接入指南](docs/DIALOG_SERVICE.md)：ViewModel 调用与宿主配置；
 - [兼容性说明](docs/COMPATIBILITY.md)；
 - [发布验证清单](docs/RELEASE_VALIDATION.md)；

@@ -30,30 +30,69 @@ public sealed record MdWindowTemplateSettings(
     bool IsClientAreaExtended,
     bool IsMaximized);
 
-/// <summary>Platform boundary for native-window operations; host applications may replace it.</summary>
+/// <summary>Platform boundary for native-window operations; host applications may replace it. 原生窗口操作的平台边界，宿主应用可替换其实现。</summary>
 /// <remarks>
-/// Set a custom implementation through <see cref="MdBorderlessWindow.PlatformAdapter"/>.
-/// Deriving from <see cref="MdAvaloniaWindowPlatformAdapter"/> is an alternative when the
-/// Avalonia move/resize fallback is suitable.
+/// <para><see cref="MdBorderlessWindow"/> chooses a default adapter through
+/// <see cref="MdWindowPlatformAdapterResolver.Resolve"/> and applies it when the window opens,
+/// its chrome options change, or <see cref="MdBorderlessWindow.PlatformAdapter"/> is replaced.
+/// Built-in adapters target Windows, macOS, Linux, and Android; unknown platforms use the generic
+/// Avalonia adapter. The generic desktop fallback uses Avalonia move/resize APIs, while the Android
+/// adapter performs no desktop-window operations.</para>
+/// <para><see cref="Capabilities"/> reports supported operations through the
+/// <see cref="MdWindowCapabilities.None"/>, <see cref="MdWindowCapabilities.Move"/>,
+/// <see cref="MdWindowCapabilities.Resize"/>, <see cref="MdWindowCapabilities.Minimize"/>,
+/// <see cref="MdWindowCapabilities.Maximize"/>, <see cref="MdWindowCapabilities.Close"/>,
+/// <see cref="MdWindowCapabilities.SystemMenu"/>, and <see cref="MdWindowCapabilities.All"/> flags.
+/// If <see cref="TryShowSystemMenu(MdBorderlessWindow, Point)"/> returns false,
+/// <see cref="MdBorderlessWindow.ShowSystemMenu(Point)"/> raises
+/// <see cref="MdBorderlessWindow.SystemMenuRequested"/>.</para>
+/// <para><see cref="MdBorderlessWindow.PlatformAdapter"/> accepts a custom implementation. Derive
+/// from <see cref="MdAvaloniaWindowPlatformAdapter"/> when its portable fallback behavior is
+/// suitable; validate native decoration and system animation behavior on each target OS.</para>
+/// <para><see cref="MdBorderlessWindow"/> 通过 <see cref="MdWindowPlatformAdapterResolver.Resolve"/> 选择默认适配器，并在窗口打开、装饰选项变化或替换 <see cref="MdBorderlessWindow.PlatformAdapter"/> 时应用它。内置适配器面向 Windows、macOS、Linux 与 Android；未知平台使用通用 Avalonia 适配器。通用桌面实现使用 Avalonia 的窗口移动/缩放 API；Android 适配器不执行桌面窗口操作。</para>
+/// <para><see cref="Capabilities"/> 通过 <see cref="MdWindowCapabilities.Move"/>、<see cref="MdWindowCapabilities.Resize"/>、<see cref="MdWindowCapabilities.Minimize"/>、<see cref="MdWindowCapabilities.Maximize"/>、<see cref="MdWindowCapabilities.Close"/> 与 <see cref="MdWindowCapabilities.SystemMenu"/> 报告支持的操作。若 <see cref="TryShowSystemMenu(MdBorderlessWindow, Point)"/> 返回 false，<see cref="MdBorderlessWindow.ShowSystemMenu(Point)"/> 会触发 <see cref="MdBorderlessWindow.SystemMenuRequested"/>。</para>
+/// <para>可通过 <see cref="MdBorderlessWindow.PlatformAdapter"/> 设置自定义实现。如果 Avalonia 的跨平台回退行为适用，可以继承 <see cref="MdAvaloniaWindowPlatformAdapter"/>。请在各目标操作系统上验证原生窗口装饰与系统动画。</para>
 /// </remarks>
+/// <example>
+/// <para>Derive from the portable adapter and override only the operation that needs custom
+/// platform behavior. Returning false lets the window raise
+/// <see cref="MdBorderlessWindow.SystemMenuRequested"/>.</para>
+/// <para>继承通用适配器，仅重写需要自定义平台行为的操作。返回 false 时，窗口会触发
+/// <see cref="MdBorderlessWindow.SystemMenuRequested"/>。</para>
+/// <code language="csharp"><![CDATA[
+/// public sealed class CustomWindowAdapter : MdAvaloniaWindowPlatformAdapter
+/// {
+///     public CustomWindowAdapter() : base(MdWindowPlatform.Windows) { }
+///
+///     public override bool TryShowSystemMenu(MdBorderlessWindow window, Point clientPoint)
+///     {
+///         // Call the platform menu API; return true only when it was handled.
+///         // 调用平台菜单 API；仅在已处理时返回 true。
+///         return false;
+///     }
+/// }
+///
+/// borderlessWindow.PlatformAdapter = new CustomWindowAdapter();
+/// ]]></code>
+/// </example>
 public interface IMdWindowPlatformAdapter
 {
-    /// <summary>Identifies the platform this adapter targets.</summary>
+    /// <summary>Identifies the platform this adapter targets. 标识此适配器面向的平台。</summary>
     MdWindowPlatform Platform { get; }
 
-    /// <summary>Operations supported by this adapter.</summary>
+    /// <summary>Operations supported by this adapter, such as move, resize, or system menu. 此适配器支持的操作，例如移动、缩放或系统菜单。</summary>
     MdWindowCapabilities Capabilities { get; }
 
-    /// <summary>Applies window-decoration and title-bar settings to the supplied window.</summary>
+    /// <summary>Applies window-decoration and title-bar settings to the supplied window. 将窗口装饰与标题栏设置应用到指定窗口。</summary>
     void Apply(MdBorderlessWindow window, MdBorderlessWindowOptions options);
 
-    /// <summary>Starts a native move operation; returns true when the adapter handled the press.</summary>
+    /// <summary>Attempts to start a native move operation; returns true when the adapter handled the press. 尝试开始原生窗口移动；适配器处理了按下事件时返回 true。</summary>
     bool TryBeginMove(MdBorderlessWindow window, PointerPressedEventArgs args);
 
-    /// <summary>Starts a native resize operation; returns true when the adapter handled the press.</summary>
+    /// <summary>Attempts to resize the specified edge; returns true when the adapter handled the press. 尝试缩放指定边缘；适配器处理了按下事件时返回 true。</summary>
     bool TryBeginResize(MdBorderlessWindow window, WindowEdge edge, PointerPressedEventArgs args);
 
-    /// <summary>Opens the platform system menu at a window-relative point when supported.</summary>
+    /// <summary>Attempts to open the system menu at a window-relative point. Returns false when unsupported or unhandled. 尝试在相对于窗口的坐标处打开系统菜单；不支持或未处理时返回 false。</summary>
     bool TryShowSystemMenu(MdBorderlessWindow window, Point clientPoint);
 }
 

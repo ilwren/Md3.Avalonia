@@ -1,0 +1,8 @@
+- name: Home
+  href: index.md
+- name: API Reference / API 参考
+  href: api/
+- name: API overview / API 概览
+  href: docs/API.md
+- name: Dialog service guide / 对话框服务指南
+  href: docs/DIALOG_SERVICE.md

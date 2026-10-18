@@ -5,7 +5,10 @@
 *.user
 *.suo
 TestResults/
+__pycache__/
 artifacts/
+/_site/
+/api/
 *.dll
 *.pdb
 *.nupkg
