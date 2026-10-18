@@ -27,7 +27,7 @@ internal static class MdScottPlotTokens
         ["TertiaryContainer"] = ("#FFD8E4", "#633B48"),
         ["InversePrimary"] = ("#D0BCFF", "#6750A4"),
         ["Error"] = ("#B3261E", "#F2B8B5"),
-        ["Surface"] = ("#FFFBFE", "#141218"),
+        ["Surface"] = ("#FEF7FF", "#141218"),
         ["SurfaceContainerHigh"] = ("#ECE6F0", "#2B2930"),
         ["OnSurfaceVariant"] = ("#49454F", "#CAC4D0"),
         ["Outline"] = ("#79747E", "#938F99"),

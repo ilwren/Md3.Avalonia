@@ -36,7 +36,7 @@ internal static class MdMapsuiTokens
         ["TertiaryContainer"] = ("#FFD8E4", "#633B48"),
         ["InversePrimary"] = ("#D0BCFF", "#6750A4"),
         ["Error"] = ("#B3261E", "#F2B8B5"),
-        ["Surface"] = ("#FFFBFE", "#141218"),
+        ["Surface"] = ("#FEF7FF", "#141218"),
         ["SurfaceContainer"] = ("#F3EDF7", "#211F26"),
         ["OnSurface"] = ("#1D1B20", "#E6E0E9"),
         ["OnSurfaceVariant"] = ("#49454F", "#CAC4D0"),

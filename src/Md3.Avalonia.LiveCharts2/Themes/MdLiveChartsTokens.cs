@@ -30,7 +30,7 @@ internal static class MdLiveChartsTokens
         ["InversePrimary"] = ("#D0BCFF", "#6750A4"),
         ["Outline"] = ("#79747E", "#938F99"),
         ["Error"] = ("#B3261E", "#F2B8B5"),
-        ["Surface"] = ("#FFFBFE", "#141218"),
+        ["Surface"] = ("#FEF7FF", "#141218"),
         ["SurfaceContainerHighest"] = ("#E6E0E9", "#36343B"),
         ["InverseSurface"] = ("#322F35", "#E6E0E9"),
         ["InverseOnSurface"] = ("#F5EFF7", "#322F35"),
