@@ -558,6 +558,32 @@ README 为空，是个"带合成动画的可拖拽布局控件"，没有标题�
   提供了同一个坐标系。位置用 `X`/`Y` 表达、由控件自己写 `Margin` 实现，并在构造函数里把两个对齐
   设成 `Left`/`Top`（本地值，故意压过主题，避免宿主居中导致上报位置失真）。
 
+## 补记（2026-10-18 之五）：手写签名板为什么是主题化而不是自研
+
+沿用「有第三方控件能做 Material 美化就走主题化」的原则，先查了 Avalonia 生态里的手写/签名控件。
+可用的只有一个：`dotnet-campus/DotNetCampus.InkCanvas`（MIT，40 星），NuGet 包名
+`DotNetCampus.AvaloniaInkCanvas`。另外两个候选都排除了——`nadirvishun/AvaloniaSignaturePad`
+（0 星，NOASSERTION，本质是示例）和 `gcc2001/HandwritingPad`（0 星，是个应用不是库）。
+
+版本只能钉 2.0.0：该 tag 的 `Directory.Build.props` 写的是 `AvaloniaVersion 12.1.0` 与
+`SkiaSharpVersion 3.119.4`，与本仓库的 Avalonia 12.1.2 基线和已解析的 SkiaSharp 版本一致；
+1.0.0 / 1.0.1 连 `Directory.Build.props` 都没有，是 Avalonia 12 之前的结构。上游没有 GitHub
+release，`build/Version.props` 一直是 `0.0.1` 占位，所以「tag 即版本」；发布这件事是通过上游
+Actions 里 `nuget-tag-publish.yml` 对 2.0.0 的成功运行确认的（2026-07-13），因为这里访问不到
+nuget.org。
+
+形态判断和地图、两个图表 provider 一样：`InkCanvas` 是 `Control`，重写 `Render` 自绘，
+**不暴露任何可样式化属性**，所以没有样式集合可注册，只能做成入口——
+`MaterialInkCanvasTheme.Follow(canvas)` 写它的 `AvaloniaSkiaInkCanvasSettings`。上游默认
+`InkColor = SKColors.Red`、`InkThickness = 10`、`EraserSize = 48`，前两个正是需要 Material
+化的部分，第三个留给宿主。
+
+签名板本身（`MdSignaturePad`）之所以还是自研，是因为上游明确把这些留给宿主：没有基线、没有空
+状态、没有清除。而且上游**没有公开 clear**——`_staticStrokeList.Clear()` 只出现在 `internal`
+方法里——所以 `Clear()` 只能逐条 `RemoveStaticStroke` 再 `Dispose`，并自己丢弃位图缓存。上游
+也禁止在笔迹进行中切换 `EditingMode`（会抛 `InvalidOperationException`）且不公开该状态，因此
+`IsErasing` 只能在两笔之间改；这一点写进了 `docs/API.md`，没有藏起来。
+
 ## 7. 数据来源
 
 - GitHub REST API（星标、最近提交、许可证、归档状态、仓库树、文件内容），2026-10-11。

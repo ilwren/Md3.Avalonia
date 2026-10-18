@@ -3,7 +3,7 @@
 发布日期：2026-10-18
 
 版本号从 `0.4.1-preview.1` 进到 `0.5.0-preview.1`。这一版没有破坏性改动，但公开 API 面增加了不少：
-可发布包从六个变成十六个，`Md3.Avalonia.Extra` 多了三个自研控件，所以走次版本而不是补丁版本。
+可发布包从六个变成十七个，`Md3.Avalonia.Extra` 多了三个自研控件，所以走次版本而不是补丁版本。
 
 > 仓库中没有 `0.4.1-preview.1` 的 tag 或 release；`docs/RELEASE_NOTES_0.4.1-preview.1.md` 保留为
 > 那一轮工作的记录。本版条目原先记在 CHANGELOG 的 `0.4.1-preview.1` 小节下，已归入
@@ -11,7 +11,7 @@
 
 ## 新增
 
-### 十个第三方控件主题包
+### 十一个第三方控件主题包
 
 按「有第三方控件就做 Material 美化，没有才自研」的原则，为下面每个库各建了一个独立的 opt-in
 主题包。每个包都是引入该依赖的唯一一处，不用就不会被拖进来：
@@ -28,6 +28,7 @@
 | `Md3.Avalonia.PropertyGrid` | bodong.Avalonia.PropertyGrid | 32 个键控控件主题 |
 | `Md3.Avalonia.NodifyM` | NodifyM.Avalonia | 画刷重定向，模板仍归上游 |
 | `Md3.Avalonia.Mapsui` | Mapsui.Avalonia12 | 地图级入口 `MaterialMapsuiTheme` |
+| `Md3.Avalonia.InkCanvas` | DotNetCampus.AvaloniaInkCanvas | 控件级入口 `MaterialInkCanvasTheme` + `MdSignaturePad` |
 
 主题化只做外观，不改上游的数据管线、模板与部件命名。确实无法在库侧解决的三处（NodifyM 的连线
 几何、PropertyGrid 的编辑器模板、Tabalonia 的标签样式）在 `docs/API.md` 中标注为「留在上游」。
@@ -76,17 +77,19 @@
 
 ## Gallery
 
-110 个已索引页面，1022 条中英对照，`scripts/check-gallery-localization.py --strict` 下未翻译正文
+111 个已索引页面，1031 条中英对照，`scripts/check-gallery-localization.py --strict` 下未翻译正文
 为 0。悬浮窗页面内嵌一个用真实曲目驱动的迷你播放器：那段 20 秒音频来自 `mdn/dom-examples` 的
 *Okay*，以 CC0 1.0 进入公有领域；播放是定时器走播放头，不接音频设备，所以在完全没有输出的机器上
 行为一致。
 
+手写签名板页面同时演示两种用法：`MdSignaturePad` 带基线、空状态提示、清除与橡皮擦，以及一个只用 `MaterialInkCanvasTheme.Follow` 美化的裸 `InkCanvas`——后者的墨水和前者一致，因为两者都从同一批 token 取值。
+
 ## 测试
 
-- `check-api-doc-coverage.py`：types=344，documented=344，missing=0
-- `check-gallery-localization.py --strict`：1022 keys，0 重复，未翻译正文 0
+- `check-api-doc-coverage.py`：types=346，documented=346，missing=0
+- `check-gallery-localization.py --strict`：1031 keys，0 重复，未翻译正文 0
 - `lint-design-tokens.py`：errors=0
-- 六个（现为十六个）`src/` 包声明 `IsAotCompatible`，并以 IL3xxx 分析器构建；本轮未新增反射
+- 六个（现为十七个）`src/` 包声明 `IsAotCompatible`，并以 IL3xxx 分析器构建；本轮未新增反射
 - CI、AOT probe、Build NuGet Packages、Build Multi-Platform Gallery 四个 workflow 全绿
 
 ## 升级

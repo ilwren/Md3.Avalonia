@@ -4,6 +4,9 @@
 
 ### Added
 
+- **`Md3.Avalonia.InkCanvas`：手写签名板（第十七个包，opt-in）**。为 [DotNetCampus.AvaloniaInkCanvas](https://github.com/dotnet-campus/DotNetCampus.InkCanvas) 2.0.0 建的主题包，是唯一引入该依赖的包。`InkCanvas` 用 Skia 自绘笔迹、不注册任何样式，所以它和地图、两个图表 provider 一样是控件级入口而非样式集合：`MaterialInkCanvasTheme.Follow(canvas)` / `Apply(canvas, dark)` 把上游默认的「红色、10 单位粗」改写为 `Md.Sys.Color.OnSurface` 与 3，并在 `ActualThemeVariantChanged` 上跟随明暗；上游自己拥有的橡皮擦尺寸、压感与位图缓存一律不碰。
+- **`MdSignaturePad`：`Md3.Avalonia.InkCanvas` 内的签名控件**。补上游留给宿主的那部分：签名基线、有墨迹后自动消失的占位提示（`:empty`）、清除按钮、橡皮擦模式（`:erasing`），以及 `StrokeCompleted` / `Cleared` 两个事件。`InkThickness` 用 `coerce` 保证为正，非纯色画刷回退为黑而不是抛异常。上游没有 clear 接口（只有 add/remove），因此 `Clear()` 先快照再逐条 `RemoveStaticStroke` + `Dispose`，并显式丢弃位图缓存；上游也禁止在笔迹进行中切换 `EditingMode` 且不公开该状态，因此 `IsErasing` 只保证在两笔之间安全，异常如实向上抛出。
+
 - **`Md3.Avalonia.AvaloniaEdit`**, an opt-in Material Design 3 chrome theme for the
   [AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit) text editor: `TextEditor`, `TextArea`,
   the search and replace panel, the completion list and the completion tooltip, plus keyed
@@ -285,7 +288,11 @@
 - The same sweep could not reproduce the empty Usage sections: every page carrying a `Usage` heading
   also carries a `CodeExample` with XAML or C# attached.
 
+- 手写签名板页面演示 `MdSignaturePad`（基线、占位提示、清除、橡皮擦）与一个仅用 `MaterialInkCanvasTheme.Follow` 美化的裸 `InkCanvas`，两者墨水一致；页面已登记进两个索引、组件总览与导航，10 条新文案进入中英对照字典（1031 条）。
+
 ### Testing
+
+- `MdSignaturePadThemeTests`（11 个）：两种变体读到的墨水颜色与粗细、`Apply` 之后上游自己的橡皮擦设置仍在、渐变画刷回退为黑而不是抛异常、真实指针输入落笔后 `StrokeCount` 与 `:empty` 的变化、`Clear` 清空并抛 `Cleared`、`IsErasing` 传到画布的 `EditingMode`。笔迹用真实指针输入产生，不去构造上游的 `SkiaStroke`——那需要 `InkId`/`StylusPointListSpan`/`ISkiaInkStrokeRenderer`，都不是宿主该碰的东西。
 
 - `MdLayoutExtrasTests` pins what the waterfall cannot show in a property dump: which column it
   actually put each child in, that a derived column count never reserves an empty column, that the

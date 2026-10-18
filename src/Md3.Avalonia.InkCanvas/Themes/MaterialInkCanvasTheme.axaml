@@ -1,0 +1,63 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:md="using:Md3.Avalonia.Controls"
+        xmlns:inking="using:DotNetCampus.Inking">
+  <!-- InkCanvas draws itself with Skia and registers no styles, so the part of this package that
+       reaches a bare canvas is the entry point in MaterialInkCanvasTheme.axaml.cs. What is here is
+       the signature pad built on top of it. The placeholder is hidden by default and shown by the
+       :empty style rather than bound to a property, because the pad learns there is ink from an
+       upstream event and not from a bindable count. -->
+  <ControlTheme x:Key="{x:Type md:MdSignaturePad}" TargetType="md:MdSignaturePad">
+    <Setter Property="InkBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="InkThickness" Value="3" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLowest.Brush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.Large}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="MinHeight" Value="180" />
+    <Setter Property="Padding" Value="16,0,16,44" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdSignaturePad">
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                ClipToBounds="True">
+          <Grid RowDefinitions="Auto,*">
+            <Grid ColumnDefinitions="*,Auto" MinHeight="40" Margin="16,4,8,0">
+              <TextBlock x:Name="PART_Placeholder"
+                         Grid.Column="0"
+                         Text="{TemplateBinding Placeholder}"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                         FontSize="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}"
+                         IsVisible="False" />
+              <md:MdIconButton x:Name="PART_ClearButton"
+                               Grid.Column="1"
+                               Size="Small"
+                               Variant="Standard"
+                               VerticalAlignment="Center"
+                               Icon="{DynamicResource Md.Icon.Close}"
+                               IsVisible="{TemplateBinding ShowClearButton}" />
+            </Grid>
+            <Grid Grid.Row="1">
+              <inking:InkCanvas x:Name="PART_Canvas" Margin="{TemplateBinding Padding}" />
+              <!-- The line a signature sits on. It is decoration, so it is not hit-testable and
+                   must not steal a stroke that starts on it. -->
+              <Border x:Name="PART_Baseline"
+                      Height="1"
+                      Margin="16,0,16,28"
+                      VerticalAlignment="Bottom"
+                      Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                      IsHitTestVisible="False"
+                      IsVisible="{TemplateBinding ShowBaseline}" />
+            </Grid>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:empty /template/ TextBlock#PART_Placeholder"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:erasing /template/ Border#PART_Baseline"><Setter Property="Opacity" Value="0.4" /></Style>
+  </ControlTheme>
+</Styles>

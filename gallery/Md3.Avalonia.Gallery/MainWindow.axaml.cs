@@ -57,6 +57,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             SkeletonNav, SlidableNav, SpinKitNav, StaggeredPanelNav,
             TagInputNav, TimelineNav, TransferNav, TreeViewNav, WaterfallNav, WaveformNav,
             FloatingWindowNav,
+            SignaturePadNav,
             NumericNav, ThemeResourcesNav, SymbolsNav, MotionNav,
             BannerNav, DataTableNav, PaginatedTableNav, DismissibleNav, ExpansionPanelNav,
             GridTileNav, RefreshNav, ReorderableListNav, StepperNav,
@@ -152,6 +153,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             Entry("Waterfall", "waterfall masonry staggered grid columns feed layout cards pinterest", WaterfallNav, () => new WaterfallGalleryPage()),
             Entry("Waveform", "waveform audio peaks playhead seek scrub level meter music sound", WaveformNav, () => new WaveformGalleryPage()),
             Entry("Floating window", "floating window draggable movable resizable picture in picture pip overlay mini player panel", FloatingWindowNav, () => new FloatingWindowGalleryPage()),
+            Entry("Signature pad", "signature pad handwriting ink pen stylus drawing sketch sign erase clear canvas inkcanvas", SignaturePadNav, () => new SignaturePadGalleryPage()),
             Entry("Borderless windows", "custom chrome title bar caption drag resize platform adapter", BorderlessWindowNav, () => new BorderlessWindowGalleryPage()),
             Entry("Numeric input", "numeric number stepper spinner increment decrement quantity", NumericNav, () => new NumericGalleryPage()),
             Entry("Theme Lab", "theme color seed hct contrast json shape font", ThemeResourcesNav, () => new ThemeResourcesGalleryPage()),
@@ -302,6 +304,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
     private void ShowWaterfall(object? s, RoutedEventArgs e) => Navigate(new WaterfallGalleryPage(), WaterfallNav);
     private void ShowWaveform(object? s, RoutedEventArgs e) => Navigate(new WaveformGalleryPage(), WaveformNav);
     private void ShowFloatingWindow(object? s, RoutedEventArgs e) => Navigate(new FloatingWindowGalleryPage(), FloatingWindowNav);
+    private void ShowSignaturePad(object? s, RoutedEventArgs e) => Navigate(new SignaturePadGalleryPage(), SignaturePadNav);
     private void ShowBorderlessWindows(object? s, RoutedEventArgs e) => Navigate(new BorderlessWindowGalleryPage(), BorderlessWindowNav);
     private void ShowNumeric(object? s, RoutedEventArgs e) => Navigate(new NumericGalleryPage(), NumericNav);
     private void ShowThemeResources(object? s, RoutedEventArgs e) => Navigate(new ThemeResourcesGalleryPage(), ThemeResourcesNav);

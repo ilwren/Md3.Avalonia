@@ -73,6 +73,14 @@
          Map, layer and style members Themes/MaterialMapsuiTheme.cs writes are upstream's own API,
          read at the tag this build was cut from. -->
     <PackageVersion Include="Mapsui.Avalonia12" Version="5.1.0" />
+    <!-- The handwriting canvas: DotNetCampus.AvaloniaInkCanvas 2.0.0 targets net8.0 and declares
+         Avalonia and Avalonia.Skia 12.1.0, so it restores against this repository's 12.1.2 baseline,
+         and its SkiaSharp 3.119.4 is the version already in this build's resolved graph. The 2.0.0
+         tag is the Avalonia 12 line - 1.0.x predates it and has no AvaloniaVersion property at all -
+         and upstream's nuget-tag-publish workflow succeeded for that tag. Bump it with the theme's
+         expectations: AvaloniaSkiaInkCanvasSettings and SkiaStroke, which
+         Themes/MaterialInkCanvasTheme writes, are upstream's own API, read at that tag. -->
+    <PackageVersion Include="DotNetCampus.AvaloniaInkCanvas" Version="2.0.0" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.2" />
     <PackageVersion Include="MaterialColorUtilities" Version="0.3.0" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />

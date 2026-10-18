@@ -200,6 +200,7 @@
             <md:MdButton x:Name="WaterfallNav" Content="Waterfall" Variant="Text" HorizontalContentAlignment="Left" Click="ShowWaterfall" />
             <md:MdButton x:Name="WaveformNav" Content="Waveform" Variant="Text" HorizontalContentAlignment="Left" Click="ShowWaveform" />
             <md:MdButton x:Name="FloatingWindowNav" Content="Floating window" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFloatingWindow" />
+            <md:MdButton x:Name="SignaturePadNav" Content="Signature pad" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSignaturePad" />
             <md:MdButton x:Name="BorderlessWindowNav" Content="Borderless windows" Variant="Text" HorizontalContentAlignment="Left" Click="ShowBorderlessWindows" />
               </StackPanel>
             </md:MdScrollViewer>

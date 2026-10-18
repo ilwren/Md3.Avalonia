@@ -1001,6 +1001,84 @@ identical XAML and C#, so it is not an option here. Upgrading the package means 
 `Mapsui.UI.Shared/MapControl.cs`, `Map.cs` and `Mapsui/Styles`; `MdMapsuiThemeTests` pins the
 palette, the canvas, both styles and the dark-variant reads that would move.
 
+## Signature pad
+
+For handwriting - a signature, an annotation, a sketch - use the opt-in `Md3.Avalonia.InkCanvas`
+package. It is the only package that depends on `DotNetCampus.AvaloniaInkCanvas`, and the control it
+wraps is like the map and the two chart providers rather than like a text editor: `InkCanvas` draws
+its own surface, rendering every stroke with Skia, and registers no styles, so there is nothing to
+put in `Application.Styles` for a bare canvas and nothing that could leak into an ink surface this
+package was not asked to style.
+
+Upstream's defaults are red ink ten units thick, and that is the whole reason a theme is needed. The
+entry point writes the two settings that decide what ink looks like and leaves the rest - eraser
+sizing, stylus pressure, the bitmap cache - to the host and to upstream:
+
+```csharp
+// Once, after the canvas is in the tree so the tokens resolve.
+MaterialInkCanvasTheme.Follow(inkCanvas);
+
+// Or for a host that knows the variant itself, including a canvas rendered off screen.
+MaterialInkCanvasTheme.Apply(inkCanvas, dark: false);
+```
+
+`Follow` applies the rules for the variant the control actually has and re-applies them from the
+control's own `ActualThemeVariantChanged` event, so the subscription lives exactly as long as the
+control does. The ink is `Md.Sys.Color.OnSurface`, which is the only colour that reads as "written
+on this surface" in both variants. A brush that is not solid has no Skia colour, so it falls back to
+black instead of throwing.
+
+`MdSignaturePad` is the same ink with the chrome a signature needs around it, and it is what the
+registered `MaterialInkCanvasTheme` style collection styles:
+
+```xml
+<themes:MaterialTheme />
+<themes:MaterialInkCanvasTheme />   <!-- opt-in package, after MaterialTheme -->
+
+<md:MdSignaturePad Height="260"
+                   Placeholder="Sign above the line"
+                   StrokeCompleted="OnStrokeCompleted"
+                   Cleared="OnCleared" />
+```
+
+| Member | Default | Notes |
+| --- | --- | --- |
+| `InkBrush` | `Md.Sys.Color.OnSurface.Brush` | Pushed into the canvas's own `InkColor`. |
+| `InkThickness` | 3 | Coerced to a positive number, so a bound zero cannot make the pen vanish. |
+| `IsErasing` | `false` | Switches the canvas to `InkCanvasEditingMode.EraseByPoint`. |
+| `ShowBaseline` / `ShowClearButton` | `true` / `true` | The line to sign on, and the clear affordance. |
+| `Placeholder` | `null` | Shown only while the pad is empty. |
+| `StrokeCount` / `IsEmpty` | read-only | Read off the canvas, so they are always true to it. |
+| `Clear()` | | Removes every stroke and raises `Cleared`. |
+
+Two pseudo-classes carry the state a template or an application wants to key off: `:empty` before the
+first stroke, `:erasing` while the eraser is selected. `StrokeCompleted` fires when a stroke is
+committed, which is the moment a signature form becomes valid; it carries no stroke data, because the
+host usually needs only that one finished, and reading the strokes themselves is upstream's API.
+
+Three things about this control are forced by upstream and are worth knowing before you ship a
+signature flow:
+
+- **There is no clear upstream.** `AvaloniaSkiaInkCanvas` exposes add and remove but no clear, so
+  `Clear()` snapshots the stroke list - removing mutates the very list being walked - removes and
+  disposes each stroke, and then drops the bitmap cache, because removing a stroke does not
+  invalidate it.
+- **`IsErasing` is only safe between strokes.** Upstream throws `InvalidOperationException` if
+  `EditingMode` changes while a stroke is in progress and keeps that state private, so the pad cannot
+  check it. The exception propagates rather than being swallowed, because silently ignoring a mode
+  change is worse than reporting one. A toolbar button cannot land mid-stroke, which is why the
+  gallery's eraser affordance is a button and not a hold.
+- **It is not a whiteboard.** Upstream states plainly that it is not built for high-performance
+  large-canvas use; a signature pad is the workload it is designed for.
+
+The package declares `IsTrimmable`, `IsAotCompatible` and `EnableTrimAnalyzer`, and adds no
+reflection. `MdSignaturePadThemeTests` pins the ink colour and thickness both variants read, that the
+settings upstream owns survive an `Apply`, that a gradient brush falls back instead of throwing, that
+real pointer input commits a stroke and hides the placeholder, that `Clear` empties the canvas and
+raises its event, and that erasing reaches the canvas mode - so upgrading the package means
+re-reading `InkCanvas.cs`, `AvaloniaSkiaInkCanvas.cs` and `AvaloniaSkiaInkCanvasSettings.cs`, which
+is where every member this section names lives.
+
 ## Trimming
 
 All sixteen packages set `IsTrimmable`, so an application that publishes with

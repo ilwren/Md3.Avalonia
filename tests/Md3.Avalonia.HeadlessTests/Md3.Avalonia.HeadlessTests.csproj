@@ -42,6 +42,7 @@
     <ProjectReference Include="../../src/Md3.Avalonia.PropertyGrid/Md3.Avalonia.PropertyGrid.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.NodifyM/Md3.Avalonia.NodifyM.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Mapsui/Md3.Avalonia.Mapsui.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.InkCanvas/Md3.Avalonia.InkCanvas.csproj" />
     <ProjectReference Include="../../gallery/Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" />
   </ItemGroup>
 </Project>
