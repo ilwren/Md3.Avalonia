@@ -12,6 +12,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using DotNetCampus.Inking;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Motion;
 using Md3.Avalonia.Themes;
 using SkiaSharp;
 using Xunit;
