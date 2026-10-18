@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             xmlns:themes="using:Md3.Avalonia.Themes"
+             xmlns:hex="using:AvaloniaHex"
+             xmlns:rendering="using:AvaloniaHex.Rendering"
+             x:Class="Md3.Avalonia.Gallery.Pages.HexEditorGalleryPage">
+  <!-- Loaded inside this page only, exactly like the AvaloniaEdit theme in CodeExample: every
+       selector targets an AvaloniaHex type, so native controls elsewhere keep their own themes. -->
+  <UserControl.Styles>
+    <themes:MaterialAvaloniaHexTheme />
+  </UserControl.Styles>
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Hex editor" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="AvaloniaHex wearing the opt-in Md3.Avalonia.AvaloniaHex theme: offset, hex and ASCII columns on a Material surface, drawn with the library's selection wash, caret and header colours." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h3" Text="Themed hex view" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The editor brings its own Material chrome — surfaceContainerLow surface, outlineVariant outline, ExtraSmall corner and MdScrollViewer scrollbars — so it can be dropped straight into a page. Offsets and column headers are onSurfaceVariant, bytes are onSurface, the header strip sits on surfaceContainerHigh and the current line on surfaceContainerHighest." />
+        <hex:HexEditor x:Name="Editor" Height="260" FontFamily="Cascadia Mono,JetBrains Mono,Consolas,monospace">
+          <hex:HexEditor.Columns>
+            <rendering:OffsetColumn />
+            <rendering:HexColumn />
+            <rendering:AsciiColumn />
+          </hex:HexEditor.Columns>
+        </hex:HexEditor>
+        <WrapPanel Orientation="Horizontal">
+          <md:MdButton Content="Toggle column headers" Variant="Outlined" Click="ToggleHeaders" Margin="0,0,8,8" />
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;themes:MaterialTheme /&gt;&#10;&lt;themes:MaterialAvaloniaHexTheme /&gt;   &lt;!-- opt-in package, after MaterialTheme --&gt;"
+                            CSharpCode="var editor = new HexEditor();&#10;editor.Columns.Add(new OffsetColumn());&#10;editor.Columns.Add(new HexColumn());&#10;editor.Columns.Add(new AsciiColumn());&#10;&#10;editor.Document = new MemoryBinaryDocument(File.ReadAllBytes(path));" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

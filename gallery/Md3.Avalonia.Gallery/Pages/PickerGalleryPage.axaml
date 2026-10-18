@@ -51,7 +51,7 @@
       </StackPanel>
 
       <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Press Escape to cancel, Enter to confirm input-mode time, and Tab to move between picker actions. Popup state and selected values support two-way MVVM binding." />
+        <TextBlock x:Name="KeyboardHint" Classes="body" TextWrapping="Wrap" Text="Press Escape to cancel, Enter to confirm input-mode time, and Tab to move between picker actions. Popup state and selected values support two-way MVVM binding." />
       </Border>
 
       <StackPanel Spacing="10">

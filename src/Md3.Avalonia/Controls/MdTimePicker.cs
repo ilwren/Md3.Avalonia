@@ -115,6 +115,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         ModeProperty.Changed.AddClassHandler<MdTimePicker>((picker, _) => picker.OnModeChanged());
         ActiveDialPartProperty.Changed.AddClassHandler<MdTimePicker>((picker, _) => picker.UpdatePseudoClasses());
         IsOpenProperty.Changed.AddClassHandler<MdTimePicker>((picker, _) => picker.OnOpenStateChanged());
+        DisplayTextProperty.Changed.AddClassHandler<MdTimePicker>((picker, _) => picker.InvalidateDisplayText());
         MdLocalization.CultureProperty.Changed.AddClassHandler<MdTimePicker>((picker, _) => picker.OnCultureChanged());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdTimePicker>((picker, _) => picker.UpdateMotion());
     }
@@ -286,6 +287,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
+        DetachAncestorScrollWatcher();
         _popupPresence.Stop();
         base.OnDetachedFromVisualTree(e);
     }
@@ -413,6 +415,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
 
     private void OnOpenStateChanged()
     {
+        if (IsOpen) AttachAncestorScrollWatcher(); else DetachAncestorScrollWatcher();
         _backScope.Update(IsOpen);
         if (IsOpen)
         {
@@ -521,6 +524,50 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         SetCurrentValue(SelectedTimeProperty, TimeSpan.FromMinutes(totalMinutes));
         _syncing = false;
         RefreshTextAndState();
+    }
+
+
+    private void InvalidateDisplayText()
+    {
+        var textBlock = _displayTextBlock;
+        if (textBlock is null) return;
+        var text = DisplayText;
+        // Assign the committed string synchronously instead of leaning on the template binding
+        // to the read-only direct property: desktop builds were observed keeping the previous
+        // value on screen after a commit while the bound readout below was already correct.
+        // Writing the text directly and invalidating measure+render keeps the field in lockstep
+        // with DisplayText on every platform.
+        if (!string.Equals(textBlock.Text, text, System.StringComparison.Ordinal)) textBlock.Text = text;
+        textBlock.InvalidateMeasure();
+        textBlock.InvalidateVisual();
+        _anchorButton?.InvalidateVisual();
+    }
+
+    private ScrollViewer? _scrollAncestor;
+
+    private void AttachAncestorScrollWatcher()
+    {
+        DetachAncestorScrollWatcher();
+        if (this.GetVisualAncestors().OfType<ScrollViewer>().FirstOrDefault() is { } scroller)
+        {
+            _scrollAncestor = scroller;
+            _scrollAncestor.PropertyChanged += OnAncestorScrollOffsetChanged;
+        }
+    }
+
+    private void DetachAncestorScrollWatcher()
+    {
+        if (_scrollAncestor is not null) _scrollAncestor.PropertyChanged -= OnAncestorScrollOffsetChanged;
+        _scrollAncestor = null;
+    }
+
+    // A picker popup left open while the page behind it scrolls drifts away from its anchor, and
+    // every subsequent dial/calendar drag then lands offset. Material surfaces close on
+    // background scroll, so follow suit.
+    private void OnAncestorScrollOffsetChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property == ScrollViewer.OffsetProperty && IsOpen)
+            SetCurrentValue(IsOpenProperty, false);
     }
 
     private void SyncFromSelectedTime()

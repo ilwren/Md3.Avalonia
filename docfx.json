@@ -10,7 +10,19 @@
             "src/Md3.Avalonia.Icons/Md3.Avalonia.Icons.csproj",
             "src/Md3.Avalonia.Icons.Lite/Md3.Avalonia.Icons.Lite.csproj",
             "src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj",
-            "src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj"
+            "src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj",
+            "src/Md3.Avalonia.AvaloniaEdit/Md3.Avalonia.AvaloniaEdit.csproj",
+            "src/Md3.Avalonia.AvaloniaHex/Md3.Avalonia.AvaloniaHex.csproj",
+            "src/Md3.Avalonia.Dock/Md3.Avalonia.Dock.csproj",
+            "src/Md3.Avalonia.Tabalonia/Md3.Avalonia.Tabalonia.csproj",
+            "src/Md3.Avalonia.Markdown/Md3.Avalonia.Markdown.csproj",
+            "src/Md3.Avalonia.LiveCharts2/Md3.Avalonia.LiveCharts2.csproj",
+            "src/Md3.Avalonia.ScottPlot/Md3.Avalonia.ScottPlot.csproj",
+            "src/Md3.Avalonia.PropertyGrid/Md3.Avalonia.PropertyGrid.csproj",
+            "src/Md3.Avalonia.NodifyM/Md3.Avalonia.NodifyM.csproj",
+            "src/Md3.Avalonia.Mapsui/Md3.Avalonia.Mapsui.csproj",
+            "src/Md3.Avalonia.InkCanvas/Md3.Avalonia.InkCanvas.csproj",
+            "src/Md3.Avalonia.Notifications/Md3.Avalonia.Notifications.csproj"
           ],
           "src": "."
         }

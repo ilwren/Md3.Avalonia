@@ -7,7 +7,19 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Headless.XUnit" />
+    <!-- Tests build Dock layouts in C#; the theme package itself only needs Dock.Avalonia. -->
+    <PackageReference Include="Dock.Model.Avalonia" />
     <PackageReference Include="Avalonia.Skia" />
+    <!-- ScottPlot 5.1.59 pulls in SkiaSharp.NativeAssets.Linux.NoDependencies, a libSkiaSharp
+         built without fontconfig for minimal containers. It writes the same
+         runtimes/linux-x64/native/libSkiaSharp.so as the fontconfig build Avalonia.Skia needs,
+         and whichever copy wins decides whether the process can enumerate system fonts at all:
+         with the NoDependencies one, every family this suite does not embed - Consolas in the
+         markdown and hex editor font stacks - fails to shape. Declaring the package here with no
+         assets keeps Avalonia's build the only one in the output, whichever package in this suite's
+         graph brings it - a direct reference wins over a transitive one, so the guard holds for any
+         Skia-based theme package the suite grows next. -->
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" ExcludeAssets="all" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="xunit.runner.visualstudio">
@@ -20,6 +32,18 @@
     <ProjectReference Include="../../src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.AvaloniaEdit/Md3.Avalonia.AvaloniaEdit.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.AvaloniaHex/Md3.Avalonia.AvaloniaHex.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.Dock/Md3.Avalonia.Dock.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.Tabalonia/Md3.Avalonia.Tabalonia.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.Markdown/Md3.Avalonia.Markdown.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.LiveCharts2/Md3.Avalonia.LiveCharts2.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.ScottPlot/Md3.Avalonia.ScottPlot.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.PropertyGrid/Md3.Avalonia.PropertyGrid.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.NodifyM/Md3.Avalonia.NodifyM.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.Mapsui/Md3.Avalonia.Mapsui.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.InkCanvas/Md3.Avalonia.InkCanvas.csproj" />
+    <ProjectReference Include="../../src/Md3.Avalonia.Notifications/Md3.Avalonia.Notifications.csproj" />
     <ProjectReference Include="../../gallery/Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" />
   </ItemGroup>
 </Project>

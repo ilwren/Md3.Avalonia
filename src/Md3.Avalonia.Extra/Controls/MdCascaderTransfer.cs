@@ -46,6 +46,7 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
     private readonly MdBackScope _backScope;
     private ItemsControl? _columnsHost;
     private Button? _anchorButton;
+    private TextBlock? _displayTextBlock;
     private Border? _surface;
     private Popup? _popup;
     private Path? _arrow;
@@ -114,6 +115,7 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
         base.OnApplyTemplate(e);
         _columnsHost = e.NameScope.Find<ItemsControl>("PART_Columns");
         _anchorButton = e.NameScope.Find<Button>("PART_Anchor");
+        _displayTextBlock = e.NameScope.Find<TextBlock>("PART_DisplayText");
         _surface = e.NameScope.Find<Border>("PART_Surface");
         _popup = e.NameScope.Find<Popup>("PART_Popup");
         _arrow = e.NameScope.Find<Path>("PART_Arrow");
@@ -122,6 +124,7 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
         if (_anchorButton is not null) _anchorButton.Click += OnAnchorClick;
         if (_popup is not null) _popup.Closed += OnPopupClosed;
         UpdateMotion();
+        InvalidateDisplayText();
     }
 
     protected override void OnAttachedToVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e)
@@ -237,10 +240,26 @@ public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresen
         SetAndRaise(ColumnsProperty, ref _columns, value);
         UpdateDisplayText();
     }
+    private void InvalidateDisplayText()
+    {
+        var textBlock = _displayTextBlock;
+        if (textBlock is null) return;
+
+        // Mirror the committed value at the point it changes instead of depending on a later
+        // template/layout pass to refresh the visible field. SetCurrentValue preserves the
+        // TemplateBinding for subsequent updates and template reapplication.
+        if (!string.Equals(textBlock.Text, DisplayText, StringComparison.Ordinal))
+            textBlock.SetCurrentValue(TextBlock.TextProperty, DisplayText);
+        textBlock.InvalidateMeasure();
+        textBlock.InvalidateVisual();
+        _anchorButton?.InvalidateVisual();
+    }
+
     private void UpdateDisplayText()
     {
         var value = SelectedPath.Count == 0 ? PlaceholderText ?? string.Empty : string.Join(PathSeparator, SelectedPath.Select(item => item.Label));
         SetAndRaise(DisplayTextProperty, ref _displayText, value);
+        InvalidateDisplayText();
         AutomationProperties.SetName(this, Label ?? MdLocalization.GetString("HierarchySelector", this));
         AutomationProperties.SetHelpText(this, value);
         PseudoClasses.Set(":has-value", SelectedPath.Count > 0);

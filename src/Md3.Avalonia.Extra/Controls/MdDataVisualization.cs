@@ -72,13 +72,21 @@ public sealed class MdTimelineItemPresenter : ContentControl
     {
         base.OnAttachedToVisualTree(e);
         _owner = this.GetVisualAncestors().OfType<MdTimeline>().FirstOrDefault();
-        if (_owner is not null) _owner.PropertyChanged += OnOwnerPropertyChanged;
+        if (_owner is not null)
+        {
+            _owner.PropertyChanged += OnOwnerPropertyChanged;
+            _owner.Items.CollectionChanged += OnOwnerItemsChanged;
+        }
         UpdateState();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
-        if (_owner is not null) _owner.PropertyChanged -= OnOwnerPropertyChanged;
+        if (_owner is not null)
+        {
+            _owner.PropertyChanged -= OnOwnerPropertyChanged;
+            _owner.Items.CollectionChanged -= OnOwnerItemsChanged;
+        }
         _owner = null;
         base.OnDetachedFromVisualTree(e);
     }
@@ -88,6 +96,14 @@ public sealed class MdTimelineItemPresenter : ContentControl
         if (e.Property == MdTimeline.ActiveIndexProperty || e.Property == MdTimeline.OrientationProperty ||
             e.Property == ItemsControl.ItemsSourceProperty)
             UpdateState();
+    }
+
+    private void OnOwnerItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        // :first and :last hide the outer connector halves. Re-evaluate those pseudo classes
+        // when a bound observable collection grows or shrinks; otherwise the old last item keeps
+        // its :last state and breaks the connector to every item appended after it.
+        UpdateState();
     }
 
     private void UpdateState()
@@ -1129,16 +1145,21 @@ public class MdRichEditor : ContentControl
         MdRichEditorCommand.StrikeThrough or MdRichEditorCommand.Heading or MdRichEditorCommand.Quote or
         MdRichEditorCommand.Code or MdRichEditorCommand.BulletedList or MdRichEditorCommand.NumberedList;
 
-    private static string? GetShortcut(MdRichEditorCommand command) => command switch
+    private static string? GetShortcut(MdRichEditorCommand command)
     {
-        MdRichEditorCommand.Bold => "Ctrl+B",
-        MdRichEditorCommand.Italic => "Ctrl+I",
-        MdRichEditorCommand.Underline => "Ctrl+U",
-        MdRichEditorCommand.Link => "Ctrl+K",
-        MdRichEditorCommand.Undo => "Ctrl+Z",
-        MdRichEditorCommand.Redo => "Ctrl+Y",
-        _ => null
-    };
+        // Touch devices have no modifier keys; rendering "Ctrl+…" chips there is noise.
+        if (OperatingSystem.IsAndroid() || OperatingSystem.IsIOS()) return null;
+        return command switch
+        {
+            MdRichEditorCommand.Bold => "Ctrl+B",
+            MdRichEditorCommand.Italic => "Ctrl+I",
+            MdRichEditorCommand.Underline => "Ctrl+U",
+            MdRichEditorCommand.Link => "Ctrl+K",
+            MdRichEditorCommand.Undo => "Ctrl+Z",
+            MdRichEditorCommand.Redo => "Ctrl+Y",
+            _ => null
+        };
+    }
 }
 
 /// <summary>Long-form compatibility name for MdRichEditor.</summary>

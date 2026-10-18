@@ -1,0 +1,55 @@
+<!--
+  Material Design 3 theme for Tabalonia.
+
+  The same shape as Tabalonia.Themes.Custom.CustomTheme (its Custom theme: a Styles root that
+  merges Themes/Custom/TabsControl.axaml and style-includes Themes/Custom/Buttons.axaml and
+  Themes/Custom/DragTabItem.axaml; upstream's Controls.axaml does the same three lines), with the
+  brush dictionary swapped for ours and two gaps filled:
+
+  * the brush dictionary is ours - Themes/Accents/Material.axaml resolves every key those templates
+    read, including the six TabItemHeader* keys upstream inherits from Avalonia's FluentTheme, onto
+    Md.Sys.Color.* - so this theme is standalone and needs neither <custom:CustomTheme /> nor
+    Avalonia's <FluentTheme />;
+  * two additive styles fill gaps upstream leaves to the host: the add-a-tab button's idle
+    foreground, and the close glyph's ink on the selected (Primary) tab (see below).
+
+  Everything else - both templates, the close-button style, the drag thumbs, the top panel and the
+  item containers - is loaded from the pinned Tabalonia package by avares:// URI rather than copied
+  here, so Tabalonia keeps owning its templates and part names.
+
+  Register it after MaterialTheme. Tabalonia has a second theme (Themes.Fluent.FluentTheme) and
+  Avalonia has its own TabControl theme; this one replaces both for Tabalonia's controls without
+  touching Avalonia's TabControl or TabItem. The Fluent variant is deliberately not ported: its two
+  dictionaries consume dozens of real Fluent resource keys, so retokenizing it would mean porting
+  Avalonia's Fluent theme as well.
+-->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:tab="using:Tabalonia.Controls"
+        x:Class="Md3.Avalonia.Themes.MaterialTabaloniaTheme">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Md3.Avalonia.Tabalonia/Themes/Accents/Material.axaml" />
+        <ResourceInclude Source="avares://Tabalonia/Themes/Custom/TabsControl.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <StyleInclude Source="avares://Tabalonia/Themes/Custom/Buttons.axaml" />
+  <StyleInclude Source="avares://Tabalonia/Themes/Custom/DragTabItem.axaml" />
+
+  <!-- Upstream's Button.AddItemCommandButtonStyle sets a template and the hover/pressed ink but
+       never an idle foreground, so the glyph would inherit an arbitrary colour. -->
+  <Style Selector="Button.AddItemCommandButtonStyle">
+    <Setter Property="Foreground" Value="{DynamicResource AddItemCommandButtonForegroundBrush}" />
+  </Style>
+
+  <!-- The close glyph lives inside the tab container, and upstream inks it from one brush that has
+       to work on the surface and on the selected container at once. On the Primary selected tab that
+       leaves OnSurfaceVariant ink on a filled container, so the selected tab swaps it for the same
+       OnPrimary its label uses - the pairing MdTabs.axaml gives its own selected tab. -->
+  <Style Selector="tab|DragTabItem:selected Button.CloseItemButtonStyle, tab|DragTabItem:selected Button.CloseItemButtonStyle:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource TabItemHeaderForegroundSelected}" />
+  </Style>
+</Styles>

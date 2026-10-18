@@ -1,25 +1,42 @@
-# 兼容性与支持范围
+# Compatibility and support policy
 
-## 当前基线
+## Supported baseline
 
-| 项目 | 基线 |
-|---|---|
-| .NET | `.NET 10`，控件包目标 `net10.0` |
-| Avalonia | `12.1.2` |
-| Desktop Gallery | Windows、macOS、Linux；CI 分别构建 |
-| Android Gallery | `net10.0-android`；构建需 .NET Android workload |
-| NuGet 版本 | `0.4.1-preview.1` |
+| Area | Baseline | Status |
+|---|---|---|
+| .NET NuGet assets | `net8.0;net10.0` for the five core-family packages; `net10.0` for the twelve opt-in third-party theme packages | The theme packages follow the TFMs their upstream libraries publish. The desktop Gallery and tests target .NET 10 |
+| Avalonia | 12.1.2 | Build and headless-test baseline for the Avalonia control packages. The floor is set by the ecosystem packages, not by the core library; see `Directory.Packages.props` |
+| Windows | x64/ARM64 hosts supported by Avalonia 12 | Library-compatible; device and assistive-technology sign-off remains external |
+| macOS | x64/Apple Silicon hosts supported by Avalonia 12 | Library-compatible; VoiceOver sign-off remains external |
+| Linux | x64/ARM64 hosts supported by Avalonia 12 | Headless Linux tested; Orca sign-off remains external |
+| Android | `Md3.Avalonia.Notifications` packs a `net10.0-android` asset (minimum API 23) when the pack scripts pass `-p:IncludeAndroidTarget=true`; Gallery host uses `net10.0-android` | Only `net10.0-android` is offered: `net8.0-android` is out of support and raises NETSDK1202. Emulator/device sign-off remains external |
+| iOS/browser | Not a preview-release target | No support commitment |
 
-所有 Avalonia 依赖版本集中定义于 [`Directory.Packages.props`](../Directory.Packages.props)。核心包使用 Avalonia 跨平台 API，不依赖桌面主题；可选 DataGrid 与 RichEditor 包分别增加其目标控件依赖。
+The core runtime package references only `Avalonia` and `MaterialColorUtilities`. It does not reference Avalonia Desktop, Win32, X11, macOS, or a desktop-only theme package. Platform-specific notification targets are documented separately below.
 
-## 平台验证边界
+## Versioning
 
-桌面 Gallery 在 Linux、Windows 和 macOS CI 上构建；Android Gallery 由独立工作流构建。Android Emulator UI 回归为单独的可选工作流，构建成功不等同于真机验收。Windows 原生窗口 chrome、Android 生命周期和输入行为、屏幕阅读器及高 DPI 场景仍应按[发布验证清单](RELEASE_VALIDATION.md)在目标平台执行。
+- Current source package baseline: `0.4.6-preview.1` (publication pending); the `0.4.5-preview.1` notes and validation evidence describe the previous baseline and are historical records.
+- Preview packages may adjust API after a changelog entry and migration note.
+- Stable releases follow Semantic Versioning.
+- Avalonia minor-version upgrades are validated by Release builds for both supported .NET package TFMs, headless tests, package validation, and the platform matrix before the supported baseline changes.
+- The public `Md*` control types, styled properties, enums, theme JSON fields, and resource-key names form the compatibility surface.
 
-当前预览版没有为 iOS 或浏览器/WASM 提供独立宿主与完整发布验收承诺。
+## Native notification package
 
-## API 与裁剪
+`Md3.Avalonia.Notifications` is a standalone package targeting `net8.0` and `net10.0` for macOS/Linux; `net8.0-windows10.0.19041.0` and `net10.0-windows10.0.19041.0` for Windows; and, when the pack scripts pass `-p:IncludeAndroidTarget=true`, `net10.0-android` for Android. The Android target has a minimum API level of 23; `net8.0-android` is not offered because it is out of support. The package provides title-and-body notifications without referencing Avalonia. Windows calls WinRT toast APIs directly, macOS uses AppKit's legacy/deprecated `NSUserNotificationCenter`, Linux calls the native `libnotify` library, and Android uses `NotificationManager`; no external helper processes are launched. Linux still requires libnotify and a D-Bus notification service. See the [package README](../src/Md3.Avalonia.Notifications/README.md) for registration, native-library, and permission requirements. The implementation still requires manual display/permission verification on each operating system; no device or desktop sign-off is claimed.
 
-所有包均为预览版；升级前请检查 [`CHANGELOG.md`](../CHANGELOG.md)。每个包生成 XML API 文档，所有六个项目启用 `IsTrimmable` 和 `IsAotCompatible` 分析选项。它们不代表每个平台、每个 RID 都已完成裁剪或 AOT 发布验证；应用仍应使用其目标运行时执行发布测试。
+## Android boundary
 
-公共控件类型、属性与主题资源属于预览 API。首次稳定发布前可能调整，届时会在变更记录中说明。
+`gallery/Md3.Avalonia.Gallery.Android` is deliberately kept outside the desktop solution so developers without the Android workload can build the library and desktop Gallery. The Gallery host targets .NET 10 only; the independent NuGet libraries retain their .NET 8 assets. Validate the host with Java 17 and an installed .NET Android workload:
+
+```bash
+dotnet workload install android
+dotnet build gallery/Md3.Avalonia.Gallery.Android -c Release
+```
+
+The host uses `ISingleViewApplicationLifetime` and `AndroidGalleryView`. Popup templates do not force `OverlayLayer`, preserving Avalonia's Android fallback behavior.
+
+## External acceptance still required
+
+The repository cannot substitute automation for ARM64 device behavior or assistive-technology review. Before a stable release, sign the checklist in `docs/RELEASE_VALIDATION.md` on physical or representative systems for Android touch/IME/rotation/lifecycle, Windows Narrator, macOS VoiceOver, and Linux Orca.

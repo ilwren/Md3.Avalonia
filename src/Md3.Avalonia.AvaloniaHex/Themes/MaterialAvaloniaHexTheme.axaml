@@ -1,0 +1,180 @@
+<!--
+  Material Design 3 theme for AvaloniaHex.
+
+  Derived from AvaloniaHex 0.1.13 Themes/Base.axaml and Themes/HexEditor.axaml (MIT, see
+  THIRD-PARTY-NOTICES.md). The structure is intentionally the same as upstream: the editor finds its
+  scroller by name (PART_ScrollViewer), the ControlTheme lives in its own dictionary next to the
+  palette dictionary, and the rendering and editing layers are skinned by styles that read the
+  resource keys AvaloniaHex publishes. Those keys keep their upstream names, so a reader can diff
+  this file against the upstream theme and an application can still re-key any of them from its own
+  resources.
+
+  What changed:
+    * The keys are filled from Md.Sys tokens instead of Fluent's System* colours:
+        HexForegroundBase            -> onSurface            (hex/ASCII/binary text)
+        OffsetForeground             -> onSurfaceVariant    (address column)
+        HeaderForeground             -> onSurfaceVariant    (column headers)
+        HeaderBackground             -> surfaceContainerHigh
+        CurrentLineBackground        -> surfaceContainerHighest
+        PrimarySelectionBackground   -> Md.Sys.Color.PrimarySelection.Brush, the same wash the rest
+                                        of the library uses for selected text
+        SecondarySelectionBackground -> primary at half that strength, for the column group that
+                                        does not hold the caret
+        Caret*Background             -> primary / onSurface washes
+        *Border                      -> solid pens over the same tokens
+    * The editor's own ControlTheme scrolls with MdScrollViewer. Upstream uses a plain
+      ScrollViewer, which has no control theme in an application that carries only MaterialTheme,
+      so the content would never be laid out.
+    * The surface, outline and corner are Material (surfaceContainerLow over outlineVariant,
+      ExtraSmall), matching the library's other data surfaces.
+    * No other control is touched: every selector below targets an AvaloniaHex type, so registering
+      this theme does not restyle the rest of the application.
+-->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:md="using:Md3.Avalonia.Controls"
+        xmlns:hex="using:AvaloniaHex"
+        xmlns:rendering="using:AvaloniaHex.Rendering"
+        xmlns:editing="using:AvaloniaHex.Editing"
+        x:Class="Md3.Avalonia.Themes.MaterialAvaloniaHexTheme">
+
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+
+        <!-- The palette AvaloniaHex asks for. Both variants declare the same keys: the values are
+             Md.Sys tokens, which are themselves theme-aware, so the Light/Dark switch happens
+             inside the token dictionaries rather than being duplicated here. -->
+        <ResourceDictionary>
+          <ResourceDictionary.ThemeDictionaries>
+
+            <ResourceDictionary x:Key="Light">
+              <SolidColorBrush x:Key="HexForegroundBase" Color="{DynamicResource Md.Sys.Color.OnSurface}" />
+              <SolidColorBrush x:Key="OffsetForeground" Color="{DynamicResource Md.Sys.Color.OnSurfaceVariant}" />
+              <SolidColorBrush x:Key="HeaderForeground" Color="{DynamicResource Md.Sys.Color.OnSurfaceVariant}" />
+              <SolidColorBrush x:Key="HeaderBackground" Color="{DynamicResource Md.Sys.Color.SurfaceContainerHigh}" />
+              <SolidColorBrush x:Key="CurrentLineBackground" Color="{DynamicResource Md.Sys.Color.SurfaceContainerHighest}" />
+
+              <SolidColorBrush x:Key="SecondarySelectionBackground"
+                               Color="{DynamicResource Md.Sys.Color.Primary}"
+                               Opacity="0.16" />
+              <SolidColorBrush x:Key="PrimaryCaretBackground"
+                               Color="{DynamicResource Md.Sys.Color.Primary}"
+                               Opacity="0.20" />
+              <SolidColorBrush x:Key="SecondaryCaretBackground"
+                               Color="{DynamicResource Md.Sys.Color.OnSurface}"
+                               Opacity="0.10" />
+
+              <Pen x:Key="PrimarySelectionBorder" Brush="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+              <Pen x:Key="SecondarySelectionBorder" Brush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+              <Pen x:Key="PrimaryCaretBorder" Brush="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+              <Pen x:Key="SecondaryCaretBorder" Brush="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              <Pen x:Key="CurrentLineBorder" Brush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" Thickness="1" />
+            </ResourceDictionary>
+
+            <ResourceDictionary x:Key="Dark">
+              <SolidColorBrush x:Key="HexForegroundBase" Color="{DynamicResource Md.Sys.Color.OnSurface}" />
+              <SolidColorBrush x:Key="OffsetForeground" Color="{DynamicResource Md.Sys.Color.OnSurfaceVariant}" />
+              <SolidColorBrush x:Key="HeaderForeground" Color="{DynamicResource Md.Sys.Color.OnSurfaceVariant}" />
+              <SolidColorBrush x:Key="HeaderBackground" Color="{DynamicResource Md.Sys.Color.SurfaceContainerHigh}" />
+              <SolidColorBrush x:Key="CurrentLineBackground" Color="{DynamicResource Md.Sys.Color.SurfaceContainerHighest}" />
+
+              <SolidColorBrush x:Key="SecondarySelectionBackground"
+                               Color="{DynamicResource Md.Sys.Color.Primary}"
+                               Opacity="0.16" />
+              <SolidColorBrush x:Key="PrimaryCaretBackground"
+                               Color="{DynamicResource Md.Sys.Color.Primary}"
+                               Opacity="0.20" />
+              <SolidColorBrush x:Key="SecondaryCaretBackground"
+                               Color="{DynamicResource Md.Sys.Color.OnSurface}"
+                               Opacity="0.10" />
+
+              <Pen x:Key="PrimarySelectionBorder" Brush="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+              <Pen x:Key="SecondarySelectionBorder" Brush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+              <Pen x:Key="PrimaryCaretBorder" Brush="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+              <Pen x:Key="SecondaryCaretBorder" Brush="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              <Pen x:Key="CurrentLineBorder" Brush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" Thickness="1" />
+            </ResourceDictionary>
+
+          </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+
+        <!-- Upstream keeps this theme in a separate HexEditor.axaml dictionary that Base.axaml
+             merges in; it is kept in its own dictionary here for the same reason - the palette
+             above is what an application re-keys, this is what templates the control. -->
+        <ResourceDictionary>
+          <ControlTheme x:Key="{x:Type hex:HexEditor}" TargetType="hex:HexEditor">
+            <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.ExtraSmall}" />
+            <Setter Property="Template">
+              <ControlTemplate TargetType="hex:HexEditor">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        ClipToBounds="True"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                  <!-- AvaloniaHex assigns its HexView to this part and casts it to ScrollViewer,
+                       so MdScrollViewer keeps the contract while supplying the Material
+                       scrollbars. -->
+                  <md:MdScrollViewer Name="PART_ScrollViewer"
+                                     Focusable="False"
+                                     HorizontalContentAlignment="Left"
+                                     HorizontalScrollBarVisibility="{TemplateBinding HorizontalScrollBarVisibility}"
+                                     Padding="{TemplateBinding Padding}"
+                                     VerticalContentAlignment="Top"
+                                     VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}" />
+                </Border>
+              </ControlTemplate>
+            </Setter>
+          </ControlTheme>
+        </ResourceDictionary>
+
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <!-- Upstream Themes/Base.axaml, unchanged apart from the ControlTheme above. -->
+  <Style Selector="hex|HexEditor">
+    <Setter Property="Foreground" Value="{DynamicResource HexForegroundBase}" />
+    <Setter Property="ColumnPadding" Value="30" />
+  </Style>
+
+  <Style Selector="rendering|HexView">
+    <Setter Property="HeaderPadding" Value="0,3,0,5" />
+  </Style>
+
+  <Style Selector="rendering|OffsetColumn">
+    <Setter Property="Foreground" Value="{DynamicResource OffsetForeground}" />
+  </Style>
+
+  <Style Selector=":is(rendering|Column)">
+    <Setter Property="HeaderForeground" Value="{DynamicResource HeaderForeground}" />
+  </Style>
+
+  <Style Selector="rendering|HeaderLayer">
+    <Setter Property="HeaderBackground" Value="{DynamicResource HeaderBackground}" />
+  </Style>
+
+  <Style Selector="editing|CurrentLineLayer">
+    <Setter Property="CurrentLineBackground" Value="{DynamicResource CurrentLineBackground}" />
+    <Setter Property="CurrentLineBorder" Value="{DynamicResource CurrentLineBorder}" />
+  </Style>
+
+  <Style Selector="editing|CaretLayer">
+    <Setter Property="PrimaryColumnBackground" Value="{DynamicResource PrimaryCaretBackground}" />
+    <Setter Property="PrimaryColumnBorder" Value="{DynamicResource PrimaryCaretBorder}" />
+    <Setter Property="SecondaryColumnBackground" Value="{DynamicResource SecondaryCaretBackground}" />
+    <Setter Property="SecondaryColumnBorder" Value="{DynamicResource SecondaryCaretBorder}" />
+  </Style>
+
+  <Style Selector="editing|SelectionLayer">
+    <!-- The one key the library already publishes for selection, so hex selection and text
+         selection cannot drift apart. -->
+    <Setter Property="PrimarySelectionBackground" Value="{DynamicResource Md.Sys.Color.PrimarySelection.Brush}" />
+    <Setter Property="PrimarySelectionBorder" Value="{DynamicResource PrimarySelectionBorder}" />
+    <Setter Property="SecondarySelectionBackground" Value="{DynamicResource SecondarySelectionBackground}" />
+    <Setter Property="SecondarySelectionBorder" Value="{DynamicResource SecondarySelectionBorder}" />
+  </Style>
+</Styles>

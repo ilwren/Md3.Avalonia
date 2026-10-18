@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             xmlns:themes="using:Md3.Avalonia.Themes"
+             xmlns:tab="using:Tabalonia.Controls"
+             xmlns:local="using:Md3.Avalonia.Gallery.Pages"
+             x:Class="Md3.Avalonia.Gallery.Pages.DraggableTabsGalleryPage">
+  <!-- The theme is loaded inside this page only. It styles Tabalonia's own types, so nothing
+       outside these strips changes - the same reason CodeExample scopes the editor theme to its
+       own preview. -->
+  <UserControl.Styles>
+    <themes:MaterialTabaloniaTheme />
+  </UserControl.Styles>
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Draggable tabs" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Tabalonia wearing the opt-in Md3.Avalonia.Tabalonia theme: reorder a tab by dragging it, tear one out into its own window, or drop it on the other strip. The strip, the tab containers and both icon buttons all read Material tokens, and no Fluent resources are needed." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h3" Text="Themed strips" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The idle tab is an onSurfaceVariant label on the surface, hover is the standard onSurface state layer, and the selected tab is a Primary container with OnPrimary ink - the same mapping the Dock theme uses for its document tabs. The second strip pins its first tab, so that one cannot be dragged or closed." />
+        <Border CornerRadius="12" ClipToBounds="True" Padding="4"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
+          <StackPanel Spacing="8" Margin="4">
+            <tab:TabsControl x:Name="MainTabs" Height="230" TabItemWidth="180"
+                             ShowDefaultAddButton="True" ShowDefaultCloseButton="True">
+              <tab:TabsControl.ItemTemplate>
+                <DataTemplate x:DataType="local:DemoTab">
+                  <TextBlock Text="{Binding Header}" />
+                </DataTemplate>
+              </tab:TabsControl.ItemTemplate>
+              <tab:TabsControl.ContentTemplate>
+                <DataTemplate x:DataType="local:DemoTab">
+                  <StackPanel Margin="16" Spacing="8">
+                    <TextBlock Text="{Binding Header}" FontWeight="Medium" />
+                    <TextBlock TextWrapping="Wrap" Opacity="0.75" Text="{Binding Body}" />
+                  </StackPanel>
+                </DataTemplate>
+              </tab:TabsControl.ContentTemplate>
+            </tab:TabsControl>
+
+            <tab:TabsControl x:Name="PinnedTabs" Height="140" TabItemWidth="150"
+                             FixedHeaderCount="1" ShowDefaultAddButton="False">
+              <tab:TabsControl.LeftContent>
+                <TextBlock Margin="10,0" VerticalAlignment="Center" FontSize="12" Opacity="0.7" Text="Pinned" />
+              </tab:TabsControl.LeftContent>
+              <tab:TabsControl.ItemTemplate>
+                <DataTemplate x:DataType="local:DemoTab">
+                  <TextBlock Text="{Binding Header}" />
+                </DataTemplate>
+              </tab:TabsControl.ItemTemplate>
+              <tab:TabsControl.ContentTemplate>
+                <DataTemplate x:DataType="local:DemoTab">
+                  <TextBlock Margin="16" TextWrapping="Wrap" Text="{Binding Body}" />
+                </DataTemplate>
+              </tab:TabsControl.ContentTemplate>
+            </tab:TabsControl>
+          </StackPanel>
+        </Border>
+        <WrapPanel Orientation="Horizontal">
+          <md:MdButton Content="Add a tab" Variant="Outlined" Click="AddTab" Margin="0,0,8,8" />
+          <md:MdButton Content="Close the selected tab" Variant="Outlined" Click="CloseSelectedTab" Margin="0,0,8,8" />
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Register the theme after MaterialTheme and keep using TabsControl as usual. It replaces Tabalonia's CustomTheme and FluentTheme and needs neither of them nor Avalonia's FluentTheme; ItemsSource must implement IList, and NewItemFactory decides what the add button appends." />
+        <gallery:CodeExample XamlCode="&lt;themes:MaterialTheme /&gt;&#10;&lt;themes:MaterialTabaloniaTheme /&gt;   &lt;!-- opt-in package, after MaterialTheme --&gt;&#10;&#10;&lt;tab:TabsControl ItemsSource=&quot;{Binding Tabs}&quot;&#10;                NewItemFactory=&quot;{Binding CreateTab}&quot;&#10;                FixedHeaderCount=&quot;1&quot; /&gt;"
+                            CSharpCode="var tabs = new ObservableCollection&lt;object&gt; { new Tab(&quot;One&quot;), new Tab(&quot;Two&quot;) };&#10;&#10;var strip = new TabsControl&#10;{&#10;    ItemsSource = tabs,&#10;    NewItemFactory = () =&gt; new Tab($&quot;Tab {tabs.Count + 1}&quot;),&#10;    FixedHeaderCount = 1&#10;};&#10;&#10;// Tabs drag, reorder, tear out and re-attach; the theme only colours them." />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

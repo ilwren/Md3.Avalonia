@@ -22,7 +22,7 @@
   <a class="md3-resource-card" href="api/">
     <span class="md3-resource-icon" aria-hidden="true">API</span>
     <h2>Generated API reference</h2>
-    <p>Browse six NuGet projects, namespaces, types, and members. Reference pages are generated from C# XML comments, with Chinese and English documentation.</p>
+    <p>Browse 18 NuGet projects, namespaces, types, and members. Reference pages are generated from C# XML comments, with Chinese and English documentation.</p>
     <span class="md3-resource-link">Explore the API · 浏览 API →</span>
   </a>
   <a class="md3-resource-card" href="docs/API.html">

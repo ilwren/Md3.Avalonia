@@ -18,11 +18,23 @@ import xml.etree.ElementTree as ET
 
 PACKAGES = [
     "Md3.Avalonia",
-    "Md3.Avalonia.Extra",
     "Md3.Avalonia.Icons",
     "Md3.Avalonia.Icons.Lite",
+    "Md3.Avalonia.Extra",
     "Md3.Avalonia.DataGrid",
     "Md3.Avalonia.RichEditor",
+    "Md3.Avalonia.AvaloniaEdit",
+    "Md3.Avalonia.AvaloniaHex",
+    "Md3.Avalonia.Dock",
+    "Md3.Avalonia.Tabalonia",
+    "Md3.Avalonia.Markdown",
+    "Md3.Avalonia.LiveCharts2",
+    "Md3.Avalonia.ScottPlot",
+    "Md3.Avalonia.PropertyGrid",
+    "Md3.Avalonia.NodifyM",
+    "Md3.Avalonia.Mapsui",
+    "Md3.Avalonia.InkCanvas",
+    "Md3.Avalonia.Notifications",
 ]
 EXPECTED_PROJECTS = {
     f"src/{package}/{package}.csproj"
@@ -30,14 +42,6 @@ EXPECTED_PROJECTS = {
 }
 # Generated glyph catalogs are documented as a package feature, not per glyph constant.
 SKIP_FILES = {"MdSymbols.cs", "MdSymbolsLite.cs"}
-XML_DOC_FILES = {
-    pathlib.Path("src/Md3.Avalonia/Controls/IMdDialogService.cs"),
-    pathlib.Path("src/Md3.Avalonia/Controls/IMdSnackbarService.cs"),
-    pathlib.Path("src/Md3.Avalonia/Controls/IMdPopupOwner.cs"),
-    pathlib.Path("src/Md3.Avalonia/Controls/MdBorderlessWindow.cs"),
-    pathlib.Path("src/Md3.Avalonia.Extra/Infrastructure/MdEcosystemInfrastructure.cs"),
-    pathlib.Path("src/Md3.Avalonia.Extra/Controls/MdDataVisualization.cs"),
-}
 DOC = pathlib.Path("docs/API.md")
 DOCFX_CONFIG = pathlib.Path("docfx.json")
 
@@ -121,12 +125,12 @@ def iter_xml_doc_blocks(text: str):
 
 
 def validate_xml_docs() -> list[str]:
+    """Validate every XML doc-comment block across the packaged projects."""
     errors = []
-    for path in sorted(XML_DOC_FILES):
-        if not path.exists():
-            errors.append(f"missing XML documentation source: {path}")
-            continue
+    for _, path in source_files():
         text = path.read_text(encoding="utf-8", errors="ignore")
+        if "///" not in text:
+            continue
         for line_number, block in iter_xml_doc_blocks(text):
             try:
                 ET.fromstring(f"<doc>\n{block}\n</doc>")

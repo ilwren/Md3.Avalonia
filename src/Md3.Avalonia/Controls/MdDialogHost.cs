@@ -72,7 +72,7 @@ public sealed class MdDialogHost : ContentControl, IMdDialogService
     {
         _backScope = new MdBackScope(this, OnBackRequested);
         _modalFocus = new MdModalFocusController(this);
-        _presence = new MdPresenceController(value => PseudoClasses.Set(":present", value));
+        _presence = new MdPresenceController(SetPresence);
         _presence.Initialize(IsOpen);
         UpdateOpenState();
     }
@@ -189,11 +189,15 @@ public sealed class MdDialogHost : ContentControl, IMdDialogService
         _overlay = e.NameScope.Find<Control>("PART_Overlay");
         _mainContent = e.NameScope.Find<ContentPresenter>("PART_MainContent");
         _dialogPresenter = e.NameScope.Find<ContentPresenter>("PART_DialogPresenter");
+        // The host can be opened before its template is applied. Mirror the controller's current
+        // presence directly onto the part instead of relying on a later style/layout pass.
+        if (_overlay is not null) _overlay.IsVisible = _presence.IsPresent;
         if (_scrim is not null) _scrim.PointerPressed += OnScrimPressed;
+        // Re-evaluate motion and open state after the parts exist. IsOpen may have changed before
+        // this template was applied, in which case the earlier update could not configure visuals.
         UpdateMotion();
+        UpdateOpenState();
         ScheduleDialogStateUpdate();
-        UpdateModalFocus();
-        _connectedService?.Pump();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -260,12 +264,27 @@ public sealed class MdDialogHost : ContentControl, IMdDialogService
                 _displayedDialog.PropertyChanged += OnDisplayedDialogPropertyChanged;
         }
 
-        PseudoClasses.Set(":full-screen-dialog", displayedDialog?.Variant == MdDialogVariant.FullScreen);
+        var displaysSimpleDialog = Dialog is MdSimpleDialog ||
+            _dialogPresenter?.GetVisualDescendants().OfType<MdSimpleDialog>().Any() == true;
+        PseudoClasses.Set(":full-screen-dialog",
+            displayedDialog?.Variant == MdDialogVariant.FullScreen || displaysSimpleDialog);
     }
 
     private void OnDisplayedDialogPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (e.Property == MdDialog.VariantProperty) UpdateDialogState();
+    }
+
+    internal bool IsHostedDialogContent(Visual visual) =>
+        ReferenceEquals(Dialog, visual) ||
+        _dialogPresenter?.GetVisualDescendants().Any(descendant => ReferenceEquals(descendant, visual)) == true;
+
+    private void SetPresence(bool present)
+    {
+        PseudoClasses.Set(":present", present);
+        // The scrim must occupy the host's arranged viewport even when opened before the
+        // template's :present style has had a layout pass.
+        if (_overlay is not null) _overlay.IsVisible = present;
     }
 
     private void UpdateOpenState()

@@ -1,7 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
+    <!-- Select the Windows-specific notifications asset for Windows builds; retain the portable
+         target on macOS/Linux so their native backends remain available. -->
     <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework Condition="'$(OS)' == 'Windows_NT'">net10.0-windows10.0.19041.0</TargetFramework>
     <RootNamespace>Md3.Avalonia.Gallery.Desktop</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Nullable>enable</Nullable>
@@ -12,7 +15,13 @@
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.Desktop" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
-    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <!-- The published Linux gallery hits the same trap as the headless suite: ScottPlot 5.1.59
+         brings SkiaSharp.NativeAssets.Linux.NoDependencies, a libSkiaSharp without fontconfig,
+         and it overwrites the fontconfig build Avalonia.Skia needs at
+         runtimes/linux-x64/native/libSkiaSharp.so. Without fontconfig the gallery cannot
+         enumerate system fonts, so the markdown and hex editor pages fail on their Consolas
+         fallback. Excluding its assets leaves Avalonia's build in place. -->
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" ExcludeAssets="all" />
     <ProjectReference Include="../Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" />
   </ItemGroup>
 </Project>

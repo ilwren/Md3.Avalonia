@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
@@ -45,15 +45,19 @@ public partial class MainWindow : Window
             ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, BreadcrumbNav, TextFieldNav,
             CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, ColorPickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
-            NavigationDrawerNav, AdaptiveNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
+            NavigationDrawerNav, AdaptiveNav, NotificationsNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
             SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, BorderlessWindowNav,
 AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             BeforeAfterNav, CalendarNav, CascaderNav, ChartNav,
             ChatNav, CommandPaletteNav, DataGridNav, DensityNav,
             HoverCardNav, MasonryNav, PagedItemsNav, PinInputNav,
-            PopoverNav, RatingNav, ResultViewNav, RichEditorNav,
+            PopoverNav, RatingNav, ResultViewNav, RichEditorNav, DockNav, DraggableTabsNav, MarkdownNav, LiveChartsNav, ScottPlotNav, PropertyGridNav, NodifyMNav,
+ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
+            TextEditorNav, HexEditorNav,
             SkeletonNav, SlidableNav, SpinKitNav, StaggeredPanelNav,
-            TagInputNav, TimelineNav, TransferNav, TreeViewNav,
+            TagInputNav, TimelineNav, TransferNav, TreeViewNav, WaterfallNav, WaveformNav,
+            FloatingWindowNav,
+            SignaturePadNav,
             NumericNav, ThemeResourcesNav, SymbolsNav, MotionNav,
             BannerNav, DataTableNav, PaginatedTableNav, DismissibleNav, ExpansionPanelNav,
             GridTileNav, RefreshNav, ReorderableListNav, StepperNav,
@@ -92,6 +96,7 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Navigation bar", "navigation bar destination flexible", NavigationBarNav, () => new NavigationBarGalleryPage()),
             Entry("Navigation drawer", "navigation drawer modal standard", NavigationDrawerNav, () => new NavigationDrawerGalleryPage()),
             Entry("Adaptive layout", "navigation rail adaptive responsive breakpoint", AdaptiveNav, () => new AdaptiveGalleryPage()),
+            Entry("Notifications", "system notifications native operating system toast alert permission", NotificationsNav, () => new NotificationsGalleryPage()),
             Entry("Search", "search bar view suggestions", SearchNav, () => new SearchGalleryPage()),
             Entry("Settings cards", "settings card preference group expander android tile", SettingsCardNav, () => new SettingsCardGalleryPage()),
             Entry("Sheets", "bottom side sheet", SheetNav, () => new SheetGalleryPage()),
@@ -128,6 +133,16 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Rating", "rating star half precision score review", RatingNav, () => new RatingGalleryPage()),
             Entry("Result view", "result empty success error state placeholder action", ResultViewNav, () => new ResultViewGalleryPage()),
             Entry("Rich editor", "rich text editor markdown bold italic toolbar adapter", RichEditorNav, () => new RichEditorGalleryPage()),
+            Entry("Docking", "dock docking layout tool pane document tab splitter float drop target", DockNav, () => new DockGalleryPage()),
+            Entry("Draggable tabs", "draggable tabs tab strip reorder tear out detach attach tabalonia theme", DraggableTabsNav, () => new DraggableTabsGalleryPage()),
+            Entry("Markdown", "markdown document renderer heading prose link list quote code block table note rule typography markdown.avalonia", MarkdownNav, () => new MarkdownGalleryPage()),
+            Entry("LiveCharts2 charts", "livecharts2 charts series axis legend tooltip palette line column pie donut gauge scatter candlestick skia", LiveChartsNav, () => new LiveChartsGalleryPage()),
+            Entry("ScottPlot charts", "scottplot charts series axis legend tooltip grid palette surface signal bars scatter skia theme", ScottPlotNav, () => new ScottPlotGalleryPage()),
+            Entry("Property grid", "property grid inspector settings object properties categories filter cell editors combo checkbox slider numeric date time avalonia.propertygrid theme", PropertyGridNav, () => new PropertyGridGalleryPage()),
+            Entry("Node editor", "node editor graph diagram wire connector pin pending connection knot minimap nodify nodifym.avalonia theme", NodifyMNav, () => new NodifyMGalleryPage()),
+            Entry("Map", "map mapsui gis cartography tiles layer feature geometry vector label palette canvas mapsui.avalonia12 theme", MapsuiNav, () => new MapsuiGalleryPage()),
+            Entry("Text editor", "code editor syntax highlighting line numbers find replace completion avaloniedit theme", TextEditorNav, () => new TextEditorGalleryPage()),
+            Entry("Hex editor", "hex binary bytes dump offsets ascii editor avaloniahex theme", HexEditorNav, () => new HexEditorGalleryPage()),
             Entry("Skeleton", "skeleton shimmer placeholder loading", SkeletonNav, () => new SkeletonGalleryPage()),
             Entry("Slidable item", "slidable swipe action row archive delete", SlidableNav, () => new SlidableItemGalleryPage()),
             Entry("Spin kit", "spinner loading indeterminate wave bounce busy", SpinKitNav, () => new SpinKitGalleryPage()),
@@ -136,6 +151,10 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Timeline", "timeline step history activity feed state", TimelineNav, () => new TimelineGalleryPage()),
             Entry("Transfer", "transfer dual list shuttle move pick", TransferNav, () => new TransferGalleryPage()),
             Entry("Tree view", "tree hierarchy expand collapse node virtualized", TreeViewNav, () => new TreeViewGalleryPage()),
+            Entry("Waterfall", "waterfall masonry staggered grid columns feed layout cards pinterest", WaterfallNav, () => new WaterfallGalleryPage()),
+            Entry("Waveform", "waveform audio peaks playhead seek scrub level meter music sound", WaveformNav, () => new WaveformGalleryPage()),
+            Entry("Floating window", "floating window draggable movable resizable picture in picture pip overlay mini player panel", FloatingWindowNav, () => new FloatingWindowGalleryPage()),
+            Entry("Signature pad", "signature pad handwriting ink pen stylus drawing sketch sign erase clear canvas inkcanvas", SignaturePadNav, () => new SignaturePadGalleryPage()),
             Entry("Borderless windows", "custom chrome title bar caption drag resize platform adapter", BorderlessWindowNav, () => new BorderlessWindowGalleryPage()),
             Entry("Numeric input", "numeric number stepper spinner increment decrement quantity", NumericNav, () => new NumericGalleryPage()),
             Entry("Theme Lab", "theme color seed hct contrast json shape font", ThemeResourcesNav, () => new ThemeResourcesGalleryPage()),
@@ -159,13 +178,18 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Adaptive controls", "adaptive switch progress cupertino ios platform", AdaptiveControlsNav, () => new AdaptiveControlsGalleryPage()),
             Entry("Focus, shortcut, Hero", "focus traversal shortcut keybinding hero transition", FocusHeroNav, () => new FocusShortcutHeroGalleryPage())
         ];
+        Array.Sort(_galleryIndex, static (left, right) =>
+            StringComparer.OrdinalIgnoreCase.Compare(left.Title, right.Title));
 
         ThemeSelector.ItemsSource = new[] { "Light", "Dark", "System" };
         ThemeSelector.SelectedIndex = 2;
         LanguageSelector.ItemsSource = new[] { "English", "简体中文" };
         LanguageSelector.SelectedIndex = 0;
         MdLocalization.SetCulture(this, _culture);
-        PageScroll.AddHandler(InputElement.PointerWheelChangedEvent, OnPagePointerWheel, RoutingStrategies.Tunnel);
+        // Let focused controls handle wheel input before the shell's scroll fallback.
+        // The shell observes handled events only to chain at an inner scroller's boundary.
+        PageScroll.AddHandler(InputElement.PointerWheelChangedEvent, OnPagePointerWheel,
+            RoutingStrategies.Bubble, handledEventsToo: true);
         Navigate(new ComponentsOverviewGalleryPage(), ComponentsOverviewNav, ComponentsTopNav);
         Dispatcher.UIThread.Post(() =>
         {
@@ -225,6 +249,8 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
     private void ShowNavigationBar(object? s, RoutedEventArgs e) => Navigate(new NavigationBarGalleryPage(), NavigationBarNav);
     private void ShowNavigationDrawer(object? s, RoutedEventArgs e) => Navigate(new NavigationDrawerGalleryPage(), NavigationDrawerNav);
     private void ShowAdaptive(object? s, RoutedEventArgs e) => Navigate(new AdaptiveGalleryPage(), AdaptiveNav);
+    private void ShowNotifications(object? s, RoutedEventArgs e) =>
+        Navigate(new NotificationsGalleryPage(), s as MdButton ?? NotificationsNav);
     private void ShowSearch(object? s, RoutedEventArgs e) => Navigate(new SearchGalleryPage(), SearchNav);
     private void ShowSettingsCard(object? s, RoutedEventArgs e) => Navigate(new SettingsCardGalleryPage(), SettingsCardNav);
     private void ShowSheets(object? s, RoutedEventArgs e) => Navigate(new SheetGalleryPage(), SheetNav);
@@ -261,6 +287,20 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
     private void ShowRating(object? s, RoutedEventArgs e) => Navigate(new RatingGalleryPage(), RatingNav);
     private void ShowResultView(object? s, RoutedEventArgs e) => Navigate(new ResultViewGalleryPage(), ResultViewNav);
     private void ShowRichEditor(object? s, RoutedEventArgs e) => Navigate(new RichEditorGalleryPage(), RichEditorNav);
+    private void ShowDock(object? s, RoutedEventArgs e) => Navigate(new DockGalleryPage(), DockNav);
+    private void ShowDraggableTabs(object? s, RoutedEventArgs e) => Navigate(new DraggableTabsGalleryPage(), DraggableTabsNav);
+
+    private void ShowMarkdown(object? s, RoutedEventArgs e) => Navigate(new MarkdownGalleryPage(), MarkdownNav);
+
+    private void ShowLiveCharts(object? s, RoutedEventArgs e) => Navigate(new LiveChartsGalleryPage(), LiveChartsNav);
+
+    private void ShowScottPlot(object? s, RoutedEventArgs e) => Navigate(new ScottPlotGalleryPage(), ScottPlotNav);
+
+    private void ShowPropertyGrid(object? s, RoutedEventArgs e) => Navigate(new PropertyGridGalleryPage(), PropertyGridNav);
+    private void ShowNodifyM(object? s, RoutedEventArgs e) => Navigate(new NodifyMGalleryPage(), NodifyMNav);
+    private void ShowMapsui(object? s, RoutedEventArgs e) => Navigate(new MapsuiGalleryPage(), MapsuiNav);
+    private void ShowTextEditor(object? s, RoutedEventArgs e) => Navigate(new TextEditorGalleryPage(), TextEditorNav);
+    private void ShowHexEditor(object? s, RoutedEventArgs e) => Navigate(new HexEditorGalleryPage(), HexEditorNav);
     private void ShowSkeleton(object? s, RoutedEventArgs e) => Navigate(new SkeletonGalleryPage(), SkeletonNav);
     private void ShowSlidableItem(object? s, RoutedEventArgs e) => Navigate(new SlidableItemGalleryPage(), SlidableNav);
     private void ShowSpinKit(object? s, RoutedEventArgs e) => Navigate(new SpinKitGalleryPage(), SpinKitNav);
@@ -269,6 +309,10 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
     private void ShowTimeline(object? s, RoutedEventArgs e) => Navigate(new TimelineGalleryPage(), TimelineNav);
     private void ShowTransfer(object? s, RoutedEventArgs e) => Navigate(new TransferGalleryPage(), TransferNav);
     private void ShowTreeView(object? s, RoutedEventArgs e) => Navigate(new TreeViewGalleryPage(), TreeViewNav);
+    private void ShowWaterfall(object? s, RoutedEventArgs e) => Navigate(new WaterfallGalleryPage(), WaterfallNav);
+    private void ShowWaveform(object? s, RoutedEventArgs e) => Navigate(new WaveformGalleryPage(), WaveformNav);
+    private void ShowFloatingWindow(object? s, RoutedEventArgs e) => Navigate(new FloatingWindowGalleryPage(), FloatingWindowNav);
+    private void ShowSignaturePad(object? s, RoutedEventArgs e) => Navigate(new SignaturePadGalleryPage(), SignaturePadNav);
     private void ShowBorderlessWindows(object? s, RoutedEventArgs e) => Navigate(new BorderlessWindowGalleryPage(), BorderlessWindowNav);
     private void ShowNumeric(object? s, RoutedEventArgs e) => Navigate(new NumericGalleryPage(), NumericNav);
     private void ShowThemeResources(object? s, RoutedEventArgs e) => Navigate(new ThemeResourcesGalleryPage(), ThemeResourcesNav);
@@ -530,18 +574,32 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
 
     private void OnPagePointerWheel(object? sender, PointerWheelEventArgs e)
     {
-        // Let an embedded material scrolling surface consume the wheel while it still has room.
-        // The shell takes over only at that surface's boundary, preserving normal scroll chaining.
-        var nested = (e.Source as Visual)?.GetVisualAncestors()
+        if (e.Delta.Y == 0) return;
+
+        var source = e.Source as Visual;
+        var numeric = source as MdNumericBox ?? source?.GetVisualAncestors().OfType<MdNumericBox>().FirstOrDefault();
+        if (numeric?.IsKeyboardFocusWithin == true)
+            return; // NumericUpDown owns the focused-wheel gesture; never scroll the page as well.
+
+        // Let an embedded scrolling surface consume the wheel while it still has room. Because
+        // this is a bubble handler, an inner ScrollViewer may already have marked the event
+        // handled; at its boundary the shell still chains the wheel to the page scroller.
+        var nested = source?.GetVisualAncestors()
             .OfType<ScrollViewer>()
             .FirstOrDefault(viewer => !ReferenceEquals(viewer, PageScroll));
+        var nestedAtBoundary = false;
         if (nested is not null)
         {
             var nestedMaximum = Math.Max(0, nested.Extent.Height - nested.Viewport.Height);
             var canConsume = e.Delta.Y > 0 && nested.Offset.Y > 0 ||
                              e.Delta.Y < 0 && nested.Offset.Y < nestedMaximum;
             if (canConsume) return;
+            nestedAtBoundary = true;
         }
+
+        // Do not override another control that consumed the gesture. The exception is an inner
+        // scroller at its boundary, where scroll chaining intentionally transfers it to the shell.
+        if (e.Handled && !nestedAtBoundary) return;
 
         var scroller = GetPageScroller();
         if (scroller is null || scroller.Extent.Height <= scroller.Viewport.Height) return;
@@ -573,16 +631,35 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             GalleryLocalization.Apply(page, _culture);
     }
 
-    private void ThemeSelectionChanged(object? sender, SelectionChangedEventArgs e)
-    {
-        var variant = ThemeSelector.SelectedIndex switch { 0 => ThemeVariant.Light, 1 => ThemeVariant.Dark, _ => ThemeVariant.Default };
-        if (Application.Current is not { } application) return;
-        application.RequestedThemeVariant = variant;
-        var mode = ThemeSelector.SelectedIndex switch
+    private void ThemeSelectionChanged(object? sender, SelectionChangedEventArgs e) =>
+        ApplyThemeMode(ThemeSelector.SelectedIndex switch
         {
             0 => MdThemeMode.Light,
             1 => MdThemeMode.Dark,
             _ => MdThemeMode.System
+        });
+
+    /// <summary>
+    /// Applies a light/dark/system theme and keeps the shell selector in sync, so pages can
+    /// toggle the theme (e.g. the settings samples' "Dark theme" switch) without the shell UI
+    /// diverging from the actual appearance.
+    /// </summary>
+    public void ApplyThemeMode(MdThemeMode mode)
+    {
+        if (Application.Current is not { } application) return;
+        var wantedIndex = mode switch { MdThemeMode.Light => 0, MdThemeMode.Dark => 1, _ => 2 };
+        if (ThemeSelector.SelectedIndex != wantedIndex)
+        {
+            // Raising SelectionChanged routes back into ApplyThemeMode with the selector aligned.
+            ThemeSelector.SelectedIndex = wantedIndex;
+            return;
+        }
+
+        application.RequestedThemeVariant = mode switch
+        {
+            MdThemeMode.Light => ThemeVariant.Light,
+            MdThemeMode.Dark => ThemeVariant.Dark,
+            _ => ThemeVariant.Default
         };
         var options = MdThemeManager.Current with { ThemeMode = mode };
         var dark = mode == MdThemeMode.Dark || mode == MdThemeMode.System && application.ActualThemeVariant == ThemeVariant.Dark;

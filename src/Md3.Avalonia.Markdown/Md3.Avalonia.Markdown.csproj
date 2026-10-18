@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Md3.Avalonia.Themes</RootNamespace>
+    <AssemblyName>Md3.Avalonia.Markdown</AssemblyName>
+    <Description>Material Design 3 style collection for Markdown.Avalonia. Opt-in package: it carries the Markdown.Avalonia.Tight dependency so the core Material packages do not have to.</Description>
+    <PackageId>Md3.Avalonia.Markdown</PackageId>
+    <Version>0.5.0-preview.1</Version>
+    <Authors>Md3.Avalonia contributors</Authors>
+    <PackageTags>avalonia;markdown;markdown-viewer;document;theme;material-design-3</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IsPackable>true</IsPackable>
+    <!-- Declares the assembly safe to trim and turns the IL2xxx analyzer on, so a new
+         reflective call fails the build instead of silently breaking a trimmed app. -->
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <!-- Assembly Markdown.Avalonia; it brings ColorTextBlock.Avalonia and ColorDocument.Avalonia,
+         whose types the selectors below name. The metapackage (with SyntaxHigh) is deliberately
+         not used: it would add an AvaloniaEdit dependency for code blocks this theme does not
+         style. See README.md for what that means for apps that add SyntaxHigh themselves. -->
+    <PackageReference Include="Markdown.Avalonia.Tight" />
+    <ProjectReference Include="../Md3.Avalonia/Md3.Avalonia.csproj" />
+    <None Include="../../README.md" Pack="true" PackagePath="/" Link="README.md" />
+    <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />
+  </ItemGroup>
+</Project>

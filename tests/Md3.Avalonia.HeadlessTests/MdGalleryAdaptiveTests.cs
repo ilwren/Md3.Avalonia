@@ -61,9 +61,9 @@ public sealed class MdGalleryAdaptiveTests
             }
 
             var window = new Window { Width = NarrowWidth, Height = 900, Content = page };
-            window.Show();
             try
             {
+                window.Show();
                 Dispatcher.UIThread.RunJobs();
                 window.Measure(new Size(NarrowWidth, 900));
                 window.Arrange(new Rect(0, 0, NarrowWidth, 900));
@@ -92,6 +92,13 @@ public sealed class MdGalleryAdaptiveTests
                     tooWide.Add($"{type.Name} ({worst.Control.GetType().Name} reaches {worst.Right:0})");
                 }
             }
+            catch (Exception exception)
+            {
+                // Measuring a page shapes its text, so a typeface the host does not have throws here
+                // rather than in the page's own test - and this loop covers every page there is. Name
+                // the one that threw; the annotation is the only evidence a run leaves behind.
+                throw new InvalidOperationException($"measuring {type.Name} in a {NarrowWidth} dip window", exception);
+            }
             finally { window.Close(); }
         }
 
@@ -100,13 +107,23 @@ public sealed class MdGalleryAdaptiveTests
         // that were declared at a fixed 820, 760 or 720 dip fixed twenty-eight of them. These
         // five are still outstanding and are listed by name rather than waved through with a
         // tolerance, so the set can only shrink: a new offender fails the test immediately.
+        // Down from five. RadioButton, PickerRestoration and BeforeAfter were page-level - a
+        // horizontal StackPanel of fixed-width children that should have been a WrapPanel - and are
+        // fixed. The two below were measured rather than guessed at, by emptying this list and
+        // reading what the assertion reported:
+        //
+        //   DateRangePickerGalleryPage (MdDatePicker reaches 500)
+        //   SwitchGalleryPage (Border reaches 484)
+        //
+        // Neither is a page layout any more. The date range picker arranges two MdDatePicker fields
+        // side by side inside its own template, and the switch page has no horizontal row at all -
+        // its only Border is capped and stretches, and the identical CodeExample hosting passes on
+        // every other page, so that Border belongs to a control. Both are template-level, and this
+        // sweep is page-level, so they stay listed with what was measured.
         var known = new HashSet<string>(StringComparer.Ordinal)
         {
-            "BeforeAfterGalleryPage",      // a caption overruns by 22 dip
-            "DateRangePickerGalleryPage",  // two pickers side by side, 20 dip over
-            "PickerRestorationGalleryPage",// a horizontal row of pickers that does not wrap
-            "RadioButtonGalleryPage",      // a horizontal row of options that does not wrap
-            "SwitchGalleryPage",           // a row of switches overruns by 4 dip
+            "DateRangePickerGalleryPage",  // MdDatePicker reaches 500: two fields side by side in the template
+            "SwitchGalleryPage",           // a Border reaches 484; not the page's own capped Border
         };
 
         var regressions = tooWide

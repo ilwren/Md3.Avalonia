@@ -1,0 +1,95 @@
+<!--
+  Material Design 3 theme for Dock: the only opt-in theme that composes an upstream theme
+  instead of porting one.
+
+  Structurally this is Dock.Avalonia.Themes.Fluent's DockFluentTheme.axaml (same 50 control
+  dictionaries, same order), with the accent dictionary swapped for ours. Two consequences:
+
+  * Every control dictionary is loaded from the pinned Dock.Avalonia.Themes.Fluent package by
+    absolute avares:// URI rather than copied here, so Dock keeps owning its templates, part
+    names and converters, and a Dock upgrade moves them for us. Only the values change, because
+    Accents/Material.axaml resolves Dock's own DockApplicationAccent*/DockTheme*/DockSurface*/
+    DockTab*/DockChrome*/DockTarget* keys onto Md.Sys.Color.*.
+  * Because those dictionaries are Dock's Fluent ones, this theme replaces DockFluentTheme and
+    does not need Avalonia's FluentTheme either; it is meant to be added after MaterialTheme in
+    Application.Styles.
+
+  Two upstream features are deliberately not ported: Dock's compact density style (the M3 theme
+  owns density) and the CacheDocumentTabContent document-template override (an opt-in Dock API,
+  not a Material concern). Everything else - including the ManagedWindowLayer chrome style below -
+  is kept exactly as upstream has it.
+-->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Dock.Avalonia.Controls"
+        x:Class="Md3.Avalonia.Themes.MaterialDockTheme">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Dock.Controls.ProportionalStackPanel/ProportionalStackPanelSplitter.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/ControlStrings.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia.Dock/Themes/Accents/Material.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia.Dock/Themes/Controls/MaterialButton.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/WindowChromeResources.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/WindowDrawnDecorations.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/ScrollViewer.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DocumentTabStripItem.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DocumentTabStrip.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DockCommandBarHost.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DockSelectorOverlay.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/MdiDocumentWindow.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/MdiDocumentControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/ToolTabStripItem.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/ToolTabStrip.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DockTarget.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/GlobalDockTarget.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DocumentControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/ToolChromeControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/ToolControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/ToolPinItemControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/ToolPinnedControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DockDockControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DocumentContentControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DocumentDockControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/PinnedDockControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/ProportionalDockControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/StackDockControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/GridDockControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/WrapDockControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/UniformGridDockControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/RootDockControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/ToolContentControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/ToolDockControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/SplitViewDockControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DockControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/ManagedWindowLayer.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/HostWindowTitleBar.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/HostWindow.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/BusyOverlayControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DialogOverlayControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/ConfirmationOverlayControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/OverlayLayerStyles.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/OverlayLayerDefaults.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/OverlayDataTemplates.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DialogShellControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/ConfirmationDialogControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DragPreviewControl.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DragPreviewWindow.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/PinnedDockWindow.axaml" />
+        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DockAdornerWindow.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <Style Selector="controls|ManagedWindowLayer controls|ToolChromeControl">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ContentPresenter Background="{TemplateBinding Background}"
+                          BorderBrush="{TemplateBinding BorderBrush}"
+                          BorderThickness="{TemplateBinding BorderThickness}"
+                          Content="{TemplateBinding Content}"
+                          Padding="{TemplateBinding Padding}" />
+      </ControlTemplate>
+    </Setter>
+  </Style>
+</Styles>
