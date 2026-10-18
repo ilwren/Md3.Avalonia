@@ -398,7 +398,7 @@ public sealed class MdFloatingWindow : ContentControl
     private void OnSettleTimerTick(object? sender, EventArgs e) => SetHeightWithoutMotion(_pendingHeight);
 
     /// <summary>
-    /// Writes <see cref="Height"/> with the transitions detached. Establishing the value an
+    /// Writes the control's <c>Height</c> with the transitions detached. Establishing the value an
     /// animation starts from, and returning to auto sizing after one has landed, both have to
     /// happen without travelling - only the travel itself should animate.
     /// </summary>
