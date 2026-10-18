@@ -11,7 +11,7 @@
     <AssemblyName>Md3.Avalonia.Notifications</AssemblyName>
     <Description>One API for native system notifications on Windows, macOS, Linux and Android.</Description>
     <PackageId>Md3.Avalonia.Notifications</PackageId>
-    <Version>0.4.6-preview.1</Version>
+    <Version>0.5.0-preview.1</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;notifications;system-notifications;windows;macos;linux;android</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
