@@ -1,7 +1,8 @@
-# Md3.Avalonia
+﻿# Md3.Avalonia
 
 面向 Avalonia 12 的 Material Design 3 控件库与组件 Gallery。
 
+![video](assets/video.mp4)
 [![CI](https://github.com/ilwren/Md3.Avalonia/actions/workflows/ci.yml/badge.svg)](https://github.com/ilwren/Md3.Avalonia/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
