@@ -91,28 +91,28 @@
             <md:MdButton x:Name="ComponentsOverviewNav" Content="Components overview" Variant="Text" HorizontalContentAlignment="Left" Click="ShowComponents" />
             <Border Margin="0,12,0,4" Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
             <TextBlock Margin="14,8,14,10" Classes="body" Text="COMMUNICATIONS" />
-            <md:MdButton x:Name="DockNav" Content="Docking" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDock" />
-            <md:MdButton x:Name="DraggableTabsNav" Content="Draggable tabs" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDraggableTabs" />
-            <md:MdButton x:Name="FloatingWindowNav" Content="Floating window" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFloatingWindow" />
-            <md:MdButton x:Name="HexEditorNav" Content="Hex editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowHexEditor" />
-            <md:MdButton x:Name="LiveChartsNav" Content="LiveCharts2 charts" Variant="Text" HorizontalContentAlignment="Left" Click="ShowLiveCharts" />
-            <md:MdButton x:Name="MapsuiNav" Content="Map" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMapsui" />
-            <md:MdButton x:Name="MarkdownNav" Content="Markdown" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMarkdown" />
-            <md:MdButton x:Name="NodifyMNav" Content="Node editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNodifyM" />
             <md:MdButton x:Name="NotificationsNav" Content="Notifications" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNotifications" />
             <Border Margin="0,12,0,4" Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
             <TextBlock Margin="14,8,14,10" Classes="body" Text="SAMPLES &amp; APPS" />
             <md:MdButton x:Name="AndroidSettingsNav" Content="Android settings" Variant="Text" HorizontalContentAlignment="Left" Click="ShowAndroidSettings" />
             <md:MdButton x:Name="ClockNav" Content="Clock app" Variant="Text" HorizontalContentAlignment="Left" Click="ShowClock" />
-            <md:MdButton x:Name="PropertyGridNav" Content="Property grid" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPropertyGrid" />
-            <md:MdButton x:Name="ScottPlotNav" Content="ScottPlot charts" Variant="Text" HorizontalContentAlignment="Left" Click="ShowScottPlot" />
-            <md:MdButton x:Name="SignaturePadNav" Content="Signature pad" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSignaturePad" />
             <md:MdButton x:Name="TasksNav" Content="Tasks &amp; todo" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTasks" />
             <Border Margin="0,12,0,4" Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
             <TextBlock Margin="14,8,14,10" Classes="body" Text="LIBRARY EXTENSIONS" />
+            <md:MdButton x:Name="DockNav" Content="Docking" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDock" />
+            <md:MdButton x:Name="DraggableTabsNav" Content="Draggable tabs" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDraggableTabs" />
+            <md:MdButton x:Name="FloatingWindowNav" Content="Floating window" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFloatingWindow" />
             <md:MdButton x:Name="FocusHeroNav" Content="Focus, shortcut, Hero" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFocusHero" />
+            <md:MdButton x:Name="HexEditorNav" Content="Hex editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowHexEditor" />
+            <md:MdButton x:Name="LiveChartsNav" Content="LiveCharts2 charts" Variant="Text" HorizontalContentAlignment="Left" Click="ShowLiveCharts" />
+            <md:MdButton x:Name="MapsuiNav" Content="Map" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMapsui" />
+            <md:MdButton x:Name="MarkdownNav" Content="Markdown" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMarkdown" />
             <md:MdButton x:Name="SymbolsNav" Content="Material Symbols" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSymbols" />
             <md:MdButton x:Name="MotionNav" Content="Motion" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMotion" />
+            <md:MdButton x:Name="NodifyMNav" Content="Node editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNodifyM" />
+            <md:MdButton x:Name="PropertyGridNav" Content="Property grid" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPropertyGrid" />
+            <md:MdButton x:Name="ScottPlotNav" Content="ScottPlot charts" Variant="Text" HorizontalContentAlignment="Left" Click="ShowScottPlot" />
+            <md:MdButton x:Name="SignaturePadNav" Content="Signature pad" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSignaturePad" />
             <md:MdButton x:Name="TextEditorNav" Content="Text editor" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTextEditor" />
             <md:MdButton x:Name="ThemeResourcesNav" Content="Theme Lab" Variant="Text" HorizontalContentAlignment="Left" Click="ShowThemeResources" />
             <Border Margin="0,12,0,4" Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />

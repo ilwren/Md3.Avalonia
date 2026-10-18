@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
@@ -338,6 +340,75 @@ public sealed class MdFloatingWindowTests
         // The collapse has to freeze the height to have something to travel from, and the restore
         // has to give that back: a window left with a fixed height would stop fitting its content.
         Assert.True(double.IsNaN(window.Height));
+        Assert.Equal(expanded, window.Bounds.Height, 3);
+    }
+
+    [AvaloniaFact]
+    public void Minimizing_Leaves_No_Empty_Band_Under_The_Title_Bar()
+    {
+        // MinHeight is set well above what a title bar needs on purpose. That floor belongs to the
+        // expanded surface; a collapsed strip held to it is exactly the band of dead space.
+        var window = new MdFloatingWindow
+        {
+            Width = 280,
+            Height = 200,
+            MinHeight = 140,
+            Content = new TextBlock { Text = "player" }
+        };
+        var host = new Grid { Width = 600, Height = 400, Children = { window } };
+        using var scope = Show(host, 600, 400);
+
+        window.IsMinimized = true;
+        Dispatcher.UIThread.RunJobs();
+
+        // Collapsed is the title bar plus the root border and nothing else, so the strip has to
+        // land on exactly that. A pixel more is space the user can see and cannot fill.
+        var bar = Part<Control>(window, "PART_TitleBar");
+        var border = window.BorderThickness;
+        Assert.Equal(bar.Bounds.Height + border.Top + border.Bottom, window.Bounds.Height, 3);
+        Assert.True(window.MinHeight < 140, $"the collapsed strip is still floored at {window.MinHeight}");
+
+        // The floor comes back with the surface, or the resize grip would let the window be pulled
+        // down past what it was asked to allow.
+        window.IsMinimized = false;
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(140, window.MinHeight, 3);
+        Assert.Equal(200, window.Bounds.Height, 3);
+    }
+
+    [AvaloniaFact]
+    public async Task Restoring_Travels_Rather_Than_Snapping_Back()
+    {
+        var window = new MdFloatingWindow { Width = 280, Height = 200, Content = new TextBlock { Text = "player" } };
+        var host = new Grid { Width = 600, Height = 400, Children = { window } };
+        using var scope = ShowWithMotion(host, 600, 400);
+        var expanded = window.Bounds.Height;
+        var duration = MdMotion.GetExitDuration(window, MdMotionSpeed.Default, MdMotionSpeed.Fast);
+
+        window.IsMinimized = true;
+        await Task.Delay(duration + TimeSpan.FromMilliseconds(80));
+        var collapsed = window.Bounds.Height;
+        Assert.True(collapsed < expanded / 2, $"collapsed to {collapsed} of {expanded}");
+
+        // The collapse ends by handing sizing back to the layout, so there is no Height left to
+        // travel from here - which is exactly why a restore has to freeze the measured height
+        // before it sets the one it is going back to. Polling for the whole travel instead of
+        // sampling once, because a single read at a guessed moment is the unreliable half of
+        // asserting a transition.
+        Assert.True(double.IsNaN(window.Height), "the collapse should have handed sizing back");
+
+        var seen = new List<double>();
+        window.IsMinimized = false;
+        var deadline = DateTime.UtcNow + duration + TimeSpan.FromMilliseconds(120);
+        while (DateTime.UtcNow < deadline)
+        {
+            Dispatcher.UIThread.RunJobs();
+            seen.Add(window.Bounds.Height);
+            await Task.Delay(20);
+        }
+
+        // A travel passes through the middle of the range; a snap reports only its two ends.
+        Assert.Contains(seen, height => height > collapsed + 2 && height < expanded - 2);
         Assert.Equal(expanded, window.Bounds.Height, 3);
     }
 

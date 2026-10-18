@@ -48,6 +48,7 @@ public sealed class MdFloatingWindow : ContentControl
     private Size _resizeOrigin;
     private double _expandedHeight = double.NaN;
     private double _pendingHeight = double.NaN;
+    private double _minHeightOverride = double.NaN;
     private bool _wasAutoSized;
     private bool _dragging;
     private bool _resizing;
@@ -322,7 +323,16 @@ public sealed class MdFloatingWindow : ContentControl
 
         // An explicit height would leave a tall empty box behind, so the title bar decides the
         // height while collapsed.
-        if (IsMinimized) SetHeightWithoutMotion(double.NaN);
+        if (IsMinimized)
+        {
+            RelaxMinHeightForCollapse();
+            SetHeightWithoutMotion(double.NaN);
+        }
+        else
+        {
+            RestoreMinHeight();
+        }
+
         _expandedHeight = double.NaN;
         _wasAutoSized = false;
     }
@@ -341,11 +351,17 @@ public sealed class MdFloatingWindow : ContentControl
         // start from. The value equals the measured height, so nothing moves on this frame.
         SetHeightWithoutMotion(current);
 
-        // Collapsed means the content row is gone, so the target is the window minus that row: what
-        // is left is the title bar, the padding and the border. Deriving it rather than naming a
-        // number keeps this right if the title bar's own minimum changes, and the clamp keeps a
-        // window with very little content inside its MinHeight.
-        var collapsed = contentHeight > 0 ? Math.Max(MinHeight, current - contentHeight) : MinHeight;
+        // Collapsed means the content row is gone, so what is left is the title bar plus the root
+        // border and nothing else. Reading that off the title bar rather than subtracting the
+        // content row keeps the answer right however the rows are laid out; the subtraction stays
+        // as the fallback for a window collapsed before its parts have been measured.
+        var collapsed = CollapsedHeight();
+        if (double.IsNaN(collapsed))
+            collapsed = contentHeight > 0 ? Math.Max(MinHeight, current - contentHeight) : MinHeight;
+
+        // The floor has to come down before the height does. Otherwise the layout holds the strip
+        // at the expanded minimum and the difference shows as empty space under the title bar.
+        RelaxMinHeightForCollapse();
 
         host.Opacity = 0d;
         Height = collapsed;
@@ -371,12 +387,61 @@ public sealed class MdFloatingWindow : ContentControl
         _contentPresence.Update(true, TimeSpan.Zero);
         host.Opacity = 1d;
 
+        // The collapse ends by handing sizing back to the layout, which leaves Height at NaN - and
+        // a travel cannot leave from NaN, it just snaps. Freezing the measured height first gives
+        // the return journey a real number to start from, exactly as Collapse does before its own.
+        var current = Bounds.Height;
+
+        RestoreMinHeight();
+
         // Nothing to travel back to means the window is measuring itself, which is already the
         // right answer, so the height is left alone rather than overwritten with a guess.
-        if (expanded > 0) Height = expanded;
+        if (expanded > 0)
+        {
+            SetHeightWithoutMotion(current);
+            Height = expanded;
+        }
 
         // A window that was measuring itself has to go back to it, but only once the travel lands.
         if (wasAutoSized && expanded > 0) ScheduleHeightSettle(double.NaN);
+    }
+
+    /// <summary>
+    /// What the collapsed window is: the title bar plus the root border. Taking it off the parts
+    /// rather than naming a number keeps the strip exact if the title bar's own minimum changes.
+    /// NaN means the parts have not been measured yet, and the caller has to fall back.
+    /// </summary>
+    private double CollapsedHeight()
+    {
+        var bar = _titleBar?.Bounds.Height ?? 0d;
+        if (bar <= 0) return double.NaN;
+
+        var border = BorderThickness;
+        return bar + border.Top + border.Bottom;
+    }
+
+    /// <summary>
+    /// Lets the collapsed strip be as short as the title bar even when <c>MinHeight</c> asks for
+    /// more. That floor belongs to the expanded surface; holding it while minimized is exactly what
+    /// leaves a band of empty space under the title bar. Written through <c>SetCurrentValue</c> so a
+    /// binding on <c>MinHeight</c> survives the round trip.
+    /// </summary>
+    private void RelaxMinHeightForCollapse()
+    {
+        var collapsed = CollapsedHeight();
+        if (double.IsNaN(collapsed) || MinHeight <= collapsed) return;
+
+        if (double.IsNaN(_minHeightOverride)) _minHeightOverride = MinHeight;
+        SetCurrentValue(MinHeightProperty, collapsed);
+    }
+
+    /// <summary>Gives <c>MinHeight</c> back what the collapsed state took from it.</summary>
+    private void RestoreMinHeight()
+    {
+        if (double.IsNaN(_minHeightOverride)) return;
+
+        SetCurrentValue(MinHeightProperty, _minHeightOverride);
+        _minHeightOverride = double.NaN;
     }
 
     /// <summary>How long the state change takes to land: the longer of the travel and the fade.</summary>
