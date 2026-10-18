@@ -49,6 +49,6 @@
       "changefreq": "weekly"
     },
     "output": "_site",
-    "template": ["default", "modern"]
+    "template": ["default", "modern", "templates/material"]
   }
 }
