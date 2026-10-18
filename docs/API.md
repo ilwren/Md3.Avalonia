@@ -43,9 +43,26 @@ This document is the public entry point for the `0.5.0-preview.1` API. Preview A
      that pulls in bodong.Avalonia.PropertyGrid. It is a normal style collection - register it after
      MaterialTheme; see the Property grid section below: -->
 <PackageReference Include="Md3.Avalonia.PropertyGrid" Version="0.5.0-preview.1" />
+<!-- Optional Material theme for the NodifyM node editor; likewise the only package that
+     pulls in NodifyM.Avalonia: -->
+<PackageReference Include="Md3.Avalonia.NodifyM" Version="0.5.0-preview.1" />
+<!-- Optional Material theme for the Mapsui map control; likewise the only package that pulls
+     in Mapsui.Avalonia12. Mapsui draws its own canvas, so the theme is a map-level entry point
+     rather than a style collection; see the Mapsui section below: -->
+<PackageReference Include="Md3.Avalonia.Mapsui" Version="0.5.0-preview.1" />
+<!-- Optional Material theme for the DotNetCampus ink canvas plus MdSignaturePad; likewise the
+     only package that pulls in DotNetCampus.AvaloniaInkCanvas. The canvas also draws itself, so
+     this is a control-level entry point; see the InkCanvas section below: -->
+<PackageReference Include="Md3.Avalonia.InkCanvas" Version="0.5.0-preview.1" />
+<!-- Optional Material theme for the maintained AvaloniaRichEditor fork; likewise the only
+     package that pulls in OlivierJC.AvaloniaRichEditor: -->
+<PackageReference Include="Md3.Avalonia.RichEditor" Version="0.5.0-preview.1" />
+<!-- Optional native system notifications for Windows, macOS, Linux and Android. Independent of
+     Avalonia themes, so there is nothing to register in Application.Styles: -->
+<PackageReference Include="Md3.Avalonia.Notifications" Version="0.5.0-preview.1" />
 ```
 
-All seven packages are versioned together and provide `net8.0` and `net10.0` NuGet assets. `Md3.Avalonia.Notifications` also provides Windows- and Android-specific assets; the Gallery host itself targets .NET 10 only. Add only the optional packages your application uses; choose **one** icon provider:
+All eighteen packages are versioned together and provide `net8.0` and `net10.0` NuGet assets. `Md3.Avalonia.Notifications` also provides Windows- and Android-specific assets; the Gallery host itself targets .NET 10 only. Add only the optional packages your application uses; choose **one** icon provider:
 
 | NuGet package | Purpose | Theme/resource registration |
 |---|---|---|
@@ -55,20 +72,18 @@ All seven packages are versioned together and provide `net8.0` and `net10.0` NuG
 | `Md3.Avalonia.Extra` | Optional ecosystem controls | `ExtraTheme` after `MaterialTheme` |
 | `Md3.Avalonia.DataGrid` | Material theme for Avalonia's native `DataGrid` | `MaterialDataGridTheme` |
 | `Md3.Avalonia.RichEditor` | Material theme for the API-compatible MIT-maintained `AvaloniaRichEditor` fork | `MaterialRichEditorTheme` |
+| `Md3.Avalonia.AvaloniaEdit` | Material theme for the AvaloniaEdit text editor | `MaterialAvaloniaEditTheme` |
+| `Md3.Avalonia.AvaloniaHex` | Material theme for the AvaloniaHex hex editor | `MaterialAvaloniaHexTheme` |
+| `Md3.Avalonia.Dock` | Material theme for the Dock docking layout system | `MaterialDockTheme` |
+| `Md3.Avalonia.Tabalonia` | Material theme for Tabaloria draggable and tearable tabs | `MaterialTabaloniaTheme` |
+| `Md3.Avalonia.Markdown` | Material 3 styles for Markdown.Avalonia documents | `MaterialMarkdownTheme` |
+| `Md3.Avalonia.LiveCharts2` | Material 3 theme for LiveCharts2 charts | `MaterialLiveChartsTheme.AddMaterialTheme` via `LiveCharts.Configure` |
+| `Md3.Avalonia.ScottPlot` | Material 3 theme for ScottPlot charts | Plot-level `MaterialScottPlotTheme.Follow` / `.Apply` |
+| `Md3.Avalonia.PropertyGrid` | Material theme for the Avalonia.PropertyGrid grid | `MaterialPropertyGridTheme` |
+| `Md3.Avalonia.NodifyM` | Material theme for the NodifyM node editor | `MaterialNodifyMTheme` |
+| `Md3.Avalonia.Mapsui` | Material theme for the Mapsui map control | Map-level `MaterialMapsuiTheme.Follow` |
+| `Md3.Avalonia.InkCanvas` | Material theme for the DotNetCampus ink canvas, plus `MdSignaturePad` | `MaterialInkCanvasTheme` |
 | `Md3.Avalonia.Notifications` | Unified Windows, macOS, Linux and Android system notifications; independent of Avalonia themes | `IMdSystemNotificationService` / `MdSystemNotificationService` |
-
-For explicit project-file references, use the same version for each package:
-
-```xml
-<PackageReference Include="Md3.Avalonia" Version="0.4.6-preview.1" />
-<!-- Optional: choose one icon provider. -->
-<PackageReference Include="Md3.Avalonia.Icons" Version="0.4.6-preview.1" />
-<!-- Or: <PackageReference Include="Md3.Avalonia.Icons.Lite" Version="0.4.6-preview.1" /> -->
-<PackageReference Include="Md3.Avalonia.Extra" Version="0.4.6-preview.1" />
-<PackageReference Include="Md3.Avalonia.DataGrid" Version="0.4.6-preview.1" />
-<PackageReference Include="Md3.Avalonia.RichEditor" Version="0.4.6-preview.1" />
-<PackageReference Include="Md3.Avalonia.Notifications" Version="0.4.6-preview.1" />
-```
 
 Register the core theme; register optional themes only when their packages are referenced:
 

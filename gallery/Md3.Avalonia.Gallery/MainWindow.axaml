@@ -165,7 +165,6 @@
             <md:MdButton x:Name="NavigationBarNav" Content="Navigation bar" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNavigationBar" />
             <md:MdButton x:Name="NavigationDrawerNav" Content="Navigation drawer" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNavigationDrawer" />
             <md:MdButton x:Name="AdaptiveNav" Content="Navigation rail &amp; adaptive" Variant="Text" HorizontalContentAlignment="Left" Click="ShowAdaptive" />
-            <md:MdButton x:Name="NotificationsAllNav" Content="Notifications" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNotifications" />
             <md:MdButton x:Name="NumericNav" Content="Numeric input" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNumeric" />
             <md:MdButton x:Name="PagedItemsNav" Content="Paged items" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPagedItems" />
             <md:MdButton x:Name="PaginatedTableNav" Content="Paginated table" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPaginatedTable" />

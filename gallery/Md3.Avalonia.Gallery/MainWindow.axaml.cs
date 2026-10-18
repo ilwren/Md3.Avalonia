@@ -45,7 +45,7 @@ public partial class MainWindow : Window
             ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, BreadcrumbNav, TextFieldNav,
             CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, ColorPickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
-            NavigationDrawerNav, AdaptiveNav, NotificationsNav, NotificationsAllNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
+            NavigationDrawerNav, AdaptiveNav, NotificationsNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
             SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, BorderlessWindowNav,
 AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             BeforeAfterNav, CalendarNav, CascaderNav, ChartNav,
@@ -535,9 +535,6 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
         var query = GallerySearch.Text?.Trim() ?? string.Empty;
         foreach (var entry in _galleryIndex)
             entry.Button.IsVisible = string.IsNullOrEmpty(query) || entry.Matches(query);
-        // Notifications is indexed through the Communications section, but remains duplicated in
-        // the alphabetical browse list so the "ALL COMPONENTS" index is genuinely complete.
-        NotificationsAllNav.IsVisible = NotificationsNav.IsVisible;
     }
 
     private void GallerySearchSubmitted(object? sender, string query)
