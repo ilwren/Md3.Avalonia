@@ -9,6 +9,10 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
 using Xunit;
+// The opt-in Md3.Avalonia.Dock package pulls in Dock.Avalonia, whose root namespace is
+// `Dock`. Inside this namespace that name wins over the Avalonia.Controls.Dock enum the
+// `using Avalonia.Controls;` above imports (CS0118), so alias the enum explicitly.
+using Dock = global::Avalonia.Controls.Dock;
 
 namespace Md3.Avalonia.HeadlessTests;
 
