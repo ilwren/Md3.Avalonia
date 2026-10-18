@@ -251,6 +251,13 @@ jobs:
         continue-on-error: true
         run: scripts/probe-tests.sh MdSignaturePadThemeTests signature-pad.trx
 
+      # Drag, resize and collapse are all gesture-driven state, and the collapse now travels rather
+      # than snapping, so a regression here is a window that ends up the wrong size rather than one
+      # that fails loudly. Worth running on its own.
+      - name: Probe the floating window tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdFloatingWindowTests floating-window.trx
+
       # Bounded, because an unbounded stall costs the job's whole timeout and takes the run's
       # annotations with it: the suite measures about four and a half minutes, so ten is a wall it
       # only reaches by hanging, and a hang reported as a failed step still lets every step after

@@ -5,6 +5,7 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
 
@@ -34,6 +35,8 @@ namespace Md3.Avalonia.Extra.Controls;
 public sealed class MdFloatingWindow : ContentControl
 {
     private readonly MdPresenceController _presence;
+    private readonly MdPresenceController _contentPresence;
+    private readonly DispatcherTimer _settleTimer;
     private Control? _titleBar;
     private Control? _contentHost;
     private Control? _resizeGrip;
@@ -44,6 +47,8 @@ public sealed class MdFloatingWindow : ContentControl
     private Point _dragOrigin;
     private Size _resizeOrigin;
     private double _expandedHeight = double.NaN;
+    private double _pendingHeight = double.NaN;
+    private bool _wasAutoSized;
     private bool _dragging;
     private bool _resizing;
 
@@ -110,6 +115,7 @@ public sealed class MdFloatingWindow : ContentControl
     {
         IsOpenProperty.Changed.AddClassHandler<MdFloatingWindow>((window, _) => window.UpdateOpenState());
         IsMinimizedProperty.Changed.AddClassHandler<MdFloatingWindow>((window, _) => window.UpdateMinimizedState());
+        MdMotion.SchemeProperty.Changed.AddClassHandler<MdFloatingWindow>((window, _) => window.UpdateMotion());
         XProperty.Changed.AddClassHandler<MdFloatingWindow>((window, _) => window.ApplyOffset());
         YProperty.Changed.AddClassHandler<MdFloatingWindow>((window, _) => window.ApplyOffset());
     }
@@ -121,11 +127,19 @@ public sealed class MdFloatingWindow : ContentControl
         // would let a page centre the window and silently break every position it reports.
         HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left;
         VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top;
-        Transitions = MdMotionTransitions.Collect(
-            MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects, MdMotionSpeed.Default),
-            MdMotionTransitions.CreateTransform(this, RenderTransformProperty, MdMotionSpeed.Default));
+        UpdateMotion();
         _presence = new MdPresenceController(value => PseudoClasses.Set(":present", value));
         _presence.Initialize(IsOpen);
+        // The content host keeps its own presence for the same reason the window does: on the way
+        // down it has to stay mounted while it fades out, and on the way back up a second click has
+        // to cancel the pending hide instead of fighting it.
+        _contentPresence = new MdPresenceController(value =>
+        {
+            if (_contentHost is { } host) host.IsVisible = value;
+        });
+        _contentPresence.Initialize(!IsMinimized);
+        _settleTimer = new DispatcherTimer();
+        _settleTimer.Tick += OnSettleTimerTick;
         ApplyOffset();
         ApplyOpenVisuals();
     }
@@ -190,13 +204,16 @@ public sealed class MdFloatingWindow : ContentControl
         if (_minimizeButton is { } minimize) minimize.Click += OnMinimizeClicked;
         if (_closeButton is { } close) close.Click += OnCloseClicked;
 
-        UpdateMinimizedState();
+        UpdateMotion();
+        ApplyMinimizedState();
         ApplyOpenVisuals();
     }
 
     protected override void OnDetachedFromVisualTree(global::Avalonia.VisualTreeAttachmentEventArgs e)
     {
         _presence.Stop();
+        _contentPresence.Stop();
+        _settleTimer.Stop();
         DetachParts();
         base.OnDetachedFromVisualTree(e);
     }
@@ -245,6 +262,30 @@ public sealed class MdFloatingWindow : ContentControl
         ApplyOpenVisuals();
     }
 
+    /// <summary>
+    /// Builds the transitions the window and its content host travel with. Re-run whenever the
+    /// motion scheme changes, because a scheme is inherited and can be changed by any ancestor:
+    /// without this the window would keep animating after an application switched to reduced
+    /// motion, which is the one thing that setting must not do.
+    /// </summary>
+    private void UpdateMotion()
+    {
+        Transitions = MdMotionTransitions.Collect(
+            MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects, MdMotionSpeed.Default),
+            // The collapse travels the height, so the height is a motion property like any other.
+            MdMotionTransitions.CreateDouble(this, HeightProperty, MdMotionKind.Spatial, MdMotionSpeed.Default),
+            MdMotionTransitions.CreateTransform(this, RenderTransformProperty, MdMotionSpeed.Default));
+
+        // The fade belongs to the content host rather than to the window: the surface itself stays
+        // opaque while what is inside it goes, which is what reads as collapsing rather than as the
+        // whole window blinking.
+        if (_contentHost is { } host)
+        {
+            host.Transitions = MdMotionTransitions.Collect(
+                MdMotionTransitions.CreateDouble(host, OpacityProperty, MdMotionKind.Effects, MdMotionSpeed.Fast));
+        }
+    }
+
     private void ApplyOpenVisuals()
     {
         Opacity = IsOpen ? 1d : 0d;
@@ -254,24 +295,120 @@ public sealed class MdFloatingWindow : ContentControl
 
     private void UpdateMinimizedState()
     {
-        PseudoClasses.Set(":minimized", IsMinimized);
-        if (_contentHost is { } host) host.IsVisible = !IsMinimized;
+        // Before the first measure there is no size to travel from, so the state is applied as it
+        // stands; animating from zero would drive the window past its own title bar.
+        if (_contentHost is not { } host || Bounds.Height <= 0)
+        {
+            ApplyMinimizedState();
+            return;
+        }
 
-        if (IsMinimized)
+        if (IsMinimized) Collapse(host);
+        else Expand(host);
+    }
+
+    /// <summary>
+    /// Sets the minimized state with no travel: what the template gets when it is applied, and what
+    /// a window gets if it is minimized before it has ever been measured.
+    /// </summary>
+    private void ApplyMinimizedState()
+    {
+        _settleTimer.Stop();
+        PseudoClasses.Set(":minimized", IsMinimized);
+        _contentPresence.Initialize(!IsMinimized);
+        if (_contentHost is { } host) host.Opacity = IsMinimized ? 0d : 1d;
+
+        // An explicit height would leave a tall empty box behind, so the title bar decides the
+        // height while collapsed.
+        if (IsMinimized) SetHeightWithoutMotion(double.NaN);
+        _expandedHeight = double.NaN;
+        _wasAutoSized = false;
+    }
+
+    private void Collapse(Control host)
+    {
+        var current = Bounds.Height;
+        var contentHeight = host.Bounds.Height;
+
+        // Restoring has to know where to go back to, and an auto-sized window has no Height to
+        // remember, so the measured height is the answer for both.
+        _wasAutoSized = double.IsNaN(Height);
+        _expandedHeight = _wasAutoSized ? current : Height;
+
+        // Freezing the height at the size it already has is what gives the collapse a number to
+        // start from. The value equals the measured height, so nothing moves on this frame.
+        SetHeightWithoutMotion(current);
+
+        // Collapsed means the content row is gone, so the target is the window minus that row: what
+        // is left is the title bar, the padding and the border. Deriving it rather than naming a
+        // number keeps this right if the title bar's own minimum changes, and the clamp keeps a
+        // window with very little content inside its MinHeight.
+        var collapsed = contentHeight > 0 ? Math.Max(MinHeight, current - contentHeight) : MinHeight;
+
+        host.Opacity = 0d;
+        Height = collapsed;
+
+        // Both the hide and the return to auto sizing wait for the travel to land. Hiding the
+        // content first would blank the surface mid-collapse; going auto-sized first would cancel
+        // the animation and snap.
+        _contentPresence.Update(false, ExitDuration());
+        ScheduleHeightSettle(double.NaN);
+    }
+
+    private void Expand(Control host)
+    {
+        // The collapse may still be waiting to hand sizing back to the layout, and letting that
+        // land after a restore would drop the window straight back down.
+        _settleTimer.Stop();
+
+        var expanded = _expandedHeight;
+        var wasAutoSized = _wasAutoSized;
+        _expandedHeight = double.NaN;
+        _wasAutoSized = false;
+
+        _contentPresence.Update(true, TimeSpan.Zero);
+        host.Opacity = 1d;
+
+        // Nothing to travel back to means the window is measuring itself, which is already the
+        // right answer, so the height is left alone rather than overwritten with a guess.
+        if (expanded > 0) Height = expanded;
+
+        // A window that was measuring itself has to go back to it, but only once the travel lands.
+        if (wasAutoSized && expanded > 0) ScheduleHeightSettle(double.NaN);
+    }
+
+    /// <summary>How long the state change takes to land: the longer of the travel and the fade.</summary>
+    private TimeSpan ExitDuration() => MdMotion.GetExitDuration(this, MdMotionSpeed.Default, MdMotionSpeed.Fast);
+
+    private void ScheduleHeightSettle(double value)
+    {
+        _pendingHeight = value;
+        _settleTimer.Stop();
+        var duration = ExitDuration();
+        if (duration <= TimeSpan.Zero)
         {
-            // An explicit height would leave a tall empty box behind, so remember it and let the
-            // title bar decide the height while collapsed.
-            if (!double.IsNaN(Height))
-            {
-                _expandedHeight = Height;
-                Height = double.NaN;
-            }
+            SetHeightWithoutMotion(value);
+            return;
         }
-        else if (!double.IsNaN(_expandedHeight))
-        {
-            Height = _expandedHeight;
-            _expandedHeight = double.NaN;
-        }
+
+        _settleTimer.Interval = duration;
+        _settleTimer.Start();
+    }
+
+    private void OnSettleTimerTick(object? sender, EventArgs e) => SetHeightWithoutMotion(_pendingHeight);
+
+    /// <summary>
+    /// Writes <see cref="Height"/> with the transitions detached. Establishing the value an
+    /// animation starts from, and returning to auto sizing after one has landed, both have to
+    /// happen without travelling - only the travel itself should animate.
+    /// </summary>
+    private void SetHeightWithoutMotion(double value)
+    {
+        _settleTimer.Stop();
+        var transitions = Transitions;
+        Transitions = null;
+        Height = value;
+        Transitions = transitions;
     }
 
     private void OnMinimizeClicked(object? sender, RoutedEventArgs e)

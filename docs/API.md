@@ -350,6 +350,18 @@ The same optional package carries a masonry layout, in the two forms a host is l
 
 The title bar drags, the lower-right grip resizes, and the minimize button collapses the window to its title bar. Minimizing hides the content without unmounting it, which is the whole point for a hosted player or editor: bindings, scroll position, media and undo history all survive the collapse, and an explicit `Height` is remembered and restored rather than leaving a tall empty box. `X` and `Y` hold the position and the control owns its `Margin` to realise them, so position it through those two properties rather than through the margin. `CanDrag`, `CanResize`, `CanMinimize` and `CanClose` each remove the affordance they name, for a host that wants a fixed panel rather than a window; the close button sets `IsOpen` to false and raises `Closed`.
 
+Collapsing and restoring both travel rather than snap. The height is a spatial motion property and
+the content host's opacity is an effect, so the window slides down to its title bar while what is
+inside it fades - the surface itself stays opaque, because fading the whole window reads as blinking
+rather than as collapsing. Three details of that are worth knowing. The collapsed height is derived
+as the window minus its content row rather than named, so it stays correct if the title bar's own
+minimum changes, and it is clamped to `MinHeight`. The content is unmounted only once the fade has
+landed, and a second click inside that window cancels the pending hide instead of fighting it. And a
+window that was measuring itself gets its `Height` back to `NaN` after the travel completes, so it
+goes on fitting its content; a window with an explicit height keeps it. Under `MdMotionScheme.Reduced`
+the travel is dropped and only the short fade remains, and under `MdMotionScheme.None` both are
+instant.
+
 Closing animates out and then unmounts, and reopening inside that window cancels the removal, so a quick close/reopen does not flicker. The surface takes `Md.Sys.Shape.Corner.ExtraLarge` and `Md.Sys.Elevation.Level3`, and steps up to `Level5` while the pointer is holding it - the same raise a dragged card gets. Like everything else in Extra it is not the operating-system Dynamic Island and does not attempt to be one: on iOS and Android that surface is drawn by the system above every application, so no toolkit can host it.
 
 ## Borderless/chromeless windows

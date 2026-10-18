@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Headless;
@@ -261,6 +262,102 @@ public sealed class MdFloatingWindowTests
     private static Point CenterOf(Control part, Window window) =>
         part.TranslatePoint(new Point(part.Bounds.Width / 2, part.Bounds.Height / 2), window)!.Value;
 
+    [AvaloniaFact]
+    public void The_Collapse_Travels_The_Height_And_Fades_The_Content()
+    {
+        var window = new MdFloatingWindow { Width = 280, Height = 200, Content = new TextBlock { Text = "player" } };
+        var host = new Grid { Width = 600, Height = 400, Children = { window } };
+        using var scope = ShowWithMotion(host, 600, 400);
+
+        // Two properties change when the window collapses, so two things have to travel: the
+        // window's own height, and the opacity of what is inside it. The surface stays opaque -
+        // fading the whole window would read as blinking rather than as collapsing.
+        Assert.NotNull(window.Transitions);
+        Assert.Contains(window.Transitions!, transition =>
+            transition is DoubleTransition && transition.Property == MdFloatingWindow.HeightProperty);
+
+        var contentHost = Part<Control>(window, "PART_ContentHost");
+        Assert.NotNull(contentHost.Transitions);
+        Assert.Contains(contentHost.Transitions!, transition =>
+            transition is DoubleTransition && transition.Property == global::Avalonia.Visual.OpacityProperty);
+    }
+
+    [AvaloniaFact]
+    public void Reduced_Motion_Keeps_The_Fade_And_Drops_The_Travel()
+    {
+        var window = new MdFloatingWindow { Width = 280, Height = 200, Content = new TextBlock { Text = "player" } };
+        var host = new Grid { Width = 600, Height = 400, Children = { window } };
+        using var scope = ShowWithMotion(host, 600, 400);
+
+        // The scheme is inherited, so an ancestor can change it after the window exists. Reduced
+        // motion keeps short effect fades and removes spatial travel: the height has to stop being
+        // a transition, and the fade has to stay.
+        MdMotion.SetScheme(host, MdMotionScheme.Reduced);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.DoesNotContain(window.Transitions!, transition => transition.Property == MdFloatingWindow.HeightProperty);
+        Assert.Contains(Part<Control>(window, "PART_ContentHost").Transitions!,
+            transition => transition.Property == global::Avalonia.Visual.OpacityProperty);
+    }
+
+    [AvaloniaFact]
+    public void Minimizing_Stops_At_The_Title_Bar_Rather_Than_At_Zero()
+    {
+        var window = new MdFloatingWindow { Width = 280, Height = 200, Content = new TextBlock { Text = "player" } };
+        var host = new Grid { Width = 600, Height = 400, Children = { window } };
+        using var scope = Show(host, 600, 400);
+        var expanded = window.Bounds.Height;
+
+        window.IsMinimized = true;
+        Dispatcher.UIThread.RunJobs();
+
+        // Collapsed is the content row gone: the title bar, the padding and the border. Anything
+        // shorter would be clipping the title bar, and anything near the old height is a tall
+        // empty box.
+        Assert.True(window.Bounds.Height < expanded / 2, $"collapsed to {window.Bounds.Height} of {expanded}");
+        Assert.True(window.Bounds.Height >= window.MinHeight);
+    }
+
+    [AvaloniaFact]
+    public void An_Auto_Sized_Window_Goes_Back_To_Measuring_Itself_After_A_Restore()
+    {
+        var window = new MdFloatingWindow { Width = 280, Content = new TextBlock { Text = "player" } };
+        var host = new Grid { Width = 600, Height = 400, Children = { window } };
+        using var scope = Show(host, 600, 400);
+        var expanded = window.Bounds.Height;
+        Assert.True(double.IsNaN(window.Height));
+
+        window.IsMinimized = true;
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(window.Bounds.Height < expanded);
+
+        window.IsMinimized = false;
+        Dispatcher.UIThread.RunJobs();
+
+        // The collapse has to freeze the height to have something to travel from, and the restore
+        // has to give that back: a window left with a fixed height would stop fitting its content.
+        Assert.True(double.IsNaN(window.Height));
+        Assert.Equal(expanded, window.Bounds.Height, 3);
+    }
+
+    [AvaloniaFact]
+    public void Restoring_At_Once_Cancels_The_Collapse_Instead_Of_Fighting_It()
+    {
+        var window = new MdFloatingWindow { Width = 280, Height = 200, Content = new TextBlock { Text = "player" } };
+        var host = new Grid { Width = 600, Height = 400, Children = { window } };
+        using var scope = ShowWithMotion(host, 600, 400);
+
+        // Motion is on, so the collapse is still in flight and the content hide is still pending
+        // when the second click lands. Both have to be dropped rather than allowed to complete.
+        window.IsMinimized = true;
+        window.IsMinimized = false;
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(Part<Control>(window, "PART_ContentHost").IsVisible);
+        Assert.Equal(200, window.Height, 3);
+        Assert.DoesNotContain(":minimized", window.Classes);
+    }
+
     private static T Part<T>(Control owner, string name) where T : Control =>
         owner.GetVisualDescendants().OfType<T>().Single(control => control.Name == name);
 
@@ -274,6 +371,18 @@ public sealed class MdFloatingWindowTests
     {
         Assert.True(scope.TryFindResource(key, scope.ActualThemeVariant, out var value), key);
         return Assert.IsType<CornerRadius>(value);
+    }
+
+    /// <summary>
+    /// Like <see cref="Show"/>, but leaves the motion scheme at its default so the transitions the
+    /// control actually builds are the ones under test.
+    /// </summary>
+    private static WindowScope ShowWithMotion(Control content, double width, double height)
+    {
+        var window = new Window { Width = width, Height = height, Content = content };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        return new WindowScope(window);
     }
 
     private static WindowScope Show(Control content, double width, double height)

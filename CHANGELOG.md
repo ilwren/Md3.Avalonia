@@ -228,6 +228,13 @@
   or collapse, and everything else is a standalone overlay application - so this one is in-house,
   and its theme lives in `AdvancedControls.axaml`.
 
+- **`MdFloatingWindow` 的最小化/还原加入过渡动画**。此前是硬切：内容 `IsVisible` 直接翻转、`Height`
+  直接变 `NaN`。现在高度按 Spatial 运动、内容宿主的不透明度按 Effects 运动——窗口滑到只剩标题栏，
+  同时里面的内容淡出，而窗口表面本身保持不透明（整体淡出看起来是闪烁而不是收起）。收起高度取
+  「窗口减去内容行」而不是写死数字，并夹到 `MinHeight`；内容在淡出结束后才卸载，期间再点一次会取消
+  待执行的隐藏；原本自适应高度的窗口在动画落地后把 `Height` 交回 `NaN`，继续随内容自适应。
+  `Reduced` 下只保留短淡出、去掉位移，`None` 下瞬时完成。
+
 ### Fixed
 
 - **A pulsing `MdWaveform` never restarted after an ancestor hid it.** The frame loop lapses when
