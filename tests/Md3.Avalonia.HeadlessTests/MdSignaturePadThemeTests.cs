@@ -219,6 +219,10 @@ public sealed class MdSignaturePadThemeTests
     {
         MdMotion.SetScheme(content, MdMotionScheme.None);
         var window = new Window { Width = width, Height = height, Content = content };
+        // Opt-in package: the app builder registers the shared themes, and each package theme is
+        // added by the tests that need it, the way the NodifyM and PropertyGrid tests do. Without
+        // it there is no ControlTheme for MdSignaturePad, so no template and no PART_* at all.
+        window.Styles.Add(new MaterialInkCanvasTheme());
         window.Show();
         Dispatcher.UIThread.RunJobs();
         return new WindowScope(window);
