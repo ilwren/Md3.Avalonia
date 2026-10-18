@@ -1,291 +1,59 @@
-# Md3.Avalonia — Material Design 3 controls for Avalonia 12
+# Md3.Avalonia
 
-一个面向 Avalonia 12 的跨平台 Material 3 / M3 Expressive 控件库与组件 Gallery。项目同时提供核心控件、动态 HCT 主题、Material Symbols provider、Flutter-inspired Extra 控件、桌面窗口适配和 Android single-view Gallery。
+面向 Avalonia 12 的 Material Design 3 控件库与组件 Gallery。
 
-NuGet 包统一支持 `net8.0` 与 `net10.0`，Avalonia 依赖基线为 `12.1.2`（生态包的下限决定的，见下方说明）；Gallery（含 Android 宿主）仅使用 .NET 10。
+[![CI](https://github.com/ilwren/Md3.Avalonia/actions/workflows/ci.yml/badge.svg)](https://github.com/ilwren/Md3.Avalonia/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-> **当前源码版本：`0.5.0-preview.1`（待发布）。** 这是十八个 NuGet 包统一使用的下一预览版基线；NuGet 安装示例须在该版本发布后才能使用。Android 真机及 TalkBack、Windows Narrator、macOS VoiceOver、Linux Orca 等人工验收尚未因此视为通过。
->
-> 快速链接：[`API 参考`](docs/API.md) · [`兼容性`](docs/COMPATIBILITY.md) · [`0.5.0-preview.1 更新说明`](docs/RELEASE_NOTES_0.5.0-preview.1.md) · [`发布与验证状态`](docs/RELEASE_VALIDATION.md) · [`Gallery`](gallery/Md3.Avalonia.Gallery/)
+- 353 个公共 API 类型，覆盖按钮、输入、导航、对话框、图表与动效，全部收录在 API 参考中并由脚本门禁校验
+- HCT 动态配色：任意 seed color，6 种 scheme、3 档对比度、49 个色彩角色
+- 内嵌官方 Material Symbols Rounded 字体，构建期校验 checksum 与 glyph 数量
+- 18 个可独立安装的 NuGet 包，第三方生态主题全部 opt-in
+- 每个控件使用独立 CLR 类型与 scoped `ControlTheme`，不覆盖 Avalonia 原生控件
+- 核心包不依赖 `Avalonia.Themes.Fluent` 或 `Avalonia.Themes.Simple`
+- 桌面与 Android 双端，全部包声明 `IsTrimmable` 与 `IsAotCompatible`
 
-## 快速开始
+> **当前版本 `0.5.0-preview.1`（预览，尚未发布）。** 预览版 API 仍可能做兼容性调整，NuGet 安装示例需在该版本发布后才可用。屏幕阅读器与 Android 真机等人工验收状态见 [已知边界](#已知边界)。
 
-### 安装核心包
+## 目录
+
+- [环境要求](#环境要求)
+- [安装](#安装)
+- [快速开始](#快速开始)
+- [NuGet 包](#nuget-包)
+- [主题](#主题)
+- [控件总览](#控件总览)
+- [目录结构](#目录结构)
+- [构建与测试](#构建与测试)
+- [文档](#文档)
+- [已知边界](#已知边界)
+- [许可证](#许可证)
+
+## 环境要求
+
+| 项 | 要求 |
+|---|---|
+| Avalonia | `12.1.2`（基线由生态包的下限决定，见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)） |
+| 库目标框架 | 核心族 `net8.0;net10.0`；第三方主题包 `net10.0`（见 [NuGet 包](#nuget-包)） |
+| Gallery 与测试 | .NET 10 |
+| Android | 最低 API 23，宿主 `net10.0-android` |
+| 打包脚本 | .NET 10 SDK、Java 17、`dotnet workload install android` |
+
+## 安装
 
 ```bash
 dotnet add package Md3.Avalonia --version 0.5.0-preview.1
 ```
 
-### 注册 Material 主题
-
-```xml
-<Application xmlns="https://github.com/avaloniaui"
-             xmlns:themes="using:Md3.Avalonia.Themes">
-  <Application.Styles>
-    <themes:MaterialTheme />
-  </Application.Styles>
-</Application>
-```
-
-### 使用控件
-
-```xml
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:md="using:Md3.Avalonia.Controls">
-  <StackPanel Spacing="16" Margin="24">
-    <md:MdButton Content="继续" Variant="Filled" />
-    <md:MdTextBox Label="项目名称" Text="{Binding ProjectName}" />
-  </StackPanel>
-</Window>
-```
-
-### 按需添加可选包
-
-十八个包的版本统一为 `0.5.0-preview.1`；只安装所需能力。图标字体 provider 二选一，其余能力包也是 opt-in：
-
-| NuGet 包 | 提供能力 |
-|---|---|
-| `Md3.Avalonia` | 核心 Material 3 控件与 `MaterialTheme` |
-| `Md3.Avalonia.Icons` | 完整 Material Symbols Rounded 字体与图标目录 |
-| `Md3.Avalonia.Icons.Lite` | 精简的 Material Symbols Rounded 字体子集；与完整 Icons provider 二选一 |
-| `Md3.Avalonia.Extra` | Flutter-inspired 扩展控件；需额外注册 `ExtraTheme` |
-| `Md3.Avalonia.DataGrid` | Avalonia 原生 `DataGrid` 的 Material 主题；需注册 `MaterialDataGridTheme` |
-| `Md3.Avalonia.RichEditor` | AvaloniaRichEditor 维护版的 Material 主题（正文支持明暗主题）；需注册 `MaterialRichEditorTheme` |
-| `Md3.Avalonia.Notifications` | Windows、macOS、Linux、Android 系统通知的统一 .NET API；独立于 Avalonia 控件主题 |
-| `Md3.Avalonia.AvaloniaEdit` | AvaloniaEdit 代码/文本编辑器的 Material 主题；需注册 `MaterialAvaloniaEditTheme` |
-| `Md3.Avalonia.AvaloniaHex` | AvaloniaHex 十六进制编辑器的 Material 主题；需注册 `MaterialAvaloniaHexTheme` |
-| `Md3.Avalonia.Dock` | Dock 停靠布局系统的 Material 主题；需注册 `MaterialDockTheme` |
-| `Md3.Avalonia.Tabalonia` | Tabalonia 可拖拽/可撕出标签页的 Material 主题；需注册 `MaterialTabaloriaTheme` |
-| `Md3.Avalonia.Markdown` | Markdown.Avalonia 文档渲染的 Material 3 样式；赋给 `MarkdownScrollViewer.MarkdownStyle` |
-| `Md3.Avalonia.LiveCharts2` | LiveCharts2 图表的 Material 3 主题；通过 `LiveCharts.Configure` 配置一次 |
-| `Md3.Avalonia.ScottPlot` | ScottPlot 图表的 Material 3 主题；绘图对象级入口 `MaterialScottPlotTheme` |
-| `Md3.Avalonia.PropertyGrid` | Avalonia.PropertyGrid 属性网格的 Material 主题；需注册 `MaterialPropertyGridTheme` |
-| `Md3.Avalonia.NodifyM` | NodifyM 节点编辑器的 Material 主题；需注册 `MaterialNodifyMTheme` |
-| `Md3.Avalonia.Mapsui` | Mapsui 地图的 Material 主题；地图级入口 `MaterialMapsuiTheme` |
-| `Md3.Avalonia.InkCanvas` | DotNetCampus.AvaloniaInkCanvas 手写画布的 Material 主题与 `MdSignaturePad`；需注册 `MaterialInkCanvasTheme` |
-
-在各包版本一致的情况下，可用 `dotnet add package <包名> --version 0.5.0-preview.1` 添加对应包。核心包不强制依赖图标 provider、DataGrid 或富文本编辑器引擎。
-
-设计原则：
-
-- 每个交互控件使用独立的 `Md*` CLR 类型和 scoped `ControlTheme`；不全局覆盖 Avalonia 原生控件；
-- 核心包不依赖 Fluent/Simple theme，尽量复用 Avalonia 原生行为、绑定、键盘和选择模型；
-- Material 颜色、字体、形状、状态层、阴影和 motion 通过 token 与 `DynamicResource` 消费；
-- Core、Icons、Icons.Lite、Extra、DataGrid、Dock、Tabalonia、Markdown、LiveCharts2、ScottPlot、PropertyGrid、NodifyM、Mapsui、AvaloniaEdit、AvaloniaHex、InkCanvas、RichEditor、Notifications 十八个包可以独立发布；Extra 和图表能力不强制绑定第三方 vendor；
-- RTL、现有 accessibility 和多平台适配代码会持续保留；当前开发优先级暂不把完整 RTL/多语种布局和屏幕阅读器人工验收作为预览版阻塞项。
-
-| Dark components and app bar | Dark outlined fields |
-|---|---|
-| ![Dark component preview](docs/MdFoundationComponentsDarkPreview.png) | ![Dark outlined-field preview](docs/MdOutlinedDarkPreview.png) |
-
-![Action-button preview](docs/MdActionButtonsPreview.png)
-
-![Carousel, card, chips and picker preview](docs/MdNewComponentsPreview.png)
-
-| Text field | Checkbox | Combo box |
-|---|---|---|
-| ![MdTextBox preview](docs/MdTextBoxPreview.png) | ![MdCheckBox preview](docs/MdCheckBoxPreview.png) | ![MdComboBox preview](docs/MdComboBoxPreview.png) |
-
-## 已实现控件
-
-### Buttons
-
-- `MdButton`：Filled、Tonal、Outlined、Text、Elevated；五种 Expressive 尺寸、Round/Square、前后图标；
-- `MdToggleButton`：Filled、Tonal、Outlined；selected 颜色和 Round/Square shape morph；
-- `MdIconButton`、`MdToggleIconButton`：Standard、Filled、Tonal、Outlined，五种尺寸、Narrow/Default/Wide、Round/Square，支持 selected icon；
-- `MdSplitButton`：主操作与尾部操作拥有独立 command，精确 2 DIP visual gap，token-sized trailing segment，并通过独立 `MdDropdownMenu` 展开；selected trailing segment 保持连接侧 4 DIP 内角；
-- `MdStandardButtonGroup`：按尺寸使用 18/12/8/8/8 DIP 间距；
-- `MdConnectedButtonGroup`：2 DIP 间距，自动计算首、中、尾按钮的外圆内方轮廓；
-- `MdFloatingActionButton`：Small、Regular、Medium、Large，Primary/Secondary/Tertiary 配色与 Level 3/4 elevation；
-- `MdExtendedFloatingActionButton`：当前 Expressive Small、Medium、Large；
-- `MdFabMenu` + `MdFabMenuItem`：可展开 2–6 个相关动作，56 DIP full-pill item、独立 `ExpansionDirection="Up|Down"`（默认向上）、首次挂载 `IsInitiallyOpen`、双向 `IsOpen`、`Show`/`Dismiss`、Escape 和可逆展开/收缩 motion。
-
-所有按钮、Icon Button 和 FAB 模板都接入 `MdRipplePresenter`：按下位置产生涟漪，裁切到完整 container shape，并支持 Expressive、Standard、Reduced、None motion scheme。
-
-`MdButton` 的 Elevated 配置为 M3 已标记 deprecated 的兼容项。新界面应优先选用其他配置。
-
-### Radio、App bars 与 Badge
-
-- `MdRadioButton : RadioButton`：20 DIP icon、40 DIP state layer、48 DIP target，支持 selected、error、disabled、`GroupName`、键盘和自动化；
-- `MdTopAppBar`：Small、Medium Flexible、Large Flexible、centered title 和 scrolled container；subtitle 自动采用完整双行高度，默认保持 edge-to-edge surface，不绘制 card 式 outline/圆角；
-- `MdBottomAppBar`：仅用于 Baseline 兼容，新设计应优先使用后续 docked toolbar；
-- `MdBadge`：6 DIP dot 与 16 DIP labeled badge；
-- `MdBadgedBox`：将 badge 放置到任意 icon/control 的 top-trailing corner。
-
-### `MdTextBox`
-
-- Filled、Outlined，56 DIP 容器、label、placeholder、icons、prefix/suffix；
-- supporting/error、Avalonia validation、字符计数和 `MaxLength`；
-- `ShowClearButton` 提供内嵌清空动作；`IsPassword` 提供原生密码遮罩和显示/隐藏按钮；
-- label 使用不参与测量的 150 ms `RenderTransform` 动画；outline focus overlay 不改变布局尺寸；
-- Outlined light/dark 均保持透明 field surface，浮动 label 准确位于 outline 中线；
-- 保留原生 `PART_TextPresenter`、`PART_ScrollViewer`、选择、IME、软键盘和 AutomationPeer。
-
-### `MdCheckBox`
-
-- Unselected、selected、indeterminate、error、disabled；
-- 18 DIP container、2 DIP 圆角、40 DIP state layer、48 DIP interactive target；
-- 方框区域本身响应 pointer hover/pressed/click；
-- check/uncheck 使用 150 ms stroke-draw、opacity 和 scale transition；
-- 保留 Avalonia 原生三态、command、键盘和自动化行为。
-
-### `MdComboBox`
-
-- Filled/Outlined text-field anchor，与 `MdTextBox` 使用一致的浮动 label/notch 几何；
-- attached popup：顶部方角、底部 4 DIP 圆角、零垂直间距、强制圆角裁切、`SurfaceContainerLow`、56 DIP item、selected `TertiaryContainer` 和 12 DIP selected shape；
-- 保留 `PART_Popup`、`PART_ItemsPresenter`、`PART_EditableTextBox`；
-- 支持 `ItemsSource`、selection、editable text、键盘导航、light dismiss 和 AutomationPeer；
-- 弱引用 popup coordinator 保证打开另一个 `MdComboBox` 时自动关闭前一个；
-- 原生 `ComboBoxItem` 只获得 popup 内的局部主题，不存在全局覆盖。
-
-### 桌面适配与响应式基础
-
-- `MdScrollViewer` + `MdScrollBar`：独立 Material 滚动模板，保留 wheel、touch、chaining、extent、viewport 与双向 offset，不覆盖原生 ScrollViewer；桌面鼠标拖页默认关闭并可用 `AllowMouseDrag` 显式启用，子控件直接操作和 `SuppressMouseDragScrolling` 子树优先；
-- `MdAutoCompleteBox : AutoCompleteBox`：原生同步/异步过滤、text completion、selection 与键盘 API，采用 Material exposed-field 与弱引用 popup coordinator；
-- `MdNumericBox : NumericUpDown`：原生 Value/Minimum/Maximum/Increment、解析、键盘与 validation，复用 Material text-field 外观；滚轮约定为仅在控件有键盘焦点时步进，未聚焦时交给外层页面滚动，桌面事件路由仍待人工确认；
-- `MdAdaptiveLayout`：按可配置 600/840/1200/1600 DIP breakpoint 选择 Compact/Medium/Expanded/Large/ExtraLarge 内容，并公开 portrait/landscape 与 Touch/Pointer/Keyboard input mode；
-- `MdSurface`、`MdText`、`MdFocusRing`、`MdStateLayer`、`MdWindow`：可选的语义表面、完整 M3 type scale 与桌面基础适配类型；
-- `MdBorderlessWindow`、`MdWindowTitleBar`、`MdCaptionButton`、`MdWindowResizeGrip` 与可替换平台 adapter：扩展客户区的 Material caption，同时保留平台边框、四角、阴影和 resize frame；Android 使用 safe no-op。
-
-### Carousel、Card、Chips 与 Pickers
-
-- `MdCarousel : ListBox` + `MdCarouselItem`：MultiBrowse、Hero、CenterAligned、Uncontained；按 Material/Flutter keyline 跟随滚动和 controller 导航调整 large/medium/40–56 DIP small 尺寸，点击选择不会令卡片突变；保留 ItemsSource/DataTemplate、键盘、autoplay/hover pause 与 finite/infinite loop；
-- `MdCard : Button`：Elevated、Filled、Outlined；支持 `Command`/`Click`，`IsInteractive=False` 可作为纯展示容器；
-- `MdChip : ToggleButton` 及 `MdAssistChip`、`MdFilterChip`、`MdInputChip`、`MdSuggestionChip`：Filter 使用双向 `IsChecked`，Input 支持 `RemoveCommand`/`RemoveRequested`；
-- `MdDatePicker` / `MdDatePickerDialog`：Docked/Modal、固定 42 格完整日期网格、按当前 CultureInfo 本地化星期顺序和文本、最小/最大日期、双向 `SelectedDate`/`IsOpen`；
-- `MdTimePicker` / `MdTimePickerDialog`：真实可拖动的 M3 时钟表盘（12/24 小时双环）、Dial/Input、默认任意一分钟精度、滚轮、键盘输入、双向 `SelectedTime`/`IsOpen`；
-- ComboBox、Dropdown、DatePicker、TimePicker 共用弱引用 popup coordinator，任一临时 surface 打开时自动关闭前一个。
-
-### Dialog、Divider、Lists 与进度反馈
-
-- `MdDialog` + `MdDialogHost`：Basic/FullScreen、声明式 `IsOpen` 双向绑定、按模型类型匹配多个预声明 `DataTemplates`，以及返回结果的 `ShowAsync(model)`/`Close(result)`；支持 Escape 与可选 scrim dismiss；
-- `MdDivider : Control`：水平/垂直、任意 inset/thickness/brush；
-- `MdList : ListBox` + `MdListItem`：Standard/Segmented、单选/多选、leading/headline/supporting/trailing slots，保留 `ItemsSource`、selection、command 与键盘行为；
-- `MdLoadingIndicator`：遵循继承式 motion scheme 的 Expressive morphing indicator，支持官网当前 contained/uncontained 两种形式；
-- `MdLinearProgressIndicator` / `MdCircularProgressIndicator`：determinate/indeterminate；线性 indicator 另支持 Flat/Wavy、可配置 thickness/amplitude/wavelength。
-
-### Menus、Navigation、Search 与反馈控件
-
-- `MdMenu` + `MdMenuItem`：M3 临时 surface、leading/trailing slots、enabled/disabled state、`Command` 与 click API；
-- `MdNavigationBar` + `MdNavigationBarItem`：当前 M3 Expressive Flexible（默认）与 Baseline 兼容模式、stacked/horizontal destination、active indicator、label 与 badge slots，保留 `ItemsSource` 和 selection；
-- `MdNavigationDrawer`：Standard/Modal、left/right placement、scrim dismiss、Escape、双向 `IsOpen`，使用单一 drawer presenter 避免内容双父级；
-- `MdSearchBar` + `MdSearchView`：搜索输入、leading/trailing actions、展开结果 surface，支持绑定与直接操作；
-- `MdSheetHost`：Bottom/Left/Right 的 Standard/Modal sheet、drag handle、scrim dismiss、Escape 与双向 `IsOpen`；
-- `MdSlider : Slider`：continuous/discrete step、16 DIP track、44×4 DIP handle、stop indicator 和随 thumb 移动的 value indicator；
-- `MdSnackbar`：single/two-line、inverse color roles、action/dismiss slots、timeout 与 `Show`/`Dismiss`；`MdSnackbarHost` + `IMdSnackbarService` 为 ViewModel 提供单实例排队显示入口；
-- `MdSwitch : ToggleButton`：selected/unselected、可选状态图标、双向 `IsChecked`、`Command`、键盘与 pointer 行为。
-
-### Flutter-inspired 扩展与生态组件
-
-- Material/Flutter 常见模式：`MdBanner`、`MdExpansionPanelList`、`MdDataTable`、`MdStepper`、`MdRefreshIndicator`、`MdPaginatedDataTable`、`MdReorderableList`、`MdGridTile`、`MdDismissible` 和交互式 `MdScrollBar`；
-- 表单与平台体验：`MdForm`/`MdFormField`、`MdDropdownFormField`、`MdSimpleDialog`、`MdAboutDialog`、`MdLicensePage`、`MdPickerRestorationStore`、`MdDraggableScrollableSheet`、`MdAdaptiveSwitch`、`MdAdaptiveProgressIndicator`、`MdHero`、`MdFocusTraversalGroup` 与 `MdShortcutScope`；
-- 富文本有两种选择：`MdRichEditor`（Extra）只提供 Material 命令面，文档交给适配器，不往库里塞编辑器引擎；需要真实编辑能力（行内格式、表格、图片、分页、HTML/JSON/RTF 往返）时，请用 opt-in 的 `Md3.Avalonia.RichEditor` 主题包搭配 AvaloniaRichEditor——该控件自绘文档、不暴露 chrome（没有 `Background`/`CornerRadius`/`Padding`），所以主题只负责墨水（正文默认前景、选区、光标、字号），容器由宿主提供；默认正文前景随 M3 `OnSurface` 令深色模式保持可读，`DefaultFontSize` 单位是**磅**而非 DIP；
-- 表格有两种选择：`MdDataGrid`（Extra）是 Material 数据表；需要完整电子表格能力（列宽调整、列重排、冻结列、分组、自动生成列）时，请用 Avalonia 原生 `DataGrid` 搭配 opt-in 的 `Md3.Avalonia.DataGrid` 主题包——控件是原生的，只有外观是 Material 的；
-- 代码/文本编辑器请用 [AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit) 搭配 opt-in 的 `Md3.Avalonia.AvaloniaEdit` 主题包：它把 `TextEditor`、`TextArea`、查找替换面板、补全列表和补全气泡都换成 M3 外观，编辑器内部需要的紧凑输入框、查找按钮与选项开关全部是只在该编辑器模板里引用的 `Md.Comp.AvaloniaEdit.*` 主题，因此**不会覆盖应用其余部分的原生控件样式**，也不需要 FluentTheme。Gallery 的 `CodeExample` 已改用该包，不再为 AvaloniaEdit 局部加载 Fluent 资源；
-- 需要看二进制/十六进制时用 [AvaloniaHex](https://github.com/Washi1337/AvaloniaHex) 搭配 opt-in 的 `Md3.Avalonia.AvaloniaHex` 主题包：它填的是 AvaloniaHex 自己发布的那些资源键（`HexForegroundBase`、`OffsetForeground`、表头、当前行、光标与选区画刷和 Pen），并给编辑器自带一个 Material 的 `ControlTheme`（`SurfaceContainerLow` 表面、`OutlineVariant` 描边、ExtraSmall 圆角、`MdScrollViewer` 滚动条），因此**不会覆盖应用其余部分的原生控件样式**，也不需要 FluentTheme；
-- 停靠/多文档布局请用 [Dock](https://github.com/wieslawsoltes/Dock) 搭配 opt-in 的 `Md3.Avalonia.Dock` 主题包：它把 Dock 自己的强调色、表面、标签、分隔条、标题栏按钮与拖放目标全部换成 `Md.Sys` token（悬停/按下是 `onSurface` 状态层，选中标签是 `Primary` 容器配 `OnPrimary` 文字），并且**不复刻**上游模板——控件字典直接按 `avares://` 引用上游包、只自带一份 accent 字典，所以模板与部件名仍由 Dock 维护，升级不会漂移；它也是唯一引入 `Dock.Avalonia`/`Dock.Avalonia.Themes.Fluent` 依赖的包，不要与 `DockFluentTheme` 同时引入；由于 Dock 的 `ButtonCreateDocument`/`ChromeButton`/`DockDrawnCaptionButton` 都基于 `{x:Type Button}`，而核心主题不碰 Avalonia 原生控件、这里也不引入 `FluentTheme`，所以该包自带一份无法回避的 Material 文本按钮主题（`Themes/Controls/MaterialButton.axaml`）——按推荐的 `Application.Styles` 用法，应用自己的普通 `Button` 也会拿到它，这是 Dock 无需 `FluentTheme` 的代价；其余原生控件仍然不受影响；
-- 需要**可拖拽、可撕出为独立窗口、可跨窗口吸附**的标签页时用 [Tabalonia](https://github.com/egorozh/Tabalonia) 搭配 opt-in 的 `Md3.Avalonia.Tabalonia` 主题包：它把上游 `Themes/Custom` 的 19 个画刷全部重写成 `Md.Sys.Color` token（标签条用 `Surface`，未选中标签是 `OnSurfaceVariant` 文字、悬停为 `OnSurface` 状态层，选中标签是 `Primary` 容器配 `OnPrimary` 文字），并补上上游其实**依赖 Avalonia `FluentTheme`** 才有的六个 `TabItemHeader*` 键，因此不需要任何 Fluent 资源；与 Dock 包一样**不复刻模板**——控件字典与 `Buttons`/`DragTabItem` 样式都按 `avares://Tabalonia/...` 直接引用上游包，所以模板与部件名仍由 Tabalonia 维护；它也是唯一引入 `Tabalonia` 依赖的包，不要与 Tabalonia 自带的 `CustomTheme`/`FluentTheme` 同时引入；
-- 需要渲染 Markdown 文档时用 [Markdown.Avalonia](https://github.com/whistyun/Markdown.Avalonia) 搭配 opt-in 的 `Md3.Avalonia.Markdown` 主题包：它的形态与其他主题包不同——**不注册到 `Application.Styles`**，因为 `MarkdownScrollViewer` 自己挑选样式集合并把它插进自己的 `Styles`（最近者胜），五个内置集合由反射在 `MarkdownStyle` 的静态属性上按名选取、其 `INamedStyle` 标记是 internal，第三方无法命名也无法注册，所以唯一可用的接缝是给查看器赋值：`<md:MarkdownScrollViewer.MarkdownStyle><themes:MaterialMarkdownTheme /></md:MarkdownScrollViewer.MarkdownStyle>`（每个查看器一个实例，与内置集合的静态属性一致）。它按上游 `MarkdownStyleFluentTheme` 的选择器清单把颜色全部换成 `Md.Sys.Color`（正文 `OnSurfaceVariant`、标题与代码 `OnSurface`、链接 `Primary`（悬停 `Tertiary`）、引用条 `Primary`、表格线与分隔线 `OutlineVariant`、代码块 `SurfaceContainerLow`、提示与表头 `SurfaceContainerHighest`、上游标红的未处理 `:::` 容器用 `Error`）、字号换成 `Md.Sys.TypeScale`（h1 `HeadlineLarge` 到 h6 `TitleSmall`，其中 h5/h6 上游完全没有样式、由本包补齐；正文 `BodyLarge`、代码与表格单元 `BodyMedium`、表头 `LabelLarge`；标题按 M3 各角色的字重（到 TitleLarge 为止 Regular，TitleMedium/TitleSmall 与表头为 Medium）而非 Fluent 的 Light），并把查看器与每个文本块的 `SelectionBrush` 指向 `Md.Sys.Color.PrimarySelection.Brush`（与 AvaloniaEdit、AvaloniaHex、输入框主题同一层选区色，否则 `ComputedSelectionBrush` 会退回上游的青色），并补上 `mdc|Rule` 的前景色；文档不继承宿主字体而固定为 `Md.Sys.Typeface.Plain`；布局基本照搬上游、只在 Material 自有形状处改动（代码块是 `SurfaceContainerLow` 加 8 圆角与 12/10 内边距的卡片，取代上游上下两条细线；表格单元格内边距 10/6；未处理 `:::` 容器的 `Error` 标记为 3 宽边框），等宽字体栈没有 token、原样保留；它也是唯一引入 `Markdown.Avalonia.Tight` 依赖的包，若自行再加 SyntaxHigh 插件还需该插件自己的 appendix 样式，见 [API 参考](docs/API.md#markdown)；
-- 需要给 [LiveCharts2](https://github.com/Live-Charts/LiveCharts2) 图表换 Material 外观时用 opt-in 的 `Md3.Avalonia.LiveCharts2`：它是唯一**完全不是 Avalonia 样式集合**的 Material 主题包（包内没有 `Styles`、也没有 `ControlTheme`），因为 LiveCharts 没有任何针对单个控件的样式接缝——每张图的外观都来自 `LiveCharts.DefaultSettings` 里那唯一一个主题，所以接缝是配置入口：启动时、在第一个图表控件出现之前调用 `LiveCharts.Configure(settings => settings.AddMaterialTheme());`。它叠在 LiveCharts 自带默认主题之上（`AddDefaultTheme` + 本包的规则），因此工具提示与图例工厂、动画和上游已经定好的几何都原样保留（平面与系列的规则追加到上游的规则列表之后；标签、指针、刻度这三类可视化元素，因为 LiveCharts 每种类型只有一个槽位、重复注册会抛异常，改为接管上游已占的槽位），只改 Material 有主张的部分：系列调色板取八个角色（`Primary`、`Tertiary`、`Secondary`、`Error`、`PrimaryContainer`、`TertiaryContainer`、`InversePrimary`、`Outline`，前四个与 LiveCharts 自带调色板一样凑出四种色相，后四个是同色相的更多色调），坐标轴用 `LabelMedium` 字号与 `OnSurfaceVariant` 墨色、网格线 `OutlineVariant` 且只画水平线（上游如此）、坐标轴内边距 12；折线是 3 DIP 描边、清空上游的面积填充、8 DIP 数据点（外圈系列色、内里表面色）；柱状以 4 DIP 圆角收尾、间距 6 DIP，堆叠柱保持直角；饼图/环图靠表面色（2 DIP）分隔切片；仪表是 `SurfaceContainerHighest` 轨道配 `Primary` 指示弧、指针沿用上游 20 DIP 宽度但墨色改用 `OnSurfaceVariant`（与 `MdProgress` 一致）；K 线用 `Tertiary` 涨、`Error` 跌，取代上游硬编码的绿与红；工具提示与图例是反相表面卡片（`InverseSurface` 底 + `InverseOnSurface` 字 + 投影，字号 `LabelLarge`），画布清屏到 `Surface`；所有颜色都按每张图绘制时所在的变体读取 `Md.Sys.Color.*`（未注册 `MaterialTheme` 时回退到包内自带的 M3 基线取值），明暗跟随应用；控件自身的覆盖（`ChartTheme`、工具提示与图例画刷）与系列自己设置的画刷依旧优先。核心包的 `MdChart` 保持与绘图引擎无关。上游固定 **2.1.0-dev-798**：Avalonia 12 线目前只有 2.1.0-dev 预发布（`net8.0`/`net10.0`，声明 `Avalonia >= 12.0.0`，低于本仓库 12.1.2 基线），稳定线 2.0.x 是 Avalonia 11 构建（声明 `Avalonia >= 11.0.0`），在 Avalonia 12 下无法加载，故不能选，见 [API 参考](docs/API.md#livecharts2)；
-- 需要给 [ScottPlot](https://github.com/ScottPlot/ScottPlot) 图表换 Material 外观时用 opt-in 的 `Md3.Avalonia.ScottPlot`：它和 LiveCharts2 包一样**不是 Avalonia 样式集合**（包内没有 `Styles`、也没有 `ControlTheme`），因为 ScottPlot 的绘图对象自己保存颜色与字体，接缝是绘图对象级的入口：`MaterialScottPlotTheme.Follow(avaPlot)` 按控件当前变体应用规则并订阅控件自身的 `ActualThemeVariantChanged`，在应用切换明暗时重放（ScottPlot 只在设置时把颜色写进绘图对象），离屏绘图对象则用 `Apply(plot, dark)` 或实例 `Apply`。它只写 Material 有主张的部分：图形背景与数据区背景同为 `Surface`；`Plot.Axes.Color` 一次把边框、刻度线、刻度标签、轴名与标题刷成 `OnSurfaceVariant`；网格主刻度 `OutlineVariant` 且次网格关闭；图例是 `SurfaceContainerHigh` 面板配 `OutlineVariant` 描边与 `OnSurfaceVariant` 文字；字阶为标题 `TitleMedium`、轴名与图例 `LabelLarge`、刻度标签 `LabelMedium`，字族取自 `Md.Sys.Typeface.Plain`；系列走与 LiveCharts2 相同的八个角色调色板（经 `Plot.Add.Palette`，之后添加的 plottable 都沿用）。ScottPlot 的边框、刻度生成、布局与交互保持原样，未被处理的绘图对象保持默认外观，进程级状态（如 `Fonts.Default`）不被改写；未注册 `MaterialTheme` 时回退到包内自带的 M3 基线取值。上游固定 **5.1.59**（`net8.0`/`net10.0`，声明 `Avalonia >= 12.0.0` 与 `ScottPlot >= 5.1.59`，低于本仓库 12.1.2 基线），见 [API 参考](docs/API.md#scottplot)；
-- 需要给 [Avalonia.PropertyGrid](https://github.com/bodong1987/Avalonia.PropertyGrid) 属性网格换 Material 外观时用 opt-in 的 `Md3.Avalonia.PropertyGrid`：网格自身不设置任何颜色（它的 604 行内嵌样式只负责模板布局，单元格编辑器全部是运行期创建的原生 Avalonia 控件），因此在没有原生控件主题的应用里它只画得出外壳、画不出单元格。`MaterialPropertyGridTheme` 用 32 个 `Md.Comp.PropertyGrid.*` 键控控件主题补齐这些缺口：每个单元格外的透传容器、Material 填充字段、按钮、筛选标签块、复选框、单选按钮、组合框及其条目、数值字段与微调器、滑块与滑块柄、进度条、日期/时间字段及其滚轮面板、分类展开器、名称/值分隔条、滚动器、上下文菜单与其条目和分隔线、工具提示；颜色全部走 `Md.Sys.Color.*`、字号走 `Md.Sys.TypeScale.*`、圆角走 `Md.Sys.Shape.Corner.*`，属性列表滚动在核心的 `MdScrollBar` 上。它保持局部的方式与 AvaloniaEdit 包相同：这些主题都不按原生类型注册，而是由「选择器要求存在 `PropertyGrid` 祖先」的样式逐个下发，因此注册它不会替换应用其他位置的任何原生控件主题，也不需要 `FluentTheme`。三处仍属上游：其模板与可展开对象工厂作为本地值设置的 0.5 DIP 灰色细线（样式覆盖不到，本包也不复刻上游 11 个内嵌样式以免与 part 名漂移）、颜色单元格沿用的 Avalonia `ColorPicker`（网格本就为自己的子树加载其样式表），以及日期/时间浮层保留控件自带的滚轮机制。上游固定 **12.1.1.1**（`net8.0`/`net9.0`/`net10.0`，声明 `Avalonia >= 12.1.1`、`Avalonia.Controls.ColorPicker >= 12.1.1` 与 `bodong.PropertyModels >= 12.0.0`），见 [API 参考](docs/API.md#property-grid)；
-- 独立 `Md3.Avalonia.Extra` 包包含 `MdAvatar`/`MdAvatarGroup`、fractional `MdRating`、`MdBreadcrumb`、`MdBeforeAfter`、`MdAnimatedText`、`MdSpinKit`、`MdStaggeredPanel`、`MdWaveform`、瀑布流布局 `MdWaterfallPanel`/`MdWaterfall`、应用内悬浮窗 `MdFloatingWindow`，并通过 opt-in `ExtraTheme` 复用核心 Material tokens；其中 `MdChart` 保持 provider-neutral，不内置第三方图表引擎；
-- Ecosystem Waves A–C：density/overlay/async/shortcut contracts、`MdPopover`、`MdHoverCard`、`MdCommandPalette`、`MdSlidableItem`、`MdPagedItemsView`、`MdMasonryPanel`、`MdDataGrid`、`MdAsyncSelect`、`MdCalendar`、`MdTimeline`、`MdResultView`、`MdCascader` 与 `MdTransfer`；
-- Ecosystem Waves D–E：provider-neutral `MdChart`、`MdRichEditor`、`MdChatView`、`MdSkeleton` 与 `MdAnimationSequence`；不捆绑 chart vendor、editor engine、network/AI provider 或数据库；
-- Ecosystem Wave F：`MdPinInput` 分格输入/粘贴/遮罩/完成状态，`MdTreeView` 无限层级/展开选择/键盘/RTL，以及由正式 Material input chips 构成的 `MdTagInput` 标签输入、建议、验证和换行布局；
-- Flutter 官方对齐登记于 [`docs/FLUTTER_COMPONENT_PARITY.md`](docs/FLUTTER_COMPONENT_PARITY.md)；Ecosystem A–F 与 clean-room gate 见 [`docs/FLUTTER_ECOSYSTEM_RESEARCH_PLAN.md`](docs/FLUTTER_ECOSYSTEM_RESEARCH_PLAN.md)；无边框窗口 W0–W3 见 [`docs/BORDERLESS_WINDOW_PLAN.md`](docs/BORDERLESS_WINDOW_PLAN.md)。
-
-### Tabs、Toolbars 与 Tooltips
-
-- `MdTabs : ListBox` + `MdTabItem : ListBoxItem`：Primary/Secondary、fixed/scrollable、stacked/inline icon、badge slot，保留 `ItemsSource`、selection 与键盘导航；
-- `MdToolbar : ItemsControl`：Docked/Floating、Standard/Vibrant、Horizontal/Vertical，以及 leading/trailing slots；默认 floating container 为 64 DIP 高的 full shape；
-- `MdTooltip` + `MdTooltipHost`：Plain/Rich surface、title/action slots、hover、focus、long-press、可选 click、Escape、outside dismiss，以及双向 `IsOpen` 和 `Show()`/`Dismiss()`；
-- Tooltip popup 与其他临时 surface 一样不强制 OverlayLayer，以兼容 Android 和无可用 overlay 的 Avalonia host。
-
-## 共用基础
-
-- Avalonia **12.0.0**；七个 NuGet 包均提供 `net8.0` 与 `net10.0` assets（Notifications 另提供 Windows/Android 专用 TFM）；Gallery 与测试项目使用 .NET 10，Gallery 不提供 `net8.0` target；
-- Light、Dark、System 主题和 `DynamicResource` tokens；
-- `MaterialColorUtilities` HCT 任意 seed color 生成器，TonalSpot/Neutral/Vibrant/Expressive/Monochrome/Fidelity 六种 scheme、Standard/Medium/High contrast、49 个标准/固定/surface-container 色彩角色；
-- `MdThemeManager`、`MdThemeJson` 与对比度诊断，支持 motion、font、shape 和主题 JSON round-trip；System/Component token 分层；
-- 核心包提供通用 `MdIcon`/`MdSymbolPresenter` 与可替换的 `Md.Sys.Typeface.Symbols.Rounded`、`Md.Icon.*` contract；完整 Google codepoint catalog、强类型 `MdSymbols` 和自动嵌入字体 provider 位于可选 `Md3.Avalonia.Icons` 包；字体/包缺失或验证失败时图标视觉为空，不使用 look-alike fallback；
-- M3 motion physics 参数、继承式 motion scheme、pointer-origin ripple、popup/FAB-menu transition；
-- 核心 `Md3.Avalonia` 控件库不依赖 `Avalonia.Themes.Fluent` 或 `Avalonia.Themes.Simple`；Gallery 也不再加载 Fluent——`CodeExample` 的 AvaloniaEdit 现在由 opt-in 的 `Md3.Avalonia.AvaloniaEdit` 主题包接管，该包自带编辑器所需的全部部件外观，因此整个仓库不再需要 Fluent/Simple；
-- 核心程序集不引用 Desktop、Win32、X11 或 macOS 专属程序集，可由 Android 宿主引用；当前 Android Gallery 的 CI target 为 `net10.0-android`；
-- Gallery 使用官网式顶部导航、真实 `MdNavigationDrawer` 左侧组件栏、中央文档与右侧动态目录；按 Compact `<600`、Medium `600–839`、Expanded `840–1199`、Large `1200–1599`、Extra-large `>=1600` 五档切换一至三栏，compact/medium 使用 modal drawer 并自动收缩过宽示例；Android bottom destinations 会切换真实页面；
-- shell 由单一 `MdScrollViewer` 持有有限 viewport，导航时解包页面预览用根 ScrollViewer，避免嵌套无限测量，并已用真实 wheel input 验证 Offset 变化；Gallery 现为 101 个页面、每个组件独立成页（见 `docs/GALLERY_DEFECTS.md` 的 #12），Components 概览页由 gallery index 生成并有测试钉死不会出现死链；
-- 每个组件页使用 AvaloniaEdit 提供具备 Light/Dark 语法高亮、选择、滚动和一键复制能力的 AXAML/C# 示例；示例语言使用单选 Material segmented button group 切换；Symbols 页面虚拟化浏览并点击复制官方 catalog 中的全部图标；
-- Avalonia Headless + Skia 行为、输入、主题隔离、布局和渲染测试。
-
-### 已内嵌官方 Material Symbols 字体
-
-仓库直接包含并随 `Md3.Avalonia.Icons` 分发完整 Google **Material Symbols Rounded** variable TTF；`Md3.Avalonia.Icons.Lite` 也包含由同一官方文件生成的真实轮廓子集。使用者无需下载、复制或手动注册字体。
-
-来源固定为 `google/material-design-icons` commit `737e3324305806514d7909874fa1818ae1808232`，完整 TTF SHA-256 为 `95b24392bb49efd1bc3e92cff4e2452ad094461bab7c97e7d8723fab97e330ca`。构建和 CI 会执行：
+按需添加可选包，全部包版本一致：
 
 ```bash
-python3 scripts/verify-fonts.py
+dotnet add package Md3.Avalonia.Icons --version 0.5.0-preview.1
 ```
 
-验证器会核对完整字体与 Lite 子集 checksum、真实 variable-font tables 和 glyph 数量，拒绝缺失、占位矩形或被替换的二进制。Apache-2.0 字体许可证同时打入两个 Icons 包。
+## 快速开始
 
-打包脚本要求 .NET 10 SDK、Java 17 和 Android workload（`dotnet workload install android`）；`scripts/build-nuget.sh` 与 `scripts/build-nuget.ps1` 都会构建七个正式包，并在 `artifacts/nuget`（或自定义输出目录）生成七个 `.nupkg` 和七个 `.snupkg`。Bash 使用 `--output`，PowerShell 使用 `-Output` 修改输出目录；发布构建可分别使用 `--version` / `-Version` 覆盖包版本。手动预览版/正式版发布流程见 [`docs/PUBLISHING.md`](docs/PUBLISHING.md)。系统通知包用法与平台前置条件见 [`src/Md3.Avalonia.Notifications/README.md`](src/Md3.Avalonia.Notifications/README.md)。
-
-同时引用 Core 与 Icons 后不需要手动调用 `ConfigureFonts`：`MdSymbols` 和核心 `MdSymbolPresenter` 会自动发现 Icons provider、注册程序集内嵌字体，验证 internal family、typeface 和官方 `search` glyph，再注入核心 `Md.Icon.*` resources。验证失败时 symbol glyph 保持隐藏，不使用 Unicode 仿制图标。
-
-## 目录
-
-```text
-src/Md3.Avalonia/                 # 官方 Flutter Material 对齐核心包；不依赖具体图标字体
-├─ Controls/                       # 核心 Md* CLR 控件、枚举和属性 API
-└─ Themes/
-   ├─ MaterialTheme.axaml
-   ├─ Tokens/                      # 11 个 token 字典，全部登记在 MaterialTheme.axaml
-   │  ├─ ColorTokens.axaml          # M3 基线配色 + Light/Dark ThemeDictionaries
-   │  ├─ ExtendedColorTokens.axaml
-   │  ├─ SystemTokens.axaml
-   │  ├─ FoundationTokens.axaml
-   │  ├─ ContainmentTokens.axaml
-   │  ├─ ButtonTokens.axaml
-   │  ├─ ActionButtonTokens.axaml
-   │  ├─ TextFieldTokens.axaml
-   │  ├─ CheckBoxTokens.axaml
-   │  ├─ ComboBoxTokens.axaml
-   │  └─ ToolbarTokens.axaml
-   └─ Controls/                    # 每类控件的 scoped ControlTheme
-src/Md3.Avalonia.Icons/           # 可选 Symbols catalog/loader；内嵌完整官方 TTF
-src/Md3.Avalonia.Extra/           # 第三方 Flutter clean-room 控件；依赖核心，不依赖 Icons
-src/Md3.Avalonia.AvaloniaEdit/    # opt-in：AvaloniaEdit 的 Material 3 主题（唯一引入该依赖的包）
-src/Md3.Avalonia.AvaloniaHex/     # opt-in：AvaloniaHex 十六进制编辑器的 Material 3 主题（唯一引入该依赖的包）
-src/Md3.Avalonia.Tabalonia/       # opt-in：Tabalonia 可拖拽标签页的 Material 3 主题（唯一引入该依赖的包）
-src/Md3.Avalonia.Markdown/        # opt-in：Markdown.Avalonia 文档渲染的 Material 3 样式集合（唯一引入该依赖的包）
-src/Md3.Avalonia.LiveCharts2/     # opt-in：LiveCharts2 图表的 Material 3 主题（唯一引入该依赖的包）
-src/Md3.Avalonia.ScottPlot/       # opt-in：ScottPlot 图表的 Material 3 主题（唯一引入该依赖的包）
-src/Md3.Avalonia.PropertyGrid/    # opt-in：Avalonia.PropertyGrid 属性网格的 Material 3 主题（唯一引入该依赖的包）
-src/Md3.Avalonia.NodifyM/         # opt-in：NodifyM.Avalonia 节点编辑器的 Material 3 主题（唯一引入该依赖的包）
-src/Md3.Avalonia.Mapsui/          # opt-in：Mapsui 地图的 Material 3 主题（唯一引入该依赖的包）
-src/Md3.Avalonia.InkCanvas/       # opt-in：手写/签名画布的 Material 3 主题 + MdSignaturePad（唯一引入该依赖的包）
-src/Md3.Avalonia.Notifications/   # Windows/macOS/Linux/Android 原生系统通知，独立于 Avalonia UI
-
-gallery/Md3.Avalonia.Gallery/     # 组件、Theme Lab、资源与字体图标页面
-gallery/Md3.Avalonia.Gallery.Android/ # net10.0-android single-view host
-tests/Md3.Avalonia.HeadlessTests/ # API、输入、主题、回归及渲染测试
-tests/.../Spec/                   # 规范一致性分层校验（L1 令牌 / L2 几何 / L3 金图 / L5 动效）
-docs/                              # API、兼容性、发布验证与参考渲染图
-spec-snapshot/manifest.json        # 官网、AndroidX commit、token 版本与决策
-spec-snapshot/tokens.json          # 外部来源的期望值 oracle（禁止由本仓库生成）
-spec-snapshot/conformance-policy.json # 棘轮开关 bootstrap/enforce 与豁免清单
-```
-
-规范一致性校验的分层职责、棘轮流程与**已知差距清单**见
-[`docs/SPEC_VERIFICATION.md`](docs/SPEC_VERIFICATION.md)。以下静态检查不需要 SDK：
-
-```bash
-python3 scripts/lint-design-tokens.py        # 设计令牌 lint
-python3 scripts/check-api-doc-coverage.py    # docs/API.md 是否覆盖全部公共类型
-```
-
-## 引入主题
+注册主题：
 
 ```xml
 <Application xmlns="https://github.com/avaloniaui"
@@ -299,9 +67,64 @@ python3 scripts/check-api-doc-coverage.py    # docs/API.md 是否覆盖全部公
 </Application>
 ```
 
-十八个可独立 pack 的 NuGet 包版本均为 `0.5.0-preview.1`：`Md3.Avalonia`（核心）、`Md3.Avalonia.Icons`、`Md3.Avalonia.Icons.Lite`（两种可选图标 provider）、`Md3.Avalonia.Extra`（依赖核心），以及十三个 opt-in 的第三方控件主题包——`Md3.Avalonia.DataGrid`（Avalonia 原生 `DataGrid` 的 Material 主题，是唯一引入 `Avalonia.Controls.DataGrid` 依赖的包）、`Md3.Avalonia.RichEditor`（[OlivierJC.AvaloniaRichEditor](https://github.com/OlivierJC/AvaloniaRichEditor) 维护版 fork 的 Material 主题，保留 `AvaloniaRichEditor` 程序集与 API 名，唯一引入该依赖的包）、`Md3.Avalonia.AvaloniaEdit`（[AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit) 的 Material 主题，唯一引入 `Avalonia.AvaloniaEdit` 依赖的包；它同时替代了 Gallery 过去为 `CodeExample` 局部加载的 Fluent 资源）和 `Md3.Avalonia.AvaloniaHex`（[AvaloniaHex](https://github.com/Washi1337/AvaloniaHex) 十六进制编辑器的 Material 主题，唯一引入 `AvaloniaHex` 依赖的包）和 `Md3.Avalonia.Dock`（[Dock](https://github.com/wieslawsoltes/Dock) 停靠布局系统的 Material 主题，唯一引入 `Dock.Avalonia`/`Dock.Avalonia.Themes.Fluent` 依赖的包）和 `Md3.Avalonia.Tabalonia`（[Tabalonia](https://github.com/egorozh/Tabalonia) 可拖拽/可撕出标签页的 Material 主题，唯一引入 `Tabalonia` 依赖的包）和 `Md3.Avalonia.Markdown`（[Markdown.Avalonia](https://github.com/whistyun/Markdown.Avalonia) 文档渲染的 Material 3 样式集合，唯一引入 `Markdown.Avalonia.Tight` 依赖的包，且是唯一不注册到 `Application.Styles`、而是赋给 `MarkdownScrollViewer.MarkdownStyle` 的主题包）和 `Md3.Avalonia.LiveCharts2`（[LiveCharts2](https://github.com/Live-Charts/LiveCharts2) 图表的 Material 3 主题，唯一引入 `LiveChartsCore.SkiaSharpView.Avalonia` 依赖的包；它不是 Avalonia 样式集合，而是通过 `LiveCharts.Configure` 配置一次的全局主题入口）和 `Md3.Avalonia.ScottPlot`（[ScottPlot](https://github.com/ScottPlot/ScottPlot) 图表的 Material 3 主题，唯一引入 `ScottPlot.Avalonia` 依赖的包；同样不是 Avalonia 样式集合，而是绘图对象级入口 `MaterialScottPlotTheme`）和 `Md3.Avalonia.PropertyGrid`（[Avalonia.PropertyGrid](https://github.com/bodong1987/Avalonia.PropertyGrid) 属性网格的 Material 主题，唯一引入 `bodong.Avalonia.PropertyGrid` 依赖的包；它为网格运行期创建的原生控件提供 32 个 `Md.Comp.PropertyGrid.*` 键控控件主题，全部通过「要求 `PropertyGrid` 祖先」的选择器下发，因此不替换应用其他位置的原生控件主题）和 `Md3.Avalonia.NodifyM`（[NodifyM.Avalonia](https://github.com/Maklith/NodifyM.Avalonia) 节点编辑器的 Material 主题，唯一引入 `NodifyM.Avalonia` 依赖的包；它把上游单一样式文件里的资源与十一个控件样式表拆开，只把 43 个画刷键重新指向 `Md.Sys.Color.*`，模板本身仍归上游）和 `Md3.Avalonia.Mapsui`（[Mapsui](https://github.com/Mapsui/Mapsui) 地图的 Material 主题，唯一引入 `Mapsui.Avalonia12` 依赖的包；Mapsui 自绘画布、没有样式接缝，因此它同样不是 Avalonia 样式集合，而是地图级入口 `MaterialMapsuiTheme`：画布取 `Surface`，未设样式的图层拿到主题的矢量样式与标注样式，已带样式的图层保持原样）和 `Md3.Avalonia.InkCanvas`（[DotNetCampus.AvaloniaInkCanvas](https://github.com/dotnet-campus/DotNetCampus.InkCanvas) 手写画布的 Material 主题，唯一引入 `DotNetCampus.AvaloniaInkCanvas` 依赖的包；画布自绘、不注册样式，因此它和地图一样是控件级入口 `MaterialInkCanvasTheme.Follow`，把上游默认的「红色、10 单位粗」改写为 `Md.Sys.Color.OnSurface`；包内另有 `MdSignaturePad`，补上游留给宿主的签名基线、空状态与清除）以及 `Md3.Avalonia.Notifications`（Windows、macOS、Linux、Android 原生系统通知的统一 .NET API，不依赖 Avalonia UI，因此不参与主题注册）。不用就不会被拖进来。核心与 Extra 都不强制引用 Icons；十八个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
+使用控件：
 
-任意 seed 主题可在启动时或运行时应用：
+```xml
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:md="using:Md3.Avalonia.Controls">
+  <StackPanel Spacing="16" Margin="24">
+    <md:MdButton Content="继续" Variant="Filled" Command="{Binding ContinueCommand}" />
+    <md:MdTextBox Label="项目名称" Text="{Binding ProjectName}" MaxLength="40" />
+    <md:MdComboBox Label="平台" Variant="Outlined"
+                   ItemsSource="{Binding Platforms}" SelectedItem="{Binding Platform}" />
+  </StackPanel>
+</Window>
+```
+
+全部可绑定 API 都是 Avalonia property，可直接配合 CommunityToolkit.MVVM 使用；控件也可以在代码中直接构造和操作。
+
+| Dark components and app bar | Dark outlined fields |
+|---|---|
+| ![Dark component preview](docs/MdFoundationComponentsDarkPreview.png) | ![Dark outlined-field preview](docs/MdOutlinedDarkPreview.png) |
+
+![Action-button preview](docs/MdActionButtonsPreview.png)
+
+## NuGet 包
+
+十八个包版本统一，均可独立安装；不使用就不会被引入。
+
+| 包 | 能力 | 主题注册 | 目标框架 |
+|---|---|---|---|
+| `Md3.Avalonia` | 核心 Material 3 控件与设计令牌 | `MaterialTheme` | `net8.0;net10.0` |
+| `Md3.Avalonia.Icons` | 完整 Material Symbols Rounded 字体与图标目录 | 自动发现 | `net8.0;net10.0` |
+| `Md3.Avalonia.Icons.Lite` | 精简图标子集，与完整 Icons 二选一 | 自动发现 | `net8.0;net10.0` |
+| `Md3.Avalonia.Extra` | Flutter-inspired 扩展控件 | `ExtraTheme` | `net8.0;net10.0` |
+| `Md3.Avalonia.DataGrid` | Avalonia 原生 `DataGrid` 主题 | `MaterialDataGridTheme` | `net8.0;net10.0` |
+| `Md3.Avalonia.Notifications` | Windows / macOS / Linux / Android 系统通知 | 无（独立于 UI 主题） | `net8.0;net10.0` + Windows 专用 |
+| `Md3.Avalonia.AvaloniaEdit` | AvaloniaEdit 编辑器主题 | `MaterialAvaloniaEditTheme` | `net10.0` |
+| `Md3.Avalonia.AvaloniaHex` | AvaloniaHex 十六进制编辑器主题 | `MaterialAvaloniaHexTheme` | `net10.0` |
+| `Md3.Avalonia.Dock` | Dock 停靠布局主题 | `MaterialDockTheme` | `net10.0` |
+| `Md3.Avalonia.Tabalonia` | Tabalonia 可拖拽标签页主题 | `MaterialTabaloniaTheme` | `net10.0` |
+| `Md3.Avalonia.Markdown` | Markdown.Avalonia 文档样式 | 赋给 `MarkdownScrollViewer.MarkdownStyle` | `net10.0` |
+| `Md3.Avalonia.LiveCharts2` | LiveCharts2 图表主题 | `LiveCharts.Configure` 配置一次 | `net10.0` |
+| `Md3.Avalonia.ScottPlot` | ScottPlot 图表主题 | 绘图对象级 `MaterialScottPlotTheme` | `net10.0` |
+| `Md3.Avalonia.PropertyGrid` | Avalonia.PropertyGrid 属性网格主题 | `MaterialPropertyGridTheme` | `net10.0` |
+| `Md3.Avalonia.NodifyM` | NodifyM 节点编辑器主题 | `MaterialNodifyMTheme` | `net10.0` |
+| `Md3.Avalonia.Mapsui` | Mapsui 地图主题 | 地图级 `MaterialMapsuiTheme` | `net10.0` |
+| `Md3.Avalonia.InkCanvas` | 手写画布主题与 `MdSignaturePad` | 控件级 `MaterialInkCanvasTheme` | `net10.0` |
+| `Md3.Avalonia.RichEditor` | AvaloniaRichEditor 维护版主题 | `MaterialRichEditorTheme` | `net10.0` |
+
+每个第三方主题包是**唯一**引入对应上游依赖的包，因此核心包不会被这些依赖污染。`Markdown`、`LiveCharts2`、`ScottPlot`、`Mapsui`、`InkCanvas` 五个包不注册到 `Application.Styles`：前者的样式赋给文档控件，其余是对象级入口。
+
+设计原则：
+
+- 每个交互控件使用独立的 `Md*` CLR 类型与 scoped `ControlTheme`，尽量复用 Avalonia 原生行为、绑定、键盘与选择模型
+- 颜色、字体、形状、状态层、阴影与 motion 一律通过 token 与 `DynamicResource` 消费
+- 字体或图标 provider 缺失、校验失败时图标保持隐藏，不使用形似的替代字形
+
+## 主题
+
+Light、Dark、System 三种模式，全部通过 `DynamicResource` 令牌消费。任意 seed 配色可在启动或运行时应用：
 
 ```csharp
 var options = new MdThemeOptions
@@ -316,170 +139,127 @@ MdThemeManager.Apply(Application.Current, options, dark);
 var json = MdThemeJson.Serialize(options);
 ```
 
-完整 API 入口见 [`docs/API.md`](docs/API.md)，兼容策略见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)，本版说明见 [`docs/RELEASE_NOTES_0.5.0-preview.1.md`](docs/RELEASE_NOTES_0.5.0-preview.1.md)。
+`MaterialColorUtilities` HCT 生成器支持 TonalSpot / Neutral / Vibrant / Expressive / Monochrome / Fidelity 六种 scheme、Standard / Medium / High 三档对比度、49 个色彩角色，并提供 System 与 Component 两层令牌、对比度诊断和主题 JSON round-trip。
 
-## XAML 与 MVVM
+### 内嵌官方 Material Symbols 字体
 
-```xml
-<Window xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:md="using:Md3.Avalonia.Controls">
-  <StackPanel Spacing="16">
-    <md:MdToggleButton Content="Favorite"
-                       IsChecked="{Binding IsFavorite}"
-                       Command="{Binding ToggleFavoriteCommand}" />
+`Md3.Avalonia.Icons` 直接分发完整的 Google **Material Symbols Rounded** variable TTF，`Md3.Avalonia.Icons.Lite` 分发由同一文件生成的真实轮廓子集，使用者无需手动下载或注册字体。
 
-    <md:MdSplitButton Content="Create"
-                      Command="{Binding CreateCommand}"
-                      TrailingCommand="{Binding ShowCreateMenuCommand}"
-                      IsDropDownOpen="{Binding IsCreateMenuOpen}" />
+来源固定为 `google/material-design-icons` commit `737e3324305806514d7909874fa1818ae1808232`，完整 TTF 的 SHA-256 为 `95b24392bb49efd1bc3e92cff4e2452ad094461bab7c97e7d8723fab97e330ca`。构建与 CI 均执行：
 
-    <md:MdTextBox Text="{Binding Name}"
-                  Label="Project name"
-                  MaxLength="40"
-                  ShowCharacterCounter="True" />
-
-    <md:MdCheckBox Content="Include diagnostics"
-                   IsChecked="{Binding IncludeDiagnostics}"
-                   IsError="{Binding HasDiagnosticsError}" />
-
-    <md:MdComboBox Label="Platform"
-                   Variant="Outlined"
-                   ItemsSource="{Binding Platforms}"
-                   SelectedItem="{Binding Platform}" />
-
-    <md:MdRadioButton Content="Automatic updates"
-                      GroupName="updateMode"
-                      IsChecked="{Binding UseAutomaticUpdates}" />
-
-    <md:MdExtendedFloatingActionButton Content="Compose"
-                                       Icon="{x:Static md:MdSymbols.Edit}"
-                                       Command="{Binding ComposeCommand}" />
-
-    <md:MdChip Content="Open now" Variant="Filter"
-               IsChecked="{Binding OpenNow}" />
-
-    <md:MdDatePicker SelectedDate="{Binding DueDate}" Mode="Modal" />
-    <md:MdTimePicker SelectedTime="{Binding StartTime}" Mode="Input" />
-
-    <md:MdLinearProgressIndicator Value="{Binding Progress}" Shape="Wavy" />
-
-    <md:MdList ItemsSource="{Binding Files}"
-               SelectedItem="{Binding SelectedFile}" />
-  </StackPanel>
-</Window>
+```bash
+python3 scripts/verify-fonts.py
 ```
 
-全部 bindable API 都是 Avalonia properties，可直接用于 CommunityToolkit.MVVM；同时保留直接控件操作：
+校验器核对完整字体与 Lite 子集的 checksum、variable-font tables 与 glyph 数量，拒绝缺失、占位矩形或被替换的二进制。同时引用 Core 与 Icons 后不需要手动调用 `ConfigureFonts`：provider 会被自动发现并注册，校验失败时 symbol glyph 保持隐藏。
 
-```csharp
-var menu = new MdFabMenu { IsOpen = true };
-var comboBox = new MdComboBox
-{
-    Label = "Platform",
-    ItemsSource = new[] { "Android", "Windows", "Linux" },
-    SelectedIndex = 0
-};
-comboBox.IsDropDownOpen = true;
+## 控件总览
 
-// DialogHost.DataTemplates can predeclare one MdDialog view for each model type.
-var result = await dialogHost.ShowAsync(new DiscardDraftDialogModel(message));
-dialogHost.Close(result: true);
+完整 API 见 [`docs/API.md`](docs/API.md)，覆盖全部 353 个公共类型；`scripts/check-api-doc-coverage.py` 会在 CI 中断言这一覆盖率。下表只列出各分组的主要类型。
 
-// Inject the same service instance into the ViewModel and an attached MdSnackbarHost.
-await snackbarService.ShowAsync(new MdSnackbarMessage("Draft archived")
-{
-    ActionContent = "Undo",
-    ActionCommand = undoCommand
-});
+| 分组 | 主要类型 |
+|---|---|
+| 按钮 | `MdButton`、`MdToggleButton`、`MdIconButton`、`MdToggleIconButton`、`MdSplitButton`、`MdStandardButtonGroup`、`MdConnectedButtonGroup`、`MdFloatingActionButton`、`MdExtendedFloatingActionButton`、`MdFabMenu` |
+| 输入 | `MdTextBox`、`MdCheckBox`、`MdRadioButton`、`MdComboBox`、`MdAutoCompleteBox`、`MdSlider`、`MdSwitch`、`MdDatePicker`、`MdTimePicker`、`MdPinInput`、`MdTagInput`、`MdForm` |
+| 导航 | `MdNavigationDrawer`、`MdNavigationBar`、`MdTabs`、`MdToolbar`、`MdTopAppBar`、`MdBottomAppBar`、`MdSearchBar`、`MdSearchView`、`MdCommandPalette`、`MdBreadcrumb` |
+| 容器与浮层 | `MdCard`、`MdDialog`、`MdDialogHost`、`MdMenu`、`MdPopover`、`MdTooltip`、`MdSnackbar`、`MdBanner`、`MdSheetHost`、`MdExpansionPanelList`、`MdFloatingWindow`、`MdBorderlessWindow` |
+| 数据展示 | `MdList`、`MdDataTable`、`MdDataGrid`、`MdCarousel`、`MdCalendar`、`MdTreeView`、`MdAvatar`、`MdBadge`、`MdChip`、`MdTimeline`、`MdWaveform`、`MdChart` |
+| 反馈与进度 | `MdCircularProgressIndicator`、`MdLinearProgressIndicator`、`MdLoadingIndicator`、`MdSkeleton`、`MdRefreshIndicator`、`MdSpinKit`、`MdStateLayer`、`MdFocusRing` |
+| 布局与动效 | `MdSurface`、`MdAdaptiveLayout`、`MdScrollViewer`、`MdWaterfall`、`MdMasonryPanel`、`MdStaggeredPanel`、`MdAnimationSequence`、`MdAnimatedText`、`MdRevealHost`、`MdMorphPanel`、`MdHero` |
+
+全部按钮、Icon Button 与 FAB 模板都接入 `MdRipplePresenter`：按下位置产生涟漪，裁切到完整 container shape，并支持 Expressive / Standard / Reduced / None 四种 motion scheme。`MdButton` 的 Elevated 配置为 M3 已标记 deprecated 的兼容项，新界面应优先选用其他配置。
+
+`Md3.Avalonia.Extra` 是可选的 clean-room 扩展包，不声称复刻对应 Flutter package 的全部 API；需要严格 parity 时查阅 [`docs/FLUTTER_PARITY_STATUS.md`](docs/FLUTTER_PARITY_STATUS.md)，不要仅凭相似的 `Md*` 类型名推断完全兼容。
+
+## 目录结构
+
+```text
+src/Md3.Avalonia/                  # 核心控件与设计令牌，不依赖具体图标字体
+├─ Controls/                       # Md* 控件、枚举与属性 API
+├─ Motion/                         # motion scheme、spring 令牌与转场
+└─ Themes/
+   ├─ MaterialTheme.axaml
+   ├─ Tokens/                      # 11 个令牌字典
+   └─ Controls/                    # 每类控件的 scoped ControlTheme
+src/Md3.Avalonia.Icons/            # 图标 provider，内嵌完整官方 TTF
+src/Md3.Avalonia.Extra/            # Flutter-inspired 扩展控件
+src/Md3.Avalonia.<Vendor>/         # 12 个 opt-in 第三方主题包，各自唯一引入上游依赖
+src/Md3.Avalonia.Notifications/    # 原生系统通知，独立于 Avalonia UI
+
+gallery/Md3.Avalonia.Gallery/          # 桌面 Gallery：108 个组件页 + Theme Lab
+gallery/Md3.Avalonia.Gallery.Android/  # net10.0-android single-view 宿主
+tests/Md3.Avalonia.HeadlessTests/      # API、输入、主题、回归与渲染测试
+tests/.../Spec/                        # 规范一致性分层校验（L1 令牌 / L2 几何 / L3 金图 / L5 动效）
+docs/                                  # API、兼容性、发布与验证文档
+spec-snapshot/                         # 外部来源的期望值 oracle 与棘轮策略
 ```
 
-## Extra 与第三方 Flutter UI 能力
-
-`Md3.Avalonia.Extra` 是可选的 clean-room 扩展包，不声称复刻 Flutter package 的全部 API。当前提供：
-
-- `MdBeforeAfter`：水平/垂直 Before/After 内容对比和可拖动分隔线；
-- `MdAnimatedText`：Typewriter、Fade、Pop-friendly、None 等文字显示模式，支持 `Start`、`Stop`、循环和完成事件；
-- `MdSpinKit`：RotatingPlain、ThreeBounce、Wave、FadingCircle、ChasingDots 等非核心 Material 加载动画；
-- `MdStaggeredPanel` / `MdAnimationSequence`：可取消的 staggered entrance 和序列 motion；
-- `MdSlidableItem`：Start/End action、拖动、键盘操作、RTL 基础、`IsOpen`、dismiss threshold 和 action command；
-- `MdMasonryPanel`：Masonry、Quilted、Woven 三种布局策略；
-- `MdChart`：provider-neutral 基础图表展示，不内置图表数据引擎，也不试图替代第三方 chart library；
-- Avatar、Rating、Breadcrumb、DataGrid、Calendar、TreeView、TagInput、RichEditor、ChatView 等生态控件。
-
-这些控件的成熟度不同。需要严格 Flutter API parity 时，请查看 [`docs/FLUTTER_PARITY_STATUS.md`](docs/FLUTTER_PARITY_STATUS.md)，不要仅根据相似的 `Md*` 类型名推断完全兼容。
-
-## Borderless window / Chromeless window
-
-桌面应用可以使用 `MdBorderlessWindow` 和 `MdWindowTitleBar` 构建 Material 标题栏。默认行为是：
-
-- Windows 保留原生 Full caption style bits，以保留 DWM 的最小化、最大化和还原行为；
-- Material 自己绘制客户区标题栏，不再叠加 Fluent/Simple 的第二套标题栏；
-- `ShowIcon` 默认为 `true`，标题栏显示 `Window.Icon`；设为 `False` 可隐藏。标题栏使用窗口主体 surface 颜色且不绘制额外分隔线；
-- `ShowMinimizeButton`、`ShowMaximizeButton`、`ShowCloseButton` 控制按钮是否显示；
-- `IsMinimizeButtonEnabled`、`IsMaximizeButtonEnabled`、`IsCloseButtonEnabled` 控制按钮是否可操作；
-- `PreserveNativeBorder`、`CanResize`、`ExtendIntoTitleBar` 控制 native frame 和客户区扩展；
-- Android adapter 是 safe no-op，Android Gallery 不展示 Borderless windows 页面。
-
-```xml
-<md:MdBorderlessWindow Title="My app"
-                       IsMinimizeButtonEnabled="False"
-                       IsMaximizeButtonEnabled="True"
-                       ShowCloseButton="True">
-  <views:Shell />
-</md:MdBorderlessWindow>
-```
-
-更换平台行为时注入 `IMdWindowPlatformAdapter`。完整 API 和限制见 [`docs/BORDERLESS_WINDOW_PLAN.md`](docs/BORDERLESS_WINDOW_PLAN.md)。
-
-## Android 约束
-
-- Android 为 Tier 1；`gallery/Md3.Avalonia.Gallery.Android` 提供 `net10.0-android` single-view 宿主（最低 API 23；发布前须覆盖最低 API 与当前 target API）；
-- Gallery 的 `App` 同时处理 desktop classic lifetime 与 Android `ISingleViewApplicationLifetime`；
-- 核心控件不引用桌面专属 API；
-- TextBox/可编辑 ComboBox 保留原生 IME 和软键盘链路；
-- Popup 继续由 Avalonia 原生 popup/fallback 宿主处理可用空间、light-dismiss 与返回键；模板不强制 OverlayLayer，避免无可用 overlay 的 Android/headless host 卡死或崩溃；
-- 小尺寸按钮仍保留至少 48 DIP 的 interaction target；
-- Android Gallery 项目已纳入 `Md3.Avalonia.sln`；CI 会构建 `net10.0-android` APK。Android 导航隐藏不适用于移动端的 Borderless windows 页面；APK 构建不等于真机验收，ARM64、旋转、生命周期和 TalkBack 仍须按 `docs/RELEASE_VALIDATION.md` 在设备上签署。
+规范一致性校验的分层职责、棘轮流程与已知差距见 [`docs/SPEC_VERIFICATION.md`](docs/SPEC_VERIFICATION.md)。
 
 ## 构建与测试
 
 ```bash
-python3 scripts/verify-fonts.py
-bash scripts/build-nuget.sh   # 构建七个 .nupkg/.snupkg (需要 Java 17 + Android workload)
+python3 scripts/verify-fonts.py     # 校验内嵌字体
+bash scripts/build-nuget.sh         # 构建十八个 .nupkg / .snupkg
 
 dotnet build gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj -c Release
 dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release
 ```
 
-完整 solution 还包含 Android Gallery；构建整个 solution 前需要安装 Android workload：
+构建完整 solution 需要先安装 Android workload：
 
 ```bash
 dotnet workload install android
 dotnet build Md3.Avalonia.sln -c Release
 ```
 
+以下静态检查不需要 .NET SDK：
+
+```bash
+python3 scripts/lint-design-tokens.py       # 设计令牌 lint
+python3 scripts/check-api-doc-coverage.py   # docs/API.md 是否覆盖全部公共类型
+python3 scripts/check-gallery-localization.py --strict
+```
+
 原生 AOT 发布桌面 Gallery（Linux 需要 clang/zlib，`--smoke` 另需 xvfb）：
 
 ```bash
 bash scripts/publish-gallery-aot.sh --rid linux-x64 --smoke   # 或 win-x64 / osx-x64 / osx-arm64
-# Windows PowerShell：
-# powershell -File scripts/publish-gallery-aot.ps1 -Rid win-x64
 ```
 
-脚本会断言产物是原生可执行文件且旁边没有托管 dll，`--smoke` 在 xvfb 下实际启动该二进制确认运行时未因裁剪丢失反射元数据而崩溃；默认清理 bin/obj。`.github/workflows/aot-probe.yml` 在 main 与 arena 分支上运行同一脚本。
+脚本会断言产物是原生可执行文件且旁边没有托管 dll，`--smoke` 在 xvfb 下实际启动该二进制，确认裁剪未丢失运行时所需的反射元数据。`.github/workflows/aot-probe.yml` 在 main 与 arena 分支上运行同一脚本。
 
-当前发布门禁会构建十八个包并严格检查十八个 `.nupkg`、十八个 `.snupkg`、统一版本和已内嵌官方字体。仓库不保留普通构建产物。测试覆盖 Light/Dark Gallery screenshots、任意 HCT seed golden vectors、49 roles、三档 contrast、主题 JSON round-trip、五档 breakpoint、搜索索引、LTR/RTL 渲染、CommunityToolkit.Mvvm、Automation/live-region、虚拟化和主题生命周期、AvaloniaEdit 双语言编辑器、真实 ScrollViewer extent/viewport/wheel offset、Autocomplete/Numeric input、adaptive breakpoints、Flexible NavigationBar、official chip/item 类型、popup 非强制 OverlayLayer、Tabs/Toolbars/Tooltips、Menus/Drawer/Rail/Search/Sheets/Slider/Snackbar/Switch 的渲染与直接 API，以及 Dialog、Lists、contained Loading/Progress、popup 互斥、文化日期网格、一分钟 TimePicker、state layer、buttons、fields、Carousel/Card/Chips、AppBar、Symbols、Radio、Badge、ripple/motion。
+发布门禁会构建十八个包，并严格检查十八个 `.nupkg`、十八个 `.snupkg`、统一版本与已内嵌的官方字体。发布使用 NuGet Trusted Publishing，配置步骤见 [`docs/PUBLISHING.md`](docs/PUBLISHING.md)。
 
-每一次 build、test 或 pack 命令结束后必须立即清理编译产物，再继续后续实现或验证。Workspace 不交付 `bin/`、`obj/`、`TestResults/`、DLL、PDB、NuGet、APK 或 AAB；`docs/*.png` 是保留的文档参考图。
+每次 build、test 或 pack 结束后必须立即清理编译产物。仓库不交付 `bin/`、`obj/`、`TestResults/`、DLL、PDB、NuGet 包、APK 或 AAB；`docs/*.png` 是保留的文档参考图。
 
-## 当前边界
+## 文档
 
-- Ripple、spring token 和 inherited motion scheme 已建立；shared-axis、fade-through、container transform 与 animated visibility 四种 M3 转场已实化（`MdRevealHost` 让出布局空间并裁剪，`MdMorphPanel` 插值两端尺寸），但对 `Control` 类型的内容不做退场叠化，详见 [Flutter parity status](docs/FLUTTER_PARITY_STATUS.md)；
-- HCT dynamic theme、49 个当前 Material role、Theme Lab 与 JSON round-trip 已完成；`MdTextBox.IsPassword` 已覆盖密码输入与 reveal 行为；
-- Android 系统返回键／预测性返回已接入（`MdBackNavigation`，覆盖 dialog、sheet、drawer、search、menu、FAB menu 与两个 picker），安全区内缩已提供按边控制（`MdSafeArea`）；两者的 headless 行为有回归测试，真机手势动画与挖孔几何仍需人工验收；
-- Android Gallery 已纳入 solution，CI 会构建 APK；这不代表物理设备、旋转、生命周期或 TalkBack 验收已签署，人工结果仍以 [`docs/RELEASE_VALIDATION.md`](docs/RELEASE_VALIDATION.md) 的记录为准；
-- 十八个包均声明 `IsTrimmable` + `IsAotCompatible` 并启用相应分析器；主题 JSON 使用源生成序列化，`MdDataGrid`/`MdAsyncSelect`/`MdSearchView` 的字符串属性路径也提供免反射 selector（见 [API 参考的 Trimming 一节](docs/API.md#trimming)）。Linux x64 原生 AOT Gallery 已发布并在 xvfb 下 smoke-run；AOT workflow 会报告诊断，但这不表示诊断数为零，也不替代 Windows/macOS/Android 或使用方应用的 AOT 验收；
-- Narrator、VoiceOver 和 Orca 必须由具备对应 OS/辅助技术的人员按发布清单人工验收；
-- 完整 Material Symbols Rounded variable TTF 与真实 Lite 子集已提交并自动打包；CI 以固定 upstream commit、SHA-256、variable tables 和 glyph 数量阻止占位或替代字体混入发布。
+| 文档 | 内容 |
+|---|---|
+| [`CHANGELOG.md`](CHANGELOG.md) | 版本变更记录 |
+| [`docs/API.md`](docs/API.md) | 全部公共类型的 API 参考，含 trimming 与 AOT 说明 |
+| [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) | 目标框架、平台与依赖兼容策略 |
+| [`docs/RELEASE_NOTES_0.5.0-preview.1.md`](docs/RELEASE_NOTES_0.5.0-preview.1.md) | 本版变更说明 |
+| [`docs/RELEASE_VALIDATION.md`](docs/RELEASE_VALIDATION.md) | 人工验收清单与签署状态 |
+| [`docs/PUBLISHING.md`](docs/PUBLISHING.md) | 发布流程与 NuGet Trusted Publishing 配置 |
+| [`docs/SPEC_VERIFICATION.md`](docs/SPEC_VERIFICATION.md) | 规范一致性分层校验与已知差距 |
+| [`docs/FLUTTER_PARITY_STATUS.md`](docs/FLUTTER_PARITY_STATUS.md) | Extra 包与 Flutter 对应控件的 parity 状态 |
+| [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md) | 重复缺陷复核清单 |
+| [`docs/BORDERLESS_WINDOW_PLAN.md`](docs/BORDERLESS_WINDOW_PLAN.md) | 无边框窗口的 API 与平台限制 |
+| [`src/Md3.Avalonia.Notifications/README.md`](src/Md3.Avalonia.Notifications/README.md) | 系统通知的用法与平台前置条件 |
 
-官网页面、冻结 AndroidX commit `e2171b56112f43bf962f5d608413f74033b580b6` 和 token 版本见 [`spec-snapshot/manifest.json`](spec-snapshot/manifest.json)。
+## 已知边界
+
+- **人工验收未签署。** Narrator、VoiceOver、Orca 与 TalkBack 必须由具备对应 OS 与辅助技术的人员按发布清单验收；Android APK 构建成功不等于真机验收，ARM64、旋转、生命周期与 TalkBack 仍需在设备上签署，结果记录于 [`docs/RELEASE_VALIDATION.md`](docs/RELEASE_VALIDATION.md)。
+- **动效。** Ripple、spring 令牌与继承式 motion scheme 已建立，shared-axis、fade-through、container transform 与 animated visibility 四种 M3 转场已实化（`MdRevealHost` 让出布局空间并裁剪，`MdMorphPanel` 插值两端尺寸），但对 `Control` 类型的内容不做退场叠化。
+- **AOT。** 十八个包均声明 `IsTrimmable` + `IsAotCompatible` 并启用相应分析器，主题 JSON 使用源生成序列化；Linux x64 原生 Gallery 已发布并在 xvfb 下 smoke-run。AOT workflow 会报告诊断，但诊断数为零不代表 Windows、macOS、Android 或使用方应用的 AOT 验收已通过。
+- **Android 返回手势与安全区。** `MdBackNavigation` 覆盖 dialog、sheet、drawer、search、menu、FAB menu 与两个 picker，`MdSafeArea` 提供按边内缩；headless 行为有回归测试，真机手势动画与挖孔几何仍需人工验收。
+- **RTL 与多语种。** 相关适配代码持续保留，但完整 RTL/多语种布局与屏幕阅读器人工验收当前不作为预览版阻塞项。
+- **字体来源。** 完整 Material Symbols Rounded variable TTF 与真实 Lite 子集已提交并自动打包；CI 以固定 upstream commit、SHA-256、variable tables 与 glyph 数量阻止占位或替代字体混入发布。
+
+官网页面、冻结的 AndroidX commit `e2171b56112f43bf962f5d608413f74033b580b6` 与 token 版本见 [`spec-snapshot/manifest.json`](spec-snapshot/manifest.json)。
+
+## 许可证
+
+Apache-2.0，见 [`LICENSE`](LICENSE)。第三方组件的许可声明见 [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md)；内嵌的 Material Symbols 字体同为 Apache-2.0，许可证随两个 Icons 包一起分发。

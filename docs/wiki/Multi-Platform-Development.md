@@ -1,6 +1,6 @@
 # Multi-Platform Development
 
-The seven NuGet libraries target **.NET 8 and .NET 10** and use Avalonia 12.0.0. The desktop and Android Gallery hosts target .NET 10 only (`net10.0` / `net10.0-android`). The current preview support matrix covers Windows, macOS, Linux, and Android; iOS is not a release target.
+The eighteen NuGet libraries use Avalonia 12.1.2. The five core-family packages target **.NET 8 and .NET 10** (`net8.0;net10.0`); the twelve opt-in third-party theme packages target **.NET 10** only, following the TFMs their upstream libraries publish.
 
 ---
 

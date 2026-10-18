@@ -62,7 +62,7 @@ This document is the public entry point for the `0.5.0-preview.1` API. Preview A
 <PackageReference Include="Md3.Avalonia.Notifications" Version="0.5.0-preview.1" />
 ```
 
-All eighteen packages are versioned together and provide `net8.0` and `net10.0` NuGet assets. `Md3.Avalonia.Notifications` also provides Windows- and Android-specific assets; the Gallery host itself targets .NET 10 only. Add only the optional packages your application uses; choose **one** icon provider:
+All eighteen packages are versioned together. The five core-family packages (`Md3.Avalonia`, `Md3.Avalonia.Icons`, `Md3.Avalonia.Icons.Lite`, `Md3.Avalonia.Extra`, `Md3.Avalonia.DataGrid`) provide `net8.0` and `net10.0` assets, and the twelve opt-in third-party theme packages provide `net10.0` only. `Md3.Avalonia.Notifications` adds `net8.0-windows10.0.19041.0`, `net10.0-windows10.0.19041.0` and, when the pack scripts opt in, `net10.0-android`. The Gallery host itself targets .NET 10 only. Add only the optional packages your application uses; choose **one** icon provider:
 
 | NuGet package | Purpose | Theme/resource registration |
 |---|---|---|

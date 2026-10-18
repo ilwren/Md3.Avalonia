@@ -46,7 +46,7 @@ await notifications.ShowAsync(new MdSystemNotification("Build complete", "The pa
 
 A Windows app built against plain `net8.0` or `net10.0` selects the generic desktop asset, not the WinRT backend; `CreateDefault()` reports that the Windows-specific target is required. Retarget the Windows host to `net8.0-windows10.0.19041.0` or `net10.0-windows10.0.19041.0` (or create a Windows-specific host project) to select the native asset. The Gallery Desktop selects this Windows target when built on Windows; it registers a current-user Start-menu shortcut with the matching AppUserModelID before showing its window.
 
-The package provides `net8.0` and `net10.0` assets for macOS/Linux, `net8.0-windows10.0.19041.0` and `net10.0-windows10.0.19041.0` for the Windows backend, plus `net8.0-android` and `net10.0-android` Android assets (minimum API 23). The Gallery host remains .NET 10-only. Building or packing Android assets requires a compatible .NET Android workload and JDK (Java 17):
+The package provides `net8.0` and `net10.0` assets for macOS/Linux and `net8.0-windows10.0.19041.0` and `net10.0-windows10.0.19041.0` for the Windows backend. The Android asset is opt-in: the pack scripts pass `-p:IncludeAndroidTarget=true`, which adds `net10.0-android` (minimum API 23). Only `net10.0-android` is offered, because `net8.0-android` is out of support and the SDK raises NETSDK1202 for it. The Gallery host remains .NET 10-only. Building or packing Android assets requires a compatible .NET Android workload and JDK (Java 17):
 
 ```bash
 dotnet workload install android
