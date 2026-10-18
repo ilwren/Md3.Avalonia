@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Md3.Avalonia.Themes</RootNamespace>
+    <AssemblyName>Md3.Avalonia.ScottPlot</AssemblyName>
+    <Description>Material Design 3 appearance (surfaces, ink, grid, legend, type scale and the Material series palette) for ScottPlot charts in Avalonia. Opt-in package: it carries the ScottPlot Avalonia dependency so the core Material packages do not have to.</Description>
+    <PackageId>Md3.Avalonia.ScottPlot</PackageId>
+    <Version>0.5.0-preview.1</Version>
+    <Authors>Md3.Avalonia contributors</Authors>
+    <PackageTags>avalonia;charts;scottplot;data-visualization;theme;material-design-3</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IsPackable>true</IsPackable>
+    <!-- Declares the assembly safe to trim and turns the IL2xxx analyzer on, so a new
+         reflective call fails the build instead of silently breaking a trimmed app. -->
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <!-- The Avalonia control and the drawing model. ScottPlot has no style collection to register
+         in either: a plot carries its own colours, so this package is an entry point that styles a
+         Plot (or the AvaPlot control that draws it) rather than a Styles subclass. See README.md. -->
+    <!-- ScottPlot.Avalonia brings the fontconfig-less SkiaSharp native asset
+         (SkiaSharp.NativeAssets.Linux.NoDependencies) with it. It collides with the fontconfig
+         build Avalonia.Skia needs at runtimes/linux-x64/native/libSkiaSharp.so, and the copy
+         that wins decides whether the host can enumerate system fonts. Every runnable head in
+         this repository excludes that package; so should any app that uses this package and
+         still wants to reach system fonts. -->
+    <PackageReference Include="ScottPlot.Avalonia" />
+    <ProjectReference Include="../Md3.Avalonia/Md3.Avalonia.csproj" />
+    <None Include="../../README.md" Pack="true" PackagePath="/" Link="README.md" />
+    <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />
+  </ItemGroup>
+</Project>

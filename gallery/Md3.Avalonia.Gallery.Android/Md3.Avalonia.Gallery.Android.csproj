@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0-android</TargetFramework>
     <SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
     <ApplicationId>io.arena.md3avalonia.gallery</ApplicationId>
     <ApplicationVersion>6</ApplicationVersion>
-    <ApplicationDisplayVersion>0.4.6-preview.1</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>0.5.0-preview.1</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
     <Nullable>enable</Nullable>

@@ -1,0 +1,101 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             xmlns:themes="using:Md3.Avalonia.Themes"
+             xmlns:dock="using:Dock.Avalonia.Controls"
+             xmlns:dockFactory="using:Dock.Model.Avalonia"
+             xmlns:dockModel="using:Dock.Model.Avalonia.Controls"
+             x:Class="Md3.Avalonia.Gallery.Pages.DockGalleryPage">
+  <!-- The theme is loaded inside this page only. It adds ControlThemes for Dock's own types on top
+       of Dock's control dictionaries, so nothing outside the dock's subtree changes - the same
+       reason CodeExample scopes its editor theme to its own preview. -->
+  <UserControl.Styles>
+    <themes:MaterialDockTheme />
+  </UserControl.Styles>
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Docking" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Dock wearing the opt-in Md3.Avalonia.Dock theme: tool panes, document tabs, splitters, drop targets, chrome buttons and the drag preview all read Material tokens. No Fluent resources are needed, light and dark follow the Material theme variant." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h3" Text="Themed dock" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Drag a tab to another edge to see the Material drop targets, and hover the document tabs to see the active-tab container and the state layers. The theme re-colours Dock's own accents and tabs and keeps Dock's templates and part names, so every layout Dock can build keeps working." />
+        <Border CornerRadius="12" ClipToBounds="True" Padding="4"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
+          <dock:DockControl Height="420" InitializeFactory="True" InitializeLayout="True">
+            <dock:DockControl.Factory>
+              <dockFactory:Factory />
+            </dock:DockControl.Factory>
+
+            <dockModel:RootDock Id="Root" IsCollapsable="False"
+                                ActiveDockable="{Binding #MainLayout}"
+                                DefaultDockable="{Binding #MainLayout}">
+              <dockModel:ProportionalDock x:Name="MainLayout" Id="MainLayout" Orientation="Horizontal">
+                <dockModel:ToolDock Id="LeftTools" Title="Left tools" Alignment="Left" Proportion="0.24"
+                                    ActiveDockable="{Binding #ExplorerTool}">
+                  <dockModel:ToolDock.ToolTemplate>
+                    <dockModel:ToolTemplate>
+                      <StackPanel Margin="12" Spacing="6" x:DataType="dockModel:Tool">
+                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                        <TextBlock TextWrapping="Wrap" Opacity="0.75"
+                                   Text="Tool panes, splitter grips and the drop targets are all Material: OutlineVariant borders, SurfaceContainer headers and a Primary indicator." />
+                      </StackPanel>
+                    </dockModel:ToolTemplate>
+                  </dockModel:ToolDock.ToolTemplate>
+                  <dockModel:Tool x:Name="ExplorerTool" Id="ExplorerTool" Title="Explorer" />
+                  <dockModel:Tool Id="OutlineTool" Title="Outline" />
+                </dockModel:ToolDock>
+
+                <dockModel:ProportionalDockSplitter />
+
+                <dockModel:ProportionalDock Id="Center" Orientation="Vertical" Proportion="0.76">
+                  <dockModel:DocumentDock Id="Documents" Proportion="0.68" CanCreateDocument="False"
+                                          ActiveDockable="{Binding #DockDoc}">
+                    <dockModel:DocumentDock.DocumentTemplate>
+                      <dockModel:DocumentTemplate>
+                        <StackPanel Margin="16" Spacing="8" x:DataType="dockModel:Document">
+                          <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                          <TextBlock TextWrapping="Wrap"
+                                     Text="MaterialDockTheme maps the 44 Dock accent, surface, tab and chrome brushes onto Md.Sys.Color tokens; the active document tab is a Primary container with OnPrimary ink." />
+                        </StackPanel>
+                      </dockModel:DocumentTemplate>
+                    </dockModel:DocumentDock.DocumentTemplate>
+                    <dockModel:Document x:Name="DockDoc" Id="DockDoc" Title="MaterialDockTheme.axaml" />
+                    <dockModel:Document Id="ReadmeDoc" Title="README.md" />
+                  </dockModel:DocumentDock>
+
+                  <dockModel:ProportionalDockSplitter />
+
+                  <dockModel:ToolDock Id="BottomTools" Title="Bottom tools" Alignment="Bottom" Proportion="0.32"
+                                      ActiveDockable="{Binding #OutputTool}">
+                    <dockModel:ToolDock.ToolTemplate>
+                      <dockModel:ToolTemplate>
+                        <StackPanel Margin="12" Spacing="6" x:DataType="dockModel:Tool">
+                          <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                          <TextBlock TextWrapping="Wrap" Opacity="0.75"
+                                     Text="Dock keeps owning its templates; this package owns only the token values, so a Dock upgrade cannot drift from a forked template." />
+                        </StackPanel>
+                      </dockModel:ToolTemplate>
+                    </dockModel:ToolDock.ToolTemplate>
+                    <dockModel:Tool x:Name="OutputTool" Id="OutputTool" Title="Output" />
+                  </dockModel:ToolDock>
+                </dockModel:ProportionalDock>
+              </dockModel:ProportionalDock>
+            </dockModel:RootDock>
+          </dock:DockControl>
+        </Border>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Usage" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Add the theme after MaterialTheme and keep using Dock as usual - the package carries Dock.Avalonia and Dock.Avalonia.Themes.Fluent, and DockFluentTheme must not be included as well. This demo registers it in the page's own styles rather than in the application's." />
+        <gallery:CodeExample XamlCode="&lt;themes:MaterialTheme /&gt;&#10;&lt;themes:MaterialDockTheme /&gt;   &lt;!-- opt-in package, after MaterialTheme --&gt;"
+                            CSharpCode="var factory = new Factory();&#10;var documents = new DocumentDock { Id = &quot;Documents&quot; };&#10;var root = new RootDock { Id = &quot;Root&quot; };&#10;&#10;root.VisibleDockables = factory.CreateList&lt;IDockable&gt;(documents);&#10;root.ActiveDockable = documents;&#10;&#10;dockControl.Factory = factory;&#10;dockControl.Layout = root;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:inking="using:DotNetCampus.Inking"
+             xmlns:themes="using:Md3.Avalonia.Themes"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.SignaturePadGalleryPage">
+  <UserControl.Styles>
+    <themes:MaterialInkCanvasTheme />
+  </UserControl.Styles>
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Signature pad" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A handwriting surface with the chrome a signature needs around it: a baseline to sign on, a hint that disappears the moment there is ink, a clear button, and an eraser. Draw in the panel below with a pointer, a pen or a finger - the strokes are smoothed and can carry pressure, and they follow the theme, so the ink is on-surface rather than the red the underlying canvas defaults to." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The strokes themselves are drawn by DotNetCampus.AvaloniaInkCanvas, which renders them with Skia. What the Material package adds is everything upstream leaves to the host: it defaults to red ink ten units thick, has no baseline, no empty state and no way to start over, and none of those are a Material decision." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Sign here" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The clear button is part of the control. Erase is a mode: switch to it and the baseline fades, because there is nothing to sign on while you are removing." />
+        <md:MdSignaturePad x:Name="Pad" Height="260" Placeholder="Sign above the line" />
+        <WrapPanel Orientation="Horizontal">
+          <md:MdButton x:Name="EraseToggle" Variant="Tonal" Click="ToggleErase" Margin="0,0,12,8" />
+          <md:MdButton x:Name="ClearPad" Variant="Text" Click="ClearThePad" Margin="0,0,12,8" />
+          <TextBlock x:Name="StrokeReadout" Classes="body" VerticalAlignment="Center" Margin="0,0,0,8" />
+        </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="The bare canvas, styled by the entry point" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="An application that wants the strokes but not the signature chrome can keep using InkCanvas directly. It draws itself with Skia and registers no styles, so the theme reaches it the way it reaches a map or a plot: one call that writes the settings it draws with." />
+        <Border Height="170"
+                BorderThickness="1"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerLowest.Brush}"
+                CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Large}"
+                ClipToBounds="True">
+          <inking:InkCanvas x:Name="BareCanvas" Margin="12" />
+        </Border>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Usage" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The theme is an opt-in package, so add it after MaterialTheme. MdSignaturePad raises StrokeCompleted when a stroke is committed, which is when a signature form becomes valid, and Cleared when it is emptied." />
+        <gallery:CodeExample XamlCode="&lt;themes:MaterialTheme /&gt;&#10;&lt;themes:MaterialInkCanvasTheme /&gt;   &lt;!-- opt-in package, after MaterialTheme --&gt;&#10;&#10;&lt;md:MdSignaturePad Height=&quot;260&quot;&#10;                   Placeholder=&quot;Sign above the line&quot;&#10;                   StrokeCompleted=&quot;OnStrokeCompleted&quot; /&gt;"
+                             CSharpCode="// A bare canvas instead of the signature pad: one call, the same ink.&#10;MaterialInkCanvasTheme.Follow(BareCanvas);&#10;&#10;private void OnStrokeCompleted(object? sender, RoutedEventArgs e)&#10;{&#10;    // The form can be submitted now.&#10;    SubmitButton.IsEnabled = Pad.StrokeCount &gt; 0;&#10;}&#10;&#10;Pad.Clear();   // raises Cleared" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

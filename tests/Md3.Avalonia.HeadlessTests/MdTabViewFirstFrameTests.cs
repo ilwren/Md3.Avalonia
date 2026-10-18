@@ -24,22 +24,26 @@ public sealed class MdTabViewFirstFrameTests
     [AvaloniaFact]
     public void Bottom_Strip_With_Window_Max_Constraints_Is_Visible_On_The_First_Layout()
     {
-        AssertStripOnFirstFrame(Dock.Bottom, constrainWindow: true);
+        // The opt-in Md3.Avalonia.Dock package brings in a root namespace named Dock, so inside
+        // this namespace the bare name resolves to that namespace rather than to the
+        // Avalonia.Controls.Dock enum imported above (CS0118). A using alias is not an escape
+        // either: the alias name would itself collide with that global namespace (CS0576).
+        AssertStripOnFirstFrame(global::Avalonia.Controls.Dock.Bottom, constrainWindow: true);
     }
 
     [AvaloniaFact]
     public void Top_Strip_With_Window_Max_Constraints_Is_Visible_On_The_First_Layout()
     {
-        AssertStripOnFirstFrame(Dock.Top, constrainWindow: true);
+        AssertStripOnFirstFrame(global::Avalonia.Controls.Dock.Top, constrainWindow: true);
     }
 
     [AvaloniaFact]
     public void Bottom_Strip_Without_Window_Constraints_Is_Visible_On_The_First_Layout()
     {
-        AssertStripOnFirstFrame(Dock.Bottom, constrainWindow: false);
+        AssertStripOnFirstFrame(global::Avalonia.Controls.Dock.Bottom, constrainWindow: false);
     }
 
-    private static void AssertStripOnFirstFrame(Dock placement, bool constrainWindow)
+    private static void AssertStripOnFirstFrame(global::Avalonia.Controls.Dock placement, bool constrainWindow)
     {
         var viewer = new MdScrollViewer
         {

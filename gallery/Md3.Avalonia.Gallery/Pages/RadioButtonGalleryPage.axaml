@@ -19,13 +19,16 @@
     </StackPanel>
     <StackPanel Spacing="12">
       <TextBlock Classes="h2" Text="States" />
-      <StackPanel Orientation="Horizontal" Spacing="32">
-        <md:MdRadioButton Content="Unselected" />
-        <md:MdRadioButton Content="Selected" IsChecked="True" />
-        <md:MdRadioButton Content="Error" IsError="True" />
-        <md:MdRadioButton Content="Disabled" IsEnabled="False" />
-        <md:MdRadioButton Content="Selected disabled" IsChecked="True" IsEnabled="False" />
-      </StackPanel>
+      <!-- WrapPanel, not a horizontal StackPanel: five labels plus 32 dip gaps is about 680 dip and a
+           narrow window has no way to scroll to the rest. The margins carry the spacing WrapPanel
+           has no Spacing property for. -->
+      <WrapPanel Orientation="Horizontal">
+        <md:MdRadioButton Content="Unselected" Margin="0,0,32,12" />
+        <md:MdRadioButton Content="Selected" IsChecked="True" Margin="0,0,32,12" />
+        <md:MdRadioButton Content="Error" IsError="True" Margin="0,0,32,12" />
+        <md:MdRadioButton Content="Disabled" IsEnabled="False" Margin="0,0,32,12" />
+        <md:MdRadioButton Content="Selected disabled" IsChecked="True" IsEnabled="False" Margin="0,0,32,12" />
+      </WrapPanel>
     </StackPanel>
     <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
       <TextBlock Classes="body" TextWrapping="Wrap" Text="The full 48-DIP target responds to mouse, touch, pen and keyboard input. Native Avalonia GroupName, command and automation semantics remain available." />

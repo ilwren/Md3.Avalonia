@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
@@ -45,15 +45,19 @@ public partial class MainWindow : Window
             ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, BreadcrumbNav, TextFieldNav,
             CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, ColorPickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
-            NavigationDrawerNav, AdaptiveNav, NotificationsNav, NotificationsAllNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
+            NavigationDrawerNav, AdaptiveNav, NotificationsNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
             SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, BorderlessWindowNav,
 AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             BeforeAfterNav, CalendarNav, CascaderNav, ChartNav,
             ChatNav, CommandPaletteNav, DataGridNav, DensityNav,
             HoverCardNav, MasonryNav, PagedItemsNav, PinInputNav,
-            PopoverNav, RatingNav, ResultViewNav, RichEditorNav,
+            PopoverNav, RatingNav, ResultViewNav, RichEditorNav, DockNav, DraggableTabsNav, MarkdownNav, LiveChartsNav, ScottPlotNav, PropertyGridNav, NodifyMNav,
+ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
+            TextEditorNav, HexEditorNav,
             SkeletonNav, SlidableNav, SpinKitNav, StaggeredPanelNav,
-            TagInputNav, TimelineNav, TransferNav, TreeViewNav,
+            TagInputNav, TimelineNav, TransferNav, TreeViewNav, WaterfallNav, WaveformNav,
+            FloatingWindowNav,
+            SignaturePadNav,
             NumericNav, ThemeResourcesNav, SymbolsNav, MotionNav,
             BannerNav, DataTableNav, PaginatedTableNav, DismissibleNav, ExpansionPanelNav,
             GridTileNav, RefreshNav, ReorderableListNav, StepperNav,
@@ -129,6 +133,16 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Rating", "rating star half precision score review", RatingNav, () => new RatingGalleryPage()),
             Entry("Result view", "result empty success error state placeholder action", ResultViewNav, () => new ResultViewGalleryPage()),
             Entry("Rich editor", "rich text editor markdown bold italic toolbar adapter", RichEditorNav, () => new RichEditorGalleryPage()),
+            Entry("Docking", "dock docking layout tool pane document tab splitter float drop target", DockNav, () => new DockGalleryPage()),
+            Entry("Draggable tabs", "draggable tabs tab strip reorder tear out detach attach tabalonia theme", DraggableTabsNav, () => new DraggableTabsGalleryPage()),
+            Entry("Markdown", "markdown document renderer heading prose link list quote code block table note rule typography markdown.avalonia", MarkdownNav, () => new MarkdownGalleryPage()),
+            Entry("LiveCharts2 charts", "livecharts2 charts series axis legend tooltip palette line column pie donut gauge scatter candlestick skia", LiveChartsNav, () => new LiveChartsGalleryPage()),
+            Entry("ScottPlot charts", "scottplot charts series axis legend tooltip grid palette surface signal bars scatter skia theme", ScottPlotNav, () => new ScottPlotGalleryPage()),
+            Entry("Property grid", "property grid inspector settings object properties categories filter cell editors combo checkbox slider numeric date time avalonia.propertygrid theme", PropertyGridNav, () => new PropertyGridGalleryPage()),
+            Entry("Node editor", "node editor graph diagram wire connector pin pending connection knot minimap nodify nodifym.avalonia theme", NodifyMNav, () => new NodifyMGalleryPage()),
+            Entry("Map", "map mapsui gis cartography tiles layer feature geometry vector label palette canvas mapsui.avalonia12 theme", MapsuiNav, () => new MapsuiGalleryPage()),
+            Entry("Text editor", "code editor syntax highlighting line numbers find replace completion avaloniedit theme", TextEditorNav, () => new TextEditorGalleryPage()),
+            Entry("Hex editor", "hex binary bytes dump offsets ascii editor avaloniahex theme", HexEditorNav, () => new HexEditorGalleryPage()),
             Entry("Skeleton", "skeleton shimmer placeholder loading", SkeletonNav, () => new SkeletonGalleryPage()),
             Entry("Slidable item", "slidable swipe action row archive delete", SlidableNav, () => new SlidableItemGalleryPage()),
             Entry("Spin kit", "spinner loading indeterminate wave bounce busy", SpinKitNav, () => new SpinKitGalleryPage()),
@@ -137,6 +151,10 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             Entry("Timeline", "timeline step history activity feed state", TimelineNav, () => new TimelineGalleryPage()),
             Entry("Transfer", "transfer dual list shuttle move pick", TransferNav, () => new TransferGalleryPage()),
             Entry("Tree view", "tree hierarchy expand collapse node virtualized", TreeViewNav, () => new TreeViewGalleryPage()),
+            Entry("Waterfall", "waterfall masonry staggered grid columns feed layout cards pinterest", WaterfallNav, () => new WaterfallGalleryPage()),
+            Entry("Waveform", "waveform audio peaks playhead seek scrub level meter music sound", WaveformNav, () => new WaveformGalleryPage()),
+            Entry("Floating window", "floating window draggable movable resizable picture in picture pip overlay mini player panel", FloatingWindowNav, () => new FloatingWindowGalleryPage()),
+            Entry("Signature pad", "signature pad handwriting ink pen stylus drawing sketch sign erase clear canvas inkcanvas", SignaturePadNav, () => new SignaturePadGalleryPage()),
             Entry("Borderless windows", "custom chrome title bar caption drag resize platform adapter", BorderlessWindowNav, () => new BorderlessWindowGalleryPage()),
             Entry("Numeric input", "numeric number stepper spinner increment decrement quantity", NumericNav, () => new NumericGalleryPage()),
             Entry("Theme Lab", "theme color seed hct contrast json shape font", ThemeResourcesNav, () => new ThemeResourcesGalleryPage()),
@@ -269,6 +287,20 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
     private void ShowRating(object? s, RoutedEventArgs e) => Navigate(new RatingGalleryPage(), RatingNav);
     private void ShowResultView(object? s, RoutedEventArgs e) => Navigate(new ResultViewGalleryPage(), ResultViewNav);
     private void ShowRichEditor(object? s, RoutedEventArgs e) => Navigate(new RichEditorGalleryPage(), RichEditorNav);
+    private void ShowDock(object? s, RoutedEventArgs e) => Navigate(new DockGalleryPage(), DockNav);
+    private void ShowDraggableTabs(object? s, RoutedEventArgs e) => Navigate(new DraggableTabsGalleryPage(), DraggableTabsNav);
+
+    private void ShowMarkdown(object? s, RoutedEventArgs e) => Navigate(new MarkdownGalleryPage(), MarkdownNav);
+
+    private void ShowLiveCharts(object? s, RoutedEventArgs e) => Navigate(new LiveChartsGalleryPage(), LiveChartsNav);
+
+    private void ShowScottPlot(object? s, RoutedEventArgs e) => Navigate(new ScottPlotGalleryPage(), ScottPlotNav);
+
+    private void ShowPropertyGrid(object? s, RoutedEventArgs e) => Navigate(new PropertyGridGalleryPage(), PropertyGridNav);
+    private void ShowNodifyM(object? s, RoutedEventArgs e) => Navigate(new NodifyMGalleryPage(), NodifyMNav);
+    private void ShowMapsui(object? s, RoutedEventArgs e) => Navigate(new MapsuiGalleryPage(), MapsuiNav);
+    private void ShowTextEditor(object? s, RoutedEventArgs e) => Navigate(new TextEditorGalleryPage(), TextEditorNav);
+    private void ShowHexEditor(object? s, RoutedEventArgs e) => Navigate(new HexEditorGalleryPage(), HexEditorNav);
     private void ShowSkeleton(object? s, RoutedEventArgs e) => Navigate(new SkeletonGalleryPage(), SkeletonNav);
     private void ShowSlidableItem(object? s, RoutedEventArgs e) => Navigate(new SlidableItemGalleryPage(), SlidableNav);
     private void ShowSpinKit(object? s, RoutedEventArgs e) => Navigate(new SpinKitGalleryPage(), SpinKitNav);
@@ -277,6 +309,10 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
     private void ShowTimeline(object? s, RoutedEventArgs e) => Navigate(new TimelineGalleryPage(), TimelineNav);
     private void ShowTransfer(object? s, RoutedEventArgs e) => Navigate(new TransferGalleryPage(), TransferNav);
     private void ShowTreeView(object? s, RoutedEventArgs e) => Navigate(new TreeViewGalleryPage(), TreeViewNav);
+    private void ShowWaterfall(object? s, RoutedEventArgs e) => Navigate(new WaterfallGalleryPage(), WaterfallNav);
+    private void ShowWaveform(object? s, RoutedEventArgs e) => Navigate(new WaveformGalleryPage(), WaveformNav);
+    private void ShowFloatingWindow(object? s, RoutedEventArgs e) => Navigate(new FloatingWindowGalleryPage(), FloatingWindowNav);
+    private void ShowSignaturePad(object? s, RoutedEventArgs e) => Navigate(new SignaturePadGalleryPage(), SignaturePadNav);
     private void ShowBorderlessWindows(object? s, RoutedEventArgs e) => Navigate(new BorderlessWindowGalleryPage(), BorderlessWindowNav);
     private void ShowNumeric(object? s, RoutedEventArgs e) => Navigate(new NumericGalleryPage(), NumericNav);
     private void ShowThemeResources(object? s, RoutedEventArgs e) => Navigate(new ThemeResourcesGalleryPage(), ThemeResourcesNav);
@@ -499,9 +535,6 @@ AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
         var query = GallerySearch.Text?.Trim() ?? string.Empty;
         foreach (var entry in _galleryIndex)
             entry.Button.IsVisible = string.IsNullOrEmpty(query) || entry.Matches(query);
-        // Notifications is indexed through the Communications section, but remains duplicated in
-        // the alphabetical browse list so the "ALL COMPONENTS" index is genuinely complete.
-        NotificationsAllNav.IsVisible = NotificationsNav.IsVisible;
     }
 
     private void GallerySearchSubmitted(object? sender, string query)

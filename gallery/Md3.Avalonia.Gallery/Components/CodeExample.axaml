@@ -2,13 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
              xmlns:avaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
-             xmlns:fluent="using:Avalonia.Themes.Fluent"
+             xmlns:themes="using:Md3.Avalonia.Themes"
              x:Class="Md3.Avalonia.Gallery.Components.CodeExample"
              x:Name="Root">
   <UserControl.Styles>
-    <!-- Fluent resources are scoped to AvaloniaEdit's own native template parts only. -->
-    <fluent:FluentTheme />
-    <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+    <!-- Scoped to this preview only: the editor needs its own theme, and MaterialTheme
+         deliberately does not replace native control themes application-wide. -->
+    <themes:MaterialAvaloniaEditTheme />
   </UserControl.Styles>
   <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
           BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"

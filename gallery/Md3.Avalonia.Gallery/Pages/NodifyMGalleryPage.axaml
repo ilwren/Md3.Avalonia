@@ -1,0 +1,143 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:nod="using:NodifyM.Avalonia.Controls"
+             xmlns:nodvm="using:NodifyM.Avalonia.ViewModelBase"
+             xmlns:nodconv="using:NodifyM.Avalonia.Converters"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             xmlns:themes="using:Md3.Avalonia.Themes"
+             x:Class="Md3.Avalonia.Gallery.Pages.NodifyMGalleryPage">
+  <!-- The theme is loaded inside this page only. It style-includes NodifyM's eleven per-control
+       style sheets and answers the brush keys those templates read with Material brushes, so it
+       restyles NodifyM's controls and nothing else - there is no native Avalonia control in this
+       package for it to leak into. -->
+  <UserControl.Styles>
+    <themes:MaterialNodifyMTheme />
+  </UserControl.Styles>
+
+  <UserControl.Resources>
+    <nodconv:FlowToDirectionConverter x:Key="FlowToDirection" />
+
+    <DataTemplate x:Key="MdConnectionTemplate" x:DataType="nodvm:ConnectionViewModelBase">
+      <!-- No wire label: upstream builds the label's geometry in C# from a hardcoded Inter typeface,
+           which no brush key and no style can reach, and a lookup for a family the host does not
+           have fails inside the render pass. -->
+      <nod:Connection Source="{Binding Source.Anchor}"
+                      Target="{Binding Target.Anchor}"
+                      Direction="{Binding ., Converter={StaticResource FlowToDirection}}"
+                      DisconnectCommand="{Binding DisconnectConnectionCommand}"
+                      SplitCommand="{Binding SplitConnectionCommand}" />
+    </DataTemplate>
+
+    <DataTemplate x:Key="MdPendingConnectionTemplate" x:DataType="nodvm:PendingConnectionViewModelBase">
+      <nod:PendingConnection StartedCommand="{Binding StartCommand}"
+                             CompletedCommand="{Binding FinishCommand}"
+                             EnablePreview="True"
+                             EnableSnapping="True"
+                             Direction="{Binding Source.Flow, Converter={StaticResource FlowToDirection}}"
+                             PreviewTarget="{Binding PreviewTarget, Mode=OneWayToSource}">
+        <TextBlock Text="{Binding PreviewText}" />
+      </nod:PendingConnection>
+    </DataTemplate>
+
+    <nod:NodeTemplateSelector x:Key="MdNodeTemplates">
+      <DataTemplate DataType="nodvm:KnotNodeViewModel" x:DataType="nodvm:KnotNodeViewModel">
+        <nod:KnotNode Location="{Binding Location, Mode=TwoWay}" Content="{Binding Connector}">
+          <nod:KnotNode.ContentTemplate>
+            <DataTemplate DataType="nodvm:ConnectorViewModelBase" x:DataType="nodvm:ConnectorViewModelBase">
+              <nod:Connector VerticalAlignment="Center"
+                             IsConnected="{Binding IsConnected}"
+                             Anchor="{Binding Anchor, Mode=OneWayToSource}" />
+            </DataTemplate>
+          </nod:KnotNode.ContentTemplate>
+        </nod:KnotNode>
+      </DataTemplate>
+      <DataTemplate DataType="nodvm:NodeViewModelBase" x:DataType="nodvm:NodeViewModelBase">
+        <nod:Node MinWidth="176"
+                  IsResize="False"
+                  VerticalAlignment="Center"
+                  Header="{Binding Title}"
+                  Footer="{Binding Footer}"
+                  Input="{Binding Input}"
+                  Output="{Binding Output}"
+                  Location="{Binding Location, Mode=TwoWay}">
+          <nod:Node.InputConnectorTemplate>
+            <DataTemplate DataType="nodvm:ConnectorViewModelBase" x:DataType="nodvm:ConnectorViewModelBase">
+              <nod:NodeInput Header="{Binding Title}"
+                             VerticalAlignment="Center"
+                             IsConnected="{Binding IsConnected}"
+                             Anchor="{Binding Anchor, Mode=OneWayToSource}" />
+            </DataTemplate>
+          </nod:Node.InputConnectorTemplate>
+          <nod:Node.OutputConnectorTemplate>
+            <DataTemplate DataType="nodvm:ConnectorViewModelBase" x:DataType="nodvm:ConnectorViewModelBase">
+              <nod:NodeOutput Header="{Binding Title}"
+                              VerticalAlignment="Center"
+                              IsConnected="{Binding IsConnected}"
+                              Anchor="{Binding Anchor, Mode=OneWayToSource}" />
+            </DataTemplate>
+          </nod:Node.OutputConnectorTemplate>
+        </nod:Node>
+      </DataTemplate>
+    </nod:NodeTemplateSelector>
+  </UserControl.Resources>
+
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Node editor" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A node editor wearing the opt-in Md3.Avalonia.NodifyM theme. The canvas is a Material surface ruled with outlineVariant grid lines, nodes are surface containers with a secondary container header, input pins are secondary containers and output pins primary containers, so the two ends of a wire are distinguishable without reading a label - and the alignment guides and the selection frame use the same primary." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h3" Text="Themed editor" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Drag a node to move it, drag from a pin onto another to wire them, drag on empty canvas to marquee-select, and scroll to zoom. The minimap in the corner is the same editor's own control, wearing the same brushes." />
+        <Grid ColumnDefinitions="*,220">
+          <!-- The frame's height is fixed, and that is not a styling choice. NodifyEditor writes its
+               own Width and Height from its parent's size - in OnLoaded and again in the
+               SizeChanged handler OnApplyTemplate attaches - so a frame that sizes itself to the
+               editor hands it a value that includes its own padding, and every layout pass makes
+               the editor that much taller. A fixed frame breaks the loop. -->
+          <Border Grid.Column="0" Height="528" CornerRadius="12" Padding="4" ClipToBounds="True"
+                  Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                  BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
+            <!-- The five bindings below are the editor's own contract, so the data type is the view
+                 model base rather than this page's demo graph: compiled bindings are on for the
+                 whole gallery, and every member named here exists on the base. -->
+            <nod:NodifyEditor x:Name="DemoEditor" x:DataType="nodvm:NodifyEditorViewModelBase"
+                              ConnectionTemplate="{StaticResource MdConnectionTemplate}"
+                              PendingConnectionTemplate="{StaticResource MdPendingConnectionTemplate}"
+                              ItemTemplate="{StaticResource MdNodeTemplates}"
+                              ItemsSource="{Binding Nodes}"
+                              Connections="{Binding Connections}"
+                              PendingConnection="{Binding PendingConnection}"
+                              SelectedItems="{Binding SelectedNodes}"
+                              DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}" />
+          </Border>
+          <Border Grid.Column="1" Margin="12,0,0,0" CornerRadius="12" Padding="12"
+                  VerticalAlignment="Bottom"
+                  Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
+                  BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="label" Text="Minimap" />
+              <nod:NodifyEditorMinimap Height="180" Editor="{Binding #DemoEditor}" />
+            </StackPanel>
+          </Border>
+        </Grid>
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Every colour in that editor comes from Md.Sys.* tokens: nothing on the controls was set, and the page's own templates read the same brush keys the package overrides rather than picking colours of their own." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="How it stays local" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The theme is a Styles collection that style-includes NodifyM's eleven per-control style sheets and answers the brush keys those templates read from an accent dictionary of ours, so the pinned package keeps owning its templates, its part names and its converters, and only the values change. Every one of those keys is mapped onto Md.Sys.Color.*, which is why light and dark follow the core theme variant and the dictionary carries no variants of its own." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="NodifyM's controls are all its own types - Node, Connector, Connection and friends - so there is no native Avalonia control here for the theme to be careful about, and registering it application-wide changes nothing else in the app. The values upstream sets as literals - a node's white ink, the Azure behind its items, a group's four inline colours and the grid rule's grey - are set again by the theme; the node's 3 DIP corner radius, baked into its template, stays upstream's." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;themes:MaterialTheme /&gt;&#10;&lt;themes:MaterialNodifyMTheme /&gt;   &lt;!-- opt-in package, after MaterialTheme --&gt;&#10;&#10;&lt;nod:NodifyEditor ItemsSource=&quot;{Binding Nodes}&quot;&#10;                  Connections=&quot;{Binding Connections}&quot;&#10;                  PendingConnection=&quot;{Binding PendingConnection}&quot;&#10;                  SelectedItems=&quot;{Binding SelectedNodes}&quot; /&gt;"
+                            CSharpCode="var graph = new MyGraph();      // : NodifyEditorViewModelBase&#10;&#10;graph.Nodes.Add(new NodeViewModelBase&#10;{&#10;    Title = &quot;Filter&quot;,&#10;    Location = new Point(280, 160),&#10;    Input = { new ConnectorViewModelBase { Title = &quot;In&quot;, Flow = ConnectorFlow.Input } },&#10;    Output = { new ConnectorViewModelBase { Title = &quot;Out&quot;, Flow = ConnectorFlow.Output } }&#10;});&#10;&#10;// The theme is a style collection: register it once next to MaterialTheme,&#10;// or in the Styles of the window that owns the editor. It replaces NodifyM's&#10;// own ControlStyles, so do not include those as well." />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

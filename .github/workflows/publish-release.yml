@@ -111,7 +111,7 @@ jobs:
             --logger "console;verbosity=normal"
 
   pack-nuget:
-    name: Pack seven NuGet packages
+    name: Pack the NuGet packages
     needs: [prepare, test]
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -269,6 +269,10 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: write
+      # Trusted publishing: this job exchanges the Actions OIDC token for a short-lived nuget.org
+      # API key, so no long-lived key is stored in the repository. Only this job gets the
+      # permission; the build and test jobs never talk to nuget.org.
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -303,25 +307,71 @@ jobs:
 
       - name: Publish packages to NuGet.org
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          # The nuget.org account that owns the packages. A repository variable rather than a
+          # secret, because the name is not sensitive: the Trusted Publishing policy is what
+          # actually authorises the push.
+          NUGET_USERNAME: ${{ vars.NUGET_USERNAME }}
         run: |
           set -euo pipefail
-          if [[ -z "${NUGET_API_KEY:-}" ]]; then
-            echo "Repository secret NUGET_API_KEY is required to publish packages." >&2
+
+          # Take the expected count from the one list that already drives the pack step, so adding
+          # a package cannot leave this check behind the way a hardcoded "exactly seven" did.
+          expected="$(sed -n 's/^PACKAGE_IDS=(\(.*\))$/\1/p' scripts/build-nuget.sh | wc -w)"
+          if (( expected == 0 )); then
+            echo "Could not read PACKAGE_IDS out of scripts/build-nuget.sh." >&2
             exit 1
           fi
+
           shopt -s nullglob
           packages=(release-artifacts/release-nuget/*.nupkg)
-          if (( ${#packages[@]} != 7 )); then
-            echo "Expected exactly seven .nupkg files, found ${#packages[@]}." >&2
+          if (( ${#packages[@]} != expected )); then
+            echo "Expected ${expected} .nupkg files, found ${#packages[@]}." >&2
             exit 1
           fi
+
+          if [[ -z "${NUGET_USERNAME:-}" ]]; then
+            echo "Repository variable NUGET_USERNAME must name the nuget.org account that owns the packages." >&2
+            exit 1
+          fi
+
+          # Trusted publishing: the Actions OIDC token is exchanged for an API key that nuget.org
+          # expires after about twenty minutes. That is why the exchange happens here and not at
+          # the top of the job - the test, pack and Gallery builds before this step take far
+          # longer than the key lives.
+          #
+          # The audience must be "nuget.org". nuget.org then matches the token's repository,
+          # repository_owner, job_workflow_ref and environment claims against the Trusted
+          # Publishing policy. The token endpoint also requires a User-Agent header.
+          oidc_response="$(curl -fsSL \
+            -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=nuget.org")"
+          if ! oidc_token="$(printf '%s' "${oidc_response}" | jq -er '.value' 2>/dev/null)"; then
+            echo "The Actions OIDC request returned no token. This job needs the id-token: write permission." >&2
+            exit 1
+          fi
+
+          token_response="$(curl -sS -X POST 'https://www.nuget.org/api/v2/token' \
+            -H "Authorization: Bearer ${oidc_token}" \
+            -H 'Content-Type: application/json' \
+            -H 'User-Agent: md3-avalonia-publish-release' \
+            --data "{\"username\":\"${NUGET_USERNAME}\",\"tokenType\":\"ApiKey\"}")"
+          if ! api_key="$(printf '%s' "${token_response}" | jq -er '.apiKey' 2>/dev/null)"; then
+            echo "nuget.org did not return an API key. Check the Trusted Publishing policy: it has to name this repository owner, this repository, this workflow file, and an environment that matches this job." >&2
+            printf '%s\n' "${token_response}" >&2
+            exit 1
+          fi
+          # Masked before the key can reach a log line.
+          printf '::add-mask::%s\n' "${api_key}"
+
+          # One key covers every package the policy's glob allows, so all packages go up with the
+          # same short-lived key. Each .nupkg carries the .snupkg sitting beside it.
           for package in "${packages[@]}"; do
-            dotnet nuget push "$package" \
+            dotnet nuget push "${package}" \
               --source https://api.nuget.org/v3/index.json \
-              --api-key "$NUGET_API_KEY" \
+              --api-key "${api_key}" \
               --skip-duplicate
           done
+          echo "Pushed ${#packages[@]} packages to nuget.org."
 
       - name: Create GitHub Release and upload assets
         env:

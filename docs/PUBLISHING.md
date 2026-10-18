@@ -1,10 +1,57 @@
-# Manual release workflow
+# Release workflow
 
-The repository publishes releases through `.github/workflows/publish-release.yml`. It is intentionally manual: it runs the headless test suite, packs all seven NuGet packages, builds Gallery for Linux, Windows, macOS, and Android, pushes the packages to NuGet.org, then creates a GitHub Release with the Gallery downloads, NuGet packages, symbol packages, and `SHA256SUMS.txt`.
+The repository publishes releases through `.github/workflows/publish-release.yml`. It is intentionally manual: it runs the headless test suite, packs all eighteen NuGet packages, builds Gallery for Linux, Windows, macOS, and Android, pushes the packages to NuGet.org, then creates a GitHub Release with the Gallery downloads, NuGet packages, symbol packages, and `SHA256SUMS.txt`.
+
+Publishing uses **NuGet Trusted Publishing** rather than a stored API key. The publish job asks GitHub for an OpenID Connect token, exchanges it at `https://www.nuget.org/api/v2/token` for an API key that nuget.org expires after about twenty minutes, pushes every package with that key, and then lets it lapse. There is no `NUGET_API_KEY` secret in this repository, and nothing long-lived is stored anywhere.
 
 ## One-time setup
 
-Add a repository Actions secret named **`NUGET_API_KEY`** with a NuGet.org API key that can publish the seven `Md3.Avalonia*` package IDs. The key is only explicitly passed to the final publish job; test and build steps do not receive it as an environment variable, and it is never stored in the repository.
+### 1. Repository variable
+
+Add a repository Actions **variable** (not a secret) named **`NUGET_USERNAME`**, set to the nuget.org account or organization that owns the `Md3.Avalonia*` packages. The account name is not sensitive — the Trusted Publishing policy is what actually authorises the push — and the token endpoint requires it in the request body.
+
+### 2. Trusted Publishing policy on nuget.org
+
+Open <https://www.nuget.org/account/trustedpublishing> while signed in as the package owner, and create one policy. The account has to be a confirmed account, and it (or an organization it belongs to) has to own at least one package before the form is offered at all.
+
+| Field | Value for this repository |
+| --- | --- |
+| Policy Name | `md3-avalonia-release` (any name; it only has to be recognisable) |
+| Package Owner | the account named by `NUGET_USERNAME` |
+| CI/CD Provider | GitHub Actions |
+| Repository Owner | `ilwren` |
+| Repository | `Md3.Avalonia` |
+| Workflow File | `publish-release.yml` |
+| Environment | leave empty — the publish job does not run in a named GitHub environment |
+
+Notes on the fields that cause the most failed first pushes:
+
+- **Workflow File** is the file name only. NuGet strips a leading `.github/workflows/`, but the name still has to match the file that requests the token. Renaming `publish-release.yml` silently breaks publishing until the policy is updated.
+- **Environment** is matched against the `environment` claim. Because the publish job declares no `environment:`, the claim is absent, so the field must stay empty. Setting it here would make every run fail.
+- If this workflow is ever moved into a reusable workflow, the claim that nuget.org sees is `job_workflow_ref` — the *called* file — not this one. The policy would have to name the reusable file instead.
+
+### 3. Pushing all eighteen packages with one policy
+
+This is the part that matters for a repository this size. A policy's scope takes **glob patterns**, so eighteen packages do not need eighteen policies — one pattern covers all of them, because every package ID in `scripts/build-nuget.sh` starts with `Md3.Avalonia`:
+
+```
+Md3.Avalonia*
+```
+
+In **Select Scopes**, tick **Push** and choose which of the two push scopes the policy grants:
+
+| Scope | Meaning | When to pick it |
+| --- | --- | --- |
+| `package:push` | Create **new** packages and push versions of them | The first publication of a package, or a repository that still adds packages. `Md3.Avalonia.Notifications` and `Md3.Avalonia.InkCanvas` are recent enough that this is the safe choice. |
+| `package:pushversion` | Push new versions of packages that **already exist** only | Once every ID is registered and the set is frozen. Narrower, so prefer it if no new package is expected. |
+
+`package:unlist` is separate; tick it only if the workflow should be able to unlist a bad version.
+
+With the glob set to `Md3.Avalonia*`, the single short-lived key the workflow obtains is valid for all eighteen IDs, and the publish step loops over `release-artifacts/release-nuget/*.nupkg` pushing each one with that key. Symbol packages need no separate handling: each `.nupkg` carries the `.snupkg` sitting beside it.
+
+Using `*` instead would also work, but it authorises the workflow to publish any package the account owns, so the narrower prefix is the better default.
+
+If a policy is created **before** a package exists on nuget.org, nuget.org treats it as a temporary policy and resets its validate-by date on each update. Publishing the package promotes it; check the policy list afterwards to confirm it is no longer pending.
 
 ## Publish a version
 
@@ -18,15 +65,28 @@ Examples:
 
 | Channel | Base version | Preview sequence | Package / Gallery version | Git tag |
 | --- | --- | ---: | --- | --- |
-| Preview | `0.4.6` | `1` | `0.4.6-preview.1` | `v0.4.6-preview.1` |
-| Stable | `0.4.6` | ignored | `0.4.6` | `v0.4.6` |
+| Preview | `0.5.0` | `1` | `0.5.0-preview.1` | `v0.5.0-preview.1` |
+| Stable | `0.5.0` | ignored | `0.5.0` | `v0.5.0` |
 
 The workflow rejects runs from branches other than `main`, malformed versions, and tags that already exist. A preview is marked as a GitHub prerelease. Android's display version is set to the same version as NuGet and desktop Gallery; its integer Android version code is increased per workflow run.
 
 Use a new version for every publication. NuGet.org does not allow replacing a published package version; `--skip-duplicate` lets a retry continue after a partially successful upload, but it does not make it safe to rebuild different contents under an already published version.
 
+## If the push fails
+
+The publish step reports which half of the exchange broke:
+
+| Message | Cause |
+| --- | --- |
+| `The Actions OIDC request returned no token.` | The publish job lost `id-token: write`, or the run is not on GitHub-hosted runners. |
+| `nuget.org did not return an API key.` | The policy does not match. Compare the repository owner, repository, workflow file and environment against the table above; the response body from nuget.org is printed beneath the message. |
+| `Repository variable NUGET_USERNAME must name…` | The variable was never added, or was added as a secret rather than a variable. |
+| `Expected 18 .nupkg files, found N.` | The pack step and this check disagree. The expected count is derived from `PACKAGE_IDS` in `scripts/build-nuget.sh`, so this means the pack job did not produce every package. |
+
+A key that expired mid-run — possible only if a push is stalled for more than about twenty minutes — shows up as an authentication error from `dotnet nuget push` partway through the loop. Re-running the workflow is safe: `--skip-duplicate` skips the versions that already landed.
+
 ## Version files
 
 The workflow supplies an MSBuild version override to the package and Gallery builds and does not edit or commit project files. The checked-in `.csproj` versions therefore remain unchanged by a release. After publishing, bump the project versions and Android `ApplicationDisplayVersion` in a normal reviewed change so local builds and subsequent branch artifacts reflect the new development baseline.
 
-`build-nuget.sh` accepts `--version 0.4.6-preview.1`; `build-nuget.ps1` accepts `-Version 0.4.6-preview.1`. Without either option, both scripts continue to use the version declared in the project files. The ordinary Gallery and NuGet build workflows remain available for branches and pull requests but no longer run on tags or releases; this workflow owns release creation and upload to avoid duplicate publication.
+`build-nuget.sh` accepts `--version 0.5.0-preview.1`; `build-nuget.ps1` accepts `-Version 0.5.0-preview.1`. Without either option, both scripts continue to use the version declared in the project files. The ordinary Gallery and NuGet build workflows remain available for branches and pull requests but no longer run on tags or releases; this workflow owns release creation and upload to avoid duplicate publication.

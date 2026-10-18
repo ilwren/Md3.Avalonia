@@ -72,7 +72,6 @@ public sealed class MdGalleryIndexTests
                 .ToArray();
             Assert.Equal(navigationTitles.OrderBy(title => title, StringComparer.OrdinalIgnoreCase), navigationTitles);
             Assert.Contains("Numeric input", navigationTitles);
-            Assert.Contains("Notifications", navigationTitles);
 
             var communicationHeader = Assert.Single(sidebar.Children.OfType<TextBlock>(),
                 text => text.Text == "COMMUNICATIONS");

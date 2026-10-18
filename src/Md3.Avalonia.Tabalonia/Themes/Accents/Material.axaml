@@ -1,0 +1,78 @@
+<!--
+  Material Design 3 tokens for Tabalonia.
+
+  Derived from Tabalonia 12.0.0 Themes/Custom/Brushes.axaml (MIT, see THIRD-PARTY-NOTICES.md).
+  That dictionary defines 19 brushes in Light/Dark theme dictionaries; every value here is
+  retokenized onto Md.Sys.Color.*, so light and dark come from the core Material theme variant and
+  the file has no ThemeDictionaries of its own.
+
+  It also defines the six keys Tabalonia's Custom templates read but its own Brushes.axaml never
+  declared - TabItemHeaderForeground{Unselected,UnselectedPointerOver,Selected,SelectedPointerOver},
+  TabItemHeaderMargin and TabItemHeaderThemeFontWeight are inherited from Avalonia's FluentTheme in
+  upstream's setup (their README registers <FluentTheme /> next to <custom:CustomTheme />). A
+  Material theme is standalone, so this package has to provide them itself; otherwise a DragTabItem
+  would render with no ink at all.
+
+  Tabalonia's drag tab is the same visual problem as Dock's document tab - a filled, draggable
+  container on a strip - so the mapping matches the one Md3.Avalonia.Dock uses: strip on Surface,
+  idle ink OnSurfaceVariant, hover an onSurface state layer, and the selected tab a Primary
+  container with OnPrimary ink. Hover/pressed opacities are literals because a SolidColorBrush's
+  Opacity is not a styled property; they carry the same 0.08/0.12 the Md.Sys.State.* tokens use.
+-->
+
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Tab strip -->
+
+    <SolidColorBrush x:Key="TabControlWindowActiveBackgroundBrush" Color="{DynamicResource Md.Sys.Color.Surface}" />
+    <SolidColorBrush x:Key="TabControlWindowInactiveBackgroundBrush" Color="{DynamicResource Md.Sys.Color.Surface}" />
+
+    <SolidColorBrush x:Key="TabItemBackgroundBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="TabItemBackgroundBrushWindowInactive" Color="Transparent" />
+    <SolidColorBrush x:Key="SelectedTabItemBackgroundBrush" Color="{DynamicResource Md.Sys.Color.Primary}" />
+
+    <SolidColorBrush x:Key="TabItemHeaderBackgroundUnselectedPointerOver"
+                     Color="{DynamicResource Md.Sys.Color.OnSurface}" Opacity="0.08" />
+    <SolidColorBrush x:Key="TabItemHeaderBackgroundUnselectedPointerOverWindowInactive"
+                     Color="{DynamicResource Md.Sys.Color.OnSurface}" Opacity="0.04" />
+
+    <SolidColorBrush x:Key="TabItemRightSeparatorBackgroundBrush" Color="{DynamicResource Md.Sys.Color.OutlineVariant}" />
+
+    <!-- Tab ink (the last six keys are the ones upstream leaves to Avalonia's FluentTheme) -->
+
+    <SolidColorBrush x:Key="TabItemHeaderForegroundUnselected" Color="{DynamicResource Md.Sys.Color.OnSurfaceVariant}" />
+    <SolidColorBrush x:Key="TabItemHeaderForegroundUnselectedPointerOver" Color="{DynamicResource Md.Sys.Color.OnSurface}" />
+    <SolidColorBrush x:Key="TabItemHeaderForegroundSelected" Color="{DynamicResource Md.Sys.Color.OnPrimary}" />
+    <SolidColorBrush x:Key="TabItemHeaderForegroundSelectedPointerOver" Color="{DynamicResource Md.Sys.Color.OnPrimary}" />
+    <Thickness x:Key="TabItemHeaderMargin">12,0,12,0</Thickness>
+    <FontWeight x:Key="TabItemHeaderThemeFontWeight">Medium</FontWeight>
+
+    <!-- Close button: an 8 DIP glyph inside a 16 DIP icon button -->
+
+    <SolidColorBrush x:Key="CloseItemButtonForeground" Color="{DynamicResource Md.Sys.Color.OnSurfaceVariant}" />
+    <SolidColorBrush x:Key="CloseItemButtonPointerOverBrush" Color="{DynamicResource Md.Sys.Color.OnSurface}" />
+    <SolidColorBrush x:Key="CloseItemButtonPressedBrush"
+                     Color="{DynamicResource Md.Sys.Color.OnSurface}" Opacity="0.12" />
+    <SolidColorBrush x:Key="CloseItemButtonInactiveWindowBrush"
+                     Color="{DynamicResource Md.Sys.Color.OnSurfaceVariant}" Opacity="0.6" />
+    <SolidColorBrush x:Key="CloseItemButtonInactiveWindowPointerOverBrush" Color="{DynamicResource Md.Sys.Color.OnSurface}" />
+
+    <!-- Add-a-tab button. AddItemCommandButtonForegroundBrush is ours: upstream never sets the
+         button's idle foreground, so without it the glyph would inherit whatever the surrounding
+         control leaves behind instead of a Material role. -->
+
+    <SolidColorBrush x:Key="AddItemCommandButtonForegroundBrush" Color="{DynamicResource Md.Sys.Color.OnSurfaceVariant}" />
+    <SolidColorBrush x:Key="AddItemCommandButtonForegroundPointerOverBrush" Color="{DynamicResource Md.Sys.Color.Primary}" />
+    <SolidColorBrush x:Key="AddItemCommandButtonBackgroundPointerOverBrush"
+                     Color="{DynamicResource Md.Sys.Color.Primary}" Opacity="0.08" />
+    <SolidColorBrush x:Key="AddItemCommandButtonBackgroundPressedBrush"
+                     Color="{DynamicResource Md.Sys.Color.Primary}" Opacity="0.12" />
+    <SolidColorBrush x:Key="AddItemCommandButtonPointerOverBrush"
+                     Color="{DynamicResource Md.Sys.Color.OnSurface}" Opacity="0.08" />
+    <SolidColorBrush x:Key="InactiveWindowAddCommandButtonForegroundBrush"
+                     Color="{DynamicResource Md.Sys.Color.OnSurfaceVariant}" Opacity="0.6" />
+    <SolidColorBrush x:Key="InactiveWindowAddCommandButtonPointerOverForegroundBrush"
+                     Color="{DynamicResource Md.Sys.Color.OnSurface}" />
+
+</ResourceDictionary>

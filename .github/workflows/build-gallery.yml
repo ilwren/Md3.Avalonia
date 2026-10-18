@@ -43,11 +43,31 @@ jobs:
       - name: Publish Desktop Gallery (${{ matrix.rid }})
         shell: bash
         run: |
+          status=0
           dotnet publish gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj \
             -c Release \
             -r ${{ matrix.rid }} \
             --self-contained false \
-            -o artifacts/desktop-${{ matrix.rid }}
+            -o artifacts/desktop-${{ matrix.rid }} > /tmp/publish.log 2>&1 || status=$?
+          cat /tmp/publish.log
+          {
+            echo "### Publish diagnostics ${{ matrix.rid }} (exit $status)"
+            if grep -qE 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}|IL[0-9]{4}' /tmp/publish.log; then
+              grep -E 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}|IL[0-9]{4}' /tmp/publish.log \
+                | sed 's/^/    /' | sort -u | head -60
+            else
+              echo "    no error line matched; last 40 lines:"
+              tail -40 /tmp/publish.log | sed 's/^/    /'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          if grep -qE 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/publish.log; then
+            grep -E 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/publish.log | sort -u | head -40 | while IFS= read -r line; do
+              printf '::error title=publish::%s\n' "${line//%/%25}"; done
+          else
+            tail -25 /tmp/publish.log | while IFS= read -r line; do
+              printf '::error title=publish-tail::%s\n' "${line//%/%25}"; done
+          fi
+          exit "$status"
 
       - name: Upload Desktop Artifacts
         uses: actions/upload-artifact@v4
@@ -84,12 +104,37 @@ jobs:
         run: dotnet workload install android
 
       - name: Build Android Gallery APK
+        shell: bash
         run: |
+          status=0
           dotnet publish gallery/Md3.Avalonia.Gallery.Android/Md3.Avalonia.Gallery.Android.csproj \
             -c Release \
             -f net10.0-android \
             -p:AndroidPackageFormat=apk \
-            -o artifacts/android/
+            -o artifacts/android/ > /tmp/android.log 2>&1 || status=$?
+          cat /tmp/android.log
+          {
+            echo "### Android publish diagnostics (exit $status)"
+            if grep -qE 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}|XA[0-9]{4}' /tmp/android.log; then
+              grep -E 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}|XA[0-9]{4}' /tmp/android.log \
+                | sed 's/^/    /' | sort -u | head -60
+            else
+              echo "    no error line matched; last 40 lines:"
+              tail -40 /tmp/android.log | sed 's/^/    /'
+            fi
+            echo "    installed workloads:"
+            dotnet workload list 2>&1 | sed 's/^/    /'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if grep -qE 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/android.log; then
+            grep -E 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/android.log | sort -u | head -40 | while IFS= read -r line; do
+              printf '::error title=android::%s\n' "${line//%/%25}"; done
+          else
+            tail -25 /tmp/android.log | while IFS= read -r line; do
+              printf '::error title=android-tail::%s\n' "${line//%/%25}"; done
+          fi
+          dotnet workload list 2>&1 | head -20 \
+            | while IFS= read -r line; do printf '::notice title=workloads::%s\n' "${line//%/%25}"; done
+          exit "$status"
 
       - name: Upload Android Artifacts
         uses: actions/upload-artifact@v4

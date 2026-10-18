@@ -24,6 +24,17 @@ $projects = @(
     (Join-Path $root "src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj"),
     (Join-Path $root "src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj"),
     (Join-Path $root "src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.AvaloniaEdit/Md3.Avalonia.AvaloniaEdit.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.AvaloniaHex/Md3.Avalonia.AvaloniaHex.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.Dock/Md3.Avalonia.Dock.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.Tabalonia/Md3.Avalonia.Tabalonia.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.Markdown/Md3.Avalonia.Markdown.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.LiveCharts2/Md3.Avalonia.LiveCharts2.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.ScottPlot/Md3.Avalonia.ScottPlot.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.PropertyGrid/Md3.Avalonia.PropertyGrid.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.NodifyM/Md3.Avalonia.NodifyM.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.Mapsui/Md3.Avalonia.Mapsui.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.InkCanvas/Md3.Avalonia.InkCanvas.csproj"),
     (Join-Path $root "src/Md3.Avalonia.Notifications/Md3.Avalonia.Notifications.csproj")
 )
 
@@ -87,7 +98,7 @@ foreach ($proj in $projects) {
 Write-Host ""
 Write-Host "Built packages:" -ForegroundColor Green
 Get-ChildItem $outputDir -Filter *.nupkg | Sort-Object LastWriteTime -Descending |
-    Select-Object -First 8 | ForEach-Object { Write-Host "  $($_.FullName)" -ForegroundColor Green }
+    Select-Object -First 18 | ForEach-Object { Write-Host "  $($_.FullName)" -ForegroundColor Green }
 if (-not $Local -and -not $Version) {
     Write-Host ""
     Write-Host "WARNING: the version is unchanged. NuGet will keep restoring the previously cached" -ForegroundColor Yellow

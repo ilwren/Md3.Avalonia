@@ -11,7 +11,8 @@
       </StackPanel>
 
       <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
-        <StackPanel Orientation="Horizontal" Spacing="12"><md:MdDatePicker x:Name="RestorableDate" Width="280" SelectedDate="2026-09-24" /><md:MdTimePicker x:Name="RestorableTime" Width="280" SelectedTime="10:15" /></StackPanel>
+        <!-- Two 280-dip pickers plus a gap is 572 dip; wrapping puts the second one underneath. -->
+        <WrapPanel Orientation="Horizontal"><md:MdDatePicker x:Name="RestorableDate" Width="280" SelectedDate="2026-09-24" Margin="0,0,12,12" /><md:MdTimePicker x:Name="RestorableTime" Width="280" SelectedTime="10:15" Margin="0,0,12,12" /></WrapPanel>
         <StackPanel Orientation="Horizontal" Spacing="8"><md:MdButton Content="Save state" Variant="Outlined" Click="SavePickerState" /><md:MdButton Content="Clear values" Variant="Text" Click="ClearPickerValues" /><md:MdButton Content="Restore state" Variant="Text" Click="RestorePickerState" /></StackPanel>
         <TextBlock x:Name="RestorationStatus" Classes="body" Text="State is held by a provider-agnostic store." />
       </StackPanel>
