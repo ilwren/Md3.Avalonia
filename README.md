@@ -2,16 +2,18 @@
 
 一个面向 Avalonia 12 的跨平台 Material 3 / M3 Expressive 控件库与组件 Gallery。项目同时提供核心控件、动态 HCT 主题、Material Symbols provider、Flutter-inspired Extra 控件、桌面窗口适配和 Android single-view Gallery。
 
-> **当前预览版：`0.4.5-preview.1`。** 适合预览、内部应用和组件验证；Android 真机及 TalkBack、Windows Narrator、macOS VoiceOver、Linux Orca 等人工验收需按 [`docs/RELEASE_VALIDATION.md`](docs/RELEASE_VALIDATION.md) 单独签署。
+NuGet 包统一支持 `net8.0` 与 `net10.0`，Avalonia 依赖基线为首个稳定版 `12.0.0`；Gallery（含 Android 宿主）仅使用 .NET 10。
+
+> **当前源码版本：`0.4.6-preview.1`（待发布）。** 这是七个 NuGet 包统一使用的下一预览版基线；NuGet 安装示例须在该版本发布后才能使用。Android 真机及 TalkBack、Windows Narrator、macOS VoiceOver、Linux Orca 等人工验收尚未因此视为通过。
 >
-> 快速链接：[`API 参考`](docs/API.md) · [`兼容性`](docs/COMPATIBILITY.md) · [`0.4.5-preview.1 更新说明`](docs/RELEASE_NOTES_0.4.5-preview.1.md) · [`Gallery`](gallery/Md3.Avalonia.Gallery/)
+> 快速链接：[`API 参考`](docs/API.md) · [`兼容性`](docs/COMPATIBILITY.md) · [`0.4.6-preview.1 更新说明`](docs/RELEASE_NOTES_0.4.6-preview.1.md) · [`发布与验证状态`](docs/RELEASE_VALIDATION.md) · [`Gallery`](gallery/Md3.Avalonia.Gallery/)
 
 ## 快速开始
 
 ### 安装核心包
 
 ```bash
-dotnet add package Md3.Avalonia --version 0.4.5-preview.1
+dotnet add package Md3.Avalonia --version 0.4.6-preview.1
 ```
 
 ### 注册 Material 主题
@@ -39,7 +41,7 @@ dotnet add package Md3.Avalonia --version 0.4.5-preview.1
 
 ### 按需添加可选包
 
-七个包的版本统一为 `0.4.5-preview.1`；只安装所需能力。图标字体 provider 二选一，其余能力包也是 opt-in：
+七个包的版本统一为 `0.4.6-preview.1`；只安装所需能力。图标字体 provider 二选一，其余能力包也是 opt-in：
 
 | NuGet 包 | 提供能力 |
 |---|---|
@@ -51,7 +53,7 @@ dotnet add package Md3.Avalonia --version 0.4.5-preview.1
 | `Md3.Avalonia.RichEditor` | AvaloniaRichEditor 维护版的 Material 主题（正文支持明暗主题）；需注册 `MaterialRichEditorTheme` |
 | `Md3.Avalonia.Notifications` | Windows、macOS、Linux、Android 系统通知的统一 .NET API；独立于 Avalonia 控件主题 |
 
-在各包版本一致的情况下，可用 `dotnet add package <包名> --version 0.4.5-preview.1` 添加对应包。核心包不强制依赖图标 provider、DataGrid 或富文本编辑器引擎。
+在各包版本一致的情况下，可用 `dotnet add package <包名> --version 0.4.6-preview.1` 添加对应包。核心包不强制依赖图标 provider、DataGrid 或富文本编辑器引擎。
 
 设计原则：
 
@@ -129,7 +131,7 @@ dotnet add package Md3.Avalonia --version 0.4.5-preview.1
 
 - `MdScrollViewer` + `MdScrollBar`：独立 Material 滚动模板，保留 wheel、touch、chaining、extent、viewport 与双向 offset，不覆盖原生 ScrollViewer；桌面鼠标拖页默认关闭并可用 `AllowMouseDrag` 显式启用，子控件直接操作和 `SuppressMouseDragScrolling` 子树优先；
 - `MdAutoCompleteBox : AutoCompleteBox`：原生同步/异步过滤、text completion、selection 与键盘 API，采用 Material exposed-field 与弱引用 popup coordinator；
-- `MdNumericBox : NumericUpDown`：原生 Value/Minimum/Maximum/Increment、解析、键盘、滚轮和 validation，复用 Material text-field 外观；
+- `MdNumericBox : NumericUpDown`：原生 Value/Minimum/Maximum/Increment、解析、键盘与 validation，复用 Material text-field 外观；滚轮约定为仅在控件有键盘焦点时步进，未聚焦时交给外层页面滚动，桌面事件路由仍待人工确认；
 - `MdAdaptiveLayout`：按可配置 600/840/1200/1600 DIP breakpoint 选择 Compact/Medium/Expanded/Large/ExtraLarge 内容，并公开 portrait/landscape 与 Touch/Pointer/Keyboard input mode；
 - `MdSurface`、`MdText`、`MdFocusRing`、`MdStateLayer`、`MdWindow`：可选的语义表面、完整 M3 type scale 与桌面基础适配类型；
 - `MdBorderlessWindow`、`MdWindowTitleBar`、`MdCaptionButton`、`MdWindowResizeGrip` 与可替换平台 adapter：扩展客户区的 Material caption，同时保留平台边框、四角、阴影和 resize frame；Android 使用 safe no-op。
@@ -183,7 +185,7 @@ dotnet add package Md3.Avalonia --version 0.4.5-preview.1
 
 ## 共用基础
 
-- Avalonia **12.1.2**；当前仓库和预览包以 `net10.0` / `net10.0-android` 为 CI 验证基线；
+- Avalonia **12.0.0**；七个 NuGet 包均提供 `net8.0` 与 `net10.0` assets（Notifications 另提供 Windows/Android 专用 TFM）；Gallery 与测试项目使用 .NET 10，Gallery 不提供 `net8.0` target；
 - Light、Dark、System 主题和 `DynamicResource` tokens；
 - `MaterialColorUtilities` HCT 任意 seed color 生成器，TonalSpot/Neutral/Vibrant/Expressive/Monochrome/Fidelity 六种 scheme、Standard/Medium/High contrast、49 个标准/固定/surface-container 色彩角色；
 - `MdThemeManager`、`MdThemeJson` 与对比度诊断，支持 motion、font、shape 和主题 JSON round-trip；System/Component token 分层；
@@ -268,7 +270,7 @@ python3 scripts/check-api-doc-coverage.py    # docs/API.md 是否覆盖全部公
 </Application>
 ```
 
-七个可独立 pack 的 NuGet 包统一为 `0.4.5-preview.1`，选择说明见上方包表。`Md3.Avalonia.DataGrid` 和 `Md3.Avalonia.RichEditor` 是 opt-in 主题包，分别引入 Avalonia 原生 DataGrid 和保留 `AvaloniaRichEditor` 程序集/API 的维护版编辑器依赖；核心包不会因此拉入这些可选依赖。七个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
+七个可独立 pack 的 NuGet 包统一为 `0.4.6-preview.1`，选择说明见上方包表。`Md3.Avalonia.DataGrid` 和 `Md3.Avalonia.RichEditor` 是 opt-in 主题包，分别引入 Avalonia 原生 DataGrid 和保留 `AvaloniaRichEditor` 程序集/API 的维护版编辑器依赖；核心包不会因此拉入这些可选依赖。七个包均包含 XML API 文档、README 和第三方声明。重复缺陷复核见 [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md)。
 
 任意 seed 主题可在启动时或运行时应用：
 
@@ -285,7 +287,7 @@ MdThemeManager.Apply(Application.Current, options, dark);
 var json = MdThemeJson.Serialize(options);
 ```
 
-完整 API 入口见 [`docs/API.md`](docs/API.md)，兼容策略见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)，本版说明见 [`docs/RELEASE_NOTES_0.4.5-preview.1.md`](docs/RELEASE_NOTES_0.4.5-preview.1.md)。
+完整 API 入口见 [`docs/API.md`](docs/API.md)，兼容策略见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)，本版说明见 [`docs/RELEASE_NOTES_0.4.6-preview.1.md`](docs/RELEASE_NOTES_0.4.6-preview.1.md)。
 
 ## XAML 与 MVVM
 
@@ -402,7 +404,7 @@ await snackbarService.ShowAsync(new MdSnackbarMessage("Draft archived")
 
 ## Android 约束
 
-- Android 为 Tier 1；`gallery/Md3.Avalonia.Gallery.Android` 提供 `net10.0-android` single-view 宿主（最低 API 23，正式发布验证目标 API 26+）；
+- Android 为 Tier 1；`gallery/Md3.Avalonia.Gallery.Android` 提供 `net10.0-android` single-view 宿主（最低 API 23；发布前须覆盖最低 API 与当前 target API）；
 - Gallery 的 `App` 同时处理 desktop classic lifetime 与 Android `ISingleViewApplicationLifetime`；
 - 核心控件不引用桌面专属 API；
 - TextBox/可编辑 ComboBox 保留原生 IME 和软键盘链路；

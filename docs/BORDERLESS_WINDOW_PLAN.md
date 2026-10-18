@@ -41,6 +41,8 @@ Source comparison was repeated against FluentAvalonia commit `e6def96e6281b79cb8
 - `Win32WindowManager` subclasses the HWND procedure for right-click/Alt+Space system-menu behavior and posts the selected command as `WM_SYSCOMMAND`; it does not fake maximize/restore with an Avalonia animation.
 - FluentAvalonia leaves window-state changes on Avalonia's native backend. Avalonia 12.1 fixed the `WindowDecorations.Full` state-animation regression, while `BorderOnly` intentionally lacks the caption style bits used by DWM.
 
+The current package baseline is Avalonia `12.0.0`, so that 12.1 fix is not included. Revalidate `WindowDecorations.Full` state changes against 12.0.0 and preserve a workaround if needed; the 12.1 behavior is not evidence for this baseline.
+
 Accordingly, `MdWindowsWindowPlatformAdapter` now uses `WindowDecorations.Full` when `PreserveNativeBorder=true`, extends the client area, leaves maximize/restore on `Window.WindowState`, and uses `GetSystemMenu`/`TrackPopupMenu`/`PostMessage(WM_SYSCOMMAND)` for the title-bar context menu. No custom maximize animation is present. Because Avalonia 12 injects `WindowDrawnDecorations` outside the `Window` control template, `MdBorderlessWindow` also assigns a dedicated empty decorations theme; this suppresses Fluent/Simple title, caption and frame visuals without removing the native style bits.
 
 The following work still requires real Windows or platform-specific evidence:

@@ -4,8 +4,10 @@ A small, standalone .NET library for showing native system notifications on Wind
 
 ## Install
 
+The project source baseline is `0.4.6-preview.1`; the package is not installable from NuGet until that preview is published.
+
 ```bash
-dotnet add package Md3.Avalonia.Notifications --version 0.4.5-preview.1
+dotnet add package Md3.Avalonia.Notifications --version 0.4.6-preview.1
 ```
 
 ## Show a notification
@@ -37,14 +39,14 @@ await notifications.ShowAsync(new MdSystemNotification("Build complete", "The pa
 
 | Platform | Implementation and setup |
 |---|---|
-| Windows 10+ | Calls the WinRT toast API directly from C#. Target the host project at `net10.0-windows10.0.19041.0` to select the native Windows asset. Classic desktop apps must set `WindowsAppUserModelId` to the ID on a Start-menu shortcut; setting the value alone does not register the app. The library does not create the shortcut. The Gallery's Windows host demonstrates current-user registration through the Windows Shell COM API (no external helper process). |
+| Windows 10+ | Calls the WinRT toast API directly from C#. Target the host project at `net8.0-windows10.0.19041.0` or `net10.0-windows10.0.19041.0` to select the native Windows asset. Classic desktop apps must set `WindowsAppUserModelId` to the ID on a Start-menu shortcut; setting the value alone does not register the app. The library does not create the shortcut. The Gallery's Windows host demonstrates current-user registration through the Windows Shell COM API (no external helper process). |
 | macOS | Uses AppKit's legacy/deprecated `NSUserNotificationCenter` API through C# interop. Delivery and attribution remain subject to macOS notification settings and app identity; verify the behavior with the packaged host app on supported macOS versions. |
 | Linux | Calls the native `libnotify` library directly; it does not launch `notify-send`. The `libnotify` shared library and a freedesktop-compatible D-Bus notification service must be available (for example, `sudo apt install libnotify4` on Debian/Ubuntu or `sudo dnf install libnotify` on Fedora). |
 | Android 6.0+ (API 23) | Calls `NotificationManager`, creates the configured notification channel on Android 8.0+, and uses `AndroidSmallIconResourceId` when supplied, falling back to the host app icon and then a generic information icon. Add `android.permission.POST_NOTIFICATIONS` to the app manifest and request it from a foreground `Activity` on Android 13+ before calling `ShowAsync`. A missing runtime grant raises `MdSystemNotificationPermissionException`; this library deliberately does not show a permission prompt. |
 
-A Windows app built against plain `net10.0` selects the generic desktop asset, not the WinRT backend; `CreateDefault()` reports that the Windows-specific target is required. Retarget the Windows host to `net10.0-windows10.0.19041.0` (or create a Windows-specific host project) to select the native asset. The Gallery Desktop selects this Windows target when built on Windows; it registers a current-user Start-menu shortcut with the matching AppUserModelID before showing its window.
+A Windows app built against plain `net8.0` or `net10.0` selects the generic desktop asset, not the WinRT backend; `CreateDefault()` reports that the Windows-specific target is required. Retarget the Windows host to `net8.0-windows10.0.19041.0` or `net10.0-windows10.0.19041.0` (or create a Windows-specific host project) to select the native asset. The Gallery Desktop selects this Windows target when built on Windows; it registers a current-user Start-menu shortcut with the matching AppUserModelID before showing its window.
 
-A host can reference the package on macOS/Linux through `net10.0`, on Windows through `net10.0-windows10.0.19041.0`, and on Android through `net10.0-android`. Building or packing the Android target requires the .NET Android workload and a compatible JDK (Java 17 for this .NET 10 baseline):
+The package provides `net8.0` and `net10.0` assets for macOS/Linux, `net8.0-windows10.0.19041.0` and `net10.0-windows10.0.19041.0` for the Windows backend, plus `net8.0-android` and `net10.0-android` Android assets (minimum API 23). The Gallery host remains .NET 10-only. Building or packing Android assets requires a compatible .NET Android workload and JDK (Java 17):
 
 ```bash
 dotnet workload install android

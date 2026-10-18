@@ -1,6 +1,6 @@
 # Md3.Avalonia Documentation
 
-Welcome to the official documentation and API reference for **Md3.Avalonia** — the modern, cross-platform Material Design 3 (M3) control library for [Avalonia UI](https://avaloniaui.net/) targeting **.NET 10.0**.
+Welcome to the documentation and API reference for **Md3.Avalonia**, the cross-platform Material Design 3 (M3) control library for [Avalonia UI](https://avaloniaui.net/). NuGet libraries target **.NET 8 and .NET 10**; the Gallery host targets .NET 10 only. Supported preview platforms are Windows, macOS, Linux, and Android; iOS is not a release target.
 
 ---
 
@@ -10,10 +10,13 @@ Md3.Avalonia is structured into modular NuGet packages:
 
 | Package | Description | Target |
 | :--- | :--- | :---: |
-| **`Md3.Avalonia`** | Core Material Design 3 controls (Buttons, TextBoxes, Cards, FAB, Navigation, Dialogs, Sliders, Sheets, etc.) | `.NET 10.0` |
-| **`Md3.Avalonia.Extra`** | Extended controls inspired by Flutter ecosystem widgets (Rich Editor, Chat View, Timeline, DataGrid, Chart, Calendar, TreeView, Breadcrumb, PIN Input, etc.) | `.NET 10.0` |
-| **`Md3.Avalonia.Icons`** | Full Material Symbols Rounded icon catalog (4,000+ glyphs) with embedded TTF font resource. | `.NET 10.0` |
-| **`Md3.Avalonia.Icons.Lite`** | Lightweight Material Symbols Rounded icon subset with embedded compact TTF font resource (~98 KB). | `.NET 10.0` |
+| **`Md3.Avalonia`** | Core Material Design 3 controls, themes, and tokens | `.NET 8; .NET 10` |
+| **`Md3.Avalonia.Extra`** | Optional ecosystem controls such as Breadcrumb, BeforeAfter, Timeline, Cascader, and TreeView | `.NET 8; .NET 10` |
+| **`Md3.Avalonia.Icons`** | Full Material Symbols Rounded catalog with embedded TTF font | `.NET 8; .NET 10` |
+| **`Md3.Avalonia.Icons.Lite`** | Reduced Material Symbols Rounded font subset | `.NET 8; .NET 10` |
+| **`Md3.Avalonia.DataGrid`** | Optional Material theme for Avalonia's DataGrid | `.NET 8; .NET 10` |
+| **`Md3.Avalonia.RichEditor`** | Optional Material theme for the maintained AvaloniaRichEditor fork | `.NET 8; .NET 10` |
+| **`Md3.Avalonia.Notifications`** | Standalone native notification API | `.NET 8; .NET 10` plus Windows/Android-specific targets |
 
 ---
 

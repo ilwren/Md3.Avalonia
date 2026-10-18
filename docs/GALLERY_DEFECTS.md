@@ -67,7 +67,7 @@ synchronised both ways. Same split as Flutter's `TabBar`/`TabBarView`.
 wrong answer: Avalonia already ships that control, and a rename would not have changed what
 `MdDataGrid` can do. The decision taken was to theme the real thing. `Md3.Avalonia.DataGrid` is
 a new opt-in package carrying the `Avalonia.Controls.DataGrid` dependency alone, so the other
-five packages stay clean, and `MdDataGrid` keeps its job as a Material data table. The gallery
+six packages stay free of that dependency, and `MdDataGrid` keeps its job as a Material data table. The gallery
 now shows both, one above the other, with the boundary written between them.
 
 The theme is derived from the DataGrid package's own Fluent theme rather than hand-written,
@@ -565,7 +565,7 @@ with which variant.
 
 ### AOT
 
-**Supported, and now declared.** All six packages carry `IsAotCompatible` and enable the
+**Supported, and now declared.** All seven current packages carry `IsAotCompatible` and enable the
 trim/AOT analyzers; package builds treat warnings as errors. The AOT probe is a separate,
 platform-limited integration check: `.github/workflows/aot-probe.yml` publishes the desktop
 Gallery with `PublishAot=true`, asserts the output is a native ELF executable with no managed

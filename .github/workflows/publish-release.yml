@@ -82,8 +82,8 @@ jobs:
           fi
 
           # The Android version code must increase for each workflow run; the repository's
-          # currently checked-in code is 5, so offset the per-workflow run number by 5.
-          ANDROID_VERSION_CODE=$((GITHUB_RUN_NUMBER + 5))
+          # currently checked-in code is 6, so offset the per-workflow run number by 6.
+          ANDROID_VERSION_CODE=$((GITHUB_RUN_NUMBER + 6))
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
           echo "release_type=${RELEASE_TYPE}" >> "$GITHUB_OUTPUT"

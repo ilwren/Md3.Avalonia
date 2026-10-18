@@ -7,9 +7,17 @@
 - Added `MdBreadcrumbPathConverter` for binding slash-separated route paths directly to `MdBreadcrumb`; navigable ancestors use the theme's primary text color, while the current item and separators stay neutral.
 - Added the standalone `Md3.Avalonia.Notifications` package with one title/body API for Windows, macOS, Linux and Android. Windows uses WinRT toast APIs from its Windows-specific .NET target, Linux calls libnotify directly (no helper processes), macOS uses AppKit interop, and Android uses `NotificationManager`; Windows AppUserModelID registration and Android 13+ runtime permission remain host responsibilities. Platform delivery still needs manual verification.
 
+### Changed
+
+- Consolidated Extra control resources under `ExtraTheme`; removed the obsolete `EcosystemTheme` name without a compatibility shim.
+- Added `net8.0` alongside `net10.0` for all seven NuGet packages and aligned Avalonia dependencies to the first stable Avalonia 12 release, `12.0.0` (including `Avalonia.Controls.DataGrid`). The Gallery remains .NET 10-only.
+
+### Verification pending
+
+- Updated `MdBeforeAfter` to defer keyboard focus until after a drag and suppress ancestor `BringIntoViewOnFocusChange` during that transition; headless regressions cover the first left-edge and top-edge drags through release. The reported desktop first-drag/position/scroll issue remains unverified and requires desktop re-test; this code/headless coverage is not desktop sign-off.
+
 ### Fixed
 
-- `MdBeforeAfter` now rejects Avalonia's automatic pointer focus during a drag and applies keyboard focus after release with ancestor `BringIntoViewOnFocusChange` temporarily suppressed. This prevents a clipped comparison from scrolling under the stationary pointer while preserving keyboard focus; the Gallery regression checks first left-edge and top-edge drags through release.
 - `MaterialRichEditorTheme` now sets the editor's default run foreground from the live M3 `OnSurface` token, so unstyled document text remains readable in dark mode. The opt-in package uses the MIT-maintained `OlivierJC.AvaloniaRichEditor` fork until the corresponding upstream package release is available.
 
 ## [0.4.5-preview.1] - 2026-10-12

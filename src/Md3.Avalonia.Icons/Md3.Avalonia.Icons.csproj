@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     <RootNamespace>Md3.Avalonia.Icons</RootNamespace>
     <AssemblyName>Md3.Avalonia.Icons</AssemblyName>
     <Description>Full Material Symbols font and glyph catalog with embedded font for Md3.Avalonia.</Description>
     <PackageId>Md3.Avalonia.Icons</PackageId>
-    <Version>0.4.5-preview.1</Version>
+    <Version>0.4.6-preview.1</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;icons;fonts;material-symbols;material-design</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

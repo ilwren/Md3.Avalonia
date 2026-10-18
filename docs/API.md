@@ -1,16 +1,16 @@
 # Md3.Avalonia public API overview
 
-This is the public API entry point for preview version `0.4.5-preview.1`. Preview APIs may receive compatibility-preserving refinements before the first stable release. Each NuGet package also ships generated XML documentation for IDE IntelliSense.
+This is the public API entry point for the source baseline `0.4.6-preview.1` (release pending). Preview APIs may receive compatibility-preserving refinements before the first stable release. Each NuGet package also ships generated XML documentation for IDE IntelliSense; the versioned installation commands become usable from NuGet after publication.
 
 ## Install and register
 
 Start with the core package:
 
 ```bash
-dotnet add package Md3.Avalonia --version 0.4.5-preview.1
+dotnet add package Md3.Avalonia --version 0.4.6-preview.1
 ```
 
-All seven packages are versioned together. Add only the optional packages your application uses; choose **one** icon provider:
+All seven packages are versioned together and provide `net8.0` and `net10.0` NuGet assets. `Md3.Avalonia.Notifications` also provides Windows- and Android-specific assets; the Gallery host itself targets .NET 10 only. Add only the optional packages your application uses; choose **one** icon provider:
 
 | NuGet package | Purpose | Theme/resource registration |
 |---|---|---|
@@ -25,14 +25,14 @@ All seven packages are versioned together. Add only the optional packages your a
 For explicit project-file references, use the same version for each package:
 
 ```xml
-<PackageReference Include="Md3.Avalonia" Version="0.4.5-preview.1" />
+<PackageReference Include="Md3.Avalonia" Version="0.4.6-preview.1" />
 <!-- Optional: choose one icon provider. -->
-<PackageReference Include="Md3.Avalonia.Icons" Version="0.4.5-preview.1" />
-<!-- Or: <PackageReference Include="Md3.Avalonia.Icons.Lite" Version="0.4.5-preview.1" /> -->
-<PackageReference Include="Md3.Avalonia.Extra" Version="0.4.5-preview.1" />
-<PackageReference Include="Md3.Avalonia.DataGrid" Version="0.4.5-preview.1" />
-<PackageReference Include="Md3.Avalonia.RichEditor" Version="0.4.5-preview.1" />
-<PackageReference Include="Md3.Avalonia.Notifications" Version="0.4.5-preview.1" />
+<PackageReference Include="Md3.Avalonia.Icons" Version="0.4.6-preview.1" />
+<!-- Or: <PackageReference Include="Md3.Avalonia.Icons.Lite" Version="0.4.6-preview.1" /> -->
+<PackageReference Include="Md3.Avalonia.Extra" Version="0.4.6-preview.1" />
+<PackageReference Include="Md3.Avalonia.DataGrid" Version="0.4.6-preview.1" />
+<PackageReference Include="Md3.Avalonia.RichEditor" Version="0.4.6-preview.1" />
+<PackageReference Include="Md3.Avalonia.Notifications" Version="0.4.6-preview.1" />
 ```
 
 Register the core theme; register optional themes only when their packages are referenced:
@@ -71,7 +71,7 @@ var notifications = MdSystemNotificationService.CreateDefault(new MdSystemNotifi
 await notifications.ShowAsync(new MdSystemNotification("Ready", "The export has finished."));
 ```
 
-`ShowAsync(title, body, cancellationToken)` is also available. For native Windows notifications, target the Windows host at `net10.0-windows10.0.19041.0`; classic desktop toast still requires the supplied AppUserModelID to be registered by the host app. Linux calls `libnotify` directly and requires its shared library plus a running D-Bus notification service (it does not launch `notify-send`). Android 13+ requires the host to declare `POST_NOTIFICATIONS` and request runtime permission before calling the service. Missing Android permission throws `MdSystemNotificationPermissionException`. Platform failures are reported as `MdSystemNotificationException`. The initial API supports title and body only (no click callback or actions); see the [package README](../src/Md3.Avalonia.Notifications/README.md) for all platform requirements.
+`ShowAsync(title, body, cancellationToken)` is also available. For native Windows notifications, target the Windows host at `net8.0-windows10.0.19041.0` or `net10.0-windows10.0.19041.0`; classic desktop toast still requires the supplied AppUserModelID to be registered by the host app. Linux calls `libnotify` directly and requires its shared library plus a running D-Bus notification service (it does not launch `notify-send`). Android 13+ requires the host to declare `POST_NOTIFICATIONS` and request runtime permission before calling the service. Missing Android permission throws `MdSystemNotificationPermissionException`. Platform failures are reported as `MdSystemNotificationException`. The initial API supports title and body only (no click callback or actions); see the [package README](../src/Md3.Avalonia.Notifications/README.md) for all platform requirements.
 
 ## Namespaces
 
@@ -143,7 +143,7 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 | Type | Primary use | Important API surface |
 |---|---|---|
 | `MdButton`, `MdIconButton`, `MdToggleButton` | Actions and two-state actions | `Command`, `CommandParameter`, `IsEnabled`, `IsChecked`, content/icon properties, variant and size properties |
-| `MdTextBox`, `MdNumericBox`, `MdAutoCompleteBox` | Text, numeric, and suggestion input | `Text`/`Value`, `Label`, `SupportingText`, `IsError`, `PlaceholderText`, `IsReadOnly`, `ItemsSource`/suggestion provider; `MdNumericBox` adds the native `Minimum`/`Maximum`/`Increment` and `ShowButtonSpinner` |
+| `MdTextBox`, `MdNumericBox`, `MdAutoCompleteBox` | Text, numeric, and suggestion input | `Text`/`Value`, `Label`, `SupportingText`, `IsError`, `PlaceholderText`, `IsReadOnly`, `ItemsSource`/suggestion provider; `MdNumericBox` adds native `Minimum`/`Maximum`/`Increment` and `ShowButtonSpinner`. Its wheel contract is focused-only stepping; an unfocused wheel should reach the outer page. Desktop event-routing acceptance remains pending. |
 | `MdSearchBar`, `MdSearchView` | Search entry and result presentation | `Text` (inherited from `TextBox`), `SearchCommand`, `SearchSubmitted`; the view adds `Header`, `IsOpen`, `SelectedResult`, `ResultDisplayMemberPath`, `CloseOnResultCommit` and `ResultCommitted` |
 | `MdCheckBox`, `MdRadioButton`, `MdSwitch` | Boolean and mutually exclusive choices | `IsChecked`, `GroupName`/selection binding, `Command` and native input events |
 | `MdSlider`, `MdRangeSlider` | Single and interval values | `Minimum`, `Maximum`; `MdSlider` uses the native `Value` and tick properties, `MdRangeSlider` uses `LowerValue`/`UpperValue` plus `Step` and `ShowValueIndicators` |

@@ -3,9 +3,10 @@
 > 工作名称：`Md3.Avalonia`  
 > 文档版本：0.5 Draft  
 > 基线日期：2026-09-22  
-> 目标框架：Avalonia 12.x / .NET 8+（Gallery 建议 .NET 10）  
+> 目标框架：Avalonia 12.x / NuGet 包面向 .NET 8 与 .NET 10；Gallery 面向 .NET 10
 > 必须支持的平台：Windows、macOS、Linux、Android  
 > 设计基线：Material Design 3 当前规范，优先采用 M3 Expressive；尚未 Expressive 化的组件采用当前 Baseline 规范
+> 当前源码基线（2026-10-18）：NuGet 包多目标 `net8.0;net10.0`，Gallery 仅使用 .NET 10；Android 最低 API 23。本文描述目标设计与验收要求，不代表每项功能均已完成；实现状态以 `docs/SPEC_VERIFICATION.md` 和 `docs/RELEASE_VALIDATION.md` 为准。
 
 ---
 
@@ -33,7 +34,7 @@
 - Gallery 中所有面向用户的交互控件必须使用 `Md*` 控件；`Grid`、`Panel`、`Border`、`Path` 等纯布局/绘图原语可以直接使用 Avalonia 类型。
 - 颜色、字体、圆角、间距、阴影、状态层和动画不得散落硬编码在模板中，必须来自设计令牌。
 - 所有会在运行时变化的主题资源必须通过 `DynamicResource` 消费。
-- 控件库必须可被 `net8.0-android` Avalonia 应用引用并在 Android 真机/模拟器上运行，不得在核心控件中引入仅桌面可用的 API。
+- 控件库 NuGet 包必须提供 `net8.0` 与 `net10.0` 资产，并可由对应 Android Avalonia 应用引用和运行；Gallery Android 宿主使用 `net10.0-android`。核心控件不得引入仅桌面可用的 API。
 - 工作区只交付源码、设计文档、必要的规范快照与经审批的参考图；不得交付 `bin/`、`obj/`、`TestResults/`、`artifacts/`、`.nupkg`、DLL、PDB 等编译或测试产物。
 
 ### 2.2 设计档位
@@ -92,9 +93,9 @@ Material 官网是持续更新的网站，浏览器和 Avalonia 的文字光栅�
 ### 4.1 首版范围
 
 - Avalonia 12.x；所有 Avalonia 包必须锁定同一补丁版本。
-- 核心控件库面向 `net8.0`，不得引用桌面专属 API；桌面 Gallery 面向 `net10.0`。
+- NuGet 控件库面向 `net8.0;net10.0`，不得引用桌面专属 API；桌面 Gallery 面向 `net10.0`。
 - Tier 1：Windows、macOS、Linux 桌面以及 Android。
-- Android 宿主面向 `net8.0-android`，至少覆盖 Android 8.0（API 26）及以上、ARM64、触摸、软键盘、返回键、生命周期恢复、深浅主题和安全区域。
+- Android 宿主面向 `net10.0-android`，最低支持 API 23，并覆盖 ARM64、触摸、软键盘、返回键、生命周期恢复、深浅主题和安全区域。
 - Tier 2：iOS、Browser/WASM 的编译和基础交互验证。
 - Light、Dark、System 三种主题模式。
 - 任意 seed color 生成完整亮/暗配色，不限于 M3 预设紫色。
@@ -123,7 +124,7 @@ Material 官网是持续更新的网站，浏览器和 Avalonia 的文字光栅�
 | R5 | MVVM 友好且支持直接操作 | 标准 `ICommand`、双向绑定、事件、方法、服务接口 |
 | R6 | 完整资源字典、字体、主题色、字体图标、任意强调色 | 三层令牌、HCT 主题生成、字体与 Material Symbols 包 |
 | R7 | 深浅模式 | `ThemeVariant`、Light/Dark 字典、System 跟随与局部作用域 |
-| R8 | 控件库可在 Android 运行 | Android 列为 Tier 1；提供 `net8.0-android` 宿主、触摸/软键盘/生命周期真机测试 |
+| R8 | 控件库可在 Android 运行 | NuGet 控件包提供 `net8.0` 与 `net10.0` 资产并可由对应 Android 应用引用；Notifications 另提供 Android 专用 TFM；Gallery 宿主使用 `net10.0-android`；API 23 起进行触摸/软键盘/生命周期真机测试 |
 | R9 | Workspace 不提供编译产物 | 只交付源码与必要文档；构建验证后清理所有 `bin/obj/TestResults/artifacts` 等产物 |
 
 ---
@@ -138,7 +139,8 @@ Md3.Avalonia.sln
 │  ├─ Md3.Avalonia.Icons.Lite/       # 官方字体真实轮廓子集
 │  ├─ Md3.Avalonia.Extra/            # Flutter 生态 clean-room 控件
 │  ├─ Md3.Avalonia.DataGrid/         # Avalonia 原生 DataGrid 的 Material 主题（opt-in）
-│  └─ Md3.Avalonia.RichEditor/       # AvaloniaRichEditor 的 Material 主题（opt-in）
+│  ├─ Md3.Avalonia.RichEditor/       # AvaloniaRichEditor 的 Material 主题（opt-in）
+│  └─ Md3.Avalonia.Notifications/   # 独立的多平台原生通知 API（不依赖 Avalonia）
 ├─ gallery/
 │  ├─ Md3.Avalonia.Gallery/          # 官网式桌面 Gallery，使用 CommunityToolkit.Mvvm
 │  ├─ Md3.Avalonia.Gallery.Desktop/  # 桌面宿主
@@ -148,14 +150,15 @@ Md3.Avalonia.sln
 └─ spec-snapshot/                     # 冻结的来源清单、令牌和一致性策略
 ```
 
-可发布包（六个，均可独立 pack）：
+可发布包（七个，均可独立 pack）：
 
 - `Md3.Avalonia`：核心控件、主题、动态 HCT 配色、motion 与公共 API；
 - `Md3.Avalonia.Icons`：完整官方 Material Symbols Rounded 字体与强类型目录；
 - `Md3.Avalonia.Icons.Lite`：官方字体的真实轮廓子集；
 - `Md3.Avalonia.Extra`：依赖核心的 clean-room 扩展控件；
 - `Md3.Avalonia.DataGrid`：唯一引入 `Avalonia.Controls.DataGrid` 依赖的 opt-in 主题包；
-- `Md3.Avalonia.RichEditor`：唯一引入 AvaloniaRichEditor 依赖的 opt-in 主题包。
+- `Md3.Avalonia.RichEditor`：唯一引入 AvaloniaRichEditor 依赖的 opt-in 主题包；
+- `Md3.Avalonia.Notifications`：不依赖 Avalonia，直接调用 Windows、macOS、Linux 与 Android 原生通知 API 的 opt-in 包。
 
 ### 6.1 Android 工程约束
 
@@ -1031,8 +1034,8 @@ Contrast: Standard / Medium / High
 
 ### 21.6 Android 验证
 
-- `net8.0-android` Debug/Release 编译检查；
-- Android API 26 与当前目标 API 模拟器冒烟测试；
+- `net10.0-android` Debug/Release 编译检查；
+- Android API 23（最低版本）及当前目标 API 模拟器冒烟测试；
 - ARM64 真机触摸、长按、拖拽、返回键和屏幕旋转；
 - `MdTextBox` 的软键盘、IME composing、selection、复制粘贴与焦点切换；
 - Light/Dark/System、字体缩放 1.0/1.3/2.0 和横竖屏布局；
