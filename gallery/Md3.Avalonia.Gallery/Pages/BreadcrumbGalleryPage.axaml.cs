@@ -23,7 +23,6 @@ public partial class BreadcrumbGalleryPage : UserControl
         ResetIconPath();
         IconBreadcrumb.ItemsSource = _iconPath;
         DeepBreadcrumb.ItemsSource = new[] { "Root", "usr", "local", "share", "fonts", "MaterialSymbols.ttf" };
-        PowerlineBreadcrumb.ItemsSource = new[] { "kg@KW", "~/iterm-test", "master" };
     }
 
     public string CurrentPath
@@ -58,7 +57,9 @@ public partial class BreadcrumbGalleryPage : UserControl
 
     private void OnPowerlineBreadcrumbInvoked(object? sender, object? item)
     {
-        PowerlineStatus.Text = $"Selected {item}.";
+        if (item is not MdBreadcrumbItem model || model.CommandParameter is not string path) return;
+        CurrentPath = path;
+        PowerlineStatus.Text = $"Navigated to: {model.Label} — trailing segments were dropped.";
     }
 
     private void OnDeepBreadcrumbInvoked(object? sender, object? item)

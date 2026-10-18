@@ -2,6 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:md="using:Md3.Avalonia.Controls"
                     xmlns:eco="using:Md3.Avalonia.Extra.Controls">
+  <eco:MdBreadcrumbPathConverter x:Key="MdBreadcrumbPathConverter" />
+
   <ControlTheme x:Key="{x:Type eco:MdAvatar}" TargetType="eco:MdAvatar">
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" />

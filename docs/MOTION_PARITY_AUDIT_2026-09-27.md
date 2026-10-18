@@ -1,7 +1,7 @@
 # Md3.Avalonia 动画与动效逐控件审计
 
 **日期：** 2026-09-27  
-**审计对象：** `Md3.Avalonia`、Flutter parity 控件、`Md3.Avalonia.Ecosystem`  
+**审计对象：** `Md3.Avalonia`、Flutter parity 控件、`Md3.Avalonia.Extra`<br>
 **审计方式：** Headless 连续帧截图 + 像素差异 + Visual Tree/Transition 状态 + 源码逐项核对
 
 ## 0. P1/P2 修复复验（2026-09-28）

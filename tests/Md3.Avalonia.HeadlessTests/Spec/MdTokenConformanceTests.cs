@@ -12,7 +12,7 @@ namespace Md3.Avalonia.HeadlessTests.Spec;
 /// <remarks>
 /// <para>
 /// Resolves every token named by <c>spec-snapshot/tokens.json</c> through the real theme merge
-/// (<c>MaterialTheme</c> + <c>EcosystemTheme</c>, 58 merged dictionaries) and compares the resolved
+/// (<c>MaterialTheme</c> + <c>ExtraTheme</c>, 58 merged dictionaries) and compares the resolved
 /// value against the externally sourced oracle.
 /// </para>
 /// <para>

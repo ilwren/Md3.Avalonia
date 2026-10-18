@@ -514,6 +514,50 @@ public sealed class MdReportedIssuesTests
     }
 
     [AvaloniaFact]
+    public void ExtraTheme_Registers_Breadcrumb_Path_Converter_Resource()
+    {
+        Assert.True(Application.Current!.TryGetResource("MdBreadcrumbPathConverter", null, out var converter));
+        Assert.IsType<MdBreadcrumbPathConverter>(converter);
+    }
+
+    [AvaloniaFact]
+    public void Breadcrumb_Gallery_Resolves_Converter_From_ExtraTheme()
+    {
+        var page = new BreadcrumbGalleryPage();
+        using var host = Show(page, 900, 700);
+        Dispatcher.UIThread.RunJobs();
+
+        var demo = page.GetVisualDescendants().OfType<MdBreadcrumb>().Single(control => control.Name == "DemoBreadcrumb");
+        var powerline = page.GetVisualDescendants().OfType<MdBreadcrumb>().Single(control => control.Name == "PowerlineBreadcrumb");
+        Assert.Equal(5, demo.Items.Count);
+        Assert.Equal(5, powerline.Items.Count);
+        Assert.Equal(MdBreadcrumbVariant.Powerline, powerline.Variant);
+    }
+
+    [AvaloniaFact]
+    public void Breadcrumb_Powerline_Variant_Uses_Chevron_Item_Theme()
+    {
+        var breadcrumb = new MdBreadcrumb
+        {
+            Variant = MdBreadcrumbVariant.Powerline,
+            ItemsSource = new[] { "Home", "Projects", "Material 3" }
+        };
+
+        using var host = Show(breadcrumb, 520, 100);
+        Dispatcher.UIThread.RunJobs();
+
+        var containers = breadcrumb.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
+        Assert.Equal(3, containers.Length);
+        Assert.All(containers, item =>
+        {
+            Assert.Equal(32, item.MinHeight);
+            Assert.Equal(2, item.GetVisualDescendants().OfType<global::Avalonia.Controls.Shapes.Path>().Count());
+        });
+        Assert.Equal(0, containers[0].Margin.Left);
+        Assert.Equal(-14, containers[1].Margin.Left);
+    }
+
+    [AvaloniaFact]
     public void Breadcrumb_Uses_Primary_Accent_For_Ancestors_But_Not_Current_Item()
     {
         var converter = new MdBreadcrumbPathConverter();

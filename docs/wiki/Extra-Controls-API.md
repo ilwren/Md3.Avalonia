@@ -190,15 +190,12 @@ High-performance virtualized grid with column sorting, inline cell editing, and 
 ---
 
 ## 6. `MdBreadcrumb` (Path Navigation)
-Cross-platform breadcrumb supporting icons, custom separators, overflow collapsing, and command binding. Navigable ancestors use the theme's primary color by default; the current location and separators remain neutral. `MdBreadcrumbPathConverter` converts a slash-separated route string into item models, with each item's `CommandParameter` holding its cumulative path prefix. `ItemInvokedCommand` receives the `MdBreadcrumbItem`; read its `CommandParameter` to update the bound path.
+Cross-platform breadcrumb supporting icons, custom separators, overflow collapsing, commands, and `Standard`/`Powerline` variants. Navigable ancestors use the theme's primary color by default; the current location and separators remain neutral. `MdBreadcrumbPathConverter` turns a slash-separated route into item models whose `CommandParameter` is the cumulative path prefix. Register `ExtraTheme` after `MaterialTheme`; it provides the converter as the `MdBreadcrumbPathConverter` resource. `ItemInvokedCommand` receives the `MdBreadcrumbItem`; read its `CommandParameter` to update the bound path.
 
 ```xml
-<UserControl.Resources>
-  <extra:MdBreadcrumbPathConverter x:Key="BreadcrumbPathConverter" />
-</UserControl.Resources>
-
 <extra:MdBreadcrumb
-    ItemsSource="{Binding CurrentPath, Converter={StaticResource BreadcrumbPathConverter}}"
+    Variant="Powerline"
+    ItemsSource="{Binding CurrentPath, Converter={StaticResource MdBreadcrumbPathConverter}}"
     ItemInvokedCommand="{Binding NavigateToBreadcrumbCommand}"
     Separator="›" />
 ```

@@ -2,7 +2,7 @@
 
 Status (2026-10-03): **W0–W2 complete; Windows W3 now preserves native DWM state-animation styles and exposes the native system menu; Snap Layout/DPI/backdrop and W4 real-platform sign-off remain open.**
 
-The custom-chrome feature is in the core `Md3.Avalonia` package. It introduces no dependency on the optional Icons or Ecosystem packages and uses Avalonia 12 window APIs.
+The custom-chrome feature is in the core `Md3.Avalonia` package. It introduces no dependency on the optional Icons or Extra packages and uses Avalonia 12 window APIs.
 
 ## W0 — contracts and platform boundary (complete)
 

@@ -329,7 +329,7 @@ Direct APIs include `Show`/`Dismiss` on transient components, `ShowAsync`/`Show`
 
 `MdCarousel` supports a bindable `MdCarouselController`, `ScrollTo`, autoplay, pointer-hover pause and finite or wrapping navigation. Weighted variants use viewport-fitted scroll/controller keylines and constrain `SmallItemWidth` to Material's 40–56 DIP range; pointer selection does not resize an item. `MdRefreshIndicator.RequestRefreshAsync` accepts a cancelable provider-neutral handler.
 
-`MdBreadcrumb.OverflowBehavior` selects `Wrap`, one-line native `Scroll`, or explicit `Collapse` behavior. `ShowTrailingSeparator` is opt-in, and `SeparatorTemplate` can render a custom separator from the `Separator` value. Invoking an ancestor raises `ItemInvoked`/`ItemInvokedCommand` without retaining list selection; the current/last item and disabled items are non-invokable. `MdBreadcrumbPathConverter` turns a slash-separated route into `MdBreadcrumbItem` entries whose `CommandParameter` is the cumulative path prefix. Ancestors use the theme's `Primary` text color by default (`MdBreadcrumbItem.UseAccentColor` can opt out); the current item uses `OnSurface`, and separators use `OutlineVariant`.
+`MdBreadcrumb.OverflowBehavior` selects `Wrap`, one-line native `Scroll`, or explicit `Collapse` behavior. `ShowTrailingSeparator` is opt-in, and `SeparatorTemplate` can render a custom separator from the `Separator` value. Invoking an ancestor raises `ItemInvoked`/`ItemInvokedCommand` without retaining list selection; the current/last item and disabled items are non-invokable. `MdBreadcrumbPathConverter` turns a slash-separated route into `MdBreadcrumbItem` entries whose `CommandParameter` is the cumulative path prefix; `ExtraTheme` registers it as the `MdBreadcrumbPathConverter` resource for XAML bindings. Ancestors use the theme's `Primary` text color by default (`MdBreadcrumbItem.UseAccentColor` can opt out); the current item uses `OnSurface`, and separators use `OutlineVariant`.
 
 `MdScrollViewer` keeps wheel, trackpad, touch, pen and scrollbar behavior native. Desktop primary-button panning is opt-in through `AllowMouseDrag`; when enabled, focusable controls retain direct manipulation, and custom content takes precedence by handling the press or capturing the pointer. Set `md:MdScrollViewer.SuppressMouseDragScrolling="True"` on any precision-interaction subtree that does neither.
 
@@ -710,7 +710,7 @@ and `Format` accept either an element or an explicit `CultureInfo`.
 | `MdColorConverters` | Value converters used by `MdColorPicker` (Extra) |
 | `MdExperimentalAttribute` | Marks an Extra type whose shape may still change; carries a `Reason` |
 | `ExtraCatalog` | Static listing of the Extra control surface |
-| `EcosystemTheme` | Styles entry registered by `ExtraTheme` |
+| `ExtraTheme` | Optional styles entry for the `Md3.Avalonia.Extra` controls |
 | `MdCalendarDayPresenter`, `MdChatMessagePresenter`, `MdPinCellPresenter`, `MdTimelineItemPresenter`, `MdDataGridHeaderPresenter`, `MdTransferLayoutPanel` | Template-internal presenters, public so templates can be replaced |
 
 ## Icon packages
