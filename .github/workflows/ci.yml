@@ -127,9 +127,33 @@ jobs:
       # Restoring both heads once up front lets every later command run --no-restore. The old
       # pipeline restored the same graph three separate times.
       - name: Restore
+        shell: bash
         run: |
-          dotnet restore gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj
-          dotnet restore tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj
+          status=0
+          : > /tmp/restore.log
+          for proj in gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj \
+                      tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj; do
+            name="$(basename "$proj" .csproj)"
+            echo "=== dotnet restore $proj ==="
+            if dotnet restore "$proj" --nologo >> /tmp/restore.log 2>&1; then
+              echo "--- $name: OK"
+            else
+              echo "--- $name: FAILED"
+              status=1
+            fi
+          done
+          cat /tmp/restore.log
+          {
+            echo "### Restore diagnostics"
+            if grep -qE 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/restore.log; then
+              grep -E 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/restore.log \
+                | sed 's/^/    /' | sort -u | head -60
+            else
+              echo "    no error line matched; last 40 lines:"
+              tail -40 /tmp/restore.log | sed 's/^/    /'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
 
       - name: Build Gallery Desktop
         shell: bash

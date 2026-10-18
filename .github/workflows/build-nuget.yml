@@ -39,9 +39,23 @@ jobs:
           python3 scripts/verify-fonts.py
 
       - name: Build and Pack NuGet Packages
+        shell: bash
         run: |
           mkdir -p artifacts/nuget
-          bash scripts/build-nuget.sh --output artifacts/nuget
+          status=0
+          bash scripts/build-nuget.sh --output artifacts/nuget > /tmp/pack.log 2>&1 || status=$?
+          cat /tmp/pack.log
+          {
+            echo "### Pack diagnostics (exit $status)"
+            if grep -qE 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/pack.log; then
+              grep -E 'error|NU[0-9]{4}|NETSDK[0-9]{4}|MSB[0-9]{4}' /tmp/pack.log \
+                | sed 's/^/    /' | sort -u | head -60
+            else
+              echo "    no error line matched; last 40 lines:"
+              tail -40 /tmp/pack.log | sed 's/^/    /'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
 
       - name: Upload NuGet Artifacts
         uses: actions/upload-artifact@v4
