@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased]
+## [0.4.6-preview.1] - Pending publication
+
+> Source baseline entry; publication, multi-target build verification, and platform acceptance remain pending.
 
 ### Added
 
