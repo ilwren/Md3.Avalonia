@@ -96,16 +96,17 @@ public class MdPropertyGridThemeTests
     [AvaloniaFact]
     public void Registering_The_Grid_Theme_Does_Not_Replace_Native_Control_Themes()
     {
-        // Button and ItemsControl are left out: Md3.Avalonia.Dock already installs an implicit
+        // Button, ItemsControl and MenuItem are left out: Md3.Avalonia.Dock installs an implicit
         // Button theme for its own chrome, and the exact contract for that one is pinned by
-        // MdDockThemeTests. Nothing else in this test application themes a native control.
+        // MdDockThemeTests; the core's MdDesktopAdapters themes MenuItem for desktop menu chrome.
+        // Nothing else in this test application themes a native control.
         var variant = Application.Current!.ActualThemeVariant;
         foreach (var native in new[]
                  {
                      typeof(TextBox), typeof(ComboBox), typeof(ComboBoxItem), typeof(CheckBox),
                      typeof(RadioButton), typeof(ToggleButton), typeof(Expander), typeof(Slider),
                      typeof(ProgressBar), typeof(NumericUpDown), typeof(DatePicker), typeof(TimePicker),
-                     typeof(GridSplitter), typeof(ScrollViewer), typeof(ContextMenu), typeof(MenuItem),
+                     typeof(GridSplitter), typeof(ScrollViewer), typeof(ContextMenu),
                      typeof(ToolTip)
                  })
         {

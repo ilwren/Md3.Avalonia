@@ -105,7 +105,7 @@ jobs:
     # test project - with the headless suite on top. It measured 6m35s at fourteen packages and
     # crossed 8m when the fifteenth landed, so the margin here is a deadlock guard, not a
     # performance budget: a hung test still costs a quarter of an hour instead of a runner-day.
-    timeout-minutes: 15
+    timeout-minutes: 25
 
     steps:
       - name: Checkout repository
@@ -292,9 +292,10 @@ jobs:
         run: scripts/probe-tests.sh MdFloatingWindowTests floating-window.trx
 
       # Bounded, because an unbounded stall costs the job's whole timeout and takes the run's
-      # annotations with it: the suite measures about four and a half minutes, so ten is a wall it
-      # only reaches by hanging, and a hang reported as a failed step still lets every step after
-      # this one publish what it found.
+      # annotations with it. The suite measured about four and a half minutes before main's tests
+      # were merged in and then ran past ten, so fifteen is the wall now: high enough that ordinary
+      # growth does not trip it, still low enough that a hang is reported as a failed step and every
+      # step after this one can publish what it found.
       - name: Run headless tests
         id: tests
         env:
@@ -302,13 +303,13 @@ jobs:
           # produced only on main, where the artefact is actually published.
           MD3_WRITE_PREVIEWS: ${{ github.ref == 'refs/heads/main' && '1' || '0' }}
         run: |
-          if ! timeout --signal=KILL 600 dotnet test \
+          if ! timeout --signal=KILL 900 dotnet test \
             tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
             -c Release --no-build --no-restore \
             --filter "FullyQualifiedName!~MdNodifyMThemeTests" \
             --logger "trx;LogFileName=results.trx" \
             --logger "console;verbosity=normal"; then
-            echo "::error::The headless suite did not finish inside ten minutes"
+            echo "::error::The headless suite did not finish inside fifteen minutes"
             exit 1
           fi
 
