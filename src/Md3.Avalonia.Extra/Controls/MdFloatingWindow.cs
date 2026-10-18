@@ -295,6 +295,8 @@ public sealed class MdFloatingWindow : ContentControl
 
     private void UpdateMinimizedState()
     {
+        PseudoClasses.Set(":minimized", IsMinimized);
+
         // Before the first measure there is no size to travel from, so the state is applied as it
         // stands; animating from zero would drive the window past its own title bar.
         if (_contentHost is not { } host || Bounds.Height <= 0)
