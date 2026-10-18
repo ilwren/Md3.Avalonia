@@ -1,7 +1,8 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:md="using:Md3.Avalonia.Controls"
-        xmlns:inking="using:DotNetCampus.Inking">
+        xmlns:inking="using:DotNetCampus.Inking"
+        x:Class="Md3.Avalonia.Themes.MaterialInkCanvasTheme">
   <!-- InkCanvas draws itself with Skia and registers no styles, so the part of this package that
        reaches a bare canvas is the entry point in MaterialInkCanvasTheme.axaml.cs. What is here is
        the signature pad built on top of it. The placeholder is hidden by default and shown by the

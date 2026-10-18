@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
@@ -38,11 +39,35 @@ public sealed class MaterialInkCanvasTheme : Styles
     /// <summary>Styles a bare canvas for one variant, for a host that manages the switch itself.</summary>
     public static void Apply(InkCanvas canvas, bool dark)
     {
+        var variant = dark ? ThemeVariant.Dark : ThemeVariant.Light;
         var settings = canvas.AvaloniaSkiaInkCanvas.Settings;
-        settings.InkColor = canvas.TryFindResource("Md.Sys.Color.OnSurface.Color",
-                dark ? ThemeVariant.Dark : ThemeVariant.Light, out var ink) && ink is Color color
-            ? new SKColor(color.R, color.G, color.B, color.A)
-            : SKColors.Black;
+        settings.InkColor = FromControl(canvas, variant) ?? FromApplication(variant) ?? SKColors.Black;
         settings.InkThickness = (float)DefaultInkThickness;
     }
+
+    /// <summary>
+    /// Reads the token from the canvas's own resource host first, which is the right answer for a
+    /// canvas inside a window that carries the theme, then from the application. The second step is
+    /// not a nicety: a control that is never attached resolves nothing at all, which is exactly the
+    /// off-screen canvas this entry point exists for, and without the fallback it would silently
+    /// draw black instead of the theme's ink.
+    /// </summary>
+    /// <remarks>
+    /// The key is <c>Md.Sys.Color.OnSurface</c>, which is the <c>Color</c>; the matching brush is
+    /// <c>Md.Sys.Color.OnSurface.Brush</c>. There is no <c>.Color</c> suffix, and asking for one
+    /// resolves to nothing.
+    /// </remarks>
+    private static SKColor? FromControl(InkCanvas canvas, ThemeVariant variant) =>
+        canvas.TryFindResource(OnSurfaceKey, variant, out var value) && value is Color color
+            ? ToSk(color)
+            : null;
+
+    private static SKColor? FromApplication(ThemeVariant variant) =>
+        Application.Current is { } app && app.TryGetResource(OnSurfaceKey, variant, out var value) && value is Color color
+            ? ToSk(color)
+            : null;
+
+    private const string OnSurfaceKey = "Md.Sys.Color.OnSurface";
+
+    private static SKColor ToSk(Color color) => new(color.R, color.G, color.B, color.A);
 }
