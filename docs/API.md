@@ -31,10 +31,18 @@ DocFX 文档站为 `src/` 下全部 18 个可打包项目生成 API 页面。可
 
 ## Source of truth / 单一文档来源
 
-Public API summaries, contracts, parameter descriptions, and examples are maintained in the C# XML comments beside their declarations. The projects emit XML documentation files, and DocFX uses those files to build the reference. The generated `MdSymbols` and `MdSymbolsLite` glyph catalogs are intentionally excluded so thousands of constants do not overwhelm API navigation and search.
+Public API summaries, contracts, parameter descriptions, and symbol-level examples are maintained in C# XML comments beside their declarations. DocFX builds the generated reference from the 18 projects' public APIs and XML documentation files. Task-oriented walkthroughs and screen-sized examples live in the guides below; the generated `MdSymbols` and `MdSymbolsLite` glyph catalogs are intentionally excluded so thousands of constants do not overwhelm API navigation and search.
 
-公共 API 摘要、契约、参数说明与示例统一维护在对应 C# 声明旁的 XML 注释中。各项目生成 XML 文档文件，DocFX 以这些文件构建 API 参考。生成的 `MdSymbols` 与 `MdSymbolsLite` 图标目录已排除，以免数千个常量淹没 API 导航与搜索。
+公共 API 摘要、契约、参数说明与符号级示例统一维护在对应 C# 声明旁的 XML 注释中。DocFX 根据 18 个项目的公共 API 与 XML 文档文件生成参考页面。任务型说明和完整页面示例放在下方指南中；生成的 `MdSymbols` 与 `MdSymbolsLite` 图标目录已排除，以免数千个常量淹没 API 导航与搜索。
 
-For task-oriented usage, see the [dialog service guide](DIALOG_SERVICE.md). Run `python3 scripts/check-api-doc-coverage.py` from the repository root to verify the DocFX project set, XML output, XML comment validity, and bilingual public-interface summaries.
+## Guides / 使用指南
 
-任务型用法请参阅[对话框服务指南](DIALOG_SERVICE.md)。在仓库根目录运行 `python3 scripts/check-api-doc-coverage.py`，可检查 DocFX 项目集合、XML 输出、注释格式及公共接口的双语摘要。
+- [Quick start / 快速上手](GETTING_STARTED.md) — install the core package, register `MaterialTheme`, and add a first screen. / 安装核心包、注册 `MaterialTheme` 并创建首个页面。
+- [Usage examples / 使用示例](USAGE_EXAMPLES.md) — form binding, icons, dynamic color, waterfall layout, and dialogs, with screenshots. / 表单绑定、图标、动态配色、瀑布流与对话框示例，并配有图片。
+- [NuGet packages / NuGet 包](NUGET_PACKAGES.md) — all 18 package IDs, target frameworks, and theme entry points. / 全部 18 个包、目标框架与主题入口。
+- [Project structure / 项目结构](PROJECT_STRUCTURE.md) — repository map and API-documentation build flow. / 仓库目录与 API 文档生成流程。
+- [Compatibility / 兼容性](COMPATIBILITY.md) and the [dialog service guide / 对话框服务指南](DIALOG_SERVICE.md).
+
+Run `python3 scripts/check-api-doc-coverage.py` from the repository root to verify the DocFX project set, XML output, XML comment validity, and bilingual public-interface summaries.
+
+在仓库根目录运行 `python3 scripts/check-api-doc-coverage.py`，可检查 DocFX 项目集合、XML 输出、注释格式及公共接口的双语摘要。

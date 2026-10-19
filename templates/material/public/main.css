@@ -672,6 +672,17 @@ article :not(pre) > code {
   font-size: 0.9em;
 }
 
+article img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1.25rem 0 1.5rem;
+  border: 1px solid var(--md3-outline-variant);
+  border-radius: var(--md3-shape-md);
+  background: var(--md3-surface-lowest);
+  box-shadow: var(--md3-elevation-1);
+}
+
 article pre {
   margin: 1rem 0 1.5rem;
   padding: 1rem 1.15rem;

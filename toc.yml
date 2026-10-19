@@ -1,8 +1,18 @@
-- name: Home
+- name: Home / 首页
   href: index.md
+- name: Quick start / 快速上手
+  href: docs/GETTING_STARTED.md
+- name: Usage examples / 使用示例
+  href: docs/USAGE_EXAMPLES.md
+- name: NuGet packages / NuGet 包
+  href: docs/NUGET_PACKAGES.md
+- name: Project structure / 项目结构
+  href: docs/PROJECT_STRUCTURE.md
 - name: API Reference / API 参考
   href: api/
 - name: API overview / API 概览
   href: docs/API.md
 - name: Dialog service guide / 对话框服务指南
   href: docs/DIALOG_SERVICE.md
+- name: Compatibility / 兼容性
+  href: docs/COMPATIBILITY.md

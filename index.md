@@ -8,8 +8,8 @@
     </p>
     <div class="md3-hero-actions">
       <a class="md3-button md3-button-filled" href="api/">Browse API reference</a>
-      <a class="md3-button md3-button-tonal" href="docs/API.html">API overview · API 概览</a>
-      <a class="md3-button md3-button-outlined" href="docs/DIALOG_SERVICE.html">Dialog guide · 对话框指南</a>
+      <a class="md3-button md3-button-tonal" href="docs/GETTING_STARTED.html">Quick start · 快速上手</a>
+      <a class="md3-button md3-button-outlined" href="docs/USAGE_EXAMPLES.html">Examples · 使用示例</a>
     </div>
   </div>
   <div class="md3-hero-art" aria-hidden="true">
@@ -19,24 +19,36 @@
 </section>
 
 <div class="md3-resource-grid" aria-label="Documentation resources">
-  <a class="md3-resource-card" href="api/">
-    <span class="md3-resource-icon" aria-hidden="true">API</span>
-    <h2>Generated API reference</h2>
-    <p>Browse 18 NuGet projects, namespaces, types, and members. Reference pages are generated from C# XML comments, with Chinese and English documentation.</p>
-    <span class="md3-resource-link">Explore the API · 浏览 API →</span>
+  <a class="md3-resource-card" href="docs/GETTING_STARTED.html">
+    <span class="md3-resource-icon" aria-hidden="true">START</span>
+    <h2>Quick start · 快速上手</h2>
+    <p>Install the core package, register the Material theme, and build your first screen. <span lang="zh-Hans">安装核心包、注册 Material 主题并创建首个页面。</span></p>
+    <span class="md3-resource-link">Start here · 从这里开始 →</span>
+  </a>
+  <a class="md3-resource-card" href="docs/USAGE_EXAMPLES.html">
+    <span class="md3-resource-icon" aria-hidden="true">EX</span>
+    <h2>Usage examples · 使用示例</h2>
+    <p>Explore binding, icons, dynamic color, dialogs, and Extra layouts with code and images. <span lang="zh-Hans">通过代码与配图了解绑定、图标、动态配色、对话框和 Extra 布局。</span></p>
+    <span class="md3-resource-link">Browse examples · 浏览示例 →</span>
+  </a>
+  <a class="md3-resource-card" href="docs/NUGET_PACKAGES.html">
+    <span class="md3-resource-icon" aria-hidden="true">18</span>
+    <h2>NuGet packages · NuGet 包</h2>
+    <p>Compare all 18 packages, target frameworks, and opt-in theme entry points. <span lang="zh-Hans">查看全部 18 个包、目标框架与可选主题入口。</span></p>
+    <span class="md3-resource-link">Choose packages · 选择包 →</span>
+  </a>
+  <a class="md3-resource-card" href="docs/PROJECT_STRUCTURE.html">
+    <span class="md3-resource-icon" aria-hidden="true">MAP</span>
+    <h2>Project structure · 项目结构</h2>
+    <p>Find source projects, gallery samples, tests, and the DocFX build pipeline. <span lang="zh-Hans">了解源码项目、Gallery 示例、测试与 DocFX 构建流程。</span></p>
+    <span class="md3-resource-link">Explore the repository · 探索仓库 →</span>
   </a>
   <a class="md3-resource-card" href="docs/API.html">
-    <span class="md3-resource-icon" aria-hidden="true">MD3</span>
+    <span class="md3-resource-icon" aria-hidden="true">API</span>
     <h2>API overview · API 概览</h2>
-    <p>Start with the public packages, key controls, and core concepts before diving into individual reference pages. <span lang="zh-Hans">先了解公开包、核心控件与基本概念，再深入查看各 API 参考页面。</span></p>
+    <p>See how the bilingual reference is generated from C# XML documentation. <span lang="zh-Hans">了解双语 API 参考如何从 C# XML 文档生成。</span></p>
     <span class="md3-resource-link">Read the overview · 阅读概览 →</span>
-  </a>
-  <a class="md3-resource-card" href="docs/DIALOG_SERVICE.html">
-    <span class="md3-resource-icon" aria-hidden="true">UI</span>
-    <h2>Dialog service guide · 对话框指南</h2>
-    <p>Learn how to use the dialog service and coordinate popup ownership in an Avalonia application.</p>
-    <span class="md3-resource-link">Open the guide · 查看指南 →</span>
   </a>
 </div>
 
-<p class="md3-page-note">Use the API Reference navigation or search to find other packages, namespaces, types, and members. · 使用 API 参考导航或搜索查找其他包、命名空间、类型与成员。</p>
+<p class="md3-page-note">Use the API Reference navigation or search to find packages, namespaces, types, and members. For dialogs, see the <a href="docs/DIALOG_SERVICE.html">dialog service guide · 对话框服务指南</a>. · 使用 API 参考导航或搜索查找包、命名空间、类型与成员；对话框请参阅对话框服务指南。</p>

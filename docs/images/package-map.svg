@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Md3.Avalonia NuGet package groups</title>
+  <desc id="desc">Core package, general add-ons, icon alternatives, eleven opt-in ecosystem themes, and standalone notifications.</desc>
+  <defs>
+    <style>
+      text { font-family: Inter, 'Segoe UI', Arial, 'Microsoft YaHei', sans-serif; fill: #251d2b; }
+      .title { font-size: 30px; font-weight: 700; }
+      .subtitle { font-size: 16px; fill: #625a67; }
+      .label { font-size: 19px; font-weight: 700; }
+      .body { font-size: 15px; }
+      .small { font-size: 13px; fill: #625a67; }
+      .inverse { fill: #fff; }
+      .card { stroke: #d7cbdc; stroke-width: 1.5; }
+    </style>
+  </defs>
+  <rect width="1200" height="720" rx="28" fill="#fbf8fc" />
+  <text x="48" y="58" class="title">Package map · NuGet 包关系</text>
+  <text x="48" y="88" class="subtitle">Install the core, then opt into only the capabilities your app uses. / 安装核心包，再按应用需要选择扩展。</text>
+
+  <rect x="48" y="116" width="1104" height="112" rx="22" fill="#eaddff" class="card" />
+  <text x="76" y="153" class="label">Core / 核心</text>
+  <text x="76" y="184" class="body" font-weight="700">Md3.Avalonia</text>
+  <text x="256" y="184" class="body">Controls · MaterialTheme · tokens · motion</text>
+  <text x="256" y="207" class="small">控件 · Material 主题 · 令牌 · 动效</text>
+
+  <path d="M600 228v28M196 256h808M196 256v20M462 256v20M738 256v20M1004 256v20" fill="none" stroke="#77658a" stroke-width="2" />
+
+  <rect x="48" y="276" width="294" height="194" rx="20" fill="#f2ecf7" class="card" />
+  <text x="72" y="312" class="label">General add-ons / 通用扩展</text>
+  <text x="72" y="350" class="body">Md3.Avalonia.Extra</text>
+  <text x="72" y="378" class="body">Md3.Avalonia.DataGrid</text>
+  <text x="72" y="406" class="body">Md3.Avalonia.RichEditor</text>
+  <text x="72" y="444" class="small">Optional controls and integrations / 可选控件与集成</text>
+
+  <rect x="358" y="276" width="210" height="194" rx="20" fill="#e8f3ef" class="card" />
+  <text x="382" y="312" class="label">Choose one / 二选一</text>
+  <text x="382" y="350" class="body">Md3.Avalonia.Icons</text>
+  <text x="382" y="378" class="small">Full catalog / 完整目录</text>
+  <path d="M382 394h158" stroke="#b6cec4" />
+  <text x="382" y="422" class="body">Md3.Avalonia.Icons.Lite</text>
+  <text x="382" y="448" class="small">Reduced subset / 精简子集</text>
+
+  <rect x="584" y="276" width="408" height="194" rx="20" fill="#fce8ef" class="card" />
+  <text x="608" y="312" class="label">11 ecosystem themes / 11 个生态主题</text>
+  <text x="608" y="350" class="body">AvaloniaEdit · AvaloniaHex · Dock · Tabalonia</text>
+  <text x="608" y="380" class="body">Markdown · LiveCharts2 · ScottPlot</text>
+  <text x="608" y="410" class="body">PropertyGrid · NodifyM · Mapsui · InkCanvas</text>
+  <text x="608" y="446" class="small">Opt-in; each adds its own upstream dependency / 显式接入；各自引入对应上游依赖</text>
+
+  <rect x="1008" y="276" width="144" height="194" rx="20" fill="#e4eff8" class="card" />
+  <text x="1030" y="312" class="label">Standalone</text>
+  <text x="1030" y="342" class="small">独立服务</text>
+  <text x="1030" y="386" class="body">Notifications</text>
+  <text x="1030" y="414" class="small">Native OS</text>
+  <text x="1030" y="438" class="small">system APIs</text>
+
+  <path d="M600 470v28" fill="none" stroke="#77658a" stroke-width="2" />
+  <rect x="48" y="510" width="1104" height="150" rx="22" fill="#f1edf4" class="card" />
+  <text x="76" y="548" class="label">One API documentation source / 单一 API 文档来源</text>
+  <rect x="76" y="572" width="292" height="58" rx="15" fill="#fff" stroke="#d7cbdc" />
+  <text x="96" y="607" class="body" font-weight="700">C# XML comments / XML 注释</text>
+  <path d="M385 601h98m-12-9 12 9-12 9" fill="none" stroke="#6750a4" stroke-width="3" />
+  <rect x="500" y="572" width="262" height="58" rx="15" fill="#fff" stroke="#d7cbdc" />
+  <text x="523" y="607" class="body" font-weight="700">DocFX metadata</text>
+  <path d="M779 601h98m-12-9 12 9-12 9" fill="none" stroke="#6750a4" stroke-width="3" />
+  <rect x="894" y="572" width="230" height="58" rx="15" fill="#6750a4" />
+  <text x="914" y="596" class="body inverse" font-weight="700">Searchable API site</text>
+  <text x="921" y="619" class="small inverse">可搜索 API 文档站</text>
+</svg>

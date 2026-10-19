@@ -237,6 +237,10 @@ bash scripts/publish-gallery-aot.sh --rid linux-x64 --smoke   # 或 win-x64 / os
 |---|---|
 | [`CHANGELOG.md`](CHANGELOG.md) | 版本变更记录 |
 | [在线 DocFX API 参考](https://ilwren.github.io/Md3.Avalonia/) · [`docs/API.md`](docs/API.md) | XML 注释生成的公共 API 页面与包入口 |
+| [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) | 快速上手、主题注册与首个页面 |
+| [`docs/USAGE_EXAMPLES.md`](docs/USAGE_EXAMPLES.md) | 表单、图标、动态配色、瀑布流与对话框示例（含配图） |
+| [`docs/NUGET_PACKAGES.md`](docs/NUGET_PACKAGES.md) | 18 个 NuGet 包、目标框架与主题入口 |
+| [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md) | 仓库目录、项目职责与 API 文档构建流程 |
 | [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) | 目标框架、平台与依赖兼容策略 |
 | [`docs/RELEASE_NOTES_0.5.0-preview.1.md`](docs/RELEASE_NOTES_0.5.0-preview.1.md) | 本版变更说明 |
 | [`docs/RELEASE_VALIDATION.md`](docs/RELEASE_VALIDATION.md) | 人工验收清单与签署状态 |

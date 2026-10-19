@@ -37,7 +37,15 @@
         "files": ["index.md", "toc.yml"]
       },
       {
-        "files": ["API.md", "DIALOG_SERVICE.md"],
+        "files": [
+          "API.md",
+          "DIALOG_SERVICE.md",
+          "GETTING_STARTED.md",
+          "NUGET_PACKAGES.md",
+          "PROJECT_STRUCTURE.md",
+          "USAGE_EXAMPLES.md",
+          "COMPATIBILITY.md"
+        ],
         "src": "docs",
         "dest": "docs"
       },
@@ -50,6 +58,15 @@
     "resource": [
       {
         "files": ["logo.png"]
+      },
+      {
+        "files": [
+          "docs/MdActionButtonsPreview.png",
+          "docs/MdNewComponentsPreview.png",
+          "docs/images/*.svg"
+        ],
+        "src": ".",
+        "dest": "."
       }
     ],
     "globalMetadata": {
