@@ -1,24 +1,28 @@
 - name: Home
   href: index.md
+- name: 简体中文
+  href: index.zh-CN.md
 - name: Guides
   items:
-    - name: Quick start / 快速上手
+    - name: Quick start
       href: docs/GETTING_STARTED.md
-    - name: Usage examples / 使用示例
+    - name: Usage examples
       href: docs/USAGE_EXAMPLES.md
 - name: API
   href: api/
 - name: Docs
   items:
-    - name: API overview / API 概览
+    - name: API overview
       href: docs/API.md
-    - name: Dialog service / 对话框服务
+    - name: Dialog service
       href: docs/DIALOG_SERVICE.md
-    - name: NuGet packages / NuGet 包
+    - name: NuGet packages
       href: docs/NUGET_PACKAGES.md
-    - name: Project structure / 项目结构
+    - name: Project structure
       href: docs/PROJECT_STRUCTURE.md
-    - name: Compatibility / 兼容性
+    - name: Compatibility
       href: docs/COMPATIBILITY.md
-    - name: AI disclosure / AI 内容说明
+    - name: Flutter parity boundaries
+      href: docs/FLUTTER_PARITY_STATUS.md
+    - name: AI disclosure
       href: docs/AI_DISCLOSURE.md

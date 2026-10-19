@@ -34,18 +34,28 @@
   "build": {
     "content": [
       {
-        "files": ["index.md", "toc.yml"]
+        "files": ["index.md", "index.zh-CN.md", "toc.yml"]
       },
       {
         "files": [
           "API.md",
+          "API.zh-CN.md",
           "AI_DISCLOSURE.md",
+          "AI_DISCLOSURE.zh-CN.md",
           "DIALOG_SERVICE.md",
+          "DIALOG_SERVICE.zh-CN.md",
           "GETTING_STARTED.md",
+          "GETTING_STARTED.zh-CN.md",
           "NUGET_PACKAGES.md",
+          "NUGET_PACKAGES.zh-CN.md",
           "PROJECT_STRUCTURE.md",
+          "PROJECT_STRUCTURE.zh-CN.md",
           "USAGE_EXAMPLES.md",
-          "COMPATIBILITY.md"
+          "USAGE_EXAMPLES.zh-CN.md",
+          "COMPATIBILITY.md",
+          "COMPATIBILITY.zh-CN.md",
+          "FLUTTER_PARITY_STATUS.md",
+          "FLUTTER_PARITY_STATUS.zh-CN.md"
         ],
         "src": "docs",
         "dest": "docs"
