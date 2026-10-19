@@ -1,43 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430" role="img" aria-labelledby="title desc">
-  <title id="title">Waterfall layout placement</title>
-  <desc id="desc">Cards with different heights are placed in order into the currently shortest of three columns.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 360" role="img" aria-labelledby="title desc">
+  <title id="title">Waterfall layout</title>
+  <desc id="desc">Items are placed in order into the currently shortest column.</desc>
   <defs>
     <style>
       text { font-family: Inter, 'Segoe UI', Arial, 'Microsoft YaHei', sans-serif; fill: #251d2b; }
       .title { font-size: 26px; font-weight: 700; }
-      .label { font-size: 16px; font-weight: 600; }
-      .small { font-size: 13px; fill: #625a67; }
+      .note { font-size: 15px; fill: #625a67; }
+      .item { font-size: 20px; font-weight: 700; text-anchor: middle; }
     </style>
   </defs>
-  <rect width="1000" height="430" rx="26" fill="#fbf8fc" />
-  <text x="38" y="50" class="title">Shortest-column placement · 最短列优先布局</text>
-  <text x="38" y="78" class="small">Items keep their input order; each next item goes to the column with the least height. / 保持输入顺序，每个新项放入当前高度最小的列。</text>
+  <rect width="1000" height="360" rx="26" fill="#fbf8fc" />
+  <text x="38" y="48" class="title">Waterfall layout</text>
+  <text x="38" y="75" class="note">Each item goes to the currently shortest column.</text>
 
-  <rect x="110" y="112" width="220" height="270" rx="18" fill="#f2ecf7" stroke="#d7cbdc" />
-  <rect x="390" y="112" width="220" height="270" rx="18" fill="#e8f3ef" stroke="#c5d8ce" />
-  <rect x="670" y="112" width="220" height="270" rx="18" fill="#fce8ef" stroke="#e6c9d2" />
-  <text x="202" y="405" class="label">Column 1 / 第 1 列</text>
-  <text x="482" y="405" class="label">Column 2 / 第 2 列</text>
-  <text x="762" y="405" class="label">Column 3 / 第 3 列</text>
+  <rect x="110" y="98" width="220" height="222" rx="18" fill="#f2ecf7" stroke="#d7cbdc" />
+  <rect x="390" y="98" width="220" height="222" rx="18" fill="#e8f3ef" stroke="#c5d8ce" />
+  <rect x="670" y="98" width="220" height="222" rx="18" fill="#fce8ef" stroke="#e6c9d2" />
 
-  <rect x="132" y="134" width="176" height="92" rx="16" fill="#eaddff" />
-  <text x="151" y="166" class="label">Item 1</text>
-  <text x="151" y="190" class="small">Placed first / 首先放入</text>
-  <rect x="412" y="134" width="176" height="132" rx="16" fill="#cce8dc" />
-  <text x="431" y="166" class="label">Item 2</text>
-  <text x="431" y="190" class="small">Placed next / 接着放入</text>
-  <rect x="692" y="134" width="176" height="76" rx="16" fill="#f5cfe0" />
-  <text x="711" y="166" class="label">Item 3</text>
-  <text x="711" y="190" class="small">Placed third / 第三项</text>
+  <rect x="132" y="118" width="176" height="70" rx="16" fill="#eaddff" />
+  <text x="220" y="161" class="item">1</text>
+  <rect x="132" y="198" width="176" height="92" rx="16" fill="#d9c7f4" />
+  <text x="220" y="253" class="item">5</text>
 
-  <rect x="132" y="240" width="176" height="118" rx="16" fill="#d9c7f4" />
-  <text x="151" y="274" class="label">Item 4</text>
-  <text x="151" y="298" class="small">Column 1 was shortest</text>
-  <text x="151" y="319" class="small">第 1 列此时最短</text>
-  <rect x="412" y="280" width="176" height="78" rx="16" fill="#b9d8cb" />
-  <text x="431" y="314" class="label">Item 5</text>
-  <text x="431" y="338" class="small">Column 2 was shortest</text>
-  <rect x="692" y="224" width="176" height="134" rx="16" fill="#edbfd2" />
-  <text x="711" y="258" class="label">Item 6</text>
-  <text x="711" y="282" class="small">Column 3 was shortest</text>
+  <rect x="412" y="118" width="176" height="108" rx="16" fill="#cce8dc" />
+  <text x="500" y="180" class="item">2</text>
+  <rect x="412" y="236" width="176" height="70" rx="16" fill="#b9d8cb" />
+  <text x="500" y="279" class="item">6</text>
+
+  <rect x="692" y="118" width="176" height="56" rx="16" fill="#f5cfe0" />
+  <text x="780" y="153" class="item">3</text>
+  <rect x="692" y="184" width="176" height="106" rx="16" fill="#edbfd2" />
+  <text x="780" y="245" class="item">4</text>
 </svg>

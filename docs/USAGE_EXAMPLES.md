@@ -106,7 +106,7 @@ Use `xmlns:eco="using:Md3.Avalonia.Extra.Controls"` and `xmlns:md="using:Md3.Ava
 
 使用 `xmlns:eco="using:Md3.Avalonia.Extra.Controls"` 和 `xmlns:md="using:Md3.Avalonia.Controls"`。`MdWaterfall` 也支持 `ItemsSource` 绑定集合。可选包详情请见 [NuGet 包指南](NUGET_PACKAGES.md)。
 
-![Illustration of items placed into the currently shortest waterfall column. / 子项依次放入当前最短瀑布流列的示意图。](images/waterfall-layout.svg)
+![Waterfall items placed into the shortest columns. / 瀑布流项目依次放入最短列的示意图。](images/waterfall-layout.svg)
 
 ## 5. ViewModel-driven dialogs / 由 ViewModel 驱动的对话框
 

@@ -4,7 +4,7 @@ This page explains where the library, optional packages, examples, tests, and ge
 
 本页介绍控件库、可选包、示例、测试与生成文档所在的位置。应用通常通过 NuGet 引用；了解仓库结构有助于阅读源码或参与开发。
 
-![Diagram of the repository's NuGet package groups. / 仓库 NuGet 包分组示意图。](images/package-map.svg)
+![NuGet package map. / NuGet 包关系图。](images/package-map.svg)
 
 ## Repository map / 仓库目录
 

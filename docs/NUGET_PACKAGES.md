@@ -39,7 +39,7 @@ The core package is the base for Avalonia controls and most opt-in theme package
 
 核心包提供 Avalonia 控件基础，也是多数可选主题包的基础。图标包是可选项；Notifications 包独立于 Avalonia UI。
 
-![Diagram of the Md3.Avalonia NuGet package groups and optional dependencies. / Md3.Avalonia NuGet 包分组与可选依赖关系图。](images/package-map.svg)
+![NuGet package map. / NuGet 包关系图。](images/package-map.svg)
 
 ## Core and general-purpose add-ons / 核心与通用扩展
 

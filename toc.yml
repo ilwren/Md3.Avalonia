@@ -1,20 +1,24 @@
-- name: Home / 首页
+- name: Home
   href: index.md
-- name: Quick start / 快速上手
-  href: docs/GETTING_STARTED.md
-- name: Usage examples / 使用示例
-  href: docs/USAGE_EXAMPLES.md
-- name: NuGet packages / NuGet 包
-  href: docs/NUGET_PACKAGES.md
-- name: Project structure / 项目结构
-  href: docs/PROJECT_STRUCTURE.md
-- name: API Reference / API 参考
+- name: Guides
+  items:
+    - name: Quick start / 快速上手
+      href: docs/GETTING_STARTED.md
+    - name: Usage examples / 使用示例
+      href: docs/USAGE_EXAMPLES.md
+- name: API
   href: api/
-- name: API overview / API 概览
-  href: docs/API.md
-- name: Dialog service guide / 对话框服务指南
-  href: docs/DIALOG_SERVICE.md
-- name: Compatibility / 兼容性
-  href: docs/COMPATIBILITY.md
-- name: AI disclosure / AI 内容说明
-  href: docs/AI_DISCLOSURE.md
+- name: Docs
+  items:
+    - name: API overview / API 概览
+      href: docs/API.md
+    - name: Dialog service / 对话框服务
+      href: docs/DIALOG_SERVICE.md
+    - name: NuGet packages / NuGet 包
+      href: docs/NUGET_PACKAGES.md
+    - name: Project structure / 项目结构
+      href: docs/PROJECT_STRUCTURE.md
+    - name: Compatibility / 兼容性
+      href: docs/COMPATIBILITY.md
+    - name: AI disclosure / AI 内容说明
+      href: docs/AI_DISCLOSURE.md
