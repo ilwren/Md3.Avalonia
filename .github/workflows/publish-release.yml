@@ -262,25 +262,16 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  publish:
-    name: Publish NuGet packages and create GitHub Release
+  release:
+    name: Create GitHub Release
     needs: [prepare, test, pack-nuget, gallery-desktop, gallery-android]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       contents: write
-      # Trusted publishing: this job exchanges the Actions OIDC token for a short-lived nuget.org
-      # API key, so no long-lived key is stored in the repository. Only this job gets the
-      # permission; the build and test jobs never talk to nuget.org.
-      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 10.0.x
 
       - name: Download all release artifacts
         uses: actions/download-artifact@v4
@@ -304,6 +295,64 @@ jobs:
           (cd release-bundle && sha256sum * > SHA256SUMS.txt)
           echo "Prepared release bundle for ${RELEASE_VERSION}:"
           ls -lh release-bundle
+
+      # The Release is created before anything talks to nuget.org, so a Trusted Publishing
+      # failure cannot leave a built release with nowhere to go. Every .nupkg and .snupkg is
+      # attached here, which makes a manual push possible without re-running any build.
+      - name: Create GitHub Release and upload assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+          RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
+          RELEASE_TYPE: ${{ needs.prepare.outputs.release_type }}
+        run: |
+          set -euo pipefail
+          # Re-run safe: a second run of this job must not fail on a tag that already exists,
+          # otherwise recovering from a later failure would need a manual release delete.
+          if gh release view "$RELEASE_TAG" --json tagName >/dev/null 2>&1; then
+            echo "Release ${RELEASE_TAG} already exists; uploading assets into it."
+            gh release upload "$RELEASE_TAG" release-bundle/* --clobber
+          else
+            release_args=(
+              "$RELEASE_TAG"
+              --title "Md3.Avalonia ${RELEASE_VERSION}"
+              --target "$GITHUB_SHA"
+              --generate-notes
+            )
+            if [[ "$RELEASE_TYPE" == "preview" ]]; then
+              release_args+=(--prerelease)
+            fi
+            gh release create "${release_args[@]}" release-bundle/*
+          fi
+
+  # Deliberately a separate job. If the push fails, the Release above already exists with the
+  # packages attached, and "Re-run failed jobs" retries only this job - the Release job is not
+  # dragged along and cannot collide with the tag it already created.
+  push-nuget:
+    name: Push packages to nuget.org
+    needs: [prepare, release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      # Trusted publishing: this job exchanges the Actions OIDC token for a short-lived nuget.org
+      # API key, so no long-lived key is stored in the repository. Only this job gets the
+      # permission; the build, test and Release jobs never talk to nuget.org.
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Download NuGet packages
+        uses: actions/download-artifact@v4
+        with:
+          name: release-nuget
+          path: release-artifacts/release-nuget
 
       - name: Publish packages to NuGet.org
         env:
@@ -335,20 +384,26 @@ jobs:
           fi
 
           # Trusted publishing: the Actions OIDC token is exchanged for an API key that nuget.org
-          # expires after about twenty minutes. That is why the exchange happens here and not at
-          # the top of the job - the test, pack and Gallery builds before this step take far
-          # longer than the key lives.
+          # expires after about an hour. That is why the exchange happens here and not at the top
+          # of the job - the test, pack and Gallery builds before this step can outlast the key.
           #
-          # The audience must be "nuget.org". nuget.org then matches the token's repository,
-          # repository_owner, job_workflow_ref and environment claims against the Trusted
-          # Publishing policy. The token endpoint also requires a User-Agent header.
-          oidc_response="$(curl -fsSL \
+          # The audience has to be the full origin "https://www.nuget.org", percent-encoded
+          # because curl passes the query string through untouched. nuget.org rejects any other
+          # value with "The JSON web token has an incorrect audience." It then matches the
+          # token's repository, repository_owner, job_workflow_ref and environment claims against
+          # the Trusted Publishing policy. The token endpoint also requires a User-Agent header.
+          if ! oidc_response="$(curl -fsSL \
             -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" \
-            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=nuget.org")"
-          if ! oidc_token="$(printf '%s' "${oidc_response}" | jq -er '.value' 2>/dev/null)"; then
-            echo "The Actions OIDC request returned no token. This job needs the id-token: write permission." >&2
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=https%3A%2F%2Fwww.nuget.org")"; then
+            echo "GitHub refused the OIDC token request. This job needs the id-token: write permission." >&2
             exit 1
           fi
+          if ! oidc_token="$(printf '%s' "${oidc_response}" | jq -er '.value' 2>/dev/null)"; then
+            echo "The Actions OIDC response carried no token." >&2
+            exit 1
+          fi
+          # Masked before it can reach a log line, the way the NuGet/login action does.
+          printf '::add-mask::%s\n' "${oidc_token}"
 
           token_response="$(curl -sS -X POST 'https://www.nuget.org/api/v2/token' \
             -H "Authorization: Bearer ${oidc_token}" \
@@ -365,29 +420,36 @@ jobs:
 
           # One key covers every package the policy's glob allows, so all packages go up with the
           # same short-lived key. Each .nupkg carries the .snupkg sitting beside it.
+          failed=0
           for package in "${packages[@]}"; do
             dotnet nuget push "${package}" \
               --source https://api.nuget.org/v3/index.json \
               --api-key "${api_key}" \
-              --skip-duplicate
+              --skip-duplicate || failed=$((failed + 1))
           done
+          if (( failed > 0 )); then
+            echo "${failed} of ${#packages[@]} packages failed to push." >&2
+            exit 1
+          fi
           echo "Pushed ${#packages[@]} packages to nuget.org."
 
-      - name: Create GitHub Release and upload assets
+      # The Release job already attached every .nupkg, so a failure here costs a re-run of this
+      # job only. Say where the packages are instead of leaving the reader to work it out.
+      - name: Report the fallback
+        if: failure()
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
           RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
-          RELEASE_TYPE: ${{ needs.prepare.outputs.release_type }}
         run: |
-          set -euo pipefail
-          release_args=(
-            "$RELEASE_TAG"
-            --title "Md3.Avalonia ${RELEASE_VERSION}"
-            --target "$GITHUB_SHA"
-            --generate-notes
-          )
-          if [[ "$RELEASE_TYPE" == "preview" ]]; then
-            release_args+=(--prerelease)
-          fi
-          gh release create "${release_args[@]}" release-bundle/*
+          {
+            echo "### nuget.org push failed"
+            echo ""
+            echo "The GitHub Release \`${RELEASE_TAG}\` was still created, and every \`.nupkg\` and"
+            echo "\`.snupkg\` is attached to it. Download them and push by hand:"
+            echo ""
+            echo '```bash'
+            echo "dotnet nuget push '*.nupkg' --source https://api.nuget.org/v3/index.json --api-key <your-key>"
+            echo '```'
+            echo ""
+            echo "Or re-run only this job once the cause is fixed - \`--skip-duplicate\` skips the"
+            echo "versions that already landed."
+          } >> "$GITHUB_STEP_SUMMARY"

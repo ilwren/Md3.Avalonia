@@ -19,7 +19,7 @@ https://github.com/user-attachments/assets/53c05bc6-f1b5-4076-8b62-c4a7a2b819bf
 - 核心包不依赖 `Avalonia.Themes.Fluent` 或 `Avalonia.Themes.Simple`
 - 桌面与 Android 双端，全部包声明 `IsTrimmable` 与 `IsAotCompatible`
 
-> **当前版本 `0.5.0-preview.1`（预览，尚未发布）。** 预览版 API 仍可能做兼容性调整，NuGet 安装示例需在该版本发布后才可用。屏幕阅读器与 Android 真机等人工验收状态见 [已知边界](#已知边界)。
+> **当前版本 `0.5.0-preview.1`。** 预览版 API 仍可能做兼容性调整，NuGet 安装示例需在该版本发布后才可用。屏幕阅读器与 Android 真机等人工验收状态见 [已知边界](#已知边界)。
 
 ## 目录
 
