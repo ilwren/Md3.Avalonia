@@ -218,12 +218,27 @@ body > header .navbar > .container-xxl {
   min-height: 64px;
 }
 
+body > header .navbar > .container-xxl {
+  min-width: 0;
+}
+
 .navbar-brand {
-  gap: 0.7rem;
+  display: block;
+  min-width: 0;
+  max-width: min(45vw, 20rem);
+  flex: 0 1 auto;
+  overflow: hidden;
   color: var(--md3-on-surface);
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body > header .navbar .navbar-collapse,
+body > header .navbar #navbar {
+  min-width: 0;
 }
 
 .navbar-brand:hover {
@@ -233,8 +248,10 @@ body > header .navbar > .container-xxl {
 .navbar-brand > img#logo {
   width: 2.35rem;
   height: 2.35rem;
+  margin-right: 0.7rem;
   border-radius: 12px;
   object-fit: cover;
+  vertical-align: middle;
   box-shadow: none;
 }
 
@@ -795,6 +812,11 @@ body > footer {
   border-color: var(--md3-outline-variant) !important;
 }
 
+body > footer .container-xxl {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 body > footer a {
   color: var(--md3-primary);
 }
@@ -1055,6 +1077,12 @@ body > footer a {
   .md3-hero-art {
     right: -3.5rem;
     opacity: 0.34;
+  }
+}
+
+@media (max-width: 767.98px) {
+  body > header .navbar .navbar-brand {
+    max-width: calc(100vw - 7.5rem);
   }
 }
 

@@ -5,7 +5,7 @@
 | Area / 范围 | Baseline / 基线 | Status / 状态 |
 |---|---|---|
 | .NET NuGet assets / .NET NuGet 资产 | `net8.0;net10.0` for six core/general-purpose packages; `net10.0` for eleven opt-in third-party theme packages. / 六个核心与通用包支持 `net8.0;net10.0`；11 个可选第三方主题包支持 `net10.0`。 | Platform-specific notification assets are listed below. The desktop Gallery and tests target .NET 10. / 通知包的平台专用资产见下文；桌面 Gallery 与测试以 .NET 10 为目标框架。 |
-| Avalonia | `12.1.2` | Build and headless-test baseline for Avalonia control packages. The floor is set by ecosystem packages, not by the core library. / Avalonia 控件包的构建与 headless 测试基线。最低版本由生态包而非核心库决定。 |
+| Avalonia | `12.1.2` | Build and headless-test baseline for Avalonia control packages. The minimum is set by third-party integration packages, not by the core library. / Avalonia 控件包的构建与 headless 测试基线。最低版本由第三方集成包而非核心库决定。 |
 | Windows | Avalonia 12-supported x64/ARM64 hosts / Avalonia 12 支持的 x64/ARM64 主机 | Library-compatible; device and assistive-technology sign-off remains external. / 库级兼容；设备与辅助技术验收仍需人工完成。 |
 | macOS | Avalonia 12-supported x64/Apple Silicon hosts / Avalonia 12 支持的 x64/Apple Silicon 主机 | Library-compatible; VoiceOver sign-off remains external. / 库级兼容；VoiceOver 验收仍需人工完成。 |
 | Linux | Avalonia 12-supported x64/ARM64 hosts / Avalonia 12 支持的 x64/ARM64 主机 | Headless Linux tested; Orca sign-off remains external. / 已进行 Linux headless 测试；Orca 验收仍需人工完成。 |

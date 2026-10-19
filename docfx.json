@@ -39,6 +39,7 @@
       {
         "files": [
           "API.md",
+          "AI_DISCLOSURE.md",
           "DIALOG_SERVICE.md",
           "GETTING_STARTED.md",
           "NUGET_PACKAGES.md",
@@ -76,7 +77,7 @@
       "_appFaviconPath": "logo.png",
       "_enableSearch": true,
       "_lang": "en",
-      "_appFooter": "<span>Generated from C# XML documentation and built with <a href=\"https://dotnet.github.io/docfx\">DocFX</a>.</span>"
+      "_appFooter": "<span>AI-generated or AI-assisted documentation may be inaccurate; verify before use / 文档可能由 AI 生成或辅助编写，使用前请核实。 <a href=\"https://ilwren.github.io/Md3.Avalonia/docs/AI_DISCLOSURE.html\">Full notice · 完整说明</a>. Built with <a href=\"https://dotnet.github.io/docfx\">DocFX</a>.</span>"
     },
     "postProcessors": ["ExtractSearchIndex"],
     "sitemap": {

@@ -48,7 +48,7 @@ Md3.Avalonia/
 | `src/Md3.Avalonia/Controls` | Public controls and contracts. / 公共控件与契约。 |
 | `src/Md3.Avalonia/Themes` | `MaterialTheme`, component styles, color/shape/type tokens, and dynamic-theme code. / `MaterialTheme`、控件样式、颜色/形状/字体令牌与动态主题代码。 |
 | `src/Md3.Avalonia/Motion` | Motion schemes, transitions, and animation helpers. / 动效方案、转场与动画辅助工具。 |
-| `src/Md3.Avalonia.<Package>/` | Independent opt-in package projects; vendor packages keep ecosystem dependencies out of the core package. / 独立的可选包项目；第三方主题包将生态依赖隔离在核心包之外。 |
+| `src/Md3.Avalonia.<Package>/` | Independent opt-in package projects; integration packages keep third-party dependencies out of the core package. / 独立的可选包项目；第三方集成包将上游依赖隔离在核心包之外。 |
 | `gallery/` | Runnable desktop and Android demonstrations; many code samples in this guide are taken from its pages. / 可运行的桌面与 Android 示例；本指南中的部分代码示例取自 Gallery 页面。 |
 | `tests/` | Headless regression tests for API behavior, rendering, themes, and interactions. / API 行为、渲染、主题与交互的 headless 回归测试。 |
 | `docs/` and `index.md` | Bilingual DocFX guides, navigation, and preview assets. / DocFX 双语指南、导航与预览图片。 |

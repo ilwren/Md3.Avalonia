@@ -52,3 +52,5 @@
 </div>
 
 <p class="md3-page-note">Use the API Reference navigation or search to find packages, namespaces, types, and members. For dialogs, see the <a href="docs/DIALOG_SERVICE.html">dialog service guide · 对话框服务指南</a>. · 使用 API 参考导航或搜索查找包、命名空间、类型与成员；对话框请参阅对话框服务指南。</p>
+
+<p class="md3-page-note"><strong>AI disclosure / AI 内容说明:</strong> This documentation may be AI-generated or AI-assisted; verify important details before use. Read the <a href="docs/AI_DISCLOSURE.html">full disclaimer / 完整免责声明</a>. · 本站文档可能由 AI 生成或辅助编写；使用前请核实重要信息，并阅读<a href="docs/AI_DISCLOSURE.html">完整免责声明</a>。</p>

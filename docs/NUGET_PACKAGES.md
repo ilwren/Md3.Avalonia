@@ -54,9 +54,9 @@ The core package is the base for Avalonia controls and most opt-in theme package
 
 ## Third-party theme packages / 第三方主题包
 
-These packages target `net10.0` in the current source. Each is opt-in and is the only Md3.Avalonia package that brings its corresponding ecosystem dependency; the core package does not acquire those dependencies.
+These packages target `net10.0` in the current source. Each is opt-in and is the only Md3.Avalonia package that brings its corresponding upstream component dependency; the core package does not acquire those dependencies.
 
-这些包在当前源码中以 `net10.0` 为目标框架。每个包均需显式添加，并且只有对应的 Md3.Avalonia 主题包会引入该生态依赖；核心包不会因此增加依赖。
+这些包在当前源码中以 `net10.0` 为目标框架。每个包均需显式添加；对应上游组件的依赖只由该主题适配包引入，核心包不会因此增加依赖。
 
 | Package / 包 | Theme entry point / 主题入口 | Integrates with / 适配组件 |
 |---|---|---|

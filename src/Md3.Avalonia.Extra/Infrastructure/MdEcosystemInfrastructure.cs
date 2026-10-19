@@ -10,7 +10,7 @@ public enum MdEcosystemDensity { Comfortable, Compact, Touch }
 public enum MdAsyncRequestState { Idle, Loading, Data, Empty, Error, Completed }
 public enum MdOverlayAlignment { Start, Center, End }
 
-/// <summary>Inherited density metadata for ecosystem controls without changing core Material identity.</summary>
+/// <summary>Inherited density metadata for Extra controls without changing core Material identity.</summary>
 public sealed class MdDensity : AvaloniaObject
 {
     public static readonly AttachedProperty<MdEcosystemDensity> ModeProperty = AvaloniaProperty.RegisterAttached<MdDensity, StyledElement, MdEcosystemDensity>(

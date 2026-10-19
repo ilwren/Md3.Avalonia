@@ -8,7 +8,7 @@
 - 353 个公共 API 类型，覆盖按钮、输入、导航、对话框、图表与动效，全部收录在 API 参考中并由脚本门禁校验
 - HCT 动态配色：任意 seed color，6 种 scheme、3 档对比度、49 个色彩角色
 - 内嵌官方 Material Symbols Rounded 字体，构建期校验 checksum 与 glyph 数量
-- 18 个可独立安装的 NuGet 包，第三方生态主题全部 opt-in
+- 18 个可独立安装的 NuGet 包，第三方集成主题包均按需引用
 - 每个控件使用独立 CLR 类型与 scoped `ControlTheme`，不覆盖 Avalonia 原生控件
 - 核心包不依赖 `Avalonia.Themes.Fluent` 或 `Avalonia.Themes.Simple`
 - 桌面与 Android 双端，全部包声明 `IsTrimmable` 与 `IsAotCompatible`
@@ -33,7 +33,7 @@
 
 | 项 | 要求 |
 |---|---|
-| Avalonia | `12.1.2`（基线由生态包的下限决定，见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)） |
+| Avalonia | `12.1.2`（最低版本由第三方集成包的依赖下限决定，见 [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)） |
 | 库目标框架 | 核心族 `net8.0;net10.0`；第三方主题包 `net10.0`（见 [NuGet 包](#nuget-包)） |
 | Gallery 与测试 | .NET 10 |
 | Android | 最低 API 23，宿主 `net10.0-android` |
@@ -237,6 +237,7 @@ bash scripts/publish-gallery-aot.sh --rid linux-x64 --smoke   # 或 win-x64 / os
 |---|---|
 | [`CHANGELOG.md`](CHANGELOG.md) | 版本变更记录 |
 | [在线 DocFX API 参考](https://ilwren.github.io/Md3.Avalonia/) · [`docs/API.md`](docs/API.md) | XML 注释生成的公共 API 页面与包入口 |
+| [`docs/AI_DISCLOSURE.md`](docs/AI_DISCLOSURE.md) | AI 生成/辅助内容说明与免责声明 |
 | [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) | 快速上手、主题注册与首个页面 |
 | [`docs/USAGE_EXAMPLES.md`](docs/USAGE_EXAMPLES.md) | 表单、图标、动态配色、瀑布流与对话框示例（含配图） |
 | [`docs/NUGET_PACKAGES.md`](docs/NUGET_PACKAGES.md) | 18 个 NuGet 包、目标框架与主题入口 |

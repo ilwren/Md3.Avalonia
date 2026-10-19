@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
   <title id="title">Md3.Avalonia NuGet package groups</title>
-  <desc id="desc">Core package, general add-ons, icon alternatives, eleven opt-in ecosystem themes, and standalone notifications.</desc>
+  <desc id="desc">Core package, general add-ons, icon alternatives, eleven opt-in third-party theme packages, and standalone notifications.</desc>
   <defs>
     <style>
       text { font-family: Inter, 'Segoe UI', Arial, 'Microsoft YaHei', sans-serif; fill: #251d2b; }
@@ -41,7 +41,7 @@
   <text x="382" y="448" class="small">Reduced subset / 精简子集</text>
 
   <rect x="584" y="276" width="408" height="194" rx="20" fill="#fce8ef" class="card" />
-  <text x="608" y="312" class="label">11 ecosystem themes / 11 个生态主题</text>
+  <text x="608" y="312" class="label">11 third-party themes / 11 个第三方主题包</text>
   <text x="608" y="350" class="body">AvaloniaEdit · AvaloniaHex · Dock · Tabalonia</text>
   <text x="608" y="380" class="body">Markdown · LiveCharts2 · ScottPlot</text>
   <text x="608" y="410" class="body">PropertyGrid · NodifyM · Mapsui · InkCanvas</text>
