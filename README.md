@@ -2,7 +2,12 @@
 
 面向 Avalonia 12 的 Material Design 3 控件库与组件 Gallery。
 
-![video](assets/video.mp4)
+
+
+https://github.com/user-attachments/assets/53c05bc6-f1b5-4076-8b62-c4a7a2b819bf
+
+
+
 [![CI](https://github.com/ilwren/Md3.Avalonia/actions/workflows/ci.yml/badge.svg)](https://github.com/ilwren/Md3.Avalonia/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
