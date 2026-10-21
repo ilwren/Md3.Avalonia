@@ -9,7 +9,7 @@ _lang: zh-CN
     <p class="md3-hero-label">Material Design 3 · Avalonia UI</p>
     <h1>Md3.Avalonia</h1>
     <p class="md3-hero-description">
-      使用面向 Avalonia 的 Material Design 3 控件与主题，构建富有表现力的桌面界面。
+      为弥补 Avalonia 移动端缺少成熟易用控件而设计，Md3.Avalonia 将统一的 Material Design 3 体验带到移动端与桌面端。
     </p>
     <div class="md3-hero-actions">
       <a class="md3-button md3-button-filled" href="api/">浏览 API 参考</a>

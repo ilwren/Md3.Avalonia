@@ -6,6 +6,11 @@
 
 <!-- Use Fixes #123 or Related to #123 when applicable. / 如适用，填写 Fixes #123 或 Related to #123。 -->
 
+## NuGet package inventory / NuGet 包清单
+
+This repository currently maintains 18 NuGet package projects. If this PR adds, removes, or renames a package, update the package docs and both issue-form package lists.
+当前仓库维护 18 个 NuGet 包项目。如果本 PR 新增、移除或重命名包，请同步更新包文档和两个 Issue 表单中的包选项。
+
 ## Change type / 变更类型
 
 - [ ] Bug fix / 缺陷修复
@@ -40,4 +45,5 @@
 - [ ] I reviewed the diff and kept the change focused. / 已检查 diff，变更范围明确。
 - [ ] Public API changes include XML documentation and API reference updates. / 公共 API 变更已补充 XML 注释和 API 文档。
 - [ ] User-facing behavior changes include relevant tests and documentation. / 面向用户的行为变更已补充相关测试与文档。
+- [ ] If package IDs or count changed, I updated the 18-package inventory and issue-form options. / 若包 ID 或数量有变化，已同步更新 18 包清单与 Issue 表单选项。
 - [ ] I did not include secrets, generated build output, or unrelated changes. / 未提交密钥、构建产物或无关变更。

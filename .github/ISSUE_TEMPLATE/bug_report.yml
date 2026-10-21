@@ -21,13 +21,26 @@ body:
     id: package
     attributes:
       label: Affected package or app / 涉及的包或应用
+      description: Select from the current 18 NuGet packages, or choose a Gallery app. / 可从当前 18 个 NuGet 包中选择，也可选择 Gallery 应用。
       options:
-        - Md3.Avalonia (core)
+        - Md3.Avalonia
         - Md3.Avalonia.Extra
         - Md3.Avalonia.Icons
         - Md3.Avalonia.Icons.Lite
         - Md3.Avalonia.DataGrid
         - Md3.Avalonia.RichEditor
+        - Md3.Avalonia.AvaloniaEdit
+        - Md3.Avalonia.AvaloniaHex
+        - Md3.Avalonia.Dock
+        - Md3.Avalonia.Tabalonia
+        - Md3.Avalonia.Markdown
+        - Md3.Avalonia.LiveCharts2
+        - Md3.Avalonia.ScottPlot
+        - Md3.Avalonia.PropertyGrid
+        - Md3.Avalonia.NodifyM
+        - Md3.Avalonia.Mapsui
+        - Md3.Avalonia.InkCanvas
+        - Md3.Avalonia.Notifications
         - Desktop Gallery
         - Android Gallery
         - Other / Unknown
@@ -39,7 +52,7 @@ body:
     attributes:
       label: Package version or commit / 包版本或提交
       description: Include the NuGet version or commit SHA if known. / 请填写 NuGet 版本或提交 SHA（如已知）。
-      placeholder: 0.4.1-preview.1
+      placeholder: 0.5.0-preview.1
     validations:
       required: false
 

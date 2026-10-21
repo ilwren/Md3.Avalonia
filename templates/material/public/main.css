@@ -731,6 +731,13 @@ article pre > .code-action {
   border-radius: var(--md3-shape-full);
 }
 
+/* Modern reveals code actions with `pre:hover > .code-action { display: block; }`.
+   Keep the grid display when that rule activates so the copy glyph stays centered. */
+article pre:hover > .code-action,
+article pre > .code-action:focus-visible {
+  display: inline-grid;
+}
+
 blockquote {
   margin: 1.25rem 0;
   padding: 0.8rem 1rem;

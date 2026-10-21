@@ -5,7 +5,7 @@
     <p class="md3-hero-label">Material Design 3 · Avalonia UI</p>
     <h1>Md3.Avalonia</h1>
     <p class="md3-hero-description">
-      Build expressive desktop interfaces with Material Design 3 controls and themes for Avalonia.
+      Designed to fill the gap in polished controls for Avalonia mobile apps, Md3.Avalonia brings a shared Material Design 3 experience to mobile and desktop.
     </p>
     <div class="md3-hero-actions">
       <a class="md3-button md3-button-filled" href="api/">Browse API reference</a>
