@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Md3.Avalonia.Localization;
@@ -15,6 +16,13 @@ namespace Md3.Avalonia.Controls;
 /// A cross-platform, lookless Material Design 3 text field. It preserves Avalonia's native
 /// TextBox editing, selection, IME and automation behavior while providing an independent theme.
 /// </summary>
+/// <remarks>
+/// Double-click word selection on text without space-separated words (CJK and other non-Latin
+/// scripts) is re-anchored to the Unicode word at the caret; the core word walk would otherwise
+/// expand to the whole run back to the start of the line, so a second click inside the
+/// double-click window turned a selection drag into a selection from the beginning of the field.
+/// See <see cref="MdWordSelectionGuard"/>.
+/// </remarks>
 [PseudoClasses(
     ":filled", ":outlined", ":md-error", ":has-label", ":no-label", ":has-leading-icon",
     ":has-trailing-icon", ":has-prefix", ":has-suffix", ":has-supporting-text",
@@ -93,6 +101,7 @@ public class MdTextBox : TextBox
     private Button? _clearButton;
     private ContentPresenter? _labelPresenter;
     private Grid? _inputRow;
+    private TextPresenter? _textPresenter;
     private bool _generatedAutomationName;
 
     static MdTextBox()
@@ -266,11 +275,33 @@ public class MdTextBox : TextBox
         _clearButton = e.NameScope.Find<Button>("PART_ClearButton");
         _labelPresenter = e.NameScope.Find<ContentPresenter>("PART_Label");
         _inputRow = e.NameScope.Find<Grid>("PART_InputRow");
+        _textPresenter = e.NameScope.Find<TextPresenter>("PART_TextPresenter");
         if (_clearButton is not null)
         {
             _clearButton.Click += OnClearButtonClick;
         }
         UpdateMotion();
+    }
+
+    // The core places the caret and anchors word selection from StringUtils word walks, which
+    // treat a CJK run as one word spanning back to the line start. Re-derive that range after
+    // the fact instead of overriding the core's pointer pipeline.
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    {
+        base.OnPointerPressed(e);
+        MdWordSelectionGuard.CorrectAfterPress(this, e, _textPresenter);
+    }
+
+    protected override void OnPointerMoved(PointerEventArgs e)
+    {
+        base.OnPointerMoved(e);
+        MdWordSelectionGuard.ExtendDuringMove(this, e, _textPresenter);
+    }
+
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    {
+        base.OnPointerReleased(e);
+        MdWordSelectionGuard.ClearOnRelease(this, e);
     }
 
     private void UpdateMotion()

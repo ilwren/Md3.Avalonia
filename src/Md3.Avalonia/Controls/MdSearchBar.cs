@@ -2,6 +2,7 @@ using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -25,6 +26,7 @@ public sealed class MdSearchBar : TextBox
         AvaloniaProperty.Register<MdSearchBar, object?>(nameof(SearchCommandParameter));
 
     private Button? _clearButton;
+    private TextPresenter? _textPresenter;
 
     static MdSearchBar()
     {
@@ -53,7 +55,27 @@ public sealed class MdSearchBar : TextBox
         if (_clearButton is not null) _clearButton.Click -= OnClearClicked;
         base.OnApplyTemplate(e);
         _clearButton = e.NameScope.Find<Button>("PART_ClearButton");
+        _textPresenter = e.NameScope.Find<TextPresenter>("PART_TextPresenter");
         if (_clearButton is not null) _clearButton.Click += OnClearClicked;
+    }
+
+    // Same CJK double-click re-anchoring as MdTextBox; see MdWordSelectionGuard.
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    {
+        base.OnPointerPressed(e);
+        MdWordSelectionGuard.CorrectAfterPress(this, e, _textPresenter);
+    }
+
+    protected override void OnPointerMoved(PointerEventArgs e)
+    {
+        base.OnPointerMoved(e);
+        MdWordSelectionGuard.ExtendDuringMove(this, e, _textPresenter);
+    }
+
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    {
+        base.OnPointerReleased(e);
+        MdWordSelectionGuard.ClearOnRelease(this, e);
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
