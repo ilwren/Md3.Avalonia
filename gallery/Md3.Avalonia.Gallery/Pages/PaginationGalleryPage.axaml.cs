@@ -7,6 +7,7 @@ public partial class PaginationGalleryPage : UserControl
 {
     private static string L(string english, string chinese) => GalleryLocalization.Choose(english, chinese);
     private bool _syncing;
+    private bool _initialized;
 
     public PaginationGalleryPage()
     {
@@ -17,17 +18,23 @@ public partial class PaginationGalleryPage : UserControl
         PageStatus.Text = L("Page 1 of 12", "第 1 页，共 12 页");
         DotsStatus.Text = L("Slide 1 of 3", "第 1 张，共 3 张");
         VerticalStatus.Text = L("Page 2 of 6", "第 2 页，共 6 页");
+        // XAML property setters (SelectedPageIndex, SelectedIndex) raise their change events
+        // while the tree is still being parsed, before later named fields exist. The handler
+        // would then dereference a field that the loader has not assigned yet, so swallow the
+        // early events: the XAML default texts already describe the initial state.
+        _initialized = true;
     }
 
     private void NumberedPagerChanged(object? sender, PipsPagerSelectedIndexChangedEventArgs e)
     {
+        if (!_initialized) return;
         PageProgress.Value = NumberedPager.SelectedPageIndex;
         PageStatus.Text = L($"Page {NumberedPager.SelectedPageIndex + 1} of 12", $"第 {NumberedPager.SelectedPageIndex + 1} 页，共 12 页");
     }
 
     private void DotsPagerChanged(object? sender, PipsPagerSelectedIndexChangedEventArgs e)
     {
-        if (_syncing) return;
+        if (!_initialized || _syncing) return;
         _syncing = true;
         DotsCarousel.SelectedIndex = DotsPager.SelectedPageIndex;
         _syncing = false;
@@ -36,7 +43,7 @@ public partial class PaginationGalleryPage : UserControl
 
     private void DotsCarouselChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (_syncing || DotsCarousel.SelectedIndex < 0) return;
+        if (!_initialized || _syncing || DotsCarousel.SelectedIndex < 0) return;
         _syncing = true;
         DotsPager.SelectedPageIndex = DotsCarousel.SelectedIndex;
         _syncing = false;
@@ -45,6 +52,7 @@ public partial class PaginationGalleryPage : UserControl
 
     private void VerticalPagerChanged(object? sender, PipsPagerSelectedIndexChangedEventArgs e)
     {
+        if (!_initialized) return;
         VerticalStatus.Text = L($"Page {VerticalPager.SelectedPageIndex + 1} of 6", $"第 {VerticalPager.SelectedPageIndex + 1} 页，共 6 页");
     }
 }

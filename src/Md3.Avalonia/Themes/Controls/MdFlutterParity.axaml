@@ -213,7 +213,7 @@
       <!-- Even-width cells let each step's trailing connector run to the next indicator. -->
       <Setter Property="ItemsPanel"><ItemsPanelTemplate><UniformGrid Rows="1" /></ItemsPanelTemplate></Setter>
     </Style>
-    <Style Selector="^:horizontal md|MdStep">
+    <Style Selector="^:horizontal /template/ md|MdStep">
       <Setter Property="Template" Value="{StaticResource MdStepHorizontalTemplate}" />
     </Style>
   </ControlTheme>
