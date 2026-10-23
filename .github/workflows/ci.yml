@@ -248,6 +248,25 @@ jobs:
         continue-on-error: true
         run: scripts/probe-tests.sh MdGallery gallery.trx
 
+      # The gallery probe above dies inside its own process (a few tests run, then silence), so the
+      # class-level probes below run each of the four remaining gallery classes in its own process.
+      # Whichever one dies alone is the one that poisons the shared dispatcher for its neighbours.
+      - name: Probe the gallery adaptive tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdGalleryAdaptiveTests gallery-adaptive.trx
+
+      - name: Probe the gallery index tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdGalleryIndexTests gallery-index.trx
+
+      - name: Probe the gallery picker page tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdGalleryPickerPageTests gallery-picker.trx
+
+      - name: Probe the gallery page render tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdGalleryTests gallery-pages.trx
+
       # The map theme is the newest package and the only one that reaches a third-party Skia text
       # stack, so its eight tests are run on their own as well: the notice is what says they ran and
       # how many, which the main suite's summary cannot be read back for.
