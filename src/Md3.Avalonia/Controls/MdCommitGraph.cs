@@ -256,24 +256,38 @@ public class MdCommitGraph : ItemsControl
                 live.Add(lane);
             }
 
-            // A lane's line spans from its oldest touching row (a commit on the lane) to its
-            // newest (a commit on the lane or a merge curve targeting it).
-            var laneTop = new Dictionary<int, int>();
-            var laneBottom = new Dictionary<int, int>();
+            // A lane's visual path is the union of its commit nodes (row midpoints) and its
+            // curve ends: a curve leaves its source lane at the row midpoint and arrives at its
+            // target lane at the row bottom. Points are kept in half-strip units (2x rows) so a
+            // half-strip is drawn exactly when the path exists on both sides of it.
+            var laneMin = new Dictionary<int, int>();
+            var laneMax = new Dictionary<int, int>();
+            void Touch(int lane, int point)
+            {
+                if (!laneMin.TryGetValue(lane, out var min))
+                {
+                    laneMin[lane] = point;
+                    laneMax[lane] = point;
+                    return;
+                }
+
+                if (point < min) laneMin[lane] = point;
+                if (point > laneMax[lane]) laneMax[lane] = point;
+            }
+
             var curves = new List<(int From, int To)>[count];
             for (var r = 0; r < count; r++)
             {
                 curves[r] = new List<(int, int)>();
                 var lane = rowLane[r];
-                laneBottom[lane] = Math.Max(laneBottom.GetValueOrDefault(lane, -1), r);
-                laneTop[lane] = Math.Min(laneTop.GetValueOrDefault(lane, count), r);
+                Touch(lane, 2 * r + 1);
 
                 foreach (var parentId in commits[r].ParentIds)
                 {
                     if (laneOf.TryGetValue(parentId, out var parentLane) && parentLane != lane)
                     {
                         curves[r].Add((lane, parentLane));
-                        laneTop[parentLane] = Math.Min(laneTop.GetValueOrDefault(parentLane, count), r);
+                        Touch(parentLane, 2 * r + 2);
                     }
                 }
             }
@@ -283,12 +297,12 @@ public class MdCommitGraph : ItemsControl
             {
                 var top = new List<int>();
                 var bottom = new List<int>();
-                foreach (var (lane, topRow) in laneTop)
+                foreach (var (lane, min) in laneMin)
                 {
-                    var bottomRow = laneBottom[lane];
-                    if (topRow <= r - 1 && bottomRow >= r)
+                    var max = laneMax[lane];
+                    if (min <= 2 * r && max >= 2 * r + 1)
                         top.Add(lane);
-                    if (topRow <= r && bottomRow >= r + 1)
+                    if (min <= 2 * r + 1 && max >= 2 * r + 2)
                         bottom.Add(lane);
                 }
                 top.Sort();
