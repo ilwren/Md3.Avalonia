@@ -12,7 +12,7 @@
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
     <Setter Property="Template">
-      <ControlTemplate TargetType="ListBoxItem">
+      <ControlTemplate x:CompileBindings="False" TargetType="ListBoxItem">
         <Grid Background="Transparent">
           <Border x:Name="PART_Section" CornerRadius="8" Background="Transparent">
             <TextBlock x:Name="PART_PageLabel" HorizontalAlignment="Center" VerticalAlignment="Center"

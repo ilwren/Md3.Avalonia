@@ -44,7 +44,7 @@
       </ControlTemplate>
     </Setter>
     <Setter Property="ItemTemplate">
-      <DataTemplate DataType="md:MdCommitNode">
+      <DataTemplate x:DataType="md:MdCommitNode">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
           <StackPanel Spacing="2">
             <TextBlock Text="{Binding Message}"
