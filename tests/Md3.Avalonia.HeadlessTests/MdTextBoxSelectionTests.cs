@@ -61,7 +61,7 @@ public class MdTextBoxSelectionTests
         AssertSelection(
             host,
             "dragging from character 11 to 21 must select exactly that range",
-            caret: 11, start: 11, end: 21);
+            caret: 21, start: 11, end: 21);
     }
 
     [AvaloniaFact]
@@ -79,7 +79,7 @@ public class MdTextBoxSelectionTests
         AssertSelection(
             host,
             "dragging from character 21 back to 11 keeps the press point as the anchor",
-            caret: 21, start: 21, end: 11);
+            caret: 11, start: 11, end: 21);
     }
 
     [AvaloniaFact]
@@ -89,7 +89,7 @@ public class MdTextBoxSelectionTests
 
         DragCharacters(host, 11, 21);
 
-        AssertSelection(host, "label-less field", caret: 11, start: 11, end: 21);
+        AssertSelection(host, "label-less field", caret: 21, start: 11, end: 21);
     }
 
     [AvaloniaFact]
@@ -104,7 +104,7 @@ public class MdTextBoxSelectionTests
 
         DragCharacters(host, 11, 21);
 
-        AssertSelection(host, "outlined field", caret: 11, start: 11, end: 21);
+        AssertSelection(host, "outlined field", caret: 21, start: 11, end: 21);
     }
 
     [AvaloniaFact]
@@ -137,7 +137,7 @@ public class MdTextBoxSelectionTests
 
         DragCharacters(host, 8, 45);
 
-        AssertSelection(host, "dragging across a line break", caret: 8, start: 8, end: 45);
+        AssertSelection(host, "dragging across a line break", caret: 45, start: 8, end: 45);
     }
 
     [AvaloniaFact]
@@ -150,7 +150,7 @@ public class MdTextBoxSelectionTests
         AssertSelection(
             host,
             "dragging CJK text from character 3 to 10 must select that range, not from the start",
-            caret: 3, start: 3, end: 10);
+            caret: 10, start: 3, end: 10);
     }
 
     [AvaloniaFact]
@@ -179,7 +179,7 @@ public class MdTextBoxSelectionTests
             host,
             "click, then a second press inside the double-click window and drag to 10 - the range " +
             "must be anchored at the press point, never at the start of the text",
-            caret: 3, start: 3, end: 10);
+            caret: 10, start: 3, end: 10);
     }
 
     [AvaloniaFact]
@@ -224,7 +224,7 @@ public class MdTextBoxSelectionTests
     {
         using var host = Show(new MdTextBox { Text = Latin });
 
-        // "Material" spans 11..19.
+        // "Material" spans 9..17.
         var point = CharacterPoint(host, 14);
         host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
@@ -237,7 +237,7 @@ public class MdTextBoxSelectionTests
 
         var start = host.Box.SelectionStart;
         var end = host.Box.SelectionEnd;
-        if (start == 11 && end == 19)
+        if (start == 9 && end == 17)
         {
             return;
         }
@@ -251,7 +251,7 @@ public class MdTextBoxSelectionTests
 
         Assert.Fail(
             $"Latin double click at character 14 produced range [{start},{end}] of \"{host.Box.Text}\"; " +
-            $"expected the core word range [11,19] or a collapsed [14,14] if no double click was " +
+            $"expected the core word range [9,17] or a collapsed [14,14] if no double click was " +
             $"reported.");
     }
 

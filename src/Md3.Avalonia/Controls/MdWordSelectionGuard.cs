@@ -1,4 +1,3 @@
-using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
@@ -31,8 +30,9 @@ internal static class MdWordSelectionGuard
     }
 
     internal static readonly AttachedProperty<State?> PreemptedStateProperty =
-        AvaloniaProperty.RegisterAttached<MdWordSelectionGuard, TextBox, State?>(
+        AvaloniaProperty.RegisterAttached<TextBox, State?>(
             "PreemptedState",
+            typeof(MdWordSelectionGuard),
             defaultValue: null,
             inherits: false);
 
@@ -123,30 +123,47 @@ internal static class MdWordSelectionGuard
     }
 
     /// <summary>
-    /// The Unicode word boundaries around the character at <paramref name="index"/>, using
-    /// <see cref="StringInfo"/> word segmentation, which treats each CJK ideograph as one word and
-    /// keeps Latin runs contiguous.
+    /// The word boundaries around the caret at <paramref name="index"/>: letters and digits run
+    /// together per script, while each CJK ideograph is one word. The word starting at or before
+    /// the caret is selected, so a caret on a word boundary selects the word to its right - the
+    /// glyph the press point sits on.
     /// </summary>
     internal static (int Start, int End) WordRange(string text, int index)
     {
-        // Walk the word boundaries (StringInfo's public API has no indexed positioning in
-        // modern .NET) and take the first word whose range contains the caret; a caret on a
-        // word's right edge still selects that word, which is the glyph the press landed on.
-        var info = new StringInfo(text);
-        while (true)
+        // .NET's public StringInfo only iterates graphemes, so the word walk is local.
+        for (var start = 0; start < text.Length;)
         {
-            var start = info.ElementIndex;
+            if (!IsWordChar(text[start]))
+            {
+                start++;
+                continue;
+            }
+
+            var end = start + 1;
+            while (end < text.Length
+                   && IsWordChar(text[end])
+                   && !(IsIdeograph(text[end]) && IsIdeograph(text[end - 1])))
+                end++;
+
+            if (start <= index && index < end)
+                return (start, end);
             if (start > index)
                 break;
-            if (!info.NextWord())
-                return (start, text.Length);
-            var end = info.ElementIndex;
-            if (index <= end)
-                return (start, end);
+            start = end;
         }
 
         return (index, Math.Min(index + 1, text.Length));
     }
+
+    private static bool IsWordChar(char ch) => char.IsLetterOrDigit(ch);
+
+    /// <summary>Scripts where each character is a standalone word (double-click selects one glyph).</summary>
+    private static bool IsIdeograph(char ch) =>
+        ch is >= '\u3400' and <= '\u4DBF'    // CJK extension A
+            or >= '\u4E00' and <= '\u9FFF'   // CJK unified ideographs
+            or >= '\u3040' and <= '\u30FF'   // hiragana + katakana
+            or >= '\uAC00' and <= '\uD7A3'   // hangul syllables
+            or >= '\uF900' and <= '\uFAFF';  // CJK compatibility ideographs
 
     private static bool IsNonAsciiLetterOrDigit(char ch)
     {
