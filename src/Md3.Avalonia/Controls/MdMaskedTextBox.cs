@@ -34,6 +34,12 @@ public enum MdMaskedTextBoxVariant
     ":has-supporting-text", ":has-error-text", ":reduced-motion", ":no-motion")]
 public class MdMaskedTextBox : MaskedTextBox
 {
+    /// <summary>
+    /// The base control styles itself as a plain <see cref="TextBox"/>, which would shadow this
+    /// type's theme; keep the style key on the Material type.
+    /// </summary>
+    protected override Type StyleKeyOverride => typeof(MdMaskedTextBox);
+
     public static readonly StyledProperty<MdMaskedTextBoxVariant> VariantProperty =
         AvaloniaProperty.Register<MdMaskedTextBox, MdMaskedTextBoxVariant>(
             nameof(Variant),
