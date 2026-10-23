@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Styling;
 using Avalonia.Layout;
 using Avalonia.Threading;
 using Md3.Avalonia.Controls;

@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Md3.Avalonia.Controls;
 using Xunit;
@@ -15,7 +16,7 @@ public sealed class MdCommitGraphTests
     [AvaloniaFact]
     public void Linear_History_Uses_A_Single_Lane()
     {
-        var rows = MdCommitGraphLayout.ComputeRows(
+        var rows = MdCommitGraph.MdCommitGraphLayout.ComputeRows(
         [
             Node("c", "b"),
             Node("b", "a"),
@@ -35,7 +36,7 @@ public sealed class MdCommitGraphTests
     public void Branch_Takes_A_New_Lane_And_Curves_Back_To_Its_Parent()
     {
         // Mainline a -> b -> c; side branch d off b. Display order is newest first.
-        var rows = MdCommitGraphLayout.ComputeRows(
+        var rows = MdCommitGraph.MdCommitGraphLayout.ComputeRows(
         [
             Node("d", "b"),
             Node("c", "b"),
@@ -56,7 +57,7 @@ public sealed class MdCommitGraphTests
     [AvaloniaFact]
     public void Merge_Stays_On_The_First_Parents_Lane_And_Releases_The_Branch()
     {
-        var rows = MdCommitGraphLayout.ComputeRows(
+        var rows = MdCommitGraph.MdCommitGraphLayout.ComputeRows(
         [
             Node("m", "a2", "b1"),
             Node("b1", "a2"),
@@ -85,7 +86,7 @@ public sealed class MdCommitGraphTests
     [AvaloniaFact]
     public void Head_Only_Rings_The_Given_Commit()
     {
-        var rows = MdCommitGraphLayout.ComputeRows(
+        var rows = MdCommitGraph.MdCommitGraphLayout.ComputeRows(
         [
             Node("m", "a2", "b1"),
             Node("b1", "a2"),

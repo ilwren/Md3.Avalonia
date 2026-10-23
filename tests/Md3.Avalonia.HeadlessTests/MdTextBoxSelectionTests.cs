@@ -305,10 +305,10 @@ public class MdTextBoxSelectionTests
         Dispatcher.UIThread.RunJobs();
 
         var presenter = box.GetVisualDescendants().OfType<TextPresenter>().FirstOrDefault()
-            ?? throw new XunitException($"no TextPresenter found in the MdTextBox template");
+            ?? throw new InvalidOperationException($"no TextPresenter found in the MdTextBox template");
         if (presenter.Bounds.Width <= 0)
         {
-            throw new XunitException($"the TextPresenter was not measured (bounds {presenter.Bounds}); the layout pass did not run");
+            throw new InvalidOperationException($"the TextPresenter was not measured (bounds {presenter.Bounds}); the layout pass did not run");
         }
 
         return new Host(window, box, presenter);
@@ -320,7 +320,7 @@ public class MdTextBoxSelectionTests
         var rect = host.Presenter.TextLayout.HitTestTextPosition(index);
         var local = new Point(rect.Left + rect.Width / 2, rect.Top + rect.Height / 2);
         return host.Presenter.TranslatePoint(local, host.Window)
-            ?? throw new XunitException("could not translate the caret point to window space");
+            ?? throw new InvalidOperationException("could not translate the caret point to window space");
     }
 
     private static void ClickCharacter(Host host, int index)
