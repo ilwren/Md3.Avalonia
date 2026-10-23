@@ -24,7 +24,7 @@ namespace Md3.Avalonia.Controls;
 internal static class MdWordSelectionGuard
 {
     /// <summary>Per-gesture state. Null means the guard does not intervene for this gesture.</summary>
-    private sealed class State
+    internal sealed class State
     {
         public int WordStart;
         public int WordEnd;
