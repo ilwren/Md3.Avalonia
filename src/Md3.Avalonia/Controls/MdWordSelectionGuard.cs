@@ -39,7 +39,7 @@ internal static class MdWordSelectionGuard
     internal static State? GetPreemptedState(TextBox box) => box.GetValue(PreemptedStateProperty);
     internal static void SetPreemptedState(TextBox box, State? value) => box.SetValue(PreemptedStateProperty, value);
 
-    /// <summary>Call from <see cref="TextBox.OnPointerPressed"/> after <c>base</c>.</summary>
+    /// <summary>Call from <c>TextBox.OnPointerPressed</c> after <c>base</c>.</summary>
     public static void CorrectAfterPress(TextBox box, PointerPressedEventArgs e, TextPresenter? presenter)
     {
         // Every new gesture starts without a guard anchor; the core's own single-click path resets
@@ -85,7 +85,7 @@ internal static class MdWordSelectionGuard
         SetPreemptedState(box, new State { WordStart = start, WordEnd = end });
     }
 
-    /// <summary>Call from <see cref="TextBox.OnPointerMoved"/> after <c>base</c>.</summary>
+    /// <summary>Call from <c>TextBox.OnPointerMoved</c> after <c>base</c>.</summary>
     public static void ExtendDuringMove(TextBox box, PointerEventArgs e, TextPresenter? presenter)
     {
         var state = GetPreemptedState(box);

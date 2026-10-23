@@ -15,7 +15,7 @@ namespace Md3.Avalonia.Controls;
 /// <remarks>
 /// <para>
 /// The default <see cref="Orientation"/> is vertical: every step renders its header and, when active,
-/// its body below the header. With <see cref="Orientation"/> set to <see cref="Avalonia.Layout.Orientation.Horizontal"/>
+/// its body below the header. With <see cref="Orientation"/> set to <c>Orientation.Horizontal</c>
 /// the steps lay out as a header row (indicator above label, horizontal connectors between steps) and
 /// the active step's content moves into a shared body below the row, mirroring Flutter's
 /// <c>StepperType.horizontal</c>.
