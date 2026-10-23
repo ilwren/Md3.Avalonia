@@ -142,14 +142,15 @@ public sealed class MdStepper : ItemsControl
             .ToArray();
         for (var index = 0; index < steps.Length; index++)
         {
-            steps[index].SetStepState(index + 1, index == ActiveStep);
-            // Per-step position drives the connector visibility: the last step never draws a
-            // trailing connector in either orientation.
-    steps[index].Classes.Set(":step-first", index == 0);
-    steps[index].Classes.Set(":step-last", index == steps.Length - 1);
-    // The step's own theme swaps in the horizontal header template when this class is set.
-    steps[index].Classes.Set(":horizontal", Orientation == Orientation.Horizontal);
-}
+            // Per-step position drives the connector visibility (the last step never draws a
+            // trailing connector) and, together with the direction, the header template.
+            steps[index].SetStepState(
+                index + 1,
+                index == ActiveStep,
+                index == 0,
+                index == steps.Length - 1,
+                Orientation == Orientation.Horizontal);
+        }
 
         // The horizontal layout renders the active step's content in a shared body below the
         // header row, so the template needs the active item's content as a property.

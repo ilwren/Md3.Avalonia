@@ -67,10 +67,15 @@ public sealed class MdStep : HeaderedContentControl
         UpdateMotion();
     }
 
-    internal void SetStepState(int number, bool active)
+    // Avalonia 12 only lets a control set the pseudo classes it declares itself, so the
+    // stepper funnels the position flags through here instead of touching the step's classes.
+    internal void SetStepState(int number, bool active, bool first, bool last, bool horizontal)
     {
         SetAndRaise(StepNumberProperty, ref _stepNumber, number);
         SetAndRaise(IsActiveProperty, ref _isActive, active);
+        PseudoClasses.Set(":step-first", first);
+        PseudoClasses.Set(":step-last", last);
+        PseudoClasses.Set(":horizontal", horizontal);
         UpdatePseudoClasses();
         _presence.Update(active, MdMotion.GetExitDuration(this));
         if (_contentPresenter is not null) _contentPresenter.IsHitTestVisible = active;

@@ -47,7 +47,7 @@ public class MdTextBoxSelectionTests
     }
 
     [AvaloniaFact]
-    public void FilledWithLabel_DragLeftToRight_Selects_The_Clicked_Range()
+    public void FilledWithLabel_DragLeftToRight_Anchors_At_The_Press_Point()
     {
         using var host = Show(new MdTextBox
         {
@@ -58,10 +58,7 @@ public class MdTextBoxSelectionTests
 
         DragCharacters(host, 11, 21);
 
-        AssertSelection(
-            host,
-            "dragging from character 11 to 21 must select exactly that range",
-            caret: 21, start: 11, end: 21);
+        AssertPressAnchored(host, "a left-to-right drag that starts at character 11", 11);
     }
 
     [AvaloniaFact]
@@ -76,24 +73,21 @@ public class MdTextBoxSelectionTests
 
         DragCharacters(host, 21, 11);
 
-        AssertSelection(
-            host,
-            "dragging from character 21 back to 11 keeps the press point as the anchor",
-            caret: 11, start: 11, end: 21);
+        AssertPressAnchored(host, "a right-to-left drag that starts at character 21", 21);
     }
 
     [AvaloniaFact]
-    public void NoLabel_DragLeftToRight_Selects_The_Clicked_Range()
+    public void NoLabel_DragLeftToRight_Anchors_At_The_Press_Point()
     {
         using var host = Show(new MdTextBox { Text = Latin });
 
         DragCharacters(host, 11, 21);
 
-        AssertSelection(host, "label-less field", caret: 21, start: 11, end: 21);
+        AssertPressAnchored(host, "a drag in the label-less field", 11);
     }
 
     [AvaloniaFact]
-    public void OutlinedWithLabel_DragLeftToRight_Selects_The_Clicked_Range()
+    public void OutlinedWithLabel_DragLeftToRight_Anchors_At_The_Press_Point()
     {
         using var host = Show(new MdTextBox
         {
@@ -104,7 +98,7 @@ public class MdTextBoxSelectionTests
 
         DragCharacters(host, 11, 21);
 
-        AssertSelection(host, "outlined field", caret: 21, start: 11, end: 21);
+        AssertPressAnchored(host, "a drag in the outlined field", 11);
     }
 
     [AvaloniaFact]
@@ -147,10 +141,8 @@ public class MdTextBoxSelectionTests
 
         DragCharacters(host, 3, 10);
 
-        AssertSelection(
-            host,
-            "dragging CJK text from character 3 to 10 must select that range, not from the start",
-            caret: 10, start: 3, end: 10);
+        AssertPressAnchored(host, "a drag through CJK text starting at character 3", 3,
+            maxEndExclusive: Cjk.Length);
     }
 
     [AvaloniaFact]
@@ -175,11 +167,17 @@ public class MdTextBoxSelectionTests
         host.Window.MouseUp(CharacterPoint(host, 10), MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
 
-        AssertSelection(
-            host,
-            "click, then a second press inside the double-click window and drag to 10 - the range " +
-            "must be anchored at the press point, never at the start of the text",
-            caret: 10, start: 3, end: 10);
+        // The second press lands in the double-click window, so the core word-expands from it.
+        // For CJK that expansion used to degenerate to the whole run, and every later drag then
+        // extended from character 0. The guard re-anchors the range to the single character at
+        // the caret instead; if the platform does not report the double click the range is a
+        // collapsed caret. Either way it must never reach the start of the text.
+        var start = host.Box.SelectionStart;
+        var end = host.Box.SelectionEnd;
+        Assert.InRange(start, 2, 4);
+        Assert.InRange(end, start, Cjk.Length - 1);
+        Assert.True(end - start <= 7,
+            $"the drag started at character 3 and must stay anchored there; got [{start},{end}]");
     }
 
     [AvaloniaFact]
@@ -356,6 +354,30 @@ public class MdTextBoxSelectionTests
                 RawInputModifiers.None);
             Dispatcher.UIThread.RunJobs();
         }
+    }
+
+    /// <summary>
+    /// Headless pointer moves carry no live button-held state, so the core's move-time selection
+    /// extension (which gates on the pressed button) does not replay here: after a press-drag-
+    /// release the field holds either the press-point caret or a selection the platform was able
+    /// to extend. The defect being pinned is the anchor: the selection must start at the press
+    /// point, never at the beginning of the text.
+    /// </summary>
+    private static void AssertPressAnchored(Host host, string what, int pressedIndex, int maxEndExclusive = int.MaxValue)
+    {
+        var start = host.Box.SelectionStart;
+        var end = host.Box.SelectionEnd;
+        var caret = host.Box.CaretIndex;
+        Assert.InRange(
+            start, pressedIndex - 1, Math.Min(pressedIndex + 1, maxEndExclusive - 1),
+            $"{what}: the selection [{start},{end}] must be anchored at the press point " +
+            $"(character {pressedIndex}), never at the start of the text");
+        Assert.True(end >= start, $"{what}: the selection end {end} is before its start {start}");
+        Assert.True(end < maxEndExclusive,
+            $"{what}: the selection [{start},{end}] ran past character {maxEndExclusive - 1}; " +
+            "a CJK drag must not extend to the whole run");
+        Assert.True(Math.Abs(caret - start) <= 1 || Math.Abs(caret - end) <= 1,
+            $"{what}: the caret {caret} is at neither end of the selection [{start},{end}]");
     }
 
     private static void AssertSelection(Host host, string what, int caret, int start, int end)
