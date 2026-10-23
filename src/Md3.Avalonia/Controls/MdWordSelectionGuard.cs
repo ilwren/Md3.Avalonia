@@ -32,7 +32,7 @@ internal static class MdWordSelectionGuard
 
     internal static readonly AttachedProperty<State?> PreemptedStateProperty =
         AvaloniaProperty.RegisterAttached<MdWordSelectionGuard, TextBox, State?>(
-            nameof(PreemptedState),
+            "PreemptedState",
             defaultValue: null,
             inherits: false);
 
@@ -129,19 +129,23 @@ internal static class MdWordSelectionGuard
     /// </summary>
     internal static (int Start, int End) WordRange(string text, int index)
     {
-        // Position at `index`; the word containing element index-1 starts at `s` and ends at `e`.
-        var info = StringInfo.CreateInstance(text, index);
-        info.MovePreviousWord();
-        var s = info.ElementIndex;
-        info.MoveNextWord();
-        var e = info.ElementIndex;
+        // Walk the word boundaries (StringInfo's public API has no indexed positioning in
+        // modern .NET) and take the first word whose range contains the caret; a caret on a
+        // word's right edge still selects that word, which is the glyph the press landed on.
+        var info = new StringInfo(text);
+        while (true)
+        {
+            var start = info.ElementIndex;
+            if (start > index)
+                break;
+            if (!info.NextWord())
+                return (start, text.Length);
+            var end = info.ElementIndex;
+            if (index <= end)
+                return (start, end);
+        }
 
-        // Element index-1 and element index are one word iff that word extends past index.
-        var start = e > index ? s : index;
-
-        info = StringInfo.CreateInstance(text, start);
-        info.MoveNextWord();
-        return (start, info.ElementIndex);
+        return (index, Math.Min(index + 1, text.Length));
     }
 
     private static bool IsNonAsciiLetterOrDigit(char ch)
