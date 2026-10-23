@@ -85,7 +85,7 @@ public sealed class MdPaginationTests
     public void Vertical_Orientation_Is_Available_From_The_Base_Pager()
     {
         Application.Current!.RequestedThemeVariant = ThemeVariant.Light;
-        var pager = new MdPagination { NumberOfPages = 5, Orientation = Avalonia.Layout.Orientation.Vertical };
+        var pager = new MdPagination { NumberOfPages = 5, Orientation = global::Avalonia.Layout.Orientation.Vertical };
         using var host = Show(pager);
 
         Assert.Contains(":vertical", pager.Classes);
