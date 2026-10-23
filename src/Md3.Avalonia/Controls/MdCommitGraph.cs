@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Layout;
@@ -80,11 +81,14 @@ public class MdCommitGraph : ItemsControl
         Recompute();
     }
 
-    private protected override void OnItemsViewCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    public MdCommitGraph()
     {
-        base.OnItemsViewCollectionChanged(sender, e);
-        Recompute();
+        // The base collection hook is private-protected and cannot be overridden from this
+        // assembly, so the public items collection is watched directly.
+        Items.CollectionChanged += OnItemsChanged;
     }
+
+    private void OnItemsChanged(object? sender, NotifyCollectionChangedEventArgs e) => Recompute();
 
     /// <summary>Recomputes lanes and connectors from the current items; call after bulk data changes.</summary>
     public void Recompute()
@@ -108,7 +112,7 @@ public class MdCommitGraph : ItemsControl
         ApplyLayoutToContainers();
     }
 
-    protected internal override Control CreateContainerForItemOverride(object? item, int index, object? recycleKey) =>
+    protected override Control CreateContainerForItemOverride(object? item, int index, object? recycleKey) =>
         new CommitGraphRow();
 
     protected override void PrepareContainerForItemOverride(Control container, object? item, int index)

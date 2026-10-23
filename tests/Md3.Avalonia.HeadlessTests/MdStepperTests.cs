@@ -19,10 +19,10 @@ public sealed class MdStepperTests
         using var host = Show(stepper);
 
         Assert.Equal(0, stepper.ActiveStep);
-        Assert.True(stepper.PseudoClasses.Contains(":vertical"));
-        Assert.False(stepper.PseudoClasses.Contains(":horizontal"));
-        Assert.True(stepper.PseudoClasses.Contains(":first-step"));
-        Assert.False(stepper.PseudoClasses.Contains(":last-step"));
+        Assert.Contains(":vertical", stepper.Classes);
+        Assert.DoesNotContain(":horizontal", stepper.Classes);
+        Assert.Contains(":first-step", stepper.Classes);
+        Assert.DoesNotContain(":last-step", stepper.Classes);
         Assert.NotNull(stepper.Template);
     }
 
@@ -35,8 +35,8 @@ public sealed class MdStepperTests
 
         stepper.Orientation = Orientation.Horizontal;
 
-        Assert.True(stepper.PseudoClasses.Contains(":horizontal"));
-        Assert.False(stepper.PseudoClasses.Contains(":vertical"));
+        Assert.Contains(":horizontal", stepper.Classes);
+        Assert.DoesNotContain(":vertical", stepper.Classes);
     }
 
     [AvaloniaFact]
@@ -49,11 +49,11 @@ public sealed class MdStepperTests
 
         stepper.Next();
         Assert.Equal(1, stepper.ActiveStep);
-        Assert.False(stepper.PseudoClasses.Contains(":first-step"));
+        Assert.DoesNotContain(":first-step", stepper.Classes);
 
         stepper.Next();
         Assert.Equal(2, stepper.ActiveStep);
-        Assert.True(stepper.PseudoClasses.Contains(":last-step"));
+        Assert.Contains(":last-step", stepper.Classes);
 
         stepper.Previous();
         Assert.Equal(1, stepper.ActiveStep);
@@ -134,11 +134,11 @@ public sealed class MdStepperTests
 
         stepper.GoTo(1);
 
-        Assert.True(one.PseudoClasses.Contains(":step-first"));
-        Assert.True(three.PseudoClasses.Contains(":step-last"));
-        Assert.True(two.PseudoClasses.Contains(":active"));
-        Assert.False(one.PseudoClasses.Contains(":active"));
-        Assert.False(three.PseudoClasses.Contains(":active"));
+        Assert.Contains(":step-first", one.Classes);
+        Assert.Contains(":step-last", three.Classes);
+        Assert.Contains(":active", two.Classes);
+        Assert.DoesNotContain(":active", one.Classes);
+        Assert.DoesNotContain(":active", three.Classes);
         Assert.Equal(2, two.StepNumber);
         Assert.True(two.IsActive);
     }

@@ -67,7 +67,7 @@
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="IsTabStop" Value="False" />
     <Setter Property="Template">
-      <ControlTemplate>
+      <ControlTemplate TargetType="md:MdPagination">
         <StackPanel Orientation="{TemplateBinding Orientation}" Spacing="4">
           <md:MdIconButton x:Name="PART_PreviousButton"
                            AutomationProperties.Name="Previous page"

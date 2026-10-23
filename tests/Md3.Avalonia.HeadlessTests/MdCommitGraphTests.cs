@@ -113,12 +113,12 @@ public sealed class MdCommitGraphTests
 
         Assert.Equal(2, graph.LaneCount);
         Assert.Equal(graph.LaneCount * graph.LaneWidth, graph.LaneColumnWidth);
-        Assert.True(graph.PseudoClasses.Contains(":has-head"));
+        Assert.Contains(":has-head", graph.Classes);
         Assert.IsType<CommitGraphRow>(graph.ContainerFromIndex(0));
         Assert.NotNull(graph.GetLaneBrush(0));
 
         graph.HeadId = null;
-        Assert.False(graph.PseudoClasses.Contains(":has-head"));
+        Assert.DoesNotContain(":has-head", graph.Classes);
     }
 
     [AvaloniaFact]

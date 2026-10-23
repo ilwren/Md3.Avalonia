@@ -1,9 +1,10 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Templates;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Visuals.Platform;
 
 namespace Md3.Avalonia.Controls;
 
@@ -51,7 +52,7 @@ internal sealed class CommitGraphRow : Grid
 /// Draws the connectors and node of one commit row: vertical lane lines in the upper and lower
 /// half-strips, cubic curves for branch/merge transitions and the commit node (plus a head ring).
 /// </summary>
-internal sealed class CommitGraphLaneHost : FrameworkElement
+internal sealed class CommitGraphLaneHost : Control
 {
     private MdCommitGraph.MdCommitGraphRowGeometry? _geometry;
     private MdCommitNode? _node;
@@ -65,7 +66,7 @@ internal sealed class CommitGraphLaneHost : FrameworkElement
         InvalidateVisual();
     }
 
-    protected override void Render(DrawingContext context)
+    public override void Render(DrawingContext context)
     {
         if (_geometry is not { } geometry || _owner is not { } owner || Bounds.Height <= 0)
             return;
@@ -99,19 +100,15 @@ internal sealed class CommitGraphLaneHost : FrameworkElement
             if (brush is null) continue;
             var start = new Point(LaneX(from, laneWidth), mid);
             var end = new Point(LaneX(to, laneWidth), height);
-            var figure = new PathFigure
+            var path = new PathGeometry();
+            using (var builder = new PathGeometryContext(path))
             {
-                StartPoint = start,
-                Segments =
-                {
-                    new CubicBezierSegment(
-                        new Point(start.X, height * 0.75),
-                        new Point(end.X, height * 0.75),
-                        end,
-                        true),
-                },
-            };
-            context.DrawGeometry(null, new Pen(brush, 2), new PathGeometry(new[] { figure }));
+                builder.BeginFigure(start, isFilled: false);
+                builder.CubicBezierTo(new Point(start.X, height * 0.75), new Point(end.X, height * 0.75), end);
+                builder.EndFigure(false);
+            }
+
+            context.DrawGeometry(null, new Pen(brush, 2), path);
         }
 
         var nodeBrush = _node?.Color ?? BrushFor(geometry.Lane);

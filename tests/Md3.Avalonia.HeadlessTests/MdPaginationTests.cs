@@ -19,11 +19,11 @@ public sealed class MdPaginationTests
         using var host = Show(pager);
 
         Assert.Equal(MdPaginationDisplayMode.Numbers, pager.DisplayMode);
-        Assert.True(pager.PseudoClasses.Contains(":numbers"));
-        Assert.False(pager.PseudoClasses.Contains(":dots"));
+        Assert.Contains(":numbers", pager.Classes);
+        Assert.DoesNotContain(":dots", pager.Classes);
         Assert.NotNull(pager.Template);
-        Assert.True(pager.PseudoClasses.Contains(":first-page"));
-        Assert.False(pager.PseudoClasses.Contains(":last-page"));
+        Assert.Contains(":first-page", pager.Classes);
+        Assert.DoesNotContain(":last-page", pager.Classes);
     }
 
     [AvaloniaFact]
@@ -33,12 +33,12 @@ public sealed class MdPaginationTests
         var pager = new MdPagination { NumberOfPages = 5, DisplayMode = MdPaginationDisplayMode.Dots };
         using var host = Show(pager);
 
-        Assert.True(pager.PseudoClasses.Contains(":dots"));
-        Assert.False(pager.PseudoClasses.Contains(":numbers"));
+        Assert.Contains(":dots", pager.Classes);
+        Assert.DoesNotContain(":numbers", pager.Classes);
 
         pager.DisplayMode = MdPaginationDisplayMode.Numbers;
-        Assert.True(pager.PseudoClasses.Contains(":numbers"));
-        Assert.False(pager.PseudoClasses.Contains(":dots"));
+        Assert.Contains(":numbers", pager.Classes);
+        Assert.DoesNotContain(":dots", pager.Classes);
     }
 
     [AvaloniaFact]
@@ -53,11 +53,11 @@ public sealed class MdPaginationTests
         pager.SelectedPageIndex = 5;
         Assert.Equal(5, pager.SelectedPageIndex);
         Assert.Equal(5, last);
-        Assert.False(pager.PseudoClasses.Contains(":first-page"));
-        Assert.False(pager.PseudoClasses.Contains(":last-page"));
+        Assert.DoesNotContain(":first-page", pager.Classes);
+        Assert.DoesNotContain(":last-page", pager.Classes);
 
         pager.SelectedPageIndex = 11;
-        Assert.True(pager.PseudoClasses.Contains(":last-page"));
+        Assert.Contains(":last-page", pager.Classes);
     }
 
     [AvaloniaFact]
@@ -87,8 +87,8 @@ public sealed class MdPaginationTests
         var pager = new MdPagination { NumberOfPages = 5, Orientation = Avalonia.Layout.Orientation.Vertical };
         using var host = Show(pager);
 
-        Assert.True(pager.PseudoClasses.Contains(":vertical"));
-        Assert.False(pager.PseudoClasses.Contains(":horizontal"));
+        Assert.Contains(":vertical", pager.Classes);
+        Assert.DoesNotContain(":horizontal", pager.Classes);
     }
 
     private static IDisposable Show(Control content) => new WindowScope(ShowWindow(content));

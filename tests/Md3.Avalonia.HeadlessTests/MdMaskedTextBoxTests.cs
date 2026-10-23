@@ -55,8 +55,8 @@ public sealed class MdMaskedTextBoxTests
         using var host = Show(box);
 
         Assert.Equal(MdMaskedTextBoxVariant.Filled, box.Variant);
-        Assert.True(box.PseudoClasses.Contains(":filled"));
-        Assert.False(box.PseudoClasses.Contains(":outlined"));
+        Assert.Contains(":filled", box.Classes);
+        Assert.DoesNotContain(":outlined", box.Classes);
         Assert.NotNull(box.Template);
     }
 
@@ -69,8 +69,8 @@ public sealed class MdMaskedTextBoxTests
 
         box.Variant = MdMaskedTextBoxVariant.Outlined;
 
-        Assert.True(box.PseudoClasses.Contains(":outlined"));
-        Assert.False(box.PseudoClasses.Contains(":filled"));
+        Assert.Contains(":outlined", box.Classes);
+        Assert.DoesNotContain(":filled", box.Classes);
     }
 
     [AvaloniaFact]
@@ -79,12 +79,12 @@ public sealed class MdMaskedTextBoxTests
         var box = new MdMaskedTextBox { Mask = "00" };
         using var host = Show(box);
 
-        Assert.False(box.PseudoClasses.Contains(":has-label"));
-        Assert.True(box.PseudoClasses.Contains(":no-label"));
-        Assert.False(box.PseudoClasses.Contains(":has-prefix"));
-        Assert.False(box.PseudoClasses.Contains(":has-supporting-text"));
-        Assert.False(box.PseudoClasses.Contains(":has-error-text"));
-        Assert.False(box.PseudoClasses.Contains(":md-error"));
+        Assert.DoesNotContain(":has-label", box.Classes);
+        Assert.Contains(":no-label", box.Classes);
+        Assert.DoesNotContain(":has-prefix", box.Classes);
+        Assert.DoesNotContain(":has-supporting-text", box.Classes);
+        Assert.DoesNotContain(":has-error-text", box.Classes);
+        Assert.DoesNotContain(":md-error", box.Classes);
 
         box.Label = "Phone";
         box.PrefixText = "+1";
@@ -92,11 +92,11 @@ public sealed class MdMaskedTextBoxTests
         box.ErrorText = "Invalid";
         box.IsError = true;
 
-        Assert.True(box.PseudoClasses.Contains(":has-label"));
-        Assert.True(box.PseudoClasses.Contains(":has-prefix"));
-        Assert.True(box.PseudoClasses.Contains(":has-supporting-text"));
-        Assert.True(box.PseudoClasses.Contains(":has-error-text"));
-        Assert.True(box.PseudoClasses.Contains(":md-error"));
+        Assert.Contains(":has-label", box.Classes);
+        Assert.Contains(":has-prefix", box.Classes);
+        Assert.Contains(":has-supporting-text", box.Classes);
+        Assert.Contains(":has-error-text", box.Classes);
+        Assert.Contains(":md-error", box.Classes);
     }
 
     private static IDisposable Show(Control content) => new WindowScope(ShowWindow(content));

@@ -41,14 +41,14 @@ public sealed class MdStepper : ItemsControl
         AvaloniaProperty.Register<MdStepper, ICommand?>(nameof(CancelCommand));
     public static readonly DirectProperty<MdStepper, object?> ActiveStepContentProperty =
         AvaloniaProperty.RegisterDirect<MdStepper, object?>(nameof(ActiveStepContent), stepper => stepper.ActiveStepContent);
-    public static readonly DirectProperty<MdStepper, ContentTemplate?> ActiveStepContentTemplateProperty =
-        AvaloniaProperty.RegisterDirect<MdStepper, ContentTemplate?>(
+    public static readonly DirectProperty<MdStepper, IDataTemplate?> ActiveStepContentTemplateProperty =
+        AvaloniaProperty.RegisterDirect<MdStepper, IDataTemplate?>(
             nameof(ActiveStepContentTemplate), stepper => stepper.ActiveStepContentTemplate);
 
     private Button? _continueButton;
     private Button? _cancelButton;
     private object? _activeStepContent;
-    private ContentTemplate? _activeStepContentTemplate;
+    private IDataTemplate? _activeStepContentTemplate;
 
     static MdStepper()
     {
@@ -79,7 +79,7 @@ public sealed class MdStepper : ItemsControl
     public object? ActiveStepContent => GetValue(ActiveStepContentProperty);
 
     /// <summary>Gets the content template of the active step, used by the horizontal layout's shared body.</summary>
-    public ContentTemplate? ActiveStepContentTemplate => GetValue(ActiveStepContentTemplateProperty);
+    public IDataTemplate? ActiveStepContentTemplate => GetValue(ActiveStepContentTemplateProperty);
 
     public event EventHandler<int>? ContinueRequested;
     public event EventHandler<int>? CancelRequested;
@@ -139,8 +139,8 @@ public sealed class MdStepper : ItemsControl
             steps[index].SetStepState(index + 1, index == ActiveStep);
             // Per-step position drives the connector visibility: the last step never draws a
             // trailing connector in either orientation.
-            steps[index].PseudoClasses.Set(":step-first", index == 0);
-            steps[index].PseudoClasses.Set(":step-last", index == steps.Length - 1);
+            steps[index].Classes.Set(":step-first", index == 0);
+            steps[index].Classes.Set(":step-last", index == steps.Length - 1);
         }
 
         // The horizontal layout renders the active step's content in a shared body below the

@@ -37,6 +37,12 @@
     <Setter Property="LaneWidth" Value="{DynamicResource Md.Comp.CommitGraph.Lane.Width}" />
     <Setter Property="NodeSize" Value="{DynamicResource Md.Comp.CommitGraph.Node.Size}" />
     <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel /></ItemsPanelTemplate></Setter>
+    <!-- No inner scroller: a host scroll view owns scrolling so lanes stay one continuous column. -->
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdCommitGraph">
+        <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
+      </ControlTemplate>
+    </Setter>
     <Setter Property="ItemTemplate">
       <DataTemplate DataType="md:MdCommitNode">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
