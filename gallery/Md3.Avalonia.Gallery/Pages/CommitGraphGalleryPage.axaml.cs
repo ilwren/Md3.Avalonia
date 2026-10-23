@@ -11,7 +11,7 @@ public partial class CommitGraphGalleryPage : UserControl
         InitializeComponent();
 
         var now = DateTimeOffset.Now;
-        var ago = int days => now.AddDays(-days).ToUniversalTime();
+        var ago = (int days) => now.AddDays(-days).ToUniversalTime();
 
         // mainline, a side branch and its merge - the shape the control exists to draw.
         DemoGraph.ItemsSource =
