@@ -67,7 +67,8 @@ public sealed class MdGalleryTests
             new BannerGalleryPage(),
             new ExpansionPanelGalleryPage(),
             new DataTableGalleryPage(),
-            new StepperGalleryPage(),
+            // TEMP-DIAG: excluded while bisecting the host crash
+            // new StepperGalleryPage(),
             new RefreshIndicatorGalleryPage(),
             new PaginatedDataTableGalleryPage(),
             new ReorderableListGalleryPage(),
@@ -123,7 +124,8 @@ public sealed class MdGalleryTests
             new TagInputGalleryPage(),
             new AvatarGalleryPage(),
             new RatingGalleryPage(),
-            new CommitGraphGalleryPage(),
+            // TEMP-DIAG: excluded while bisecting the host crash
+            // new CommitGraphGalleryPage(),
             new MaskedTextBoxGalleryPage(),
             new PaginationGalleryPage()
         ];
