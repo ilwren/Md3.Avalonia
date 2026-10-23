@@ -50,9 +50,11 @@ for result in results:
     failed.append(f"{result.get('testName')}: {first}")
 
 # Annotations are the only part of a run that survives a cancelled job, and GitHub caps them, so
-# this is one line however many tests went wrong.
-print("::notice::%s alone: exit=%s, %d run, %d failed -> %s"
-      % (name, status, len(results), len(failed), "; ".join(failed) or "none"))
+# this is one line however many tests went wrong. The trx lists results in completion order, so
+# the last entry names how far a dead process got.
+last = results[-1].get("testName", "?").rsplit(".", 1)[-1] if results else "none"
+print("::notice::%s alone: exit=%s, %d run, %d failed, last=%s -> %s"
+      % (name, status, len(results), len(failed), last, "; ".join(failed) or "none"))
 PY
 
 exit "$status"
