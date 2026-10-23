@@ -150,6 +150,8 @@
     <Style Selector="^:active /template/ Border#PART_HConnector"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
     <Style Selector="^:step-last /template/ Border#PART_Connector"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:step-last /template/ Border#PART_HConnector"><Setter Property="IsVisible" Value="False" /></Style>
+    <!-- DynamicResource: the horizontal template is declared later in this dictionary. -->
+    <Style Selector="^:horizontal"><Setter Property="Template" Value="{DynamicResource MdStepHorizontalTemplate}" /></Style>
     <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
   </ControlTheme>
 
@@ -212,9 +214,6 @@
       <Setter Property="Template" Value="{StaticResource MdStepperHorizontalTemplate}" />
       <!-- Even-width cells let each step's trailing connector run to the next indicator. -->
       <Setter Property="ItemsPanel"><ItemsPanelTemplate><UniformGrid Rows="1" /></ItemsPanelTemplate></Setter>
-    </Style>
-    <Style Selector="^:horizontal /template/ md|MdStep">
-      <Setter Property="Template" Value="{StaticResource MdStepHorizontalTemplate}" />
     </Style>
   </ControlTheme>
 
