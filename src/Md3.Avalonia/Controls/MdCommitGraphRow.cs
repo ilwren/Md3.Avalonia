@@ -4,7 +4,6 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Templates;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Avalonia.Visuals.Platform;
 
 namespace Md3.Avalonia.Controls;
 
@@ -100,15 +99,18 @@ internal sealed class CommitGraphLaneHost : Control
             if (brush is null) continue;
             var start = new Point(LaneX(from, laneWidth), mid);
             var end = new Point(LaneX(to, laneWidth), height);
-            var path = new PathGeometry();
-            using (var builder = new PathGeometryContext(path))
+            // StreamGeometry/Open is the drawing pattern the repo uses everywhere; PathGeometry
+            // only rebuilds its native geometry when the Figures property is reassigned, so
+            // figures added to the initial collection are never rendered.
+            var curve = new StreamGeometry();
+            using (var figure = curve.Open())
             {
-                builder.BeginFigure(start, isFilled: false);
-                builder.CubicBezierTo(new Point(start.X, height * 0.75), new Point(end.X, height * 0.75), end);
-                builder.EndFigure(false);
+                figure.BeginFigure(start, isFilled: false);
+                figure.CubicBezierTo(new Point(start.X, height * 0.75), new Point(end.X, height * 0.75), end);
+                figure.EndFigure(false);
             }
 
-            context.DrawGeometry(null, new Pen(brush, 2), path);
+            context.DrawGeometry(null, new Pen(brush, 2), curve);
         }
 
         var nodeBrush = _node?.Color ?? BrushFor(geometry.Lane);
