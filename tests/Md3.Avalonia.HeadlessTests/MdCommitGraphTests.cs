@@ -102,13 +102,13 @@ public sealed class MdCommitGraphTests
     {
         Application.Current!.RequestedThemeVariant = ThemeVariant.Light;
         var graph = new MdCommitGraph { HeadId = "m" };
-        graph.ItemsSource =
-        [
+        graph.ItemsSource = new MdCommitNode[]
+        {
             Node("m", "a2", "b1"),
             Node("b1", "a2"),
             Node("a2", "a1"),
             Node("a1"),
-        ];
+        };
         using var host = Show(graph);
 
         Assert.Equal(2, graph.LaneCount);
@@ -126,12 +126,12 @@ public sealed class MdCommitGraphTests
     {
         Application.Current!.RequestedThemeVariant = ThemeVariant.Light;
         var graph = new MdCommitGraph { MaxLanes = 2, LaneWidth = 20, NodeSize = 10 };
-        graph.ItemsSource =
-        [
+        graph.ItemsSource = new MdCommitNode[]
+        {
             Node("c", "b"),
             Node("b", "a"),
             Node("a"),
-        ];
+        };
         using var host = Show(graph);
 
         var laneZero = graph.GetLaneBrush(0);
@@ -147,7 +147,7 @@ public sealed class MdCommitGraphTests
     public void Non_Node_Items_Fall_Back_To_A_Synthetic_Id()
     {
         var graph = new MdCommitGraph();
-        graph.ItemsSource = ["just a string", Node("a")];
+        graph.ItemsSource = new object?[] { "just a string", Node("a") };
         using var host = Show(graph);
 
         Assert.Equal(2, graph.LaneCount);

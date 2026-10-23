@@ -14,8 +14,8 @@ public partial class CommitGraphGalleryPage : UserControl
         var ago = (int days) => now.AddDays(-days).ToUniversalTime();
 
         // mainline, a side branch and its merge - the shape the control exists to draw.
-        DemoGraph.ItemsSource =
-        [
+        DemoGraph.ItemsSource = new MdCommitNode[]
+        {
             new MdCommitNode
             {
                 Id = "a1",
@@ -81,6 +81,6 @@ public partial class CommitGraphGalleryPage : UserControl
                 Author = "ilwren",
                 Date = ago(21),
             },
-        ];
+        };
     }
 }
