@@ -172,12 +172,14 @@ public class MdTextBoxSelectionTests
         // extended from character 0. The guard re-anchors the range to the single character at
         // the caret instead; if the platform does not report the double click the range is a
         // collapsed caret. Either way it must never reach the start of the text.
-        var start = host.Box.SelectionStart;
-        var end = host.Box.SelectionEnd;
-        Assert.InRange(start, 2, 4);
-        Assert.InRange(end, start, Cjk.Length - 1);
-        Assert.True(end - start <= 7,
-            $"the drag started at character 3 and must stay anchored there; got [{start},{end}]");
+        var selStart = host.Box.SelectionStart;
+        var selEnd = host.Box.SelectionEnd;
+        Assert.True(selStart >= 2 && selStart <= 4,
+            $"the selection [{selStart},{selEnd}] must start at the pressed character, got {selStart}");
+        Assert.True(selEnd >= selStart && selEnd < Cjk.Length,
+            $"the selection [{selStart},{selEnd}] must stay inside the text and be well-formed");
+        Assert.True(selEnd - selStart <= 7,
+            $"the drag started at character 3 and must stay anchored there; got [{selStart},{selEnd}]");
     }
 
     [AvaloniaFact]
@@ -368,8 +370,8 @@ public class MdTextBoxSelectionTests
         var start = host.Box.SelectionStart;
         var end = host.Box.SelectionEnd;
         var caret = host.Box.CaretIndex;
-        Assert.InRange(
-            start, pressedIndex - 1, Math.Min(pressedIndex + 1, maxEndExclusive - 1),
+        var high = Math.Min(pressedIndex + 1, maxEndExclusive - 1);
+        Assert.True(start >= pressedIndex - 1 && start <= high,
             $"{what}: the selection [{start},{end}] must be anchored at the press point " +
             $"(character {pressedIndex}), never at the start of the text");
         Assert.True(end >= start, $"{what}: the selection end {end} is before its start {start}");
