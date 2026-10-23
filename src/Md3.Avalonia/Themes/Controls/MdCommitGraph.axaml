@@ -80,7 +80,7 @@
           <TextBlock Grid.Column="1"
                      VerticalAlignment="Center"
                      FontSize="12"
-                     FontFamily="JetBrains Mono, Consolas, monospace"
+                     FontFamily="Cascadia Mono,Consolas,Menlo,DejaVu Sans Mono,Liberation Mono,Noto Sans Mono,monospace"
                      Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                      Text="{Binding ShortId}" />
         </Grid>
