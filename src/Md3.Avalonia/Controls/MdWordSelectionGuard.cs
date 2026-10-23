@@ -30,14 +30,14 @@ internal static class MdWordSelectionGuard
         public int WordEnd;
     }
 
-    public static readonly AttachedProperty<State?> PreemptedStateProperty =
+    internal static readonly AttachedProperty<State?> PreemptedStateProperty =
         AvaloniaProperty.RegisterAttached<MdWordSelectionGuard, TextBox, State?>(
             nameof(PreemptedState),
             defaultValue: null,
             inherits: false);
 
-    public static State? GetPreemptedState(TextBox box) => box.GetValue(PreemptedStateProperty);
-    public static void SetPreemptedState(TextBox box, State? value) => box.SetValue(PreemptedStateProperty, value);
+    internal static State? GetPreemptedState(TextBox box) => box.GetValue(PreemptedStateProperty);
+    internal static void SetPreemptedState(TextBox box, State? value) => box.SetValue(PreemptedStateProperty, value);
 
     /// <summary>Call from <see cref="TextBox.OnPointerPressed"/> after <c>base</c>.</summary>
     public static void CorrectAfterPress(TextBox box, PointerPressedEventArgs e, TextPresenter? presenter)
