@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
@@ -11,6 +12,15 @@ using Avalonia.Threading;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A Flutter-style Material stepper with linear/non-linear navigation and command hooks.</summary>
+/// <remarks>
+/// <para>
+/// The default <see cref="Orientation"/> is vertical: every step renders its header and, when active,
+/// its body below the header. With <see cref="Orientation"/> set to <see cref="Avalonia.Layout.Orientation.Horizontal"/>
+/// the steps lay out as a header row (indicator above label, horizontal connectors between steps) and
+/// the active step's content moves into a shared body below the row, mirroring Flutter's
+/// <c>StepperType.horizontal</c>.
+/// </para>
+/// </remarks>
 [PseudoClasses(":vertical", ":horizontal", ":first-step", ":last-step")]
 public sealed class MdStepper : ItemsControl
 {
@@ -29,9 +39,16 @@ public sealed class MdStepper : ItemsControl
         AvaloniaProperty.Register<MdStepper, ICommand?>(nameof(ContinueCommand));
     public static readonly StyledProperty<ICommand?> CancelCommandProperty =
         AvaloniaProperty.Register<MdStepper, ICommand?>(nameof(CancelCommand));
+    public static readonly DirectProperty<MdStepper, object?> ActiveStepContentProperty =
+        AvaloniaProperty.RegisterDirect<MdStepper, object?>(nameof(ActiveStepContent), stepper => stepper.ActiveStepContent);
+    public static readonly DirectProperty<MdStepper, ContentTemplate?> ActiveStepContentTemplateProperty =
+        AvaloniaProperty.RegisterDirect<MdStepper, ContentTemplate?>(
+            nameof(ActiveStepContentTemplate), stepper => stepper.ActiveStepContentTemplate);
 
     private Button? _continueButton;
     private Button? _cancelButton;
+    private object? _activeStepContent;
+    private ContentTemplate? _activeStepContentTemplate;
 
     static MdStepper()
     {
@@ -57,6 +74,12 @@ public sealed class MdStepper : ItemsControl
     public object? CancelContent { get => GetValue(CancelContentProperty); set => SetValue(CancelContentProperty, value); }
     public ICommand? ContinueCommand { get => GetValue(ContinueCommandProperty); set => SetValue(ContinueCommandProperty, value); }
     public ICommand? CancelCommand { get => GetValue(CancelCommandProperty); set => SetValue(CancelCommandProperty, value); }
+
+    /// <summary>Gets the content of the active step, used by the horizontal layout's shared body.</summary>
+    public object? ActiveStepContent => GetValue(ActiveStepContentProperty);
+
+    /// <summary>Gets the content template of the active step, used by the horizontal layout's shared body.</summary>
+    public ContentTemplate? ActiveStepContentTemplate => GetValue(ActiveStepContentTemplateProperty);
 
     public event EventHandler<int>? ContinueRequested;
     public event EventHandler<int>? CancelRequested;
@@ -112,7 +135,20 @@ public sealed class MdStepper : ItemsControl
             .Distinct()
             .ToArray();
         for (var index = 0; index < steps.Length; index++)
+        {
             steps[index].SetStepState(index + 1, index == ActiveStep);
+            // Per-step position drives the connector visibility: the last step never draws a
+            // trailing connector in either orientation.
+            steps[index].PseudoClasses.Set(":step-first", index == 0);
+            steps[index].PseudoClasses.Set(":step-last", index == steps.Length - 1);
+        }
+
+        // The horizontal layout renders the active step's content in a shared body below the
+        // header row, so the template needs the active item's content as a property.
+        var active = steps.Length > 0 ? steps[Math.Clamp(ActiveStep, 0, steps.Length - 1)] : null;
+        SetAndRaise(ActiveStepContentProperty, ref _activeStepContent, active?.Content);
+        SetAndRaise(ActiveStepContentTemplateProperty, ref _activeStepContentTemplate, active?.ContentTemplate);
+
         UpdatePseudoClasses();
     }
 

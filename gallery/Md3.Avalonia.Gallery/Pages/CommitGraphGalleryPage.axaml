@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.CommitGraphGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Commit graph" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="A GitHub-style commit history: lanes, branch curves, merge connectors and a head marker." />
+      </StackPanel>
+
+      <StackPanel Spacing="10" MaxWidth="760" HorizontalAlignment="Stretch">
+        <TextBlock Classes="h2" Text="History" />
+        <md:MdCard Padding="16">
+          <md:MdCommitGraph x:Name="DemoGraph" HeadId="a1" />
+        </md:MdCard>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample CSharpCode="var graph = new MdCommitGraph&#10;{&#10;    HeadId = &quot;a1&quot;,&#10;    Items =&#10;    {&#10;        new MdCommitNode { Id = &quot;a1&quot;, Message = &quot;Merge branch 'feature' into main&quot;,&#10;                           Author = &quot;ilwren&quot;, ParentIds = [&quot;a2&quot;, &quot;b1&quot;] },&#10;        new MdCommitNode { Id = &quot;b1&quot;, Message = &quot;Feature: new export&quot;&#10;                           ParentIds = [&quot;a2&quot;] },&#10;        new MdCommitNode { Id = &quot;a2&quot;, Message = &quot;Refactor pipeline&quot;&#10;                           ParentIds = [&quot;a3&quot;] },&#10;        new MdCommitNode { Id = &quot;a3&quot;, Message = &quot;Initial commit&quot; },&#10;    },&#10;};" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

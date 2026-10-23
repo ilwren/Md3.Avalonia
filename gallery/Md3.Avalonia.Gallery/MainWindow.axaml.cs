@@ -61,6 +61,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             NumericNav, ThemeResourcesNav, SymbolsNav, MotionNav,
             BannerNav, DataTableNav, PaginatedTableNav, DismissibleNav, ExpansionPanelNav,
             GridTileNav, RefreshNav, ReorderableListNav, StepperNav,
+            CommitGraphNav, MaskedTextBoxNav, PaginationNav,
             FormValidationNav, SimpleDialogNav, AboutDialogNav, PickerRestoreNav,
             DraggableSheetNav, KeyboardAvoidNav, AdaptiveControlsNav, FocusHeroNav,
             AutoCompleteNav, DateRangePickerNav, RangeSliderNav, ResponsiveContentNav,
@@ -123,9 +124,11 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             Entry("Chart", "chart line bar series axis plot data visualisation visualization", ChartNav, () => new ChartGalleryPage()),
             Entry("Chat view", "chat message bubble conversation quote retry attachment composer", ChatNav, () => new ChatViewGalleryPage()),
             Entry("Command palette", "command palette search keyword action launcher", CommandPaletteNav, () => new CommandPaletteGalleryPage()),
+            Entry("Commit graph", "commit graph git history branch merge lane", CommitGraphNav, () => new CommitGraphGalleryPage()),
             Entry("Data grids", "data grid table row column sort filter spreadsheet datagrid theme", DataGridNav, () => new DataGridGalleryPage()),
             Entry("Density", "density compact comfortable spacing scope attached property", DensityNav, () => new DensityGalleryPage()),
             Entry("Hover cards", "hover card delay focus preview overlay", HoverCardNav, () => new HoverCardGalleryPage()),
+            Entry("Masked text field", "masked text field input mask pin phone phone number format", MaskedTextBoxNav, () => new MaskedTextBoxGalleryPage()),
             Entry("Masonry panel", "masonry quilted staggered tile dashboard reflow", MasonryNav, () => new MasonryPanelGalleryPage()),
             Entry("Paged items", "paging pagination infinite scroll load more async page", PagedItemsNav, () => new PagedItemsGalleryPage()),
             Entry("PIN input", "pin otp code verification digit mask one time password", PinInputNav, () => new PinInputGalleryPage()),
@@ -163,6 +166,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             Entry("Banner", "banner message action persistent dismiss", BannerNav, () => new BannerGalleryPage()),
             Entry("Data table", "data table sort column header rows", DataTableNav, () => new DataTableGalleryPage()),
             Entry("Paginated table", "paginated data table rows per page pagination", PaginatedTableNav, () => new PaginatedDataTableGalleryPage()),
+            Entry("Pagination", "pagination pager page numbers dots carousel prev next", PaginationNav, () => new PaginationGalleryPage()),
             Entry("Dismissible", "dismissible swipe to dismiss restore slidable", DismissibleNav, () => new DismissibleGalleryPage()),
             Entry("Expansion panels", "expansion panel accordion expand collapse", ExpansionPanelNav, () => new ExpansionPanelGalleryPage()),
             Entry("Grid tiles", "grid tile bar media footer favorite", GridTileNav, () => new GridTileGalleryPage()),
@@ -327,6 +331,9 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
     private void ShowRefresh(object? s, RoutedEventArgs e) => Navigate(new RefreshIndicatorGalleryPage(), RefreshNav);
     private void ShowReorderableList(object? s, RoutedEventArgs e) => Navigate(new ReorderableListGalleryPage(), ReorderableListNav);
     private void ShowStepper(object? s, RoutedEventArgs e) => Navigate(new StepperGalleryPage(), StepperNav);
+    private void ShowCommitGraph(object? s, RoutedEventArgs e) => Navigate(new CommitGraphGalleryPage(), CommitGraphNav);
+    private void ShowMaskedTextBox(object? s, RoutedEventArgs e) => Navigate(new MaskedTextBoxGalleryPage(), MaskedTextBoxNav);
+    private void ShowPagination(object? s, RoutedEventArgs e) => Navigate(new PaginationGalleryPage(), PaginationNav);
     private void ShowFormValidation(object? s, RoutedEventArgs e) => Navigate(new FormValidationGalleryPage(), FormValidationNav);
     private void ShowSimpleDialog(object? s, RoutedEventArgs e) => Navigate(new SimpleDialogGalleryPage(), SimpleDialogNav);
     private void ShowAboutDialog(object? s, RoutedEventArgs e) => Navigate(new AboutDialogGalleryPage(), AboutDialogNav);

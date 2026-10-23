@@ -141,10 +141,10 @@ await notifications.ShowAsync(new MdSystemNotification("Ready", "The export has 
 ## Components
 
 - Actions: `MdButton`, `MdToggleButton`, `MdIconButton`, `MdToggleIconButton`, `MdSplitButton`, `MdStandardButtonGroup`, `MdConnectedButtonGroup`, `MdFloatingActionButton`, `MdExtendedFloatingActionButton`, `MdFabMenu`, `MdFabMenuItem`.
-- Selection and input: `MdTextBox`, `MdCheckBox`, `MdRadioButton`, `MdComboBox`, `MdAutoCompleteBox`, `MdNumericBox`, `MdSwitch`, `MdSlider`, `MdRangeSlider`, `MdSegmentedButtonGroup`, `MdSegmentedButton`.
-- Content: `MdCard`, `MdCarousel`, `MdCarouselItem`, `MdChip`, `MdAssistChip`, `MdFilterChip`, `MdInputChip`, `MdSuggestionChip`, `MdList`, `MdListItem`, `MdDivider`.
+- Selection and input: `MdTextBox`, `MdMaskedTextBox`, `MdCheckBox`, `MdRadioButton`, `MdComboBox`, `MdAutoCompleteBox`, `MdNumericBox`, `MdSwitch`, `MdSlider`, `MdRangeSlider`, `MdSegmentedButtonGroup`, `MdSegmentedButton`.
+- Content: `MdCard`, `MdCarousel`, `MdCarouselItem`, `MdChip`, `MdAssistChip`, `MdFilterChip`, `MdInputChip`, `MdSuggestionChip`, `MdList`, `MdListItem`, `MdDivider`, `MdCommitGraph`, `MdCommitNode`.
 - Pickers: `MdDatePicker`, `MdDatePickerDialog`, `MdDateRangePicker`, `MdTimePicker`, `MdTimePickerDialog`, and the interactive `MdTimeDial`/`MdTimeDialPart` clock-face API.
-- Navigation: `MdTopAppBar`, `MdBottomAppBar`, `MdNavigationBar`, `MdNavigationBarItem`, `MdNavigationDrawer`, `MdNavigationRail`, `MdTabs`, `MdTabItem`, `MdTabsView`, `MdTabView`, `MdTabViewItem`.
+- Navigation: `MdTopAppBar`, `MdBottomAppBar`, `MdNavigationBar`, `MdNavigationBarItem`, `MdNavigationDrawer`, `MdNavigationRail`, `MdTabs`, `MdTabItem`, `MdTabsView`, `MdTabView`, `MdTabViewItem`, `MdPagination`.
 - Tabs come in two shapes. `MdTabView` carries its own tab strip and content, like a classic `TabControl`. `MdTabs` is only the bar, for the common Material case where it sits in an app bar or header away from the pages; pair it with `MdTabsView`, whose children are the pages matched to the bar's tabs by position, and whose `Tabs` property keeps selection in step both ways. This mirrors Flutter's `TabBar` and `TabBarView`.
 - Transient surfaces: `MdDialog`, `MdDialogHost`, `MdDialogService`, `IMdDialogService`, `MdDialogServiceExtensions`, `MdDropdownMenu`, `MdMenuAnchor`, `MdMenu`, `MdMenuItem`, `MdSheetHost`, `MdSnackbar`, `MdSnackbarHost`, `MdSnackbarService`, `IMdSnackbarService`, `MdTooltip`, `MdTooltipHost`.
 - Feedback: `MdLoadingIndicator`, `MdLinearProgressIndicator`, `MdCircularProgressIndicator`, `MdBadge`, `MdBadgedBox`.
@@ -173,11 +173,11 @@ The following catalog covers the public control surface shipped by the core pack
 | Area | Controls and supporting types |
 |---|---|
 | **Buttons and actions** | `MdButton` (`Filled`, `Tonal`, `Outlined`, `Text` variants), `MdIconButton`, `MdToggleButton`, `MdToggleIconButton`, `MdSplitButton`, `MdStandardButtonGroup`, `MdConnectedButtonGroup`, `MdFloatingActionButton`, `MdExtendedFloatingActionButton`, `MdFabMenu`, `MdFabMenuItem`, `MdFabMenuPanel` |
-| **Text and form input** | `MdTextBox`, `MdNumericBox`, `MdAutoCompleteBox`, `MdSearchBar`, `MdSearchView`, `MdCheckBox`, `MdRadioButton`, `MdSwitch`, `MdSlider`, `MdRangeSlider`, `MdComboBox`, `MdForm`, `MdFormField`, `MdDropdownFormField`, `MdOutlinedFieldBorder` |
+| **Text and form input** | `MdTextBox`, `MdMaskedTextBox`, `MdNumericBox`, `MdAutoCompleteBox`, `MdSearchBar`, `MdSearchView`, `MdCheckBox`, `MdRadioButton`, `MdSwitch`, `MdSlider`, `MdRangeSlider`, `MdComboBox`, `MdForm`, `MdFormField`, `MdDropdownFormField`, `MdOutlinedFieldBorder` |
 | **Chips and selection** | `MdChip`, `MdAssistChip`, `MdFilterChip`, `MdInputChip`, `MdSuggestionChip`, `MdSegmentedButton`, `MdSegmentedButtonGroup` |
-| **Surfaces and content** | `MdSurface`, `MdCard`, `MdList`, `MdListItem`, `MdDivider`, `MdCarousel`, `MdCarouselItem`, `MdGridTile`, `MdGridTileBar`, `MdBanner`, `MdExpansionPanel`, `MdExpansionPanelList`, `MdDataTable`, `MdPaginatedDataTable` |
+| **Surfaces and content** | `MdSurface`, `MdCard`, `MdList`, `MdListItem`, `MdDivider`, `MdCarousel`, `MdCarouselItem`, `MdGridTile`, `MdGridTileBar`, `MdBanner`, `MdExpansionPanel`, `MdExpansionPanelList`, `MdDataTable`, `MdPaginatedDataTable`, `MdCommitGraph`, `MdCommitNode` |
 | **Menus and dialogs** | `MdMenu`, `MdMenuItem`, `MdSubMenuItem`, `MdMenuAnchor`, `MdDropdownMenu`, `MdDialog`, `MdDialogHost`, `MdSimpleDialog`, `MdAboutDialog`, `MdLicensePage`, `MdSheetHost`, `MdTooltip`, `MdTooltipHost` |
-| **Navigation and layout** | `MdScaffold`, `MdTopAppBar`, `MdBottomAppBar`, `MdToolbar`, `MdNavigationBar`, `MdNavigationBarItem`, `MdNavigationDrawer`, `MdNavigationRail`, `MdNavigationRailItem`, `MdNavigationSuite`, `MdTabs`, `MdTabItem`, `MdTabView`, `MdTabViewItem`, `MdAdaptiveLayout`, `MdAdaptiveSwitch`, `MdKeyboardAvoidingHost`, `MdDraggableScrollableSheet` |
+| **Navigation and layout** | `MdScaffold`, `MdTopAppBar`, `MdBottomAppBar`, `MdToolbar`, `MdNavigationBar`, `MdNavigationBarItem`, `MdNavigationDrawer`, `MdNavigationRail`, `MdNavigationRailItem`, `MdNavigationSuite`, `MdTabs`, `MdTabItem`, `MdTabView`, `MdTabViewItem`, `MdPagination`, `MdAdaptiveLayout`, `MdAdaptiveSwitch`, `MdKeyboardAvoidingHost`, `MdDraggableScrollableSheet` |
 | **Mobile platform integration** | `MdSafeArea`, `MdBackNavigation`, `MdBackScope`, `MdKeyboardAvoidingHost` |
 | **Settings and preference surfaces** | `MdSettingsGroup`, `MdSettingsCard`, `MdSettingsExpander` |
 | **Feedback and status** | `MdLoadingIndicator`, `MdLinearProgressIndicator`, `MdCircularProgressIndicator`, `MdAdaptiveProgressIndicator`, `MdBadge`, `MdBadgedBox`, `MdRefreshIndicator`, `MdSnackbar`, `MdSnackbarHost`, `MdSnackbarService` |
@@ -186,7 +186,7 @@ The following catalog covers the public control surface shipped by the core pack
 | **Foundations and icons** | `MdText`, `MdIcon`, `MdSymbolPresenter`, `MdStateLayer`, `MdRipplePresenter`, `MdFocusRing`, `MdScrollViewer`, `MdScrollBar`, `MdSliderThumb`, `MdWindow` |
 | **Window chrome** | `MdBorderlessWindow`, `MdWindowTitleBar`, `MdCaptionButton`, `MdWindowCaptionButton`, `MdWindowDragRegion`, `MdWindowResizeGrip`, `IMdWindowPlatformAdapter`, `MdWindowPlatformAdapterResolver`, `MdWindowsWindowPlatformAdapter`, `MdMacOsWindowPlatformAdapter`, `MdLinuxWindowPlatformAdapter`, `MdAvaloniaWindowPlatformAdapter`, `MdAndroidWindowPlatformAdapter` |
 
-Most core controls expose styled properties, bindable `Items`/`ItemsSource` where applicable, routed events, commands, and native Avalonia automation peers. Variant and option enums are part of the public API and should be preferred over string values. All 81 public enums (60 core and 21 Extra) are listed with their members under [Enumerations](#enumerations).
+Most core controls expose styled properties, bindable `Items`/`ItemsSource` where applicable, routed events, commands, and native Avalonia automation peers. Variant and option enums are part of the public API and should be preferred over string values. All 83 public enums (62 core and 21 Extra) are listed with their members under [Enumerations](#enumerations).
 
 ### Core control quick reference
 
@@ -205,6 +205,10 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 | `MdDatePicker`, `MdDateRangePicker`, `MdTimePicker` | Date, date range, and time selection | selected value(s), mode, dialogs, validation, restoration and `ShowAsync` |
 | `MdSnackbarHost`, `MdSnackbarService` | Queued transient messages | `Show`, `ShowAsync`, `Dismiss`, action/result, queue and shared service injection |
 | `MdCarousel`, `MdRefreshIndicator`, `MdReorderableList` | Touch-friendly content interaction | controller/provider APIs, navigation, refresh callbacks, reorder callbacks |
+| `MdMaskedTextBox` | Mask-constrained text input | `Mask` (literals are filled in while typing), `PromptChar`, `HidePromptOnLeave`, `MaskCompleted`/`MaskFull`; field state through `Label`, `PrefixText`, `SupportingText`, `ErrorText`, `IsError` and `MdMaskedTextBoxVariant` |
+| `MdCommitGraph`, `MdCommitNode` | GitHub-style commit history | items are `MdCommitNode` (`Id`, `Message`, `Author`, `Date`, `ParentIds`, `Tag`, `Color`); `HeadId` marks the head, `LaneWidth`/`MaxLanes`/`NodeSize` size the drawing, and `LaneCount` reports the lanes in use. Branching and merging draws the standard lane/curve connectors. `MdCommitGraphDateTextConverter` formats a node `Date` for the item template (`MMM d` in-year, `MMM d, yyyy` otherwise) |
+| `MdPagination` | Paging through a large page range | `NumberOfPages`, two-way `SelectedPageIndex`, `DisplayMode` (`MdPaginationDisplayMode.Numbers`/`Dots`), previous/next buttons; the visible window stays centered on the current page |
+| `MdStepper`, `MdStep` | Step-based flows | `SelectedIndex`, step `Header`/`Subtitle`/`State`; `Orientation` vertical (step list, default) or horizontal (connector header row with the active step's body below it) |
 | `MdScaffold`, `MdAdaptiveLayout`, `MdToolbar` | Application shell and responsive layout | slots/regions, breakpoint mode, density, toolbar mode and platform input mode |
 
 ### Optional package catalog (`Md3.Avalonia.Extra`)
@@ -1235,7 +1239,7 @@ when neither package is present.
 
 Every public enum and its members are listed below. To print the current member lists from source, run `python3 scripts/check-api-doc-coverage.py --enums`. The default coverage check fails when a public type name is missing from this document; it does not compare enum member lists, so review this table when the source enums change.
 
-### Core (`Md3.Avalonia`) — 60 enumerations
+### Core (`Md3.Avalonia`) — 62 enumerations
 
 | Enum | Members |
 |---|---|
@@ -1265,6 +1269,7 @@ Every public enum and its members are listed below. To print the current member 
 | `MdIconButtonVariant` | `Standard` · `Filled` · `Tonal` · `Outlined` |
 | `MdIconButtonWidth` | `Narrow` · `Default` · `Wide` |
 | `MdListVariant` | `Standard` · `Segmented` |
+| `MdMaskedTextBoxVariant` | `Filled` · `Outlined` |
 | `MdMotionKind` | `Spatial` · `Effects` |
 | `MdMotionScheme` | `Expressive` · `Standard` · `Reduced` · `None` |
 | `MdMotionSpeed` | `Fast` · `Default` · `Slow` |
@@ -1272,6 +1277,7 @@ Every public enum and its members are listed below. To print the current member 
 | `MdNavigationBarVariant` | `Flexible` · `Baseline` |
 | `MdNavigationDrawerPlacement` | `Left` · `Right` |
 | `MdNavigationSuiteMode` | `Auto` · `NavigationBar` · `NavigationRail` · `NavigationDrawer` |
+| `MdPaginationDisplayMode` | `Numbers` · `Dots` |
 | `MdPlaybackRequest` | `Play` · `Pause` · `Previous` · `Next` · `Rewind` · `Forward` · `Mute` · `Unmute` · `EnterFullScreen` · `ExitFullScreen` |
 | `MdProgressShape` | `Flat` · `Wavy` |
 | `MdSafeAreaEdges` | `None` · `Left` · `Top` · `Right` · `Bottom` · `Horizontal` · `Vertical` · `All` |

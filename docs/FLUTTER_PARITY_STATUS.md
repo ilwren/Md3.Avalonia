@@ -1,6 +1,6 @@
 # Flutter parity status
 
-Last reviewed: 2026-10-02  
+Last reviewed: 2026-10-22  
 Comparison target: Flutter stable public API documentation (see `spec-snapshot/manifest.json`).
 
 Md3.Avalonia is Avalonia-native. A similar type name does **not** imply complete Flutter API,
@@ -21,6 +21,11 @@ normative for documentation and release notes.
 | `MdAboutDialog` | API shell | About metadata surface and license callback | No built-in dialog route or complete Flutter license flow |
 | `MdContainerTransform`, `MdAnimatedVisibility` (Extra) | Implemented subset | Bounds and shape morph on Material's 30/70 cross-fade; clip-based enter/exit that never reflows content | Elevation morph and interruption velocity are not modelled; a reversal restarts rather than retargets |
 | `MdSharedAxis`, `MdFadeThrough` (Extra) | Partial | Phased entrance with slide/scale, retained exit for templated and view-model content | A `Control` assigned to `Content` cannot be shown by two presenters at once, so its exit phase is skipped and only the entrance animates |
+| `MdStepper` | Implemented subset | Vertical and horizontal (`Orientation`) step flows; per-step `State` styling, index navigation and `ActiveStepChanged` | No Flutter `controlsStep`/`currentStep` animation-timing parity; horizontal step content placement is simplified versus Flutter's |
+| `MdPagination` | No Flutter counterpart | Numbered and dot display modes, previous/next paging over `NumberOfPages`, two-way `SelectedPageIndex` | Flutter has no first-party pagination widget; the control is based on Avalonia `PipsPager`, not a Flutter port |
+| `MdMaskedTextBox` | No Flutter counterpart | Input constrained to a mask with auto-filled literals, `PromptChar`, `HidePromptOnLeave`, and the `MdTextBox` field-state surface | Flutter masks input with `TextInputFormatter` (no first-party widget); the control extends Avalonia `MaskedTextBox` |
+| `MdCommitGraph` | No Flutter counterpart | Lane-based commit history with branch/merge connectors, head marker, per-lane Material colors, `HeadId` and read-only `LaneCount` | No first-party Flutter commit graph; layout is a custom GitHub-style lane algorithm, items are plain `MdCommitNode` models supplied by the host |
+| `MdCarousel` | Mapped to `PageView` | Weighted, hero, center-aligned and uncontained carousel variants with controller and autoplay | Not certified for Flutter `PageView` physics/scroll-position parity |
 
 ## Release policy
 

@@ -82,6 +82,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Color picker", () => new ColorPickerGalleryPage());
         AddPage("Data table", () => new DataTableGalleryPage());
         AddPage("Paginated table", () => new PaginatedDataTableGalleryPage());
+        AddPage("Pagination", () => new PaginationGalleryPage());
         AddPage("Dialogs", () => new DialogGalleryPage());
         AddPage("Simple dialog", () => new SimpleDialogGalleryPage());
         AddPage("About and licenses", () => new AboutDialogGalleryPage());
@@ -134,6 +135,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Signature pad", () => new SignaturePadGalleryPage());
         AddPage("Chat view", () => new ChatViewGalleryPage());
         AddPage("Command palette", () => new CommandPaletteGalleryPage());
+        AddPage("Commit graph", () => new CommitGraphGalleryPage());
         AddPage("Data grids", () => new DataGridGalleryPage());
         AddPage("Docking", () => new DockGalleryPage());
         AddPage("Draggable tabs", () => new DraggableTabsGalleryPage());
@@ -146,6 +148,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Hex editor", () => new HexEditorGalleryPage());
         AddPage("Density", () => new DensityGalleryPage());
         AddPage("Hover cards", () => new HoverCardGalleryPage());
+        AddPage("Masked text field", () => new MaskedTextBoxGalleryPage());
         AddPage("Masonry panel", () => new MasonryPanelGalleryPage());
         AddPage("Paged items", () => new PagedItemsGalleryPage());
         AddPage("PIN input", () => new PinInputGalleryPage());

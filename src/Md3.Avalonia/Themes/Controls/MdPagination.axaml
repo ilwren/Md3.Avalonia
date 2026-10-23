@@ -1,0 +1,134 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <!-- Numbered page item: one-based index on a 32 DIP square. -->
+  <ControlTheme x:Key="MdPaginationNumberItemTheme" TargetType="ListBoxItem">
+    <Setter Property="Width" Value="32" />
+    <Setter Property="Height" Value="32" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Margin" Value="2,0" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ListBoxItem">
+        <Grid Background="Transparent">
+          <Border x:Name="PART_Section" CornerRadius="8" Background="Transparent">
+            <TextBlock x:Name="PART_PageLabel" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       FontSize="13" Foreground="{TemplateBinding Foreground}" Text="{Binding}" />
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_Section"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" /></Style>
+    <Style Selector="^:selected /template/ Border#PART_Section"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /></Style>
+    <Style Selector="^:selected /template/ TextBlock#PART_PageLabel"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" /></Style>
+    <Style Selector="^:selected:pointerover /template/ Border#PART_Section"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" /></Style>
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
+  </ControlTheme>
+
+  <!-- Dot page item: the Material pager - an 8 DIP dot that stretches to a 24 DIP pill when selected. -->
+  <ControlTheme x:Key="MdPaginationDotItemTheme" TargetType="ListBoxItem">
+    <Setter Property="Width" Value="24" />
+    <Setter Property="Height" Value="32" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Margin" Value="2,0" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ListBoxItem">
+        <Grid Background="Transparent">
+          <Border x:Name="PART_Dot" Width="8" Height="8" CornerRadius="4" VerticalAlignment="Center"
+                  Background="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}">
+            <Border.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Width" Duration="0:0:0.2" />
+                <BrushTransition Property="Background" Duration="0:0:0.2" />
+              </Transitions>
+            </Border.Transitions>
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_Dot"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" /></Style>
+    <Style Selector="^:selected /template/ Border#PART_Dot">
+      <Setter Property="Width" Value="24" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:selected:pointerover /template/ Border#PART_Dot"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type md:MdPagination}" TargetType="md:MdPagination">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Orientation="{TemplateBinding Orientation}" Spacing="4">
+          <md:MdIconButton x:Name="PART_PreviousButton"
+                           AutomationProperties.Name="Previous page"
+                           Icon="{DynamicResource Md.Icon.ChevronLeft}"
+                           IsVisible="{TemplateBinding IsPreviousButtonVisible}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+          <ListBox x:Name="PART_PipsPagerList"
+                   Background="Transparent"
+                   BorderThickness="0"
+                   Padding="0"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                   ItemsSource="{Binding TemplateSettings.Pips, RelativeSource={RelativeSource TemplatedParent}}"
+                   SelectedIndex="{Binding SelectedPageIndex, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                   AutoScrollToSelectedItem="False"
+                   ClipToBounds="False"
+                   ItemContainerTheme="{StaticResource MdPaginationNumberItemTheme}">
+            <ListBox.Styles>
+              <Style Selector="ScrollViewer">
+                <Setter Property="ClipToBounds" Value="False" />
+              </Style>
+            </ListBox.Styles>
+            <ListBox.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="{Binding Orientation, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=PipsPager}}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="0" />
+              </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+          </ListBox>
+          <md:MdIconButton x:Name="PART_NextButton"
+                           AutomationProperties.Name="Next page"
+                           Icon="{DynamicResource Md.Icon.ChevronRight}"
+                           IsVisible="{TemplateBinding IsNextButtonVisible}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:dots /template/ ListBox#PART_PipsPagerList">
+      <Setter Property="ItemContainerTheme" Value="{StaticResource MdPaginationDotItemTheme}" />
+    </Style>
+    <!-- Vertical pagers walk up and down: the expansion glyphs are the Material up/down chevrons. -->
+    <Style Selector="^:vertical /template/ md|MdIconButton#PART_PreviousButton">
+      <Setter Property="Icon" Value="{DynamicResource Md.Icon.ExpandLess}" />
+    </Style>
+    <Style Selector="^:vertical /template/ md|MdIconButton#PART_NextButton">
+      <Setter Property="Icon" Value="{DynamicResource Md.Icon.ExpandMore}" />
+    </Style>
+
+    <!-- The base control already disables the button at either end; hide it so the pager keeps its size. -->
+    <Style Selector="^:first-page /template/ md|MdIconButton#PART_PreviousButton">
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="IsHitTestVisible" Value="False" />
+    </Style>
+    <Style Selector="^:last-page /template/ md|MdIconButton#PART_NextButton">
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="IsHitTestVisible" Value="False" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

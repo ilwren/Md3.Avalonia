@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -122,7 +122,10 @@ public sealed class MdGalleryTests
             new TreeViewGalleryPage(),
             new TagInputGalleryPage(),
             new AvatarGalleryPage(),
-            new RatingGalleryPage()
+            new RatingGalleryPage(),
+            new CommitGraphGalleryPage(),
+            new MaskedTextBoxGalleryPage(),
+            new PaginationGalleryPage()
         ];
 
         foreach (var page in pages)

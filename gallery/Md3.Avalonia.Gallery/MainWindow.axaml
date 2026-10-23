@@ -142,6 +142,7 @@
             <md:MdButton x:Name="ColorPickerNav" Content="Color picker" Variant="Text" HorizontalContentAlignment="Left" Click="ShowColorPicker" />
             <md:MdButton x:Name="ComboBoxNav" Content="Combo box" Variant="Text" HorizontalContentAlignment="Left" Click="ShowComboBoxes" />
             <md:MdButton x:Name="CommandPaletteNav" Content="Command palette" Variant="Text" HorizontalContentAlignment="Left" Click="ShowCommandPalette" />
+            <md:MdButton x:Name="CommitGraphNav" Content="Commit graph" Variant="Text" HorizontalContentAlignment="Left" Click="ShowCommitGraph" />
             <md:MdButton x:Name="DataGridNav" Content="Data grids" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDataGrid" />
             <md:MdButton x:Name="DataTableNav" Content="Data table" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDataTable" />
             <md:MdButton x:Name="PickerNav" Content="Date &amp; time pickers" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPickers" />
@@ -160,6 +161,7 @@
             <md:MdButton x:Name="KeyboardAvoidNav" Content="Keyboard avoidance" Variant="Text" HorizontalContentAlignment="Left" Click="ShowKeyboardAvoid" />
             <md:MdButton x:Name="ListNav" Content="Lists" Variant="Text" HorizontalContentAlignment="Left" Click="ShowLists" />
             <md:MdButton x:Name="LoadingNav" Content="Loading" Variant="Text" HorizontalContentAlignment="Left" Click="ShowLoading" />
+            <md:MdButton x:Name="MaskedTextBoxNav" Content="Masked text field" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMaskedTextBox" />
             <md:MdButton x:Name="MasonryNav" Content="Masonry panel" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMasonry" />
             <md:MdButton x:Name="MenuNav" Content="Menus" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMenus" />
             <md:MdButton x:Name="NavigationBarNav" Content="Navigation bar" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNavigationBar" />
@@ -168,6 +170,7 @@
             <md:MdButton x:Name="NumericNav" Content="Numeric input" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNumeric" />
             <md:MdButton x:Name="PagedItemsNav" Content="Paged items" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPagedItems" />
             <md:MdButton x:Name="PaginatedTableNav" Content="Paginated table" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPaginatedTable" />
+            <md:MdButton x:Name="PaginationNav" Content="Pagination" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPagination" />
             <md:MdButton x:Name="PickerRestoreNav" Content="Picker restoration" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPickerRestore" />
             <md:MdButton x:Name="PinInputNav" Content="PIN input" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPinInput" />
             <md:MdButton x:Name="PopoverNav" Content="Popover" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPopover" />

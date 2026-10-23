@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.PaginationGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Pagination" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="Previous and next buttons step through pages; numbered or dot indicators keep the current page in view." />
+      </StackPanel>
+
+      <StackPanel Spacing="10" MaxWidth="760" HorizontalAlignment="Stretch">
+        <TextBlock Classes="h2" Text="Numbered" />
+        <md:MdCard Padding="24">
+          <StackPanel Spacing="20">
+            <md:MdLinearProgressIndicator x:Name="PageProgress" Minimum="0" Maximum="11" Value="0" />
+            <TextBlock x:Name="PageStatus" Classes="body" Text="Page 1 of 12" />
+            <md:MdPagination x:Name="NumberedPager" NumberOfPages="12" SelectedPageIndex="0" MaxVisiblePips="5"
+                             SelectedIndexChanged="NumberedPagerChanged" HorizontalAlignment="Center" />
+          </StackPanel>
+        </md:MdCard>
+      </StackPanel>
+
+      <StackPanel Spacing="10" MaxWidth="760" HorizontalAlignment="Stretch">
+        <TextBlock Classes="h2" Text="Dots" />
+        <md:MdCard Padding="24">
+          <StackPanel Spacing="20">
+            <md:MdCarousel x:Name="DotsCarousel" Height="180" ItemHeight="160" ItemWidth="320" SelectedIndex="0"
+                           SelectionChanged="DotsCarouselChanged">
+              <md:MdCarouselItem>
+                <md:MdCard>
+                  <TextBlock x:Name="SlideOneText" Classes="body" Text="Slide 1" />
+                </md:MdCard>
+              </md:MdCarouselItem>
+              <md:MdCarouselItem>
+                <md:MdCard>
+                  <TextBlock x:Name="SlideTwoText" Classes="body" Text="Slide 2" />
+                </md:MdCard>
+              </md:MdCarouselItem>
+              <md:MdCarouselItem>
+                <md:MdCard>
+                  <TextBlock x:Name="SlideThreeText" Classes="body" Text="Slide 3" />
+                </md:MdCard>
+              </md:MdCarouselItem>
+            </md:MdCarousel>
+            <md:MdPagination x:Name="DotsPager" DisplayMode="Dots" NumberOfPages="3" SelectedPageIndex="0"
+                             SelectedIndexChanged="DotsPagerChanged" HorizontalAlignment="Center" />
+            <TextBlock x:Name="DotsStatus" Classes="body" Text="Slide 1 of 3" />
+          </StackPanel>
+        </md:MdCard>
+      </StackPanel>
+
+      <StackPanel Spacing="10" MaxWidth="760" HorizontalAlignment="Stretch">
+        <TextBlock Classes="h2" Text="Vertical" />
+        <StackPanel Orientation="Horizontal" Spacing="24" HorizontalAlignment="Left">
+          <md:MdPagination x:Name="VerticalPager" Orientation="Vertical" NumberOfPages="6" SelectedPageIndex="1"
+                           SelectedIndexChanged="VerticalPagerChanged" VerticalAlignment="Center" />
+          <md:MdCard Padding="24" MinWidth="260">
+            <TextBlock x:Name="VerticalStatus" Classes="body" Text="Page 2 of 6" />
+          </md:MdCard>
+        </StackPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdPagination x:Name=&quot;Pager&quot; NumberOfPages=&quot;12&quot;&#10;                SelectedPageIndex=&quot;0&quot; MaxVisiblePips=&quot;5&quot;&#10;                DisplayMode=&quot;Numbers&quot;&#10;                SelectedIndexChanged=&quot;OnPageChanged&quot; /&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

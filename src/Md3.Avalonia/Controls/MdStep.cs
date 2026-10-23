@@ -11,7 +11,8 @@ using Md3.Avalonia.Motion;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A header, optional subtitle and body participating in an <see cref="MdStepper"/>.</summary>
-[PseudoClasses(":active", ":inactive", ":content-present", ":complete", ":editing", ":error", ":disabled", ":reduced-motion", ":no-motion")]
+[PseudoClasses(":active", ":inactive", ":content-present", ":complete", ":editing", ":error", ":disabled",
+    ":reduced-motion", ":no-motion", ":step-first", ":step-last")]
 public sealed class MdStep : HeaderedContentControl
 {
     public static readonly StyledProperty<object?> SubtitleProperty =

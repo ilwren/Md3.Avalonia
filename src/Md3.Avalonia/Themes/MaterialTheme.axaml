@@ -62,6 +62,9 @@
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdFlutterParity.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdFlutterAdvanced.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdSettingsCard.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdPagination.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdMaskedTextBox.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdCommitGraph.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>
