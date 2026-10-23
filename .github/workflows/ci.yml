@@ -267,6 +267,34 @@ jobs:
         continue-on-error: true
         run: scripts/probe-tests.sh MdGalleryTests gallery-pages.trx
 
+      # The main suite dies a few minutes in even with every gallery probe green, so the poison
+      # may sit in the new non-gallery classes or accumulate across the whole process. Probe each
+      # new class alone, then the entire suite with the gallery classes removed: if that run dies
+      # too, the poison is not a gallery page at all.
+      - name: Probe the commit graph tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdCommitGraphTests commit-graph.trx
+
+      - name: Probe the pagination tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdPaginationTests pagination.trx
+
+      - name: Probe the stepper tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdStepperTests stepper.trx
+
+      - name: Probe the masked text field tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdMaskedTextBoxTests mask.trx
+
+      - name: Probe the text box selection tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdTextBoxSelectionTests selection.trx
+
+      - name: Probe the suite without the gallery classes
+        continue-on-error: true
+        run: scripts/probe-tests.sh "FullyQualifiedName!~MdGallery" no-gallery.trx everything-but-the-gallery
+
       # The map theme is the newest package and the only one that reaches a third-party Skia text
       # stack, so its eight tests are run on their own as well: the notice is what says they ran and
       # how many, which the main suite's summary cannot be read back for.

@@ -11,16 +11,24 @@ set -uo pipefail
 
 filter="${1:?a filter fragment is required}"
 trx="${2:?a .trx file name is required}"
+label="${3:-$filter}"
 project="tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj"
+
+# A filter containing '|' or '!' is a full vstest expression; anything else is a name fragment.
+if [[ "$filter" == *'|'* || "$filter" == *'!'* ]]; then
+  expression="$filter"
+else
+  expression="FullyQualifiedName~$filter"
+fi
 
 timeout --signal=KILL 300 dotnet test "$project" \
   -c Release --no-build --no-restore \
-  --filter "FullyQualifiedName~$filter" \
+  --filter "$expression" \
   --logger "trx;LogFileName=$trx" \
   --logger "console;verbosity=normal"
 status=$?
 
-python3 - "$filter" "$trx" "$status" <<'PY'
+python3 - "$label" "$trx" "$status" <<'PY'
 import glob
 import sys
 import xml.etree.ElementTree as ET
