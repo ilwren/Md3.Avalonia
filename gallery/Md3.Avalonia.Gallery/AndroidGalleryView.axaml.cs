@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
@@ -136,6 +136,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Chat view", () => new ChatViewGalleryPage());
         AddPage("Command palette", () => new CommandPaletteGalleryPage());
         AddPage("Commit graph", () => new CommitGraphGalleryPage());
+        AddPage("Contribution grid", () => new ContributionGridGalleryPage());
         AddPage("Data grids", () => new DataGridGalleryPage());
         AddPage("Docking", () => new DockGalleryPage());
         AddPage("Draggable tabs", () => new DraggableTabsGalleryPage());

@@ -136,7 +136,8 @@
        Content is not rendered here; the stepper's shared body owns it. -->
   <ControlTemplate x:Key="MdStepHorizontalTemplate" TargetType="md:MdStep">
     <Grid ColumnDefinitions="Auto,*" Background="Transparent">
-      <Button x:Name="PART_HeaderButton" Theme="{StaticResource MdStepHeaderButtonTheme}" Padding="12,4" HorizontalAlignment="Left">
+      <!-- Extra padding widens the transparent hit area around each step header. -->
+      <Button x:Name="PART_HeaderButton" Theme="{StaticResource MdStepHeaderButtonTheme}" Padding="16,10" HorizontalAlignment="Left">
         <StackPanel Spacing="4" MinWidth="64" HorizontalAlignment="Center">
           <Border x:Name="PART_Indicator" Width="32" Height="32" HorizontalAlignment="Center"
                   Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" CornerRadius="16">
@@ -158,7 +159,7 @@
           </StackPanel>
         </StackPanel>
       </Button>
-      <Border x:Name="PART_HConnector" Grid.Column="1" Height="2" VerticalAlignment="Top" Margin="8,19,8,0"
+      <Border x:Name="PART_HConnector" Grid.Column="1" Height="2" VerticalAlignment="Top" Margin="8,25,8,0"
               IsHitTestVisible="False" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
     </Grid>
   </ControlTemplate>
@@ -168,7 +169,7 @@
        StepperType.horizontal. -->
   <ControlTemplate x:Key="MdStepperHorizontalTemplate" TargetType="md:MdStepper">
     <Grid RowDefinitions="Auto,*">
-      <Border Grid.Row="0" Padding="16,8">
+      <Border Grid.Row="0" Padding="20,12">
         <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
       </Border>
       <Grid Grid.Row="1" RowDefinitions="*,Auto" Margin="0,16,0,0">

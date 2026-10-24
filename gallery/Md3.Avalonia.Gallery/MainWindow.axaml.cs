@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
@@ -61,7 +61,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             NumericNav, ThemeResourcesNav, SymbolsNav, MotionNav,
             BannerNav, DataTableNav, PaginatedTableNav, DismissibleNav, ExpansionPanelNav,
             GridTileNav, RefreshNav, ReorderableListNav, StepperNav,
-            CommitGraphNav, MaskedTextBoxNav, PaginationNav,
+            CommitGraphNav, ContributionGridNav, MaskedTextBoxNav, PaginationNav,
             FormValidationNav, SimpleDialogNav, AboutDialogNav, PickerRestoreNav,
             DraggableSheetNav, KeyboardAvoidNav, AdaptiveControlsNav, FocusHeroNav,
             AutoCompleteNav, DateRangePickerNav, RangeSliderNav, ResponsiveContentNav,
@@ -125,6 +125,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             Entry("Chat view", "chat message bubble conversation quote retry attachment composer", ChatNav, () => new ChatViewGalleryPage()),
             Entry("Command palette", "command palette search keyword action launcher", CommandPaletteNav, () => new CommandPaletteGalleryPage()),
             Entry("Commit graph", "commit graph git history branch merge lane", CommitGraphNav, () => new CommitGraphGalleryPage()),
+            Entry("Contribution grid", "contribution grid github heatmap activity days week calendar", ContributionGridNav, () => new ContributionGridGalleryPage()),
             Entry("Data grids", "data grid table row column sort filter spreadsheet datagrid theme", DataGridNav, () => new DataGridGalleryPage()),
             Entry("Density", "density compact comfortable spacing scope attached property", DensityNav, () => new DensityGalleryPage()),
             Entry("Hover cards", "hover card delay focus preview overlay", HoverCardNav, () => new HoverCardGalleryPage()),
@@ -332,6 +333,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
     private void ShowReorderableList(object? s, RoutedEventArgs e) => Navigate(new ReorderableListGalleryPage(), ReorderableListNav);
     private void ShowStepper(object? s, RoutedEventArgs e) => Navigate(new StepperGalleryPage(), StepperNav);
     private void ShowCommitGraph(object? s, RoutedEventArgs e) => Navigate(new CommitGraphGalleryPage(), CommitGraphNav);
+    private void ShowContributionGrid(object? s, RoutedEventArgs e) => Navigate(new ContributionGridGalleryPage(), ContributionGridNav);
     private void ShowMaskedTextBox(object? s, RoutedEventArgs e) => Navigate(new MaskedTextBoxGalleryPage(), MaskedTextBoxNav);
     private void ShowPagination(object? s, RoutedEventArgs e) => Navigate(new PaginationGalleryPage(), PaginationNav);
     private void ShowFormValidation(object? s, RoutedEventArgs e) => Navigate(new FormValidationGalleryPage(), FormValidationNav);

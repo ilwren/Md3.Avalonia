@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -143,6 +143,7 @@
             <md:MdButton x:Name="ComboBoxNav" Content="Combo box" Variant="Text" HorizontalContentAlignment="Left" Click="ShowComboBoxes" />
             <md:MdButton x:Name="CommandPaletteNav" Content="Command palette" Variant="Text" HorizontalContentAlignment="Left" Click="ShowCommandPalette" />
             <md:MdButton x:Name="CommitGraphNav" Content="Commit graph" Variant="Text" HorizontalContentAlignment="Left" Click="ShowCommitGraph" />
+            <md:MdButton x:Name="ContributionGridNav" Content="Contribution grid" Variant="Text" HorizontalContentAlignment="Left" Click="ShowContributionGrid" />
             <md:MdButton x:Name="DataGridNav" Content="Data grids" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDataGrid" />
             <md:MdButton x:Name="DataTableNav" Content="Data table" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDataTable" />
             <md:MdButton x:Name="PickerNav" Content="Date &amp; time pickers" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPickers" />

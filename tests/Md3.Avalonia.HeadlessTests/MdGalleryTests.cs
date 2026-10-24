@@ -124,6 +124,7 @@ public sealed class MdGalleryTests
             new AvatarGalleryPage(),
             new RatingGalleryPage(),
             new CommitGraphGalleryPage(),
+            new ContributionGridGalleryPage(),
             new MaskedTextBoxGalleryPage(),
             new PaginationGalleryPage()
         ];

@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
@@ -468,7 +468,13 @@ internal static class GalleryLocalization
         ["PIN code"]="PIN 码", ["Waiting for input."]="等待输入。", ["Error state"]="错误状态",
         ["Commit graph"]="提交图",
         ["A GitHub-style commit history: lanes, branch curves, merge connectors and a head marker."]="GitHub 风格的提交历史：泳道、分支曲线、合并连线与 HEAD 标记。",
+        ["A GitHub-style commit history that reads dense histories: first-parent links stay solid, the parts a merge absorbs turn dashed, and every commit can be clicked to inspect it."]="GitHub 风格的提交历史，能读懂复杂历史：第一父级链保持实线，被合并吸收的部分转为虚线，每条提交都可单击查看详情。",
         ["History"]="历史",
+        ["Contribution grid"]="贡献图",
+        ["A GitHub-style activity heatmap: one column per week, seven rows, levels sized against the data's own percentiles. Click a day to inspect it; hover for its tooltip."]="GitHub 风格的贡献热力图：每周为一列、共七行，等级按数据自身百分位划分。单击某一天查看详情，悬停显示提示。",
+        ["Stats"]="统计", ["Regenerate"]="重新生成", ["Compact"]="紧凑",
+        ["Smaller cells and tighter spacing fit a whole year in a sidebar."]="更小的格子与更紧的间距，能让一整年放进侧边栏。",
+        ["Numbered, one screen per page"]="数字，每页一屏", ["Dots, vertical"]="圆点，垂直",
         ["Horizontal"]="水平",
         ["The header row walks through the steps with connectors; the active step's body moves below the row."]="标题行以连接线依次经过各步骤；当前步骤的内容在行下方移动。",
     };

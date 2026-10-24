@@ -1,13 +1,64 @@
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
+using Avalonia.Media;
 
 namespace Md3.Avalonia.Gallery.Pages;
 
 public partial class PaginationGalleryPage : UserControl
 {
     private static string L(string english, string chinese) => GalleryLocalization.Choose(english, chinese);
+
+    // (symbol, accent role, English title, Chinese title, English body, Chinese body) -
+    // every one of the 12 pages shows something different.
+    private static readonly (string Symbol, string Accent, string TitleEn, string TitleZh, string BodyEn, string BodyZh)[] NumberedPages =
+    [
+        ("◧", "Md.Sys.Color.Primary", "Dashboard", "仪表盘",
+         "KPIs, charts and the last activity at a glance.", "关键指标、图表与最新动态，一屏尽览。"),
+        ("✉", "Md.Sys.Color.Secondary", "Inbox", "收件箱",
+         "Unread threads and quick replies, no search required.", "未读会话与快速回复，无需搜索。"),
+        ("✦", "Md.Sys.Color.Tertiary", "Ideas", "灵感",
+         "Every half-formed thought the team saved this week.", "团队本周收藏的所有半成品想法。"),
+        ("▣", "Md.Sys.Color.Error", "Issues", "问题",
+         "Blocked, failing and still open - in one honest list.", "被阻塞、失败与仍开放的问题，一张诚实的清单。"),
+        ("◐", "Md.Sys.Color.PrimaryContainer", "Builds", "构建",
+         "The latest pipeline runs and what broke them.", "最新的流水线运行结果与失败原因。"),
+        ("◆", "Md.Sys.Color.SecondaryContainer", "Roadmap", "路线图",
+         "Quarterly goals ordered by the effort they really take.", "按真实投入排序的季度目标。"),
+        ("★", "Md.Sys.Color.TertiaryContainer", "Favorites", "收藏",
+         "Documents, boards and dashboards pinned by you.", "你固定的文档、看板与仪表盘。"),
+        ("➜", "Md.Sys.Color.ErrorContainer", "Deploys", "部署",
+         "Staging and production, with one-tape rollbacks.", "预发与生产环境，一键回滚。"),
+        ("✚", "Md.Sys.Color.SurfaceVariant", "Team", "团队",
+         "Who is where, in what timezone and on which plan.", "谁在哪里、处于哪个时区、使用哪个套餐。"),
+        ("◈", "Md.Sys.Color.OnSurfaceVariant", "Audit", "审计",
+         "Every change, who made it and why, in order.", "每一次变更、操作者与原因，按序排列。"),
+        ("▤", "Md.Sys.Color.Outline", "Docs", "文档",
+         "How-to guides written by the people who built it.", "由构建者撰写的操作指南。"),
+        ("✳", "Md.Sys.Color.InversePrimary", "Settings", "设置",
+         "The switches that change how the whole workspace behaves.", "改变整个工作区行为的开关。"),
+    ];
+
+    private static readonly (string TitleEn, string TitleZh, string BodyEn, string BodyZh)[] VerticalDotsPages =
+    [
+        ("Welcome", "欢迎",
+         "Four quick steps set up a workspace your team will actually use.",
+         "四个简单步骤就能建好一个团队真正会用起来的工作区。"),
+        ("Pick a home", "选择起点",
+         "Start from a template or keep an empty board - both stay fast.",
+         "从模板开始或保留空白看板，两者同样快。"),
+        ("Invite people", "邀请成员",
+         "A link and a role per person; nobody gets more access than needed.",
+         "每人一个链接和一个角色，没有人会获得多余的权限。"),
+        ("Go", "完成",
+         "That is everything. The workspace is live the moment you continue.",
+         "就是这些。点击继续，工作区即刻上线。"),
+    ];
+
     private bool _syncing;
     private bool _initialized;
+    private Border[]? _numberedPages;
 
     public PaginationGalleryPage()
     {
@@ -18,6 +69,16 @@ public partial class PaginationGalleryPage : UserControl
         PageStatus.Text = L("Page 1 of 12", "第 1 页，共 12 页");
         DotsStatus.Text = L("Slide 1 of 3", "第 1 张，共 3 张");
         VerticalStatus.Text = L("Page 2 of 6", "第 2 页，共 6 页");
+        VerticalDotsTitle.Text = L(VerticalDotsPages[0].TitleEn, VerticalDotsPages[0].TitleZh);
+        VerticalDotsBody.Text = L(VerticalDotsPages[0].BodyEn, VerticalDotsPages[0].BodyZh);
+        VerticalDotsStatus.Text = L("Dots page 1 of 4", "圆点第 1 页，共 4 页");
+
+        _numberedPages = NumberedPages.Select(BuildNumberedPage).ToArray();
+        NumberedPagesHost.Children.Clear();
+        foreach (var page in _numberedPages)
+            NumberedPagesHost.Children.Add(page);
+        ShowNumberedPage(0);
+
         // XAML property setters (SelectedPageIndex, SelectedIndex) raise their change events
         // while the tree is still being parsed, before later named fields exist. The handler
         // would then dereference a field that the loader has not assigned yet, so swallow the
@@ -30,6 +91,56 @@ public partial class PaginationGalleryPage : UserControl
         if (!_initialized) return;
         PageProgress.Value = NumberedPager.SelectedPageIndex;
         PageStatus.Text = L($"Page {NumberedPager.SelectedPageIndex + 1} of 12", $"第 {NumberedPager.SelectedPageIndex + 1} 页，共 12 页");
+        ShowNumberedPage(NumberedPager.SelectedPageIndex);
+    }
+
+    private void ShowNumberedPage(int index)
+    {
+        if (_numberedPages is null) return;
+        for (var i = 0; i < _numberedPages.Length; i++)
+            _numberedPages[i].IsVisible = i == index;
+    }
+
+    private static Border BuildNumberedPage(
+        (string Symbol, string Accent, string TitleEn, string TitleZh, string BodyEn, string BodyZh) spec)
+    {
+        var (symbol, accent, titleEn, titleZh, bodyEn, bodyZh) = spec;
+        return new Border
+        {
+            CornerRadius = new CornerRadius(12),
+            Padding = new Thickness(24),
+            Background = new DynamicResourceReference("Md.Sys.Color.SurfaceContainerLow.Brush"),
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
+            Child = new StackPanel
+            {
+                Spacing = 6,
+                VerticalAlignment = VerticalAlignment.Center,
+                Children =
+                {
+                    new TextBlock
+                    {
+                        Text = symbol,
+                        FontSize = 40,
+                        Foreground = new DynamicResourceReference(accent + ".Brush"),
+                    },
+                    new TextBlock
+                    {
+                        Text = L(titleEn, titleZh),
+                        FontSize = 18,
+                        FontWeight = FontWeight.SemiBold,
+                        Foreground = new DynamicResourceReference("Md.Sys.Color.OnSurface.Brush"),
+                    },
+                    new TextBlock
+                    {
+                        Text = L(bodyEn, bodyZh),
+                        FontSize = 13,
+                        TextWrapping = TextWrapping.Wrap,
+                        Foreground = new DynamicResourceReference("Md.Sys.Color.OnSurfaceVariant.Brush"),
+                    },
+                },
+            },
+        };
     }
 
     private void DotsPagerChanged(object? sender, PipsPagerSelectedIndexChangedEventArgs e)
@@ -48,6 +159,15 @@ public partial class PaginationGalleryPage : UserControl
         DotsPager.SelectedPageIndex = DotsCarousel.SelectedIndex;
         _syncing = false;
         DotsStatus.Text = L($"Slide {DotsCarousel.SelectedIndex + 1} of 3", $"第 {DotsCarousel.SelectedIndex + 1} 张，共 3 张");
+    }
+
+    private void VerticalDotsPagerChanged(object? sender, PipsPagerSelectedIndexChangedEventArgs e)
+    {
+        if (!_initialized) return;
+        var page = VerticalDotsPages[VerticalDotsPager.SelectedPageIndex];
+        VerticalDotsTitle.Text = L(page.TitleEn, page.TitleZh);
+        VerticalDotsBody.Text = L(page.BodyEn, page.BodyZh);
+        VerticalDotsStatus.Text = L($"Dots page {VerticalDotsPager.SelectedPageIndex + 1} of 4", $"圆点第 {VerticalDotsPager.SelectedPageIndex + 1} 页，共 4 页");
     }
 
     private void VerticalPagerChanged(object? sender, PipsPagerSelectedIndexChangedEventArgs e)

@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             xmlns:motion="using:Md3.Avalonia.Motion"
              x:Class="Md3.Avalonia.Gallery.Pages.PaginationGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Spacing="28" Margin="0,0,12,24">
@@ -12,13 +13,16 @@
       </StackPanel>
 
       <StackPanel Spacing="10" MaxWidth="760" HorizontalAlignment="Stretch">
-        <TextBlock Classes="h2" Text="Numbered" />
+        <TextBlock Classes="h2" Text="Numbered, one screen per page" />
         <md:MdCard Padding="24">
           <StackPanel Spacing="20">
+            <!-- Each of the 12 pages is a completely different screen; the pager swaps them. -->
+            <Grid x:Name="NumberedPagesHost" Height="230" />
             <md:MdLinearProgressIndicator x:Name="PageProgress" Minimum="0" Maximum="11" Value="0" />
             <TextBlock x:Name="PageStatus" Classes="body" Text="Page 1 of 12" />
             <md:MdPagination x:Name="NumberedPager" NumberOfPages="12" SelectedPageIndex="0" MaxVisiblePips="5"
-                             SelectedIndexChanged="NumberedPagerChanged" HorizontalAlignment="Center" />
+                             SelectedIndexChanged="NumberedPagerChanged" HorizontalAlignment="Center"
+                             motion:MdMotion.Scheme="None" />
           </StackPanel>
         </md:MdCard>
       </StackPanel>
@@ -46,8 +50,25 @@
               </md:MdCarouselItem>
             </md:MdCarousel>
             <md:MdPagination x:Name="DotsPager" DisplayMode="Dots" NumberOfPages="3" SelectedPageIndex="0"
-                             SelectedIndexChanged="DotsPagerChanged" HorizontalAlignment="Center" />
+                             SelectedIndexChanged="DotsPagerChanged" HorizontalAlignment="Center"
+                             motion:MdMotion.Scheme="None" />
             <TextBlock x:Name="DotsStatus" Classes="body" Text="Slide 1 of 3" />
+          </StackPanel>
+        </md:MdCard>
+      </StackPanel>
+
+      <StackPanel Spacing="10" MaxWidth="760" HorizontalAlignment="Stretch">
+        <TextBlock Classes="h2" Text="Dots, vertical" />
+        <md:MdCard Padding="24">
+          <StackPanel Orientation="Horizontal" Spacing="24">
+            <md:MdPagination x:Name="VerticalDotsPager" DisplayMode="Dots" Orientation="Vertical" NumberOfPages="4" SelectedPageIndex="0"
+                             SelectedIndexChanged="VerticalDotsPagerChanged" VerticalAlignment="Center"
+                             motion:MdMotion.Scheme="None" />
+            <StackPanel Spacing="8" VerticalAlignment="Center" MinWidth="240">
+              <TextBlock x:Name="VerticalDotsTitle" Classes="h2" Text="Onboarding" />
+              <TextBlock x:Name="VerticalDotsBody" Classes="body" TextWrapping="Wrap" />
+              <TextBlock x:Name="VerticalDotsStatus" Classes="body" Text="Dots page 1 of 4" />
+            </StackPanel>
           </StackPanel>
         </md:MdCard>
       </StackPanel>
@@ -56,7 +77,8 @@
         <TextBlock Classes="h2" Text="Vertical" />
         <StackPanel Orientation="Horizontal" Spacing="24" HorizontalAlignment="Left">
           <md:MdPagination x:Name="VerticalPager" Orientation="Vertical" NumberOfPages="6" SelectedPageIndex="1"
-                           SelectedIndexChanged="VerticalPagerChanged" VerticalAlignment="Center" />
+                           SelectedIndexChanged="VerticalPagerChanged" VerticalAlignment="Center"
+                           motion:MdMotion.Scheme="None" />
           <md:MdCard Padding="24" MinWidth="260">
             <TextBlock x:Name="VerticalStatus" Classes="body" Text="Page 2 of 6" />
           </md:MdCard>

@@ -8,19 +8,25 @@
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Commit graph" />
         <TextBlock Classes="body" TextWrapping="Wrap"
-                   Text="A GitHub-style commit history: lanes, branch curves, merge connectors and a head marker." />
+                   Text="A GitHub-style commit history that reads dense histories: first-parent links stay solid, the parts a merge absorbs turn dashed, and every commit can be clicked to inspect it." />
       </StackPanel>
 
-      <StackPanel Spacing="10" MaxWidth="760" HorizontalAlignment="Stretch">
-        <TextBlock Classes="h2" Text="History" />
+      <Grid ColumnDefinitions="*,320" ColumnSpacing="20">
         <md:MdCard Padding="16">
-          <md:MdCommitGraph x:Name="DemoGraph" HeadId="a1" />
+          <md:MdCommitGraph x:Name="DemoGraph" HeadId="h5" CommitClicked="GraphCommitClicked" />
         </md:MdCard>
-      </StackPanel>
+
+        <StackPanel Spacing="10" VerticalAlignment="Top" Margin="0,4,0,0">
+          <TextBlock Classes="h2" Text="Selection" />
+          <md:MdCard Padding="16">
+            <StackPanel x:Name="DetailContent" Spacing="8" />
+          </md:MdCard>
+        </StackPanel>
+      </Grid>
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
-        <gallery:CodeExample CSharpCode="var graph = new MdCommitGraph&#10;{&#10;    HeadId = &quot;a1&quot;,&#10;    Items =&#10;    {&#10;        new MdCommitNode { Id = &quot;a1&quot;, Message = &quot;Merge branch 'feature' into main&quot;,&#10;                           Author = &quot;ilwren&quot;, ParentIds = [&quot;a2&quot;, &quot;b1&quot;] },&#10;        new MdCommitNode { Id = &quot;b1&quot;, Message = &quot;Feature: new export&quot;&#10;                           ParentIds = [&quot;a2&quot;] },&#10;        new MdCommitNode { Id = &quot;a2&quot;, Message = &quot;Refactor pipeline&quot;&#10;                           ParentIds = [&quot;a3&quot;] },&#10;        new MdCommitNode { Id = &quot;a3&quot;, Message = &quot;Initial commit&quot; },&#10;    },&#10;};" />
+        <gallery:CodeExample CSharpCode="var graph = new MdCommitGraph&#10;{&#10;    HeadId = &quot;h5&quot;,&#10;    ItemsSource = commits,&#10;};&#10;graph.CommitClicked += (_, node) =&gt; Details.Show(node);" />
       </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>
