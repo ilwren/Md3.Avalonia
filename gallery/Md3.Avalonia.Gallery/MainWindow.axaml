@@ -202,9 +202,9 @@
             <md:MdButton x:Name="TimelineNav" Content="Timeline" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTimeline" />
             <md:MdButton x:Name="ToolbarNav" Content="Toolbars" Variant="Text" HorizontalContentAlignment="Left" Click="ShowToolbars" />
             <md:MdButton x:Name="TooltipNav" Content="Tooltips" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTooltips" />
-            <md:MdButton x:Name="VideoPlayerNav" Content="Video player" Variant="Text" HorizontalContentAlignment="Left" Click="ShowVideoPlayer" />
             <md:MdButton x:Name="TransferNav" Content="Transfer" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTransfer" />
             <md:MdButton x:Name="TreeViewNav" Content="Tree view" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTreeView" />
+            <md:MdButton x:Name="VideoPlayerNav" Content="Video player" Variant="Text" HorizontalContentAlignment="Left" Click="ShowVideoPlayer" />
             <md:MdButton x:Name="WaterfallNav" Content="Waterfall" Variant="Text" HorizontalContentAlignment="Left" Click="ShowWaterfall" />
             <md:MdButton x:Name="WaveformNav" Content="Waveform" Variant="Text" HorizontalContentAlignment="Left" Click="ShowWaveform" />
               </StackPanel>
