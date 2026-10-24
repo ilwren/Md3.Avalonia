@@ -218,10 +218,11 @@ public sealed class MdCommitGraphTests
         host.Window.MouseUp(point, MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
 
-        Assert.Equal("b", graph.SelectedId,
-            $"row bounds {row.Bounds}, window point {point}, " +
-            $"transform was {(row.TransformToVisual(host.Window) is null ? "null" : "set")}, " +
-            $"row has {row.Bounds.Height} height in a {graph.Items.Count}-row graph");
+        if (graph.SelectedId != "b")
+            throw new Xunit.Sdk.XunitException(
+                $"click at {point} selected '{graph.SelectedId ?? "<null>"}' instead of 'b'; " +
+                $"row bounds {row.Bounds}, transform {(row.TransformToVisual(host.Window) is null ? "null" : "set")}, " +
+                $"row height {row.Bounds.Height} in a {graph.Items.Count}-row graph");
         Assert.NotNull(clicked);
         Assert.Equal("b", clicked!.Id);
         Assert.True(row.IsSelected, "the clicked row must be highlighted");
