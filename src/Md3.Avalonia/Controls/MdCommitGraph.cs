@@ -47,6 +47,8 @@ public class MdCommitGraph : ItemsControl
 
     private IReadOnlyList<MdCommitGraphRowGeometry> _rows = Array.Empty<MdCommitGraphRowGeometry>();
     private int _laneCount;
+    private IBrush?[] _laneBrushCache = Array.Empty<IBrush>();
+    private ThemeVariant _laneBrushVariant;
 
     static MdCommitGraph()
     {
@@ -132,15 +134,53 @@ public class MdCommitGraph : ItemsControl
     }
 
     /// <summary>Resolves the brush for a lane from the <c>Md.CommitGraph.Lane.Brush.N</c> tokens.</summary>
+    /// <remarks>
+    /// Hits are cached per (slot, theme variant): a render pass asks for one brush per lane per
+    /// row, and a walk plus a lazy resource build per paint is wasted work. Misses are not
+    /// cached, so a host whose theme attaches late still picks up the real tokens on the next
+    /// paint instead of being frozen on the fallback.
+    /// </remarks>
     public IBrush? GetLaneBrush(int lane)
     {
-        var slot = MaxLanes <= 0 ? 1 : (lane % MaxLanes) + 1;
-        var key = $"Md.CommitGraph.Lane.Brush.{slot}";
-        if (this.FindResource(key) is IBrush brush)
+        var variant = ActualThemeVariant;
+        var capacity = Math.Max(MaxLanes, 1);
+        if (_laneBrushCache.Length != capacity || _laneBrushVariant != variant)
+        {
+            _laneBrushCache = new IBrush?[capacity];
+            _laneBrushVariant = variant;
+        }
+
+        var slot = (lane % capacity) + 1;
+        if (_laneBrushCache[slot - 1] is { } hit)
+            return hit;
+
+        var brush = FindThemeBrush($"Md.CommitGraph.Lane.Brush.{slot}", variant);
+        if (brush is not null)
+        {
+            _laneBrushCache[slot - 1] = brush;
             return brush;
+        }
+
         // Fallback for hosts without the Md theme loaded.
-        return this.FindResource("Md.Sys.Color.Primary.Brush") as IBrush
+        return FindThemeBrush("Md.Sys.Color.Primary.Brush", variant)
             ?? new SolidColorBrush(Color.FromRgb(0x67, 0x50, 0xA4));
+    }
+
+    /// <summary>
+    /// Looks a brush up from the theme, trying the control's own resource chain first (so a
+    /// scoped override still wins) and then the application. The control chain can miss on a
+    /// freshly shown control, before its style attachment to the app has settled, which is why
+    /// the lookup does not stop at the control.
+    /// </summary>
+    private IBrush? FindThemeBrush(string key, ThemeVariant variant)
+    {
+        if (this.TryFindResource(key, variant, out var found) && found is IBrush brush)
+            return brush;
+        return Application.Current is { } app
+            && app.TryFindResource(key, variant, out var appFound)
+            && appFound is IBrush appBrush
+                ? appBrush
+                : null;
     }
 
     private void ApplyLayoutToContainers()
