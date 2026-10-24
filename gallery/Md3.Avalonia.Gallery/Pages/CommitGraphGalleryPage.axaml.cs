@@ -1,9 +1,10 @@
+using System;
+using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Md3.Avalonia.Controls;
-using System;
-using System.Linq;
 
 namespace Md3.Avalonia.Gallery.Pages;
 
@@ -73,7 +74,7 @@ public partial class CommitGraphGalleryPage : UserControl
         });
 
         var meta = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
-        meta.Children.Add(Info(node.Author + " · " + node.Date.ToString("MMM d, yyyy")));
+        meta.Children.Add(Info(node.Author + " · " + (node.Date?.ToString("MMM d, yyyy") ?? string.Empty)));
         if (node.Tag is { Length: > 0 } tag)
             meta.Children.Add(Chip(tag, "Md.Sys.Color.PrimaryContainer.Brush"));
         if (DemoGraph.HeadId == node.Id)

@@ -86,13 +86,13 @@ public partial class ContributionGridGalleryPage : UserControl
         Text = text,
         FontSize = strong ? 15 : 13,
         FontWeight = strong ? FontWeight.SemiBold : FontWeight.Normal,
-        TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+        TextWrapping = TextWrapping.Wrap,
     };
 
     private static TextBlock Info(string text) => new()
     {
         Text = text,
         FontSize = 13,
-        TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+        TextWrapping = TextWrapping.Wrap,
     };
 }
