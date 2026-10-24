@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <RootNamespace>Md3.Avalonia.Media</RootNamespace>
+    <AssemblyName>Md3.Avalonia.Media</AssemblyName>
+    <PackageId>Md3.Avalonia.Media</PackageId>
+    <Version>0.5.0-preview.2</Version>
+    <Description>Customizable Material Design 3 video player controls for Avalonia.</Description>
+    <PackageTags>avalonia;video;media;player;controls;material-design-3</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="LibVLCSharp.Avalonia" />
+  </ItemGroup>
+</Project>

@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.Icons.Lite", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.Extra", "src\Md3.Avalonia.Extra\Md3.Avalonia.Extra.csproj", "{247044DF-FA5C-4AD9-9BB1-86C104C6663D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.Media", "src\Md3.Avalonia.Media\Md3.Avalonia.Media.csproj", "{6F103B92-12C8-47AC-9622-146C54C138E9}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.DataGrid", "src\Md3.Avalonia.DataGrid\Md3.Avalonia.DataGrid.csproj", "{7F2A1C64-9D3E-4B58-A6C1-55D0E8B4F912}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.RichEditor", "src\Md3.Avalonia.RichEditor\Md3.Avalonia.RichEditor.csproj", "{3C8E7A51-6B24-4D97-9E13-A84F2C60D5B7}"
@@ -58,6 +60,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6F103B92-12C8-47AC-9622-146C54C138E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F103B92-12C8-47AC-9622-146C54C138E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F103B92-12C8-47AC-9622-146C54C138E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F103B92-12C8-47AC-9622-146C54C138E9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0096730E-6FFA-4645-A9D2-2A879409BAA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0096730E-6FFA-4645-A9D2-2A879409BAA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0096730E-6FFA-4645-A9D2-2A879409BAA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -145,6 +151,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{6F103B92-12C8-47AC-9622-146C54C138E9} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{0096730E-6FFA-4645-A9D2-2A879409BAA1} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{339728F8-3B14-4550-9303-49C8A73D7DA7} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{779728F8-3B14-4550-9303-49C8A73D7DA8} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}

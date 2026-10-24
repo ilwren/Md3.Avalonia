@@ -131,7 +131,8 @@ jobs:
           status=0
           : > /tmp/restore.log
           for proj in gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj \
-                      tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj; do
+                      tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
+                      src/Md3.Avalonia.Media/Md3.Avalonia.Media.csproj; do
             name="$(basename "$proj" .csproj)"
             echo "=== dotnet restore $proj ==="
             if dotnet restore "$proj" --nologo >> /tmp/restore.log 2>&1; then
@@ -162,6 +163,13 @@ jobs:
               printf '::error title=restore-tail::%s\n' "${line//%/%25}"; done
           fi
           exit "$status"
+
+      - name: Build media controls package
+        shell: bash
+        run: |
+          scripts/ci-build.sh \
+            src/Md3.Avalonia.Media/Md3.Avalonia.Media.csproj \
+            "Media controls package"
 
       - name: Build Gallery Desktop
         shell: bash
