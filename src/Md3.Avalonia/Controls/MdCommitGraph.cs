@@ -200,17 +200,21 @@ public class MdCommitGraph : ItemsControl
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             return;
 
-        // Resolve the pressed row geometrically: the presenter places the rows at exactly
-        // RowHeight spacing from the top, so the index is the position divided by the row
-        // height. No hit testing is involved, which keeps the result identical on desktop,
-        // mobile and the headless host.
+        // Resolve the pressed row from the containers' own bounds: each row reports its
+        // bounds in this graph's coordinate space, and the pressed position is in the same
+        // space, so the first containing row is the clicked one. No hit testing or source
+        // walking is involved, which keeps the result identical on desktop, mobile and the
+        // headless host, and correct for rows of any height.
         var pos = e.GetPosition(this);
-        if (RowHeight <= 0 || pos.Y < 0)
-            return;
-        var index = (int)(pos.Y / RowHeight);
-        if (index >= Items.Count)
-            return;
-        OnCommitRowClicked(index);
+        for (var i = 0; i < Items.Count; i++)
+        {
+            if (ContainerFromIndex(i) is CommitGraphRow { Bounds.Width: > 0, Bounds.Height: > 0 } row
+                && row.Bounds.Contains(pos))
+            {
+                OnCommitRowClicked(i);
+                return;
+            }
+        }
     }
 
     /// <summary>Selects the commit of the given row and raises <see cref="CommitClicked"/>.</summary>
