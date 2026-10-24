@@ -1,4 +1,6 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Md3.Avalonia.Media.Controls;
@@ -27,14 +29,14 @@ public partial class MediaPlayerGalleryPage : UserControl
             },
             Child = new StackPanel
             {
-                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
-                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Center,
+                VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
                 Spacing = 8,
                 Children =
                 {
-                    new TextBlock { Text = "▶", FontSize = 44, Foreground = Brushes.White, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center },
+                    new TextBlock { Text = "▶", FontSize = 44, Foreground = Brushes.White, HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Center },
                     new TextBlock { Text = "Material Player Preview", FontSize = 18, Foreground = Brushes.White },
-                    new TextBlock { Text = "Interactive controls · simulated timeline", FontSize = 12, Foreground = Brushes.LightGray, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center }
+                    new TextBlock { Text = "Interactive controls · simulated timeline", FontSize = 12, Foreground = Brushes.LightGray, HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Center }
                 }
             }
         };
