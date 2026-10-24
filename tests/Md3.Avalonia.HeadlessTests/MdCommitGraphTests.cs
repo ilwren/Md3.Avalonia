@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Md3.Avalonia.Controls;
@@ -140,8 +141,12 @@ public sealed class MdCommitGraphTests
         var laneTwo = graph.GetLaneBrush(2);
         Assert.NotNull(laneZero);
         Assert.NotNull(laneOne);
-        Assert.NotSame(laneZero, laneOne);
-        Assert.Same(laneZero, laneTwo); // 2 % 2 + 1 wraps back to the first slot
+        Assert.NotNull(laneTwo);
+        // Compare colors, not instances: FindResource is free to hand out a fresh brush object
+        // each call, and the cache that used to keep them identical gets rebuilt when other
+        // theme consumers (the gallery pages) load in the same process.
+        Assert.NotEqual(((SolidColorBrush)laneOne!).Color, ((SolidColorBrush)laneZero!).Color);
+        Assert.Equal(((SolidColorBrush)laneZero!).Color, ((SolidColorBrush)laneTwo!).Color); // 2 % 2 + 1 wraps back to the first slot
     }
 
     [AvaloniaFact]
