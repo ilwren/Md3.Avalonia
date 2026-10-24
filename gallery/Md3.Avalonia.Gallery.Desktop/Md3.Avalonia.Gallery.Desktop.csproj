@@ -23,5 +23,7 @@
          fallback. Excluding its assets leaves Avalonia's build in place. -->
     <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" ExcludeAssets="all" />
     <ProjectReference Include="../Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Condition="'$(OS)' == 'Windows_NT'" />
+    <PackageReference Include="VideoLAN.LibVLC.Mac" Condition="$([MSBuild]::IsOSPlatform('OSX'))" />
   </ItemGroup>
 </Project>

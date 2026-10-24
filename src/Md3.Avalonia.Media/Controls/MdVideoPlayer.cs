@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Animation;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -123,8 +124,17 @@ public sealed class MdVideoPlayer : UserControl
         var button = new Button
         {
             Content = text, Padding = new Thickness(10, 4),
-            Background = Brushes.Transparent, Foreground = Brushes.White, BorderThickness = new Thickness(0)
+            Background = Brushes.Transparent, Foreground = Brushes.White, BorderThickness = new Thickness(0),
+            Transitions = new Transitions
+            {
+                new DoubleTransition { Property = OpacityProperty, Duration = TimeSpan.FromMilliseconds(140) }
+            }
         };
+        button.PointerEntered += (_, _) => button.Opacity = 0.82;
+        button.PointerExited += (_, _) => button.Opacity = 1;
+        button.PointerPressed += (_, _) => button.Opacity = 0.58;
+        button.PointerReleased += (_, _) => button.Opacity = 0.82;
+        button.PointerCaptureLost += (_, _) => button.Opacity = 1;
         ToolTip.SetTip(button, tooltip);
         return button;
     }
