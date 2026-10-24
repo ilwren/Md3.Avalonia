@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500" role="img" aria-labelledby="title desc">
+  <title id="title">NuGet package map</title>
+  <desc id="desc">Core package, optional add-ons, icon alternatives, third-party integrations, and standalone notifications.</desc>
+  <defs>
+    <style>
+      text { font-family: Inter, 'Segoe UI', Arial, 'Microsoft YaHei', sans-serif; fill: #251d2b; }
+      .title { font-size: 30px; font-weight: 700; }
+      .label { font-size: 18px; font-weight: 700; }
+      .body { font-size: 15px; }
+      .card { stroke: #d7cbdc; stroke-width: 1.5; }
+    </style>
+  </defs>
+  <rect width="1200" height="500" rx="28" fill="#fbf8fc" />
+  <text x="48" y="58" class="title">NuGet packages</text>
+
+  <rect x="48" y="82" width="1104" height="100" rx="22" fill="#eaddff" class="card" />
+  <text x="76" y="122" class="label">Core</text>
+  <text x="76" y="153" class="body" font-weight="700">Md3.Avalonia</text>
+  <text x="310" y="142" class="body">Controls · MaterialTheme · design tokens · motion</text>
+
+  <path d="M600 182v22M196 204h808M196 204v16M462 204v16M788 204v16M1080 204v16" fill="none" stroke="#77658a" stroke-width="2" />
+
+  <rect x="48" y="220" width="294" height="230" rx="20" fill="#f2ecf7" class="card" />
+  <text x="72" y="258" class="label">Add-ons</text>
+  <text x="72" y="300" class="body">Md3.Avalonia.Extra</text>
+  <text x="72" y="332" class="body">Md3.Avalonia.DataGrid</text>
+  <text x="72" y="364" class="body">Md3.Avalonia.RichEditor</text>
+
+  <rect x="358" y="220" width="210" height="230" rx="20" fill="#e8f3ef" class="card" />
+  <text x="382" y="258" class="label">Icons</text>
+  <text x="382" y="305" class="body">Full</text>
+  <text x="382" y="337" class="body">Lite</text>
+
+  <rect x="584" y="220" width="408" height="230" rx="20" fill="#fce8ef" class="card" />
+  <text x="608" y="258" class="label">Theme integrations</text>
+  <text x="608" y="304" class="body">AvaloniaEdit · AvaloniaHex · Dock · Tabalonia</text>
+  <text x="608" y="336" class="body">Markdown · LiveCharts2 · ScottPlot</text>
+  <text x="608" y="368" class="body">PropertyGrid · NodifyM · Mapsui · InkCanvas</text>
+
+  <rect x="1008" y="220" width="144" height="230" rx="20" fill="#e4eff8" class="card" />
+  <text x="1030" y="258" class="label">Standalone</text>
+  <text x="1030" y="304" class="body">Notifications</text>
+</svg>

@@ -8,11 +8,12 @@
     <AssemblyName>Md3.Avalonia.PropertyGrid</AssemblyName>
     <Description>Material Design 3 theme for the Avalonia.PropertyGrid control. Opt-in package: it carries the bodong.Avalonia.PropertyGrid dependency so the core Material packages do not have to.</Description>
     <PackageId>Md3.Avalonia.PropertyGrid</PackageId>
-    <Version>0.5.0-preview.1</Version>
+    <Version>0.5.0-preview.2</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;propertygrid;property;grid;editor;inspector;settings;controls;theme;material-design-3</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>logo-128.png</PackageIcon>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
@@ -36,6 +37,7 @@
     <PackageReference Include="bodong.Avalonia.PropertyGrid" />
     <ProjectReference Include="../Md3.Avalonia/Md3.Avalonia.csproj" />
     <None Include="../../README.md" Pack="true" PackagePath="/" Link="README.md" />
+    <None Include="../../assets/logo-128.png" Pack="true" PackagePath="/" Link="logo-128.png" />
     <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />
   </ItemGroup>
 </Project>

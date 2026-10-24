@@ -71,7 +71,7 @@ public class MdBreadcrumbItem : AvaloniaObject
 
 /// <summary>
 /// A desktop and touch breadcrumb path supporting rich item models, icons, custom separators,
-/// overflow collapsing, MVVM commands, and direct selection APIs aligned with Flutter ecosystem patterns.
+/// overflow collapsing, MVVM commands, and direct selection APIs aligned with Flutter navigation patterns.
 /// </summary>
 [PseudoClasses(":wrap-overflow", ":scroll-overflow", ":collapse-overflow", ":powerline")]
 public sealed class MdBreadcrumb : ListBox

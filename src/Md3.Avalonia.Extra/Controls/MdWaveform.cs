@@ -15,6 +15,7 @@ namespace Md3.Avalonia.Extra.Controls;
 /// A Material waveform: one bar per peak, mirrored around the centre line by default, with the
 /// played part in Primary and the rest in SurfaceContainerHighest - the same split a Material 3
 /// slider makes between its active and inactive track.
+/// 用于显示音频峰值并支持播放进度拖动的 Material 波形控件。
 /// </summary>
 /// <remarks>
 /// <para>

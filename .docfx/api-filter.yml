@@ -1,0 +1,4 @@
+apiRules:
+  - exclude:
+      uidRegex: '^Md3\.Avalonia\.Controls\.MdSymbols(Lite)?$'
+      type: Class

@@ -10,6 +10,7 @@ namespace Md3.Avalonia.Extra.Controls;
 /// <summary>
 /// A masonry layout: children are placed into columns, each one going into whichever column is
 /// currently shortest, so items of differing heights pack without leaving ragged gaps.
+/// 按最短列贪心分配子项的瀑布流布局面板。
 /// </summary>
 /// <remarks>
 /// <para>
@@ -44,7 +45,7 @@ public class MdWaterfallPanel : Panel
     static MdWaterfallPanel() => AffectsMeasure<MdWaterfallPanel>(
         ColumnsProperty, MinColumnWidthProperty, ColumnSpacingProperty, ItemSpacingProperty);
 
-    /// <summary>An explicit column count. Zero, the default, derives the count from <see cref="MinColumnWidth"/>.</summary>
+    /// <summary>An explicit column count. Zero, the default, derives the count from <see cref="MinColumnWidth"/>. / 显式设置列数；默认值 0 表示根据 <see cref="MinColumnWidth"/> 推导列数。</summary>
     public int Columns { get => GetValue(ColumnsProperty); set => SetValue(ColumnsProperty, value); }
 
     /// <summary>The narrowest a column may be when the count is derived. Ignored once <see cref="Columns"/> is set.</summary>
@@ -58,6 +59,7 @@ public class MdWaterfallPanel : Panel
 
     /// <summary>
     /// Whether children glide to their new places when the column count changes.
+    /// 列数变化时，是否为子项移动到新位置添加平滑过渡动画。
     /// </summary>
     /// <remarks>
     /// Only a change of column count is animated. A resize that keeps the count has the children
@@ -196,6 +198,7 @@ public class MdWaterfallPanel : Panel
 /// <summary>
 /// An items control whose panel is a <see cref="MdWaterfallPanel"/>, for a masonry feed bound to a
 /// collection rather than one written out by hand.
+/// 使用 <see cref="MdWaterfallPanel"/> 排列子项的 ItemsControl，适用于绑定集合的瀑布流内容。
 /// </summary>
 /// <remarks>
 /// The layout properties live here and the theme's panel reads them, so a feed configures itself

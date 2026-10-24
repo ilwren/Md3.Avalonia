@@ -8,6 +8,7 @@ namespace Md3.Avalonia.Extra.Controls;
 /// <summary>
 /// Converts a slash-separated route path into breadcrumb items. Each item's
 /// <see cref="MdBreadcrumbItem.CommandParameter"/> is the path prefix it represents.
+/// 将斜杠分隔的路由路径转换为面包屑项，并将对应路径前缀作为每项的命令参数。
 /// </summary>
 /// <remarks>
 /// This converter is intended for application routes and logical paths. It normalizes
