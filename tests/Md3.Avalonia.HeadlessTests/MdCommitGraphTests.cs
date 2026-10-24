@@ -224,7 +224,9 @@ public sealed class MdCommitGraphTests
 
         var before = Snap(graph, rows);
         var row = rows[1];
-        var transform = row.TransformToVisual(host.Window) ?? Matrix.Identity;
+        // A row's Bounds already sit in its parent (the graph's) space, so the row-to-window
+        // transform would add its offset twice; the graph's transform is the right one.
+        var transform = graph.TransformToVisual(host.Window) ?? Matrix.Identity;
         var bounds = row.Bounds.TransformToAABB(transform);
         var point = new Point(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
         host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);

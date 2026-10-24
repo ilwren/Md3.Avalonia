@@ -422,15 +422,21 @@ public class MdCommitGraph : ItemsControl
             // parent (the same parent the lane algorithm follows), and the segments of those
             // links are drawn solid; every other lane segment is branch continuation and stays
             // dashed, so dense histories read as one bold mainline with faded branch work.
+            // Every slot must exist before any link walks to its parent: in git-log display
+            // order a commit's parent sits below it (pr > r), so a combined fill-and-use loop
+            // would read slots that are not created until a later iteration.
             var activeTop = new HashSet<int>[count];
             var activeBottom = new HashSet<int>[count];
             var activeCurves = new HashSet<(int, int)>[count];
+            for (var i = 0; i < count; i++)
+            {
+                activeTop[i] = new HashSet<int>();
+                activeBottom[i] = new HashSet<int>();
+                activeCurves[i] = new HashSet<(int, int)>();
+            }
+
             for (var r = 0; r < count; r++)
             {
-                activeTop[r] = new HashSet<int>();
-                activeBottom[r] = new HashSet<int>();
-                activeCurves[r] = new HashSet<(int, int)>();
-
                 string? parentId = null;
                 foreach (var pid in commits[r].ParentIds)
                 {

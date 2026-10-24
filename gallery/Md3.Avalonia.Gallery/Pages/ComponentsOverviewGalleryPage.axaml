@@ -20,6 +20,7 @@
             <md:MdButton Content="Buttons" Tag="Buttons" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Command palette" Tag="Command palette" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Commit graph" Tag="Commit graph" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Contribution grid" Tag="Contribution grid" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Dismissible" Tag="Dismissible" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="FABs" Tag="FABs" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Icon buttons" Tag="Icon buttons" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
