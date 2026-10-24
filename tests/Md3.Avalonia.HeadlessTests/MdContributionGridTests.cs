@@ -117,7 +117,7 @@ public sealed class MdContributionGridTests
         var cells = host.Window.FindDescendantOfType<ContributionCellsHost>();
         Assert.NotNull(cells);
 
-        var windowPoint = new Point(2, 17).Transform(cells!.TransformToVisual(host.Window));
+        var windowPoint = new Point(2, 17).Transform(cells!.TransformToVisual(host.Window) ?? Matrix.Identity);
         host.Window.MouseDown(windowPoint, MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
         host.Window.MouseUp(windowPoint, MouseButton.Left, RawInputModifiers.None);
@@ -156,10 +156,17 @@ public sealed class MdContributionGridTests
         return new GridHost(window);
     }
 
-    private sealed class GridHost(Window window) : IDisposable
+    private sealed class GridHost : IDisposable
     {
-        public Window Window { get; } = window;
+        private readonly Window _window;
 
-        public void Dispose() => window.Close();
+        public GridHost(Window window)
+        {
+            _window = window;
+        }
+
+        public Window Window => _window;
+
+        public void Dispose() => _window.Close();
     }
 }

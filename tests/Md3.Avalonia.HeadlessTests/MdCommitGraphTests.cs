@@ -162,7 +162,7 @@ public sealed class MdCommitGraphTests
         //   row 3: b0 = a1        (fork)
         //   row 4: a1 = a0
         //   row 5: a0             (root)
-        var rows = MdCommitGraphLayout.ComputeRows(new[]
+        var rows = MdCommitGraph.MdCommitGraphLayout.ComputeRows(new[]
         {
             Node("m", "a2", "b1"),
             Node("b1", "b0"),
@@ -210,7 +210,7 @@ public sealed class MdCommitGraphTests
         using var host = Show(graph);
 
         var row = (CommitGraphRow)graph.ContainerFromIndex(1)!;
-        var bounds = row.Bounds.Transform(row.TransformToVisual(host.Window));
+        var bounds = row.Bounds.TransformToAABB(row.TransformToVisual(host.Window)!);
         var point = new Point(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
         host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
@@ -282,11 +282,19 @@ public sealed class MdCommitGraphTests
         return window;
     }
 
-    private sealed class Host(Window window, MdCommitGraph graph) : IDisposable
+    private sealed class Host : IDisposable
     {
-        public Window Window { get; } = window;
-        public MdCommitGraph Graph { get; } = graph;
+        private readonly Window _window;
 
-        public void Dispose() => window.Close();
+        public Host(Window window, MdCommitGraph graph)
+        {
+            _window = window;
+            Graph = graph;
+        }
+
+        public Window Window => _window;
+        public MdCommitGraph Graph { get; }
+
+        public void Dispose() => _window.Close();
     }
 }
