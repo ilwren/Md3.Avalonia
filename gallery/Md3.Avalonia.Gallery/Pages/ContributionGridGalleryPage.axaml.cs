@@ -86,7 +86,6 @@ public partial class ContributionGridGalleryPage : UserControl
         FontSize = strong ? 15 : 13,
         FontWeight = strong ? FontWeight.SemiBold : FontWeight.Normal,
         TextWrapping = Avalonia.Media.TextWrapping.Wrap,
-        Foreground = new DynamicResourceReference(strong ? "Md.Sys.Color.OnSurface.Brush" : "Md.Sys.Color.OnSurfaceVariant.Brush"),
     };
 
     private static TextBlock Info(string text) => new()
@@ -94,6 +93,5 @@ public partial class ContributionGridGalleryPage : UserControl
         Text = text,
         FontSize = 13,
         TextWrapping = Avalonia.Media.TextWrapping.Wrap,
-        Foreground = new DynamicResourceReference("Md.Sys.Color.OnSurfaceVariant.Brush"),
     };
 }

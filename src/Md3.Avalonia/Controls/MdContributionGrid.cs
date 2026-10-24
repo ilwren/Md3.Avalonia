@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -53,7 +54,6 @@ public class MdContributionGrid : TemplatedControl
     private ContributionCellsHost? _cells;
     private Canvas? _monthLabels;
     private Canvas? _dayLabels;
-    private StackPanel? _legend;
     private IBrush?[] _levelBrushCache = Array.Empty<IBrush?>();
     private ThemeVariant? _levelBrushVariant;
 
@@ -62,8 +62,6 @@ public class MdContributionGrid : TemplatedControl
         DaysProperty.Changed.AddClassHandler<MdContributionGrid>((grid, _) => grid.UpdateModel());
         CellSizeProperty.Changed.AddClassHandler<MdContributionGrid>((grid, _) => grid.OnLayoutMetricsChanged());
         CellSpacingProperty.Changed.AddClassHandler<MdContributionGrid>((grid, _) => grid.OnLayoutMetricsChanged());
-        LessLabelProperty.Changed.AddClassHandler<MdContributionGrid>((grid, _) => grid.RebuildLegend());
-        MoreLabelProperty.Changed.AddClassHandler<MdContributionGrid>((grid, _) => grid.RebuildLegend());
     }
 
     /// <summary>Gets or sets the days to render; order does not matter.</summary>
@@ -119,10 +117,9 @@ public class MdContributionGrid : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        _cells = e.NameScope.Get<ContributionCellsHost>("PART_Cells");
-        _monthLabels = e.NameScope.Get<Canvas>("PART_MonthLabels");
-        _dayLabels = e.NameScope.Get<Canvas>("PART_DayLabels");
-        _legend = e.NameScope.Get<StackPanel>("PART_Legend");
+        _cells = e.NameScope.Find<ContributionCellsHost>("PART_Cells");
+        _monthLabels = e.NameScope.Find<Canvas>("PART_MonthLabels");
+        _dayLabels = e.NameScope.Find<Canvas>("PART_DayLabels");
         _cells?.Attach(this);
         UpdateModel();
     }
@@ -220,11 +217,13 @@ public class MdContributionGrid : TemplatedControl
             var step = CellSize + CellSpacing;
             foreach (var label in MonthLabels)
             {
+                // No explicit foreground: the labels inherit the control's Foreground, which
+                // the theme points at the on-surface-variant token, so they follow runtime
+                // theme switches for free.
                 var text = new TextBlock
                 {
                     Text = label.Text,
                     FontSize = 11,
-                    Foreground = new DynamicResourceReference("Md.Sys.Color.OnSurfaceVariant.Brush"),
                 };
                 Canvas.SetLeft(text, label.WeekIndex * step);
                 _monthLabels.Children.Add(text);
@@ -250,50 +249,11 @@ public class MdContributionGrid : TemplatedControl
                     Text = name,
                     FontSize = 11,
                     Margin = new Thickness(0, 0, 6, 0),
-                    Foreground = new DynamicResourceReference("Md.Sys.Color.OnSurfaceVariant.Brush"),
                 };
                 // Center the label on its row: the row's top edge plus half a cell.
                 Canvas.SetTop(text, row * step + CellSize / 2 - 7);
                 _dayLabels.Children.Add(text);
             }
-        }
-
-        RebuildLegend();
-    }
-
-    private void RebuildLegend()
-    {
-        if (_legend is not null)
-        {
-            _legend.Children.Clear();
-            _legend.Children.Add(new TextBlock
-            {
-                Text = LessLabel,
-                FontSize = 11,
-                VerticalAlignment = VerticalAlignment.Center,
-                Foreground = new DynamicResourceReference("Md.Sys.Color.OnSurfaceVariant.Brush"),
-            });
-            for (var level = 0; level < 5; level++)
-            {
-                var swatch = new Border
-                {
-                    Width = 10,
-                    Height = 10,
-                    CornerRadius = new CornerRadius(2),
-                    Margin = new Thickness(level == 0 ? 6 : 0, 0, level == 4 ? 6 : 0, 0),
-                    VerticalAlignment = VerticalAlignment.Center,
-                    IsHitTestVisible = false,
-                    Background = new DynamicResourceReference($"Md.ContributionGrid.Level.Brush.{level}"),
-                };
-                _legend.Children.Add(swatch);
-            }
-            _legend.Children.Add(new TextBlock
-            {
-                Text = MoreLabel,
-                FontSize = 11,
-                VerticalAlignment = VerticalAlignment.Center,
-                Foreground = new DynamicResourceReference("Md.Sys.Color.OnSurfaceVariant.Brush"),
-            });
         }
     }
 
@@ -371,47 +331,40 @@ internal sealed class ContributionCellsHost : Control
                     null,
                     new Rect(week * step, dayOfWeek * step, cell, cell),
                     corner,
-                    0);
+                    corner);
             }
         }
     }
 
-    protected override void OnPointerMove(PointerEventArgs e)
+    protected override void OnPointerMoved(PointerEventArgs e)
     {
-        base.OnPointerMove(e);
+        base.OnPointerMoved(e);
         var day = DayAt(e.GetPosition(this));
         if (day == _hoveredDay)
             return;
 
         _hoveredDay = day;
-        if (day is null)
+        ToolTip.SetTip(this, day is null ? null : new TextBlock
         {
-            ToolTipService.SetToolTip(this, null);
-        }
-        else
-        {
-            ToolTipService.SetToolTip(this, new TextBlock
-            {
-                Text = $"{day.Value} on {day.Date:yyyy-MM-dd}",
-                FontSize = 12,
-            });
-        }
+            Text = $"{day.Value} on {day.Date:yyyy-MM-dd}",
+            FontSize = 12,
+        });
     }
 
-    protected override void OnPointerLeave(PointerEventArgs e)
+    protected override void OnPointerExited(PointerEventArgs e)
     {
-        base.OnPointerLeave(e);
+        base.OnPointerExited(e);
         if (_hoveredDay is not null)
         {
             _hoveredDay = null;
-            ToolTipService.SetToolTip(this, null);
+            ToolTip.SetTip(this, null);
         }
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
-        if (e.InitialPressedPointer.Properties.IsLeftButtonPressed == false)
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             return;
         if (_owner is null)
             return;

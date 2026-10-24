@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
@@ -196,7 +197,7 @@ public class MdCommitGraph : ItemsControl
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
-        if (e.InitialPressedPointer.Properties.IsLeftButtonPressed == false)
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             return;
         if (e.Source is not IVisual visual)
             return;

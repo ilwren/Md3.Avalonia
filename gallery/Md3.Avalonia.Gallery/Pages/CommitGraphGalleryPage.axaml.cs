@@ -12,6 +12,7 @@ public partial class CommitGraphGalleryPage : UserControl
     private static string L(string english, string chinese) => GalleryLocalization.Choose(english, chinese);
 
     private readonly MdCommitNode[] _nodes;
+    private MdCommitNode? _selected;
 
     public CommitGraphGalleryPage()
     {
@@ -42,6 +43,10 @@ public partial class CommitGraphGalleryPage : UserControl
         DemoGraph.ItemsSource = _nodes;
 
         ShowDetail(null);
+
+        // The chips carry brushes resolved from theme tokens; a theme switch re-renders the
+        // detail so they stay in step.
+        ActualThemeVariantChanged += (_, _) => ShowDetail(_selected);
     }
 
     private void GraphCommitClicked(object? sender, MdCommitNode? e)
@@ -51,16 +56,11 @@ public partial class CommitGraphGalleryPage : UserControl
 
     private void ShowDetail(MdCommitNode? node)
     {
+        _selected = node;
         DetailContent.Children.Clear();
         if (node is null)
         {
-            DetailContent.Children.Add(new TextBlock
-            {
-                Text = L("Click a commit in the graph to inspect it here.", "点击提交图中的任意提交，在这里查看详情。"),
-                FontSize = 13,
-                TextWrapping = TextWrapping.Wrap,
-                Foreground = new DynamicResourceReference("Md.Sys.Color.OnSurfaceVariant.Brush"),
-            });
+            DetailContent.Children.Add(Info(L("Click a commit in the graph to inspect it here.", "点击提交图中的任意提交，在这里查看详情。")));
             return;
         }
 
@@ -70,15 +70,14 @@ public partial class CommitGraphGalleryPage : UserControl
             FontSize = 15,
             FontWeight = FontWeight.SemiBold,
             TextWrapping = TextWrapping.Wrap,
-            Foreground = new DynamicResourceReference("Md.Sys.Color.OnSurface.Brush"),
         });
 
         var meta = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
-        meta.Children.Add(MetaText(node.Author + " · " + node.Date.ToString("MMM d, yyyy")));
+        meta.Children.Add(Info(node.Author + " · " + node.Date.ToString("MMM d, yyyy")));
         if (node.Tag is { Length: > 0 } tag)
-            meta.Children.Add(Chip(tag, "Md.Sys.Color.PrimaryContainer.Brush", "Md.Sys.Color.OnPrimaryContainer.Brush"));
+            meta.Children.Add(Chip(tag, "Md.Sys.Color.PrimaryContainer.Brush"));
         if (DemoGraph.HeadId == node.Id)
-            meta.Children.Add(Chip(L("HEAD", "HEAD"), "Md.Sys.Color.SurfaceContainerHighest.Brush", "Md.Sys.Color.OnSurface.Brush"));
+            meta.Children.Add(Chip(L("HEAD", "HEAD"), "Md.Sys.Color.SurfaceContainerHighest.Brush"));
         DetailContent.Children.Add(meta);
 
         var parents = node.ParentIds.ToArray();
@@ -86,30 +85,28 @@ public partial class CommitGraphGalleryPage : UserControl
         var hint = node.ParentIds.Any(p => _nodes.All(n => n.Id != p))
             ? L(" (not in this shallow history)", "（不在当前的浅历史中）")
             : "";
-        DetailContent.Children.Add(MetaText(parentLine + hint));
-        DetailContent.Children.Add(MetaText(L($"Lanes in use: {DemoGraph.LaneCount}", $"当前使用的泳道数：{DemoGraph.LaneCount}")));
+        DetailContent.Children.Add(Info(parentLine + hint));
+        DetailContent.Children.Add(Info(L($"Lanes in use: {DemoGraph.LaneCount}", $"当前使用的泳道数：{DemoGraph.LaneCount}")));
     }
 
-    private static TextBlock MetaText(string text) => new()
+    private static TextBlock Info(string text) => new()
     {
         Text = text,
         FontSize = 13,
         TextWrapping = TextWrapping.Wrap,
-        Foreground = new DynamicResourceReference("Md.Sys.Color.OnSurfaceVariant.Brush"),
     };
 
-    private static Border Chip(string text, string background, string foreground) => new()
+    private Border Chip(string text, string backgroundToken) => new()
     {
         CornerRadius = new CornerRadius(10),
         Padding = new Thickness(8, 2, 8, 2),
-        Background = new DynamicResourceReference(background),
+        Background = MdThemeResources.FindBrush(this, backgroundToken, ActualThemeVariant),
         VerticalAlignment = VerticalAlignment.Center,
         Child = new TextBlock
         {
             Text = text,
             FontSize = 11,
             FontWeight = FontWeight.SemiBold,
-            Foreground = new DynamicResourceReference(foreground),
         },
     };
 }

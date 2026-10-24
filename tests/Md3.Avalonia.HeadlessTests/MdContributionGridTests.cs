@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
@@ -45,14 +46,15 @@ public sealed class MdContributionGridTests
             Days = Enumerable.Range(1, 100).Select(i => Day(new DateTime(2025, 3, 1).AddDays(i % 40), i)).ToList(),
         };
 
-        Assert.Equal(new[] { 28, 50, 76, 100 }, grid.Thresholds);
+        // Quantiles of 1..100 at the (count-1)-interpolated positions: 25.75, 50.5, 75.25.
+        Assert.Equal(new[] { 26, 50, 75, 100 }, grid.Thresholds);
         Assert.Equal(0, MdContributionGrid.LevelForValue(0, grid.Thresholds));
-        Assert.Equal(1, MdContributionGrid.LevelForValue(28, grid.Thresholds));
-        Assert.Equal(2, MdContributionGrid.LevelForValue(29, grid.Thresholds));
+        Assert.Equal(1, MdContributionGrid.LevelForValue(26, grid.Thresholds));
+        Assert.Equal(2, MdContributionGrid.LevelForValue(27, grid.Thresholds));
         Assert.Equal(2, MdContributionGrid.LevelForValue(50, grid.Thresholds));
         Assert.Equal(3, MdContributionGrid.LevelForValue(51, grid.Thresholds));
-        Assert.Equal(3, MdContributionGrid.LevelForValue(76, grid.Thresholds));
-        Assert.Equal(4, MdContributionGrid.LevelForValue(77, grid.Thresholds));
+        Assert.Equal(3, MdContributionGrid.LevelForValue(75, grid.Thresholds));
+        Assert.Equal(4, MdContributionGrid.LevelForValue(76, grid.Thresholds));
         Assert.Equal(4, MdContributionGrid.LevelForValue(100, grid.Thresholds));
     }
 
@@ -95,7 +97,7 @@ public sealed class MdContributionGridTests
         Assert.Null(host.DayAt(new Point(2, 14.5)));
         Assert.Null(host.DayAt(new Point(14.5, 16)));
         Assert.Null(host.DayAt(new Point(30, 16)));   // beyond the single week column
-        Assert.Null(host.DayAt(new Point(2, 100)));   // beyond the seven rows
+        Assert.Null(host.DayAt(new Point(2, 110)));   // beyond the seven rows
         Assert.Null(host.DayAt(new Point(-1, 16)));
     }
 
@@ -112,7 +114,7 @@ public sealed class MdContributionGridTests
         grid.DayClicked += (_, day) => clicked = day;
 
         using var host = ShowGrid(grid);
-        var cells = host.Window.FindNamedChild<ContributionCellsHost>("PART_Cells");
+        var cells = host.Window.FindDescendantOfType<ContributionCellsHost>();
         Assert.NotNull(cells);
 
         var windowPoint = new Point(2, 17).Transform(cells!.TransformToVisual(host.Window));

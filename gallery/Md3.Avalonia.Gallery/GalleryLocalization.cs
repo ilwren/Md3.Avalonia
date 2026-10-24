@@ -475,6 +475,7 @@ internal static class GalleryLocalization
         ["Stats"]="统计", ["Regenerate"]="重新生成", ["Compact"]="紧凑",
         ["Smaller cells and tighter spacing fit a whole year in a sidebar."]="更小的格子与更紧的间距，能让一整年放进侧边栏。",
         ["Numbered, one screen per page"]="数字，每页一屏", ["Dots, vertical"]="圆点，垂直",
+        ["Onboarding"]="入门引导", ["Dots page 1 of 4"]="圆点第 1 页，共 4 页",
         ["Horizontal"]="水平",
         ["The header row walks through the steps with connectors; the active step's body moves below the row."]="标题行以连接线依次经过各步骤；当前步骤的内容在行下方移动。",
     };

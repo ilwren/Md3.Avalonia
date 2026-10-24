@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Gallery.Pages;
 
@@ -73,11 +74,16 @@ public partial class PaginationGalleryPage : UserControl
         VerticalDotsBody.Text = L(VerticalDotsPages[0].BodyEn, VerticalDotsPages[0].BodyZh);
         VerticalDotsStatus.Text = L("Dots page 1 of 4", "圆点第 1 页，共 4 页");
 
-        _numberedPages = NumberedPages.Select(BuildNumberedPage).ToArray();
-        NumberedPagesHost.Children.Clear();
-        foreach (var page in _numberedPages)
-            NumberedPagesHost.Children.Add(page);
-        ShowNumberedPage(0);
+        RebuildPages();
+        ShowNumberedPage(NumberedPager.SelectedPageIndex);
+
+        // The per-page accents and the card surface are resolved from theme tokens; a theme
+        // switch rebuilds the pages so they stay in step.
+        ActualThemeVariantChanged += (_, _) =>
+        {
+            RebuildPages();
+            ShowNumberedPage(NumberedPager.SelectedPageIndex);
+        };
 
         // XAML property setters (SelectedPageIndex, SelectedIndex) raise their change events
         // while the tree is still being parsed, before later named fields exist. The handler
@@ -101,7 +107,15 @@ public partial class PaginationGalleryPage : UserControl
             _numberedPages[i].IsVisible = i == index;
     }
 
-    private static Border BuildNumberedPage(
+    private void RebuildPages()
+    {
+        _numberedPages = NumberedPages.Select(spec => BuildNumberedPage(spec)).ToArray();
+        NumberedPagesHost.Children.Clear();
+        foreach (var page in _numberedPages)
+            NumberedPagesHost.Children.Add(page);
+    }
+
+    private Border BuildNumberedPage(
         (string Symbol, string Accent, string TitleEn, string TitleZh, string BodyEn, string BodyZh) spec)
     {
         var (symbol, accent, titleEn, titleZh, bodyEn, bodyZh) = spec;
@@ -109,7 +123,7 @@ public partial class PaginationGalleryPage : UserControl
         {
             CornerRadius = new CornerRadius(12),
             Padding = new Thickness(24),
-            Background = new DynamicResourceReference("Md.Sys.Color.SurfaceContainerLow.Brush"),
+            Background = MdThemeResources.FindBrush(this, "Md.Sys.Color.SurfaceContainerLow.Brush", ActualThemeVariant),
             HorizontalAlignment = HorizontalAlignment.Stretch,
             VerticalAlignment = VerticalAlignment.Stretch,
             Child = new StackPanel
@@ -122,21 +136,19 @@ public partial class PaginationGalleryPage : UserControl
                     {
                         Text = symbol,
                         FontSize = 40,
-                        Foreground = new DynamicResourceReference(accent + ".Brush"),
+                        Foreground = MdThemeResources.FindBrush(this, accent + ".Brush", ActualThemeVariant),
                     },
                     new TextBlock
                     {
                         Text = L(titleEn, titleZh),
                         FontSize = 18,
                         FontWeight = FontWeight.SemiBold,
-                        Foreground = new DynamicResourceReference("Md.Sys.Color.OnSurface.Brush"),
                     },
                     new TextBlock
                     {
                         Text = L(bodyEn, bodyZh),
                         FontSize = 13,
                         TextWrapping = TextWrapping.Wrap,
-                        Foreground = new DynamicResourceReference("Md.Sys.Color.OnSurfaceVariant.Brush"),
                     },
                 },
             },

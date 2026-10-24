@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Media;
@@ -208,7 +209,7 @@ public sealed class MdCommitGraphTests
 
         using var host = Show(graph);
 
-        var row = graph.ContainerFromIndex(1);
+        var row = (CommitGraphRow)graph.ContainerFromIndex(1)!;
         var bounds = row.Bounds.Transform(row.TransformToVisual(host.Window));
         var point = new Point(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
         host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);

@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Styling;
 
 namespace Md3.Avalonia.Controls;
 
@@ -13,7 +14,7 @@ namespace Md3.Avalonia.Controls;
 /// </summary>
 internal sealed class CommitGraphRow : Grid
 {
-    private readonly Border _selectionBackground;
+    private readonly CommitGraphSelectionBackground _selectionBackground;
 
     public CommitGraphLaneHost LaneHost { get; } = new();
     public ContentPresenter ContentPresenter { get; } = new();
@@ -21,17 +22,12 @@ internal sealed class CommitGraphRow : Grid
     public CommitGraphRow()
     {
         ColumnDefinitions = new ColumnDefinitions("Auto,*");
-        _selectionBackground = new Border
+        _selectionBackground = new CommitGraphSelectionBackground
         {
             Grid.ColumnSpan = 2,
-            CornerRadius = new CornerRadius(8),
             Margin = new Thickness(-8, 0, -4, 0),
             IsHitTestVisible = false,
-            IsVisible = false,
             Opacity = 0.55,
-            // Resolved when the row attaches to the theme; a host without the Md theme simply
-            // leaves the highlight invisible.
-            Background = new DynamicResourceReference("Md.Sys.Color.SurfaceContainerHigh.Brush"),
         };
         LaneHost.VerticalAlignment = VerticalAlignment.Stretch;
         LaneHost.MinHeight = 44;
@@ -49,17 +45,18 @@ internal sealed class CommitGraphRow : Grid
     {
         LaneHost.Width = laneColumnWidth;
         LaneHost.Set(geometry, item as MdCommitNode, graph);
+        _selectionBackground.SetOwner(graph);
         ContentPresenter.Content = item;
         ContentPresenter.ContentTemplate = graph.ItemTemplate;
     }
 
     public void SetSelected(bool selected)
     {
-        _selectionBackground.IsVisible = selected;
+        _selectionBackground.SetSelected(selected);
         LaneHost.InvalidateVisual();
     }
 
-    internal bool IsSelected => _selectionBackground.IsVisible;
+    internal bool IsSelected => _selectionBackground.IsSelected;
 
     public void ClearGeometry()
     {
@@ -212,5 +209,52 @@ internal sealed class CommitGraphLaneHost : Control
         if (geometry.IsHead)
             context.DrawEllipse(null, new Pen(nodeBrush, 2), center, nodeSize / 2 + 3, nodeSize / 2 + 3);
         context.DrawEllipse(nodeBrush, null, center, nodeSize / 2, nodeSize / 2);
+    }
+}
+
+/// <summary>
+/// The rounded highlight behind a selected commit row. Drawn rather than a bordered panel so
+/// the brush is resolved from the theme tokens at paint time - the way the lane drawing does
+/// it - which keeps it in step with runtime theme switches without any reference plumbing.
+/// </summary>
+internal sealed class CommitGraphSelectionBackground : Control
+{
+    private MdCommitGraph? _owner;
+    private IBrush? _brush;
+    private ThemeVariant? _variant;
+
+    public bool IsSelected { get; private set; }
+
+    public void SetOwner(MdCommitGraph owner)
+    {
+        _owner = owner;
+        _variant = null;
+        InvalidateVisual();
+    }
+
+    public void SetSelected(bool selected)
+    {
+        if (IsSelected == selected)
+            return;
+        IsSelected = selected;
+        InvalidateVisual();
+    }
+
+    public override void Render(DrawingContext context)
+    {
+        var owner = _owner;
+        if (!IsSelected || owner is null || Bounds.Width <= 0)
+            return;
+
+        var variant = owner.ActualThemeVariant;
+        if (_variant != variant)
+        {
+            _brush = MdThemeResources.FindBrush(owner, "Md.Sys.Color.SurfaceContainerHigh.Brush", variant);
+            _variant = variant;
+        }
+
+        if (_brush is null)
+            return;
+        context.DrawRectangle(_brush, null, new Rect(0, 0, Bounds.Width, Bounds.Height), 8, 8);
     }
 }
