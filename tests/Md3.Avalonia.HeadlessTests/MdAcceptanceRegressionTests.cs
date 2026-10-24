@@ -120,13 +120,13 @@ public sealed class MdAcceptanceRegressionTests
         Assert.True(FontManager.Current.TryGetGlyphTypeface(
             new Typeface(MdExternalMaterialSymbols.FontFamily!), out var glyphTypeface));
         var searchCodepoint = char.ConvertToUtf32(searchGlyph, 0);
-        Assert.True(glyphTypeface.CharacterToGlyphMap.TryGetGlyph(searchCodepoint, out var glyph));
+        Assert.True(glyphTypeface.TryGetGlyph((uint)searchCodepoint, out var glyph));
         Assert.True(glyph > 0);
         foreach (var controlGlyph in new[] { MdSymbols.Check, MdSymbols.Schedule, MdSymbols.RotateRight })
         {
             Assert.NotNull(controlGlyph);
             var codepoint = char.ConvertToUtf32(controlGlyph!, 0);
-            Assert.True(glyphTypeface.CharacterToGlyphMap.TryGetGlyph(codepoint, out var controlGlyphIndex));
+            Assert.True(glyphTypeface.TryGetGlyph((uint)codepoint, out var controlGlyphIndex));
             Assert.True(controlGlyphIndex > 0);
         }
 

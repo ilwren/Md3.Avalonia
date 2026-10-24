@@ -318,10 +318,10 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
     private void TooltipPointerExited(object? sender, PointerEventArgs e) =>
         ScheduleHideIfUnattended();
 
-    private void TooltipGotFocus(object? sender, FocusChangedEventArgs e) =>
+    private void TooltipGotFocus(object? sender, RoutedEventArgs e) =>
         _hideTimer.Stop();
 
-    private void TooltipLostFocus(object? sender, FocusChangedEventArgs e) =>
+    private void TooltipLostFocus(object? sender, RoutedEventArgs e) =>
         ScheduleHideIfUnattended();
 
     private bool HasPointerOrKeyboardPresence =>

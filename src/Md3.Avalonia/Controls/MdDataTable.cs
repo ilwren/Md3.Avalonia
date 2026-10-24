@@ -110,7 +110,7 @@ public sealed class MdDataTable : ListBox
     }
 }
 
-internal sealed class MdDataTableAutomationPeer(MdDataTable owner) : ListBoxAutomationPeer(owner)
+internal sealed class MdDataTableAutomationPeer(MdDataTable owner) : SelectingItemsControlAutomationPeer(owner)
 {
     protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.DataGrid;
     protected override bool IsControlElementCore() => true;

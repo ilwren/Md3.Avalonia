@@ -119,7 +119,7 @@ internal sealed class MdModalFocusController
             Dispatcher.UIThread.Post(() => target.Focus(NavigationMethod.Unspecified), DispatcherPriority.Input);
     }
 
-    private void OnTopLevelGotFocus(object? sender, FocusChangedEventArgs e)
+    private void OnTopLevelGotFocus(object? sender, GotFocusEventArgs e)
     {
         if (!_active || _scope is null || e.Source is not Visual source) return;
         if (IsWithin(source, _scope))

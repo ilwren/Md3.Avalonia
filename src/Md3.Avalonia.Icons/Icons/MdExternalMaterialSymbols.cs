@@ -27,7 +27,7 @@ public static class MdExternalMaterialSymbols
     private static WeakReference<FontManager>? _configuredManager;
     private static WeakReference<FontManager>? _automaticAttemptedManager;
     private static WeakReference<Application>? _appliedApplication;
-    private static GlyphTypeface? _configuredGlyphTypeface;
+    private static IGlyphTypeface? _configuredGlyphTypeface;
     private static IReadOnlyDictionary<string, string> _resolvedControlGlyphs = new Dictionary<string, string>();
 
     // Resource contract consumed by the core controls. Hosts can replace any of these keys with a
@@ -203,7 +203,7 @@ public static class MdExternalMaterialSymbols
         {
             var codepoint = char.ConvertToUtf32(glyph, index);
             if (codepoint > 0xffff) index++;
-            if (!_configuredGlyphTypeface.CharacterToGlyphMap.TryGetGlyph(codepoint, out var value) || value == 0) return false;
+            if (!_configuredGlyphTypeface.TryGetGlyph((uint)codepoint, out var value) || value == 0) return false;
         }
         return true;
     }
@@ -218,7 +218,7 @@ public static class MdExternalMaterialSymbols
         return alternatives.Select(char.ConvertFromUtf32).FirstOrDefault(HasGlyph);
     }
 
-    private static void ResolveControlGlyphs(GlyphTypeface glyphTypeface,
+    private static void ResolveControlGlyphs(IGlyphTypeface glyphTypeface,
         out IReadOnlyDictionary<string, string> resolved,
         out IReadOnlyList<string> missing)
     {
@@ -230,7 +230,7 @@ public static class MdExternalMaterialSymbols
                 ? compatible
                 : [resource.Value];
             var selected = candidates.FirstOrDefault(value => value.Length > 0 &&
-                glyphTypeface.CharacterToGlyphMap.TryGetGlyph(value[0], out var glyph) && glyph != 0);
+                glyphTypeface.TryGetGlyph((uint)value[0], out var glyph) && glyph != 0);
             if (selected is null) missingKeys.Add(resource.Key);
             else values[resource.Key] = selected;
         }

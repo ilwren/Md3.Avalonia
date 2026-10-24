@@ -34,6 +34,8 @@ public sealed class MdBeforeAfter : TemplatedControl
     private double _dragPointerOffset;
     private IPointer? _dragFocusScrollPointer;
     private (ScrollViewer Viewer, bool BringIntoViewOnFocusChange)[]? _dragFocusScrollState;
+    private TopLevel? _topLevel;
+    private bool _focusableBeforePointerDrag;
 
     /// <summary>How far a click on the image away from the handle nudges the divider.</summary>
     private const double TrackStep = .1;
@@ -57,7 +59,6 @@ public sealed class MdBeforeAfter : TemplatedControl
         // the drag starts in the bubbling handler. Suppress ancestor ScrollViewer auto-scroll for
         // a divider grab before that focus attempt, so a first press cannot move the control
         // underneath the stationary pointer.
-        AddHandler(InputElement.PointerPressedEvent, OnPointerPressedPreview, RoutingStrategies.Tunnel);
         AddHandler(InputElement.PointerReleasedEvent, OnPointerReleasedForFocusScroll,
             RoutingStrategies.Bubble, handledEventsToo: true);
     }
@@ -161,6 +162,25 @@ public sealed class MdBeforeAfter : TemplatedControl
         PseudoClasses.Set(":dragging", true);
     }
 
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        _topLevel = TopLevel.GetTopLevel(this);
+        // Avalonia 11 focuses the nearest focusable ancestor from a class handler at the
+        // pointer target. Listen higher in the tunnel so the drag can defer that focus before
+        // the target's class handler runs; a target-local tunnel handler would be too late.
+        _topLevel?.AddHandler(InputElement.PointerPressedEvent,
+            OnTopLevelPointerPressedPreview, RoutingStrategies.Tunnel);
+    }
+
+    private void OnTopLevelPointerPressedPreview(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.Source is not Visual source ||
+            (!ReferenceEquals(source, this) && !source.GetVisualAncestors().Contains(this)))
+            return;
+        OnPointerPressedPreview(sender, e);
+    }
+
     private void OnPointerPressedPreview(object? sender, PointerPressedEventArgs e)
     {
         if (!IsInteractive || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
@@ -187,6 +207,8 @@ public sealed class MdBeforeAfter : TemplatedControl
             .Select(viewer => (Viewer: viewer,
                 BringIntoViewOnFocusChange: ScrollViewer.GetBringIntoViewOnFocusChange(viewer)))
             .ToArray();
+        _focusableBeforePointerDrag = Focusable;
+        SetCurrentValue(FocusableProperty, false);
 
         foreach (var state in _dragFocusScrollState)
             state.Viewer.SetCurrentValue(ScrollViewer.BringIntoViewOnFocusChangeProperty, false);
@@ -203,6 +225,7 @@ public sealed class MdBeforeAfter : TemplatedControl
             return;
 
         _dragFocusScrollState = null;
+        SetCurrentValue(FocusableProperty, _focusableBeforePointerDrag);
         foreach (var entry in state)
             entry.Viewer.SetCurrentValue(
                 ScrollViewer.BringIntoViewOnFocusChangeProperty, entry.BringIntoViewOnFocusChange);
@@ -264,18 +287,6 @@ public sealed class MdBeforeAfter : TemplatedControl
         }
         base.OnPointerMoved(e);
     }
-    protected override void OnGettingFocus(FocusChangingEventArgs e)
-    {
-        // Avalonia's FocusManager focuses the nearest focusable ancestor on mouse-down before
-        // pointer handlers run. Reject that pointer-originated focus: it makes the parent
-        // ScrollViewer bring this partly clipped control into view in the middle of the drag.
-        // Keyboard/tab focus remains available; pointer focus is deferred until release.
-        if (e.NavigationMethod == NavigationMethod.Pointer)
-            e.TryCancel();
-
-        base.OnGettingFocus(e);
-    }
-
     private void FocusWithoutScrollingAncestors()
     {
         var scrollViewers = this.GetVisualAncestors().OfType<ScrollViewer>().ToArray();
@@ -300,7 +311,7 @@ public sealed class MdBeforeAfter : TemplatedControl
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
-        var focusAfterRelease = _dragging && Focusable;
+        var focusAfterRelease = _dragging;
         if (_dragging)
         {
             _dragging = false;
@@ -315,7 +326,7 @@ public sealed class MdBeforeAfter : TemplatedControl
         // Focus only after pointer tracking ends, and temporarily keep ancestor ScrollViewers from
         // bringing this clipped control into view. Restoring their original settings immediately
         // afterwards preserves the host's normal focus behavior for every later interaction.
-        if (focusAfterRelease)
+        if (focusAfterRelease && Focusable)
             Dispatcher.UIThread.Post(FocusWithoutScrollingAncestors, DispatcherPriority.Input);
     }
     protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
@@ -331,6 +342,11 @@ public sealed class MdBeforeAfter : TemplatedControl
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
+        if (_topLevel is not null)
+        {
+            _topLevel.RemoveHandler(InputElement.PointerPressedEvent, OnTopLevelPointerPressedPreview);
+            _topLevel = null;
+        }
         _dragging = false;
         PseudoClasses.Set(":dragging", false);
         RestoreAncestorBringIntoView();

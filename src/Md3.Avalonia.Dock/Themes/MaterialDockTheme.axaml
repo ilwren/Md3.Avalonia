@@ -31,7 +31,6 @@
         <ResourceInclude Source="avares://Md3.Avalonia.Dock/Themes/Accents/Material.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia.Dock/Themes/Controls/MaterialButton.axaml" />
         <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/WindowChromeResources.axaml" />
-        <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/WindowDrawnDecorations.axaml" />
         <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/ScrollViewer.axaml" />
         <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DocumentTabStripItem.axaml" />
         <ResourceInclude Source="avares://Dock.Avalonia.Themes.Fluent/Controls/DocumentTabStrip.axaml" />

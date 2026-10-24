@@ -7,6 +7,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -242,7 +243,7 @@ public sealed class MdMotionLifecycleTests
             // tracking must tolerate enter/leave events arriving from separate popup roots.
             // Opening an interactive popup can move keyboard focus. That focus transition must
             // not arm a hide timer while the pointer is still on the trigger.
-            host.RaiseEvent(new FocusChangedEventArgs(InputElement.LostFocusEvent));
+            host.RaiseEvent(new RoutedEventArgs(InputElement.LostFocusEvent));
             Assert.True(host.IsOpen, "the attended rich tooltip should remain open after focus changes");
             Assert.False(host.IsHideDelayPending);
 
@@ -1070,7 +1071,7 @@ public sealed class MdMotionLifecycleTests
         Canvas.SetLeft(destination, 260);
         Canvas.SetTop(destination, 120);
         var canvas = new Canvas { Children = { source, destination } };
-        var layers = new VisualLayerManager { EnableOverlayLayer = true, Child = canvas };
+        var layers = new VisualLayerManager { Child = canvas };
         var scope = Show(layers, 520, 360);
         var overlay = Assert.IsType<OverlayLayer>(OverlayLayer.GetOverlayLayer(source));
         var baselineChildren = overlay.Children.Count;

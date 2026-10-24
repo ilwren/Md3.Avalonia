@@ -4,7 +4,7 @@
     <RootNamespace>Md3.Avalonia.Themes</RootNamespace>
     <AssemblyName>Md3.Avalonia.Mapsui</AssemblyName>
     <Description>Material Design 3 appearance (canvas, layer palette, vector and label styles, type scale) for Mapsui maps in Avalonia. Opt-in package: it carries the Mapsui Avalonia dependency so the core Material packages do not have to.</Description>
-    <PackageId>Md3.Avalonia.Mapsui</PackageId>
+    <PackageId>Md3.Avalonia11.Mapsui</PackageId>
     <Version>0.5.0-preview.1</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;maps;mapsui;gis;cartography;theme;material-design-3</PackageTags>
@@ -28,7 +28,7 @@
          either, and MapControl draws its own surface from the map's own colours, so this package is
          an entry point that styles a Map (or the MapControl that draws it) rather than a Styles
          subclass. See README.md. -->
-    <PackageReference Include="Mapsui.Avalonia12" />
+    <PackageReference Include="Mapsui.Avalonia" />
     <ProjectReference Include="../Md3.Avalonia/Md3.Avalonia.csproj" />
     <None Include="../../README.md" Pack="true" PackagePath="/" Link="README.md" />
     <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" Link="THIRD-PARTY-NOTICES.md" />

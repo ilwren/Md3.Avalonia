@@ -16,7 +16,6 @@ public sealed class TestApplication : Application
         Styles.Add(new MaterialTheme());
         Styles.Add(new ExtraTheme());
         Styles.Add(new MaterialDataGridTheme());
-        Styles.Add(new MaterialRichEditorTheme());
         Styles.Add(new MaterialAvaloniaEditTheme());
         Styles.Add(new MaterialAvaloniaHexTheme());
         Styles.Add(new MaterialDockTheme());

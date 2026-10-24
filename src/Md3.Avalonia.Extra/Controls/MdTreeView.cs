@@ -433,7 +433,7 @@ public sealed class MdTreeView : ListBox
     }
 }
 
-internal sealed class MdTreeViewAutomationPeer(MdTreeView owner) : ListBoxAutomationPeer(owner)
+internal sealed class MdTreeViewAutomationPeer(MdTreeView owner) : SelectingItemsControlAutomationPeer(owner)
 {
     private IReadOnlyList<AutomationPeer>? _rows;
     private MdTreeView TreeOwner => (MdTreeView)Owner;

@@ -163,7 +163,7 @@ public sealed class MdVisualGoldenTests
         {
             Width = scene.Width,
             Height = scene.Height,
-            WindowDecorations = WindowDecorations.None,
+            SystemDecorations = SystemDecorations.None,
             Content = scene.Build()
         };
 
@@ -178,7 +178,7 @@ public sealed class MdVisualGoldenTests
             }
 
             using var buffer = new MemoryStream();
-            frame.Save(buffer, new PngBitmapEncoderOptions());
+            frame.Save(buffer);
             return buffer.ToArray();
         }
         finally

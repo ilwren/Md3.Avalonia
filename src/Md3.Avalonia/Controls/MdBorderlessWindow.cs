@@ -4,7 +4,6 @@ using System.Windows.Input;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
-using Avalonia.Controls.Chrome;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -51,7 +50,7 @@ public class MdAvaloniaWindowPlatformAdapter(MdWindowPlatform platform) : IMdWin
         if (Platform == MdWindowPlatform.Android) return;
         // Portable fallback: retain the platform resize frame while Material owns the client title
         // content. Windows overrides this because DWM animations require Full caption style bits.
-        window.WindowDecorations = options.PreserveNativeBorder ? WindowDecorations.BorderOnly : WindowDecorations.None;
+        window.SystemDecorations = options.PreserveNativeBorder ? SystemDecorations.BorderOnly : SystemDecorations.None;
         window.ExtendClientAreaToDecorationsHint = options.ExtendIntoTitleBar;
         window.ExtendClientAreaTitleBarHeightHint = Math.Max(0, options.TitleBarHeight);
         window.CanResize = options.CanResize;
@@ -91,7 +90,7 @@ public sealed class MdWindowsWindowPlatformAdapter() : MdAvaloniaWindowPlatformA
 
     public override void Apply(MdBorderlessWindow window, MdBorderlessWindowOptions options)
     {
-        window.WindowDecorations = options.PreserveNativeBorder ? WindowDecorations.Full : WindowDecorations.None;
+        window.SystemDecorations = options.PreserveNativeBorder ? SystemDecorations.Full : SystemDecorations.None;
         window.ExtendClientAreaToDecorationsHint = options.ExtendIntoTitleBar;
         window.ExtendClientAreaTitleBarHeightHint = Math.Max(0, options.TitleBarHeight);
         window.CanResize = options.CanResize;
@@ -263,7 +262,7 @@ public class MdBorderlessWindow : MdWindow
             PlatformAdapter.Apply(this, new MdBorderlessWindowOptions(CanResize, ExtendIntoTitleBar, height, PreserveNativeBorder));
         else
         {
-            WindowDecorations = WindowDecorations.Full;
+            SystemDecorations = SystemDecorations.Full;
             ExtendClientAreaToDecorationsHint = false;
         }
         var settings = new MdWindowTemplateSettings(
@@ -398,7 +397,7 @@ public sealed class MdWindowTitleBar : ContentControl
     }
 }
 
-/// <summary>Accessible caption action button with native non-client role metadata.</summary>
+/// <summary>Accessible caption action button for an Avalonia 11 custom window title bar.</summary>
 [PseudoClasses(":minimize", ":maximize", ":restore", ":close")]
 public class MdCaptionButton : Button
 {
@@ -454,12 +453,6 @@ public class MdCaptionButton : Button
         PseudoClasses.Set(":restore", restoring);
         PseudoClasses.Set(":close", Kind == MdCaptionButtonKind.Close);
 
-        WindowDecorationProperties.SetElementRole(this, Kind switch
-        {
-            MdCaptionButtonKind.Minimize => WindowDecorationsElementRole.MinimizeButton,
-            MdCaptionButtonKind.MaximizeRestore => WindowDecorationsElementRole.MaximizeButton,
-            _ => WindowDecorationsElementRole.CloseButton
-        });
         AutomationProperties.SetName(this, Kind switch
         {
             MdCaptionButtonKind.Minimize => "Minimize",
@@ -479,9 +472,6 @@ public sealed class MdWindowCaptionButton : MdCaptionButton
 /// <summary>Explicit draggable title-bar region that excludes interactive descendants.</summary>
 public sealed class MdWindowDragRegion : ContentControl
 {
-    public MdWindowDragRegion() =>
-        WindowDecorationProperties.SetElementRole(this, WindowDecorationsElementRole.TitleBar);
-
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
@@ -497,10 +487,6 @@ public sealed class MdWindowResizeGrip : Control
     public static readonly StyledProperty<WindowEdge> EdgeProperty =
         AvaloniaProperty.Register<MdWindowResizeGrip, WindowEdge>(nameof(Edge), WindowEdge.SouthEast);
 
-    static MdWindowResizeGrip() =>
-        EdgeProperty.Changed.AddClassHandler<MdWindowResizeGrip>((grip, _) => grip.UpdateElementRole());
-
-    public MdWindowResizeGrip() => UpdateElementRole();
 
     public WindowEdge Edge { get => GetValue(EdgeProperty); set => SetValue(EdgeProperty, value); }
 
@@ -511,15 +497,4 @@ public sealed class MdWindowResizeGrip : Control
         if (this.FindAncestorOfType<MdBorderlessWindow>()?.TryBeginResize(Edge, e) == true) e.Handled = true;
     }
 
-    private void UpdateElementRole() => WindowDecorationProperties.SetElementRole(this, Edge switch
-    {
-        WindowEdge.North => WindowDecorationsElementRole.ResizeN,
-        WindowEdge.South => WindowDecorationsElementRole.ResizeS,
-        WindowEdge.East => WindowDecorationsElementRole.ResizeE,
-        WindowEdge.West => WindowDecorationsElementRole.ResizeW,
-        WindowEdge.NorthEast => WindowDecorationsElementRole.ResizeNE,
-        WindowEdge.NorthWest => WindowDecorationsElementRole.ResizeNW,
-        WindowEdge.SouthWest => WindowDecorationsElementRole.ResizeSW,
-        _ => WindowDecorationsElementRole.ResizeSE
-    });
 }

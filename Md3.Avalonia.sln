@@ -14,7 +14,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.Extra", "src\M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.DataGrid", "src\Md3.Avalonia.DataGrid\Md3.Avalonia.DataGrid.csproj", "{7F2A1C64-9D3E-4B58-A6C1-55D0E8B4F912}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.RichEditor", "src\Md3.Avalonia.RichEditor\Md3.Avalonia.RichEditor.csproj", "{3C8E7A51-6B24-4D97-9E13-A84F2C60D5B7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Md3.Avalonia.AvaloniaEdit", "src\Md3.Avalonia.AvaloniaEdit\Md3.Avalonia.AvaloniaEdit.csproj", "{5A2D9E14-7C3B-4E62-8F41-2B7C9D0A6E53}"
 EndProject
@@ -78,10 +77,6 @@ Global
 		{7F2A1C64-9D3E-4B58-A6C1-55D0E8B4F912}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F2A1C64-9D3E-4B58-A6C1-55D0E8B4F912}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F2A1C64-9D3E-4B58-A6C1-55D0E8B4F912}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3C8E7A51-6B24-4D97-9E13-A84F2C60D5B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3C8E7A51-6B24-4D97-9E13-A84F2C60D5B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3C8E7A51-6B24-4D97-9E13-A84F2C60D5B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3C8E7A51-6B24-4D97-9E13-A84F2C60D5B7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5A2D9E14-7C3B-4E62-8F41-2B7C9D0A6E53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5A2D9E14-7C3B-4E62-8F41-2B7C9D0A6E53}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A2D9E14-7C3B-4E62-8F41-2B7C9D0A6E53}.Release|Any CPU.ActiveCfg = Release|Any CPU

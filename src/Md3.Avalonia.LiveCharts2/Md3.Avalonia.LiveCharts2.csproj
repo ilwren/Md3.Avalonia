@@ -4,7 +4,7 @@
     <RootNamespace>Md3.Avalonia.Themes</RootNamespace>
     <AssemblyName>Md3.Avalonia.LiveCharts2</AssemblyName>
     <Description>Material Design 3 theme (colors, series palette and type scale) for LiveCharts2 charts in Avalonia. Opt-in package: it carries the LiveCharts2 Avalonia dependency so the core Material packages do not have to.</Description>
-    <PackageId>Md3.Avalonia.LiveCharts2</PackageId>
+    <PackageId>Md3.Avalonia11.LiveCharts2</PackageId>
     <Version>0.5.0-preview.1</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;charts;livecharts;data-visualization;theme;material-design-3</PackageTags>

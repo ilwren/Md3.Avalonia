@@ -97,7 +97,7 @@ public sealed class MdAdditionalControlTests
             foreach (var owner in owners)
             {
                 var popup = Assert.IsAssignableFrom<TemplatedControl>(owner)
-                    .GetTemplateDescendants().OfType<Popup>().Single();
+                    .GetTemplateChildren().OfType<Popup>().Single();
                 Assert.False(popup.ShouldUseOverlayLayer);
             }
         }

@@ -12,7 +12,7 @@
     <RootNamespace>Md3.Avalonia.Notifications</RootNamespace>
     <AssemblyName>Md3.Avalonia.Notifications</AssemblyName>
     <Description>One API for native system notifications on Windows, macOS, Linux and Android.</Description>
-    <PackageId>Md3.Avalonia.Notifications</PackageId>
+    <PackageId>Md3.Avalonia11.Notifications</PackageId>
     <Version>0.5.0-preview.1</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;notifications;system-notifications;windows;macos;linux;android</PackageTags>

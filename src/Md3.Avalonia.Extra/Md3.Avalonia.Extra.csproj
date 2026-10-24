@@ -4,7 +4,7 @@
     <RootNamespace>Md3.Avalonia.Extra</RootNamespace>
     <AssemblyName>Md3.Avalonia.Extra</AssemblyName>
     <Description>Extended Material Design 3 components and advanced UX widgets for Avalonia, inspired by popular open-source Flutter ecosystem widgets.</Description>
-    <PackageId>Md3.Avalonia.Extra</PackageId>
+    <PackageId>Md3.Avalonia11.Extra</PackageId>
     <Version>0.5.0-preview.1</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;flutter;extra;controls;mvvm;android;desktop;material-design-3</PackageTags>
