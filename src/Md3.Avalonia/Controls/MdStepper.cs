@@ -82,10 +82,12 @@ public sealed class MdStepper : ItemsControl
     public ICommand? CancelCommand { get => GetValue(CancelCommandProperty); set => SetValue(CancelCommandProperty, value); }
 
     /// <summary>Gets the content of the active step, used by the horizontal layout's shared body.</summary>
-    public object? ActiveStepContent => GetValue(ActiveStepContentProperty);
+    // The getter must read the field, not GetValue: a getter-only DirectProperty whose CLR
+    // getter calls GetValue recurses through the property registry until the stack overflows.
+    public object? ActiveStepContent => _activeStepContent;
 
     /// <summary>Gets the content template of the active step, used by the horizontal layout's shared body.</summary>
-    public IDataTemplate? ActiveStepContentTemplate => GetValue(ActiveStepContentTemplateProperty);
+    public IDataTemplate? ActiveStepContentTemplate => _activeStepContentTemplate;
 
     public event EventHandler<int>? ContinueRequested;
     public event EventHandler<int>? CancelRequested;

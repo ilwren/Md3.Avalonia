@@ -70,7 +70,9 @@ public class MdCommitGraph : ItemsControl
     public double NodeSize { get => GetValue(NodeSizeProperty); set => SetValue(NodeSizeProperty, value); }
 
     /// <summary>Gets the number of lanes the current commit list occupies.</summary>
-    public int LaneCount => GetValue(LaneCountProperty);
+    // Reads the field, not GetValue: a getter-only DirectProperty whose CLR getter calls GetValue
+    // recurses through the property registry until the stack overflows.
+    public int LaneCount => _laneCount;
 
     /// <summary>Gets the width of the graph column (lane count times <see cref="LaneWidth"/>).</summary>
     public double LaneColumnWidth => LaneCount * LaneWidth;

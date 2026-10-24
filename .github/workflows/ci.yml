@@ -23,10 +23,6 @@ env:
   # The terminal logger spends real time redrawing progress that nobody watches in CI.
   DOTNET_CLI_UI_LANGUAGE: en
   MSBUILDTERMINALLOGGER: 'off'
-  # The JIT's write-xor-execute allocator intermittently segfaults the headless test host on the
-  # runner image: a process dies with no test failure and no managed exception, and where it dies
-  # changes between runs. Disable the allocator so the tests cannot be killed by the host.
-  DOTNET_EnableWriteXorExecute: '0'
 
 # Least privilege, declared rather than inherited: the conformance publisher needs to write a
 # pull request comment, and relying on the repository-wide default would make this workflow's
@@ -252,29 +248,9 @@ jobs:
         continue-on-error: true
         run: scripts/probe-tests.sh MdGallery gallery.trx
 
-      # The gallery probe above dies inside its own process (a few tests run, then silence), so the
-      # class-level probes below run each of the four remaining gallery classes in its own process.
-      # Whichever one dies alone is the one that poisons the shared dispatcher for its neighbours.
-      - name: Probe the gallery adaptive tests alone
-        continue-on-error: true
-        run: scripts/probe-tests.sh MdGalleryAdaptiveTests gallery-adaptive.trx
-
-      - name: Probe the gallery index tests alone
-        continue-on-error: true
-        run: scripts/probe-tests.sh MdGalleryIndexTests gallery-index.trx
-
-      - name: Probe the gallery picker page tests alone
-        continue-on-error: true
-        run: scripts/probe-tests.sh MdGalleryPickerPageTests gallery-picker.trx
-
-      - name: Probe the gallery page render tests alone
-        continue-on-error: true
-        run: scripts/probe-tests.sh MdGalleryTests gallery-pages.trx
-
-      # The main suite dies a few minutes in even with every gallery probe green, so the poison
-      # may sit in the new non-gallery classes or accumulate across the whole process. Probe each
-      # new class alone, then the entire suite with the gallery classes removed: if that run dies
-      # too, the poison is not a gallery page at all.
+      # These four classes are new and are the only ones in the suite that own custom Render
+      # passes, custom templates or pointer-press guards, so each runs alone: a class that dies
+      # in its own process dies differently (and readably) than it would beside its neighbours.
       - name: Probe the commit graph tests alone
         continue-on-error: true
         run: scripts/probe-tests.sh MdCommitGraphTests commit-graph.trx
@@ -294,10 +270,6 @@ jobs:
       - name: Probe the text box selection tests alone
         continue-on-error: true
         run: scripts/probe-tests.sh MdTextBoxSelectionTests selection.trx
-
-      - name: Probe the suite without the gallery classes
-        continue-on-error: true
-        run: scripts/probe-tests.sh "FullyQualifiedName!~MdGallery" no-gallery.trx everything-but-the-gallery
 
       # The map theme is the newest package and the only one that reaches a third-party Skia text
       # stack, so its eight tests are run on their own as well: the notice is what says they ran and

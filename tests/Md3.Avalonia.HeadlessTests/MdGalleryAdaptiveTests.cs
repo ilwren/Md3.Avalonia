@@ -38,10 +38,7 @@ public sealed class MdGalleryAdaptiveTests
             .Where(type => type is { IsAbstract: false, IsPublic: true }
                            && typeof(UserControl).IsAssignableFrom(type)
                            && type.Namespace == typeof(ButtonGalleryPage).Namespace
-                           && type.GetConstructor(Type.EmptyTypes) is not null
-                           // TEMP-DIAG: excluded while bisecting the host crash
-                           && type.Name != "CommitGraphGalleryPage"
-                           && type.Name != "StepperGalleryPage")
+                           && type.GetConstructor(Type.EmptyTypes) is not null)
             .OrderBy(type => type.Name)
             .ToArray();
 
