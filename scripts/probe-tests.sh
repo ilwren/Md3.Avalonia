@@ -82,12 +82,16 @@ results = [
 ]
 
 failed = []
+detailed = []
 for result in results:
     if result.get("outcome") != "Failed":
         continue
     message = result.find(".//ns:Message", ns)
-    first = message.text.strip().splitlines()[0] if message is not None and message.text else ""
+    text = message.text.strip() if message is not None and message.text else ""
+    first = text.splitlines()[0]
     failed.append(f"{result.get('testName')}: {first}")
+    if len(detailed) < 3 and text:
+        detailed.append(f"{result.get('testName')}: {text[:1600]}")
 
 # Annotations are the only part of a run that survives a cancelled job, and GitHub caps them, so
 # this is one line however many tests went wrong. The trx lists results in completion order, so
@@ -95,6 +99,11 @@ for result in results:
 last = results[-1].get("testName", "?").rsplit(".", 1)[-1] if results else "none"
 print("::notice::%s alone: exit=%s, %d run, %d failed, last=%s -> %s"
       % (name, status, len(results), len(failed), last, "; ".join(failed) or "none"))
+
+# The first line loses the stack trace; the full message keeps the exact source line of an
+# unhandled exception, which is what a truncated console log never survives.
+for entry in detailed:
+    print("::error::%s detail: %s" % (name, entry.replace("\n", " | ")))
 PY
 
 exit "$status"

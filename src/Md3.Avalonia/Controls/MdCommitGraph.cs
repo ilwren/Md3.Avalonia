@@ -277,6 +277,28 @@ public class MdCommitGraph : ItemsControl
             IReadOnlyList<MdCommitNode> commits,
             string? headId)
         {
+            // A bare NullReferenceException here loses the line number once the stack is
+            // truncated by the test harness, so the core is wrapped: any null that reaches it
+            // is rethrown with the input state in the message.
+            if (commits is null)
+                throw new InvalidOperationException("MdCommitGraphLayout.ComputeRows: commits is null");
+            try
+            {
+                return ComputeRowsCore(commits, headId);
+            }
+            catch (NullReferenceException ex)
+            {
+                throw new InvalidOperationException(
+                    $"MdCommitGraphLayout.ComputeRows: NullReferenceException; count={commits.Count} " +
+                    $"headId={(headId ?? "<null>")} items=[{string.Join(", ", commits.Select(c => c is null ? "null" : $"'{c.Id}'"))}]",
+                    ex);
+            }
+        }
+
+        private static IReadOnlyList<MdCommitGraphRowGeometry> ComputeRowsCore(
+            IReadOnlyList<MdCommitNode> commits,
+            string? headId)
+        {
             var count = commits.Count;
             var idToRow = new Dictionary<string, int>(StringComparer.Ordinal);
             for (var i = 0; i < count; i++)

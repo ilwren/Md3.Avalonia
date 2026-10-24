@@ -31,10 +31,11 @@ public sealed class MdContributionGridTests
         };
 
         // 2025-01-06 is a Monday: the first column starts on Sunday 2025-01-05 and the data
-        // runs to 2025-02-16, 42 days later, so seven week columns.
+        // runs to 2025-02-17, 42 days later, so seven week columns. The first week that opens
+        // on a February day is the one starting Sunday 2025-02-02, the fifth column.
         Assert.Equal(7, grid.WeekCount);
         Assert.Equal(new DateTime(2025, 1, 5), grid.WeekStart);
-        Assert.Equal(new[] { ("Jan", 0), ("Feb", 3) },
+        Assert.Equal(new[] { ("Jan", 0), ("Feb", 4) },
             grid.MonthLabels.Select(l => (l.Text, l.WeekIndex)).ToArray());
     }
 
