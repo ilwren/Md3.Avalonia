@@ -48,6 +48,7 @@
             <md:MdButton Content="Snackbar" Tag="Snackbar" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Spin kit" Tag="Spin kit" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Tooltips" Tag="Tooltips" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Video player" Tag="Video player" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
           </StackPanel>
         </Border>
 
