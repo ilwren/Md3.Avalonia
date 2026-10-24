@@ -28,10 +28,13 @@ timeout --signal=KILL 300 dotnet test "$project" \
   --logger "console;verbosity=normal" > /tmp/probe-console.txt 2>&1
 status=$?
 
-# A non-zero exit with no failed tests means the host itself died; the console tail is the only
-# trace that is not lost, so ship the last lines as an extra annotation.
+# A non-zero exit with no failed tests means the host itself died; the console is the only trace
+# that is not lost. Ship the fatal context (the exception header sits above the stack tail) and
+# the tail as extra annotations.
 if [ "$status" -ne 0 ]; then
-  tail_line=$(tail -n 12 /tmp/probe-console.txt | tr '\n' ' | ' | cut -c1-400)
+  fatal_ctx=$(grep -B 30 -m1 "FATAL ERROR\|Fatal error\|Unhandled exception" /tmp/probe-console.txt | tail -n 18 | tr '\n' ' | ' | cut -c1-450)
+  [ -n "$fatal_ctx" ] && echo "::error::${label} fatal context: ${fatal_ctx}"
+  tail_line=$(tail -n 6 /tmp/probe-console.txt | tr '\n' ' | ' | cut -c1-450)
   echo "::error::${label} console tail: ${tail_line}"
 fi
 
