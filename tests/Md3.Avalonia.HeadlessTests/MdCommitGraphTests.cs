@@ -210,7 +210,8 @@ public sealed class MdCommitGraphTests
         using var host = Show(graph);
 
         var row = (CommitGraphRow)graph.ContainerFromIndex(1)!;
-        var bounds = row.Bounds.TransformToAABB(row.TransformToVisual(host.Window)!);
+        var transform = row.TransformToVisual(host.Window) ?? Matrix.Identity;
+        var bounds = row.Bounds.TransformToAABB(transform);
         var point = new Point(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
         host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
