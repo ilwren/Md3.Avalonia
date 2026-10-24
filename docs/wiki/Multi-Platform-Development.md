@@ -1,6 +1,6 @@
 # Multi-Platform Development
 
-The eighteen NuGet libraries use Avalonia 12.1.2. The five core-family packages target **.NET 8 and .NET 10** (`net8.0;net10.0`); the twelve opt-in third-party theme packages target **.NET 10** only, following the TFMs their upstream libraries publish.
+The seventeen NuGet libraries use Avalonia 11.3.22. The five core-family packages target **.NET 8 and .NET 10** (`net8.0;net10.0`); the eleven opt-in third-party theme packages target **.NET 10** only, following the TFMs their upstream libraries publish.
 
 ---
 
@@ -45,8 +45,9 @@ internal static class Program
 ```csharp
 using Android.App;
 using Android.Content.PM;
+using Avalonia;
 using Avalonia.Android;
-using Md3.Avalonia.Gallery;
+using GalleryApp = Md3.Avalonia.Gallery.App;
 
 namespace Md3.Avalonia.Gallery.Android;
 
@@ -55,8 +56,10 @@ namespace Md3.Avalonia.Gallery.Android;
     Theme = "@style/MyTheme.NoActionBar",
     MainLauncher = true,
     ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
-public sealed class MainActivity : AvaloniaMainActivity<App>
+public sealed class MainActivity : AvaloniaMainActivity<GalleryApp>
 {
+    protected override AppBuilder CustomizeAppBuilder(AppBuilder builder) =>
+        base.CustomizeAppBuilder(builder).WithInterFont();
 }
 ```
 

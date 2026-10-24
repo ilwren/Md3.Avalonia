@@ -2,7 +2,7 @@
 
 Status (2026-10-03): **W0–W2 complete; Windows W3 now preserves native DWM state-animation styles and exposes the native system menu; Snap Layout/DPI/backdrop and W4 real-platform sign-off remain open.**
 
-The custom-chrome feature is in the core `Md3.Avalonia` package. It introduces no dependency on the optional Icons or Extra packages and uses Avalonia 12 window APIs.
+The custom-chrome feature is in the core `Md3.Avalonia11` package. It introduces no dependency on the optional Icons or Extra packages and uses Avalonia 11 window APIs.
 
 ## W0 — contracts and platform boundary (complete)
 
@@ -25,11 +25,11 @@ The custom-chrome feature is in the core `Md3.Avalonia` package. It introduces n
 
 This phase is verified structurally by headless tests. It does not by itself prove compositor shadows, OS corner rendering or native window behavior.
 
-## W2 — Avalonia 12 decoration roles and generic fallback (complete)
+## W2 — Avalonia 11 extended client area and generic fallback (complete)
 
-- The default title bar and explicit `MdWindowDragRegion` carry `WindowDecorationsElementRole.TitleBar`.
-- Caption buttons carry native MinimizeButton, MaximizeButton and CloseButton roles.
-- All eight resize regions carry the corresponding ResizeN/S/E/W/NE/NW/SE/SW roles.
+- The default title bar and explicit `MdWindowDragRegion` use the platform adapter's `BeginMoveDrag` fallback.
+- Caption buttons expose managed commands and distinct automation names for minimize, maximize/restore and close.
+- All eight resize regions carry their corresponding `WindowEdge` values and call `BeginResizeDrag`; Avalonia 12-only `WindowDecorationsElementRole` values are not used.
 - `MdAvaloniaWindowPlatformAdapter` retains `BeginMoveDrag` and `BeginResizeDrag` as the generic fallback.
 - `MdAndroidWindowPlatformAdapter` reports no desktop window capabilities and performs no desktop chrome calls.
 
@@ -39,11 +39,11 @@ Source comparison was repeated against FluentAvalonia commit `e6def96e6281b79cb8
 
 - `FAAppWindow` overrides `ExtendClientAreaToDecorationsHint` to `true` on Windows and retains the system frame; its Windows template explicitly avoids drawing a second frame.
 - `Win32WindowManager` subclasses the HWND procedure for right-click/Alt+Space system-menu behavior and posts the selected command as `WM_SYSCOMMAND`; it does not fake maximize/restore with an Avalonia animation.
-- FluentAvalonia leaves window-state changes on Avalonia's native backend. Avalonia 12.1 fixed the `WindowDecorations.Full` state-animation regression, while `BorderOnly` intentionally lacks the caption style bits used by DWM.
+- FluentAvalonia leaves window-state changes on Avalonia's native backend. `SystemDecorations.Full` retains the caption style bits used by DWM, while `BorderOnly` is the portable fallback for other desktop platforms.
 
-The current package baseline is Avalonia `12.0.0`, so that 12.1 fix is not included. Revalidate `WindowDecorations.Full` state changes against 12.0.0 and preserve a workaround if needed; the 12.1 behavior is not evidence for this baseline.
+The current package baseline is Avalonia `11.3.22`. Native state transitions still require real Windows validation; headless template tests are not evidence of DWM behavior.
 
-Accordingly, `MdWindowsWindowPlatformAdapter` now uses `WindowDecorations.Full` when `PreserveNativeBorder=true`, extends the client area, leaves maximize/restore on `Window.WindowState`, and uses `GetSystemMenu`/`TrackPopupMenu`/`PostMessage(WM_SYSCOMMAND)` for the title-bar context menu. No custom maximize animation is present. Because Avalonia 12 injects `WindowDrawnDecorations` outside the `Window` control template, `MdBorderlessWindow` also assigns a dedicated empty decorations theme; this suppresses Fluent/Simple title, caption and frame visuals without removing the native style bits.
+Accordingly, `MdWindowsWindowPlatformAdapter` now uses `SystemDecorations.Full` when `PreserveNativeBorder=true`, extends the client area, leaves maximize/restore on `Window.WindowState`, and uses `GetSystemMenu`/`TrackPopupMenu`/`PostMessage(WM_SYSCOMMAND)` for the title-bar context menu. No custom maximize animation is present. The Material title bar is placed with `ExtendClientAreaToDecorationsHint` and `ExtendClientAreaTitleBarHeightHint`; no Avalonia 12-only `WindowDrawnDecorations` theme or decoration-property API is used.
 
 The following work still requires real Windows or platform-specific evidence:
 
@@ -60,7 +60,7 @@ Until those tests exist, the implementation is described as matching FluentAvalo
 Completed automated work:
 
 - `BorderlessWindowGalleryPage` contains a themed preview, capability diagnostics, usage samples and a real secondary-window launcher.
-- `MdBorderlessWindowTemplateTests` verifies the self-contained template, content margin, title-height updates, eight decoration roles, caption roles and restore state.
+- `MdBorderlessWindowTemplateTests` verifies the self-contained template, content margin, title-height updates, eight grip `WindowEdge` values, caption automation names and restore state.
 - Adapter/API regression tests remain in the full headless suite.
 - Release build and full headless suite remain required CI gates; exact totals are recorded by the workflow rather than copied into this plan.
 - Core, Icons, Icons.Lite and Extra package verification is part of the NuGet gate.

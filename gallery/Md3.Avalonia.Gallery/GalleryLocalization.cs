@@ -472,10 +472,10 @@ internal static class GalleryLocalization
                 var original = Originals.GetValue(content, _ => new Original(label)).Value;
                 content.Content = Translate(original, culture);
             }
-            if (element is TextBox input && input.PlaceholderText is { } placeholder)
+            if (element is TextBox input && input.Watermark is { } placeholder)
             {
                 var original = PlaceholderOriginals.GetValue(input, _ => new Original(placeholder)).Value;
-                input.PlaceholderText = Translate(original, culture);
+                input.Watermark = Translate(original, culture);
             }
             if (element is MdTextBox field && field.Label is string fieldLabel)
             {

@@ -1,6 +1,6 @@
-# Core Controls API Reference (`Md3.Avalonia`)
+# Core Controls API Reference (`Md3.Avalonia11`)
 
-The `Md3.Avalonia` package contains the standard Material Design 3 (Material You) component catalog.
+The `Md3.Avalonia11` package contains the standard Material Design 3 (Material You) component catalog.
 
 ---
 

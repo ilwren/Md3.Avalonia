@@ -2,12 +2,17 @@
 
 发布日期：2026-10-18
 
-版本号从 `0.4.1-preview.1` 进到 `0.5.0-preview.1`。这一版没有破坏性改动，但公开 API 面增加了不少：
-可发布包从六个变成十七个，`Md3.Avalonia.Extra` 多了三个自研控件，所以走次版本而不是补丁版本。
+版本号从 `0.4.1-preview.1` 进到 `0.5.0-preview.1`。原始基线增加了公开 API 和第三方主题包；2026-10-24 的后续迁移将同一源码基线适配到 Avalonia 11，并改用 `Md3.Avalonia11*` 包身份。框架与包 ID 变化需要按下方升级说明处理。
 
 > 仓库中没有 `0.4.1-preview.1` 的 tag 或 release；`docs/RELEASE_NOTES_0.4.1-preview.1.md` 保留为
 > 那一轮工作的记录。本版条目原先记在 CHANGELOG 的 `0.4.1-preview.1` 小节下，已归入
 > `## [0.5.0-preview.1]`。
+
+## Avalonia 11 迁移（2026-10-24）
+
+- Avalonia 与平台宿主统一使用 `11.3.22`；Android 宿主改为 `AvaloniaMainActivity<GalleryApp>`，窗口装饰、焦点事件、字体 glyph、PNG 保存及自动化 peer 均使用 Avalonia 11 API。
+- 十七个包的 PackageId 全部为 `Md3.Avalonia11` / `Md3.Avalonia11.*`，项目路径、程序集名、命名空间和 `avares://Md3.Avalonia...` 资源 URI 保持不变。
+- 支持 Avalonia 11 的第三方主题降级保留，精确版本见 `docs/COMPATIBILITY.md`；没有 Avalonia 11 版本的 OlivierJC.AvaloniaRichEditor 美化包被移除。
 
 ## 新增
 
@@ -18,22 +23,22 @@
 
 | 包 | 上游 | 形态 |
 |---|---|---|
-| `Md3.Avalonia.AvaloniaEdit` | AvaloniaEdit | Avalonia 样式集合 |
-| `Md3.Avalonia.AvaloniaHex` | AvaloniaHex | Avalonia 样式集合 |
-| `Md3.Avalonia.Dock` | Dock | 样式集合（含一个无法回避的原生 Button 主题）|
-| `Md3.Avalonia.Tabalonia` | Tabalonia | Avalonia 样式集合 |
-| `Md3.Avalonia.Markdown` | Markdown.Avalonia | 赋给 `MarkdownScrollViewer.MarkdownStyle` |
-| `Md3.Avalonia.LiveCharts2` | LiveCharts2 | 配置入口 `LiveCharts.Configure(...)` |
-| `Md3.Avalonia.ScottPlot` | ScottPlot.Avalonia | 绘图对象入口 `MaterialScottPlotTheme` |
-| `Md3.Avalonia.PropertyGrid` | bodong.Avalonia.PropertyGrid | 32 个键控控件主题 |
-| `Md3.Avalonia.NodifyM` | NodifyM.Avalonia | 画刷重定向，模板仍归上游 |
-| `Md3.Avalonia.Mapsui` | Mapsui.Avalonia12 | 地图级入口 `MaterialMapsuiTheme` |
-| `Md3.Avalonia.InkCanvas` | DotNetCampus.AvaloniaInkCanvas | 控件级入口 `MaterialInkCanvasTheme` + `MdSignaturePad` |
+| `Md3.Avalonia11.AvaloniaEdit` | AvaloniaEdit | Avalonia 样式集合 |
+| `Md3.Avalonia11.AvaloniaHex` | AvaloniaHex | Avalonia 样式集合 |
+| `Md3.Avalonia11.Dock` | Dock | 样式集合（含一个无法回避的原生 Button 主题）|
+| `Md3.Avalonia11.Tabalonia` | Tabalonia | Avalonia 样式集合 |
+| `Md3.Avalonia11.Markdown` | Markdown.Avalonia | 赋给 `MarkdownScrollViewer.MarkdownStyle` |
+| `Md3.Avalonia11.LiveCharts2` | LiveCharts2 | 配置入口 `LiveCharts.Configure(...)` |
+| `Md3.Avalonia11.ScottPlot` | ScottPlot.Avalonia | 绘图对象入口 `MaterialScottPlotTheme` |
+| `Md3.Avalonia11.PropertyGrid` | bodong.Avalonia.PropertyGrid | 32 个键控控件主题 |
+| `Md3.Avalonia11.NodifyM` | NodifyM.Avalonia | 画刷重定向，模板仍归上游 |
+| `Md3.Avalonia11.Mapsui` | Mapsui.Avalonia | 地图级入口 `MaterialMapsuiTheme` |
+| `Md3.Avalonia11.InkCanvas` | DotNetCampus.AvaloniaInkCanvas | 控件级入口 `MaterialInkCanvasTheme` + `MdSignaturePad` |
 
 主题化只做外观，不改上游的数据管线、模板与部件命名。确实无法在库侧解决的三处（NodifyM 的连线
 几何、PropertyGrid 的编辑器模板、Tabalonia 的标签样式）在 `docs/API.md` 中标注为「留在上游」。
 
-### 三个自研控件（`Md3.Avalonia.Extra`）
+### 三个自研控件（`Md3.Avalonia11.Extra`）
 
 - **`MdWaveform`** —— 峰值驱动的波形图。播放过的部分用 `Primary`，其余用
   `SurfaceContainerHighest`，与 Material 3 滑块区分活动/非活动轨道的方式一致；播放头可拖拽、
@@ -71,7 +76,7 @@
   `MonospaceFontFamily` 而不是 `FontFamily` 上：`CCode` 的构造函数把后者绑到前者，而绑定的优先级
   高于样式 setter。
 - **`MdWaveform` 的脉冲在祖先隐藏它之后永不恢复。** 帧循环在 `ShouldAnimate` 变假时停摆，而这个
-  判断包含 `IsEffectivelyVisible` —— 但没有任何东西在可见性回来时通知控件。Avalonia 12.1.2 只把
+  判断包含 `IsEffectivelyVisible` —— 但没有任何东西在可见性回来时通知控件。Avalonia 11.3.22 只把
   `IsEffectivelyVisible` 暴露成普通 CLR 属性，变更事件是 `internal`，所以隐藏父级对子级完全没有
   通知，已经停摆的循环就一直停着。悬浮窗最小化、折叠面板收起、标签页切走都会因此让脉冲永久冻结。
   现在控件在挂载期间订阅每个可视祖先的 `IsVisible`；Avalonia 在把新的有效可见性下发给子级**之后**
@@ -89,20 +94,20 @@
 
 ## 测试
 
-- `check-api-doc-coverage.py`：types=346，documented=346，missing=0
-- `check-gallery-localization.py --strict`：1031 keys，0 重复，未翻译正文 0
+- `check-api-doc-coverage.py`：types=352，documented=352，missing=0
+- `check-gallery-localization.py --strict`：1048 keys，0 重复，未翻译正文 0
 - `lint-design-tokens.py`：errors=0
 - 六个（现为十七个）`src/` 包声明 `IsAotCompatible`，并以 IL3xxx 分析器构建；本轮未新增反射
-- CI、AOT probe、Build NuGet Packages、Build Multi-Platform Gallery 四个 workflow 全绿
+- 发布门禁：CI、AOT probe、Build NuGet Packages、Build Multi-Platform Gallery 四个 workflow 均需通过
 
 ## 升级
 
 ```xml
-<PackageReference Include="Md3.Avalonia" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11" Version="0.5.0-preview.1" />
 <!-- 需要哪个生态主题就再加哪一个 -->
-<PackageReference Include="Md3.Avalonia.Extra" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.Extra" Version="0.5.0-preview.1" />
 ```
 
-没有已知的破坏性改动。两处行为变化值得知道：`MdWaveform` 现在会在祖先可见性变化时重新评估是否
+Avalonia 11 迁移要求把 PackageReference 从旧的 `Md3.Avalonia*` 改为 `Md3.Avalonia11*`；程序集和命名空间不变。第三方 AvaloniaRichEditor 没有 Avalonia 11 兼容版本，因此其独立美化包、Gallery 集成和测试已移除；Extra 自研 `MdRichEditor` 保留。两处原有行为变化仍值得知道：`MdWaveform` 现在会在祖先可见性变化时重新评估是否
 播放脉动（此前会永久停摆），以及 `MaterialMarkdownTheme` 现在设置 `MonospaceFontFamily` 而不是
 让它回落到宿主挑出的单个字体族。

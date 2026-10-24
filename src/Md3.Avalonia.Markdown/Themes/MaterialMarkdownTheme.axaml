@@ -17,7 +17,7 @@
   This file is therefore a collection, not an application theme: it is assigned per viewer (or per
   page) instead of being merged into Application.Styles.
 
-  It mirrors the selector set of MarkdownStyleFluentTheme - the collection of the Avalonia 12 line,
+  It mirrors the selector set of MarkdownStyleFluentTheme - the Avalonia 11-compatible collection,
   which is what the pinned Markdown.Avalonia.Tight ships - retokenized onto Md.Sys.*. Colours and
   sizes become tokens; everything else is upstream's own value, except where Material has a shape or
   a spacing of its own (marked "Material" below). Per element:

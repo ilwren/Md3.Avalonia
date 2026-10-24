@@ -5,85 +5,81 @@ This document is the public entry point for the `0.5.0-preview.1` API. Preview A
 ## Install and register
 
 ```xml
-<PackageReference Include="Md3.Avalonia" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11" Version="0.5.0-preview.1" />
 <!-- Optional symbol providers (choose one): -->
-<PackageReference Include="Md3.Avalonia.Icons" Version="0.5.0-preview.1" />
-<PackageReference Include="Md3.Avalonia.Icons.Lite" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.Icons" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.Icons.Lite" Version="0.5.0-preview.1" />
 <!-- Optional clean-room third-party Flutter patterns (depends on core): -->
-<PackageReference Include="Md3.Avalonia.Extra" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.Extra" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for Avalonia's own DataGrid; the only package that pulls in
      Avalonia.Controls.DataGrid: -->
-<PackageReference Include="Md3.Avalonia.DataGrid" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.DataGrid" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for the AvaloniaEdit text editor; likewise the only package that
      pulls in Avalonia.AvaloniaEdit: -->
-<PackageReference Include="Md3.Avalonia.AvaloniaEdit" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.AvaloniaEdit" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for the AvaloniaHex hex editor; likewise the only package that
      pulls in AvaloniaHex: -->
-<PackageReference Include="Md3.Avalonia.AvaloniaHex" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.AvaloniaHex" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for the Dock docking layout system; likewise the only package
      that pulls in Dock.Avalonia and Dock.Avalonia.Themes.Fluent: -->
-<PackageReference Include="Md3.Avalonia.Dock" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.Dock" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for Tabalonia draggable tabs; likewise the only package that
      pulls in Tabalonia: -->
-<PackageReference Include="Md3.Avalonia.Tabalonia" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.Tabalonia" Version="0.5.0-preview.1" />
 <!-- Optional Material style collection for Markdown.Avalonia documents; likewise the only package
      that pulls in Markdown.Avalonia.Tight. Unlike every other theme package it is not registered
      in Application.Styles - see the Markdown section below: -->
-<PackageReference Include="Md3.Avalonia.Markdown" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.Markdown" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for LiveCharts2 charts; likewise the only package that pulls in
      LiveChartsCore.SkiaSharpView.Avalonia. Like the Markdown package it is not registered in
      Application.Styles - it is configured once through LiveCharts.Configure; see the LiveCharts2
      section below: -->
-<PackageReference Include="Md3.Avalonia.LiveCharts2" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.LiveCharts2" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for ScottPlot charts; likewise the only package that pulls in
      ScottPlot.Avalonia. It is a plot-level entry point rather than a style collection, so it is not
      registered in Application.Styles either; see the ScottPlot section below: -->
-<PackageReference Include="Md3.Avalonia.ScottPlot" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.ScottPlot" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for the Avalonia.PropertyGrid property grid; likewise the only package
      that pulls in bodong.Avalonia.PropertyGrid. It is a normal style collection - register it after
      MaterialTheme; see the Property grid section below: -->
-<PackageReference Include="Md3.Avalonia.PropertyGrid" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.PropertyGrid" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for the NodifyM node editor; likewise the only package that
      pulls in NodifyM.Avalonia: -->
-<PackageReference Include="Md3.Avalonia.NodifyM" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.NodifyM" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for the Mapsui map control; likewise the only package that pulls
-     in Mapsui.Avalonia12. Mapsui draws its own canvas, so the theme is a map-level entry point
+     in Mapsui.Avalonia. Mapsui draws its own canvas, so the theme is a map-level entry point
      rather than a style collection; see the Mapsui section below: -->
-<PackageReference Include="Md3.Avalonia.Mapsui" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.Mapsui" Version="0.5.0-preview.1" />
 <!-- Optional Material theme for the DotNetCampus ink canvas plus MdSignaturePad; likewise the
      only package that pulls in DotNetCampus.AvaloniaInkCanvas. The canvas also draws itself, so
      this is a control-level entry point; see the InkCanvas section below: -->
-<PackageReference Include="Md3.Avalonia.InkCanvas" Version="0.5.0-preview.1" />
-<!-- Optional Material theme for the maintained AvaloniaRichEditor fork; likewise the only
-     package that pulls in OlivierJC.AvaloniaRichEditor: -->
-<PackageReference Include="Md3.Avalonia.RichEditor" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.InkCanvas" Version="0.5.0-preview.1" />
 <!-- Optional native system notifications for Windows, macOS, Linux and Android. Independent of
      Avalonia themes, so there is nothing to register in Application.Styles: -->
-<PackageReference Include="Md3.Avalonia.Notifications" Version="0.5.0-preview.1" />
+<PackageReference Include="Md3.Avalonia11.Notifications" Version="0.5.0-preview.1" />
 ```
 
-All eighteen packages are versioned together. The five core-family packages (`Md3.Avalonia`, `Md3.Avalonia.Icons`, `Md3.Avalonia.Icons.Lite`, `Md3.Avalonia.Extra`, `Md3.Avalonia.DataGrid`) provide `net8.0` and `net10.0` assets, and the twelve opt-in third-party theme packages provide `net10.0` only. `Md3.Avalonia.Notifications` adds `net8.0-windows10.0.19041.0`, `net10.0-windows10.0.19041.0` and, when the pack scripts opt in, `net10.0-android`. The Gallery host itself targets .NET 10 only. Add only the optional packages your application uses; choose **one** icon provider:
+All seventeen packages are versioned together. The five core-family packages (`Md3.Avalonia11`, `Md3.Avalonia11.Icons`, `Md3.Avalonia11.Icons.Lite`, `Md3.Avalonia11.Extra`, `Md3.Avalonia11.DataGrid`) provide `net8.0` and `net10.0` assets, and the eleven opt-in third-party theme packages provide `net10.0` only. `Md3.Avalonia11.Notifications` adds `net8.0-windows10.0.19041.0`, `net10.0-windows10.0.19041.0` and, when the pack scripts opt in, `net10.0-android`. The Gallery host itself targets .NET 10 only. Add only the optional packages your application uses; choose **one** icon provider:
 
 | NuGet package | Purpose | Theme/resource registration |
 |---|---|---|
-| `Md3.Avalonia` | Core Material 3 controls and tokens | `MaterialTheme` |
-| `Md3.Avalonia.Icons` | Full Material Symbols Rounded font and glyph catalog | Discovered automatically; no extra theme |
-| `Md3.Avalonia.Icons.Lite` | Reduced Material Symbols Rounded subset | Discovered automatically; use instead of `Icons` |
-| `Md3.Avalonia.Extra` | Optional ecosystem controls | `ExtraTheme` after `MaterialTheme` |
-| `Md3.Avalonia.DataGrid` | Material theme for Avalonia's native `DataGrid` | `MaterialDataGridTheme` |
-| `Md3.Avalonia.RichEditor` | Material theme for the API-compatible MIT-maintained `AvaloniaRichEditor` fork | `MaterialRichEditorTheme` |
-| `Md3.Avalonia.AvaloniaEdit` | Material theme for the AvaloniaEdit text editor | `MaterialAvaloniaEditTheme` |
-| `Md3.Avalonia.AvaloniaHex` | Material theme for the AvaloniaHex hex editor | `MaterialAvaloniaHexTheme` |
-| `Md3.Avalonia.Dock` | Material theme for the Dock docking layout system | `MaterialDockTheme` |
-| `Md3.Avalonia.Tabalonia` | Material theme for Tabaloria draggable and tearable tabs | `MaterialTabaloniaTheme` |
-| `Md3.Avalonia.Markdown` | Material 3 styles for Markdown.Avalonia documents | `MaterialMarkdownTheme` |
-| `Md3.Avalonia.LiveCharts2` | Material 3 theme for LiveCharts2 charts | `MaterialLiveChartsTheme.AddMaterialTheme` via `LiveCharts.Configure` |
-| `Md3.Avalonia.ScottPlot` | Material 3 theme for ScottPlot charts | Plot-level `MaterialScottPlotTheme.Follow` / `.Apply` |
-| `Md3.Avalonia.PropertyGrid` | Material theme for the Avalonia.PropertyGrid grid | `MaterialPropertyGridTheme` |
-| `Md3.Avalonia.NodifyM` | Material theme for the NodifyM node editor | `MaterialNodifyMTheme` |
-| `Md3.Avalonia.Mapsui` | Material theme for the Mapsui map control | Map-level `MaterialMapsuiTheme.Follow` |
-| `Md3.Avalonia.InkCanvas` | Material theme for the DotNetCampus ink canvas, plus `MdSignaturePad` | `MaterialInkCanvasTheme` |
-| `Md3.Avalonia.Notifications` | Unified Windows, macOS, Linux and Android system notifications; independent of Avalonia themes | `IMdSystemNotificationService` / `MdSystemNotificationService` |
+| `Md3.Avalonia11` | Core Material 3 controls and tokens | `MaterialTheme` |
+| `Md3.Avalonia11.Icons` | Full Material Symbols Rounded font and glyph catalog | Discovered automatically; no extra theme |
+| `Md3.Avalonia11.Icons.Lite` | Reduced Material Symbols Rounded subset | Discovered automatically; use instead of `Icons` |
+| `Md3.Avalonia11.Extra` | Optional ecosystem controls | `ExtraTheme` after `MaterialTheme` |
+| `Md3.Avalonia11.DataGrid` | Material theme for Avalonia's native `DataGrid` | `MaterialDataGridTheme` |
+| `Md3.Avalonia11.AvaloniaEdit` | Material theme for the AvaloniaEdit text editor | `MaterialAvaloniaEditTheme` |
+| `Md3.Avalonia11.AvaloniaHex` | Material theme for the AvaloniaHex hex editor | `MaterialAvaloniaHexTheme` |
+| `Md3.Avalonia11.Dock` | Material theme for the Dock docking layout system | `MaterialDockTheme` |
+| `Md3.Avalonia11.Tabalonia` | Material theme for Tabaloria draggable and tearable tabs | `MaterialTabaloniaTheme` |
+| `Md3.Avalonia11.Markdown` | Material 3 styles for Markdown.Avalonia documents | `MaterialMarkdownTheme` |
+| `Md3.Avalonia11.LiveCharts2` | Material 3 theme for LiveCharts2 charts | `MaterialLiveChartsTheme.AddMaterialTheme` via `LiveCharts.Configure` |
+| `Md3.Avalonia11.ScottPlot` | Material 3 theme for ScottPlot charts | Plot-level `MaterialScottPlotTheme.Follow` / `.Apply` |
+| `Md3.Avalonia11.PropertyGrid` | Material theme for the Avalonia.PropertyGrid grid | `MaterialPropertyGridTheme` |
+| `Md3.Avalonia11.NodifyM` | Material theme for the NodifyM node editor | `MaterialNodifyMTheme` |
+| `Md3.Avalonia11.Mapsui` | Material theme for the Mapsui map control | Map-level `MaterialMapsuiTheme.Follow` |
+| `Md3.Avalonia11.InkCanvas` | Material theme for the DotNetCampus ink canvas, plus `MdSignaturePad` | `MaterialInkCanvasTheme` |
+| `Md3.Avalonia11.Notifications` | Unified Windows, macOS, Linux and Android system notifications; independent of Avalonia themes | `IMdSystemNotificationService` / `MdSystemNotificationService` |
 
 Register the core theme; register optional themes only when their packages are referenced:
 
@@ -96,16 +92,15 @@ Register the core theme; register optional themes only when their packages are r
     <!-- Optional: -->
     <extra:ExtraTheme />
     <themes:MaterialDataGridTheme />
-    <themes:MaterialRichEditorTheme />
   </Application.Styles>
 </Application>
 ```
 
-All component themes are scoped to `Md*` types. Registering `MaterialTheme` does not replace Avalonia's built-in `Button`, `TextBox`, `ComboBox`, `ScrollViewer`, or other native themes. The DataGrid and rich-editor themes are opt-in and do not add those third-party controls to the core package.
+All component themes are scoped to `Md*` types. Registering `MaterialTheme` does not replace Avalonia's built-in `Button`, `TextBox`, `ComboBox`, `ScrollViewer`, or other native themes. The DataGrid and other third-party themes are opt-in and do not add those controls to the core package.
 
 ## System notifications
 
-`Md3.Avalonia.Notifications` is a standalone package (no Avalonia dependency) that exposes `IMdSystemNotificationService`, `MdSystemNotificationService`, `MdSystemNotification`, and `MdSystemNotificationOptions`:
+`Md3.Avalonia11.Notifications` is a standalone package (no Avalonia dependency) that exposes `IMdSystemNotificationService`, `MdSystemNotificationService`, `MdSystemNotification`, and `MdSystemNotificationOptions`:
 
 ```csharp
 using Md3.Avalonia.Notifications;
@@ -168,7 +163,7 @@ await notifications.ShowAsync(new MdSystemNotification("Ready", "The export has 
 
 The following catalog covers the public control surface shipped by the core package. Types ending in `*Item`, `*Part`, `*Presenter`, `*Thumb`, `*Panel`, or `*Grid` are supporting visual types that can also be composed directly when their API is public. For the exact dependency version and XML documentation, use the generated `Md3.Avalonia.xml` file in the NuGet package.
 
-### Core controls (`Md3.Avalonia`)
+### Core controls (`Md3.Avalonia11`)
 
 | Area | Controls and supporting types |
 |---|---|
@@ -207,7 +202,7 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 | `MdCarousel`, `MdRefreshIndicator`, `MdReorderableList` | Touch-friendly content interaction | controller/provider APIs, navigation, refresh callbacks, reorder callbacks |
 | `MdScaffold`, `MdAdaptiveLayout`, `MdToolbar` | Application shell and responsive layout | slots/regions, breakpoint mode, density, toolbar mode and platform input mode |
 
-### Optional package catalog (`Md3.Avalonia.Extra`)
+### Optional package catalog (`Md3.Avalonia11.Extra`)
 
 `ExtraTheme` must be registered in addition to `MaterialTheme`. These controls are maintained as optional ecosystem patterns, not as claims of official Material 3 parity.
 
@@ -224,29 +219,6 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 `MdPagedItemsView.ItemTemplate` sets the presentation of each loaded record; `MdDataGrid` is a narrower surface than Avalonia `DataGrid` and is not a drop-in replacement for it.
 
 The Extra support contracts are also public: `IMdPageProvider<T>`, `MdPageRequest`, `MdPageResult<T>`, `MdAsyncRequestState`, `MdDensity`, `MdEcosystemDensity`, `MdOverlayPlacement`, `MdOverlayAlignment`, `MdShortcutBinding`, and `MdFocusReturnScope`. Data and adapter contracts include `IMdChartDataProvider`, `IMdRichEditorAdapter`, and `IMdRichEditorStateAdapter`. Supporting enums and records configure those controls.
-
-### Rich-text editor theme package
-
-`Md3.Avalonia.RichEditor` themes `AvaloniaRichEditor.Controls.RichEditor` without replacing its engine or supplying a document. It sets the default run foreground to the active M3 `OnSurface` token (including live light/dark changes), alongside the selection, caret and type scale. The host supplies the surface/chrome, and the application can load or export HTML through the editor API:
-
-```xml
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:rte="using:AvaloniaRichEditor.Controls">
-  <Border Padding="16" CornerRadius="12"
-          Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
-          BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
-    <rte:RichEditor x:Name="Editor" Height="240" />
-  </Border>
-</UserControl>
-```
-
-```csharp
-Editor.LoadHtml("<p><b>Welcome</b> to the editor.</p>");
-string html = Editor.ToHtml();
-```
-
-Register `MaterialRichEditorTheme` after `MaterialTheme`. This is separate from `MdRichEditor` in `Md3.Avalonia.Extra`, which provides an engine-neutral command surface and expects an `IMdRichEditorAdapter`.
 
 ### Common usage patterns
 
@@ -383,11 +355,11 @@ Direct APIs include `Show`/`Dismiss` on transient components, `ShowAsync`/`Show`
 
 `MdScrollViewer` keeps wheel, trackpad, touch, pen and scrollbar behavior native. Desktop primary-button panning is opt-in through `AllowMouseDrag`; when enabled, focusable controls retain direct manipulation, and custom content takes precedence by handling the press or capturing the pointer. Set `md:MdScrollViewer.SuppressMouseDragScrolling="True"` on any precision-interaction subtree that does neither.
 
-`MdBorderlessWindow.PlatformAdapter` is replaceable. `PreserveNativeBorder` defaults to `true`: Windows uses `WindowDecorations.Full` plus an extended client area so the native `WS_CAPTION`/minimize/maximize styles and DWM state animations remain available, while macOS/Linux retain the portable border-only path. The Material template suppresses its own outer outline whenever a native frame is present, and an empty Avalonia 12 `WindowDrawnDecorations` theme prevents Fluent/Simple title and caption visuals from being layered over the Material title bar. The caption uses the window surface background without a separator rule, and shows `Window.Icon` unless `ShowIcon="False"`. `ShowMinimizeButton`/`ShowMaximizeButton`/`ShowCloseButton` control visibility, while `IsMinimizeButtonEnabled`/`IsMaximizeButtonEnabled`/`IsCloseButtonEnabled` control each action independently. View models use Avalonia `WindowState`; Android resolves to a safe no-op adapter.
+`MdBorderlessWindow.PlatformAdapter` is replaceable. `PreserveNativeBorder` defaults to `true`: Windows uses Avalonia 11 `SystemDecorations.Full` plus an extended client area so the native `WS_CAPTION`/minimize/maximize styles and DWM state animations remain available, while macOS/Linux retain the portable border-only path. The Material template suppresses its own outer outline whenever a native frame is present. `ExtendClientAreaToDecorationsHint` and `ExtendClientAreaTitleBarHeightHint` place the Material title bar in the extended client area without the Avalonia 12-only drawn-decoration theme APIs. The caption uses the window surface background without a separator rule, and shows `Window.Icon` unless `ShowIcon="False"`. `ShowMinimizeButton`/`ShowMaximizeButton`/`ShowCloseButton` control visibility, while `IsMinimizeButtonEnabled`/`IsMaximizeButtonEnabled`/`IsCloseButtonEnabled` control each action independently. View models use Avalonia `WindowState`; Android resolves to a safe no-op adapter.
 
 ## Extra visual controls
 
-The optional `Md3.Avalonia.Extra` package contains visual and ecosystem controls that are intentionally not counted as official Material 3 components:
+The optional `Md3.Avalonia11.Extra` package contains visual and ecosystem controls that are intentionally not counted as official Material 3 components:
 
 ```xml
 <extra:MdBeforeAfter Before="{Binding Original}" After="{Binding Revised}" Position="0.5" />
@@ -565,12 +537,12 @@ keyboard covering a focused field.
 
 ## Avalonia DataGrid
 
-`MdDataGrid` in `Md3.Avalonia.Extra` is a Material data table: columns, sorting, filtering,
+`MdDataGrid` in `Md3.Avalonia11.Extra` is a Material data table: columns, sorting, filtering,
 sticky headers and inline edit. It is not a replacement for Avalonia's `DataGrid` and does not
 try to be — no column resizing or reordering, no frozen columns, no grouping, no
 auto-generated columns.
 
-When an application needs the real thing, the opt-in `Md3.Avalonia.DataGrid` package themes
+When an application needs the real thing, the opt-in `Md3.Avalonia11.DataGrid` package themes
 Avalonia's own control to Material, so the choice is about capability rather than appearance:
 
 ```xml
@@ -592,12 +564,12 @@ scrollbars, and a cell editor that no longer derives from Fluent's `TextBox` the
 
 ## AvaloniaEdit
 
-`MdRichEditor` in `Md3.Avalonia.Extra` is a chrome-only editor surface: it exposes a Material
+`MdRichEditor` in `Md3.Avalonia11.Extra` is a chrome-only editor surface: it exposes a Material
 command bar and delegates the document to an `IMdRichEditorAdapter`, and it never ships an
 editing engine.
 
 For a real code/text editor, use [AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit)
-with the opt-in `Md3.Avalonia.AvaloniaEdit` package. `MaterialAvaloniaEditTheme` themes the
+with the opt-in `Md3.Avalonia11.AvaloniaEdit` package. `MaterialAvaloniaEditTheme` themes the
 editor chrome to Material 3:
 
 ```xml
@@ -627,7 +599,7 @@ templates reference. Registering this theme therefore never replaces Avalonia's 
 ## AvaloniaHex
 
 For binary and hex inspection, use [AvaloniaHex](https://github.com/Washi1337/AvaloniaHex) with
-the opt-in `Md3.Avalonia.AvaloniaHex` package:
+the opt-in `Md3.Avalonia11.AvaloniaHex` package:
 
 ```xml
 <Application.Styles>
@@ -651,7 +623,7 @@ uses for selection.
 ## Dock
 
 For docking layouts - tool panes, document tabs and floating windows - use
-[Dock](https://github.com/wieslawsoltes/Dock) with the opt-in `Md3.Avalonia.Dock` package:
+[Dock](https://github.com/wieslawsoltes/Dock) with the opt-in `Md3.Avalonia11.Dock` package:
 
 ```xml
 <Application.Styles>
@@ -695,7 +667,7 @@ absence of a density/preset API means light and dark, contrast and density all c
 ## Tabalonia
 
 For draggable tabs that can be reordered, torn out into their own window and attached to another
-strip, use [Tabalonia](https://github.com/egorozh/Tabalonia) with the opt-in `Md3.Avalonia.Tabalonia`
+strip, use [Tabalonia](https://github.com/egorozh/Tabalonia) with the opt-in `Md3.Avalonia11.Tabalonia`
 package:
 
 ```xml
@@ -731,7 +703,7 @@ accents file holds no theme dictionaries of its own, light and dark both come fr
 
 For Markdown documents rendered with
 [Markdown.Avalonia](https://github.com/whistyun/Markdown.Avalonia), use the opt-in
-`Md3.Avalonia.Markdown` package. It is the only package that depends on `Markdown.Avalonia.Tight`
+`Md3.Avalonia11.Markdown` package. It is the only package that depends on `Markdown.Avalonia.Tight`
 (the core-only package; its assembly is `Markdown.Avalonia`) and, unlike every other theme package,
 it is *not* registered in `Application.Styles`:
 
@@ -751,8 +723,8 @@ collections are selected by reflection over `MarkdownStyle`'s static properties 
 cannot add a name to that list. The only seam is the `MarkdownStyle` property itself, and it takes
 one instance per viewer - the built-in collections also hand out a fresh object per access.
 
-Read the collection as a retokenization of the package's own `MarkdownStyleFluentTheme` (the
-collection of the Avalonia 12 line, which is what the pinned package ships): every selector it
+Read the collection as a retokenization of the package's own `MarkdownStyleFluentTheme`, adapted
+to the pinned Avalonia 11-compatible package: every selector it
 styles is styled here with the same shape. Prose is `OnSurfaceVariant` on `Surface`, headings and
 code are `OnSurface`, links are `Primary` underlined and switch to `Tertiary` on hover (upstream
 asks for the complementary accent), the blockquote bar is `Primary`, cell and divider rules are
@@ -808,7 +780,7 @@ tree.
 ## LiveCharts2
 
 For charts drawn with [LiveCharts2](https://github.com/Live-Charts/LiveCharts2), use the opt-in
-`Md3.Avalonia.LiveCharts2` package. It is the only package that depends on
+`Md3.Avalonia11.LiveCharts2` package. It is the only package that depends on
 `LiveChartsCore.SkiaSharpView.Avalonia`, and the only Material theme in this repository that is not
 an Avalonia style collection at all:
 
@@ -866,14 +838,7 @@ entirely, and the view's tooltip and legend paints are preferred over the theme'
 a series sets itself, because theme rules never overwrite a value that is already there where
 LiveCharts documents user values as taking precedence.
 
-The pinned version is **2.1.0-dev-798**: LiveCharts2's Avalonia 12 line is currently published only
-as `2.1.0-dev` prereleases (`net8.0`/`net10.0`, declaring `Avalonia >= 12.0.0`, which restores
-against this repository's 12.1.2 baseline). The stable `2.0.x` line is the Avalonia 11 build - it
-declares `Avalonia >= 11.0.0`, targets `netstandard2.0`/`net6.0`/`net8.0` and does not load against
-Avalonia 12 - so it is not an option here even though it sorts higher. Upgrading the package means
-re-reading `Themes/Theme.cs`, `Themes/LiveChartsStylerExtensions.cs` and the SkiaSharp
-`ThemesExtensions.cs` of the new build; `MdLiveChartsThemeTests` pins the palette, the rules and the
-dark-variant reads that would move.
+The pinned version is **2.0.5**, the stable Avalonia 11 line. Its Avalonia dependencies restore against this repository's `11.3.22` baseline. Upgrading the package means re-reading `Themes/Theme.cs`, `Themes/LiveChartsStylerExtensions.cs` and the SkiaSharp `ThemesExtensions.cs` of the new build; `MdLiveChartsThemeTests` pins the palette, the rules and the dark-variant reads that would move.
 
 `MdChart` in the core package stays provider neutral: it keeps drawing through whichever chart
 engine an application picks, and this package only styles LiveCharts2.
@@ -881,7 +846,7 @@ engine an application picks, and this package only styles LiveCharts2.
 ## ScottPlot
 
 For plots drawn with [ScottPlot](https://github.com/ScottPlot/ScottPlot), use the opt-in
-`Md3.Avalonia.ScottPlot` package. It is the only package that depends on `ScottPlot.Avalonia`, and -
+`Md3.Avalonia11.ScottPlot` package. It is the only package that depends on `ScottPlot.Avalonia`, and -
 like the LiveCharts2 package - it is not an Avalonia style collection at all, because ScottPlot has
 no style seam either: a `Plot` carries its own colours and its own type, so there is nothing to
 register in `Application.Styles` and nothing that could leak into a chart this package was not asked
@@ -921,11 +886,7 @@ Everything upstream decides stays as it ships - axis frames, tick generation, la
 and a plot this package was not handed keeps every ScottPlot default. Nothing is process-wide: the
 theme never assigns `Fonts.Default`, so it cannot change the type of plots it was not asked to style.
 
-The pinned version is **5.1.59**: it targets `net8.0`/`net10.0` and declares `Avalonia >= 12.0.0` and
-`ScottPlot >= 5.1.59`, which restores against this repository's 12.1.2 baseline. Upgrading the
-package means re-reading `Plot.cs`, `Primitives/PlotStyle.cs`, `Primitives/LabelStyle.cs` and the
-`ScottPlot.Avalonia` `AvaPlot` control; `MdScottPlotThemeTests` pins the palette, the rules, the
-variant tracking, the baselines and the fact that a plot that was not asked for keeps its defaults.
+The pinned version is **5.0.56**, selected because its Avalonia control and dependency chain support Avalonia 11. It restores against this repository's `11.3.22` baseline. Upgrading the package means re-reading `Plot.cs`, `Primitives/PlotStyle.cs`, `Primitives/LabelStyle.cs` and the `ScottPlot.Avalonia` `AvaPlot` control; `MdScottPlotThemeTests` pins the palette, the rules, the variant tracking, the baselines and the fact that a plot that was not asked for keeps its defaults.
 
 `MdChart` in the core package stays provider neutral: it keeps drawing through whichever chart
 engine an application picks, and this package only styles ScottPlot.
@@ -947,7 +908,7 @@ The gallery's desktop head and the headless suite both do.
 
 For an object inspector built with
 [bodong.Avalonia.PropertyGrid](https://github.com/bodong1987/Avalonia.PropertyGrid), use the opt-in
-`Md3.Avalonia.PropertyGrid` package. It is the only package that depends on
+`Md3.Avalonia11.PropertyGrid` package. It is the only package that depends on
 `bodong.Avalonia.PropertyGrid`, and unlike the chart packages it is an ordinary style collection:
 
 ```xml
@@ -979,7 +940,7 @@ items and separators, and tooltips. Every colour is a `Md.Sys.Color.*` token, ev
 `Md.Sys.TypeScale.*` value, every corner a `Md.Sys.Shape.Corner.*` one, and the property list
 scrolls on the core package's `MdScrollBar`.
 
-It stays local the same way `Md3.Avalonia.AvaloniaEdit` does: none of those themes is registered for
+It stays local the same way `Md3.Avalonia11.AvaloniaEdit` does: none of those themes is registered for
 its native type. One style per native type hands the theme over, and every one of those selectors
 requires a `PropertyGrid` ancestor, so registering this theme never replaces Avalonia's native
 `TextBox`, `ComboBox` or `DatePicker` theme for the rest of the application - a control outside a
@@ -998,18 +959,13 @@ Three things stay upstream's, and two of them cannot be changed from a style:
   Material date picker is a calendar, and re-implementing `DatePickerPresenter` as one is a
   different project.
 
-The pinned version is **12.1.1.1**: it targets `net8.0`/`net9.0`/`net10.0` and declares
-`Avalonia >= 12.1.1`, `Avalonia.Controls.ColorPicker >= 12.1.1` and `bodong.PropertyModels >= 12.0.0`,
-so it restores against this repository's 12.1.2 baseline. The grid iterates quickly, so upgrading it
-means re-reading `Controls/*.axaml` and the built-in cell-edit factories for new controls and new
-part names; `MdPropertyGridThemeTests` pins the cell editors, the chrome, the date flyout's parts
-and the editing behaviour that would move.
+The pinned version is **11.3.11.1**, the selected Avalonia 11-compatible release, restored against this repository's `11.3.22` baseline. The grid iterates quickly, so upgrading it means re-reading `Controls/*.axaml` and the built-in cell-edit factories for new controls and new part names; `MdPropertyGridThemeTests` pins the cell editors, the chrome, the date flyout's parts and the editing behaviour that would move.
 
 ## Node editor
 
 For a graph or node editor built with
 [NodifyM.Avalonia](https://github.com/Maklith/NodifyM.Avalonia), use the opt-in
-`Md3.Avalonia.NodifyM` package. It is the only package that depends on `NodifyM.Avalonia`, and like
+`Md3.Avalonia11.NodifyM` package. It is the only package that depends on `NodifyM.Avalonia`, and like
 the property grid it is an ordinary style collection:
 
 ```xml
@@ -1037,17 +993,12 @@ node's ink, the borders it paints on hover and when selected, the background beh
 group's four inline colours, the grid rule's brush and the six brushes the minimap builds from raw
 colour keys. The node's 3 DIP corner radius stays upstream's - it is baked into the template.
 
-The pinned version is **12.0.0**: it targets `net8.0` and declares `Avalonia >= 12.0.2`,
-`CommunityToolkit.Mvvm >= 8.2.2` and `System.Reactive >= 6.0.1`, so it restores against this
-repository's 12.1.2 baseline. Upgrading it means re-reading `ResourceDictionaries/Brushes.axaml` for
-new keys and `Controls/*.axaml` for new templates and part names; `MdNodifyMThemeTests` pins the
-brushes the realized controls actually use, the additive styles and the variant switch that would
-move.
+The pinned version is **1.1.9**, the selected Avalonia 11-compatible release, restored against this repository's `11.3.22` baseline. Upgrading it means re-reading `ResourceDictionaries/Brushes.axaml` for new keys and `Controls/*.axaml` for new templates and part names; `MdNodifyMThemeTests` pins the brushes the realized controls actually use, the additive styles and the variant switch that would move.
 
 ## Map
 
-For maps drawn with [Mapsui](https://github.com/Mapsui/Mapsui), use the opt-in `Md3.Avalonia.Mapsui`
-package. It is the only package that depends on `Mapsui.Avalonia12`, and - like the two chart
+For maps drawn with [Mapsui](https://github.com/Mapsui/Mapsui), use the opt-in `Md3.Avalonia11.Mapsui`
+package. It is the only package that depends on `Mapsui.Avalonia`, and - like the two chart
 providers - it is not an Avalonia style collection at all: `MapControl` draws its own surface from
 the colours a `Map` and its layers carry, and asks no resource host for anything, so there is nothing
 to register in `Application.Styles` and nothing that could leak into a map this package was not asked
@@ -1100,16 +1051,11 @@ animation - and a map this package was not handed keeps every Mapsui default. Co
 and polygons through `Mapsui.Nts`, which this package does not depend on; the gallery demo is points
 and labels for that reason, and it holds its features in memory so the page never fetches a tile.
 
-The pinned version is **`Mapsui.Avalonia12` 5.1.0**: the Avalonia 12 package (`net8.0`, declaring
-`Avalonia >= 12.0.2`, `Avalonia.Skia >= 12.0.2` and `SkiaSharp >= 3.119.4`, all of which restore
-against this repository's 12.1.2 and 3.119.4 pins). `Mapsui.Avalonia` is the Avalonia 11 build with
-identical XAML and C#, so it is not an option here. Upgrading the package means re-reading
-`Mapsui.UI.Shared/MapControl.cs`, `Map.cs` and `Mapsui/Styles`; `MdMapsuiThemeTests` pins the
-palette, the canvas, both styles and the dark-variant reads that would move.
+The pinned version is **`Mapsui.Avalonia` 5.0.2**, which declares `Avalonia >= 11.3.1` and `Avalonia.Skia >= 11.3.1` and restores against this repository's `11.3.22` baseline. The separate `Mapsui.Avalonia12` package is intentionally not used. Upgrading the package means re-reading `Mapsui.UI.Shared/MapControl.cs`, `Map.cs` and `Mapsui/Styles`; `MdMapsuiThemeTests` pins the palette, the canvas, both styles and the dark-variant reads that would move.
 
 ## Signature pad
 
-For handwriting - a signature, an annotation, a sketch - use the opt-in `Md3.Avalonia.InkCanvas`
+For handwriting - a signature, an annotation, a sketch - use the opt-in `Md3.Avalonia11.InkCanvas`
 package. It is the only package that depends on `DotNetCampus.AvaloniaInkCanvas`, and the control it
 wraps is like the map and the two chart providers rather than like a text editor: `InkCanvas` draws
 its own surface, rendering every stroke with Skia, and registers no styles, so there is nothing to
@@ -1187,7 +1133,7 @@ is where every member this section names lives.
 
 ## Trimming
 
-All eighteen packages declare `IsTrimmable` and `IsAotCompatible` and build with the IL2xxx/IL3xxx analyzers enabled. This describes the library assemblies; application-owned reflection, dynamic XAML, and third-party code may still require preservation or selectors in the consuming app.
+All seventeen packages declare `IsTrimmable` and `IsAotCompatible` and build with the IL2xxx/IL3xxx analyzers enabled. This describes the library assemblies; application-owned reflection, dynamic XAML, and third-party code may still require preservation or selectors in the consuming app.
 
 The Linux x64 AOT probe publishes the desktop Gallery with `PublishAot=true`, checks that the output is a native executable without a managed Gallery assembly beside it, and smoke-runs that binary under xvfb. It reports linker diagnostics but does not claim zero diagnostics for every downstream app or validate Windows, macOS, or Android AOT.
 
@@ -1235,7 +1181,7 @@ when neither package is present.
 
 Every public enum and its members are listed below. To print the current member lists from source, run `python3 scripts/check-api-doc-coverage.py --enums`. The default coverage check fails when a public type name is missing from this document; it does not compare enum member lists, so review this table when the source enums change.
 
-### Core (`Md3.Avalonia`) — 60 enumerations
+### Core (`Md3.Avalonia11`) — 60 enumerations
 
 | Enum | Members |
 |---|---|
@@ -1300,7 +1246,7 @@ Every public enum and its members are listed below. To print the current member 
 | `MdWindowCapabilities` | `None` · `Move` · `Resize` · `Minimize` · `Maximize` · `Close` · `SystemMenu` · `All` |
 | `MdWindowPlatform` | `Unknown` · `Windows` · `MacOS` · `Linux` · `Android` |
 
-### Optional (`Md3.Avalonia.Extra`) — 21 enumerations
+### Optional (`Md3.Avalonia11.Extra`) — 21 enumerations
 
 | Enum | Members |
 |---|---|
@@ -1411,7 +1357,7 @@ and `Format` accept either an element or an explicit `CultureInfo`.
 | `MdColorConverters` | Value converters used by `MdColorPicker` (Extra) |
 | `MdExperimentalAttribute` | Marks an Extra type whose shape may still change; carries a `Reason` |
 | `ExtraCatalog` | Static listing of the Extra control surface |
-| `ExtraTheme` | Optional styles entry for the `Md3.Avalonia.Extra` controls |
+| `ExtraTheme` | Optional styles entry for the `Md3.Avalonia11.Extra` controls |
 | `MdCalendarDayPresenter`, `MdChatMessagePresenter`, `MdPinCellPresenter`, `MdTimelineItemPresenter`, `MdDataGridHeaderPresenter`, `MdTransferLayoutPanel` | Template-internal presenters, public so templates can be replaced |
 
 ## Icon packages
@@ -1420,8 +1366,8 @@ Two interchangeable symbol providers are offered; reference at most one.
 
 | Package | Contents | Catalog type |
 |---|---|---|
-| `Md3.Avalonia.Icons` | The complete Material Symbols Rounded variable TTF | `MdSymbols`, `MdExternalMaterialSymbols` |
-| `Md3.Avalonia.Icons.Lite` | A real outline subset cut from the same official file | `MdSymbolsLite`, `MdExternalMaterialSymbolsLite` |
+| `Md3.Avalonia11.Icons` | The complete Material Symbols Rounded variable TTF | `MdSymbols`, `MdExternalMaterialSymbols` |
+| `Md3.Avalonia11.Icons.Lite` | A real outline subset cut from the same official file | `MdSymbolsLite`, `MdExternalMaterialSymbolsLite` |
 
 Both providers expose the same shape: `FontFamily`, `IsAvailable`, `EnsureConfigured()` and
 `ApplyTo(Application)`. Referencing a provider alongside the core package is enough — the core

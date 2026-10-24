@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased] - 2026-10-24
+
+### Changed
+
+- Migrated the complete control library, Gallery, tests, and packaging baseline to Avalonia `11.3.22`; adapted window chrome, Android hosting, focus events, glyph lookup, template traversal, overlay creation, automation peers, and bitmap saving to Avalonia 11 APIs.
+- Renamed all seventeen NuGet package identities to `Md3.Avalonia11` / `Md3.Avalonia11.*`. Assembly names, namespaces, source paths, and Avalonia resource URIs remain unchanged.
+- Kept third-party themes on their Avalonia 11-compatible releases: DataGrid 11.3.13, AvaloniaEdit 11.4.1, AvaloniaHex 0.1.12, Dock 11.3.12.1, Tabalonia 0.10.7, Markdown 11.0.3, LiveCharts2 2.0.5, ScottPlot 5.0.56, PropertyGrid 11.3.11.1, NodifyM 1.1.9, Mapsui 5.0.2, and InkCanvas 1.0.1.
+
+### Removed
+
+- Removed the third-party AvaloniaRichEditor theme package, Gallery integration, tests, and pack entries because OlivierJC.AvaloniaRichEditor publishes no Avalonia 11-compatible release. The independent Extra `MdRichEditor` controls remain.
+
 ## [0.5.0-preview.1] - 2026-10-18
 
 ### Added

@@ -15,6 +15,12 @@ namespace Md3.Avalonia.Controls;
 [PseudoClasses(":filled", ":outlined", ":md-error", ":has-label", ":has-supporting-text", ":spinner-left")]
 public sealed class MdNumericBox : NumericUpDown
 {
+    public static readonly StyledProperty<string?> PlaceholderTextProperty =
+        WatermarkProperty.AddOwner<MdNumericBox>();
+
+    public static readonly StyledProperty<IBrush?> PlaceholderForegroundProperty =
+        AvaloniaProperty.Register<MdNumericBox, IBrush?>(nameof(PlaceholderForeground));
+
     public static readonly StyledProperty<MdTextBoxVariant> VariantProperty =
         AvaloniaProperty.Register<MdNumericBox, MdTextBoxVariant>(nameof(Variant), MdTextBoxVariant.Outlined);
     public static readonly StyledProperty<object?> LabelProperty =
@@ -69,6 +75,8 @@ public sealed class MdNumericBox : NumericUpDown
         }
     }
 
+    public string? PlaceholderText { get => GetValue(PlaceholderTextProperty); set => SetValue(PlaceholderTextProperty, value); }
+    public IBrush? PlaceholderForeground { get => GetValue(PlaceholderForegroundProperty); set => SetValue(PlaceholderForegroundProperty, value); }
     public MdTextBoxVariant Variant { get => GetValue(VariantProperty); set => SetValue(VariantProperty, value); }
     public object? Label { get => GetValue(LabelProperty); set => SetValue(LabelProperty, value); }
     public object? SupportingText { get => GetValue(SupportingTextProperty); set => SetValue(SupportingTextProperty, value); }

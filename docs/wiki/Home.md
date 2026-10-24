@@ -10,13 +10,12 @@ Md3.Avalonia is structured into modular NuGet packages:
 
 | Package | Description | Target |
 | :--- | :--- | :---: |
-| **`Md3.Avalonia`** | Core Material Design 3 controls, themes, and tokens | `.NET 8; .NET 10` |
-| **`Md3.Avalonia.Extra`** | Optional ecosystem controls such as Breadcrumb, BeforeAfter, Timeline, Cascader, and TreeView | `.NET 8; .NET 10` |
-| **`Md3.Avalonia.Icons`** | Full Material Symbols Rounded catalog with embedded TTF font | `.NET 8; .NET 10` |
-| **`Md3.Avalonia.Icons.Lite`** | Reduced Material Symbols Rounded font subset | `.NET 8; .NET 10` |
-| **`Md3.Avalonia.DataGrid`** | Optional Material theme for Avalonia's DataGrid | `.NET 8; .NET 10` |
-| **`Md3.Avalonia.RichEditor`** | Optional Material theme for the maintained AvaloniaRichEditor fork | `.NET 8; .NET 10` |
-| **`Md3.Avalonia.Notifications`** | Standalone native notification API | `.NET 8; .NET 10` plus Windows/Android-specific targets |
+| **`Md3.Avalonia11`** | Core Material Design 3 controls, themes, and tokens | `.NET 8; .NET 10` |
+| **`Md3.Avalonia11.Extra`** | Optional ecosystem controls such as Breadcrumb, BeforeAfter, Timeline, Cascader, and TreeView | `.NET 8; .NET 10` |
+| **`Md3.Avalonia11.Icons`** | Full Material Symbols Rounded catalog with embedded TTF font | `.NET 8; .NET 10` |
+| **`Md3.Avalonia11.Icons.Lite`** | Reduced Material Symbols Rounded font subset | `.NET 8; .NET 10` |
+| **`Md3.Avalonia11.DataGrid`** | Optional Material theme for Avalonia's DataGrid | `.NET 8; .NET 10` |
+| **`Md3.Avalonia11.Notifications`** | Standalone native notification API | `.NET 8; .NET 10` plus Windows/Android-specific targets |
 
 ---
 

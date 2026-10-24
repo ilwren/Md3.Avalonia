@@ -1,6 +1,6 @@
-# Extra Controls API Reference (`Md3.Avalonia.Extra`)
+# Extra Controls API Reference (`Md3.Avalonia11.Extra`)
 
-The `Md3.Avalonia.Extra` package provides advanced UI controls inspired by popular open-source Flutter ecosystem widgets (such as `flutter_colorpicker`, `flutter_quill`, `flutter_chat_ui`, `flutter_slidable`, etc.) and official Material Design 3 motion patterns.
+The `Md3.Avalonia11.Extra` package provides advanced UI controls inspired by popular open-source Flutter ecosystem widgets (such as `flutter_colorpicker`, `flutter_quill`, `flutter_chat_ui`, `flutter_slidable`, etc.) and official Material Design 3 motion patterns.
 
 To use these controls, add the XML namespace:
 ```xml

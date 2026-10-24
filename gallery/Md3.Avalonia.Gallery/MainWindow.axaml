@@ -51,7 +51,7 @@
           </md:MdButton>
         </StackPanel>
         <TextBlock Grid.Row="3" HorizontalAlignment="Center" FontSize="10"
-                   Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Avalonia 12" />
+                   Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Avalonia 11" />
       </Grid>
     </Border>
 

@@ -6,17 +6,17 @@ Install the required NuGet packages into your Avalonia project via the .NET CLI 
 
 ```bash
 # Core Material Design 3 controls (Required)
-dotnet add package Md3.Avalonia
+dotnet add package Md3.Avalonia11
 
 # Optional: Extra extended controls (Rich Editor, Chat View, Timeline, DataGrid, etc.)
-dotnet add package Md3.Avalonia.Extra
+dotnet add package Md3.Avalonia11.Extra
 
 # Choose ONE icon font package:
 # Option A: Full icon font catalog (4,000+ glyphs)
-dotnet add package Md3.Avalonia.Icons
+dotnet add package Md3.Avalonia11.Icons
 
 # Option B: Lightweight icon font subset (~98 KB)
-dotnet add package Md3.Avalonia.Icons.Lite
+dotnet add package Md3.Avalonia11.Icons.Lite
 ```
 
 ---

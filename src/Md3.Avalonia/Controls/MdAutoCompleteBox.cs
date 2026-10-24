@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
+using Avalonia.Media;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
 
@@ -14,6 +15,12 @@ namespace Md3.Avalonia.Controls;
 [PseudoClasses(":filled", ":outlined", ":md-error", ":has-label", ":has-supporting-text", ":popup-present", ":reduced-motion", ":no-motion")]
 public sealed class MdAutoCompleteBox : AutoCompleteBox, IMdPopupOwner, IMdPopupPresenceOwner
 {
+    public static readonly StyledProperty<string?> PlaceholderTextProperty =
+        WatermarkProperty.AddOwner<MdAutoCompleteBox>();
+
+    public static readonly StyledProperty<IBrush?> PlaceholderForegroundProperty =
+        AvaloniaProperty.Register<MdAutoCompleteBox, IBrush?>(nameof(PlaceholderForeground));
+
     public static readonly StyledProperty<MdTextBoxVariant> VariantProperty =
         AvaloniaProperty.Register<MdAutoCompleteBox, MdTextBoxVariant>(nameof(Variant), MdTextBoxVariant.Outlined);
     public static readonly StyledProperty<object?> LabelProperty =
@@ -47,6 +54,8 @@ public sealed class MdAutoCompleteBox : AutoCompleteBox, IMdPopupOwner, IMdPopup
         UpdatePopupState();
     }
 
+    public string? PlaceholderText { get => GetValue(PlaceholderTextProperty); set => SetValue(PlaceholderTextProperty, value); }
+    public IBrush? PlaceholderForeground { get => GetValue(PlaceholderForegroundProperty); set => SetValue(PlaceholderForegroundProperty, value); }
     public MdTextBoxVariant Variant { get => GetValue(VariantProperty); set => SetValue(VariantProperty, value); }
     public object? Label { get => GetValue(LabelProperty); set => SetValue(LabelProperty, value); }
     public object? SupportingText { get => GetValue(SupportingTextProperty); set => SetValue(SupportingTextProperty, value); }

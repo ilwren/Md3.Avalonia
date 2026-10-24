@@ -3,7 +3,7 @@
 Validated package baseline: `0.4.5-preview.1` (historical; publication status is not asserted here)
 Automated baseline date: 2026-10-12
 
-> This record describes the six-package `0.4.5-preview.1` validation baseline, not the current `0.4.6-preview.1` source baseline. The new standalone Notifications package and any later code are not covered by the automated evidence below; the Notifications manual checks in the matrix are still pending for `0.4.6-preview.1`.
+> This record describes the six-package `0.4.5-preview.1` validation baseline, not the current `0.5.0-preview.1` Avalonia 11 source baseline. The new standalone Notifications package and any later code are not covered by the automated evidence below; the Notifications manual checks in the matrix are still pending for `0.5.0-preview.1`.
 
 ## Automated gates
 
@@ -32,14 +32,14 @@ Automated evidence for code commit [`258abb6`](https://github.com/ilwren/Md3.Ava
 - [Multi-platform Gallery run `38224348901`](https://github.com/ilwren/Md3.Avalonia/actions/runs/38224348901) passed Linux, Windows and macOS desktop publish plus Android APK build/upload. APK compilation is not physical-device sign-off.
 - [Linux x64 AOT probe `38224348903`](https://github.com/ilwren/Md3.Avalonia/actions/runs/38224348903) passed native executable verification and xvfb smoke test. It reported `Binding(String)` trim/dynamic-code warnings in `gallery/Md3.Avalonia.Gallery/Pages/DataGridGalleryPage.axaml.cs:23–25`; this is not a zero-diagnostic result and does not sign off other platforms or consuming-app behavior.
 
-## Pending validation for `0.4.6-preview.1`
+## Pending validation for `0.5.0-preview.1` (Avalonia 11)
 
 The current source baseline has not been validated by the historical CI evidence above. Before publishing, confirm:
 
-- [ ] All eighteen NuGet packages build and pack against Avalonia 12.1.2: the five core-family packages as `net8.0` and `net10.0`, the twelve opt-in theme packages as `net10.0`.
-- [ ] `Md3.Avalonia.Notifications` additionally packs `net8.0-windows10.0.19041.0`, `net10.0-windows10.0.19041.0` and, with `-p:IncludeAndroidTarget=true`, `net10.0-android` assets; the Android target retains minimum API 23.
+- [ ] All seventeen `Md3.Avalonia11*` NuGet packages build and pack against Avalonia 11.3.22: the five core-family packages as `net8.0` and `net10.0`, the eleven opt-in theme packages as `net10.0`, plus Notifications.
+- [ ] `Md3.Avalonia11.Notifications` additionally packs `net8.0-windows10.0.19041.0`, `net10.0-windows10.0.19041.0` and, with `-p:IncludeAndroidTarget=true`, `net10.0-android` assets; the Android target retains minimum API 23.
 - [ ] Desktop Gallery, Android Gallery host and headless test project remain .NET 10 targets; the Gallery does not gain a `net8.0` target.
-- [ ] Inspect each `.nupkg` asset group and compile a minimal .NET 8 consumer against the five core-family packages. The twelve `net10.0`-only theme packages cannot be consumed from .NET 8; verify those against a .NET 10 consumer instead.
+- [ ] Inspect each `.nupkg` asset group and compile a minimal .NET 8 consumer against the five core-family packages. The eleven `net10.0`-only theme packages cannot be consumed from .NET 8; verify those against a .NET 10 consumer instead.
 
 ## Interaction regression acceptance
 
@@ -51,7 +51,7 @@ Keep these scenarios in the headless suite; a generic focused-control drag or a 
 - `MdDesktopPopupAndComparisonTests.Comparison_First_Arrange_Uses_Final_Size_For_Initial_Position`: before any pointer input or Position change, check that the default 0.5 handle is centered after the first arrange in both orientations.
 - `MdComparisonDragTests.First_Gallery_Drag_From_Left_And_Top_Edges_Does_Not_Focus_Or_Scroll_During_Drag`: exercise the first inward-and-return drag from clipped left/top handles in both orientations, while checking the Gallery ScrollViewer stays fixed and restores its focus behavior. The focus/scroll guard in `22488b5` still failed on the reported Windows 11 / 150% setup; the initial-geometry correction now has headless coverage, but physical desktop confirmation remains pending.
 - `MdAcceptanceRegressionTests.Numeric_Box_Mouse_Wheel_Spins_Only_When_Focused_And_Unfocused_Wheel_Scrolls_Page`: a focused numeric field may step; when it is not focused, the wheel must reach the outer page ScrollViewer. This is headless coverage only until the desktop event-routing behavior is confirmed.
-- `MdRichEditorTreeVisualRegressionTests.RichEditor_Gallery_Starts_With_Rasterized_Sample_Content` and `TreeView_Chevron_Painted_Ink_Is_Centered_In_The_Transparent_State_Target`: verify actual rendered pixels and the chevron's rasterized-ink centroid inside its transparent state area.
+- `MdTreeViewVisualRegressionTests.TreeView_Chevron_Painted_Ink_Is_Centered_In_The_Transparent_State_Target`: verify actual rendered pixels and the chevron's rasterized-ink centroid inside its transparent state area.
 
 Picker stale-field behavior and Cascader label/dropdown clipping have headless/CI coverage, but their actual desktop appearance still requires manual confirmation. The SimpleDialog black scrim must still be checked against the full native window, and the NumericBox wheel contract must still be checked with real desktop event routing. Do not infer desktop sign-off from any of these headless results.
 
@@ -59,7 +59,7 @@ Picker stale-field behavior and Cascader label/dropdown clipping have headless/C
 
 Do not mark an item complete without recording device/OS, assistive technology version, tester and date. The System notifications item is a follow-up gate for the new `0.4.6-preview.1` Notifications package; it is not evidence from the historical `0.4.5-preview.1` release.
 
-- [ ] Windows x64: pointer, keyboard-only, 100/150/200% scale, Narrator. Recheck BorderlessWindow maximize/restore and `WindowDecorations.Full` state changes on Avalonia 12.0.0 (the fix described for 12.1 is not in this baseline). Specifically recheck `MdBeforeAfter` at 150%: the latest report on `22488b5` showed Position 0.5 with the horizontal/vertical handle at the left/top and a first-drag jump; no desktop sign-off yet. Also verify the SimpleDialog black scrim covers the entire native window, and that `MdNumericBox` steps only while focused while an unfocused wheel scrolls the outer page.
+- [ ] Windows x64: pointer, keyboard-only, 100/150/200% scale, Narrator. Recheck BorderlessWindow maximize/restore and `SystemDecorations.Full` state changes on Avalonia 11.3.22. Specifically recheck `MdBeforeAfter` at 150%: the latest report on `22488b5` showed Position 0.5 with the horizontal/vertical handle at the left/top and a first-drag jump; no desktop sign-off yet. Also verify the SimpleDialog black scrim covers the entire native window, and that `MdNumericBox` steps only while focused while an unfocused wheel scrolls the outer page.
 - [ ] System notifications: verify the Windows 11 24H2 Gallery's first-run per-user shortcut/AUMID registration, toast delivery, and notification settings; macOS delivery/attribution; Linux X11 and Wayland using the direct `libnotify` backend; Android API 32 vs 33+ with permission denied/granted, channel settings, and app-specific small icon. This package still needs platform sign-off.
 - [ ] Windows ARM64: launch, Gallery navigation, popup/picker/dialog smoke.
 - [ ] macOS Apple Silicon: keyboard, trackpad, VoiceOver, Light/Dark/System.

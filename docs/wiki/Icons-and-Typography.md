@@ -8,7 +8,7 @@ Md3.Avalonia includes first-class support for **Material Symbols Rounded** with 
 
 ### Package Comparison:
 
-| Feature | `Md3.Avalonia.Icons` | `Md3.Avalonia.Icons.Lite` |
+| Feature | `Md3.Avalonia11.Icons` | `Md3.Avalonia11.Icons.Lite` |
 | :--- | :--- | :--- |
 | **Glyph Count** | 4,405 mapped code points / 6,646 glyphs | 45 curated code points / 66 glyphs |
 | **Binary Size** | ~14.5 MiB official variable TTF | ~98 KiB real-outline subset |

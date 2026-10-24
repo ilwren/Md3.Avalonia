@@ -30,10 +30,10 @@
             <TextBlock x:Name="PART_Placeholder"
                        VerticalAlignment="Center"
                        FontSize="{TemplateBinding FontSize}"
-                       Foreground="{TemplateBinding PlaceholderForeground}"
+                       Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                        IsHitTestVisible="False"
                        Opacity="0"
-                       Text="{TemplateBinding PlaceholderText}" />
+                       Text="{TemplateBinding Watermark}" />
             <TextPresenter x:Name="PART_TextPresenter"
                            VerticalAlignment="Center"
                            CaretBlinkInterval="{TemplateBinding CaretBlinkInterval}"
@@ -236,8 +236,7 @@
                                FontSize="{TemplateBinding FontSize}"
                                Foreground="{TemplateBinding Foreground}"
                                IsVisible="{TemplateBinding IsEditable}"
-                               PlaceholderForeground="{TemplateBinding PlaceholderForeground}"
-                               PlaceholderText="{x:Null}"
+                               Watermark="{x:Null}"
                                SelectionBrush="{DynamicResource Md.Sys.Color.PrimarySelection.Brush}"
                                Text="{TemplateBinding Text, Mode=TwoWay}"
                                Theme="{StaticResource MdComboBoxEditableTextBoxTheme}" />

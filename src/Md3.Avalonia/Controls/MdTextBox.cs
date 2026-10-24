@@ -22,6 +22,14 @@ namespace Md3.Avalonia.Controls;
     ":reduced-motion", ":no-motion")]
 public class MdTextBox : TextBox
 {
+    // Avalonia 11 calls this Watermark. Keep the control's PlaceholderText API while sharing
+    // the native property, so Watermark and PlaceholderText cannot diverge.
+    public static readonly StyledProperty<string?> PlaceholderTextProperty =
+        WatermarkProperty.AddOwner<MdTextBox>();
+
+    public static readonly StyledProperty<IBrush?> PlaceholderForegroundProperty =
+        AvaloniaProperty.Register<MdTextBox, IBrush?>(nameof(PlaceholderForeground));
+
     public static readonly StyledProperty<MdTextBoxVariant> VariantProperty =
         AvaloniaProperty.Register<MdTextBox, MdTextBoxVariant>(
             nameof(Variant),
@@ -127,6 +135,18 @@ public class MdTextBox : TextBox
         AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Assertive);
         UpdateAccessibility();
         MdTextEditingContextMenu.Attach(this);
+    }
+
+    public string? PlaceholderText
+    {
+        get => GetValue(PlaceholderTextProperty);
+        set => SetValue(PlaceholderTextProperty, value);
+    }
+
+    public IBrush? PlaceholderForeground
+    {
+        get => GetValue(PlaceholderForegroundProperty);
+        set => SetValue(PlaceholderForegroundProperty, value);
     }
 
     public MdTextBoxVariant Variant

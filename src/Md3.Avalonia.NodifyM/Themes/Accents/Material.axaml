@@ -1,7 +1,7 @@
 <!--
   Material Design 3 tokens for NodifyM.Avalonia.
 
-  Derived from NodifyM.Avalonia 12.0.0 ResourceDictionaries/Brushes.axaml (MIT, see
+  Derived from NodifyM.Avalonia 1.1.9 ResourceDictionaries/Brushes.axaml (MIT, see
   THIRD-PARTY-NOTICES.md). Upstream defines 42 colors in Light/Dark theme dictionaries and turns
   them into 44 brushes; the control templates read the brushes with StaticResource. Forty-three of
   those brushes are redeclared here against Md.Sys.Color.*, so light and dark come from the core Material theme
