@@ -199,7 +199,7 @@ public class MdCommitGraph : ItemsControl
         base.OnPointerPressed(e);
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             return;
-        if (e.Source is not IVisual visual)
+        if (e.Source is not Visual visual)
             return;
         if (visual.GetVisualAncestors().OfType<CommitGraphRow>().FirstOrDefault() is not { } row)
             return;

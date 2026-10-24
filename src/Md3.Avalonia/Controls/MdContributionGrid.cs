@@ -169,7 +169,8 @@ public class MdContributionGrid : TemplatedControl
         {
             var first = days.Min(day => day.Date.Date);
             var last = days.Max(day => day.Date.Date);
-            WeekStart = first.AddDays(-first.DayOfWeek); // week columns start on Sunday, like GitHub
+            var cultureData = CultureInfo.CurrentCulture.CultureData;
+            WeekStart = first.AddDays(-(int)first.DayOfWeek); // week columns start on Sunday, like GitHub
             WeekCount = (int)((last - WeekStart).TotalDays / 7) + 1;
 
             var labels = new List<MdContributionMonthLabel>();
@@ -180,7 +181,7 @@ public class MdContributionGrid : TemplatedControl
                 if (weekStart.Month != previousMonth)
                 {
                     labels.Add(new MdContributionMonthLabel(
-                        CultureInfo.CurrentCulture.TextInfo.GetAbbreviatedMonthName(weekStart.Month),
+                        cultureData.GetAbbreviatedMonthName(weekStart.Month),
                         week));
                     previousMonth = weekStart.Month;
                 }
@@ -235,7 +236,7 @@ public class MdContributionGrid : TemplatedControl
             _dayLabels.Children.Clear();
             _dayLabels.Width = 34;
             var step = CellSize + CellSpacing;
-            var names = CultureInfo.CurrentCulture.TextInfo;
+            var names = CultureInfo.CurrentCulture.CultureData;
             var rows = new (string Name, int Row)[]
             {
                 (names.GetAbbreviatedDayName(DayOfWeek.Monday), 1),
@@ -297,7 +298,7 @@ internal sealed class ContributionCellsHost : Control
     protected override Size MeasureOverride(Size availableSize)
     {
         if (_owner is null || _owner.WeekCount == 0)
-            return Size.Zero;
+            return default;
 
         var step = _owner.CellSize + _owner.CellSpacing;
         var width = _owner.WeekCount * step - _owner.CellSpacing;

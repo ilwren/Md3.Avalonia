@@ -24,11 +24,11 @@ internal sealed class CommitGraphRow : Grid
         ColumnDefinitions = new ColumnDefinitions("Auto,*");
         _selectionBackground = new CommitGraphSelectionBackground
         {
-            Grid.ColumnSpan = 2,
             Margin = new Thickness(-8, 0, -4, 0),
             IsHitTestVisible = false,
             Opacity = 0.55,
         };
+        Grid.SetColumnSpan(_selectionBackground, 2);
         LaneHost.VerticalAlignment = VerticalAlignment.Stretch;
         LaneHost.MinHeight = 44;
         Grid.SetColumn(LaneHost, 0);
