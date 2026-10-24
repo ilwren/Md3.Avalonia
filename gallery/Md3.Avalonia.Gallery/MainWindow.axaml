@@ -189,7 +189,7 @@
             <md:MdButton x:Name="SkeletonNav" Content="Skeleton" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSkeleton" />
             <md:MdButton x:Name="SlidableNav" Content="Slidable item" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSlidableItem" />
             <md:MdButton x:Name="SliderNav" Content="Slider" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSlider" />
-            <md:MdButton x:Name="VideoPlayerNav" Content="Video player" Variant="Text" HorizontalContentAlignment="Left" Click="ShowVideoPlayer" />
+
             <md:MdButton x:Name="SnackbarNav" Content="Snackbar" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSnackbar" />
             <md:MdButton x:Name="SpinKitNav" Content="Spin kit" Variant="Text" HorizontalContentAlignment="Left" Click="ShowSpinKit" />
             <md:MdButton x:Name="StaggeredPanelNav" Content="Staggered panel" Variant="Text" HorizontalContentAlignment="Left" Click="ShowStaggeredPanel" />
@@ -202,6 +202,7 @@
             <md:MdButton x:Name="TimelineNav" Content="Timeline" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTimeline" />
             <md:MdButton x:Name="ToolbarNav" Content="Toolbars" Variant="Text" HorizontalContentAlignment="Left" Click="ShowToolbars" />
             <md:MdButton x:Name="TooltipNav" Content="Tooltips" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTooltips" />
+            <md:MdButton x:Name="VideoPlayerNav" Content="Video player" Variant="Text" HorizontalContentAlignment="Left" Click="ShowVideoPlayer" />
             <md:MdButton x:Name="TransferNav" Content="Transfer" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTransfer" />
             <md:MdButton x:Name="TreeViewNav" Content="Tree view" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTreeView" />
             <md:MdButton x:Name="WaterfallNav" Content="Waterfall" Variant="Text" HorizontalContentAlignment="Left" Click="ShowWaterfall" />
