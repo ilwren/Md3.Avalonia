@@ -66,8 +66,8 @@ public sealed class MdVideoPlayer : UserControl
                         LastChildFill = false,
                         Children =
                         {
-                            Dock(_playButton, Dock.Left), Dock(_time, Dock.Left),
-                            Dock(muteButton, Dock.Right), Dock(_volume, Dock.Right), Dock(full, Dock.Right)
+                            AddDocked(_playButton, Avalonia.Controls.Dock.Left), AddDocked(_time, Avalonia.Controls.Dock.Left),
+                            AddDocked(muteButton, Avalonia.Controls.Dock.Right), AddDocked(_volume, Avalonia.Controls.Dock.Right), AddDocked(full, Avalonia.Controls.Dock.Right)
                         }
                     }
                 }
@@ -118,13 +118,18 @@ public sealed class MdVideoPlayer : UserControl
     /// <summary>Raised when the fullscreen button is pressed; the host window decides how fullscreen is implemented.</summary>
     public event EventHandler? FullscreenRequested;
 
-    private static Button Button(string text, string tooltip) => new()
+    private static Button Button(string text, string tooltip)
     {
-        Content = text, ToolTip = tooltip, Padding = new Thickness(10, 4),
-        Background = Brushes.Transparent, Foreground = Brushes.White, BorderThickness = new Thickness(0)
-    };
+        var button = new Button
+        {
+            Content = text, Padding = new Thickness(10, 4),
+            Background = Brushes.Transparent, Foreground = Brushes.White, BorderThickness = new Thickness(0)
+        };
+        ToolTip.SetTip(button, tooltip);
+        return button;
+    }
 
-    private static Control Dock(Control child, Dock dock)
+    private static Control AddDocked(Control child, Avalonia.Controls.Dock dock)
     {
         DockPanel.SetDock(child, dock);
         return child;
