@@ -866,9 +866,18 @@ public sealed class MdMotionLifecycleTests
         Assert.Contains(":reordering", list.Classes);
         var draggedTransform = Assert.IsType<TranslateTransform>(rows[0].RenderTransform);
         Assert.True(Math.Abs(draggedTransform.Y) > 1);
-        var reflow = rows.Skip(1).Select(row => row.RenderTransform).OfType<TranslateTransform>().First(transform => Math.Abs(transform.Y) > 1);
-        Assert.NotNull(reflow.Transitions);
-        Assert.Contains(reflow.Transitions!, transition => transition is DoubleTransition { Property: var property } && property == TranslateTransform.YProperty);
+        var transitionSnapshot = rows.Skip(1).Select(row => row.RenderTransform).OfType<TranslateTransform>()
+            .ToDictionary(transform => transform, transform => transform.Transitions?.ToArray());
+        // An animated getter reports the in-flight value, which can still be zero on the first
+        // headless frame. Pin the transition configuration, then disable motion to read the final
+        // reflow offsets instead of depending on wall-clock animation timing.
+        MdMotion.SetScheme(list, MdMotionScheme.None);
+        Dispatcher.UIThread.RunJobs();
+        var reflow = transitionSnapshot.FirstOrDefault(pair => Math.Abs(pair.Key.Y) > 1);
+        Assert.True(reflow.Key is not null,
+            $"No adjacent row reflowed; offsets: [{string.Join(", ", transitionSnapshot.Keys.Select(transform => transform.Y))}]");
+        Assert.NotNull(reflow.Value);
+        Assert.Contains(reflow.Value!, transition => transition is DoubleTransition { Property: var property } && property == TranslateTransform.YProperty);
 
         var scroll = list.GetVisualDescendants().OfType<ScrollViewer>().Single();
         var edge = list.TranslatePoint(new Point(list.Bounds.Width / 2, list.Bounds.Height - 3), scope.Window)!.Value;
