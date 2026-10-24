@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Md3.Avalonia.Controls;
 
@@ -21,7 +22,7 @@ public partial class ContributionGridGalleryPage : UserControl
         ShowSelection(null);
     }
 
-    private void RegenerateButtonClicked(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void RegenerateButtonClicked(object? sender, RoutedEventArgs e)
     {
         _seed = Environment.TickCount;
         Generate();
