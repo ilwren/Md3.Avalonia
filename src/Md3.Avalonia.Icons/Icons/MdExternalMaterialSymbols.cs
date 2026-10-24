@@ -113,6 +113,9 @@ public static class MdExternalMaterialSymbols
             try
             {
                 var collection = new EmbeddedFontCollection(CollectionKey, source.Source);
+                // Avalonia 11 initializes an embedded collection from AddFontCollection; unlike
+                // 12.x, its constructor does not populate the family list. Register before reading.
+                fontManager.AddFontCollection(collection);
                 var familyNames = collection.Select(family => family.Name).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
                 var familyName = familyNames.FirstOrDefault(name => name.Contains("Material Symbols Rounded", StringComparison.OrdinalIgnoreCase))
                     ?? familyNames.FirstOrDefault(name => name.Contains("Material Symbols", StringComparison.OrdinalIgnoreCase) && name.Contains("Round", StringComparison.OrdinalIgnoreCase))
@@ -120,11 +123,11 @@ public static class MdExternalMaterialSymbols
                     ?? familyNames.FirstOrDefault(name => name.Equals("Material Icons", StringComparison.OrdinalIgnoreCase));
                 if (familyName is null)
                 {
+                    fontManager.RemoveFontCollection(CollectionKey);
                     LoadFailureReason = $"'{source.Description}' exposes [{string.Join(", ", familyNames)}], not a rounded Material Symbols/Icons family.";
                     continue;
                 }
 
-                fontManager.AddFontCollection(collection);
                 var candidate = new FontFamily($"{CollectionKey}#{familyName}");
                 if (!fontManager.TryGetGlyphTypeface(new Typeface(candidate), out var glyphTypeface))
                 {
