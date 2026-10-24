@@ -25,5 +25,6 @@
     <ProjectReference Include="../Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Condition="'$(OS)' == 'Windows_NT'" />
     <PackageReference Include="VideoLAN.LibVLC.Mac" Condition="$([MSBuild]::IsOSPlatform('OSX'))" />
+    <Content Include="../Md3.Avalonia.Gallery/Assets/Media/BigBuckBunny-480p.mp4" Link="Assets/Media/BigBuckBunny-480p.mp4" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

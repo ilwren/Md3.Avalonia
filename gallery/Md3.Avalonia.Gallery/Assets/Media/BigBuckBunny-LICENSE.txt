@@ -1,0 +1,10 @@
+Big Buck Bunny — 30-second 480p sample
+
+(c) copyright Blender Foundation / www.bigbuckbunny.org
+Licensed under Creative Commons Attribution 3.0 (CC BY 3.0):
+https://creativecommons.org/licenses/by/3.0/
+
+The source sample package is bower-media-samples/big-buck-bunny-480p-30s:
+https://github.com/bower-media-samples/big-buck-bunny-480p-30s
+
+The sample is bundled locally for the Md3.Avalonia Gallery video-player preview; it is not streamed from a network URL during playback.

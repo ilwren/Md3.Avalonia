@@ -13,12 +13,12 @@
       <StackPanel MaxWidth="880" Spacing="12">
         <TextBlock Classes="h2" Text="Interactive preview" />
         <media:MdVideoPlayer x:Name="Player" Height="360" HorizontalAlignment="Stretch" />
-        <TextBlock x:Name="PlaybackStatus" Classes="body" Text="Loading public preview video…" TextWrapping="Wrap" />
-        <TextBlock Classes="body" Text="Preview: Big Buck Bunny © Blender Foundation, licensed under Creative Commons Attribution 3.0 (CC BY 3.0)." TextWrapping="Wrap" />
+        <TextBlock x:Name="PlaybackStatus" Classes="body" Text="Opening bundled local video…" TextWrapping="Wrap" />
+        <TextBlock Classes="body" Text="Local sample: Big Buck Bunny © Blender Foundation, licensed under Creative Commons Attribution 3.0 (CC BY 3.0)." TextWrapping="Wrap" />
       </StackPanel>
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="LibVLCSharp integration" />
-        <gallery:CodeExample XamlCode="&lt;media:MdVideoPlayer x:Name=&quot;Player&quot; /&gt;" CSharpCode="Core.Initialize();&#10;var libVlc = new LibVLC();&#10;var mediaPlayer = new MediaPlayer(libVlc);&#10;mediaPlayer.Media = new Media(libVlc, new Uri(videoUri));&#10;Player.AttachLibVlc(mediaPlayer);&#10;mediaPlayer.Play();" />
+        <gallery:CodeExample XamlCode="&lt;media:MdVideoPlayer x:Name=&quot;Player&quot; /&gt;" CSharpCode="Core.Initialize();&#10;var libVlc = new LibVLC();&#10;var mediaPlayer = new MediaPlayer(libVlc);&#10;mediaPlayer.Media = new Media(libVlc, new Uri(localFilePath));&#10;Player.AttachLibVlc(mediaPlayer);&#10;mediaPlayer.Play();" />
       </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>
