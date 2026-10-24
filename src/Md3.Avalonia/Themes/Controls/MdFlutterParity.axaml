@@ -131,29 +131,6 @@
 
   <!-- Stepper -->
   <ControlTheme x:Key="MdStepHeaderButtonTheme" TargetType="Button" BasedOn="{StaticResource MdExpansionHeaderButtonTheme}" />
-  <ControlTheme x:Key="{x:Type md:MdStep}" TargetType="md:MdStep">
-    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
-    <Setter Property="Template"><ControlTemplate TargetType="md:MdStep"><Grid ColumnDefinitions="40,*" RowDefinitions="Auto,Auto"><Border x:Name="PART_Connector" Grid.RowSpan="2" Width="2" Margin="0,40,0,-16" HorizontalAlignment="Center" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" /><Button x:Name="PART_HeaderButton" Grid.ColumnSpan="2" MinHeight="56" Theme="{StaticResource MdStepHeaderButtonTheme}"><Grid Margin="4,0" ColumnDefinitions="40,*" ColumnSpacing="12"><Border x:Name="PART_Indicator" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" CornerRadius="16"><Grid><TextBlock x:Name="PART_StepNumber" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{TemplateBinding StepNumber}" /><Path x:Name="PART_CompleteIcon" Width="18" Height="18" Data="{StaticResource Md.Flutter.Check}" Stroke="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round" Opacity="0" /><TextBlock x:Name="PART_ErrorIcon" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Md.Sys.Color.OnError.Brush}" FontWeight="Bold" Text="!" Opacity="0" /></Grid></Border><StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2"><ContentPresenter Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" Foreground="{TemplateBinding Foreground}" /><ContentPresenter Content="{TemplateBinding Subtitle}" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /></StackPanel></Grid></Button><ContentPresenter x:Name="PART_StepContent" Grid.Row="1" Grid.Column="1" Margin="12,0,0,16" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" IsVisible="False" Opacity="0" RenderTransform="translate(0px, -8px)" /></Grid></ControlTemplate></Setter>
-    <Style Selector="^:active /template/ Border#PART_Indicator"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
-    <Style Selector="^:active /template/ TextBlock#PART_StepNumber"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" /></Style>
-    <Style Selector="^:content-present /template/ ContentPresenter#PART_StepContent"><Setter Property="IsVisible" Value="True" /></Style>
-    <Style Selector="^:active /template/ ContentPresenter#PART_StepContent"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="translate(0px, 0px)" /></Style>
-    <Style Selector="^:complete /template/ Border#PART_Indicator"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
-    <Style Selector="^:complete /template/ TextBlock#PART_StepNumber"><Setter Property="Opacity" Value="0" /></Style>
-    <Style Selector="^:complete /template/ Path#PART_CompleteIcon"><Setter Property="Opacity" Value="1" /></Style>
-    <Style Selector="^:error /template/ Border#PART_Indicator"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" /></Style>
-    <Style Selector="^:error /template/ TextBlock#PART_StepNumber"><Setter Property="Opacity" Value="0" /></Style>
-    <Style Selector="^:error /template/ TextBlock#PART_ErrorIcon"><Setter Property="Opacity" Value="1" /></Style>
-    <Style Selector="^:reduced-motion /template/ ContentPresenter#PART_StepContent"><Setter Property="RenderTransform" Value="translate(0px, 0px)" /></Style>
-    <!-- Connector coloring follows the active step, like Flutter's Stepper; the last step never draws a trailing connector. -->
-    <Style Selector="^:active /template/ Border#PART_Connector"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
-    <Style Selector="^:active /template/ Border#PART_HConnector"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
-    <Style Selector="^:step-last /template/ Border#PART_Connector"><Setter Property="IsVisible" Value="False" /></Style>
-    <Style Selector="^:step-last /template/ Border#PART_HConnector"><Setter Property="IsVisible" Value="False" /></Style>
-    <!-- DynamicResource: the horizontal template is declared later in this dictionary. -->
-    <Style Selector="^:horizontal"><Setter Property="Template" Value="{DynamicResource MdStepHorizontalTemplate}" /></Style>
-    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
-  </ControlTheme>
 
   <!-- Horizontal step header: indicator above the label, trailing connector at indicator height.
        Content is not rendered here; the stepper's shared body owns it. -->
@@ -205,6 +182,29 @@
       </Grid>
     </Grid>
   </ControlTemplate>
+  <ControlTheme x:Key="{x:Type md:MdStep}" TargetType="md:MdStep">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Template"><ControlTemplate TargetType="md:MdStep"><Grid ColumnDefinitions="40,*" RowDefinitions="Auto,Auto"><Border x:Name="PART_Connector" Grid.RowSpan="2" Width="2" Margin="0,40,0,-16" HorizontalAlignment="Center" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" /><Button x:Name="PART_HeaderButton" Grid.ColumnSpan="2" MinHeight="56" Theme="{StaticResource MdStepHeaderButtonTheme}"><Grid Margin="4,0" ColumnDefinitions="40,*" ColumnSpacing="12"><Border x:Name="PART_Indicator" Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" CornerRadius="16"><Grid><TextBlock x:Name="PART_StepNumber" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{TemplateBinding StepNumber}" /><Path x:Name="PART_CompleteIcon" Width="18" Height="18" Data="{StaticResource Md.Flutter.Check}" Stroke="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round" Opacity="0" /><TextBlock x:Name="PART_ErrorIcon" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Md.Sys.Color.OnError.Brush}" FontWeight="Bold" Text="!" Opacity="0" /></Grid></Border><StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2"><ContentPresenter Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" Foreground="{TemplateBinding Foreground}" /><ContentPresenter Content="{TemplateBinding Subtitle}" FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /></StackPanel></Grid></Button><ContentPresenter x:Name="PART_StepContent" Grid.Row="1" Grid.Column="1" Margin="12,0,0,16" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" IsVisible="False" Opacity="0" RenderTransform="translate(0px, -8px)" /></Grid></ControlTemplate></Setter>
+    <Style Selector="^:active /template/ Border#PART_Indicator"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Style Selector="^:active /template/ TextBlock#PART_StepNumber"><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" /></Style>
+    <Style Selector="^:content-present /template/ ContentPresenter#PART_StepContent"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:active /template/ ContentPresenter#PART_StepContent"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="translate(0px, 0px)" /></Style>
+    <Style Selector="^:complete /template/ Border#PART_Indicator"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Style Selector="^:complete /template/ TextBlock#PART_StepNumber"><Setter Property="Opacity" Value="0" /></Style>
+    <Style Selector="^:complete /template/ Path#PART_CompleteIcon"><Setter Property="Opacity" Value="1" /></Style>
+    <Style Selector="^:error /template/ Border#PART_Indicator"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" /></Style>
+    <Style Selector="^:error /template/ TextBlock#PART_StepNumber"><Setter Property="Opacity" Value="0" /></Style>
+    <Style Selector="^:error /template/ TextBlock#PART_ErrorIcon"><Setter Property="Opacity" Value="1" /></Style>
+    <Style Selector="^:reduced-motion /template/ ContentPresenter#PART_StepContent"><Setter Property="RenderTransform" Value="translate(0px, 0px)" /></Style>
+    <!-- Connector coloring follows the active step, like Flutter's Stepper; the last step never draws a trailing connector. -->
+    <Style Selector="^:active /template/ Border#PART_Connector"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Style Selector="^:active /template/ Border#PART_HConnector"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Style Selector="^:step-last /template/ Border#PART_Connector"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:step-last /template/ Border#PART_HConnector"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:horizontal"><Setter Property="Template" Value="{StaticResource MdStepHorizontalTemplate}" /></Style>
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
+  </ControlTheme>
+
 
   <ControlTheme x:Key="{x:Type md:MdStepper}" TargetType="md:MdStepper">
     <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel /></ItemsPanelTemplate></Setter>
