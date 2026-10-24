@@ -65,6 +65,7 @@
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdPagination.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdMaskedTextBox.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdCommitGraph.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdContributionGrid.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>
