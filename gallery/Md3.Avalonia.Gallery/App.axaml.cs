@@ -104,7 +104,7 @@ public partial class App : Application
         {
             var item = new NativeMenuItem(GalleryLocalization.Choose(english, chinese))
             {
-                ToggleType = MenuItemToggleType.Radio,
+                ToggleType = NativeMenuItemToggleType.Radio,
                 IsChecked = ReferenceEquals(Current?.RequestedThemeVariant, variant),
             };
             var chosen = variant;
