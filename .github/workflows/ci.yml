@@ -23,6 +23,10 @@ env:
   # The terminal logger spends real time redrawing progress that nobody watches in CI.
   DOTNET_CLI_UI_LANGUAGE: en
   MSBUILDTERMINALLOGGER: 'off'
+  # The JIT's write-xor-execute allocator intermittently segfaults the headless test host on the
+  # runner image: a process dies with no test failure and no managed exception, and where it dies
+  # changes between runs. Disable the allocator so the tests cannot be killed by the host.
+  DOTNET_EnableWriteXorExecute: '0'
 
 # Least privilege, declared rather than inherited: the conformance publisher needs to write a
 # pull request comment, and relying on the repository-wide default would make this workflow's

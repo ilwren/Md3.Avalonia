@@ -25,8 +25,15 @@ timeout --signal=KILL 300 dotnet test "$project" \
   -c Release --no-build --no-restore \
   --filter "$expression" \
   --logger "trx;LogFileName=$trx" \
-  --logger "console;verbosity=normal"
+  --logger "console;verbosity=normal" > /tmp/probe-console.txt 2>&1
 status=$?
+
+# A non-zero exit with no failed tests means the host itself died; the console tail is the only
+# trace that is not lost, so ship the last lines as an extra annotation.
+if [ "$status" -ne 0 ]; then
+  tail_line=$(tail -n 12 /tmp/probe-console.txt | tr '\n' ' | ' | cut -c1-400)
+  echo "::error::${label} console tail: ${tail_line}"
+fi
 
 python3 - "$label" "$trx" "$status" <<'PY'
 import glob
