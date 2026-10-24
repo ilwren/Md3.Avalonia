@@ -23,7 +23,7 @@ https://github.com/user-attachments/assets/53c05bc6-f1b5-4076-8b62-c4a7a2b819bf
 
 - Desktop and Android targets; every package declares `IsTrimmable` and `IsAotCompatible`.
 
-> **Current published preview: [`0.5.0-preview.1`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.1).** The install examples below use packages already available on NuGet.org. The repository source now targets `0.5.0-preview.2`, which is not published yet; examples remain pinned to `.1`. Preview APIs may still receive compatibility changes. See [Known limitations](#known-limitations) for manual screen-reader and Android-device validation status.
+> **Current preview: [`0.5.0-preview.2`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.2).** The install examples below use this version. Preview APIs may still receive compatibility changes. See [Known limitations](#known-limitations) for manual screen-reader and Android-device validation status.
 >
 
 ## Contents
@@ -55,13 +55,13 @@ https://github.com/user-attachments/assets/53c05bc6-f1b5-4076-8b62-c4a7a2b819bf
 Install the core package
 
 ```bash
-dotnet add package Md3.Avalonia --version 0.5.0-preview.1
+dotnet add package Md3.Avalonia --version 0.5.0-preview.2
 ```
 
 Add optional packages as needed; all packages use the same version
 
 ```bash
-dotnet add package Md3.Avalonia.Icons --version 0.5.0-preview.1
+dotnet add package Md3.Avalonia.Icons --version 0.5.0-preview.2
 ```
 
 ## Quick start
@@ -259,7 +259,7 @@ Clean build artifacts immediately after every build, test, or pack operation. Do
 | [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md) | Repository layout, project responsibilities, and API-doc build flow |
 | [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) | Target frameworks, platforms, and dependency compatibility policy |
 | [`docs/RELEASE_NOTES_0.5.0-preview.1.md`](docs/RELEASE_NOTES_0.5.0-preview.1.md) | Changes in the published release |
-| [`docs/RELEASE_NOTES_0.5.0-preview.2.md`](docs/RELEASE_NOTES_0.5.0-preview.2.md) | Draft notes for the unpublished next preview |
+| [`docs/RELEASE_NOTES_0.5.0-preview.2.md`](docs/RELEASE_NOTES_0.5.0-preview.2.md) | Changes in preview 0.5.0-preview.2 |
 | [`docs/RELEASE_VALIDATION.md`](docs/RELEASE_VALIDATION.md) | Manual validation checklist and sign-off status |
 | [`docs/PUBLISHING.md`](docs/PUBLISHING.md) | Release process and NuGet Trusted Publishing setup |
 | [`docs/SPEC_VERIFICATION.md`](docs/SPEC_VERIFICATION.md) | Layered spec verification and known gaps |

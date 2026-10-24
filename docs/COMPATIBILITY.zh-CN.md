@@ -22,7 +22,7 @@ _lang: zh-CN
 
 ## 版本策略
 
-当前已发布包基线为 [`0.5.0-preview.1`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.1)（共 18 个包，2026-10-19 发布）。仓库项目文件现以 `0.5.0-preview.2` 为版本，但尚未发布；更早的预览说明仅记录历史基线。
+当前包版本为 [`0.5.0-preview.2`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.2)（共 18 个包）。更早的预览说明仅记录历史基线。
 预览包可能调整 API；调整时应同时更新变更记录与迁移说明。
 稳定版遵循 Semantic Versioning。
 更新 Avalonia 次版本前，会对支持的 .NET 目标框架进行 Release 构建、headless 测试、包校验与平台矩阵验证。

@@ -18,7 +18,7 @@ The core runtime package references only `Avalonia` and `MaterialColorUtilities`
 
 ## Versioning
 
-- Current published package baseline: [`0.5.0-preview.1`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.1) (18 packages; published 2026-10-19). Current project files target `0.5.0-preview.2`, which is not published yet. Earlier preview notes describe historical baselines.
+- Current package version: [`0.5.0-preview.2`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.2) (18 packages). Earlier preview notes describe historical baselines.
 - Preview packages may adjust API after a changelog entry and migration note.
 - Stable releases follow Semantic Versioning.
 - Avalonia minor-version upgrades are validated by Release builds for the supported .NET package TFMs, headless tests, package validation, and the platform matrix before the baseline changes.

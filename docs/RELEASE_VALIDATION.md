@@ -1,10 +1,10 @@
 # Release validation record
 
-Latest published package release: [`0.5.0-preview.1`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.1) (18 packages; NuGet.org publication succeeded on 2026-10-19)
-Current source package candidate: `0.5.0-preview.2` (not yet published; release validation is pending)
+Current package version: [`0.5.0-preview.2`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.2) (18 packages)
+Previous package release: [`0.5.0-preview.1`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.1) (NuGet.org publication succeeded on 2026-10-19)
 Historical automated baseline: `0.4.5-preview.1` (2026-10-12)
 
-> The `0.4.5-preview.1` evidence below is historical. The published `0.5.0-preview.1` release workflow [passed](https://github.com/ilwren/Md3.Avalonia/actions/runs/39198020957), including package build/publish, headless tests, and Gallery builds for Linux, macOS, Windows, and Android. That run does not validate the `.2` source candidate or sign off the manual device, desktop, or assistive-technology checks listed below.
+> The `0.4.5-preview.1` evidence below is historical. The `0.5.0-preview.1` release workflow [passed](https://github.com/ilwren/Md3.Avalonia/actions/runs/39198020957), including package build/publish, headless tests, and Gallery builds for Linux, macOS, Windows, and Android. That run does not validate the `.2` release or sign off the manual device, desktop, or assistive-technology checks listed below.
 
 ## Automated gates
 
@@ -14,10 +14,10 @@ Historical automated baseline: `0.4.5-preview.1` (2026-10-12)
 | Restore | `dotnet restore Md3.Avalonia.sln` | Success |
 | Release compile | CI `Build Gallery Desktop` plus multi-platform Gallery workflow | 0 warnings, 0 errors for .NET 10 release projects |
 | Tests | `dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release` | 0 failed; no unexplained skipped tests |
-| Package | `bash scripts/build-nuget.sh` or `scripts/build-nuget.ps1` (all 18 packable projects; requires the Android workload) | 18 `.nupkg` and 18 `.snupkg`; consistent `0.5.0-preview.1` metadata, readmes, notices, XML docs, and one-way dependencies |
+| Package | `bash scripts/build-nuget.sh` or `scripts/build-nuget.ps1` (all 18 packable projects; requires the Android workload) | 18 `.nupkg` and 18 `.snupkg`; consistent `0.5.0-preview.2` metadata, readmes, notices, XML docs, and one-way dependencies |
 | Immediate artifact cleanup | after every build/test/pack, scan and remove `bin`, `obj`, `TestResults`, DLL/PDB and packages before continuing | No generated workspace artifacts |
 | Dynamic color | golden seed vectors, arbitrary seed/variant, contrast pairs, JSON round-trip | Pass |
-| Trim analysis | CI/package build with `EnableTrimAnalyzer` on all 18 `0.5.0-preview.1` packages | 0 IL2xxx warnings; every suppression carries a written justification |
+| Trim analysis | CI/package build with `EnableTrimAnalyzer` on all 18 `0.5.0-preview.2` packages | 0 IL2xxx warnings; every suppression carries a written justification |
 | Trim escape hatches | `MdTrimmingTests` | Selector delegates on `MdDataGrid`, `MdAsyncSelect` and `MdSearchView` return without reflection; `IsTrimmable` present on shipped assemblies |
 | Responsive Gallery | 599/600/839/840/1199/1200/1599/1600 boundary behavior | Pass |
 | Visual directions/themes | LTR/RTL, Light/Dark, Standard/Medium/High | Render without exception |
@@ -45,9 +45,9 @@ The successful package build validates the declared release targets. A separate 
 
 - [ ] Inspect each `.nupkg` asset group and compile a minimal .NET 8 consumer against the seven packages that provide `net8.0` assets. The 11 opt-in third-party theme packages target `net10.0`; verify those against a .NET 10 consumer.
 
-## Pending release validation for `0.5.0-preview.2`
+## Release validation for `0.5.0-preview.2`
 
-The repository projects now target `.2`, but no `0.5.0-preview.2` release run exists yet. After these changes are reviewed and integrated into `main`, run the release workflow and confirm the 18 package outputs, NuGet push, headless tests, and platform Gallery builds for `.2`. The successful `.1` run above is not evidence for the new package version.
+Record the `.2` release workflow results here, confirming the 18 package outputs, NuGet push, headless tests, and platform Gallery builds. The successful `.1` run above is historical and does not validate the `.2` release.
 
 ## Interaction regression acceptance
 
@@ -65,7 +65,7 @@ Picker stale-field behavior and Cascader label/dropdown clipping have headless/C
 
 ## Manual platform matrix — not signed in this environment
 
-Do not mark an item complete without recording device/OS, assistive technology version, tester and date. The System notifications item is a manual follow-up for the published `0.5.0-preview.1` Notifications package; successful package publication does not constitute platform-delivery sign-off.
+Do not mark an item complete without recording device/OS, assistive technology version, tester and date. The System notifications item is a manual follow-up for the `0.5.0-preview.2` Notifications package; successful package publication does not constitute platform-delivery sign-off.
 
 - [ ] Windows x64: pointer, keyboard-only, 100/150/200% scale, Narrator. Recheck BorderlessWindow maximize/restore and `WindowDecorations.Full` state changes on Avalonia 12.1.2. Specifically recheck `MdBeforeAfter` at 150%: the latest report on `22488b5` showed Position 0.5 with the horizontal/vertical handle at the left/top and a first-drag jump; no desktop sign-off yet. Also verify the SimpleDialog black scrim covers the entire native window, and that `MdNumericBox` steps only while focused while an unfocused wheel scrolls the outer page.
 - [ ] System notifications: verify the Windows 11 24H2 Gallery's first-run per-user shortcut/AUMID registration, toast delivery, and notification settings; macOS delivery/attribution; Linux X11 and Wayland using the direct `libnotify` backend; Android API 32 vs 33+ with permission denied/granted, channel settings, and app-specific small icon. This package still needs platform sign-off.

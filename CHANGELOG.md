@@ -1,10 +1,10 @@
 # Changelog
 
-## [0.5.0-preview.2] - Unreleased
+## [0.5.0-preview.2]
 
 ### Documentation
 
-- Clarified that `0.5.0-preview.1` is the latest published package version while repository projects are being prepared for `0.5.0-preview.2`; install examples remain pinned to the published version.
+- Updated English and Chinese package/install guidance and Gallery examples to use `0.5.0-preview.2`.
 - Corrected package-release metadata and documentation covering package counts, release dates, target frameworks, compatibility, and release validation.
 
 ### Packaging

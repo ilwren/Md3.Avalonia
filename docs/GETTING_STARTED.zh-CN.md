@@ -12,7 +12,7 @@ _lang: zh-CN
 
 - Avalonia 12；仓库当前基线为 `12.1.2`。
 - 推荐使用 .NET 10 SDK。核心包、Extra、Icons、Icons.Lite、DataGrid、RichEditor 与 Notifications 包也提供 .NET 8 资产；第三方主题扩展包以 .NET 10 为目标框架。
-- 当前已发布预览版为 [`0.5.0-preview.1`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.1)。仓库项目文件现已切换到 `0.5.0-preview.2`，但该版本尚未发布；以下命令仍安装已发布的 `.1`。
+- 当前预览版为 [`0.5.0-preview.2`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.2)。
 
 ## 1. 创建 Avalonia 应用
 
@@ -29,11 +29,11 @@ cd Md3Quickstart
 核心包提供控件、主题令牌与动效。若要使用随包提供的 Material Symbols 目录和字体，再添加一个图标包。`Icons` 提供完整目录，`Icons.Lite` 是较小的替代方案；二者任选其一，不要同时安装。
 
 ```bash
-dotnet add package Md3.Avalonia --version 0.5.0-preview.1
-dotnet add package Md3.Avalonia.Icons --version 0.5.0-preview.1
+dotnet add package Md3.Avalonia --version 0.5.0-preview.2
+dotnet add package Md3.Avalonia.Icons --version 0.5.0-preview.2
 ```
 
-生产项目请将所有 Md3.Avalonia 包固定到同一版本；当前 `0.5.0-preview.1` 已发布于 NuGet.org。测试尚未发布的源码改动时，可从本仓库构建本地 NuGet 源；详见 [NuGet 包指南](NUGET_PACKAGES.zh-CN.md)。
+生产项目请将所有 Md3.Avalonia 包固定到同一版本；当前预览版本为 `0.5.0-preview.2`。如需测试本地源码改动，可从本仓库构建本地 NuGet 源；详见 [NuGet 包指南](NUGET_PACKAGES.zh-CN.md)。
 
 ## 3. 注册主题
 

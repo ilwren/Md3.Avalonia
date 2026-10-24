@@ -6,10 +6,10 @@ A small, standalone .NET library for showing native system notifications on Wind
 
 ## Install
 
-The latest published version is [`0.5.0-preview.1`](https://www.nuget.org/packages/Md3.Avalonia.Notifications/0.5.0-preview.1). Repository project files now target `0.5.0-preview.2`, which is not published yet; use the `.1` version in the install command below until `.2` is released.
+The current preview is [`0.5.0-preview.2`](https://www.nuget.org/packages/Md3.Avalonia.Notifications/0.5.0-preview.2).
 
 ```bash
-dotnet add package Md3.Avalonia.Notifications --version 0.5.0-preview.1
+dotnet add package Md3.Avalonia.Notifications --version 0.5.0-preview.2
 ```
 
 ## Show a notification
