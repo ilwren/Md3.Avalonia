@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
@@ -28,7 +28,7 @@ internal static class GalleryLocalization
         ["Checkbox"]="复选框", ["Radio buttons"]="单选按钮", ["Combo box"]="组合框", ["Carousel"]="轮播", ["Cards"]="卡片", ["Chips"]="标签块",
         ["Date & time pickers"]="日期和时间选择器", ["Date and time pickers"]="日期和时间选择器", ["Color picker"]="颜色选择器", ["Dialogs"]="对话框", ["Divider"]="分隔线", ["Lists"]="列表", ["Loading"]="加载", ["Progress"]="进度",
         ["Menus"]="菜单", ["Navigation bar"]="导航栏", ["Navigation drawer"]="导航抽屉", ["Navigation rail & adaptive"]="导航轨道与自适应", ["Search"]="搜索",
-        ["Sheets"]="面板", ["Slider"]="滑块", ["Segmented & range"]="分段按钮与范围", ["Snackbar"]="消息条", ["Switch"]="开关", ["Tabs"]="标签页",
+        ["Sheets"]="面板", ["Slider"]="滑块", ["Video player"]="视频播放器", ["Interactive preview"]="交互式预览", ["A customizable video player shell with transport controls, seeking, volume, and fullscreen integration."]="可自定义的视频播放器界面，提供播放控制、进度拖动、音量及全屏集成。", ["This gallery preview uses a simulated session; connect LibVLCSharp for real media playback."]="此 Gallery 预览使用模拟播放会话；连接 LibVLCSharp 即可播放真实媒体。", ["LibVLCSharp integration"]="LibVLCSharp 集成", ["Material Player Preview"]="Material 播放器预览", ["Interactive controls · simulated timeline"]="交互式控件 · 模拟进度", ["Segmented & range"]="分段按钮与范围", ["Snackbar"]="消息条", ["Switch"]="开关", ["Tabs"]="标签页",
         ["Toolbars"]="工具栏", ["Tooltips"]="工具提示", ["Flutter parity"]="Flutter 组件补全", ["Desktop adapters"]="桌面适配控件", ["Theme resources"]="主题资源", ["Theme Lab"]="主题实验室", ["Material Symbols"]="Material 图标", ["Motion"]="动效",
         ["Theme controls"]="主题控制", ["Seed color"]="种子颜色", ["Scheme variant"]="配色方案变体", ["Contrast"]="对比度", ["Theme mode"]="主题模式", ["Typography"]="字体排印", ["Shape"]="形状",
         ["Apply theme"]="应用主题", ["Reset"]="重置", ["Copy JSON"]="复制 JSON", ["Export file"]="导出文件", ["Import file"]="导入文件", ["Apply JSON"]="应用 JSON",

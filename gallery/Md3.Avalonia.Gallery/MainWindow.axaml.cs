@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
@@ -45,7 +45,7 @@ public partial class MainWindow : Window
             ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, BreadcrumbNav, TextFieldNav,
             CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, ColorPickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
-            NavigationDrawerNav, AdaptiveNav, NotificationsNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
+            NavigationDrawerNav, AdaptiveNav, NotificationsNav, SearchNav, SettingsCardNav, SheetNav, SliderNav, VideoPlayerNav,
             SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, BorderlessWindowNav,
 AnimatedTextNav, AnimationSequenceNav, AsyncSelectNav, AvatarNav,
             BeforeAfterNav, CalendarNav, CascaderNav, ChartNav,
@@ -101,6 +101,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             Entry("Settings cards", "settings card preference group expander android tile", SettingsCardNav, () => new SettingsCardGalleryPage()),
             Entry("Sheets", "bottom side sheet", SheetNav, () => new SheetGalleryPage()),
             Entry("Slider", "slider range value", SliderNav, () => new SliderGalleryPage()),
+            Entry("Video player", "video player playback LibVLC audio seek media", VideoPlayerNav, () => new MediaPlayerGalleryPage()),
             Entry("Autocomplete", "autocomplete auto complete suggestion filter typeahead text field", AutoCompleteNav, () => new AutoCompleteGalleryPage()),
             Entry("Date range picker", "date range picker start end calendar localized", DateRangePickerNav, () => new DateRangePickerGalleryPage()),
             Entry("Range slider", "range slider two handle lower upper span step", RangeSliderNav, () => new RangeSliderGalleryPage()),
@@ -255,6 +256,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
     private void ShowSettingsCard(object? s, RoutedEventArgs e) => Navigate(new SettingsCardGalleryPage(), SettingsCardNav);
     private void ShowSheets(object? s, RoutedEventArgs e) => Navigate(new SheetGalleryPage(), SheetNav);
     private void ShowSlider(object? s, RoutedEventArgs e) => Navigate(new SliderGalleryPage(), SliderNav);
+    private void ShowVideoPlayer(object? s, RoutedEventArgs e) => Navigate(new MediaPlayerGalleryPage(), VideoPlayerNav);
     private void ShowAutoComplete(object? s, RoutedEventArgs e) => Navigate(new AutoCompleteGalleryPage(), AutoCompleteNav);
     private void ShowDateRangePicker(object? s, RoutedEventArgs e) => Navigate(new DateRangePickerGalleryPage(), DateRangePickerNav);
     private void ShowRangeSlider(object? s, RoutedEventArgs e) => Navigate(new RangeSliderGalleryPage(), RangeSliderNav);

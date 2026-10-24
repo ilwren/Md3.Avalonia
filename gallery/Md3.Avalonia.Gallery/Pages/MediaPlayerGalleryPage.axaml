@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:media="using:Md3.Avalonia.Media.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.MediaPlayerGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Video player" />
+        <TextBlock Classes="body" Text="A customizable video player shell with transport controls, seeking, volume, and fullscreen integration." />
+      </StackPanel>
+      <StackPanel MaxWidth="880" Spacing="12">
+        <TextBlock Classes="h2" Text="Interactive preview" />
+        <media:MdVideoPlayer x:Name="Player" Height="360" HorizontalAlignment="Stretch" />
+        <TextBlock Classes="body" Text="This gallery preview uses a simulated session; connect LibVLCSharp for real media playback." TextWrapping="Wrap" />
+      </StackPanel>
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="LibVLCSharp integration" />
+        <gallery:CodeExample XamlCode="&lt;media:MdVideoPlayer x:Name=&quot;Player&quot; /&gt;" CSharpCode="Core.Initialize();&#10;var libVlc = new LibVLC();&#10;var mediaPlayer = new MediaPlayer(libVlc);&#10;mediaPlayer.Media = new Media(libVlc, new Uri(videoUri));&#10;Player.AttachLibVlc(mediaPlayer);&#10;mediaPlayer.Play();" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>
