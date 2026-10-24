@@ -21,6 +21,11 @@ internal sealed class CommitGraphRow : Grid
 
     public CommitGraphRow()
     {
+        // A null background makes the whole row invisible to hit testing except where its
+        // text happens to be, so presses on the empty part of a row never reached the graph
+        // and the commit could not be selected. Transparent keeps the row click-free of any
+        // visible paint while registering its full bounds as a hit area.
+        Background = Brushes.Transparent;
         ColumnDefinitions = new ColumnDefinitions("Auto,*");
         _selectionBackground = new CommitGraphSelectionBackground
         {
