@@ -200,29 +200,17 @@ public class MdCommitGraph : ItemsControl
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             return;
 
-        // Resolve the pressed row from the position, not from e.Source: the source is only a
-        // visual the input pipeline hit-tested, and hosts (including the headless test driver)
-        // may report it differently. The position hit test is exact, and walking from the hit
-        // element (or the row itself) finds the owning row either way.
-        var hit = InputHitTest(e.GetPosition(this));
-        var row = FindRow(hit as Visual);
-        if (row is null)
+        // Resolve the pressed row geometrically: the presenter places the rows at exactly
+        // RowHeight spacing from the top, so the index is the position divided by the row
+        // height. No hit testing is involved, which keeps the result identical on desktop,
+        // mobile and the headless host.
+        var pos = e.GetPosition(this);
+        if (RowHeight <= 0 || pos.Y < 0)
             return;
-        var index = IndexFromContainer(row);
-        if (index < 0)
+        var index = (int)(pos.Y / RowHeight);
+        if (index >= Items.Count)
             return;
         OnCommitRowClicked(index);
-    }
-
-    private static CommitGraphRow? FindRow(Visual? visual)
-    {
-        for (var v = visual; v is not null; v = v.GetVisualParent())
-        {
-            if (v is CommitGraphRow row)
-                return row;
-        }
-
-        return null;
     }
 
     /// <summary>Selects the commit of the given row and raises <see cref="CommitClicked"/>.</summary>
