@@ -51,9 +51,20 @@ if match:
     header = lines[0][:160]
     frames = [l[:140] for l in lines[1:] if l.startswith("at ") or l.startswith("   at ")][:4]
     print("::error::%s crash: %s // %s" % (label, header, " | ".join(frames)[:330]))
-else:
-    tail = [l.strip() for l in text.splitlines() if l.strip()][-5:]
-    print("::error::%s no unhandled-exception marker; tail: %s" % (label, " | ".join(tail)[:400]))
+    raise SystemExit
+
+# No managed marker: a native abort. The aborting library prints its reason right before the
+# run summary - ship everything after the last PASS/FAIL test line and before "Results File".
+lines = [l for l in text.splitlines() if l.strip()]
+cut = 0
+for i, l in enumerate(lines):
+    if re.search(r"(Passed!|Failed!|Aborted)", l) and ("error" not in l.lower()):
+        cut = i
+summary = next((i for i, l in enumerate(lines) if "Results File" in l), len(lines))
+between = [l.strip() for l in lines[max(cut, 0):summary]
+           if l.strip() and not re.match(r"^\[\w+\.net", l.strip())][:25]
+blob = " | ".join(between)[:900]
+print("::error::%s native-abort region: %s" % (label, blob or "(nothing between last test line and summary)"))
 PY
 fi
 
