@@ -13,7 +13,7 @@ public partial class MediaPlayerGalleryPage : UserControl
     private const string PreviewVideoUrl = "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
     private LibVLC? _libVlc;
     private MediaPlayer? _mediaPlayer;
-    private Media? _media;
+    private LibVLCSharp.Shared.Media? _media;
     private LibVlcPlaybackSession? _session;
 
     public MediaPlayerGalleryPage()
@@ -65,7 +65,7 @@ public partial class MediaPlayerGalleryPage : UserControl
             _mediaPlayer = new MediaPlayer(_libVlc);
             _mediaPlayer.EncounteredError += OnPlaybackError;
             _mediaPlayer.Playing += OnPlaybackStarted;
-            _media = new Media(_libVlc, new Uri(PreviewVideoUrl));
+            _media = new LibVLCSharp.Shared.Media(_libVlc, new Uri(PreviewVideoUrl));
             _mediaPlayer.Media = _media;
             Player.AttachLibVlc(_mediaPlayer);
             _session = (LibVlcPlaybackSession)Player.Session!;
