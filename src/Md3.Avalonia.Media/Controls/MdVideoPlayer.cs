@@ -66,8 +66,8 @@ public sealed class MdVideoPlayer : UserControl
                         LastChildFill = false,
                         Children =
                         {
-                            AddDocked(_playButton, Avalonia.Controls.Dock.Left), AddDocked(_time, Avalonia.Controls.Dock.Left),
-                            AddDocked(muteButton, Avalonia.Controls.Dock.Right), AddDocked(_volume, Avalonia.Controls.Dock.Right), AddDocked(full, Avalonia.Controls.Dock.Right)
+                            AddDocked(_playButton, global::Avalonia.Controls.Dock.Left), AddDocked(_time, global::Avalonia.Controls.Dock.Left),
+                            AddDocked(muteButton, global::Avalonia.Controls.Dock.Right), AddDocked(_volume, global::Avalonia.Controls.Dock.Right), AddDocked(full, global::Avalonia.Controls.Dock.Right)
                         }
                     }
                 }
@@ -129,7 +129,7 @@ public sealed class MdVideoPlayer : UserControl
         return button;
     }
 
-    private static Control AddDocked(Control child, Avalonia.Controls.Dock dock)
+    private static Control AddDocked(Control child, global::Avalonia.Controls.Dock dock)
     {
         DockPanel.SetDock(child, dock);
         return child;
