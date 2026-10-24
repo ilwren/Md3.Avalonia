@@ -49,7 +49,7 @@ public class MdCommitGraph : ItemsControl
     private IReadOnlyList<MdCommitGraphRowGeometry> _rows = Array.Empty<MdCommitGraphRowGeometry>();
     private int _laneCount;
     private IBrush?[] _laneBrushCache = Array.Empty<IBrush>();
-    private ThemeVariant _laneBrushVariant;
+    private ThemeVariant? _laneBrushVariant;
 
     static MdCommitGraph()
     {
