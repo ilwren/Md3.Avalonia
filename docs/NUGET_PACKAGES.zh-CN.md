@@ -8,7 +8,7 @@ _lang: zh-CN
 
 Md3.Avalonia 拆分为 18 个 NuGet 包，应用可按需引用核心控件，并独立添加图标字体、扩展控件或第三方主题。每次发布的所有包使用相同版本号。
 
-> **预览版状态：** 当前仓库源码版本为 `0.5.0-preview.1`，README 标注该版本尚未发布。下方命令假设当前 NuGet 源已提供对应版本。
+> **已发布预览版：** `0.5.0-preview.1` 已发布到 NuGet.org，本版 18 个包均使用此版本号。可查看 [NuGet.org 上的 `Md3.Avalonia` 核心包](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.1)。仓库项目文件已切换到 `0.5.0-preview.2`，但该版本尚未发布，因此下方安装命令仍固定使用 `.1`。
 
 ## 安装
 
@@ -19,7 +19,7 @@ dotnet add package Md3.Avalonia --version 0.5.0-preview.1
 dotnet add package Md3.Avalonia.Icons --version 0.5.0-preview.1
 ```
 
-仅在应用实际使用对应功能时添加扩展控件或第三方主题包。所有 Md3.Avalonia 包应保持相同版本。如果预览包尚未上架，可从仓库构建本地 NuGet 源：
+仅在应用实际使用对应功能时添加扩展控件或第三方主题包。所有 Md3.Avalonia 包应保持相同版本。测试尚未发布的源码改动时，可从仓库构建本地 NuGet 源：
 
 ```bash
 # 在库仓库中构建全部包并输出到本地 NuGet 源。

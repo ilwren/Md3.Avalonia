@@ -4,7 +4,7 @@
 
 Md3.Avalonia is split into 18 packages so an app can take the core controls it needs and add optional fonts, widgets, or third-party themes independently. All packages from a release use the same version.
 
-> **Preview status:** The repository currently tracks `0.5.0-preview.1`; the README marks it as not yet published. The commands below assume a matching version is available on your NuGet source.
+> **Published preview:** `0.5.0-preview.1` is available on NuGet.org; all 18 packages in this release use this version. See [`Md3.Avalonia` on NuGet.org](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.1). Repository projects now target `0.5.0-preview.2`, which is not published yet, so the install commands below remain pinned to `.1`.
 
 ## Install
 
@@ -15,7 +15,7 @@ dotnet add package Md3.Avalonia --version 0.5.0-preview.1
 dotnet add package Md3.Avalonia.Icons --version 0.5.0-preview.1
 ```
 
-Add optional controls or a vendor theme only when the app uses them. Keep every Md3.Avalonia package on the same version. If the preview is not available on NuGet yet, build a local feed from a repository checkout:
+Add optional controls or a vendor theme only when the app uses them. Keep every Md3.Avalonia package on the same version. To test unreleased source changes before publication, build a local feed from a repository checkout:
 
 ```bash
 # In the library checkout: build all packages into a local feed.

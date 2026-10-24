@@ -6,7 +6,7 @@
 
 ## 安装
 
-项目源代码基线为 `0.5.0-preview.1`；该预览版发布前无法从 NuGet 安装此包。
+当前已发布版本为 [`0.5.0-preview.1`](https://www.nuget.org/packages/Md3.Avalonia.Notifications/0.5.0-preview.1)。仓库项目文件现以 `0.5.0-preview.2` 为版本，但尚未发布；在 `.2` 发布前，请使用下方 `.1` 安装命令。
 
 ```bash
 dotnet add package Md3.Avalonia.Notifications --version 0.5.0-preview.1

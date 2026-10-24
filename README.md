@@ -23,7 +23,7 @@ https://github.com/user-attachments/assets/53c05bc6-f1b5-4076-8b62-c4a7a2b819bf
 
 - Desktop and Android targets; every package declares `IsTrimmable` and `IsAotCompatible`.
 
-> **Current version: `0.5.0-preview.1`.** Preview APIs may still receive compatibility changes. NuGet install examples become usable after this version is published. See [Known limitations](#known-limitations) for manual screen-reader and Android-device validation status.
+> **Current published preview: [`0.5.0-preview.1`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.1).** The install examples below use packages already available on NuGet.org. The repository source now targets `0.5.0-preview.2`, which is not published yet; examples remain pinned to `.1`. Preview APIs may still receive compatibility changes. See [Known limitations](#known-limitations) for manual screen-reader and Android-device validation status.
 >
 
 ## Contents
@@ -258,7 +258,8 @@ Clean build artifacts immediately after every build, test, or pack operation. Do
 | [`docs/NUGET_PACKAGES.md`](docs/NUGET_PACKAGES.md) | 18 NuGet packages, target frameworks, and theme entry points |
 | [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md) | Repository layout, project responsibilities, and API-doc build flow |
 | [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) | Target frameworks, platforms, and dependency compatibility policy |
-| [`docs/RELEASE_NOTES_0.5.0-preview.1.md`](docs/RELEASE_NOTES_0.5.0-preview.1.md) | Changes in this release |
+| [`docs/RELEASE_NOTES_0.5.0-preview.1.md`](docs/RELEASE_NOTES_0.5.0-preview.1.md) | Changes in the published release |
+| [`docs/RELEASE_NOTES_0.5.0-preview.2.md`](docs/RELEASE_NOTES_0.5.0-preview.2.md) | Draft notes for the unpublished next preview |
 | [`docs/RELEASE_VALIDATION.md`](docs/RELEASE_VALIDATION.md) | Manual validation checklist and sign-off status |
 | [`docs/PUBLISHING.md`](docs/PUBLISHING.md) | Release process and NuGet Trusted Publishing setup |
 | [`docs/SPEC_VERIFICATION.md`](docs/SPEC_VERIFICATION.md) | Layered spec verification and known gaps |

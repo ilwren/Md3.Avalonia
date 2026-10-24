@@ -18,7 +18,7 @@
 
 - 桌面与 Android 双端，全部包声明 `IsTrimmable` 与 `IsAotCompatible`。
 
-> **当前版本 `0.5.0-preview.1`。** 预览版 API 仍可能做兼容性调整，NuGet 安装示例需在该版本发布后才可用。屏幕阅读器与 Android 真机等人工验收状态见 [已知边界](#已知边界)。
+> **当前已发布预览版：[`0.5.0-preview.1`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.1)。** 以下安装示例可直接从 NuGet.org 获取此版本。仓库源码已切换到 `0.5.0-preview.2`，该版本尚未发布，因此示例仍固定使用 `.1`。预览期 API 仍可能做兼容性调整。屏幕阅读器与 Android 真机等人工验收状态见 [已知边界](#已知边界)。
 
 ## 目录
 
@@ -252,7 +252,8 @@ bash scripts/publish-gallery-aot.sh --rid linux-x64 --smoke   # 也可指定 win
 | [`docs/NUGET_PACKAGES.zh-CN.md`](docs/NUGET_PACKAGES.zh-CN.md) | 18 个 NuGet 包、目标框架与主题入口 |
 | [`docs/PROJECT_STRUCTURE.zh-CN.md`](docs/PROJECT_STRUCTURE.zh-CN.md) | 仓库目录、项目职责与 API 文档构建流程 |
 | [`docs/COMPATIBILITY.zh-CN.md`](docs/COMPATIBILITY.zh-CN.md) | 目标框架、平台与依赖兼容策略 |
-| [`docs/RELEASE_NOTES_0.5.0-preview.1.md`](docs/RELEASE_NOTES_0.5.0-preview.1.md) | 本版变更说明 |
+| [`docs/RELEASE_NOTES_0.5.0-preview.1.md`](docs/RELEASE_NOTES_0.5.0-preview.1.md) | 已发布版本的变更说明 |
+| [`docs/RELEASE_NOTES_0.5.0-preview.2.md`](docs/RELEASE_NOTES_0.5.0-preview.2.md) | 下一预览版的未发布草案 |
 | [`docs/RELEASE_VALIDATION.md`](docs/RELEASE_VALIDATION.md) | 人工验收清单与签署状态 |
 | [`docs/PUBLISHING.md`](docs/PUBLISHING.md) | 发布流程与 NuGet Trusted Publishing 配置 |
 | [`docs/SPEC_VERIFICATION.md`](docs/SPEC_VERIFICATION.md) | 规范一致性分层校验与已知差距 |

@@ -7,8 +7,8 @@ This guide takes a new Avalonia app from package references to its first Materia
 ## Requirements
 
 - Avalonia 12. The repository baseline is Avalonia `12.1.2`.
-- .NET 10 SDK is recommended. The core controls, Extra, icons, DataGrid, and RichEditor packages also target .NET 8; third-party theme add-ons target .NET 10.
-- The current source version is `0.5.0-preview.1`. The repository README marks it as not yet published; package commands below work once that version is available on your configured NuGet feed.
+- .NET 10 SDK is recommended. The core, Extra, Icons, Icons.Lite, DataGrid, RichEditor, and Notifications packages also provide .NET 8 assets; third-party theme add-ons target .NET 10.
+- The current published preview is [`0.5.0-preview.1`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.1). Repository projects now target `0.5.0-preview.2`, which is not published yet; the commands below intentionally install `.1`.
 
 ## 1. Create an Avalonia app
 
@@ -25,11 +25,11 @@ cd Md3Quickstart
 The core package supplies controls, theme tokens, and motion. Add one icon package if you want the bundled Material Symbols catalog and font. `Icons` is the full catalog; `Icons.Lite` is a smaller alternative—choose one, not both.
 
 ```bash
-dotnet add package Md3.Avalonia
-dotnet add package Md3.Avalonia.Icons
+dotnet add package Md3.Avalonia --version 0.5.0-preview.1
+dotnet add package Md3.Avalonia.Icons --version 0.5.0-preview.1
 ```
 
-Pin every Md3.Avalonia package to the same version in production. If the preview version is not on NuGet yet, use a published version or build the packages from this repository; see [NuGet packages](NUGET_PACKAGES.md).
+Pin every Md3.Avalonia package to the same version in production. The current preview is already published; to test unreleased source changes, build the packages from this repository as described in [NuGet packages](NUGET_PACKAGES.md).
 
 ## 3. Register the theme
 
