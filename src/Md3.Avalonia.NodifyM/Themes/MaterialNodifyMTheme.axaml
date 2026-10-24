@@ -23,30 +23,24 @@
   for this theme to be careful about.
 
   The styles below the includes cover the values that never go through a brush key, which no accent
-  dictionary can reach. There are three kinds. A node's ink is a literal White, the border it paints
-  on hover is LightBlue and the one it paints when selected is Orange; the editor's own background is
-  a literal Azure; a node group sets four colours inline (#3E3E42, #1E1E1E, White, Transparent) and
-  so never reads the GroupingNode.* keys upstream defines for it; and the grid rule takes the
-  Gainsboro its property registers with, because the default grid-line template never sets a brush.
-  Then the minimap and the editor's marquee build brushes from raw colour keys, bypassing upstream's
-  own brush dictionary, so those six setters, the marquee rectangle and the grid rule are re-pointed
-  at the brushes the canvas itself uses. Node thickness drops from 2 to 1 because an
-  M3 hairline is what a filled card carries.
+  dictionary can reach. A node's ink is a literal White, the border it paints on hover is LightBlue
+  and the one it paints when selected is Orange; the editor's own background is a literal Azure; a
+  node group sets four colours inline (#3E3E42, #1E1E1E, White, Transparent) and so never reads the
+  GroupingNode.* keys upstream defines for it; and the grid rule takes the Gainsboro its property
+  registers with, because the default grid-line template never sets a brush. Node thickness drops
+  from 2 to 1 because an M3 hairline is what a filled card carries.
 
-  Four things stay upstream's and are not ported. The node's 3 DIP corner radius is baked into its
-  template - retokenizing it would mean forking the template, and a node editor's corners are not
-  worth owning an upstream file for. The marquee you drag on empty canvas is the same case with a
-  sharper edge: its stroke and fill are set on the rectangle itself in the template rather than in a
-  style, and a value written that way outranks any style setter, so the SelectionRectangle brushes
-  this file redeclares answer the minimap's viewport and nothing else. And upstream's checkered
-  ItemContainer.HighlightBrush has no counterpart here: no template in the package reads the key, and
-  a hover tile wants its own decision rather than a translation of a pattern.
-  The fourth is the label a connection can carry: upstream builds its geometry in C# from a
-  hardcoded Inter typeface, so neither a brush key nor a style reaches it and there is no FontFamily
-  property to set, and a lookup for a family the host does not have fails inside the render pass -
-  which is why the gallery's own wire template binds no Text. Connection.TextColorBrush is still
-  redeclared here, because the accent answers upstream's whole key set whether or not a template in
-  this repository reads it.
+  The node's 3 DIP corner radius stays upstream's because it is baked into the template. The marquee
+  dragged on empty canvas likewise sets its stroke and fill directly on the template rectangle, so
+  those local values outrank style setters and stay upstream's. Upstream's checkered
+  ItemContainer.HighlightBrush also remains: no template in this version reads that key.
+  The label a connection can carry is another template-independent case: upstream builds its
+  geometry in C# from a hardcoded Inter typeface, so neither a brush key nor a style reaches it and
+  there is no FontFamily property to set. The gallery's own wire template therefore binds no Text.
+  Connection.TextColorBrush is still redeclared here so the accent answers upstream's whole key set.
+
+  NodifyM 1.1.9 does not ship NodifyEditorMinimap. This theme consequently has no minimap style, and
+  the gallery and tests do not reference that newer control.
 
   One thing to know when hosting the editor, which cost a CI run to find: NodifyEditor writes its
   own Width and Height from its parent's size, in OnLoaded and again in the SizeChanged handler
@@ -128,18 +122,6 @@
        the control at it, and a canvas is ruled in outlineVariant without the consumer knowing. -->
   <Style Selector="nod|LargeGridLine">
     <Setter Property="Brush" Value="{StaticResource GridLinesColorBrush}" />
-  </Style>
-
-  <!-- The minimap is the other place upstream reaches for raw colour keys - five of the six brushes
-       it sets are built there, with opacities, rather than taken from its brush dictionary. Re-point
-       them at the brushes the canvas uses and the small map agrees with the editor beside it. -->
-  <Style Selector="nod|NodifyEditorMinimap">
-    <Setter Property="MapBackground" Value="{StaticResource NodifyEditor.BackgroundBrush}" />
-    <Setter Property="MapBorderBrush" Value="{StaticResource GridLinesColorBrush}" />
-    <Setter Property="NodeBrush" Value="{StaticResource Node.HeaderBrush}" />
-    <Setter Property="NodeBorderBrush" Value="{StaticResource Node.BorderBrush}" />
-    <Setter Property="ViewportBrush" Value="{StaticResource ItemContainer.SelectedBrush}" />
-    <Setter Property="ViewportBorderBrush" Value="{StaticResource NodifyEditor.SelectionRectangleStrokeBrush}" />
   </Style>
 
   <!-- NodeGroup reads none of the GroupingNode.* brushes upstream defines: its style sets four

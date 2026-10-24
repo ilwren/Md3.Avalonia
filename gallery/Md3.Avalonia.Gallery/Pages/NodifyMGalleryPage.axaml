@@ -91,8 +91,8 @@
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h3" Text="Themed editor" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Drag a node to move it, drag from a pin onto another to wire them, drag on empty canvas to marquee-select, and scroll to zoom. The minimap in the corner is the same editor's own control, wearing the same brushes." />
-        <Grid ColumnDefinitions="*,220">
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Drag a node to move it, drag from a pin onto another to wire them, drag on empty canvas to marquee-select, and scroll to zoom." />
+        <Grid>
           <!-- The frame's height is fixed, and that is not a styling choice. NodifyEditor writes its
                own Width and Height from its parent's size - in OnLoaded and again in the
                SizeChanged handler OnApplyTemplate attaches - so a frame that sizes itself to the
@@ -113,15 +113,6 @@
                               PendingConnection="{Binding PendingConnection}"
                               SelectedItems="{Binding SelectedNodes}"
                               DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}" />
-          </Border>
-          <Border Grid.Column="1" Margin="12,0,0,0" CornerRadius="12" Padding="12"
-                  VerticalAlignment="Bottom"
-                  Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
-                  BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
-            <StackPanel Spacing="8">
-              <TextBlock Classes="label" Text="Minimap" />
-              <nod:NodifyEditorMinimap Height="180" Editor="{Binding #DemoEditor}" />
-            </StackPanel>
           </Border>
         </Grid>
         <TextBlock Classes="body" TextWrapping="Wrap" Text="Every colour in that editor comes from Md.Sys.* tokens: nothing on the controls was set, and the page's own templates read the same brush keys the package overrides rather than picking colours of their own." />

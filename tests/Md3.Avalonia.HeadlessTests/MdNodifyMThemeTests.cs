@@ -96,28 +96,15 @@ public class MdNodifyMThemeTests
     }
 
     [AvaloniaFact(Timeout = 60_000)]
-    public void The_Grid_Rule_And_The_Minimap_Take_The_Canvas_Brushes()
+    public void The_Grid_Rule_Takes_The_Canvas_Brush()
     {
         var grid = new LargeGridLine { Width = 240, Height = 120 };
-        var minimap = new NodifyEditorMinimap { Width = 180, Height = 140 };
-        using var scope = Show(new StackPanel { Children = { grid, minimap } });
+        using var scope = Show(grid);
 
         // The grid rule takes its colour from the property's own default - Gainsboro - because the
         // default grid-line template never sets a brush, so the key upstream defines for grid lines
         // is read by nothing until this style points the control at it.
         Assert.Equal(TokenColor("Md.Sys.Color.OutlineVariant.Brush"), ColorOf(grid.Brush));
-
-        // The minimap is the other place upstream builds brushes from raw colour keys instead of
-        // taking one from its own dictionary: all six are re-pointed at the canvas brushes.
-        Assert.Equal(TokenColor("Md.Sys.Color.Surface.Brush"), ColorOf(minimap.MapBackground));
-        Assert.Equal(TokenColor("Md.Sys.Color.OutlineVariant.Brush"), ColorOf(minimap.MapBorderBrush));
-        Assert.Equal(TokenColor("Md.Sys.Color.SecondaryContainer.Brush"), ColorOf(minimap.NodeBrush));
-        Assert.Equal(TokenColor("Md.Sys.Color.OutlineVariant.Brush"), ColorOf(minimap.NodeBorderBrush));
-        Assert.Equal(TokenColor("Md.Sys.Color.Primary.Brush"), ColorOf(minimap.ViewportBorderBrush));
-
-        var viewport = Assert.IsAssignableFrom<ISolidColorBrush>(minimap.ViewportBrush);
-        Assert.Equal(TokenColor("Md.Sys.Color.Primary.Brush"), viewport.Color);
-        Assert.Equal(0.12, viewport.Opacity, 3);
     }
 
     [AvaloniaFact(Timeout = 60_000)]

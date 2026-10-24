@@ -990,8 +990,9 @@ in the application.
 
 The values upstream sets as literals rather than brush keys are set again by additive styles: a
 node's ink, the borders it paints on hover and when selected, the background behind its items, a node
-group's four inline colours, the grid rule's brush and the six brushes the minimap builds from raw
-colour keys. The node's 3 DIP corner radius stays upstream's - it is baked into the template.
+group's four inline colours and the grid rule's brush. The node's 3 DIP corner radius stays
+upstream's - it is baked into the template. NodifyM 1.1.9 does not ship `NodifyEditorMinimap`, so the
+Avalonia 11 theme, gallery and tests intentionally contain no minimap references.
 
 The pinned version is **1.1.9**, the selected Avalonia 11-compatible release, restored against this repository's `11.3.22` baseline. Upgrading it means re-reading `ResourceDictionaries/Brushes.axaml` for new keys and `Controls/*.axaml` for new templates and part names; `MdNodifyMThemeTests` pins the brushes the realized controls actually use, the additive styles and the variant switch that would move.
 

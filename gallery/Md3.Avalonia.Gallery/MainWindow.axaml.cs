@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
@@ -139,7 +139,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             Entry("LiveCharts2 charts", "livecharts2 charts series axis legend tooltip palette line column pie donut gauge scatter candlestick skia", LiveChartsNav, () => new LiveChartsGalleryPage()),
             Entry("ScottPlot charts", "scottplot charts series axis legend tooltip grid palette surface signal bars scatter skia theme", ScottPlotNav, () => new ScottPlotGalleryPage()),
             Entry("Property grid", "property grid inspector settings object properties categories filter cell editors combo checkbox slider numeric date time avalonia.propertygrid theme", PropertyGridNav, () => new PropertyGridGalleryPage()),
-            Entry("Node editor", "node editor graph diagram wire connector pin pending connection knot minimap nodify nodifym.avalonia theme", NodifyMNav, () => new NodifyMGalleryPage()),
+            Entry("Node editor", "node editor graph diagram wire connector pin pending connection knot nodify nodifym.avalonia theme", NodifyMNav, () => new NodifyMGalleryPage()),
             Entry("Map", "map mapsui gis cartography tiles layer feature geometry vector label palette canvas mapsui.avalonia12 theme", MapsuiNav, () => new MapsuiGalleryPage()),
             Entry("Text editor", "code editor syntax highlighting line numbers find replace completion avaloniedit theme", TextEditorNav, () => new TextEditorGalleryPage()),
             Entry("Hex editor", "hex binary bytes dump offsets ascii editor avaloniahex theme", HexEditorNav, () => new HexEditorGalleryPage()),

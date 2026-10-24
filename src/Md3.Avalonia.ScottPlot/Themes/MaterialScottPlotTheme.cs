@@ -68,7 +68,7 @@ public sealed class MaterialScottPlotTheme
     // Named in full: ScottPlot.Palettes is a nested namespace, and a using directive imports the types
     // of a namespace, not the namespaces inside it.
     public static IPalette SeriesPalette(bool dark) => new ScottPlot.Palettes.Custom(
-        PaletteRoleNames.Select(role => MdScottPlotTokens.Color(role, dark)),
+        PaletteRoleNames.Select(role => MdScottPlotTokens.Color(role, dark)).ToArray(),
         dark ? "Material 3 (dark)" : "Material 3",
         "Md.Sys.Color roles, in the order the Material themes walk them");
 
