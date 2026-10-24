@@ -169,10 +169,12 @@ public class MdContributionGrid : TemplatedControl
         {
             var first = days.Min(day => day.Date.Date);
             var last = days.Max(day => day.Date.Date);
-            var monthNames = CultureInfo.CurrentCulture.TextInfo.AbbreviatedMonthNames;
+            var culture = CultureInfo.CurrentCulture;
             WeekStart = first.AddDays(-(int)first.DayOfWeek); // week columns start on Sunday, like GitHub
             WeekCount = (int)((last - WeekStart).TotalDays / 7) + 1;
 
+            // .NET 10 removed the TextInfo name arrays; the MMM custom format is the stable
+            // way to get the current culture's abbreviated month name.
             var labels = new List<MdContributionMonthLabel>();
             var previousMonth = -1;
             for (var week = 0; week < WeekCount; week++)
@@ -181,7 +183,7 @@ public class MdContributionGrid : TemplatedControl
                 if (weekStart.Month != previousMonth)
                 {
                     labels.Add(new MdContributionMonthLabel(
-                        monthNames[weekStart.Month - 1],
+                        weekStart.ToString("MMM", culture),
                         week));
                     previousMonth = weekStart.Month;
                 }
@@ -236,12 +238,15 @@ public class MdContributionGrid : TemplatedControl
             _dayLabels.Children.Clear();
             _dayLabels.Width = 34;
             var step = CellSize + CellSpacing;
-            var dayNames = CultureInfo.CurrentCulture.TextInfo.AbbreviatedDayNames;
+            // Same story for the weekday marks: the ddd format of a known Monday/Wednesday/
+            // Friday gives the culture's abbreviated names.
+            var culture = CultureInfo.CurrentCulture;
+            var monday = new DateTime(2025, 1, 6); // a known Monday
             var rows = new (string Name, int Row)[]
             {
-                (dayNames[(int)DayOfWeek.Monday], 1),
-                (dayNames[(int)DayOfWeek.Wednesday], 3),
-                (dayNames[(int)DayOfWeek.Friday], 5),
+                (monday.ToString("ddd", culture), 1),
+                (monday.AddDays(2).ToString("ddd", culture), 3),
+                (monday.AddDays(4).ToString("ddd", culture), 5),
             };
             foreach (var (name, row) in rows)
             {
