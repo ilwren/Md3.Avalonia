@@ -12,6 +12,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 
 namespace Md3.Avalonia.Controls;
 
@@ -28,6 +29,16 @@ namespace Md3.Avalonia.Controls;
 /// override. <see cref="HeadId"/> rings the node of the given commit.
 /// </para>
 /// <para>
+/// Every commit's link to its first parent is drawn solid, so the mainline and each branch's
+/// own spine stand out; the parts a merge absorbs - the merge curve and the short stub above a
+/// merged branch's last commit - are dashed, the way IntelliJ's commit log fades absorbed
+/// branch work, which is what makes dense multi-branch histories readable.
+/// </para>
+/// <para>
+/// Clicking a row selects that commit (<see cref="SelectedId"/>) and raises
+/// <see cref="CommitClicked"/>, so a host can inspect or act on a single commit.
+/// </para>
+/// <para>
 /// Rows are not virtualized: the graph lays every row out so lanes stay continuous, which is
 /// intended for histories of a few hundred commits or fewer.
 /// </para>
@@ -37,6 +48,8 @@ public class MdCommitGraph : ItemsControl
 {
     public static readonly StyledProperty<string?> HeadIdProperty =
         AvaloniaProperty.Register<MdCommitGraph, string?>(nameof(HeadId));
+    public static readonly StyledProperty<string?> SelectedIdProperty =
+        AvaloniaProperty.Register<MdCommitGraph, string?>(nameof(SelectedId));
     public static readonly StyledProperty<double> LaneWidthProperty =
         AvaloniaProperty.Register<MdCommitGraph, double>(nameof(LaneWidth), 20);
     public static readonly StyledProperty<int> MaxLanesProperty =
@@ -58,10 +71,20 @@ public class MdCommitGraph : ItemsControl
         LaneWidthProperty.Changed.AddClassHandler<MdCommitGraph>((graph, _) => graph.ApplyLayoutToContainers());
         NodeSizeProperty.Changed.AddClassHandler<MdCommitGraph>((graph, _) => graph.InvalidateRows());
         ItemTemplateProperty.Changed.AddClassHandler<MdCommitGraph>((graph, _) => graph.ApplyLayoutToContainers());
+        SelectedIdProperty.Changed.AddClassHandler<MdCommitGraph>((graph, _) => graph.ApplySelection());
     }
 
     /// <summary>Gets or sets the identifier of the head commit; its node gets a ring.</summary>
     public string? HeadId { get => GetValue(HeadIdProperty); set => SetValue(HeadIdProperty, value); }
+
+    /// <summary>
+    /// Gets or sets the identifier of the selected commit. Set by clicking a row or
+    /// programmatically; the selected row is highlighted.
+    /// </summary>
+    public string? SelectedId { get => GetValue(SelectedIdProperty); set => SetValue(SelectedIdProperty, value); }
+
+    /// <summary>Raised when a commit row is clicked; the argument is that commit.</summary>
+    public event EventHandler<MdCommitNode?>? CommitClicked;
 
     /// <summary>Gets or sets the width of one graph lane.</summary>
     public double LaneWidth { get => GetValue(LaneWidthProperty); set => SetValue(LaneWidthProperty, value); }
@@ -124,7 +147,10 @@ public class MdCommitGraph : ItemsControl
     {
         base.PrepareContainerForItemOverride(container, item, index);
         if (container is CommitGraphRow row)
+        {
             row.Apply(index < _rows.Count ? _rows[index] : null, item, this, LaneColumnWidth);
+            row.SetSelected(item is MdCommitNode { Id: var id } && id == SelectedId);
+        }
     }
 
     protected override void ClearContainerForItemOverride(Control container)
@@ -155,7 +181,7 @@ public class MdCommitGraph : ItemsControl
         if (_laneBrushCache[slot - 1] is { } hit)
             return hit;
 
-        var brush = FindThemeBrush($"Md.CommitGraph.Lane.Brush.{slot}", variant);
+        var brush = MdThemeResources.FindBrush(this, $"Md.CommitGraph.Lane.Brush.{slot}", variant);
         if (brush is not null)
         {
             _laneBrushCache[slot - 1] = brush;
@@ -163,25 +189,42 @@ public class MdCommitGraph : ItemsControl
         }
 
         // Fallback for hosts without the Md theme loaded.
-        return FindThemeBrush("Md.Sys.Color.Primary.Brush", variant)
+        return MdThemeResources.FindBrush(this, "Md.Sys.Color.Primary.Brush", variant)
             ?? new SolidColorBrush(Color.FromRgb(0x67, 0x50, 0xA4));
     }
 
-    /// <summary>
-    /// Looks a brush up from the theme, trying the control's own resource chain first (so a
-    /// scoped override still wins) and then the application. The control chain can miss on a
-    /// freshly shown control, before its style attachment to the app has settled, which is why
-    /// the lookup does not stop at the control.
-    /// </summary>
-    private IBrush? FindThemeBrush(string key, ThemeVariant variant)
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
-        if (this.TryFindResource(key, variant, out var found) && found is IBrush brush)
-            return brush;
-        return Application.Current is { } app
-            && app.TryFindResource(key, variant, out var appFound)
-            && appFound is IBrush appBrush
-                ? appBrush
-                : null;
+        base.OnPointerPressed(e);
+        if (e.InitialPressedPointer.Properties.IsLeftButtonPressed == false)
+            return;
+        if (e.Source is not IVisual visual)
+            return;
+        if (visual.GetVisualAncestors().OfType<CommitGraphRow>().FirstOrDefault() is not { } row)
+            return;
+        var index = IndexFromContainer(row);
+        if (index < 0)
+            return;
+        OnCommitRowClicked(index);
+    }
+
+    /// <summary>Selects the commit of the given row and raises <see cref="CommitClicked"/>.</summary>
+    private void OnCommitRowClicked(int index)
+    {
+        var node = Items[index] as MdCommitNode;
+        if (node is null)
+            return;
+        SelectedId = node.Id;
+        CommitClicked?.Invoke(this, node);
+    }
+
+    private void ApplySelection()
+    {
+        for (var i = 0; i < Items.Count; i++)
+        {
+            if (ContainerFromIndex(i) is CommitGraphRow row)
+                row.SetSelected(Items[i] is MdCommitNode { Id: var id } && id == SelectedId);
+        }
     }
 
     private void ApplyLayoutToContainers()
@@ -210,6 +253,15 @@ public class MdCommitGraph : ItemsControl
         public required IReadOnlyList<int> BottomLanes { get; init; }
         public required IReadOnlyList<(int From, int To)> Curves { get; init; }
         public bool IsHead { get; init; }
+
+        /// <summary>The top half-strips that lie on the first-parent chain; the rest are dashed.</summary>
+        public IReadOnlyCollection<int> ActiveTopLanes { get; init; } = Array.Empty<int>();
+
+        /// <summary>The bottom half-strips that lie on the first-parent chain; the rest are dashed.</summary>
+        public IReadOnlyCollection<int> ActiveBottomLanes { get; init; } = Array.Empty<int>();
+
+        /// <summary>The first-parent curves of this row; the other curves are dashed.</summary>
+        public IReadOnlyCollection<(int From, int To)> ActiveCurves { get; init; } = Array.Empty<(int, int)>();
     }
 
     /// <summary>
@@ -335,6 +387,58 @@ public class MdCommitGraph : ItemsControl
                 }
             }
 
+            // First-parent skeleton, the IDEA look: each commit links to its first present
+            // parent (the same parent the lane algorithm follows), and the segments of those
+            // links are drawn solid; every other lane segment is branch continuation and stays
+            // dashed, so dense histories read as one bold mainline with faded branch work.
+            var activeTop = new HashSet<int>[count];
+            var activeBottom = new HashSet<int>[count];
+            var activeCurves = new HashSet<(int, int)>[count];
+            for (var r = 0; r < count; r++)
+            {
+                activeTop[r] = new HashSet<int>();
+                activeBottom[r] = new HashSet<int>();
+                activeCurves[r] = new HashSet<(int, int)>();
+
+                string? parentId = null;
+                foreach (var pid in commits[r].ParentIds)
+                {
+                    if (idToRow.TryGetValue(pid, out _))
+                    {
+                        parentId = pid;
+                        break;
+                    }
+                }
+
+                if (parentId is null)
+                    continue;
+
+                var pr = idToRow[parentId];
+                var lane = rowLane[r];
+                var parentLane = rowLane[pr];
+                if (lane == parentLane)
+                {
+                    // The link runs from this row's centre to the parent's centre: the bottom
+                    // half-strips from this row down, the top half-strips from the row below up
+                    // to the parent row's top strip (where the parent's node sits).
+                    for (var row = r; row < pr; row++)
+                        activeBottom[row].Add(lane);
+                    for (var row = r + 1; row < pr; row++)
+                        activeTop[row].Add(lane);
+                    activeTop[pr].Add(lane);
+                }
+                else
+                {
+                    activeCurves[r].Add((lane, parentLane));
+                    for (var row = r + 1; row < pr; row++)
+                    {
+                        activeTop[row].Add(parentLane);
+                        activeBottom[row].Add(parentLane);
+                    }
+                    activeTop[pr].Add(parentLane);
+                }
+            }
+
             var result = new MdCommitGraphRowGeometry[count];
             for (var r = 0; r < count; r++)
             {
@@ -358,6 +462,9 @@ public class MdCommitGraph : ItemsControl
                     BottomLanes = bottom,
                     Curves = curves[r],
                     IsHead = headId is not null && commits[r].Id == headId,
+                    ActiveTopLanes = activeTop[r],
+                    ActiveBottomLanes = activeBottom[r],
+                    ActiveCurves = activeCurves[r],
                 };
             }
 

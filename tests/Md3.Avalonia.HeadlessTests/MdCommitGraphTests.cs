@@ -4,9 +4,11 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
 using Xunit;
 
@@ -150,6 +152,98 @@ public sealed class MdCommitGraphTests
     }
 
     [AvaloniaFact]
+    public void First_Parent_Links_Are_Solid_Merge_Absorbed_Segments_Are_Dashed()
+    {
+        // m merges branch b into main:
+        //   row 0: m  = a2 + b1   (merge)
+        //   row 1: b1 = b0
+        //   row 2: a2 = a1
+        //   row 3: b0 = a1        (fork)
+        //   row 4: a1 = a0
+        //   row 5: a0             (root)
+        var rows = MdCommitGraphLayout.ComputeRows(new[]
+        {
+            Node("m", "a2", "b1"),
+            Node("b1", "b0"),
+            Node("a2", "a1"),
+            Node("b0", "a1"),
+            Node("a1", "a0"),
+            Node("a0"),
+        }, headId: "m");
+
+        // The mainline (a0..m, lane 0) is a first-parent chain: solid everywhere it is drawn,
+        // including through the fork row (row 3) where the other lane's node sits.
+        Assert.Contains(0, rows[0].ActiveBottomLanes);
+        Assert.Contains(0, rows[1].ActiveBottomLanes);
+        Assert.Contains(0, rows[2].ActiveTopLanes);
+        Assert.Contains(0, rows[3].ActiveTopLanes);
+        Assert.Contains(0, rows[3].ActiveBottomLanes);
+        Assert.Contains(0, rows[4].ActiveBottomLanes);
+        Assert.Contains(0, rows[5].ActiveTopLanes);
+
+        // Each branch commit links to its first parent solidly, including the fork curve
+        // from b0 (lane 1) back to main (lane 0).
+        Assert.Contains((1, 0), rows[3].ActiveCurves);
+        Assert.Contains(1, rows[2].ActiveTopLanes);
+        Assert.Contains(1, rows[2].ActiveBottomLanes);
+        Assert.Contains(1, rows[3].ActiveTopLanes);
+
+        // What the merge absorbs is dashed: the merge curve at row 0, and the short stub of
+        // the merged branch's lane above its last commit (row 1).
+        Assert.Contains((0, 1), rows[0].Curves);
+        Assert.DoesNotContain((0, 1), rows[0].ActiveCurves);
+        Assert.Contains(1, rows[1].TopLanes);
+        Assert.DoesNotContain(1, rows[1].ActiveTopLanes);
+    }
+
+    [AvaloniaFact]
+    public void Clicking_A_Row_Selects_The_Commit_And_Raises_The_Event()
+    {
+        var graph = new MdCommitGraph
+        {
+            ItemsSource = new[] { Node("a"), Node("b", "a"), Node("c", "b") },
+        };
+        MdCommitNode? clicked = null;
+        graph.CommitClicked += (_, node) => clicked = node;
+
+        using var host = Show(graph);
+
+        var row = graph.ContainerFromIndex(1);
+        var bounds = row.Bounds.Transform(row.TransformToVisual(host.Window));
+        var point = new Point(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
+        host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.MouseUp(point, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal("b", graph.SelectedId);
+        Assert.NotNull(clicked);
+        Assert.Equal("b", clicked!.Id);
+        Assert.True(row.IsSelected, "the clicked row must be highlighted");
+        Assert.False(((CommitGraphRow)graph.ContainerFromIndex(0)!).IsSelected);
+    }
+
+    [AvaloniaFact]
+    public void Selecting_The_Commit_Programmatically_Highlights_Its_Row()
+    {
+        var graph = new MdCommitGraph
+        {
+            ItemsSource = new[] { Node("a"), Node("b", "a") },
+        };
+        using var host = Show(graph);
+
+        graph.SelectedId = "a";
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(((CommitGraphRow)graph.ContainerFromIndex(0)!).IsSelected);
+        Assert.False(((CommitGraphRow)graph.ContainerFromIndex(1)!).IsSelected);
+
+        graph.SelectedId = null;
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(((CommitGraphRow)graph.ContainerFromIndex(0)!).IsSelected);
+    }
+
+    [AvaloniaFact]
     public void Non_Node_Items_Fall_Back_To_A_Synthetic_Id()
     {
         var graph = new MdCommitGraph();
@@ -177,7 +271,7 @@ public sealed class MdCommitGraphTests
         ParentIds = parents,
     };
 
-    private static IDisposable Show(Control content) => new WindowScope(ShowWindow(content));
+    private static Host Show(MdCommitGraph graph) => new(ShowWindow(graph), graph);
 
     private static Window ShowWindow(Control content)
     {
@@ -187,8 +281,11 @@ public sealed class MdCommitGraphTests
         return window;
     }
 
-    private sealed class WindowScope(Window window) : IDisposable
+    private sealed class Host(Window window, MdCommitGraph graph) : IDisposable
     {
+        public Window Window { get; } = window;
+        public MdCommitGraph Graph { get; } = graph;
+
         public void Dispose() => window.Close();
     }
 }
