@@ -38,8 +38,10 @@ public sealed class MdSystemNotificationTests
     [Fact]
     public async Task A_Cancelled_Request_Does_Not_Start_A_Platform_Notification()
     {
+        // This headless test uses the net10.0 asset; Windows notifications require the
+        // Windows-specific target. xUnit v2 has no Assert.Skip, so make that case a no-op.
         if (OperatingSystem.IsWindows())
-            Assert.Skip("This headless test uses the net10.0 asset; Windows notifications require the Windows-specific target.");
+            return;
 
         var service = MdSystemNotificationService.CreateDefault();
         using var cancellation = new CancellationTokenSource();

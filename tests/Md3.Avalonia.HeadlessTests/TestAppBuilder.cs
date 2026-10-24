@@ -37,7 +37,7 @@ public static class TestAppBuilder
             .UseSkia()
             .UseHeadless(new AvaloniaHeadlessPlatformOptions
             {
-                UseHeadlessDrawing = false,
-                ShouldRenderOnUIThread = true
+                // Avalonia 11's headless compositor already renders on the UI thread.
+                UseHeadlessDrawing = false
             });
 }
