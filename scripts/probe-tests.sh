@@ -29,13 +29,32 @@ timeout --signal=KILL 300 dotnet test "$project" \
 status=$?
 
 # A non-zero exit with no failed tests means the host itself died; the console is the only trace
-# that is not lost. Ship the fatal context (the exception header sits above the stack tail) and
-# the tail as extra annotations.
+# that is not lost. .NET prints "Unhandled exception. <Type>:" (or "Fatal error. <Type>") on the
+# thread that kills the process, followed by the stack - ship that block, not the xunit frames
+# around the pipeline message.
 if [ "$status" -ne 0 ]; then
-  fatal_ctx=$(grep -B 30 -m1 "FATAL ERROR\|Fatal error\|Unhandled exception" /tmp/probe-console.txt | tail -n 18 | tr '\n' ' | ' | cut -c1-450)
-  [ -n "$fatal_ctx" ] && echo "::error::${label} fatal context: ${fatal_ctx}"
-  tail_line=$(tail -n 6 /tmp/probe-console.txt | tr '\n' ' | ' | cut -c1-450)
-  echo "::error::${label} console tail: ${tail_line}"
+  python3 - /tmp/probe-console.txt "$label" <<'PY'
+import re
+import sys
+
+path, label = sys.argv[1:3]
+try:
+    text = open(path, errors="replace").read()
+except OSError:
+    text = ""
+
+match = re.search(r"(Unhandled exception\. [^\n]+|Fatal error\. [^\n]+)", text)
+if match:
+    start = match.start()
+    chunk = text[start:start + 4000]
+    lines = [l.strip() for l in chunk.splitlines() if l.strip()]
+    header = lines[0][:160]
+    frames = [l[:140] for l in lines[1:] if l.startswith("at ") or l.startswith("   at ")][:4]
+    print("::error::%s crash: %s // %s" % (label, header, " | ".join(frames)[:330]))
+else:
+    tail = [l.strip() for l in text.splitlines() if l.strip()][-5:]
+    print("::error::%s no unhandled-exception marker; tail: %s" % (label, " | ".join(tail)[:400]))
+PY
 fi
 
 python3 - "$label" "$trx" "$status" <<'PY'
