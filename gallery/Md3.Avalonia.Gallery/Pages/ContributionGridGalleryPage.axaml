@@ -39,7 +39,9 @@
         <TextBlock Classes="body" TextWrapping="Wrap"
                    Text="Smaller cells and tighter spacing fit a whole year in a sidebar." />
         <md:MdCard Padding="16">
-          <md:MdContributionGrid x:Name="CompactGrid" CellSize="9" CellSpacing="2" />
+          <md:MdScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+            <md:MdContributionGrid x:Name="CompactGrid" CellSize="9" CellSpacing="2" />
+          </md:MdScrollViewer>
         </md:MdCard>
       </StackPanel>
 

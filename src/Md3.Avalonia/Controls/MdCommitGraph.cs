@@ -199,14 +199,30 @@ public class MdCommitGraph : ItemsControl
         base.OnPointerPressed(e);
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             return;
-        if (e.Source is not Visual visual)
-            return;
-        if (visual.GetVisualAncestors().OfType<CommitGraphRow>().FirstOrDefault() is not { } row)
+
+        // Resolve the pressed row from the position, not from e.Source: the source is only a
+        // visual the input pipeline hit-tested, and hosts (including the headless test driver)
+        // may report it differently. The position hit test is exact, and walking from the hit
+        // element (or the row itself) finds the owning row either way.
+        var hit = InputHitTest(e.GetPosition(this));
+        var row = FindRow(hit as Visual);
+        if (row is null)
             return;
         var index = IndexFromContainer(row);
         if (index < 0)
             return;
         OnCommitRowClicked(index);
+    }
+
+    private static CommitGraphRow? FindRow(Visual? visual)
+    {
+        for (var v = visual; v is not null; v = v.GetVisualParent())
+        {
+            if (v is CommitGraphRow row)
+                return row;
+        }
+
+        return null;
     }
 
     /// <summary>Selects the commit of the given row and raises <see cref="CommitClicked"/>.</summary>
