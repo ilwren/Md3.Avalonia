@@ -169,7 +169,7 @@ public class MdContributionGrid : TemplatedControl
         {
             var first = days.Min(day => day.Date.Date);
             var last = days.Max(day => day.Date.Date);
-            var cultureData = CultureInfo.CurrentCulture.CultureData;
+            var monthNames = CultureInfo.CurrentCulture.TextInfo.AbbreviatedMonthNames;
             WeekStart = first.AddDays(-(int)first.DayOfWeek); // week columns start on Sunday, like GitHub
             WeekCount = (int)((last - WeekStart).TotalDays / 7) + 1;
 
@@ -181,7 +181,7 @@ public class MdContributionGrid : TemplatedControl
                 if (weekStart.Month != previousMonth)
                 {
                     labels.Add(new MdContributionMonthLabel(
-                        cultureData.GetAbbreviatedMonthName(weekStart.Month),
+                        monthNames[weekStart.Month - 1],
                         week));
                     previousMonth = weekStart.Month;
                 }
@@ -236,12 +236,12 @@ public class MdContributionGrid : TemplatedControl
             _dayLabels.Children.Clear();
             _dayLabels.Width = 34;
             var step = CellSize + CellSpacing;
-            var names = CultureInfo.CurrentCulture.CultureData;
+            var dayNames = CultureInfo.CurrentCulture.TextInfo.AbbreviatedDayNames;
             var rows = new (string Name, int Row)[]
             {
-                (names.GetAbbreviatedDayName(DayOfWeek.Monday), 1),
-                (names.GetAbbreviatedDayName(DayOfWeek.Wednesday), 3),
-                (names.GetAbbreviatedDayName(DayOfWeek.Friday), 5),
+                (dayNames[(int)DayOfWeek.Monday], 1),
+                (dayNames[(int)DayOfWeek.Wednesday], 3),
+                (dayNames[(int)DayOfWeek.Friday], 5),
             };
             foreach (var (name, row) in rows)
             {
