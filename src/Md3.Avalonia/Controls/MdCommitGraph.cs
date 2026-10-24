@@ -302,7 +302,15 @@ public class MdCommitGraph : ItemsControl
             var count = commits.Count;
             var idToRow = new Dictionary<string, int>(StringComparer.Ordinal);
             for (var i = 0; i < count; i++)
-                idToRow[commits[i].Id] = i;
+            {
+                if (commits[i] is not { } node)
+                    throw new InvalidOperationException($"MdCommitGraphLayout: commit at index {i} is null");
+                if (node.Id is null)
+                    throw new InvalidOperationException($"MdCommitGraphLayout: commit at index {i} has a null Id");
+                if (node.ParentIds is null)
+                    throw new InvalidOperationException($"MdCommitGraphLayout: commit '{node.Id}' has null ParentIds");
+                idToRow[node.Id] = i;
+            }
 
             // Children per parent in display order (first entry is the newest child).
             var childRows = new Dictionary<string, List<int>>(StringComparer.Ordinal);

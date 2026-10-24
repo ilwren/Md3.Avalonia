@@ -209,20 +209,35 @@ public sealed class MdCommitGraphTests
 
         using var host = Show(graph);
 
-        var row = (CommitGraphRow)graph.ContainerFromIndex(1)!;
+        var rows = new[]
+        {
+            (CommitGraphRow)graph.ContainerFromIndex(0)!,
+            (CommitGraphRow)graph.ContainerFromIndex(1)!,
+            (CommitGraphRow)graph.ContainerFromIndex(2)!,
+        };
+
+        static string Snap(MdCommitGraph g, CommitGraphRow[] rs)
+        {
+            var rects = rs.Select(r => $"{r.Bounds.X:F0},{r.Bounds.Y:F0},{r.Bounds.Width:F0}x{r.Bounds.Height:F0}");
+            return $"laneW={g.LaneWidth} lanes={g.LaneCount} graph={g.Bounds.Width:F0}x{g.Bounds.Height:F0} rows=[{string.Join(" | ", rects)}]";
+        }
+
+        var before = Snap(graph, rows);
+        var row = rows[1];
         var transform = row.TransformToVisual(host.Window) ?? Matrix.Identity;
         var bounds = row.Bounds.TransformToAABB(transform);
         var point = new Point(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
         host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
+        var afterDown = Snap(graph, rows);
         host.Window.MouseUp(point, MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
+        var afterUp = Snap(graph, rows);
 
         if (graph.SelectedId != "b")
             throw new Xunit.Sdk.XunitException(
-                $"click at {point} selected '{graph.SelectedId ?? "<null>"}' instead of 'b'; " +
-                $"row bounds {row.Bounds}, transform {(row.TransformToVisual(host.Window) is null ? "null" : "set")}, " +
-                $"row height {row.Bounds.Height} in a {graph.Items.Count}-row graph");
+                $"click at {point} selected '{graph.SelectedId ?? "<null>"}' instead of 'b'\n" +
+                $"before:    {before}\nafterDown: {afterDown}\nafterUp:   {afterUp}");
         Assert.NotNull(clicked);
         Assert.Equal("b", clicked!.Id);
         Assert.True(row.IsSelected, "the clicked row must be highlighted");

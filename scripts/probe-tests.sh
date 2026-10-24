@@ -61,9 +61,14 @@ for i, l in enumerate(lines):
     if re.search(r"(Passed!|Failed!|Aborted)", l) and ("error" not in l.lower()):
         cut = i
 summary = next((i for i, l in enumerate(lines) if "Results File" in l), len(lines))
-between = [l.strip() for l in lines[max(cut, 0):summary]
-           if l.strip() and not re.match(r"^\[\w+\.net", l.strip())][:25]
-blob = " | ".join(between)[:900]
+region = [l.strip() for l in lines[max(cut, 0):summary]
+          if l.strip() and not re.match(r"^\[\w+\.net", l.strip())]
+# Stack frames carry the source line; keep every "at " frame even when the region is long,
+# and cap the rest so the annotation still fits.
+frames = [l[:200] for l in region if l.startswith("at ") or l.startswith("   at ")][:8]
+others = [l[:160] for l in region
+          if not (l.startswith("at ") or l.startswith("   at ")) and "at Md3" not in l][:12]
+blob = " | ".join(others + frames)[:2400]
 print("::error::%s native-abort region: %s" % (label, blob or "(nothing between last test line and summary)"))
 PY
 fi
@@ -88,10 +93,14 @@ for result in results:
         continue
     message = result.find(".//ns:Message", ns)
     text = message.text.strip() if message is not None and message.text else ""
-    first = text.splitlines()[0]
+    stack = result.find(".//ns:StackTrace", ns)
+    stack_text = (stack.text or "").strip() if stack is not None else ""
+    # xunit v3 keeps the inner-exception stack (the real source line) outside the message.
+    full = text + ("\n----\n" + stack_text if stack_text and stack_text not in text else "")
+    first = (text or stack_text).splitlines()[0] if (text or stack_text) else ""
     failed.append(f"{result.get('testName')}: {first}")
-    if len(detailed) < 3 and text:
-        detailed.append(f"{result.get('testName')}: {text[:1600]}")
+    if len(detailed) < 3 and full:
+        detailed.append(f"{result.get('testName')}: {full[:1600]}")
 
 # Annotations are the only part of a run that survives a cancelled job, and GitHub caps them, so
 # this is one line however many tests went wrong. The trx lists results in completion order, so
