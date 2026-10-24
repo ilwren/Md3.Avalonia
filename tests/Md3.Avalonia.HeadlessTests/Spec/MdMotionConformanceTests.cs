@@ -27,7 +27,7 @@ namespace Md3.Avalonia.HeadlessTests.Spec;
 /// nothing else keeps in sync.</item>
 /// </list>
 /// <para>
-/// The spring physics need no UI, so they run as a plain <c>[Fact]</c> outside the Avalonia
+/// The spring physics need no UI, so they run as a plain <c>[AvaloniaFact]</c> outside the Avalonia
 /// headless session. Only the parts that genuinely need a dispatcher or the resource system pay
 /// for one.
 /// </para>
@@ -49,7 +49,7 @@ public sealed class MdMotionConformanceTests
         ("StandardSlowSpatial", MdMotionTokens.StandardSlowSpatial)
     ];
 
-    [Fact]
+    [AvaloniaFact]
     public void Spring_Physics_Match_An_Independent_Integration_And_The_Published_Settling_Points()
     {
         var policy = MdSpecPolicy.Load();

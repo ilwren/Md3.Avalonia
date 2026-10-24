@@ -29,7 +29,7 @@ public sealed class MdScalingTests
         }
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Every_Render_Target_Bitmap_Is_Sized_In_Physical_Pixels()
     {
         // A RenderTargetBitmap is one of the few APIs in the library that takes real pixels. Sizing
@@ -54,7 +54,7 @@ public sealed class MdScalingTests
             "RenderTargetBitmap sized without RenderScaling:\n  " + string.Join("\n  ", offenders));
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void The_Libraries_Ship_No_Raster_Assets()
     {
         // Raster artwork is the usual reason a control library goes soft at 150%. Everything the

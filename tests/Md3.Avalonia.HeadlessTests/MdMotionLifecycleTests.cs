@@ -23,7 +23,7 @@ namespace Md3.Avalonia.HeadlessTests;
 
 public sealed class MdMotionLifecycleTests
 {
-    [Fact]
+    [AvaloniaFact]
     public void Motion_Resolver_Distinguishes_Physics_Reduced_And_None()
     {
         var expressive = MdMotion.Resolve(MdMotionScheme.Expressive, MdMotionKind.Spatial, MdMotionSpeed.Default);
@@ -171,7 +171,7 @@ public sealed class MdMotionLifecycleTests
         Assert.False(results.IsVisible);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Popup_Owners_Separate_Desired_Open_State_From_Visual_Presence()
     {
         var menu = new MdMenuAnchor();
@@ -289,7 +289,7 @@ public sealed class MdMotionLifecycleTests
         }
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Combo_And_AutoComplete_Presence_Reverses_And_Replacement_Unmounts_Old_Host()
     {
         var combo = new MdComboBox { ItemsSource = new[] { "One", "Two" } };
@@ -322,7 +322,7 @@ public sealed class MdMotionLifecycleTests
         Assert.False(autocomplete.IsPopupOpen);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Dropdown_Menu_Closes_Native_Host_In_The_Same_Turn()
     {
         var menu = new MdDropdownMenu { Content = new MdMenu() };
@@ -402,7 +402,7 @@ public sealed class MdMotionLifecycleTests
         Assert.False(stepContent.IsVisible);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Ecosystem_Popover_Retains_Exit_And_Immediately_Replaces_Old_Host()
     {
         var first = new MdPopover { Anchor = "First", PopoverContent = "One" };
@@ -737,7 +737,7 @@ public sealed class MdMotionLifecycleTests
         Assert.True(dismissible.DragOffset < 0);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Date_And_Time_Picker_Popups_Retain_Exit_And_Replace_Each_Other()
     {
         var date = new MdDatePicker();

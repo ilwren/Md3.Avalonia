@@ -17,7 +17,7 @@ namespace Md3.Avalonia.HeadlessTests;
 
 public sealed class MdTextBoxTests
 {
-    [Fact]
+    [AvaloniaFact]
     public void Core_Control_Assembly_Has_No_Desktop_Platform_Dependency()
     {
         var references = typeof(MdTextBox).Assembly

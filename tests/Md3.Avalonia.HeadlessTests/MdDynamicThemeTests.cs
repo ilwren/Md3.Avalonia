@@ -14,7 +14,7 @@ namespace Md3.Avalonia.HeadlessTests;
 
 public sealed class MdDynamicThemeTests
 {
-    [Fact]
+    [AvaloniaFact]
     public void Baseline_Seed_Matches_Golden_Hct_Vectors()
     {
         var light = MdThemeGenerator.Generate(new MdThemeOptions(), dark: false);
@@ -30,7 +30,7 @@ public sealed class MdDynamicThemeTests
         Assert.Equal(49, dark.Count);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Arbitrary_Seed_Variants_And_Contrast_Are_Deterministic()
     {
         var options = new MdThemeOptions
@@ -52,7 +52,7 @@ public sealed class MdDynamicThemeTests
         Assert.NotEqual(first["Primary"], monochrome["Primary"]);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Theme_Json_Round_Trips_All_User_Choices()
     {
         var expected = new MdThemeOptions
