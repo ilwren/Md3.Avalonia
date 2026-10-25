@@ -261,7 +261,8 @@ public partial class PaginationGalleryPage : UserControl
     private void ScrollVerticalDotsTo(int index)
     {
         var scroll = VerticalDotsScroll;
-        var viewport = scroll.ActualHeight;
+        // Bounds, not ActualHeight: the 12 line moved the actual-size pair off Control.
+        var viewport = scroll.Bounds.Height;
         if (viewport <= 0)
             return; // Not laid out yet; offset zero already centres nothing and the first
                    // navigation will position the stack.

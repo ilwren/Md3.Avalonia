@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Md3.Avalonia.Controls;
@@ -11,6 +12,10 @@ namespace Md3.Avalonia.Gallery.Pages;
 public partial class ContributionGridGalleryPage : UserControl
 {
     private static string L(string english, string chinese) => GalleryLocalization.Choose(english, chinese);
+
+    // The same stack the XAML templates use; Avalonia 12 has no FontFamily.Monospace constant.
+    private static readonly FontFamily Monospace =
+        "Cascadia Mono,Consolas,Menlo,DejaVu Sans Mono,Liberation Mono,Noto Sans Mono,monospace";
 
     private static readonly string[] MessagePool =
     [
@@ -160,11 +165,13 @@ public partial class ContributionGridGalleryPage : UserControl
         {
             FontSize = 12.5,
             TextWrapping = TextWrapping.Wrap,
-            Runs =
+            // Inlines, not Runs: Avalonia's TextBlock has no Runs property, and the collection
+            // must be constructed rather than initialized in place.
+            Inlines = new InlineCollection
             {
-                new Run(hash) { FontFamily = FontFamily.Monospace, Foreground = muted },
+                new Run(hash) { FontFamily = Monospace, Foreground = muted, FontSize = 11 },
                 new Run("  " + message),
-                new Run($"  ·  {author} {time}") { Foreground = muted, FontSize = 11.5 },
+                new Run($"  ·  {author} {time}") { Foreground = muted, FontSize = 11 },
             },
         };
     }

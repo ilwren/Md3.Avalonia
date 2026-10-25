@@ -145,9 +145,20 @@ public partial class CommitGraphGalleryPage : UserControl
         if (dashed)
             pen.DashStyle = new DashStyle(new double[] { 6, 4 }, 0);
 
-        var line = new Path
+        // Fully qualified: unqualified, Path resolves to System.IO.Path in this namespace.
+        // StreamGeometry is built with the Open/BeginFigure pattern the repo uses everywhere;
+        // the Parse shortcut is not in the Avalonia 12 API.
+        var data = new StreamGeometry();
+        using (var figure = data.Open())
         {
-            Data = StreamGeometry.Parse("M0,1 L28,1"),
+            figure.BeginFigure(new Point(0, 1), isFilled: false);
+            figure.LineTo(new Point(28, 1));
+            figure.EndFigure(false);
+        }
+
+        var line = new global::Avalonia.Controls.Shapes.Path
+        {
+            Data = data,
             Stroke = pen,
             Width = 28,
             Height = 2,
