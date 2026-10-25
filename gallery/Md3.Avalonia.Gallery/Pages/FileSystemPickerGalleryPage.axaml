@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.FileSystemPickerGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,28">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="File-system picker" />
+        <TextBlock Classes="body" MaxWidth="820" HorizontalAlignment="Left" TextWrapping="Wrap"
+                   Text="Browse real file-system paths with Material controls. This picker does not call Avalonia StorageProvider, a native file picker, or Android SAF." />
+        <TextBlock Classes="body" MaxWidth="820" HorizontalAlignment="Left" TextWrapping="Wrap" Opacity="0.76"
+                   Text="The process still needs operating-system permission for every location. On Android, app-private paths work directly; scoped storage and the application sandbox are not bypassed." />
+      </StackPanel>
+
+      <WrapPanel>
+        <md:MdButton Content="Files" Variant="Tonal" Margin="0,0,10,10" Click="ShowFiles" />
+        <md:MdButton Content="Folders" Variant="Outlined" Margin="0,0,10,10" Click="ShowFolders" />
+        <md:MdCheckBox x:Name="MultipleToggle" Content="Allow multiple" Margin="6,0,10,10"
+                       Checked="MultipleChanged" Unchecked="MultipleChanged" />
+      </WrapPanel>
+
+      <TextBlock x:Name="PickerStatus" Classes="body" TextWrapping="Wrap"
+                 Text="Choose a file, or switch to folder mode." />
+
+      <md:MdFileSystemPicker x:Name="PathPicker" Height="520"
+                             Title="Choose a file"
+                             Mode="File"
+                             FilePatterns="{x:Null}"
+                             SelectionConfirmed="SelectionConfirmed"
+                             CancelRequested="SelectionCancelled"
+                             NavigationFailed="NavigationFailed" />
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdFileSystemPicker Mode=&quot;File&quot;&#10;                           InitialDirectory=&quot;{Binding WorkspacePath}&quot;&#10;                           FilePatterns=&quot;{Binding AllowedPatterns}&quot;&#10;                           SelectionConfirmed=&quot;FilesConfirmed&quot; /&gt;"
+                             CSharpCode="// Paths are normalized absolute file-system paths.&#10;picker.FilePatterns = new[] { &quot;*.json&quot;, &quot;*.txt&quot; };&#10;await picker.NavigateAsync(startPath);&#10;picker.SelectionConfirmed += (_, e) =&gt; Open(e.Paths[0]);" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

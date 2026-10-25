@@ -143,7 +143,7 @@ await notifications.ShowAsync(new MdSystemNotification("Ready", "The export has 
 - Actions: `MdButton`, `MdToggleButton`, `MdIconButton`, `MdToggleIconButton`, `MdSplitButton`, `MdStandardButtonGroup`, `MdConnectedButtonGroup`, `MdFloatingActionButton`, `MdExtendedFloatingActionButton`, `MdFabMenu`, `MdFabMenuItem`.
 - Selection and input: `MdTextBox`, `MdMaskedTextBox`, `MdCheckBox`, `MdRadioButton`, `MdComboBox`, `MdAutoCompleteBox`, `MdNumericBox`, `MdSwitch`, `MdSlider`, `MdRangeSlider`, `MdSegmentedButtonGroup`, `MdSegmentedButton`.
 - Content: `MdCard`, `MdCarousel`, `MdCarouselItem`, `MdChip`, `MdAssistChip`, `MdFilterChip`, `MdInputChip`, `MdSuggestionChip`, `MdList`, `MdListItem`, `MdDivider`, `MdCommitGraph`, `MdCommitNode`, `MdContributionGrid`, `MdContributionDay`.
-- Pickers: `MdDatePicker`, `MdDatePickerDialog`, `MdDateRangePicker`, `MdTimePicker`, `MdTimePickerDialog`, and the interactive `MdTimeDial`/`MdTimeDialPart` clock-face API.
+- Pickers: `MdDatePicker`, `MdDatePickerDialog`, `MdDateRangePicker`, `MdTimePicker`, `MdTimePickerDialog`, the interactive `MdTimeDial`/`MdTimeDialPart` clock-face API, and the direct-path `MdFileSystemPicker`.
 - Navigation: `MdTopAppBar`, `MdBottomAppBar`, `MdNavigationBar`, `MdNavigationBarItem`, `MdNavigationDrawer`, `MdNavigationRail`, `MdTabs`, `MdTabItem`, `MdTabsView`, `MdTabView`, `MdTabViewItem`, `MdPagination`.
 - Tabs come in two shapes. `MdTabView` carries its own tab strip and content, like a classic `TabControl`. `MdTabs` is only the bar, for the common Material case where it sits in an app bar or header away from the pages; pair it with `MdTabsView`, whose children are the pages matched to the bar's tabs by position, and whose `Tabs` property keeps selection in step both ways. This mirrors Flutter's `TabBar` and `TabBarView`.
 - Transient surfaces: `MdDialog`, `MdDialogHost`, `MdDialogService`, `IMdDialogService`, `MdDialogServiceExtensions`, `MdDropdownMenu`, `MdMenuAnchor`, `MdMenu`, `MdMenuItem`, `MdSheetHost`, `MdSnackbar`, `MdSnackbarHost`, `MdSnackbarService`, `IMdSnackbarService`, `MdTooltip`, `MdTooltipHost`.
@@ -181,12 +181,12 @@ The following catalog covers the public control surface shipped by the core pack
 | **Mobile platform integration** | `MdSafeArea`, `MdBackNavigation`, `MdBackScope`, `MdKeyboardAvoidingHost` |
 | **Settings and preference surfaces** | `MdSettingsGroup`, `MdSettingsCard`, `MdSettingsExpander` |
 | **Feedback and status** | `MdLoadingIndicator`, `MdLinearProgressIndicator`, `MdCircularProgressIndicator`, `MdAdaptiveProgressIndicator`, `MdBadge`, `MdBadgedBox`, `MdRefreshIndicator`, `MdSnackbar`, `MdSnackbarHost`, `MdSnackbarService` |
-| **Pickers and calendars** | `MdDatePicker`, `MdDatePickerDialog`, `MdDateRangePicker`, `MdCalendarGrid`, `MdCalendarDay`, `MdTimePicker`, `MdTimePickerDialog`, `MdTimeDial`, `MdTimeDialPart`, `MdPickerRestorationStore` |
+| **Pickers and calendars** | `MdDatePicker`, `MdDatePickerDialog`, `MdDateRangePicker`, `MdCalendarGrid`, `MdCalendarDay`, `MdTimePicker`, `MdTimePickerDialog`, `MdTimeDial`, `MdTimeDialPart`, `MdPickerRestorationStore`, `MdFileSystemPicker`, `MdFileSystemPickerMode`, `MdFileSystemEntry`, `MdFileSystemSelectionEventArgs`, `MdFileSystemNavigationFailedEventArgs` |
 | **Lists and interaction patterns** | `MdReorderableList`, `MdDismissible`, `MdStepper`, `MdStep`, `MdHero`, `MdFocusTraversalGroup`, `MdShortcutScope` |
 | **Foundations and icons** | `MdText`, `MdIcon`, `MdSymbolPresenter`, `MdStateLayer`, `MdRipplePresenter`, `MdFocusRing`, `MdScrollViewer`, `MdScrollBar`, `MdSliderThumb`, `MdWindow` |
 | **Window chrome** | `MdBorderlessWindow`, `MdWindowTitleBar`, `MdCaptionButton`, `MdWindowCaptionButton`, `MdWindowDragRegion`, `MdWindowResizeGrip`, `IMdWindowPlatformAdapter`, `MdWindowPlatformAdapterResolver`, `MdWindowsWindowPlatformAdapter`, `MdMacOsWindowPlatformAdapter`, `MdLinuxWindowPlatformAdapter`, `MdAvaloniaWindowPlatformAdapter`, `MdAndroidWindowPlatformAdapter` |
 
-Most core controls expose styled properties, bindable `Items`/`ItemsSource` where applicable, routed events, commands, and native Avalonia automation peers. Variant and option enums are part of the public API and should be preferred over string values. All 83 public enums (62 core and 21 Extra) are listed with their members under [Enumerations](#enumerations).
+Most core controls expose styled properties, bindable `Items`/`ItemsSource` where applicable, routed events, commands, and native Avalonia automation peers. Variant and option enums are part of the public API and should be preferred over string values. All 84 public enums (63 core and 21 Extra) are listed with their members under [Enumerations](#enumerations).
 
 ### Core control quick reference
 
@@ -203,6 +203,7 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 | `MdNavigationBar`, `MdNavigationRail`, `MdNavigationDrawer` | Primary application navigation | item collections, selected index/item, placement/layout and `ItemInvoked` |
 | `MdTabs`, `MdTabView` | Peer navigation and document views | tab collections, selected item/index, closable/reorderable view items |
 | `MdDatePicker`, `MdDateRangePicker`, `MdTimePicker` | Date, date range, and time selection | selected value(s), mode, dialogs, validation, restoration and `ShowAsync` |
+| `MdFileSystemPicker` | Direct file-system file/folder selection | `Mode`, `InitialDirectory`, `CurrentDirectory`, `FilePatterns`, `ShowHiddenItems`, `AllowMultiple`, `Entries`, `SelectedPaths`, `NavigateAsync`/`RefreshAsync`/`GoUpAsync`/`GoHomeAsync`, `SelectionConfirmed`, `CancelRequested`, `NavigationFailed` |
 | `MdSnackbarHost`, `MdSnackbarService` | Queued transient messages | `Show`, `ShowAsync`, `Dismiss`, action/result, queue and shared service injection |
 | `MdCarousel`, `MdRefreshIndicator`, `MdReorderableList` | Touch-friendly content interaction | controller/provider APIs, navigation, refresh callbacks, reorder callbacks |
 | `MdMaskedTextBox` | Mask-constrained text input | `Mask` (literals are filled in while typing), `PromptChar`, `HidePromptOnLeave`, `MaskCompleted`/`MaskFull`; field state through `Label`, `PrefixText`, `SupportingText`, `ErrorText`, `IsError` and `MdMaskedTextBoxVariant` |
@@ -380,7 +381,9 @@ Material allows one dialog at a time, so a request made while another is display
 
 An `MdSnackbar` is a visual control, so calling `Show()` on an instance that was never attached to a window cannot render it. For code-behind or ViewModels, place one `MdSnackbarHost` in the application shell, assign a shared `MdSnackbarService`, and inject that same instance as `IMdSnackbarService`. The service queues consecutive messages and the attached host displays them one at a time.
 
-Direct APIs include `Show`/`Dismiss` on transient components, `ShowAsync`/`Show`/`Close` on `MdDialogHost` and `IMdDialogService`, `Show`/`ShowAsync`/`Dismiss` on `MdSnackbarHost` and `IMdSnackbarService`, direct collection APIs inherited from Avalonia item controls, and standard routed events. Ecosystem controls additionally expose provider delegates and direct state-machine methods such as `LoadNextPageAsync`, `RefreshAsync`, `SearchAsync`, `SelectDate`, `MoveToTarget`, `Execute`, `Submit`, `PlayAsync`, `NotifyOwnerScrolled`, `MdPinInput.SetCode`/`Clear`, `MdTreeView.ExpandAll`/`CollapseAll`/`SelectById`, `MdTagInput.AddTag`/`RemoveTag`/`ClearTags`, and `MdRating.SetValueFromPosition`.
+Direct APIs include `Show`/`Dismiss` on transient components, `ShowAsync`/`Show`/`Close` on `MdDialogHost` and `IMdDialogService`, `Show`/`ShowAsync`/`Dismiss` on `MdSnackbarHost` and `IMdSnackbarService`, `NavigateAsync`/`RefreshAsync`/`GoUpAsync`/`GoHomeAsync`/`ConfirmSelection` on `MdFileSystemPicker`, direct collection APIs inherited from Avalonia item controls, and standard routed events. Ecosystem controls additionally expose provider delegates and direct state-machine methods such as `LoadNextPageAsync`, `RefreshAsync`, `SearchAsync`, `SelectDate`, `MoveToTarget`, `Execute`, `Submit`, `PlayAsync`, `NotifyOwnerScrolled`, `MdPinInput.SetCode`/`Clear`, `MdTreeView.ExpandAll`/`CollapseAll`/`SelectById`, `MdTagInput.AddTag`/`RemoveTag`/`ClearTags`, and `MdRating.SetValueFromPosition`.
+
+`MdFileSystemPicker` is an in-process browser built from the library's `MdTextBox`, `MdList`, `MdButton`, `MdIconButton`, `MdCheckBox`, and progress controls (the ordered Avalonia/redesign/Flutter source study is recorded in [FILE_SYSTEM_PICKER_RESEARCH.md](FILE_SYSTEM_PICKER_RESEARCH.md)). It never invokes Avalonia `StorageProvider`, a native file dialog, or Android SAF: `MdFileSystemSelectionEventArgs.Paths` therefore contains normalized absolute paths from `System.IO`. `Mode="File"` keeps directories visible for navigation and applies `FilePatterns` only to files; `Mode="Folder"` lists directories and can confirm the current directory. Multi-selection, hidden-item display, editable path navigation, Home/parent/refresh actions, empty/loading/error states, double-click/Enter activation, and explicit per-folder open buttons are included. This is not a sandbox escape: Android scoped storage, macOS sandbox entitlements, Unix permissions, and Windows ACLs still determine which paths can be enumerated. Start in an app-accessible directory and let the host own any platform permission flow.
 
 `MdCarousel` supports a bindable `MdCarouselController`, `ScrollTo`, autoplay, pointer-hover pause and finite or wrapping navigation. Weighted variants use viewport-fitted scroll/controller keylines and constrain `SmallItemWidth` to Material's 40–56 DIP range; pointer selection does not resize an item. `MdRefreshIndicator.RequestRefreshAsync` accepts a cancelable provider-neutral handler.
 
@@ -1266,6 +1269,7 @@ Every public enum and its members are listed below. To print the current member 
 | `MdFabColor` | `PrimaryContainer` · `SecondaryContainer` · `TertiaryContainer` · `Primary` · `Secondary` · `Tertiary` |
 | `MdFabMenuExpansionDirection` | `Up` · `Down` |
 | `MdFabSize` | `Small` · `Regular` · `Medium` · `Large` |
+| `MdFileSystemPickerMode` | `File` · `Folder` |
 | `MdFocusTraversalPolicy` | `VisualOrder` · `TabIndex` · `ReadingOrder` |
 | `MdIconButtonVariant` | `Standard` · `Filled` · `Tonal` · `Outlined` |
 | `MdIconButtonWidth` | `Narrow` · `Default` · `Wide` |
@@ -1348,6 +1352,8 @@ handlers can be written without casting:
 | `MdFormSubmittedEventArgs` | `MdForm.Submitted` |
 | `MdHeroTransitionEventArgs` | `MdHero.TransitionRequested` — source and destination rectangles |
 | `MdPlaybackRequestEventArgs` | media/playback affordances, paired with `MdPlaybackRequest` |
+| `MdFileSystemSelectionEventArgs` | `MdFileSystemPicker.SelectionConfirmed` — normalized selected paths |
+| `MdFileSystemNavigationFailedEventArgs` | `MdFileSystemPicker.NavigationFailed` — requested path and file-system exception |
 | `MdDataGridCellEditEventArgs` | `MdDataGrid` cell commit (Extra) |
 
 `MdSearchBar.SearchSubmitted` passes the submitted text as a plain `string`.

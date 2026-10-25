@@ -47,6 +47,9 @@ Keep these scenarios in the headless suite; a generic focused-control drag or a 
 
 - `MdReportedIssuesTests.Carousel_Clicking_A_Collapsed_Card_Makes_It_The_Focal_Keyline`: the first click on a collapsed Carousel keyline focuses and expands that card.
 - `MdDialogAndSnackbarHostTests.Gallery_Simple_Dialog_Scrim_Covers_The_Whole_Desktop_Window`: headless assertion that the SimpleDialog scrim spans the Gallery root, including the app bar and navigation rail. This does not prove that the black mask covers the full native desktop window.
+- `MdDialogAndSnackbarHostTests.Gallery_Simple_Dialog_Scrim_Covers_The_Whole_Android_Shell`: verifies the Android single-view shell resolves the shared viewport-level host and its scrim spans both app bars, not only the current page.
+- `MdDialogAndSnackbarHostTests.Gallery_License_Dialog_Uses_A_Compact_Full_Screen_Android_Layout`: constrains the license task to a 360×640 viewport, requires `MdDialogVariant.FullScreen`, and checks the compact license layout stays within the host.
+- `MdFileSystemPickerTests`: enumerates temporary real paths without a storage provider, checks pattern/hidden filtering and file/folder results, and verifies visible navigation errors preserve the last valid directory.
 - `MdMotionLifecycleTests.Rich_Tooltip_Uses_Owner_Overlay_And_Remains_Open_While_Attended`: verify the tooltip popup actually uses the owner's overlay layer and shares its `TopLevel`, move onto the interactive action, then leave both trigger and tooltip to check the grace period. The root-cause fix targets native-popup owner deactivation; physical desktop verification remains pending.
 - `MdDesktopPopupAndComparisonTests.Comparison_First_Arrange_Uses_Final_Size_For_Initial_Position`: before any pointer input or Position change, check that the default 0.5 handle is centered after the first arrange in both orientations.
 - `MdComparisonDragTests.First_Gallery_Drag_From_Left_And_Top_Edges_Does_Not_Focus_Or_Scroll_During_Drag`: exercise the first inward-and-return drag from clipped left/top handles in both orientations, while checking the Gallery ScrollViewer stays fixed and restores its focus behavior. The focus/scroll guard in `22488b5` still failed on the reported Windows 11 / 150% setup; the initial-geometry correction now has headless coverage, but physical desktop confirmation remains pending.
@@ -64,7 +67,7 @@ Do not mark an item complete without recording device/OS, assistive technology v
 - [ ] Windows ARM64: launch, Gallery navigation, popup/picker/dialog smoke.
 - [ ] macOS Apple Silicon: keyboard, trackpad, VoiceOver, Light/Dark/System.
 - [ ] Linux x64: Wayland/X11 launch, keyboard, Orca, font fallback.
-- [ ] Android ARM64 physical device on minimum API 23 and the current target API: touch targets, scroll, IME, password reveal, popup light-dismiss, back, rotation, resume, low-memory recreation.
+- [ ] Android ARM64 physical device on minimum API 23 and the current target API: touch targets, scroll, IME, password reveal, popup light-dismiss, back, rotation, resume, low-memory recreation. Recheck the SimpleDialog scrim across the entire single-view shell, the license page in portrait/landscape, and direct-path picker behavior in app-private versus permission-denied locations; the picker must report access failures and must not imply that scoped storage was bypassed.
 - [ ] Android emulator compact/medium/expanded widths: theme switch and dynamic seed.
 - [ ] High-contrast/forced-color platform settings where exposed by the OS.
 - [ ] Localization review for English and Simplified Chinese, including picker culture behavior.

@@ -29,6 +29,7 @@ public partial class AndroidGalleryView : UserControl
 
     internal int NavigationPageCount => _galleryIndex.Count;
     internal string? CurrentPageTitle => _currentPageTitle;
+    internal MdDialogHost DialogHost => MobileDialogHost;
 
     public AndroidGalleryView()
     {
@@ -78,6 +79,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Cards", () => new CardGalleryPage());
         AddPage("Chips", () => new ChipGalleryPage());
         AddPage("Date and time pickers", () => new PickerGalleryPage());
+        AddPage("File-system picker", () => new FileSystemPickerGalleryPage());
         AddPage("Picker restoration", () => new PickerRestorationGalleryPage());
         AddPage("Color picker", () => new ColorPickerGalleryPage());
         AddPage("Data table", () => new DataTableGalleryPage());

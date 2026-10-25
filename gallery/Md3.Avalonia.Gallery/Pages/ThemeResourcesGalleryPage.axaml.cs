@@ -6,7 +6,6 @@ using Avalonia.Input.Platform;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Md3.Avalonia.Controls;
-using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Md3.Avalonia.Motion;
 using Md3.Avalonia.Themes.Dynamic;
@@ -71,39 +70,99 @@ public partial class ThemeResourcesGalleryPage : UserControl
         }
     }
 
-    private async void ExportJson(object? sender, RoutedEventArgs e)
+    private void ExportJson(object? sender, RoutedEventArgs e)
     {
-        var topLevel = TopLevel.GetTopLevel(this);
-        if (topLevel?.StorageProvider is null) return;
-        var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
-        {
-            Title = "Export Material theme",
-            SuggestedFileName = "material-theme.json",
-            FileTypeChoices = [new FilePickerFileType("JSON theme") { Patterns = ["*.json"] }]
-        });
-        if (file is null) return;
-        await using var stream = await file.OpenWriteAsync();
-        stream.SetLength(0);
-        await using var writer = new StreamWriter(stream);
-        await writer.WriteAsync(MdThemeJson.Serialize(ReadOptions()));
-        StatusText.Text = $"Exported {file.Name}.";
+        ShowFileSystemPicker(
+            title: "Choose an export folder",
+            mode: MdFileSystemPickerMode.Folder,
+            patterns: null,
+            async path =>
+            {
+                var outputPath = Path.Combine(path, "material-theme.json");
+                try
+                {
+                    await File.WriteAllTextAsync(outputPath, MdThemeJson.Serialize(ReadOptions()));
+                    StatusText.Text = $"Exported to {outputPath}.";
+                }
+                catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+                {
+                    StatusText.Text = $"Theme was not exported: {exception.Message}";
+                }
+            });
     }
 
-    private async void ImportJson(object? sender, RoutedEventArgs e)
+    private void ImportJson(object? sender, RoutedEventArgs e)
     {
-        var topLevel = TopLevel.GetTopLevel(this);
-        if (topLevel?.StorageProvider is null) return;
-        var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        ShowFileSystemPicker(
+            title: "Import a Material theme",
+            mode: MdFileSystemPickerMode.File,
+            patterns: ["*.json"],
+            async path =>
+            {
+                try
+                {
+                    JsonBox.Text = await File.ReadAllTextAsync(path);
+                    ApplyJson(sender, e);
+                }
+                catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+                {
+                    StatusText.Text = $"Theme was not imported: {exception.Message}";
+                }
+            });
+    }
+
+    private void ShowFileSystemPicker(
+        string title,
+        MdFileSystemPickerMode mode,
+        IEnumerable<string>? patterns,
+        Func<string, Task> confirmed)
+    {
+        var host = GalleryDialogHosts.Find(this);
+        if (host is null)
         {
-            Title = "Import Material theme",
-            AllowMultiple = false,
-            FileTypeFilter = [new FilePickerFileType("JSON theme") { Patterns = ["*.json"] }]
-        });
-        if (files.Count == 0) return;
-        await using var stream = await files[0].OpenReadAsync();
-        using var reader = new StreamReader(stream);
-        JsonBox.Text = await reader.ReadToEndAsync();
-        ApplyJson(sender, e);
+            StatusText.Text = "The file-system picker needs a Gallery dialog host.";
+            return;
+        }
+
+        var viewportWidth = host.Bounds.Width > 0
+            ? host.Bounds.Width
+            : TopLevel.GetTopLevel(this)?.ClientSize.Width ?? Bounds.Width;
+        var useFullScreen = viewportWidth <= 0 || viewportWidth < 760;
+        var picker = new MdFileSystemPicker
+        {
+            Title = title,
+            Mode = mode,
+            ConfirmText = mode == MdFileSystemPickerMode.Folder ? "Export here" : "Import",
+            InitialDirectory = FileSystemPickerGalleryPage.ResolveAccessibleStartDirectory(),
+            FilePatterns = patterns
+        };
+        if (!useFullScreen)
+        {
+            picker.Width = 700;
+            picker.Height = 520;
+        }
+
+        picker.CancelRequested += (_, _) => host.Close();
+        picker.SelectionConfirmed += async (_, args) =>
+        {
+            var path = args.Paths.FirstOrDefault();
+            if (path is null) return;
+            host.Close(path);
+            await confirmed(path);
+        };
+
+        var dialog = new MdDialog
+        {
+            Content = picker,
+            Padding = new Thickness(0),
+            Variant = useFullScreen ? MdDialogVariant.FullScreen : MdDialogVariant.Basic
+        };
+        if (!useFullScreen)
+        {
+            dialog.MinWidth = 700;
+            dialog.MaxWidth = 760;
+        }
+        _ = host.ShowAsync(dialog);
     }
 
     private void ApplyOptions(MdThemeOptions options)

@@ -26,11 +26,9 @@
             Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
             BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,1,0">
       <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
-        <Border Width="56" Height="56" HorizontalAlignment="Center" CornerRadius="18"
-                Background="{DynamicResource Md.Sys.Color.Primary.Brush}">
-          <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" FontWeight="Medium"
-                     Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" Text="M3" />
-        </Border>
+        <Image Width="56" Height="56" HorizontalAlignment="Center" Stretch="Uniform"
+               Source="avares://Md3.Avalonia.Gallery/Assets/logo-128.png"
+               AutomationProperties.Name="Md3.Avalonia logo" />
         <md:MdIconButton Grid.Row="1" Icon="{x:Static md:MdSymbols.Search}" Click="FocusGallerySearch"
                          HorizontalAlignment="Center" ToolTip.Tip="Search" />
         <StackPanel x:Name="TopNavigation" Grid.Row="2" Spacing="4" VerticalAlignment="Top">
@@ -61,11 +59,9 @@
         <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12">
           <md:MdIconButton x:Name="NavigationMenuButton" Grid.Column="0" Icon="{x:Static md:MdSymbols.Menu}"
                            Click="ToggleNavigation" ToolTip.Tip="Open navigation" />
-          <Border x:Name="CompactBrandMark" Grid.Column="1" Width="44" Height="44" CornerRadius="14"
-                  Background="{DynamicResource Md.Sys.Color.Primary.Brush}">
-            <TextBlock Text="M3" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18"
-                       FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" />
-          </Border>
+          <Image x:Name="CompactBrandMark" Grid.Column="1" Width="44" Height="44" Stretch="Uniform"
+                 Source="avares://Md3.Avalonia.Gallery/Assets/logo-128.png"
+                 AutomationProperties.Name="Md3.Avalonia logo" />
           <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="1">
             <TextBlock x:Name="BrandTitle" FontSize="18" FontWeight="Medium" Text="Material Design 3" />
             <TextBlock FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Avalonia component gallery" />
@@ -155,6 +151,7 @@
             <md:MdButton x:Name="DraggableSheetNav" Content="Draggable sheet" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDraggableSheet" />
             <md:MdButton x:Name="ExpansionPanelNav" Content="Expansion panels" Variant="Text" HorizontalContentAlignment="Left" Click="ShowExpansionPanels" />
             <md:MdButton x:Name="FabNav" Content="FABs" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFabs" />
+            <md:MdButton x:Name="FileSystemPickerNav" Content="File-system picker" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFileSystemPicker" />
             <md:MdButton x:Name="FormValidationNav" Content="Form validation" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFormValidation" />
             <md:MdButton x:Name="GridTileNav" Content="Grid tiles" Variant="Text" HorizontalContentAlignment="Left" Click="ShowGridTiles" />
             <md:MdButton x:Name="HoverCardNav" Content="Hover cards" Variant="Text" HorizontalContentAlignment="Left" Click="ShowHoverCard" />

@@ -9,7 +9,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap"
                    Text="Components are interactive building blocks for creating a user interface. They can be organized into categories based on their purpose: action, containment, communications, navigation, selection, and text input." />
         <TextBlock Classes="body" TextWrapping="Wrap" Opacity="0.72"
-                   Text="108 indexed pages. Every entry below opens its own page; MdGalleryIndexTests fails the build if any of them stops resolving." />
+                   Text="109 indexed pages. Every entry below opens its own page; MdGalleryIndexTests fails the build if any of them stops resolving." />
       </StackPanel>
 
       <WrapPanel Orientation="Horizontal">
@@ -154,6 +154,7 @@
             <md:MdButton Content="Color picker" Tag="Color picker" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Date and time pickers" Tag="Date and time pickers" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Date range picker" Tag="Date range picker" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="File-system picker" Tag="File-system picker" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Picker restoration" Tag="Picker restoration" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Radio buttons" Tag="Radio buttons" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Range slider" Tag="Range slider" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />

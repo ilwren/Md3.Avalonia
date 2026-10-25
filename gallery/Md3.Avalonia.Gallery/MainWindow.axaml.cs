@@ -34,6 +34,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        Icon = App.LoadGalleryIcon();
         AutomationProperties.SetLandmarkType(NavigationPane, AutomationLandmarkType.Navigation);
         AutomationProperties.SetLandmarkType(PageScroll, AutomationLandmarkType.Main);
         AutomationProperties.SetLandmarkType(TableOfContentsPane, AutomationLandmarkType.Complementary);
@@ -43,7 +44,7 @@ public partial class MainWindow : Window
         [
             ComponentsOverviewNav, AndroidSettingsNav, ClockNav, TasksNav,
             ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, BreadcrumbNav, TextFieldNav,
-            CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, ColorPickerNav,
+            CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, FileSystemPickerNav, ColorPickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
             NavigationDrawerNav, AdaptiveNav, NotificationsNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
             SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, BorderlessWindowNav,
@@ -87,6 +88,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             Entry("Cards", "card elevated filled outlined", CardNav, () => new CardGalleryPage()),
             Entry("Chips", "chip assist filter input suggestion", ChipNav, () => new ChipGalleryPage()),
             Entry("Date and time pickers", "calendar clock picker localized minute", PickerNav, () => new PickerGalleryPage()),
+            Entry("File-system picker", "file folder path browser filesystem android storage", FileSystemPickerNav, () => new FileSystemPickerGalleryPage()),
             Entry("Color picker", "color picker palette hsv hex rgb alpha flutter swatch", ColorPickerNav, () => new ColorPickerGalleryPage()),
             Entry("Dialogs", "dialog modal alert", DialogNav, () => new DialogGalleryPage()),
             Entry("Divider", "separator inset", DividerNav, () => new DividerGalleryPage()),
@@ -244,6 +246,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
     private void ShowCards(object? s, RoutedEventArgs e) => Navigate(new CardGalleryPage(), CardNav);
     private void ShowChips(object? s, RoutedEventArgs e) => Navigate(new ChipGalleryPage(), ChipNav);
     private void ShowPickers(object? s, RoutedEventArgs e) => Navigate(new PickerGalleryPage(), PickerNav);
+    private void ShowFileSystemPicker(object? s, RoutedEventArgs e) => Navigate(new FileSystemPickerGalleryPage(), FileSystemPickerNav);
     private void ShowColorPicker(object? s, RoutedEventArgs e) => Navigate(new ColorPickerGalleryPage(), ColorPickerNav);
     private void ShowDialogs(object? s, RoutedEventArgs e) => Navigate(new DialogGalleryPage(), DialogNav);
     private void ShowDivider(object? s, RoutedEventArgs e) => Navigate(new DividerGalleryPage(), DividerNav);

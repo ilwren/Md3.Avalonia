@@ -1,4 +1,4 @@
-﻿# Md3.Avalonia
+# Md3.Avalonia
 
 面向 Avalonia 12 的 Material Design 3 控件库与组件 Gallery。
 
@@ -11,7 +11,7 @@ https://github.com/user-attachments/assets/53c05bc6-f1b5-4076-8b62-c4a7a2b819bf
 [![CI](https://github.com/ilwren/Md3.Avalonia/actions/workflows/ci.yml/badge.svg)](https://github.com/ilwren/Md3.Avalonia/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-- 353 个公共 API 类型，覆盖按钮、输入、导航、对话框、图表与动效，全部收录在 API 参考中并由脚本门禁校验
+- 368 个公共 API 类型，覆盖按钮、输入、导航、对话框、图表与动效，全部收录在 API 参考中并由脚本门禁校验
 - HCT 动态配色：任意 seed color，6 种 scheme、3 档对比度、49 个色彩角色
 - 内嵌官方 Material Symbols Rounded 字体，构建期校验 checksum 与 glyph 数量
 - 18 个可独立安装的 NuGet 包，第三方生态主题全部 opt-in
@@ -161,17 +161,19 @@ python3 scripts/verify-fonts.py
 
 ## 控件总览
 
-完整 API 见 [`docs/API.md`](docs/API.md)，覆盖全部 353 个公共类型；`scripts/check-api-doc-coverage.py` 会在 CI 中断言这一覆盖率。下表只列出各分组的主要类型。
+完整 API 见 [`docs/API.md`](docs/API.md)，覆盖全部 368 个公共类型；`scripts/check-api-doc-coverage.py` 会在 CI 中断言这一覆盖率。下表只列出各分组的主要类型。
 
 | 分组 | 主要类型 |
 |---|---|
 | 按钮 | `MdButton`、`MdToggleButton`、`MdIconButton`、`MdToggleIconButton`、`MdSplitButton`、`MdStandardButtonGroup`、`MdConnectedButtonGroup`、`MdFloatingActionButton`、`MdExtendedFloatingActionButton`、`MdFabMenu` |
-| 输入 | `MdTextBox`、`MdCheckBox`、`MdRadioButton`、`MdComboBox`、`MdAutoCompleteBox`、`MdSlider`、`MdSwitch`、`MdDatePicker`、`MdTimePicker`、`MdPinInput`、`MdTagInput`、`MdForm` |
+| 输入 | `MdTextBox`、`MdCheckBox`、`MdRadioButton`、`MdComboBox`、`MdAutoCompleteBox`、`MdSlider`、`MdSwitch`、`MdDatePicker`、`MdTimePicker`、`MdFileSystemPicker`、`MdPinInput`、`MdTagInput`、`MdForm` |
 | 导航 | `MdNavigationDrawer`、`MdNavigationBar`、`MdTabs`、`MdToolbar`、`MdTopAppBar`、`MdBottomAppBar`、`MdSearchBar`、`MdSearchView`、`MdCommandPalette`、`MdBreadcrumb` |
 | 容器与浮层 | `MdCard`、`MdDialog`、`MdDialogHost`、`MdMenu`、`MdPopover`、`MdTooltip`、`MdSnackbar`、`MdBanner`、`MdSheetHost`、`MdExpansionPanelList`、`MdFloatingWindow`、`MdBorderlessWindow` |
 | 数据展示 | `MdList`、`MdDataTable`、`MdDataGrid`、`MdCarousel`、`MdCalendar`、`MdTreeView`、`MdAvatar`、`MdBadge`、`MdChip`、`MdTimeline`、`MdWaveform`、`MdChart` |
 | 反馈与进度 | `MdCircularProgressIndicator`、`MdLinearProgressIndicator`、`MdLoadingIndicator`、`MdSkeleton`、`MdRefreshIndicator`、`MdSpinKit`、`MdStateLayer`、`MdFocusRing` |
 | 布局与动效 | `MdSurface`、`MdAdaptiveLayout`、`MdScrollViewer`、`MdWaterfall`、`MdMasonryPanel`、`MdStaggeredPanel`、`MdAnimationSequence`、`MdAnimatedText`、`MdRevealHost`、`MdMorphPanel`、`MdHero` |
+
+`MdFileSystemPicker` 是由库内 `Md*` 组件组成的真实路径浏览器，文件/文件夹模式、过滤、单选/多选、路径输入、上级/Home/刷新以及错误/空状态均在控件内完成；它不调用 Avalonia `StorageProvider`、系统 file picker 或 Android SAF。返回值是 `System.IO` 可直接使用的规范化绝对路径，但它不会绕过 Android scoped storage、应用沙箱或操作系统权限，宿主仍须选择可访问的起始目录并自行处理平台权限。
 
 全部按钮、Icon Button 与 FAB 模板都接入 `MdRipplePresenter`：按下位置产生涟漪，裁切到完整 container shape，并支持 Expressive / Standard / Reduced / None 四种 motion scheme。`MdButton` 的 Elevated 配置为 M3 已标记 deprecated 的兼容项，新界面应优先选用其他配置。
 

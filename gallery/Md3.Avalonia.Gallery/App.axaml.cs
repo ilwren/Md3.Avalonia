@@ -46,7 +46,7 @@ public partial class App : Application
     {
         var trayIcon = new TrayIcon
         {
-            Icon = LoadTrayIcon(),
+            Icon = LoadGalleryIcon(),
             ToolTipText = "Md3.Avalonia Gallery",
             Menu = BuildTrayMenu(desktop),
             IsVisible = true,
@@ -64,12 +64,13 @@ public partial class App : Application
         }
     }
 
-    private static WindowIcon? LoadTrayIcon()
+    internal static WindowIcon? LoadGalleryIcon()
     {
-        // A missing or unreadable icon must not take the shell down; the menu still works.
+        // The visible Gallery mark, title-bar icon and tray all use the repository's canonical
+        // logo. A missing or unreadable asset must not take the shell down; the menu still works.
         try
         {
-            using var stream = AssetLoader.Open(new Uri("avares://Md3.Avalonia.Gallery/Assets/tray-icon.png"));
+            using var stream = AssetLoader.Open(new Uri("avares://Md3.Avalonia.Gallery/Assets/logo-128.png"));
             return new WindowIcon(new Bitmap(stream));
         }
         catch

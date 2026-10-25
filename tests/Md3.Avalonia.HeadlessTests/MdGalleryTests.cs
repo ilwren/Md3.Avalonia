@@ -40,6 +40,7 @@ public sealed class MdGalleryTests
             new CardGalleryPage(),
             new ChipGalleryPage(),
             new PickerGalleryPage(),
+            new FileSystemPickerGalleryPage(),
             new DialogGalleryPage(),
             new DividerGalleryPage(),
             new ListGalleryPage(),

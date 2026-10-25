@@ -4,7 +4,9 @@
              x:Class="Md3.Avalonia.Gallery.AndroidGalleryView"
              Background="{DynamicResource Md.Sys.Color.Surface.Brush}">
   <!-- Android uses a single-view lifetime, so it needs its own compact shell. Keep the complete
-       Gallery index in a modal, scrollable drawer instead of limiting mobile to four sample pages. -->
+       Gallery index in a modal, scrollable drawer instead of limiting mobile to four sample pages.
+       The dialog host is a sibling of the entire shell so every modal scrim includes both app bars. -->
+  <Grid>
   <md:MdNavigationDrawer x:Name="MobileDrawer"
                          IsModal="True"
                          IsOpen="False"
@@ -12,14 +14,17 @@
     <md:MdNavigationDrawer.DrawerContent>
       <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
         <Grid RowDefinitions="72,*">
-          <Grid Margin="12,8" ColumnDefinitions="*,Auto">
-            <StackPanel VerticalAlignment="Center" Spacing="1">
+          <Grid Margin="12,8" ColumnDefinitions="48,*,Auto" ColumnSpacing="10">
+            <Image Grid.Column="0" Width="44" Height="44" Stretch="Uniform"
+                   Source="avares://Md3.Avalonia.Gallery/Assets/logo-128.png"
+                   AutomationProperties.Name="Md3.Avalonia logo" />
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
               <TextBlock FontSize="20" FontWeight="SemiBold" Text="Material 3 Gallery" />
               <TextBlock FontSize="12"
                          Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                          Text="All samples and components" />
             </StackPanel>
-            <md:MdIconButton Grid.Column="1"
+            <md:MdIconButton Grid.Column="2"
                              Icon="{x:Static md:MdSymbols.Close}"
                              AutomationProperties.Name="Close navigation"
                              Click="CloseNavigation" />
@@ -96,4 +101,7 @@
       </md:MdNavigationBar>
     </Grid>
   </md:MdNavigationDrawer>
+  <md:MdDialogHost x:Name="MobileDialogHost"
+                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ZIndex="100" />
+  </Grid>
 </UserControl>
