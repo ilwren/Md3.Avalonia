@@ -114,6 +114,7 @@ public partial class ContributionGridGalleryPage : UserControl
         // A fresh list on each pass: the grids watch the Days property, not list mutations.
         var days = new List<MdContributionDay>(_days);
         DemoGrid.Days = days;
+        DemoGrid.SelectedDate = null;
         CompactGrid.Days = days;
 
         var total = days.Sum(day => day.Value);

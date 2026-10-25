@@ -188,6 +188,36 @@ public sealed class MdGalleryTests
     }
 
     [AvaloniaFact]
+    public void Git_Graph_Galleries_Keep_Details_Separate_And_Do_Not_Ripple_Whole_Cards()
+    {
+        var samples = new (UserControl Page, string SelectionPaneName)[]
+        {
+            (new CommitGraphGalleryPage(), "CommitSelectionPane"),
+            (new ContributionGridGalleryPage(), "ContributionSelectionPane"),
+        };
+
+        foreach (var (page, selectionPaneName) in samples)
+        {
+            var host = new Window { Width = 960, Height = 760, Content = page };
+            host.Show();
+            try
+            {
+                Dispatcher.UIThread.RunJobs();
+
+                var selectionPane = page.GetVisualDescendants().OfType<StackPanel>()
+                    .Single(panel => panel.Name == selectionPaneName);
+                Assert.Equal(1, Grid.GetColumn(selectionPane));
+
+                var cards = page.GetVisualDescendants().OfType<MdCard>().ToArray();
+                Assert.NotEmpty(cards);
+                Assert.All(cards, card => Assert.False(card.IsInteractive,
+                    "presentational graph cards must not show a whole-card state layer or ripple"));
+            }
+            finally { host.Close(); }
+        }
+    }
+
+    [AvaloniaFact]
     public void Code_Examples_Never_Show_A_Placeholder_Where_A_Sample_Belongs()
     {
         // Thirty-two pages supply only AXAML. The component used to stand in a TODO comment for

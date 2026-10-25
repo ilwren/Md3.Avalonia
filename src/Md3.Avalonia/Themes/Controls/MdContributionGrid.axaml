@@ -18,6 +18,12 @@
                              Color="{DynamicResource Md.Sys.Color.Primary}" Opacity="0.75" />
             <SolidColorBrush x:Key="Md.ContributionGrid.Level.Brush.4"
                              Color="{DynamicResource Md.Sys.Color.Primary}" />
+            <!-- Two-tone selection remains visible over both the empty surface cell and every
+                 primary-toned activity level. -->
+            <SolidColorBrush x:Key="Md.ContributionGrid.Selection.Outer.Brush"
+                             Color="{DynamicResource Md.Sys.Color.Surface}" />
+            <SolidColorBrush x:Key="Md.ContributionGrid.Selection.Inner.Brush"
+                             Color="{DynamicResource Md.Sys.Color.Primary}" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
             <SolidColorBrush x:Key="Md.ContributionGrid.Level.Brush.0"
@@ -29,6 +35,10 @@
             <SolidColorBrush x:Key="Md.ContributionGrid.Level.Brush.3"
                              Color="{DynamicResource Md.Sys.Color.Primary}" Opacity="0.8" />
             <SolidColorBrush x:Key="Md.ContributionGrid.Level.Brush.4"
+                             Color="{DynamicResource Md.Sys.Color.Primary}" />
+            <SolidColorBrush x:Key="Md.ContributionGrid.Selection.Outer.Brush"
+                             Color="{DynamicResource Md.Sys.Color.Surface}" />
+            <SolidColorBrush x:Key="Md.ContributionGrid.Selection.Inner.Brush"
                              Color="{DynamicResource Md.Sys.Color.Primary}" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>

@@ -12,7 +12,7 @@
                    Text="A GitHub-style activity heatmap: one column per week, seven rows, levels sized against the data's own percentiles. Click a single day to read the commits it contains; hover for its tooltip." />
       </StackPanel>
 
-      <md:MdCard Padding="16">
+      <md:MdCard Padding="16" IsInteractive="False">
         <md:MdScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
           <md:MdContributionGrid x:Name="DemoGrid" DayClicked="DemoGridDayClicked" />
         </md:MdScrollViewer>
@@ -21,14 +21,14 @@
       <Grid ColumnDefinitions="*,320" ColumnSpacing="20">
         <StackPanel Spacing="10">
           <TextBlock Classes="h2" Text="Stats" />
-          <md:MdCard Padding="16">
+          <md:MdCard Padding="16" IsInteractive="False">
             <StackPanel x:Name="StatsContent" Spacing="8" />
           </md:MdCard>
         </StackPanel>
 
-        <StackPanel Spacing="10">
+        <StackPanel x:Name="ContributionSelectionPane" Grid.Column="1" Spacing="10">
           <TextBlock Classes="h2" Text="Selection" />
-          <md:MdCard Padding="16">
+          <md:MdCard Padding="16" IsInteractive="False">
             <StackPanel x:Name="SelectionContent" Spacing="8" />
           </md:MdCard>
           <md:MdButton x:Name="RegenerateButton" Content="Regenerate" HorizontalAlignment="Left" Click="RegenerateButtonClicked"
@@ -40,7 +40,7 @@
         <TextBlock Classes="h2" Text="Compact" />
         <TextBlock Classes="body" TextWrapping="Wrap"
                    Text="Smaller cells and tighter spacing fit a whole year in a sidebar." />
-        <md:MdCard Padding="16">
+        <md:MdCard Padding="16" IsInteractive="False">
           <md:MdScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
             <md:MdContributionGrid x:Name="CompactGrid" CellSize="9" CellSpacing="2" />
           </md:MdScrollViewer>

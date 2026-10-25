@@ -468,7 +468,7 @@ internal static class GalleryLocalization
         ["PIN code"]="PIN 码", ["Waiting for input."]="等待输入。", ["Error state"]="错误状态",
         ["Commit graph"]="提交图",
         ["A GitHub-style commit history: lanes, branch curves, merge connectors and a head marker."]="GitHub 风格的提交历史：泳道、分支曲线、合并连线与 HEAD 标记。",
-        ["A GitHub-style commit history that reads dense histories: first-parent links stay solid, the parts a merge absorbs turn dashed, and every commit can be clicked to inspect it."]="GitHub 风格的提交历史，能读懂复杂历史：第一父级链保持实线，被合并吸收的部分转为虚线，每条提交都可单击查看详情。",
+        ["A GitHub-style commit history that reads dense histories: first-parent links stay prominent, merged branch links remain continuous but muted, and every commit can be clicked to inspect it."]="GitHub 风格的提交历史，能读懂复杂历史：第一父级链保持突出，被合并的分支连线保持连续但会弱化，每条提交都可单击查看详情。",
         ["Merge-heavy history"]="合并密集的历史",
         ["History"]="历史",
         ["Contribution grid"]="贡献图",

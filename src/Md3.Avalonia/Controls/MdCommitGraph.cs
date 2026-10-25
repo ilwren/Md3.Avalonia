@@ -30,10 +30,10 @@ namespace Md3.Avalonia.Controls;
 /// override. <see cref="HeadId"/> rings the node of the given commit.
 /// </para>
 /// <para>
-/// Every commit's link to its first parent is drawn solid, so the mainline and each branch's
-/// own spine stand out; the parts a merge absorbs - the merge curve and the short stub above a
-/// merged branch's last commit - are dashed, the way IntelliJ's commit log fades absorbed
-/// branch work, which is what makes dense multi-branch histories readable.
+/// Every commit link stays continuous so branch topology is never mistaken for missing data.
+/// Links to first parents use full opacity, so the mainline and each branch's own spine stand
+/// out; the parts a merge absorbs - the merge curve and the short stub above a merged branch's
+/// last commit - are muted, following the hierarchy used by desktop Git clients.
 /// </para>
 /// <para>
 /// Clicking a row selects that commit (<see cref="SelectedId"/>) and raises
@@ -263,13 +263,13 @@ public class MdCommitGraph : ItemsControl
         public required IReadOnlyList<(int From, int To)> Curves { get; init; }
         public bool IsHead { get; init; }
 
-        /// <summary>The top half-strips that lie on the first-parent chain; the rest are dashed.</summary>
+        /// <summary>The top half-strips that lie on the first-parent chain; the rest are muted.</summary>
         public IReadOnlyCollection<int> ActiveTopLanes { get; init; } = Array.Empty<int>();
 
-        /// <summary>The bottom half-strips that lie on the first-parent chain; the rest are dashed.</summary>
+        /// <summary>The bottom half-strips that lie on the first-parent chain; the rest are muted.</summary>
         public IReadOnlyCollection<int> ActiveBottomLanes { get; init; } = Array.Empty<int>();
 
-        /// <summary>The first-parent curves of this row; the other curves are dashed.</summary>
+        /// <summary>The first-parent curves of this row; the other curves are muted.</summary>
         public IReadOnlyCollection<(int From, int To)> ActiveCurves { get; init; } = Array.Empty<(int, int)>();
     }
 
@@ -426,10 +426,10 @@ public class MdCommitGraph : ItemsControl
                 }
             }
 
-            // First-parent skeleton, the IDEA look: each commit links to its first present
-            // parent (the same parent the lane algorithm follows), and the segments of those
-            // links are drawn solid; every other lane segment is branch continuation and stays
-            // dashed, so dense histories read as one bold mainline with faded branch work.
+            // First-parent skeleton: each commit links to its first present parent (the same
+            // parent the lane algorithm follows), and the segments of those links are drawn at
+            // full opacity; every other lane segment is branch continuation and stays muted,
+            // so dense histories read as one prominent mainline with quieter branch work.
             // Every slot must exist before any link walks to its parent: in git-log display
             // order a commit's parent sits below it (pr > r), so a combined fill-and-use loop
             // would read slots that are not created until a later iteration.

@@ -77,9 +77,9 @@ internal sealed class CommitGraphRow : Grid
 /// <summary>
 /// Draws the connectors and node of one commit row: vertical lane lines in the upper and lower
 /// half-strips, cubic curves for branch/merge transitions and the commit node (plus a head
-/// ring). First-parent links are solid; the segments a merge absorbs are dashed (the IntelliJ
-/// commit-log look). The selected row is picked out by the soft background the row paints, not
-/// by extra rings in the tree itself.
+/// ring). Every link is continuous; first-parent links use full opacity while the segments a
+/// merge absorbs are muted. The selected row is picked out by the soft background the row
+/// paints, not by extra rings in the tree itself.
 /// </summary>
 internal sealed class CommitGraphLaneHost : Control
 {
@@ -107,15 +107,6 @@ internal sealed class CommitGraphLaneHost : Control
 
         static double LaneX(int lane, double laneWidth) => lane * laneWidth + laneWidth / 2;
 
-        static Pen MakePen(IBrush brush, double thickness, bool dashed, double height)
-        {
-            var pen = new Pen(brush, thickness);
-            if (dashed)
-                pen.DashStyle = new DashStyle(
-                    new double[] { Math.Max(3, height * 0.25), Math.Max(2, height * 0.2) }, 0);
-            return pen;
-        }
-
         IBrush? BrushFor(int lane) => owner.GetLaneBrush(lane);
 
         void DrawSegment(Point from, Point to, IBrush? brush, bool active, bool curve)
@@ -123,24 +114,41 @@ internal sealed class CommitGraphLaneHost : Control
             if (brush is null)
                 return;
 
-            var pen = MakePen(brush, 2, !active, height);
-            if (curve)
+            var pen = new Pen(brush, 2);
+            void Draw()
             {
-                var curvePath = new StreamGeometry();
-                using (var figure = curvePath.Open())
+                if (curve)
                 {
-                    figure.BeginFigure(from, isFilled: false);
-                    figure.CubicBezierTo(
-                        new Point(from.X, height * 0.75),
-                        new Point(to.X, height * 0.75),
-                        to);
-                    figure.EndFigure(false);
+                    var curvePath = new StreamGeometry();
+                    using (var figure = curvePath.Open())
+                    {
+                        figure.BeginFigure(from, isFilled: false);
+                        figure.CubicBezierTo(
+                            new Point(from.X, height * 0.75),
+                            new Point(to.X, height * 0.75),
+                            to);
+                        figure.EndFigure(false);
+                    }
+                    context.DrawGeometry(null, pen, curvePath);
                 }
-                context.DrawGeometry(null, pen, curvePath);
+                else
+                {
+                    context.DrawLine(pen, from, to);
+                }
+            }
+
+            // A dashed pen restarts its dash phase for every row half and every curve. That can
+            // leave both sides of a join blank and makes a valid branch look disconnected.
+            // Keep the topology continuous and distinguish absorbed merge paths by opacity,
+            // matching mature Avalonia Git clients and Flutter graph painters.
+            if (active)
+            {
+                Draw();
             }
             else
             {
-                context.DrawLine(pen, from, to);
+                using (context.PushOpacity(0.5))
+                    Draw();
             }
         }
 

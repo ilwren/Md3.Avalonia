@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using Avalonia;
-using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -25,7 +24,7 @@ public partial class CommitGraphGalleryPage : UserControl
         var ago = (int days) => now.AddDays(-days).ToUniversalTime();
 
         // A dense history the control exists to make readable: a mainline with two release
-        // tags, a feature branch that merged in (its absorbed tail renders dashed), an open
+        // tags, a feature branch that merged in (its absorbed tail renders muted), an open
         // docs branch at HEAD, two short-lived spikes, and a shallow root whose first parent
         // is not in the data.
         _nodes = new MdCommitNode[]
@@ -46,8 +45,8 @@ public partial class CommitGraphGalleryPage : UserControl
         DemoGraph.ItemsSource = _nodes;
 
         // A history that is mostly merges: two feature lines cut from the mainline and folded
-        // back in, so the graph must keep each branch in its own lane and mark every
-        // absorbed segment dashed.
+        // back in, so the graph must keep each branch in its own lane and keep every
+        // absorbed segment continuous while muting it.
         _mergeNodes = new MdCommitNode[]
         {
             new() { Id = "mh4", Message = "docs: launch notes", Author = "wren", Date = ago(1), ParentIds = ["mm3"] },
@@ -117,7 +116,7 @@ public partial class CommitGraphGalleryPage : UserControl
         var all = source == MergeGraph ? _mergeNodes : _nodes;
         var parents = node.ParentIds.ToArray();
         var mergeHint = parents.Length > 1
-            ? L(" Merge commit: the second parent's line is dashed.", " 合并提交：第二父提交所在的线以虚线表示。")
+            ? L(" Merge commit: the second parent's line stays continuous but muted.", " 合并提交：第二父提交所在的线保持连续，但会弱化显示。")
             : "";
         var parentLine = L($"Parents: {string.Join(", ", parents)}", $"父提交：{string.Join("，", parents)}") + mergeHint;
         var hint = parents.Any(p => all.All(n => n.Id != p))
@@ -134,13 +133,13 @@ public partial class CommitGraphGalleryPage : UserControl
         if (brush is null)
             return;
 
-        LegendHost.Children.Add(LegendLine(brush, dashed: false,
-            L("Solid: first-parent / mainline", "实线：主线 / 第一父提交")));
-        LegendHost.Children.Add(LegendLine(brush, dashed: true,
-            L("Dashed: absorbed by a merge", "虚线：被合并吸收的线")));
+        LegendHost.Children.Add(LegendLine(brush, muted: false,
+            L("Prominent: first-parent / mainline", "突出显示：主线 / 第一父提交")));
+        LegendHost.Children.Add(LegendLine(brush, muted: true,
+            L("Muted: absorbed by a merge", "弱化显示：被合并吸收的线")));
     }
 
-    private StackPanel LegendLine(IBrush brush, bool dashed, string label)
+    private StackPanel LegendLine(IBrush brush, bool muted, string label)
     {
         // Fully qualified: unqualified, Path resolves to System.IO.Path in this namespace.
         // StreamGeometry is built with the Open/BeginFigure pattern the repo uses everywhere;
@@ -153,14 +152,15 @@ public partial class CommitGraphGalleryPage : UserControl
             figure.EndFigure(false);
         }
 
-        // 12 splits the pen off the shape: Stroke is a brush, thickness and the dash array
-        // live on their own properties.
+        // Keep both legend samples continuous, just like the graph. Opacity rather than a
+        // restarted dash pattern distinguishes the secondary merge path without implying that
+        // commits are missing from the history.
         var line = new global::Avalonia.Controls.Shapes.Path
         {
             Data = data,
             Stroke = brush,
             StrokeThickness = 2,
-            StrokeDashArray = dashed ? new AvaloniaList<double> { 6, 4 } : null,
+            Opacity = muted ? 0.5 : 1,
             Width = 28,
             Height = 2,
             VerticalAlignment = VerticalAlignment.Center,

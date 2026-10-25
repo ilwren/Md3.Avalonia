@@ -8,17 +8,17 @@
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Commit graph" />
         <TextBlock Classes="body" TextWrapping="Wrap"
-                   Text="A GitHub-style commit history that reads dense histories: first-parent links stay solid, the parts a merge absorbs turn dashed, and every commit can be clicked to inspect it." />
+                   Text="A GitHub-style commit history that reads dense histories: first-parent links stay prominent, merged branch links remain continuous but muted, and every commit can be clicked to inspect it." />
       </StackPanel>
 
       <Grid ColumnDefinitions="*,320" ColumnSpacing="20">
-        <md:MdCard Padding="16">
+        <md:MdCard Padding="16" IsInteractive="False">
           <md:MdCommitGraph x:Name="DemoGraph" HeadId="h5" CommitClicked="GraphCommitClicked" />
         </md:MdCard>
 
-        <StackPanel Spacing="10" VerticalAlignment="Top" Margin="0,4,0,0">
+        <StackPanel x:Name="CommitSelectionPane" Grid.Column="1" Spacing="10" VerticalAlignment="Top" Margin="0,4,0,0">
           <TextBlock Classes="h2" Text="Selection" />
-          <md:MdCard Padding="16">
+          <md:MdCard Padding="16" IsInteractive="False">
             <StackPanel x:Name="DetailContent" Spacing="8" />
           </md:MdCard>
         </StackPanel>
@@ -26,7 +26,7 @@
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Merge-heavy history" />
-        <md:MdCard Padding="16">
+        <md:MdCard Padding="16" IsInteractive="False">
           <StackPanel Spacing="12">
             <md:MdCommitGraph x:Name="MergeGraph" HeadId="mh4" CommitClicked="MergeGraphCommitClicked" />
             <WrapPanel x:Name="LegendHost" Orientation="Horizontal" ItemSpacing="20" Margin="20,0,8,0" />

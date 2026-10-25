@@ -153,7 +153,7 @@ public sealed class MdCommitGraphTests
     }
 
     [AvaloniaFact]
-    public void First_Parent_Links_Are_Solid_Merge_Absorbed_Segments_Are_Dashed()
+    public void First_Parent_Links_Are_Prominent_Merge_Absorbed_Segments_Are_Muted()
     {
         // m merges branch b into main:
         //   row 0: m  = a2 + b1   (merge)
@@ -189,8 +189,8 @@ public sealed class MdCommitGraphTests
         Assert.Contains(1, rows[2].ActiveBottomLanes);
         Assert.Contains(1, rows[3].ActiveTopLanes);
 
-        // What the merge absorbs is dashed: the merge curve at row 0, and the short stub of
-        // the merged branch's lane above its last commit (row 1).
+        // What the merge absorbs is muted but remains continuous: the merge curve at row 0,
+        // and the short stub of the merged branch's lane above its last commit (row 1).
         Assert.Contains((0, 1), rows[0].Curves);
         Assert.DoesNotContain((0, 1), rows[0].ActiveCurves);
         Assert.Contains(1, rows[1].TopLanes);

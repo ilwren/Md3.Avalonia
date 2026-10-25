@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -34,8 +35,11 @@ public sealed record MdContributionMonthLabel(string Text, int WeekIndex);
 /// Levels 1-4 are relative to the data itself (GitHub-style): the non-zero values are split at
 /// their 25/50/75 percentiles, so the same visual distribution comes out of 1-5 values as of
 /// 1-500. Days absent from <see cref="Days"/> count as zero. Clicking a day raises
-/// <see cref="DayClicked"/> and hovering shows a tooltip with the value and date.
+/// <see cref="DayClicked"/> and gives that one cell a stable selection outline; hovering shows
+/// a tooltip with the value and date. The control does not use a ripple or whole-grid pressed
+/// state because the interaction target is the individual day.
 /// </remarks>
+[PseudoClasses(":has-selection")]
 public class MdContributionGrid : TemplatedControl
 {
     public static readonly StyledProperty<IReadOnlyList<MdContributionDay>> DaysProperty =
@@ -45,6 +49,9 @@ public class MdContributionGrid : TemplatedControl
         AvaloniaProperty.Register<MdContributionGrid, double>(nameof(CellSize), 12);
     public static readonly StyledProperty<double> CellSpacingProperty =
         AvaloniaProperty.Register<MdContributionGrid, double>(nameof(CellSpacing), 3);
+    public static readonly StyledProperty<DateTimeOffset?> SelectedDateProperty =
+        AvaloniaProperty.Register<MdContributionGrid, DateTimeOffset?>(nameof(SelectedDate),
+            defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
     public static readonly StyledProperty<string> LessLabelProperty =
         AvaloniaProperty.Register<MdContributionGrid, string>(nameof(LessLabel), "Less");
     public static readonly StyledProperty<string> MoreLabelProperty =
@@ -56,12 +63,16 @@ public class MdContributionGrid : TemplatedControl
     private Canvas? _dayLabels;
     private IBrush?[] _levelBrushCache = Array.Empty<IBrush?>();
     private ThemeVariant? _levelBrushVariant;
+    private IBrush? _selectionOuterBrush;
+    private IBrush? _selectionInnerBrush;
+    private ThemeVariant? _selectionBrushVariant;
 
     static MdContributionGrid()
     {
         DaysProperty.Changed.AddClassHandler<MdContributionGrid>((grid, _) => grid.UpdateModel());
         CellSizeProperty.Changed.AddClassHandler<MdContributionGrid>((grid, _) => grid.OnLayoutMetricsChanged());
         CellSpacingProperty.Changed.AddClassHandler<MdContributionGrid>((grid, _) => grid.OnLayoutMetricsChanged());
+        SelectedDateProperty.Changed.AddClassHandler<MdContributionGrid>((grid, _) => grid.OnSelectionChanged());
     }
 
     /// <summary>Gets or sets the days to render; order does not matter.</summary>
@@ -83,6 +94,16 @@ public class MdContributionGrid : TemplatedControl
     {
         get => GetValue(CellSpacingProperty);
         set => SetValue(CellSpacingProperty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets the selected calendar day. Clicking a cell updates this value and draws a
+    /// stable outline around that cell without a ripple or whole-grid pressed state.
+    /// </summary>
+    public DateTimeOffset? SelectedDate
+    {
+        get => GetValue(SelectedDateProperty);
+        set => SetValue(SelectedDateProperty, value);
     }
 
     /// <summary>Gets or sets the legend text at the low end of the levels.</summary>
@@ -124,7 +145,13 @@ public class MdContributionGrid : TemplatedControl
         UpdateModel();
     }
 
-    internal void OnDayClicked(MdContributionDay? day) => DayClicked?.Invoke(this, day);
+    internal void OnDayClicked(MdContributionDay day)
+    {
+        // SetCurrentValue preserves an existing binding while making the clicked cell the
+        // control's one explicit selection.
+        SetCurrentValue(SelectedDateProperty, day.Date);
+        DayClicked?.Invoke(this, day);
+    }
 
     internal bool TryGetDayValue(DateTime date, out int value) => _valueByDay.TryGetValue(date, out value);
 
@@ -142,6 +169,27 @@ public class MdContributionGrid : TemplatedControl
         }
 
         return _levelBrushCache;
+    }
+
+    internal (IBrush? Outer, IBrush? Inner) GetSelectionBrushes()
+    {
+        var variant = ActualThemeVariant;
+        if (_selectionBrushVariant != variant || _selectionOuterBrush is null || _selectionInnerBrush is null)
+        {
+            _selectionOuterBrush = MdThemeResources.FindBrush(
+                this, "Md.ContributionGrid.Selection.Outer.Brush", variant);
+            _selectionInnerBrush = MdThemeResources.FindBrush(
+                this, "Md.ContributionGrid.Selection.Inner.Brush", variant);
+            _selectionBrushVariant = variant;
+        }
+
+        return (_selectionOuterBrush, _selectionInnerBrush);
+    }
+
+    private void OnSelectionChanged()
+    {
+        PseudoClasses.Set(":has-selection", SelectedDate.HasValue);
+        _cells?.InvalidateVisual();
     }
 
     private void OnLayoutMetricsChanged()
@@ -340,6 +388,27 @@ internal sealed class ContributionCellsHost : Control
                     corner);
             }
         }
+
+        if (owner.SelectedDate is not { } selected)
+            return;
+
+        var selectedDayIndex = (selected.Date - owner.WeekStart).Days;
+        if (selectedDayIndex < 0 || selectedDayIndex >= owner.WeekCount * 7)
+            return;
+
+        var selectedWeek = selectedDayIndex / 7;
+        var selectedDayOfWeek = selectedDayIndex % 7;
+        var inset = Math.Min(1.5, cell / 4);
+        var selectionRect = new Rect(
+            selectedWeek * step + inset,
+            selectedDayOfWeek * step + inset,
+            Math.Max(0, cell - inset * 2),
+            Math.Max(0, cell - inset * 2));
+        var (outer, inner) = owner.GetSelectionBrushes();
+        if (outer is not null)
+            context.DrawRectangle(null, new Pen(outer, 3), selectionRect, corner, corner);
+        if (inner is not null)
+            context.DrawRectangle(null, new Pen(inner, 1), selectionRect, corner, corner);
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)
@@ -374,7 +443,13 @@ internal sealed class ContributionCellsHost : Control
             return;
         if (_owner is null)
             return;
-        _owner.OnDayClicked(DayAt(e.GetPosition(this)));
+
+        var day = DayAt(e.GetPosition(this));
+        if (day is null)
+            return;
+
+        _owner.OnDayClicked(day);
+        e.Handled = true;
     }
 
     /// <summary>Resolves the day under a point in this host's coordinates, or null in the gaps.</summary>
@@ -389,7 +464,7 @@ internal sealed class ContributionCellsHost : Control
         var dayOfWeek = (int)(position.Y / step);
         if (week >= owner.WeekCount || dayOfWeek >= 7)
             return null;
-        if (position.X - week * step > owner.CellSize || position.Y - dayOfWeek * step > owner.CellSize)
+        if (position.X - week * step >= owner.CellSize || position.Y - dayOfWeek * step >= owner.CellSize)
             return null;
 
         var date = owner.WeekStart.AddDays(7L * week + dayOfWeek);

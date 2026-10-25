@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
@@ -95,7 +96,9 @@ public sealed class MdContributionGridTests
         Assert.Equal(0, tuesday.Value);
 
         // The spacing gap between cells is empty.
+        Assert.Null(host.DayAt(new Point(2, 12)));
         Assert.Null(host.DayAt(new Point(2, 14.5)));
+        Assert.Null(host.DayAt(new Point(12, 16)));
         Assert.Null(host.DayAt(new Point(14.5, 16)));
         Assert.Null(host.DayAt(new Point(30, 16)));   // beyond the single week column
         Assert.Null(host.DayAt(new Point(2, 110)));   // beyond the seven rows
@@ -127,6 +130,36 @@ public sealed class MdContributionGridTests
         Assert.NotNull(clicked);
         Assert.Equal(new DateTime(2025, 6, 2), clicked!.Date.Date);
         Assert.Equal(5, clicked.Value);
+        Assert.Equal(new DateTime(2025, 6, 2), grid.SelectedDate?.Date);
+        Assert.Contains(":has-selection", grid.Classes);
+    }
+
+    [AvaloniaFact]
+    public void Clicking_A_Gap_Does_Not_Select_Or_Invoke_The_Whole_Grid()
+    {
+        var grid = new MdContributionGrid
+        {
+            Width = 500,
+            Height = 220,
+            Days = new[] { Day(new DateTime(2025, 6, 2), 5) },
+        };
+        var clickCount = 0;
+        grid.DayClicked += (_, _) => clickCount++;
+
+        using var host = ShowGrid(grid);
+        var cells = host.Window.FindDescendantOfType<ContributionCellsHost>();
+        Assert.NotNull(cells);
+
+        // x=12 is the first pixel after the 12-dip cell and before the next 15-dip step.
+        var windowPoint = new Point(12, 17).Transform(cells!.TransformToVisual(host.Window) ?? Matrix.Identity);
+        host.Window.MouseDown(windowPoint, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.MouseUp(windowPoint, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(0, clickCount);
+        Assert.Null(grid.SelectedDate);
+        Assert.DoesNotContain(":has-selection", grid.Classes);
     }
 
     [AvaloniaFact]
@@ -142,6 +175,11 @@ public sealed class MdContributionGridTests
         Assert.Equal(5, brushes.Length);
         Assert.All(brushes, b => Assert.NotNull(b));
         Assert.NotSame(brushes[0], brushes[4]);
+
+        var (outer, inner) = grid.GetSelectionBrushes();
+        Assert.NotNull(outer);
+        Assert.NotNull(inner);
+        Assert.NotEqual(((SolidColorBrush)outer!).Color, ((SolidColorBrush)inner!).Color);
     }
 
     private static GridHost ShowGrid(MdContributionGrid grid)
