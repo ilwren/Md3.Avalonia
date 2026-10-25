@@ -18,6 +18,7 @@
 - 当前 17 个 NuGet 包统一使用 `Md3.Avalonia11` / `Md3.Avalonia11.*` 身份；程序集、命名空间、源码路径与 `avares://` 资源 URI 保持不变。
 - 保留所有具有 Avalonia 11 兼容版本的第三方主题，并按 Avalonia 11 API 调整窗口装饰、Android 宿主、焦点事件、字形查找、模板遍历、弹层、自动化 peers 与位图保存。
 - OlivierJC.AvaloniaRichEditor 没有 Avalonia 11 兼容版本，因此移除其第三方主题包、Gallery 集成、测试、DocFX 与打包入口；Extra 中独立的 `MdRichEditor` 控件不受影响。
+- 桌面 Gallery 显式使用 `Tmds.DBus.Protocol 0.21.3` 修复版本，避免 Avalonia.FreeDesktop `11.3.13` 的 `0.21.2` 下限还原出具有已知高危漏洞的版本；Avalonia 最低基线保持 `11.3.13`。
 
 ## Gallery 品牌资源
 

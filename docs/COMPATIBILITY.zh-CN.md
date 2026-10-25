@@ -49,6 +49,8 @@ Avalonia `11.3.13` 是所有保留集成共同支持的最低版本，并非任�
 
 `OlivierJC.AvaloniaRichEditor` 没有 Avalonia 11 兼容版本，因此其第三方主题包不在此基线中；`Md3.Avalonia11.Extra` 内独立的 `MdRichEditor` 与 `MdRichTextEditor` 控件仍然保留。
 
+桌面 Gallery 显式固定 `Tmds.DBus.Protocol 0.21.3`。Avalonia.FreeDesktop `11.3.13` 声明 `>=0.21.2`，但 `0.21.2` 受 [GHSA-xrw6-gwf8-vvr9](https://github.com/advisories/GHSA-xrw6-gwf8-vvr9) 影响；`0.21.3` 是包含修复的向后移植版本。此安全版本覆盖不会改变 Avalonia `11.3.13` 基线。
+
 ## 原生通知包
 
 `Md3.Avalonia11.Notifications` 是独立包，不依赖 Avalonia。macOS/Linux 使用 `net8.0` 与 `net10.0`；Windows 使用 `net8.0-windows10.0.19041.0` 与 `net10.0-windows10.0.19041.0`；打包脚本传入 `-p:IncludeAndroidTarget=true` 时，为 Android 加入 `net10.0-android`。Android 最低 API 级别为 23；由于 `net8.0-android` 已停止支持，因此不提供该目标。Windows 使用 WinRT toast API，macOS 使用 AppKit 中已弃用的 `NSUserNotificationCenter`，Linux 调用原生 `libnotify`，Android 使用 `NotificationManager`；实现不会启动外部辅助进程。Linux 需要 `libnotify` 与 D-Bus 通知服务。注册与权限要求见[中文包 README](https://github.com/ilwren/Md3.Avalonia/blob/arena/7fa0e0b4-md3-avalonia/src/Md3.Avalonia.Notifications/README.zh-CN.md)。各操作系统上的显示与权限行为仍需人工验证。

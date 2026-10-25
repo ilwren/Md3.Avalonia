@@ -15,7 +15,10 @@
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.Desktop" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
-    <!-- The published Linux gallery hits the same trap as the headless suite: ScottPlot 5.1.59
+    <!-- Directly select the patched backport instead of Avalonia.FreeDesktop 11.3.13's
+         vulnerable 0.21.2 lower bound (GHSA-xrw6-gwf8-vvr9). -->
+    <PackageReference Include="Tmds.DBus.Protocol" />
+    <!-- The published Linux gallery hits the same trap as the headless suite: ScottPlot 5.0.56
          brings SkiaSharp.NativeAssets.Linux.NoDependencies, a libSkiaSharp without fontconfig,
          and it overwrites the fontconfig build Avalonia.Skia needs at
          runtimes/linux-x64/native/libSkiaSharp.so. Without fontconfig the gallery cannot

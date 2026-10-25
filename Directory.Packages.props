@@ -13,6 +13,10 @@
     <PackageVersion Include="Avalonia.Skia" Version="11.3.13" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="11.3.13" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.3.13" />
+    <!-- Avalonia.FreeDesktop 11.3.13 accepts Tmds.DBus.Protocol >= 0.21.2, but 0.21.2
+         is affected by GHSA-xrw6-gwf8-vvr9. The desktop host directly selects the patched
+         0.21.3 backport so the Avalonia baseline can remain at its true minimum. -->
+    <PackageVersion Include="Tmds.DBus.Protocol" Version="0.21.3" />
 
     <PackageVersion Include="Avalonia.AvaloniaEdit" Version="11.4.1" />
     <PackageVersion Include="AvaloniaHex" Version="0.1.12" />

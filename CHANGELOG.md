@@ -21,6 +21,7 @@
 ### Packaging
 
 - Added shared NuGet repository metadata pointing all packages to the GitHub source repository.
+- Pinned the desktop Gallery's `Tmds.DBus.Protocol` dependency to the patched `0.21.3` backport because Avalonia.FreeDesktop `11.3.13` otherwise resolves the vulnerable `0.21.2` release (GHSA-xrw6-gwf8-vvr9).
 
 ## [0.5.0-preview.1] - 2026-10-19
 

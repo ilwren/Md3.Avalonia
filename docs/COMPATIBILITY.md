@@ -45,6 +45,8 @@ Avalonia `11.3.13` is the lowest common version for the retained integrations, n
 
 `OlivierJC.AvaloniaRichEditor` has no Avalonia 11-compatible release, so its third-party theme package is not part of this baseline. The independent `MdRichEditor` and `MdRichTextEditor` controls in `Md3.Avalonia11.Extra` remain available.
 
+The desktop Gallery directly pins `Tmds.DBus.Protocol 0.21.3`. Avalonia.FreeDesktop `11.3.13` declares `>=0.21.2`, but `0.21.2` is affected by [GHSA-xrw6-gwf8-vvr9](https://github.com/advisories/GHSA-xrw6-gwf8-vvr9); `0.21.3` is the patched backport. This security override does not change the Avalonia `11.3.13` baseline.
+
 ## Native notification package
 
 `Md3.Avalonia11.Notifications` is standalone and does not reference Avalonia. It targets `net8.0` and `net10.0` for macOS/Linux; `net8.0-windows10.0.19041.0` and `net10.0-windows10.0.19041.0` for Windows; and, when the pack scripts pass `-p:IncludeAndroidTarget=true`, `net10.0-android` for Android. The Android target has a minimum API level of 23; `net8.0-android` is not offered because it is out of support. Windows calls WinRT toast APIs, macOS uses AppKit's legacy/deprecated `NSUserNotificationCenter`, Linux calls the native `libnotify` library, and Android uses `NotificationManager`; no external helper processes are launched. Linux requires `libnotify` and a D-Bus notification service. See the [package README](https://github.com/ilwren/Md3.Avalonia/blob/main/src/Md3.Avalonia.Notifications/README.md) for registration and permission requirements. Display and permission behavior still require manual checks on each operating system.
