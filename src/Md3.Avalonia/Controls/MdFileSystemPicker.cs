@@ -583,7 +583,7 @@ public sealed class MdFileSystemPicker : TemplatedControl
     private static bool IsHidden(string name, FileAttributes attributes) =>
         OperatingSystem.IsWindows()
             ? (attributes & (FileAttributes.Hidden | FileAttributes.System)) != 0
-            : name.StartsWith('.', StringComparison.Ordinal);
+            : name.Length > 0 && name[0] == '.';
 
     private static bool MatchesPatterns(string name, IReadOnlyList<string> patterns)
     {
