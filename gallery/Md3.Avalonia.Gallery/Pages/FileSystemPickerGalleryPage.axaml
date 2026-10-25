@@ -17,7 +17,7 @@
         <md:MdButton Content="Files" Variant="Tonal" Margin="0,0,10,10" Click="ShowFiles" />
         <md:MdButton Content="Folders" Variant="Outlined" Margin="0,0,10,10" Click="ShowFolders" />
         <md:MdCheckBox x:Name="MultipleToggle" Content="Allow multiple" Margin="6,0,10,10"
-                       Checked="MultipleChanged" Unchecked="MultipleChanged" />
+                       IsCheckedChanged="MultipleChanged" />
       </WrapPanel>
 
       <TextBlock x:Name="PickerStatus" Classes="body" TextWrapping="Wrap"
