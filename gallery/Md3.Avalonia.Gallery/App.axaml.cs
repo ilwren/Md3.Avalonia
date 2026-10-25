@@ -69,7 +69,7 @@ public partial class App : Application
         // A missing or unreadable icon must not take the shell down; the menu still works.
         try
         {
-            using var stream = AssetLoader.Open(new Uri("avares://Md3.Avalonia.Gallery/Assets/tray-icon.png"));
+            using var stream = AssetLoader.Open(new Uri("avares://Md3.Avalonia.Gallery/Assets/logo.png"));
             return new WindowIcon(new Bitmap(stream));
         }
         catch

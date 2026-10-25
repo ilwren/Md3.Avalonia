@@ -20,7 +20,7 @@ Open <https://www.nuget.org/account/trustedpublishing> while signed in as the pa
 | Package Owner | the account named by `NUGET_USERNAME` |
 | CI/CD Provider | GitHub Actions |
 | Repository Owner | `ilwren` |
-| Repository | `Md3.Avalonia` |
+| Repository | `Md3.Avalonia11` |
 | Workflow File | `publish-release.yml` |
 | Environment | leave empty — the publish job does not run in a named GitHub environment |
 
@@ -66,11 +66,16 @@ Examples:
 | Channel | Base version | Preview sequence | Package / Gallery version | Git tag |
 | --- | --- | ---: | --- | --- |
 | Preview | `0.5.0` | `1` | `0.5.0-preview.1` | `v0.5.0-preview.1` |
+| Preview | `0.5.0` | `2` | `0.5.0-preview.2` | `v0.5.0-preview.2` |
 | Stable | `0.5.0` | ignored | `0.5.0` | `v0.5.0` |
 
 The workflow rejects runs from branches other than `main`, malformed versions, and tags that already exist. A preview is marked as a GitHub prerelease. Android's display version is set to the same version as NuGet and desktop Gallery; its integer Android version code is increased per workflow run.
 
 Use a new version for every publication. NuGet.org does not allow replacing a published package version; `--skip-duplicate` lets a retry continue after a partially successful upload, but it does not make it safe to rebuild different contents under an already published version.
+
+## NuGet source repository metadata
+
+All package projects inherit `RepositoryUrl` and `RepositoryType` from the root `Directory.Build.props`. This emits a `<repository type="git" url="https://github.com/ilwren/Md3.Avalonia" />` element in each `.nuspec`, which NuGet.org displays as the source repository link. The metadata applies to newly packed and published versions; an existing NuGet version cannot be rewritten.
 
 ## If the push fails
 
@@ -89,4 +94,4 @@ A key that expired mid-run — possible only if a push is stalled for more than 
 
 The workflow supplies an MSBuild version override to the package and Gallery builds and does not edit or commit project files. The checked-in `.csproj` versions therefore remain unchanged by a release. After publishing, bump the project versions and Android `ApplicationDisplayVersion` in a normal reviewed change so local builds and subsequent branch artifacts reflect the new development baseline.
 
-`build-nuget.sh` accepts `--version 0.5.0-preview.1`; `build-nuget.ps1` accepts `-Version 0.5.0-preview.1`. Without either option, both scripts continue to use the version declared in the project files. The ordinary Gallery and NuGet build workflows remain available for branches and pull requests but no longer run on tags or releases; this workflow owns release creation and upload to avoid duplicate publication.
+`build-nuget.sh` accepts `--version 0.5.0-preview.2`; `build-nuget.ps1` accepts `-Version 0.5.0-preview.2`. Without either option, both scripts continue to use the version declared in the project files. The ordinary Gallery and NuGet build workflows remain available for branches and pull requests but no longer run on tags or releases; this workflow owns release creation and upload to avoid duplicate publication.

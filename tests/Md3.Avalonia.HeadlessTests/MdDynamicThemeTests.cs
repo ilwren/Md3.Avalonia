@@ -2,6 +2,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
@@ -83,6 +85,33 @@ public sealed class MdDynamicThemeTests
         Assert.IsType<SolidColorBrush>(application.Resources["Md.Sys.Color.Primary.Brush"]);
         var radius = Assert.IsType<CornerRadius>(application.Resources["Md.Comp.Button.Small.Shape.Round"]);
         Assert.Equal(14.4, radius.TopLeft, precision: 10);
+    }
+
+    [AvaloniaFact]
+    public void Gallery_Uses_Repository_Logo_For_Window_And_Brand_Marks()
+    {
+        var gallery = new MainWindow { Width = 1280, Height = 800 };
+        gallery.Show();
+        try
+        {
+            Assert.NotNull(gallery.Icon);
+            var primaryRail = gallery.FindControl<Border>("PrimaryNavigationRail")!;
+            var primaryLogo = primaryRail.GetVisualDescendants().OfType<Image>().Single();
+            var compactLogo = Assert.IsType<Image>(gallery.FindControl<Border>("CompactBrandMark")!.Child);
+            Assert.NotNull(primaryLogo.Source);
+            Assert.NotNull(compactLogo.Source);
+
+            using var stream = AssetLoader.Open(new Uri("avares://Md3.Avalonia.Gallery/Assets/logo.png"));
+            using var logo = new Bitmap(stream);
+            Assert.Equal(1254, logo.PixelSize.Width);
+            Assert.Equal(1254, logo.PixelSize.Height);
+            Assert.Equal(logo.PixelSize, Assert.IsType<Bitmap>(primaryLogo.Source).PixelSize);
+            Assert.Equal(logo.PixelSize, Assert.IsType<Bitmap>(compactLogo.Source).PixelSize);
+        }
+        finally
+        {
+            gallery.Close();
+        }
     }
 
     [AvaloniaFact]

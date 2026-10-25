@@ -1,11 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>Md3.Avalonia.Themes</RootNamespace>
     <AssemblyName>Md3.Avalonia.Dock</AssemblyName>
     <Description>Material Design 3 theme for Dock. Opt-in package: it carries the Dock.Avalonia and Dock.Avalonia.Themes.Fluent dependencies so the core Material packages do not have to.</Description>
     <PackageId>Md3.Avalonia11.Dock</PackageId>
-    <Version>0.5.0-preview.1</Version>
+    <Version>0.5.0-preview.2</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;dock;docking;layout;controls;theme;material-design-3</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

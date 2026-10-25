@@ -32,6 +32,6 @@
     <ProjectReference Include="../../src/Md3.Avalonia.Mapsui/Md3.Avalonia.Mapsui.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.InkCanvas/Md3.Avalonia.InkCanvas.csproj" />
     <AvaloniaResource Include="Assets/Media/**" />
-    <AvaloniaResource Include="Assets/tray-icon.png" />
+    <AvaloniaResource Include="../../logo.png" Link="Assets/logo.png" />
   </ItemGroup>
 </Project>

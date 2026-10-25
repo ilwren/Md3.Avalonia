@@ -2,7 +2,7 @@ using System.IO;
 
 namespace Md3.Avalonia.Notifications;
 
-/// <summary>Host and platform configuration for <see cref="MdSystemNotificationService"/>.</summary>
+/// <summary>Host and platform configuration for <see cref="MdSystemNotificationService"/>. / 用于配置系统通知服务的宿主应用信息与平台设置。</summary>
 public sealed class MdSystemNotificationOptions
 {
     /// <summary>Gets or sets the app name shown by the notification service when the platform supports it.</summary>

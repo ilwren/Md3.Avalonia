@@ -16,6 +16,7 @@ namespace Md3.Avalonia.Themes;
 
 /// <summary>
 /// The Material Design 3 look for <a href="https://livecharts.dev">LiveCharts2</a> charts.
+/// 用于 LiveCharts2 图表的 Material Design 3 外观配置。
 /// </summary>
 /// <remarks>
 /// <para>

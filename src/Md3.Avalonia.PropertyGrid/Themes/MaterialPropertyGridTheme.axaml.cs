@@ -7,6 +7,7 @@ namespace Md3.Avalonia.Themes;
 /// Material Design 3 chrome for <c>Avalonia.PropertyGrid</c>'s <c>PropertyGrid</c>. Add it after
 /// <c>MaterialTheme</c>, in <c>Application.Styles</c> or in the <c>Styles</c> of whichever window
 /// or page owns the grid.
+/// Avalonia.PropertyGrid 属性网格的 Material Design 3 样式。
 /// </summary>
 /// <remarks>
 /// <para>

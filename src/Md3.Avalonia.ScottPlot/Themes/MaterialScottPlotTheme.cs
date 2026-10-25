@@ -10,6 +10,7 @@ namespace Md3.Avalonia.Themes;
 /// <summary>
 /// Material 3 appearance for a ScottPlot plot: the surfaces, the ink, the grid, the legend and the
 /// type scale a Material chart is drawn with, plus the Material series palette.
+/// 用于 ScottPlot 图表的 Material 3 外观与配色主题。
 /// </summary>
 /// <remarks>
 /// <para>

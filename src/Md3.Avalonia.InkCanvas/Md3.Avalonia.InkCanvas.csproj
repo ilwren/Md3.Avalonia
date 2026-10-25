@@ -5,7 +5,7 @@
     <AssemblyName>Md3.Avalonia.InkCanvas</AssemblyName>
     <Description>Material Design 3 theme for the DotNetCampus.AvaloniaInkCanvas handwriting canvas, plus MdSignaturePad, a signature pad built on it. Opt-in package: it carries the ink canvas dependency so the core Material packages do not have to.</Description>
     <PackageId>Md3.Avalonia11.InkCanvas</PackageId>
-    <Version>0.5.0-preview.1</Version>
+    <Version>0.5.0-preview.2</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;ink;handwriting;signature;stylus;pen;drawing;theme;material-design-3</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

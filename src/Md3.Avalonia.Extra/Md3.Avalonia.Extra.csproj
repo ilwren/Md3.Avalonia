@@ -1,11 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     <RootNamespace>Md3.Avalonia.Extra</RootNamespace>
     <AssemblyName>Md3.Avalonia.Extra</AssemblyName>
-    <Description>Extended Material Design 3 components and advanced UX widgets for Avalonia, inspired by popular open-source Flutter ecosystem widgets.</Description>
+    <Description>Extended Material Design 3 components and advanced UX widgets for Avalonia, inspired by popular open-source Flutter UI patterns.</Description>
     <PackageId>Md3.Avalonia11.Extra</PackageId>
-    <Version>0.5.0-preview.1</Version>
+    <Version>0.5.0-preview.2</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;flutter;extra;controls;mvvm;android;desktop;material-design-3</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

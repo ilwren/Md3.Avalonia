@@ -16,6 +16,7 @@ namespace Md3.Avalonia.Controls;
 /// A Material signature pad: a handwriting surface with the chrome a signature needs around it - a
 /// baseline to sign on, a hint that disappears once there is ink, a clear button, and an eraser
 /// mode - all filled from Material tokens rather than from the ink canvas's own defaults.
+/// 基于 Material 设计令牌的手写签名控件，提供签名基线、提示、清除操作与橡皮擦模式。
 /// </summary>
 /// <remarks>
 /// <para>

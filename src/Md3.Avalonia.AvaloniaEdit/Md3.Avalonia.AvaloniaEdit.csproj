@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <!-- Same reasoning as Md3.Avalonia.DataGrid: a RootNamespace that
@@ -8,7 +8,7 @@
     <AssemblyName>Md3.Avalonia.AvaloniaEdit</AssemblyName>
     <Description>Material Design 3 theme for the AvaloniaEdit control library. Opt-in package: it carries the Avalonia.AvaloniaEdit dependency so the core Material packages do not have to.</Description>
     <PackageId>Md3.Avalonia11.AvaloniaEdit</PackageId>
-    <Version>0.5.0-preview.1</Version>
+    <Version>0.5.0-preview.2</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;avaloniaedit;editor;text-editor;syntax;controls;theme;material-design-3</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

@@ -13,7 +13,7 @@ Md3.Avalonia11.PropertyGrid, Md3.Avalonia11.NodifyM, Md3.Avalonia11.Mapsui, Md3.
 Usage:
   scripts/build-nuget.sh [--output /absolute/or/relative/path]
                          [--configuration Release]
-                         [--version 0.5.0-preview.1]
+                         [--version 0.5.0-preview.2]
                          [--no-restore]
                          [--keep-intermediate]
 
@@ -64,7 +64,7 @@ done
 if [[ "$OUTPUT" != /* ]]; then OUTPUT="$ROOT/$OUTPUT"; fi
 
 if [[ -n "$PACKAGE_VERSION" ]] && [[ ! "$PACKAGE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]; then
-  echo "error: invalid package version '$PACKAGE_VERSION' (expected SemVer such as 0.4.6 or 0.4.6-preview.1)" >&2
+  echo "error: invalid package version '$PACKAGE_VERSION' (expected SemVer such as 0.5.0 or 0.5.0-preview.2)" >&2
   exit 2
 fi
 VERSION_ARGS=()

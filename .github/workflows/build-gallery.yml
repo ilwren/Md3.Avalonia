@@ -48,6 +48,8 @@ jobs:
             -c Release \
             -r ${{ matrix.rid }} \
             --self-contained false \
+            -p:DebugSymbols=false \
+            -p:DebugType=None \
             -o artifacts/desktop-${{ matrix.rid }} > /tmp/publish.log 2>&1 || status=$?
           cat /tmp/publish.log
           {
@@ -68,6 +70,16 @@ jobs:
               printf '::error title=publish-tail::%s\n' "${line//%/%25}"; done
           fi
           exit "$status"
+
+      - name: Remove PDB debug symbols
+        shell: pwsh
+        run: |
+          $publishDirectory = "artifacts/desktop-${{ matrix.rid }}"
+          $symbols = @(Get-ChildItem -LiteralPath $publishDirectory -Recurse -File -Filter '*.pdb')
+          if ($symbols.Count -gt 0) { $symbols | Remove-Item -Force }
+          $remaining = @(Get-ChildItem -LiteralPath $publishDirectory -Recurse -File -Filter '*.pdb')
+          if ($remaining.Count -gt 0) { throw "PDB files remain in the Gallery artifact." }
+          Write-Host "Excluded $($symbols.Count) PDB files from the Gallery artifact."
 
       - name: Upload Desktop Artifacts
         uses: actions/upload-artifact@v4
