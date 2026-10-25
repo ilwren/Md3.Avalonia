@@ -25,6 +25,10 @@ public sealed class LibVlcVideoSurface : UserControl
     private FrameData? _pendingFrame;
     private int _renderScheduled;
     private int _disposed;
+    private IntPtr _frameBuffer;
+    private int _frameWidth;
+    private int _frameHeight;
+    private int _framePitch;
     private WriteableBitmap? _bitmap;
 
     /// <summary>Creates an Avalonia-rendered video surface and registers its LibVLC callbacks.</summary>
@@ -54,9 +58,13 @@ public sealed class LibVlcVideoSurface : UserControl
         var pitch = Align(checked(w * 4), 32);
         var lineCount = Align(h, 32);
         var buffer = Marshal.AllocHGlobal(checked(pitch * lineCount));
-        var context = new FrameContext(buffer, w, h, pitch);
-        var handle = GCHandle.Alloc(context);
-        opaque = GCHandle.ToIntPtr(handle);
+        _frameBuffer = buffer;
+        _frameWidth = w;
+        _frameHeight = h;
+        _framePitch = pitch;
+        // LibVLC passes this private pointer to the lock, display, and cleanup callbacks.
+        // Keep it as the raw allocation address; it is not a managed GCHandle.
+        opaque = buffer;
 
         pitches = (uint)pitch;
         lines = (uint)lineCount;
@@ -71,28 +79,32 @@ public sealed class LibVlcVideoSurface : UserControl
     }
 
     private static int Align(int value, int alignment) => (value + alignment - 1) & ~(alignment - 1);
-    private static FrameContext? GetContext(IntPtr opaque) => opaque == IntPtr.Zero ? null : GCHandle.FromIntPtr(opaque).Target as FrameContext;
 
     private IntPtr LockVideo(IntPtr opaque, IntPtr planes)
     {
-        if (GetContext(opaque) is not { } context) return IntPtr.Zero;
-        Marshal.WriteIntPtr(planes, context.Buffer);
-        return IntPtr.Zero;
+        if (opaque == IntPtr.Zero || planes == IntPtr.Zero) return IntPtr.Zero;
+        Marshal.WriteIntPtr(planes, opaque);
+        return opaque;
     }
 
     private void UnlockVideo(IntPtr opaque, IntPtr picture, IntPtr planes) { }
 
     private void DisplayVideo(IntPtr opaque, IntPtr picture)
     {
-        if (GetContext(opaque) is not { } context || Volatile.Read(ref _disposed) != 0) return;
+        if (opaque == IntPtr.Zero || opaque != Volatile.Read(ref _frameBuffer) || Volatile.Read(ref _disposed) != 0) return;
+
+        var width = _frameWidth;
+        var height = _frameHeight;
+        var pitch = _framePitch;
+        if (width <= 0 || height <= 0 || pitch < width * 4) return;
 
         // Copy the decoded frame before returning to LibVLC: its callback buffer is reused immediately.
-        var packedStride = checked(context.Width * 4);
-        var frame = new byte[checked(packedStride * context.Height)];
-        for (var row = 0; row < context.Height; row++)
-            Marshal.Copy(IntPtr.Add(context.Buffer, row * context.Pitch), frame, row * packedStride, packedStride);
+        var packedStride = checked(width * 4);
+        var frame = new byte[checked(packedStride * height)];
+        for (var row = 0; row < height; row++)
+            Marshal.Copy(IntPtr.Add(opaque, row * pitch), frame, row * packedStride, packedStride);
 
-        Interlocked.Exchange(ref _pendingFrame, new FrameData(frame, context.Width, context.Height)); // Drop older frames if the UI thread is behind.
+        Interlocked.Exchange(ref _pendingFrame, new FrameData(frame, width, height)); // Drop older frames if the UI thread is behind.
         if (Interlocked.Exchange(ref _renderScheduled, 1) == 0)
             Dispatcher.UIThread.Post(RenderPendingFrame, DispatcherPriority.Render);
     }
@@ -129,10 +141,10 @@ public sealed class LibVlcVideoSurface : UserControl
     {
         if (opaque != IntPtr.Zero)
         {
-            var handle = GCHandle.FromIntPtr(opaque);
-            if (handle.Target is FrameContext context && context.Buffer != IntPtr.Zero)
-                Marshal.FreeHGlobal(context.Buffer);
-            handle.Free();
+            // LibVLC supplies the raw buffer pointer returned from VideoFormatCallback.
+            // Treating it as a GCHandle caused the AccessViolationException reported by callers.
+            if (Interlocked.CompareExchange(ref _frameBuffer, IntPtr.Zero, opaque) == opaque)
+                Marshal.FreeHGlobal(opaque);
             opaque = IntPtr.Zero;
         }
 
@@ -158,6 +170,5 @@ public sealed class LibVlcVideoSurface : UserControl
         });
     }
 
-    private sealed record FrameContext(IntPtr Buffer, int Width, int Height, int Pitch);
     private sealed record FrameData(byte[] Pixels, int Width, int Height);
 }
