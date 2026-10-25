@@ -125,7 +125,7 @@ public sealed class MdMenu : ItemsControl
         return match.Focus(NavigationMethod.Directional);
     }
 
-    private void OnItemGotFocus(object? sender, FocusChangedEventArgs e)
+    private void OnItemGotFocus(object? sender, GotFocusEventArgs e)
     {
         if (e.Source is MdMenuItem item)
             SetRovingItem(GetFocusableItems(), item);

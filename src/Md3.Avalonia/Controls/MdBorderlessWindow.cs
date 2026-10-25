@@ -4,7 +4,6 @@ using System.Windows.Input;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
-using Avalonia.Controls.Chrome;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -30,14 +29,69 @@ public sealed record MdWindowTemplateSettings(
     bool IsClientAreaExtended,
     bool IsMaximized);
 
-/// <summary>Platform boundary for native-window operations; host applications may replace it.</summary>
+/// <summary>Platform boundary for native-window operations; host applications may replace it. 原生窗口操作的平台边界，宿主应用可替换其实现。</summary>
+/// <remarks>
+/// <para><see cref="MdBorderlessWindow"/> chooses a default adapter through
+/// <see cref="MdWindowPlatformAdapterResolver.Resolve"/> and applies it when the window opens,
+/// its chrome options change, or <see cref="MdBorderlessWindow.PlatformAdapter"/> is replaced.
+/// Built-in adapters target Windows, macOS, Linux, and Android; unknown platforms use the generic
+/// Avalonia adapter. The generic desktop fallback uses Avalonia move/resize APIs, while the Android
+/// adapter performs no desktop-window operations.</para>
+/// <para><see cref="Capabilities"/> reports supported operations through the
+/// <see cref="MdWindowCapabilities.None"/>, <see cref="MdWindowCapabilities.Move"/>,
+/// <see cref="MdWindowCapabilities.Resize"/>, <see cref="MdWindowCapabilities.Minimize"/>,
+/// <see cref="MdWindowCapabilities.Maximize"/>, <see cref="MdWindowCapabilities.Close"/>,
+/// <see cref="MdWindowCapabilities.SystemMenu"/>, and <see cref="MdWindowCapabilities.All"/> flags.
+/// If <see cref="TryShowSystemMenu(MdBorderlessWindow, Point)"/> returns false,
+/// <see cref="MdBorderlessWindow.ShowSystemMenu(Point)"/> raises
+/// <see cref="MdBorderlessWindow.SystemMenuRequested"/>.</para>
+/// <para><see cref="MdBorderlessWindow.PlatformAdapter"/> accepts a custom implementation. Derive
+/// from <see cref="MdAvaloniaWindowPlatformAdapter"/> when its portable fallback behavior is
+/// suitable; validate native decoration and system animation behavior on each target OS.</para>
+/// <para><see cref="MdBorderlessWindow"/> 通过 <see cref="MdWindowPlatformAdapterResolver.Resolve"/> 选择默认适配器，并在窗口打开、装饰选项变化或替换 <see cref="MdBorderlessWindow.PlatformAdapter"/> 时应用它。内置适配器面向 Windows、macOS、Linux 与 Android；未知平台使用通用 Avalonia 适配器。通用桌面实现使用 Avalonia 的窗口移动/缩放 API；Android 适配器不执行桌面窗口操作。</para>
+/// <para><see cref="Capabilities"/> 通过 <see cref="MdWindowCapabilities.Move"/>、<see cref="MdWindowCapabilities.Resize"/>、<see cref="MdWindowCapabilities.Minimize"/>、<see cref="MdWindowCapabilities.Maximize"/>、<see cref="MdWindowCapabilities.Close"/> 与 <see cref="MdWindowCapabilities.SystemMenu"/> 报告支持的操作。若 <see cref="TryShowSystemMenu(MdBorderlessWindow, Point)"/> 返回 false，<see cref="MdBorderlessWindow.ShowSystemMenu(Point)"/> 会触发 <see cref="MdBorderlessWindow.SystemMenuRequested"/>。</para>
+/// <para>可通过 <see cref="MdBorderlessWindow.PlatformAdapter"/> 设置自定义实现。如果 Avalonia 的跨平台回退行为适用，可以继承 <see cref="MdAvaloniaWindowPlatformAdapter"/>。请在各目标操作系统上验证原生窗口装饰与系统动画。</para>
+/// </remarks>
+/// <example>
+/// <para>Derive from the portable adapter and override only the operation that needs custom
+/// platform behavior. Returning false lets the window raise
+/// <see cref="MdBorderlessWindow.SystemMenuRequested"/>.</para>
+/// <para>继承通用适配器，仅重写需要自定义平台行为的操作。返回 false 时，窗口会触发
+/// <see cref="MdBorderlessWindow.SystemMenuRequested"/>。</para>
+/// <code language="csharp"><![CDATA[
+/// public sealed class CustomWindowAdapter : MdAvaloniaWindowPlatformAdapter
+/// {
+///     public CustomWindowAdapter() : base(MdWindowPlatform.Windows) { }
+///
+///     public override bool TryShowSystemMenu(MdBorderlessWindow window, Point clientPoint)
+///     {
+///         // Call the platform menu API; return true only when it was handled.
+///         // 调用平台菜单 API；仅在已处理时返回 true。
+///         return false;
+///     }
+/// }
+///
+/// borderlessWindow.PlatformAdapter = new CustomWindowAdapter();
+/// ]]></code>
+/// </example>
 public interface IMdWindowPlatformAdapter
 {
+    /// <summary>Identifies the platform this adapter targets. 标识此适配器面向的平台。</summary>
     MdWindowPlatform Platform { get; }
+
+    /// <summary>Operations supported by this adapter, such as move, resize, or system menu. 此适配器支持的操作，例如移动、缩放或系统菜单。</summary>
     MdWindowCapabilities Capabilities { get; }
+
+    /// <summary>Applies window-decoration and title-bar settings to the supplied window. 将窗口装饰与标题栏设置应用到指定窗口。</summary>
     void Apply(MdBorderlessWindow window, MdBorderlessWindowOptions options);
+
+    /// <summary>Attempts to start a native move operation; returns true when the adapter handled the press. 尝试开始原生窗口移动；适配器处理了按下事件时返回 true。</summary>
     bool TryBeginMove(MdBorderlessWindow window, PointerPressedEventArgs args);
+
+    /// <summary>Attempts to resize the specified edge; returns true when the adapter handled the press. 尝试缩放指定边缘；适配器处理了按下事件时返回 true。</summary>
     bool TryBeginResize(MdBorderlessWindow window, WindowEdge edge, PointerPressedEventArgs args);
+
+    /// <summary>Attempts to open the system menu at a window-relative point. Returns false when unsupported or unhandled. 尝试在相对于窗口的坐标处打开系统菜单；不支持或未处理时返回 false。</summary>
     bool TryShowSystemMenu(MdBorderlessWindow window, Point clientPoint);
 }
 
@@ -51,7 +105,7 @@ public class MdAvaloniaWindowPlatformAdapter(MdWindowPlatform platform) : IMdWin
         if (Platform == MdWindowPlatform.Android) return;
         // Portable fallback: retain the platform resize frame while Material owns the client title
         // content. Windows overrides this because DWM animations require Full caption style bits.
-        window.WindowDecorations = options.PreserveNativeBorder ? WindowDecorations.BorderOnly : WindowDecorations.None;
+        window.SystemDecorations = options.PreserveNativeBorder ? SystemDecorations.BorderOnly : SystemDecorations.None;
         window.ExtendClientAreaToDecorationsHint = options.ExtendIntoTitleBar;
         window.ExtendClientAreaTitleBarHeightHint = Math.Max(0, options.TitleBarHeight);
         window.CanResize = options.CanResize;
@@ -91,7 +145,7 @@ public sealed class MdWindowsWindowPlatformAdapter() : MdAvaloniaWindowPlatformA
 
     public override void Apply(MdBorderlessWindow window, MdBorderlessWindowOptions options)
     {
-        window.WindowDecorations = options.PreserveNativeBorder ? WindowDecorations.Full : WindowDecorations.None;
+        window.SystemDecorations = options.PreserveNativeBorder ? SystemDecorations.Full : SystemDecorations.None;
         window.ExtendClientAreaToDecorationsHint = options.ExtendIntoTitleBar;
         window.ExtendClientAreaTitleBarHeightHint = Math.Max(0, options.TitleBarHeight);
         window.CanResize = options.CanResize;
@@ -263,7 +317,7 @@ public class MdBorderlessWindow : MdWindow
             PlatformAdapter.Apply(this, new MdBorderlessWindowOptions(CanResize, ExtendIntoTitleBar, height, PreserveNativeBorder));
         else
         {
-            WindowDecorations = WindowDecorations.Full;
+            SystemDecorations = SystemDecorations.Full;
             ExtendClientAreaToDecorationsHint = false;
         }
         var settings = new MdWindowTemplateSettings(
@@ -398,7 +452,7 @@ public sealed class MdWindowTitleBar : ContentControl
     }
 }
 
-/// <summary>Accessible caption action button with native non-client role metadata.</summary>
+/// <summary>Accessible caption action button for an Avalonia 11 custom window title bar.</summary>
 [PseudoClasses(":minimize", ":maximize", ":restore", ":close")]
 public class MdCaptionButton : Button
 {
@@ -454,12 +508,6 @@ public class MdCaptionButton : Button
         PseudoClasses.Set(":restore", restoring);
         PseudoClasses.Set(":close", Kind == MdCaptionButtonKind.Close);
 
-        WindowDecorationProperties.SetElementRole(this, Kind switch
-        {
-            MdCaptionButtonKind.Minimize => WindowDecorationsElementRole.MinimizeButton,
-            MdCaptionButtonKind.MaximizeRestore => WindowDecorationsElementRole.MaximizeButton,
-            _ => WindowDecorationsElementRole.CloseButton
-        });
         AutomationProperties.SetName(this, Kind switch
         {
             MdCaptionButtonKind.Minimize => "Minimize",
@@ -479,9 +527,6 @@ public sealed class MdWindowCaptionButton : MdCaptionButton
 /// <summary>Explicit draggable title-bar region that excludes interactive descendants.</summary>
 public sealed class MdWindowDragRegion : ContentControl
 {
-    public MdWindowDragRegion() =>
-        WindowDecorationProperties.SetElementRole(this, WindowDecorationsElementRole.TitleBar);
-
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
@@ -497,10 +542,6 @@ public sealed class MdWindowResizeGrip : Control
     public static readonly StyledProperty<WindowEdge> EdgeProperty =
         AvaloniaProperty.Register<MdWindowResizeGrip, WindowEdge>(nameof(Edge), WindowEdge.SouthEast);
 
-    static MdWindowResizeGrip() =>
-        EdgeProperty.Changed.AddClassHandler<MdWindowResizeGrip>((grip, _) => grip.UpdateElementRole());
-
-    public MdWindowResizeGrip() => UpdateElementRole();
 
     public WindowEdge Edge { get => GetValue(EdgeProperty); set => SetValue(EdgeProperty, value); }
 
@@ -511,15 +552,4 @@ public sealed class MdWindowResizeGrip : Control
         if (this.FindAncestorOfType<MdBorderlessWindow>()?.TryBeginResize(Edge, e) == true) e.Handled = true;
     }
 
-    private void UpdateElementRole() => WindowDecorationProperties.SetElementRole(this, Edge switch
-    {
-        WindowEdge.North => WindowDecorationsElementRole.ResizeN,
-        WindowEdge.South => WindowDecorationsElementRole.ResizeS,
-        WindowEdge.East => WindowDecorationsElementRole.ResizeE,
-        WindowEdge.West => WindowDecorationsElementRole.ResizeW,
-        WindowEdge.NorthEast => WindowDecorationsElementRole.ResizeNE,
-        WindowEdge.NorthWest => WindowDecorationsElementRole.ResizeNW,
-        WindowEdge.SouthWest => WindowDecorationsElementRole.ResizeSW,
-        _ => WindowDecorationsElementRole.ResizeSE
-    });
 }

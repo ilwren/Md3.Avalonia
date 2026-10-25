@@ -1,4 +1,5 @@
 using System.Globalization;
+using Avalonia.Headless.XUnit;
 using Md3.Avalonia.Extra.Controls;
 using Xunit;
 
@@ -6,7 +7,7 @@ namespace Md3.Avalonia.HeadlessTests;
 
 public sealed class MdBreadcrumbPathConverterTests
 {
-    [Fact]
+    [AvaloniaFact]
     public void Converts_Path_To_Prefix_Items_And_Accents_Ancestors()
     {
         var converter = new MdBreadcrumbPathConverter();
@@ -23,7 +24,7 @@ public sealed class MdBreadcrumbPathConverterTests
         Assert.False(items[2].UseAccentColor);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Converts_Rooted_Path_With_A_Clickable_Root_Item()
     {
         var converter = new MdBreadcrumbPathConverter();
@@ -39,7 +40,7 @@ public sealed class MdBreadcrumbPathConverterTests
         Assert.False(items[^1].UseAccentColor);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Empty_Path_Produces_No_Items()
     {
         var converter = new MdBreadcrumbPathConverter();

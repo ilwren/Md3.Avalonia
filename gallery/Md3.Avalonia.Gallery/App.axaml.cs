@@ -47,7 +47,7 @@ public partial class App : Application
         var trayIcon = new TrayIcon
         {
             Icon = LoadTrayIcon(),
-            ToolTipText = "Md3.Avalonia Gallery",
+            ToolTipText = "Md3.Avalonia11 Gallery",
             Menu = BuildTrayMenu(desktop),
             IsVisible = true,
         };
@@ -69,7 +69,7 @@ public partial class App : Application
         // A missing or unreadable icon must not take the shell down; the menu still works.
         try
         {
-            using var stream = AssetLoader.Open(new Uri("avares://Md3.Avalonia.Gallery/Assets/tray-icon.png"));
+            using var stream = AssetLoader.Open(new Uri("avares://Md3.Avalonia.Gallery/Assets/logo.png"));
             return new WindowIcon(new Bitmap(stream));
         }
         catch
@@ -104,7 +104,7 @@ public partial class App : Application
         {
             var item = new NativeMenuItem(GalleryLocalization.Choose(english, chinese))
             {
-                ToggleType = MenuItemToggleType.Radio,
+                ToggleType = NativeMenuItemToggleType.Radio,
                 IsChecked = ReferenceEquals(Current?.RequestedThemeVariant, variant),
             };
             var chosen = variant;

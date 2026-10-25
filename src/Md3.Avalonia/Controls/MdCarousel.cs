@@ -120,8 +120,10 @@ public sealed class MdCarousel : ListBox
                 SetLayoutAnchor(SelectedIndex, settle: true);
             UpdateSelectionAnnouncement();
         };
-        ScrollGesture += (_, _) => CancelSettleForDirectManipulation();
-        ScrollGestureEnded += (_, _) => SnapToNearestRealizedItem();
+        AddHandler(Gestures.ScrollGestureEvent, (_, _) => CancelSettleForDirectManipulation(),
+            handledEventsToo: true);
+        AddHandler(Gestures.ScrollGestureEndedEvent, (_, _) => SnapToNearestRealizedItem(),
+            handledEventsToo: true);
         PointerWheelChanged += (_, _) =>
         {
             CancelSettleForDirectManipulation();

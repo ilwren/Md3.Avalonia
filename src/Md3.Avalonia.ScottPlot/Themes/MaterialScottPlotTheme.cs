@@ -10,6 +10,7 @@ namespace Md3.Avalonia.Themes;
 /// <summary>
 /// Material 3 appearance for a ScottPlot plot: the surfaces, the ink, the grid, the legend and the
 /// type scale a Material chart is drawn with, plus the Material series palette.
+/// 用于 ScottPlot 图表的 Material 3 外观与配色主题。
 /// </summary>
 /// <remarks>
 /// <para>
@@ -68,7 +69,7 @@ public sealed class MaterialScottPlotTheme
     // Named in full: ScottPlot.Palettes is a nested namespace, and a using directive imports the types
     // of a namespace, not the namespaces inside it.
     public static IPalette SeriesPalette(bool dark) => new ScottPlot.Palettes.Custom(
-        PaletteRoleNames.Select(role => MdScottPlotTokens.Color(role, dark)),
+        PaletteRoleNames.Select(role => MdScottPlotTokens.Color(role, dark)).ToArray(),
         dark ? "Material 3 (dark)" : "Material 3",
         "Md.Sys.Color roles, in the order the Material themes walk them");
 

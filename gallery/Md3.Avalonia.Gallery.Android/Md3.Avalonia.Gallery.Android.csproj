@@ -3,9 +3,11 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0-android</TargetFramework>
     <SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
-    <ApplicationId>io.arena.md3avalonia.gallery</ApplicationId>
+    <!-- A separate application identity allows the Avalonia 11 and main Gallery apps to be
+         installed side by side, and produces non-conflicting APK file names. -->
+    <ApplicationId>io.arena.md3avalonia11.gallery</ApplicationId>
     <ApplicationVersion>6</ApplicationVersion>
-    <ApplicationDisplayVersion>0.5.0-preview.1</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>0.5.0-preview.2</ApplicationDisplayVersion>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
     <Nullable>enable</Nullable>

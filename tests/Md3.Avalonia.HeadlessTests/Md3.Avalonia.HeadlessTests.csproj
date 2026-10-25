@@ -10,7 +10,7 @@
     <!-- Tests build Dock layouts in C#; the theme package itself only needs Dock.Avalonia. -->
     <PackageReference Include="Dock.Model.Avalonia" />
     <PackageReference Include="Avalonia.Skia" />
-    <!-- ScottPlot 5.1.59 pulls in SkiaSharp.NativeAssets.Linux.NoDependencies, a libSkiaSharp
+    <!-- ScottPlot 5.0.56 pulls in SkiaSharp.NativeAssets.Linux.NoDependencies, a libSkiaSharp
          built without fontconfig for minimal containers. It writes the same
          runtimes/linux-x64/native/libSkiaSharp.so as the fontconfig build Avalonia.Skia needs,
          and whichever copy wins decides whether the process can enumerate system fonts at all:
@@ -21,7 +21,7 @@
          Skia-based theme package the suite grows next. -->
     <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" ExcludeAssets="all" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -31,7 +31,6 @@
     <ProjectReference Include="../../src/Md3.Avalonia.Icons.Lite/Md3.Avalonia.Icons.Lite.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj" />
-    <ProjectReference Include="../../src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.AvaloniaEdit/Md3.Avalonia.AvaloniaEdit.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.AvaloniaHex/Md3.Avalonia.AvaloniaHex.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Dock/Md3.Avalonia.Dock.csproj" />

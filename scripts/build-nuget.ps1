@@ -1,4 +1,4 @@
-# Build the release NuGet packages for all seven Md3.Avalonia packages.
+# Build the release NuGet packages for all seventeen Md3.Avalonia11 packages.
 # Requires Java 17 and the .NET Android workload: dotnet workload install android.
 [CmdletBinding()]
 param(
@@ -23,7 +23,6 @@ $projects = @(
     (Join-Path $root "src/Md3.Avalonia.Icons.Lite/Md3.Avalonia.Icons.Lite.csproj"),
     (Join-Path $root "src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj"),
     (Join-Path $root "src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj"),
-    (Join-Path $root "src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj"),
     (Join-Path $root "src/Md3.Avalonia.AvaloniaEdit/Md3.Avalonia.AvaloniaEdit.csproj"),
     (Join-Path $root "src/Md3.Avalonia.AvaloniaHex/Md3.Avalonia.AvaloniaHex.csproj"),
     (Join-Path $root "src/Md3.Avalonia.Dock/Md3.Avalonia.Dock.csproj"),
@@ -52,7 +51,7 @@ if ($Version -and $Local) {
     throw "-Version and -Local cannot be combined."
 }
 if ($Version -and $Version -notmatch '^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$') {
-    throw "Invalid package version '$Version'. Use SemVer such as 0.4.6 or 0.4.6-preview.1."
+    throw "Invalid package version '$Version'. Use SemVer such as 0.5.0 or 0.5.0-preview.2."
 }
 
 $versionArgs = @()
@@ -98,10 +97,10 @@ foreach ($proj in $projects) {
 Write-Host ""
 Write-Host "Built packages:" -ForegroundColor Green
 Get-ChildItem $outputDir -Filter *.nupkg | Sort-Object LastWriteTime -Descending |
-    Select-Object -First 18 | ForEach-Object { Write-Host "  $($_.FullName)" -ForegroundColor Green }
+    Select-Object -First 17 | ForEach-Object { Write-Host "  $($_.FullName)" -ForegroundColor Green }
 if (-not $Local -and -not $Version) {
     Write-Host ""
     Write-Host "WARNING: the version is unchanged. NuGet will keep restoring the previously cached" -ForegroundColor Yellow
     Write-Host "copy from %USERPROFILE%\.nuget\packages instead of this build. Either pass -Local, or" -ForegroundColor Yellow
-    Write-Host "delete the cache first, e.g.:  rmdir /s /q `"%USERPROFILE%\.nuget\packages\md3.avalonia`"" -ForegroundColor Yellow
+    Write-Host "delete the cache first, e.g.:  rmdir /s /q `"%USERPROFILE%\.nuget\packages\md3.avalonia11`"" -ForegroundColor Yellow
 }

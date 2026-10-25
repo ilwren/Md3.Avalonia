@@ -1,3 +1,4 @@
+using Avalonia.Headless.XUnit;
 using Md3.Avalonia.Notifications;
 using Xunit;
 
@@ -5,7 +6,7 @@ namespace Md3.Avalonia.HeadlessTests;
 
 public sealed class MdSystemNotificationTests
 {
-    [Fact]
+    [AvaloniaFact]
     public void Notification_Requires_A_Title_And_Allows_An_Empty_Body()
     {
         Assert.Throws<ArgumentException>(() => new MdSystemNotification(" ", "Body"));
@@ -13,7 +14,7 @@ public sealed class MdSystemNotificationTests
         Assert.Equal(string.Empty, new MdSystemNotification("Title", string.Empty).Body);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Default_Service_Respects_The_Current_Target_Framework()
     {
         if (OperatingSystem.IsWindows())
@@ -28,18 +29,20 @@ public sealed class MdSystemNotificationTests
         Assert.False(string.IsNullOrWhiteSpace(new MdSystemNotificationOptions().ApplicationName));
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Android_Small_Icon_Resource_Must_Be_Positive_When_Provided()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => MdSystemNotificationService.CreateDefault(
             new MdSystemNotificationOptions { AndroidSmallIconResourceId = 0 }));
     }
 
-    [Fact]
+    [AvaloniaFact]
     public async Task A_Cancelled_Request_Does_Not_Start_A_Platform_Notification()
     {
+        // This headless test uses the net10.0 asset; Windows notifications require the
+        // Windows-specific target. xUnit v2 has no Assert.Skip, so make that case a no-op.
         if (OperatingSystem.IsWindows())
-            Assert.Skip("This headless test uses the net10.0 asset; Windows notifications require the Windows-specific target.");
+            return;
 
         var service = MdSystemNotificationService.CreateDefault();
         using var cancellation = new CancellationTokenSource();

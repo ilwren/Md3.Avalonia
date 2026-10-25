@@ -144,7 +144,7 @@ public sealed class MdAuditP1P2RegressionTests
         Assert.Equal("面包屑导航", AutomationProperties.GetName(breadcrumb));
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Disabled_CommandPalette_Item_Exposes_Disabled_State()
     {
         var command = new DisabledCommand();

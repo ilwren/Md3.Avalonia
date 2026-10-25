@@ -8,7 +8,8 @@
         Width="1440" Height="900" MinWidth="360" MinHeight="600"
         Background="{DynamicResource Md.Sys.Color.Surface.Brush}"
         Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
-        Title="Material 3 for Avalonia — Gallery">
+        Title="Material 3 for Avalonia 11 — Gallery"
+        Icon="avares://Md3.Avalonia.Gallery/Assets/logo.png">
   <Window.Styles>
     <Style Selector="TextBlock.h1"><Setter Property="FontSize" Value="48" /><Setter Property="FontWeight" Value="Normal" /><Setter Property="LineHeight" Value="56" /></Style>
     <Style Selector="TextBlock.h2"><Setter Property="FontSize" Value="28" /><Setter Property="FontWeight" Value="Normal" /><Setter Property="LineHeight" Value="36" /></Style>
@@ -26,10 +27,8 @@
             Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
             BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,1,0">
       <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
-        <Border Width="56" Height="56" HorizontalAlignment="Center" CornerRadius="18"
-                Background="{DynamicResource Md.Sys.Color.Primary.Brush}">
-          <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" FontWeight="Medium"
-                     Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" Text="M3" />
+        <Border Width="56" Height="56" HorizontalAlignment="Center" CornerRadius="18" ClipToBounds="True">
+          <Image Source="avares://Md3.Avalonia.Gallery/Assets/logo.png" Stretch="Uniform" />
         </Border>
         <md:MdIconButton Grid.Row="1" Icon="{x:Static md:MdSymbols.Search}" Click="FocusGallerySearch"
                          HorizontalAlignment="Center" ToolTip.Tip="Search" />
@@ -51,7 +50,7 @@
           </md:MdButton>
         </StackPanel>
         <TextBlock Grid.Row="3" HorizontalAlignment="Center" FontSize="10"
-                   Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Avalonia 12" />
+                   Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Avalonia 11" />
       </Grid>
     </Border>
 
@@ -61,10 +60,8 @@
         <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12">
           <md:MdIconButton x:Name="NavigationMenuButton" Grid.Column="0" Icon="{x:Static md:MdSymbols.Menu}"
                            Click="ToggleNavigation" ToolTip.Tip="Open navigation" />
-          <Border x:Name="CompactBrandMark" Grid.Column="1" Width="44" Height="44" CornerRadius="14"
-                  Background="{DynamicResource Md.Sys.Color.Primary.Brush}">
-            <TextBlock Text="M3" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18"
-                       FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" />
+          <Border x:Name="CompactBrandMark" Grid.Column="1" Width="44" Height="44" CornerRadius="14" ClipToBounds="True">
+            <Image Source="avares://Md3.Avalonia.Gallery/Assets/logo.png" Stretch="Uniform" />
           </Border>
           <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="1">
             <TextBlock x:Name="BrandTitle" FontSize="18" FontWeight="Medium" Text="Material Design 3" />

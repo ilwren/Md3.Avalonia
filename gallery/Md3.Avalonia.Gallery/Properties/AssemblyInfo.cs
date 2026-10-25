@@ -3,4 +3,4 @@ using System.Runtime.CompilerServices;
 // MdGalleryIndexTests calls MainWindow.NavigateToIndexedPage to prove that every link on the
 // components overview page resolves to a real page.
 [assembly: InternalsVisibleTo("Md3.Avalonia.HeadlessTests")]
-[assembly: InternalsVisibleTo("Md3.Avalonia.Gallery.Desktop")]
+[assembly: InternalsVisibleTo("Md3.Avalonia11.Gallery.Desktop")]

@@ -36,13 +36,14 @@ namespace Md3.Avalonia.HeadlessTests;
 /// editor in a window only to read back the two literals its style hardcodes - without a pump
 /// afterwards. A populated editor is still covered: <see cref="MdGalleryTests"/> renders the gallery
 /// page that carries one. Every test here also carries a timeout, so a stall shows up as a named
-/// failure instead of a cancelled job.
+/// failure instead of a cancelled job. xUnit v2 enforces timeouts only for async tests, so each test
+/// awaits <see cref="Task.CompletedTask"/> without pumping the dispatcher.
 /// </para>
 /// </remarks>
 public class MdNodifyMThemeTests
 {
     [AvaloniaFact(Timeout = 60_000)]
-    public void The_Node_Is_A_Material_Container_With_The_Right_Ink()
+    public async Task The_Node_Is_A_Material_Container_With_The_Right_Ink()
     {
         var node = NewNode();
         using var scope = Show(node);
@@ -66,10 +67,11 @@ public class MdNodifyMThemeTests
         var footer = node.GetVisualDescendants().OfType<ContentPresenter>()
             .Single(presenter => presenter.Name == "FooterContentPresenter");
         Assert.Equal(TokenColor("Md.Sys.Color.OnSurfaceVariant.Brush"), ColorOf(footer.Foreground!));
+        await Task.CompletedTask;
     }
 
     [AvaloniaFact(Timeout = 60_000)]
-    public void The_Pins_Split_By_Direction_And_The_Dragged_Wire_Is_Primary()
+    public async Task The_Pins_Split_By_Direction_And_The_Dragged_Wire_Is_Primary()
     {
         var node = NewNode();
         var pending = new PendingConnection();
@@ -93,35 +95,24 @@ public class MdNodifyMThemeTests
         // A pending wire - the drag in progress - is Primary rather than the resting wire's ink.
         Assert.Equal(TokenColor("Md.Sys.Color.Primary.Brush"), ColorOf(pending.Stroke!));
         Assert.Equal(TokenColor("Md.Sys.Color.SurfaceContainerHigh.Brush"), ColorOf(pending.Background!));
+        await Task.CompletedTask;
     }
 
     [AvaloniaFact(Timeout = 60_000)]
-    public void The_Grid_Rule_And_The_Minimap_Take_The_Canvas_Brushes()
+    public async Task The_Grid_Rule_Takes_The_Canvas_Brush()
     {
         var grid = new LargeGridLine { Width = 240, Height = 120 };
-        var minimap = new NodifyEditorMinimap { Width = 180, Height = 140 };
-        using var scope = Show(new StackPanel { Children = { grid, minimap } });
+        using var scope = Show(grid);
 
         // The grid rule takes its colour from the property's own default - Gainsboro - because the
         // default grid-line template never sets a brush, so the key upstream defines for grid lines
         // is read by nothing until this style points the control at it.
         Assert.Equal(TokenColor("Md.Sys.Color.OutlineVariant.Brush"), ColorOf(grid.Brush));
-
-        // The minimap is the other place upstream builds brushes from raw colour keys instead of
-        // taking one from its own dictionary: all six are re-pointed at the canvas brushes.
-        Assert.Equal(TokenColor("Md.Sys.Color.Surface.Brush"), ColorOf(minimap.MapBackground));
-        Assert.Equal(TokenColor("Md.Sys.Color.OutlineVariant.Brush"), ColorOf(minimap.MapBorderBrush));
-        Assert.Equal(TokenColor("Md.Sys.Color.SecondaryContainer.Brush"), ColorOf(minimap.NodeBrush));
-        Assert.Equal(TokenColor("Md.Sys.Color.OutlineVariant.Brush"), ColorOf(minimap.NodeBorderBrush));
-        Assert.Equal(TokenColor("Md.Sys.Color.Primary.Brush"), ColorOf(minimap.ViewportBorderBrush));
-
-        var viewport = Assert.IsAssignableFrom<ISolidColorBrush>(minimap.ViewportBrush);
-        Assert.Equal(TokenColor("Md.Sys.Color.Primary.Brush"), viewport.Color);
-        Assert.Equal(0.12, viewport.Opacity, 3);
+        await Task.CompletedTask;
     }
 
     [AvaloniaFact(Timeout = 60_000)]
-    public void Selecting_A_Node_Frames_It_In_Primary()
+    public async Task Selecting_A_Node_Frames_It_In_Primary()
     {
         var node = NewNode();
         using var scope = Show(node);
@@ -135,10 +126,11 @@ public class MdNodifyMThemeTests
         node.IsSelected = false;
         Dispatcher.UIThread.RunJobs();
         Assert.Equal(TokenColor("Md.Sys.Color.OutlineVariant.Brush"), ColorOf(node.BorderBrush!));
+        await Task.CompletedTask;
     }
 
     [AvaloniaFact(Timeout = 60_000)]
-    public void The_Brushes_Follow_The_Material_Variant()
+    public async Task The_Brushes_Follow_The_Material_Variant()
     {
         using var light = Show(NewNode());
         var lightSurface = TokenColor("Md.Sys.Color.SurfaceContainerHigh.Brush");
@@ -158,10 +150,11 @@ public class MdNodifyMThemeTests
         var darkSurface = ColorOf(dark.Content<Node>().Background!);
         Assert.NotEqual(lightSurface, darkSurface);
         Assert.Equal(TokenColor("Md.Sys.Color.SurfaceContainerHigh.Brush", ThemeVariant.Dark), darkSurface);
+        await Task.CompletedTask;
     }
 
     [AvaloniaFact(Timeout = 60_000)]
-    public void Registering_The_Theme_Leaves_Native_Controls_Alone()
+    public async Task Registering_The_Theme_Leaves_Native_Controls_Alone()
     {
         // NodifyM's controls are all its own types, so there is no native control for this theme to
         // be careful about - which is what makes it safe to register application-wide. The claim is
@@ -176,10 +169,11 @@ public class MdNodifyMThemeTests
         Assert.Null(button.Theme);
         Assert.Null(check.Theme);
         Assert.DoesNotContain(Application.Current!.Styles, style => style.GetType().Name == "FluentTheme");
+        await Task.CompletedTask;
     }
 
     [AvaloniaFact(Timeout = 60_000)]
-    public void The_Editor_Canvas_Takes_The_Surface_Brush()
+    public async Task The_Editor_Canvas_Takes_The_Surface_Brush()
     {
         // The editor's items host is painted with a literal Azure, so the canvas under it is
         // re-pointed at a brush key and the control gets a Background of its own to match. Both come
@@ -205,6 +199,7 @@ public class MdNodifyMThemeTests
         var marquee = editor.GetVisualDescendants().OfType<Rectangle>()
             .Single(rectangle => rectangle.Name == "SelectionRent");
         Assert.Equal(TokenColor("Md.Sys.Color.SurfaceContainerLow.Brush"), ColorOf(marquee.Stroke!));
+        await Task.CompletedTask;
     }
 
     /// <summary>

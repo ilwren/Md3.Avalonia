@@ -5,6 +5,7 @@ namespace Md3.Avalonia.Themes;
 
 /// <summary>
 /// The Material Design 3 style collection for Markdown.Avalonia.
+/// Markdown.Avalonia 文档控件的 Material Design 3 样式集合。
 /// </summary>
 /// <remarks>
 /// <para>

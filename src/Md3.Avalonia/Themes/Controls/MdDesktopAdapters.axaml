@@ -1,6 +1,5 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:chrome="using:Avalonia.Controls.Chrome"
                     xmlns:md="using:Md3.Avalonia.Controls">
   <!-- Scroll infrastructure is opt-in: native Avalonia controls are never globally restyled. -->
   <!-- Keep the draggable Thumb at the full 12-DIP cross-axis hit size. Hover changes only the
@@ -110,10 +109,7 @@
             <ScrollContentPresenter.GestureRecognizers>
               <ScrollGestureRecognizer CanHorizontallyScroll="{Binding CanHorizontallyScroll, ElementName=PART_ContentPresenter}"
                                        CanVerticallyScroll="{Binding CanVerticallyScroll, ElementName=PART_ContentPresenter}"
-                                       IsScrollInertiaEnabled="{Binding (ScrollViewer.IsScrollInertiaEnabled), ElementName=PART_ContentPresenter}"
-                                       Offset="{Binding Offset, ElementName=PART_ContentPresenter}"
-                                       Viewport="{Binding Viewport, ElementName=PART_ContentPresenter}"
-                                       Extent="{Binding Extent, ElementName=PART_ContentPresenter}" />
+                                       IsScrollInertiaEnabled="{Binding (ScrollViewer.IsScrollInertiaEnabled), ElementName=PART_ContentPresenter}" />
             </ScrollContentPresenter.GestureRecognizers>
           </ScrollContentPresenter>
           <!-- The bars are calibrated synchronously from MdScrollViewer (OnApplyTemplate plus a
@@ -337,21 +333,9 @@
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
   </ControlTheme>
 
-  <!-- Avalonia 12 inserts WindowDrawnDecorations outside the Window control template whenever
-       the client area extends into Full decorations. FluentTheme/SimpleTheme normally draw their
-       own title, caption buttons and frame there. MdBorderlessWindow supplies all of those itself,
-       so use an intentionally empty decoration template while preserving the native Full style
-       bits which DWM needs for minimize/maximize/restore animation. -->
-  <ControlTheme x:Key="MdBorderlessWindowDrawnDecorationsTheme" TargetType="chrome:WindowDrawnDecorations">
-    <Setter Property="DefaultTitleBarHeight" Value="0" />
-    <Setter Property="DefaultFrameThickness" Value="0" />
-    <Setter Property="DefaultShadowThickness" Value="0" />
-    <Setter Property="Template">
-      <WindowDrawnDecorationsTemplate>
-        <chrome:WindowDrawnDecorationsContent />
-      </WindowDrawnDecorationsTemplate>
-    </Setter>
-  </ControlTheme>
+  <!-- Avalonia 11 custom chrome uses SystemDecorations plus ExtendClientAreaToDecorationsHint.
+       MdBorderlessWindow owns its title bar and caption buttons in this template, so the
+       Fluent/Simple TitleBar is not needed and no separate decoration theme is required. -->
 
   <!-- A complete custom-chrome window template. On Windows the adapter retains Full native
        decorations (and therefore DWM state animations) while the extended client area and this
@@ -359,7 +343,6 @@
   <ControlTheme x:Key="{x:Type md:MdBorderlessWindow}" TargetType="md:MdBorderlessWindow"
                 BasedOn="{StaticResource {x:Type md:MdWindow}}">
     <Setter Property="UseLayoutRounding" Value="True" />
-    <Setter Property="WindowDecorationsTheme" Value="{StaticResource MdBorderlessWindowDrawnDecorationsTheme}" />
     <!-- PART_WindowFrame below rounds its own corners, but the window's client area was still
          painted opaque and square behind it, so the OS surface showed through at every corner:
          a rounded card floating inside a square window. The corner radius has to be cut out of
@@ -391,8 +374,7 @@
                                 VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                 Content="{TemplateBinding Content}"
                                 ContentTemplate="{TemplateBinding ContentTemplate}"
-                                Foreground="{TemplateBinding Foreground}"
-                                chrome:WindowDecorationProperties.ElementRole="User" />
+                                Foreground="{TemplateBinding Foreground}" />
               <md:MdWindowTitleBar x:Name="PART_DefaultTitleBar"
                                    Height="{Binding TemplateSettings.TitleBarHeight, RelativeSource={RelativeSource TemplatedParent}}"
                                    VerticalAlignment="Top"
@@ -407,33 +389,29 @@
                                    ShowCloseButton="{TemplateBinding ShowCloseButton}"
                                    IsMinimizeButtonEnabled="{TemplateBinding IsMinimizeButtonEnabled}"
                                    IsMaximizeButtonEnabled="{TemplateBinding IsMaximizeButtonEnabled}"
-                                   IsCloseButtonEnabled="{TemplateBinding IsCloseButtonEnabled}"
-                                   chrome:WindowDecorationProperties.ElementRole="TitleBar" />
+                                   IsCloseButtonEnabled="{TemplateBinding IsCloseButtonEnabled}" />
             </Grid>
           </Border>
 
           <md:MdWindowResizeGrip Classes="window-resize-grip" Edge="North" Height="6" VerticalAlignment="Top"
-                                HorizontalAlignment="Stretch" chrome:WindowDecorationProperties.ElementRole="ResizeN" />
+                                HorizontalAlignment="Stretch" />
           <md:MdWindowResizeGrip Classes="window-resize-grip" Edge="South" Height="6" VerticalAlignment="Bottom"
-                                HorizontalAlignment="Stretch" chrome:WindowDecorationProperties.ElementRole="ResizeS" />
+                                HorizontalAlignment="Stretch" />
           <md:MdWindowResizeGrip Classes="window-resize-grip" Edge="East" Width="6" HorizontalAlignment="Right"
-                                VerticalAlignment="Stretch" chrome:WindowDecorationProperties.ElementRole="ResizeE" />
+                                VerticalAlignment="Stretch" />
           <md:MdWindowResizeGrip Classes="window-resize-grip" Edge="West" Width="6" HorizontalAlignment="Left"
-                                VerticalAlignment="Stretch" chrome:WindowDecorationProperties.ElementRole="ResizeW" />
+                                VerticalAlignment="Stretch" />
           <md:MdWindowResizeGrip Classes="window-resize-grip" Edge="NorthEast" Width="10" Height="10"
-                                HorizontalAlignment="Right" VerticalAlignment="Top" chrome:WindowDecorationProperties.ElementRole="ResizeNE" />
+                                HorizontalAlignment="Right" VerticalAlignment="Top" />
           <md:MdWindowResizeGrip Classes="window-resize-grip" Edge="NorthWest" Width="10" Height="10"
-                                HorizontalAlignment="Left" VerticalAlignment="Top" chrome:WindowDecorationProperties.ElementRole="ResizeNW" />
+                                HorizontalAlignment="Left" VerticalAlignment="Top" />
           <md:MdWindowResizeGrip Classes="window-resize-grip" Edge="SouthEast" Width="10" Height="10"
-                                HorizontalAlignment="Right" VerticalAlignment="Bottom" chrome:WindowDecorationProperties.ElementRole="ResizeSE" />
+                                HorizontalAlignment="Right" VerticalAlignment="Bottom" />
           <md:MdWindowResizeGrip Classes="window-resize-grip" Edge="SouthWest" Width="10" Height="10"
-                                HorizontalAlignment="Left" VerticalAlignment="Bottom" chrome:WindowDecorationProperties.ElementRole="ResizeSW" />
+                                HorizontalAlignment="Left" VerticalAlignment="Bottom" />
         </Grid>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:not(:custom-chrome)">
-      <Setter Property="WindowDecorationsTheme" Value="{x:Null}" />
-    </Style>
     <Style Selector="^:native-frame /template/ Border#PART_WindowFrame">
       <!-- The native frame already supplies the edge; avoid drawing a second Material frame. -->
       <Setter Property="Margin" Value="0" /><Setter Property="BorderThickness" Value="0" /><Setter Property="CornerRadius" Value="0" /><Setter Property="ClipToBounds" Value="False" />
@@ -456,12 +434,10 @@
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdWindowTitleBar">
         <Border Background="{TemplateBinding Background}"
-                BorderThickness="0"
-                chrome:WindowDecorationProperties.ElementRole="TitleBar">
+                BorderThickness="0">
           <Grid ColumnDefinitions="Auto,*,Auto,Auto" Height="{TemplateBinding Height}">
             <Grid Grid.Column="0" Margin="8,0" VerticalAlignment="Center"
-                  IsVisible="{TemplateBinding ShowIcon}"
-                  chrome:WindowDecorationProperties.ElementRole="User">
+                  IsVisible="{TemplateBinding ShowIcon}">
               <Image Source="{TemplateBinding IconSource}" Width="20" Height="20" Stretch="Uniform" />
               <ContentPresenter Content="{TemplateBinding LeadingContent}" Foreground="{TemplateBinding Foreground}" />
             </Grid>
@@ -471,8 +447,7 @@
                                 Foreground="{TemplateBinding Foreground}" Opacity="0.7" />
             </StackPanel>
             <ContentPresenter Grid.Column="2" VerticalAlignment="Center"
-                              Content="{TemplateBinding TrailingContent}"
-                              chrome:WindowDecorationProperties.ElementRole="User" />
+                              Content="{TemplateBinding TrailingContent}" />
             <StackPanel Grid.Column="3" Orientation="Horizontal" IsVisible="{TemplateBinding ShowCaptionButtons}">
               <md:MdCaptionButton Kind="Minimize" IsVisible="{TemplateBinding ShowMinimizeButton}"
                                   IsEnabled="{TemplateBinding IsMinimizeButtonEnabled}"
@@ -520,7 +495,6 @@
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdWindowDragRegion}" TargetType="md:MdWindowDragRegion">
-    <Setter Property="chrome:WindowDecorationProperties.ElementRole" Value="TitleBar" />
     <Setter Property="Template"><ControlTemplate><ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" /></ControlTemplate></Setter>
   </ControlTheme>
   <ControlTheme x:Key="{x:Type md:MdWindowResizeGrip}" TargetType="md:MdWindowResizeGrip">

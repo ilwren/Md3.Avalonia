@@ -12,9 +12,6 @@ public partial class RichEditorGalleryPage : UserControl
     public RichEditorGalleryPage()
     {
         InitializeComponent();
-        ThemedRichEditor.LoadHtml(
-            "<p><b>Welcome to the Material 3 rich-text editor.</b></p>" +
-            "<p>Select text and try <i>italic</i> or <b>bold</b> formatting.</p>");
         _editorAdapter = new MdTextBoxRichEditorAdapter(EditorText, RichPreview);
         RichEditor.Adapter = _editorAdapter;
     }

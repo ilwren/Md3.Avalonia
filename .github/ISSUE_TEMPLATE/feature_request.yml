@@ -1,0 +1,105 @@
+name: Feature request / 功能建议
+description: Propose an improvement or new capability / 提出改进或新功能建议
+title: "[Feature] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the user need rather than only a preferred implementation. Search existing issues for related requests before submitting.
+        请优先说明用户需求，不要只描述偏好的实现方式；提交前请搜索相关建议。
+
+  - type: input
+    id: summary
+    attributes:
+      label: Summary / 建议概述
+      description: A short name for the requested capability. / 简要概括希望增加的能力。
+      placeholder: Add a keyboard shortcut to dismiss a dialog. / 增加键盘快捷键以关闭对话框。
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Related area / 涉及范围
+      options:
+        - Core controls and themes
+        - Extra controls
+        - Icons
+        - DataGrid theme
+        - Desktop Gallery
+        - Android Gallery
+        - Documentation
+        - Other / Unknown
+    validations:
+      required: true
+
+  - type: dropdown
+    id: packages
+    attributes:
+      label: Affected NuGet packages / 涉及的 NuGet 包
+      description: Select from the current 17 packages; choose all that apply. / 当前共有 17 个 NuGet 包，可多选。
+      multiple: true
+      options:
+        - Md3.Avalonia11
+        - Md3.Avalonia11.Extra
+        - Md3.Avalonia11.Icons
+        - Md3.Avalonia11.Icons.Lite
+        - Md3.Avalonia11.DataGrid
+        - Md3.Avalonia11.AvaloniaEdit
+        - Md3.Avalonia11.AvaloniaHex
+        - Md3.Avalonia11.Dock
+        - Md3.Avalonia11.Tabalonia
+        - Md3.Avalonia11.Markdown
+        - Md3.Avalonia11.LiveCharts2
+        - Md3.Avalonia11.ScottPlot
+        - Md3.Avalonia11.PropertyGrid
+        - Md3.Avalonia11.NodifyM
+        - Md3.Avalonia11.Mapsui
+        - Md3.Avalonia11.InkCanvas
+        - Md3.Avalonia11.Notifications
+        - Not package-specific / 不针对单个包
+    validations:
+      required: false
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case / 问题或使用场景
+      description: What are you trying to do, and what limitation are you encountering? / 说明使用场景及当前限制。
+      placeholder: |
+        I need to ...
+        Today I cannot ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior / 期望行为
+      description: Explain what the library should do. Examples or a sketch are welcome. / 描述期望的行为，可附示例或草图。
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered / 考虑过的替代方案
+      description: Include workarounds or trade-offs if relevant. / 如适用，请说明临时方案或取舍。
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria / 验收标准
+      description: List observable outcomes that would make this request complete. / 列出可验证的完成条件。
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Before submitting / 提交前确认
+      options:
+        - label: I searched existing issues and did not find a matching request. / 我已搜索现有 Issue，未发现相同建议。
+          required: true

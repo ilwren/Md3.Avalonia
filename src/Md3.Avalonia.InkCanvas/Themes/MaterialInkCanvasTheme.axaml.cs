@@ -12,6 +12,7 @@ namespace Md3.Avalonia.Themes;
 /// Material Design 3 for handwriting. Registering the theme styles <see cref="Md3.Avalonia.Controls.MdSignaturePad"/>;
 /// <see cref="Follow"/> and <see cref="Apply"/> are the entry points for an application that uses a
 /// bare <see cref="InkCanvas"/> instead and only wants its ink to stop being red.
+/// DotNetCampus 手写画布的 Material Design 3 主题，并包含 MdSignaturePad 样式。
 /// </summary>
 /// <remarks>
 /// <c>InkCanvas</c> is not a <c>TemplatedControl</c> and registers no styles: it draws strokes with

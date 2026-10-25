@@ -172,7 +172,7 @@ public sealed class MdRound2BehaviorTests
         Assert.True(wideText.Bounds.X > wideIcon.Bounds.X, $"side-by-side layout expected, got icon {wideIcon.Bounds} text {wideText.Bounds}");
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Baseline_Surface_Tokens_Match_The_M3_2023_Values()
     {
         // The 2023 baseline moved light surface/background/bright to #FEF7FF (from the old
@@ -190,7 +190,7 @@ public sealed class MdRound2BehaviorTests
         Assert.Equal(global::Avalonia.Media.Color.Parse("#36343B"), Assert.IsType<global::Avalonia.Media.Color>(darkBright));
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Motion_Spring_Tokens_Match_The_M3_Generated_Values()
     {
         // Official M3 spring tokens (AndroidX M3 generated tokens / material-components-android):
@@ -283,7 +283,7 @@ public sealed class MdRound2BehaviorTests
         Assert.Equal(40, indicator.Value);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Linear_Indeterminate_Sweep_Follows_The_M3_Two_Segment_Timeline()
     {
         // Both segments start collapsed at the leading edge of the 1800 ms loop.

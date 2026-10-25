@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
@@ -318,10 +319,10 @@ public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
     private void TooltipPointerExited(object? sender, PointerEventArgs e) =>
         ScheduleHideIfUnattended();
 
-    private void TooltipGotFocus(object? sender, FocusChangedEventArgs e) =>
+    private void TooltipGotFocus(object? sender, RoutedEventArgs e) =>
         _hideTimer.Stop();
 
-    private void TooltipLostFocus(object? sender, FocusChangedEventArgs e) =>
+    private void TooltipLostFocus(object? sender, RoutedEventArgs e) =>
         ScheduleHideIfUnattended();
 
     private bool HasPointerOrKeyboardPresence =>

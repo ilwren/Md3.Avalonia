@@ -13,6 +13,8 @@ namespace Md3.Avalonia.Controls;
 public sealed class MdTabViewItem : TabItem
 {
     private Border? _indicator;
+    public static readonly StyledProperty<object?> IconProperty =
+        AvaloniaProperty.Register<MdTabViewItem, object?>(nameof(Icon));
     public static readonly StyledProperty<object?> BadgeProperty = AvaloniaProperty.Register<MdTabViewItem, object?>(nameof(Badge));
     public static readonly StyledProperty<MdTabVariant> VariantProperty =
         AvaloniaProperty.Register<MdTabViewItem, MdTabVariant>(nameof(Variant), MdTabVariant.Secondary);
@@ -24,6 +26,7 @@ public sealed class MdTabViewItem : TabItem
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdTabViewItem>((item, _) => item.UpdateMotion());
     }
     public MdTabViewItem() => UpdatePseudoClasses();
+    public object? Icon { get => GetValue(IconProperty); set => SetValue(IconProperty, value); }
     public object? Badge { get => GetValue(BadgeProperty); set => SetValue(BadgeProperty, value); }
 
     /// <summary>Material tab style: primary (full-width indicator, text-first) or secondary.</summary>

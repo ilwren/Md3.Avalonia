@@ -14,7 +14,7 @@
         <Grid RowDefinitions="72,*">
           <Grid Margin="12,8" ColumnDefinitions="*,Auto">
             <StackPanel VerticalAlignment="Center" Spacing="1">
-              <TextBlock FontSize="20" FontWeight="SemiBold" Text="Material 3 Gallery" />
+              <TextBlock FontSize="20" FontWeight="SemiBold" Text="Material 3 for Avalonia 11" />
               <TextBlock FontSize="12"
                          Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                          Text="All samples and components" />

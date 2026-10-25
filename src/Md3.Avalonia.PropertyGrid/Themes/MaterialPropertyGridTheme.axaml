@@ -223,7 +223,6 @@
         <Setter Property="MinHeight" Value="40" />
         <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
         <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
-        <Setter Property="PlaceholderForeground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
         <Setter Property="SelectionBrush" Value="{DynamicResource Md.Sys.Color.PrimarySelection.Brush}" />
         <Setter Property="SelectionForegroundBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
         <Setter Property="CaretBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
@@ -250,9 +249,9 @@
                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                FontFamily="{TemplateBinding FontFamily}"
                                FontSize="{TemplateBinding FontSize}"
-                               Foreground="{TemplateBinding PlaceholderForeground}"
+                               Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                                IsHitTestVisible="False"
-                               Text="{TemplateBinding PlaceholderText}"
+                               Text="{TemplateBinding Watermark}"
                                TextWrapping="NoWrap">
                       <TextBlock.IsVisible>
                         <Binding Converter="{x:Static StringConverters.IsNullOrEmpty}"
@@ -325,9 +324,9 @@
               <Panel>
                 <TextBlock Name="PART_Watermark"
                            VerticalAlignment="Center"
-                           Foreground="{TemplateBinding PlaceholderForeground}"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                            IsHitTestVisible="False"
-                           Text="{TemplateBinding PlaceholderText}">
+                           Text="{TemplateBinding Watermark}">
                   <TextBlock.IsVisible>
                     <Binding Converter="{x:Static StringConverters.IsNullOrEmpty}"
                              Path="Text"
@@ -1389,10 +1388,7 @@
                                       VerticalSnapPointsType="{TemplateBinding VerticalSnapPointsType}">
                 <ScrollContentPresenter.GestureRecognizers>
                   <ScrollGestureRecognizer CanHorizontallyScroll="{Binding CanHorizontallyScroll, ElementName=PART_ContentPresenter}"
-                                           CanVerticallyScroll="{Binding CanVerticallyScroll, ElementName=PART_ContentPresenter}"
-                                           Extent="{Binding Extent, ElementName=PART_ContentPresenter}"
-                                           Offset="{Binding Offset, ElementName=PART_ContentPresenter}"
-                                           Viewport="{Binding Viewport, ElementName=PART_ContentPresenter}" />
+                                           CanVerticallyScroll="{Binding CanVerticallyScroll, ElementName=PART_ContentPresenter}" />
                 </ScrollContentPresenter.GestureRecognizers>
               </ScrollContentPresenter>
               <md:MdScrollBar Name="PART_HorizontalScrollBar" Grid.Row="1" Orientation="Horizontal" />

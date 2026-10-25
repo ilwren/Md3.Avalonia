@@ -16,7 +16,6 @@ public sealed class TestApplication : Application
         Styles.Add(new MaterialTheme());
         Styles.Add(new ExtraTheme());
         Styles.Add(new MaterialDataGridTheme());
-        Styles.Add(new MaterialRichEditorTheme());
         Styles.Add(new MaterialAvaloniaEditTheme());
         Styles.Add(new MaterialAvaloniaHexTheme());
         Styles.Add(new MaterialDockTheme());
@@ -38,7 +37,7 @@ public static class TestAppBuilder
             .UseSkia()
             .UseHeadless(new AvaloniaHeadlessPlatformOptions
             {
-                UseHeadlessDrawing = false,
-                ShouldRenderOnUIThread = true
+                // Avalonia 11's headless compositor already renders on the UI thread.
+                UseHeadlessDrawing = false
             });
 }

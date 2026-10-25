@@ -1,7 +1,7 @@
 <!--
   Material Design 3 chrome for AvaloniaEdit.
 
-  Derived from Avalonia.AvaloniaEdit 12.0.0 Themes/Base.xaml, Themes/Fluent/AvaloniaEdit.xaml and
+  Derived from Avalonia.AvaloniaEdit 11.4.1 Themes/Base.xaml, Themes/Fluent/AvaloniaEdit.xaml and
   the search/completion dictionaries of the same package (MIT, see THIRD-PARTY-NOTICES.md). The
   templates, the bindings and every PART_ name AvaloniaEdit looks up by name
   (PART_ScrollViewer, PART_searchTextBox, PART_replaceTextBox, PART_MessageView, PART_MessageContent,
@@ -62,7 +62,6 @@
         <Setter Property="MinWidth" Value="120" />
         <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
         <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
-        <Setter Property="PlaceholderForeground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
         <Setter Property="SelectionBrush" Value="{DynamicResource Md.Sys.Color.PrimarySelection.Brush}" />
         <Setter Property="SelectionForegroundBrush" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
         <Setter Property="CaretBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
@@ -93,9 +92,9 @@
                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                  FontFamily="{TemplateBinding FontFamily}"
                                  FontSize="{TemplateBinding FontSize}"
-                                 Foreground="{TemplateBinding PlaceholderForeground}"
+                                 Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                                  IsHitTestVisible="False"
-                                 Text="{TemplateBinding PlaceholderText}"
+                                 Text="{TemplateBinding Watermark}"
                                  TextWrapping="NoWrap">
                         <TextBlock.IsVisible>
                           <Binding Converter="{x:Static StringConverters.IsNullOrEmpty}"
@@ -462,7 +461,7 @@
                            Grid.Column="1"
                            Grid.Row="0"
                            Width="265"
-                           PlaceholderText="{x:Static ae:SR.SearchLabel}"
+                           Watermark="{x:Static ae:SR.SearchLabel}"
                            Text="{Binding SearchPattern, RelativeSource={RelativeSource TemplatedParent}}"
                            Theme="{StaticResource Md.Comp.AvaloniaEdit.SearchFieldTheme}">
                     <TextBox.InnerRightContent>
@@ -571,7 +570,7 @@
                            Grid.Column="1"
                            Grid.Row="1"
                            Width="265"
-                           PlaceholderText="{x:Static ae:SR.ReplaceLabel}"
+                           Watermark="{x:Static ae:SR.ReplaceLabel}"
                            IsVisible="{Binding IsReplaceMode, RelativeSource={RelativeSource TemplatedParent}}"
                            Text="{Binding ReplacePattern, RelativeSource={RelativeSource TemplatedParent}}"
                            Theme="{StaticResource Md.Comp.AvaloniaEdit.SearchFieldTheme}" />

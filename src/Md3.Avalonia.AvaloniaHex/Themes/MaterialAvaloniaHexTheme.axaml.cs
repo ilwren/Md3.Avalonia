@@ -7,6 +7,7 @@ namespace Md3.Avalonia.Themes;
 /// Material Design 3 theme for the <c>AvaloniaHex</c> hex editor. Add it after
 /// <c>MaterialTheme</c>; it replaces the AvaloniaHex Fluent/Simple style sheets, so do not include
 /// both.
+/// AvaloniaHex 十六进制编辑器的 Material Design 3 样式。
 /// </summary>
 /// <remarks>
 /// <para>

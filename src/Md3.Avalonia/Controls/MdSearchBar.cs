@@ -5,6 +5,7 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 
 namespace Md3.Avalonia.Controls;
 
@@ -13,6 +14,12 @@ namespace Md3.Avalonia.Controls;
 [PseudoClasses(":empty", ":has-text", ":has-leading", ":has-trailing", ":clear-visible")]
 public sealed class MdSearchBar : TextBox
 {
+    public static readonly StyledProperty<string?> PlaceholderTextProperty =
+        WatermarkProperty.AddOwner<MdSearchBar>();
+
+    public static readonly StyledProperty<IBrush?> PlaceholderForegroundProperty =
+        AvaloniaProperty.Register<MdSearchBar, IBrush?>(nameof(PlaceholderForeground));
+
     public static readonly StyledProperty<object?> LeadingContentProperty =
         AvaloniaProperty.Register<MdSearchBar, object?>(nameof(LeadingContent));
     public static readonly StyledProperty<object?> TrailingContentProperty =
@@ -40,6 +47,8 @@ public sealed class MdSearchBar : TextBox
         MdTextEditingContextMenu.Attach(this);
     }
 
+    public string? PlaceholderText { get => GetValue(PlaceholderTextProperty); set => SetValue(PlaceholderTextProperty, value); }
+    public IBrush? PlaceholderForeground { get => GetValue(PlaceholderForegroundProperty); set => SetValue(PlaceholderForegroundProperty, value); }
     public object? LeadingContent { get => GetValue(LeadingContentProperty); set => SetValue(LeadingContentProperty, value); }
     public object? TrailingContent { get => GetValue(TrailingContentProperty); set => SetValue(TrailingContentProperty, value); }
     public bool ShowClearButton { get => GetValue(ShowClearButtonProperty); set => SetValue(ShowClearButtonProperty, value); }

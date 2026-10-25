@@ -1,0 +1,107 @@
+name: Bug report / 缺陷报告
+description: Report a reproducible defect in Md3.Avalonia / 报告可复现的问题
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before submitting, search existing issues for duplicates. Remove secrets, personal data, and private URLs from logs or screenshots.
+        提交前请搜索是否已有相同问题；日志和截图中请勿包含密钥、个人信息或私有链接。
+
+  - type: input
+    id: summary
+    attributes:
+      label: Summary / 问题概述
+      description: A short, specific description of the defect. / 简要描述问题。
+      placeholder: The popup closes when scrolling the page. / 页面滚动时弹层意外关闭。
+    validations:
+      required: true
+
+  - type: dropdown
+    id: package
+    attributes:
+      label: Affected package or app / 涉及的包或应用
+      description: Select from the current 17 NuGet packages, or choose a Gallery app. / 可从当前 17 个 NuGet 包中选择，也可选择 Gallery 应用。
+      options:
+        - Md3.Avalonia11
+        - Md3.Avalonia11.Extra
+        - Md3.Avalonia11.Icons
+        - Md3.Avalonia11.Icons.Lite
+        - Md3.Avalonia11.DataGrid
+        - Md3.Avalonia11.AvaloniaEdit
+        - Md3.Avalonia11.AvaloniaHex
+        - Md3.Avalonia11.Dock
+        - Md3.Avalonia11.Tabalonia
+        - Md3.Avalonia11.Markdown
+        - Md3.Avalonia11.LiveCharts2
+        - Md3.Avalonia11.ScottPlot
+        - Md3.Avalonia11.PropertyGrid
+        - Md3.Avalonia11.NodifyM
+        - Md3.Avalonia11.Mapsui
+        - Md3.Avalonia11.InkCanvas
+        - Md3.Avalonia11.Notifications
+        - Desktop Gallery
+        - Android Gallery
+        - Other / Unknown
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Package version or commit / 包版本或提交
+      description: Include the NuGet version or commit SHA if known. / 请填写 NuGet 版本或提交 SHA（如已知）。
+      placeholder: 0.5.0-preview.2
+    validations:
+      required: false
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment / 运行环境
+      description: Include .NET, Avalonia, OS, device, and architecture when relevant. / 请按需填写 .NET、Avalonia、操作系统、设备与架构。
+      placeholder: |
+        .NET:
+        Avalonia:
+        OS / device:
+        Architecture:
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce / 复现步骤
+      description: List the smallest set of steps that reproduces the problem. / 列出可稳定复现问题的最简步骤。
+      placeholder: |
+        1. Create ...
+        2. Set ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-actual
+    attributes:
+      label: Expected and actual behavior / 预期与实际行为
+      placeholder: |
+        Expected / 预期：
+        Actual / 实际：
+    validations:
+      required: true
+
+  - type: textarea
+    id: sample
+    attributes:
+      label: Minimal sample, screenshot, or logs / 最小示例、截图或日志
+      description: Add only what helps reproduce or diagnose the issue. Redact sensitive information. / 仅提供有助于复现或诊断的材料，并先移除敏感信息。
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Before submitting / 提交前确认
+      options:
+        - label: I searched existing issues and did not find a matching report. / 我已搜索现有 Issue，未发现相同报告。
+          required: true

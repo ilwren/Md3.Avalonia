@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <!-- Same reasoning as Md3.Avalonia.DataGrid and Md3.Avalonia.AvaloniaEdit: a RootNamespace that
@@ -7,8 +7,8 @@
     <RootNamespace>Md3.Avalonia.Themes</RootNamespace>
     <AssemblyName>Md3.Avalonia.PropertyGrid</AssemblyName>
     <Description>Material Design 3 theme for the Avalonia.PropertyGrid control. Opt-in package: it carries the bodong.Avalonia.PropertyGrid dependency so the core Material packages do not have to.</Description>
-    <PackageId>Md3.Avalonia.PropertyGrid</PackageId>
-    <Version>0.5.0-preview.1</Version>
+    <PackageId>Md3.Avalonia11.PropertyGrid</PackageId>
+    <Version>0.5.0-preview.2</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;propertygrid;property;grid;editor;inspector;settings;controls;theme;material-design-3</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

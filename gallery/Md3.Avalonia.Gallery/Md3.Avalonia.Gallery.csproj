@@ -9,7 +9,6 @@
   <ItemGroup>
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.AvaloniaEdit" />
-    <PackageReference Include="OlivierJC.AvaloniaRichEditor" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="Dock.Avalonia" />
@@ -20,7 +19,6 @@
     <ProjectReference Include="../../src/Md3.Avalonia.Icons.Lite/Md3.Avalonia.Icons.Lite.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Extra/Md3.Avalonia.Extra.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.DataGrid/Md3.Avalonia.DataGrid.csproj" />
-    <ProjectReference Include="../../src/Md3.Avalonia.RichEditor/Md3.Avalonia.RichEditor.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.Notifications/Md3.Avalonia.Notifications.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.AvaloniaEdit/Md3.Avalonia.AvaloniaEdit.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.AvaloniaHex/Md3.Avalonia.AvaloniaHex.csproj" />
@@ -34,6 +32,6 @@
     <ProjectReference Include="../../src/Md3.Avalonia.Mapsui/Md3.Avalonia.Mapsui.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.InkCanvas/Md3.Avalonia.InkCanvas.csproj" />
     <AvaloniaResource Include="Assets/Media/**" />
-    <AvaloniaResource Include="Assets/tray-icon.png" />
+    <AvaloniaResource Include="../../logo.png" Link="Assets/logo.png" />
   </ItemGroup>
 </Project>

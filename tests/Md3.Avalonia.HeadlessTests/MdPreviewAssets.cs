@@ -35,6 +35,6 @@ internal static class MdPreviewAssets
         }
 
         using var stream = File.Create(Path.Combine(AppContext.BaseDirectory, fileName));
-        frame.Save(stream, new PngBitmapEncoderOptions());
+        frame.Save(stream);
     }
 }

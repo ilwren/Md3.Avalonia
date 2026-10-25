@@ -1,13 +1,15 @@
-# Md3.Avalonia.Notifications
+# Md3.Avalonia11.Notifications
+
+[English](README.md) | [简体中文](README.zh-CN.md)
 
 A small, standalone .NET library for showing native system notifications on Windows, macOS, Linux, and Android. It has no Avalonia dependency.
 
 ## Install
 
-The project source baseline is `0.4.6-preview.1`; the package is not installable from NuGet until that preview is published.
+The current preview is [`0.5.0-preview.2`](https://www.nuget.org/packages/Md3.Avalonia11.Notifications/0.5.0-preview.2).
 
 ```bash
-dotnet add package Md3.Avalonia.Notifications --version 0.4.6-preview.1
+dotnet add package Md3.Avalonia11.Notifications --version 0.5.0-preview.2
 ```
 
 ## Show a notification

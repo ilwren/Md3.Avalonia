@@ -405,7 +405,7 @@ public sealed class MdP0AccessibilityAndKeyboardTests
         Assert.Equal(new Thickness(10), host.Padding);
     }
 
-    [Fact]
+    [AvaloniaFact]
     public void Completed_Motion_APIs_No_Longer_Claim_To_Be_Experimental()
     {
         // These four shipped as state shells: pseudo-classes plus an IsVisible switch, no

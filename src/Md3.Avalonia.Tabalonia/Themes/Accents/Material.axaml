@@ -1,7 +1,7 @@
 <!--
   Material Design 3 tokens for Tabalonia.
 
-  Derived from Tabalonia 12.0.0 Themes/Custom/Brushes.axaml (MIT, see THIRD-PARTY-NOTICES.md).
+  Derived from Tabalonia 0.10.7 Themes/Custom/Brushes.axaml (MIT, see THIRD-PARTY-NOTICES.md).
   That dictionary defines 19 brushes in Light/Dark theme dictionaries; every value here is
   retokenized onto Md.Sys.Color.*, so light and dark come from the core Material theme variant and
   the file has no ThemeDictionaries of its own.

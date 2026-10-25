@@ -1,7 +1,7 @@
 <!--
   Material Design 3 tokens for Dock.
 
-  Derived from Dock.Avalonia.Themes.Fluent 12.1.0.6 Accents/Fluent.axaml (MIT, see
+  Derived from Dock.Avalonia.Themes.Fluent 11.3.12.1 Accents/Fluent.axaml (MIT, see
   THIRD-PARTY-NOTICES.md). The retokenized entries are the colours: Dock's five
   DockApplicationAccent* brushes and the DockTheme*/DockSurface*/DockBorder*/DockTab*/
   DockChrome*/DockTarget*/DockSplitter* aliases now resolve to Md.Sys.Color.* tokens, so light
