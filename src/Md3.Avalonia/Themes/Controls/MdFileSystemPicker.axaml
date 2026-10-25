@@ -75,7 +75,7 @@
                                 IsVisible="{Binding IsDirectory}" />
                           <Path Data="{StaticResource Md.FileSystemPicker.FileGeometry}"
                                 Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
-                                StrokeThickness="1.7" StrokeLineJoin="Round"
+                                StrokeThickness="1.7" StrokeJoin="Round"
                                 IsVisible="{Binding IsDirectory, Converter={x:Static BoolConverters.Not}}" />
                         </Grid>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
