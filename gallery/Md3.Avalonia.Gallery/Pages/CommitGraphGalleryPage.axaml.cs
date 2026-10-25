@@ -141,10 +141,6 @@ public partial class CommitGraphGalleryPage : UserControl
 
     private StackPanel LegendLine(IBrush brush, bool dashed, string label)
     {
-        var pen = new Pen(brush, 2);
-        if (dashed)
-            pen.DashStyle = new DashStyle(new double[] { 6, 4 }, 0);
-
         // Fully qualified: unqualified, Path resolves to System.IO.Path in this namespace.
         // StreamGeometry is built with the Open/BeginFigure pattern the repo uses everywhere;
         // the Parse shortcut is not in the Avalonia 12 API.
@@ -156,10 +152,14 @@ public partial class CommitGraphGalleryPage : UserControl
             figure.EndFigure(false);
         }
 
+        // 12 splits the pen off the shape: Stroke is a brush, thickness and the dash array
+        // live on their own properties.
         var line = new global::Avalonia.Controls.Shapes.Path
         {
             Data = data,
-            Stroke = pen,
+            Stroke = brush,
+            StrokeThickness = 2,
+            StrokeDashArray = dashed ? new AvaloniaList<double> { 6, 4 } : null,
             Width = 28,
             Height = 2,
             VerticalAlignment = VerticalAlignment.Center,
