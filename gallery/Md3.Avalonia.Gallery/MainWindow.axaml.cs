@@ -214,6 +214,8 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
     /// </summary>
     public IReadOnlyList<string> IndexedPageTitles => _galleryIndex.Select(entry => entry.Title).ToArray();
 
+    internal Control? CurrentPage => PageHost.Content as Control;
+
     internal bool NavigateToIndexedPage(string title)
     {
         var entry = _galleryIndex.FirstOrDefault(candidate => string.Equals(candidate.Title, title, StringComparison.Ordinal));

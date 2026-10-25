@@ -1197,7 +1197,7 @@ is where every member this section names lives.
 
 All eighteen packages declare `IsTrimmable` and `IsAotCompatible` and build with the IL2xxx/IL3xxx analyzers enabled. This describes the library assemblies; application-owned reflection, dynamic XAML, and third-party code may still require preservation or selectors in the consuming app.
 
-The Linux x64 AOT probe publishes the desktop Gallery with `PublishAot=true`, checks that the output is a native executable without a managed Gallery assembly beside it, and smoke-runs that binary under xvfb. It reports linker diagnostics but does not claim zero diagnostics for every downstream app or validate Windows, macOS, or Android AOT.
+The Linux x64 AOT probe publishes the desktop Gallery with `PublishAot=true`, checks that the output is a native executable without a managed Gallery assembly beside it, and smoke-runs that binary under xvfb. Its `file-system-picker` scenario opens the actual Gallery page inside the native process, materializes the control template and compiled bindings, enumerates and filters a temporary real directory, selects an entry, confirms its normalized path, and must write a success marker before the workflow passes. The probe reports linker diagnostics but does not claim zero diagnostics for every downstream app or validate Windows, macOS, or Android AOT.
 
 Two things in a UI library genuinely need reflection, and both are handled:
 

@@ -229,13 +229,14 @@ python3 scripts/check-api-doc-coverage.py   # docs/API.md 是否覆盖全部公�
 python3 scripts/check-gallery-localization.py --strict
 ```
 
-原生 AOT 发布桌面 Gallery（Linux 需要 clang/zlib，`--smoke` 另需 xvfb）：
+原生 AOT 发布桌面 Gallery（Linux 需要 clang/zlib，smoke 另需 xvfb）：
 
 ```bash
-bash scripts/publish-gallery-aot.sh --rid linux-x64 --smoke   # 或 win-x64 / osx-x64 / osx-arm64
+bash scripts/publish-gallery-aot.sh --rid linux-x64 --smoke-scenario file-system-picker
+# 通用启动检查仍可使用 --smoke；也可发布 win-x64 / osx-x64 / osx-arm64
 ```
 
-脚本会断言产物是原生可执行文件且旁边没有托管 dll，`--smoke` 在 xvfb 下实际启动该二进制，确认裁剪未丢失运行时所需的反射元数据。`.github/workflows/aot-probe.yml` 在 main 与 arena 分支上运行同一脚本。
+脚本会断言产物是原生可执行文件且旁边没有托管 dll。`--smoke` 在 xvfb 下实际启动该二进制；`--smoke-scenario file-system-picker` 还会在原生进程中打开该 Gallery 页面，实例化控件模板，枚举临时真实目录，并验证过滤、选择和确认路径，只有进程写出成功标记才会通过。`.github/workflows/aot-probe.yml` 在 main 与 arena 分支上运行该定向场景。
 
 发布门禁会构建十八个包，并严格检查十八个 `.nupkg`、十八个 `.snupkg`、统一版本与已内嵌的官方字体。发布使用 NuGet Trusted Publishing，配置步骤见 [`docs/PUBLISHING.md`](docs/PUBLISHING.md)。
 
