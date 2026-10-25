@@ -6,7 +6,6 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using LibVLCSharp.Shared;
-using LibVLCSharp.Avalonia;
 
 namespace Md3.Avalonia.Media.Controls;
 
@@ -27,9 +26,10 @@ public interface IVideoPlaybackSession : IDisposable
 
 /// <summary>A skinnable video player shell with transport, seeking, volume, and fullscreen controls.</summary>
 /// <remarks>
-/// The control intentionally does not bundle a playback engine. Assign an <see cref="IVideoPlaybackSession"/>
-/// implementation and place its renderer in <see cref="VideoContent"/>. This keeps native codecs and
-/// deployment assets optional; LibVLCSharp.Avalonia can be used as the rendering/playback backend.
+/// The control offers a backend-neutral <see cref="IVideoPlaybackSession"/> contract and a built-in
+/// LibVLCSharp adapter. Use <see cref="AttachLibVlc(MediaPlayer)"/> for an Avalonia-rendered software
+/// surface that allows this control's chrome to stay above the video, or assign another backend through
+/// <see cref="Session"/> and <see cref="VideoContent"/>.
 /// </remarks>
 public sealed class MdVideoPlayer : UserControl
 {
@@ -103,11 +103,11 @@ public sealed class MdVideoPlayer : UserControl
 
     /// <summary>Connects the control directly to LibVLCSharp and creates its Avalonia video surface.</summary>
     /// <param name="mediaPlayer">An initialized LibVLCSharp player with media assigned.</param>
-    /// <returns>The created Avalonia video view, also available through <see cref="VideoContent"/>.</returns>
-    public VideoView AttachLibVlc(MediaPlayer mediaPlayer)
+    /// <returns>The created Avalonia-composited video surface, also available through <see cref="VideoContent"/>.</returns>
+    public LibVlcVideoSurface AttachLibVlc(MediaPlayer mediaPlayer)
     {
         ArgumentNullException.ThrowIfNull(mediaPlayer);
-        var view = new VideoView { MediaPlayer = mediaPlayer };
+        var view = new LibVlcVideoSurface(mediaPlayer);
         VideoContent = view;
         Session = new LibVlcPlaybackSession(mediaPlayer);
         return view;

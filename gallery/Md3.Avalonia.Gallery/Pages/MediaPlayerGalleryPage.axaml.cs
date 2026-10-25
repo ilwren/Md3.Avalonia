@@ -15,6 +15,7 @@ public partial class MediaPlayerGalleryPage : UserControl
     private MediaPlayer? _mediaPlayer;
     private LibVLCSharp.Shared.Media? _media;
     private LibVlcPlaybackSession? _session;
+    private LibVlcVideoSurface? _videoSurface;
 
     public MediaPlayerGalleryPage()
     {
@@ -70,7 +71,7 @@ public partial class MediaPlayerGalleryPage : UserControl
             _mediaPlayer.Playing += OnPlaybackStarted;
             _media = new LibVLCSharp.Shared.Media(_libVlc, new Uri(PreviewVideoPath));
             _mediaPlayer.Media = _media;
-            Player.AttachLibVlc(_mediaPlayer);
+            _videoSurface = Player.AttachLibVlc(_mediaPlayer);
             _session = (LibVlcPlaybackSession)Player.Session!;
             PlaybackStatus.Text = "Opening local video file…";
             if (!_mediaPlayer.Play())
@@ -98,6 +99,8 @@ public partial class MediaPlayerGalleryPage : UserControl
             _mediaPlayer.Stop();
         }
         DisposePlayback();
+        _videoSurface?.Dispose();
+        _videoSurface = null;
         Player.Session = null;
         Player.VideoContent = null;
     }

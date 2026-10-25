@@ -4,7 +4,7 @@ An optional, separately packaged Avalonia video-player UI inspired by Better Pla
 
 ## LibVLC integration and dependencies
 
-The package references `LibVLCSharp.Avalonia`, so the managed LibVLCSharp bindings are restored transitively. It does **not** bundle every native LibVLC build into the base control package: native payloads are platform- and architecture-specific, the Windows package is very large, and Linux LibVLC is normally installed by the distribution. Keeping native runtimes out of the base UI package avoids adding unrelated native binaries to every consumer.
+The package references `LibVLCSharp.Avalonia`, so the managed LibVLCSharp bindings are restored transitively. `AttachLibVlc` renders decoded frames into an Avalonia `WriteableBitmap` using LibVLC callbacks rather than putting a native `VideoView` window above the Avalonia visual tree; that lets the player buttons and seek bar remain visible and interactive. It does **not** bundle every native LibVLC build into the base control package: native payloads are platform- and architecture-specific, the Windows package is very large, and Linux LibVLC is normally installed by the distribution. Keeping native runtimes out of the base UI package avoids adding unrelated native binaries to every consumer.
 
 The Gallery desktop host demonstrates automatic native package restore where VideoLAN provides packages:
 
