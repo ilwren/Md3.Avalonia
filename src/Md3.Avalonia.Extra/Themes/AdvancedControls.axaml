@@ -623,7 +623,12 @@
                     BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}"
                     ClipToBounds="True"
                     Opacity="0"
-                    RenderTransform="scale(0.8) translate(0px,-8px)"
+                    <!-- A pure scale from the top-left anchor: any translate with a negative
+                         Y moved the open surface up over the field's bottom edge while the
+                         entrance ran, so with nothing selected the menu visibly overlapped
+                         the cascader. Shrinking towards the top-left keeps the surface's top
+                         edge on the anchor's bottom edge for the whole animation. -->
+                    RenderTransform="scale(0.88)"
                     RenderTransformOrigin="0%,0%">
               <ItemsControl Name="PART_Columns" Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding Columns}">
                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
@@ -693,10 +698,12 @@
       <Setter Property="IsNotched" Value="True" />
     </Style>
     <Style Selector="^:present /template/ Border#PART_Surface"><Setter Property="IsVisible" Value="True" /></Style>
-    <Style Selector="^:open /template/ Border#PART_Surface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
+    <!-- Keep the open state a one-operation transform too so the entrance interpolates a
+         scale into a scale instead of a scale-plus-translate into a scale. -->
+    <Style Selector="^:open /template/ Border#PART_Surface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
     <Style Selector="^:open /template/ Path#PART_Arrow"><Setter Property="RenderTransform" Value="rotate(180deg)" /></Style>
-    <Style Selector="^:reduced-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
-    <Style Selector="^:no-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
+    <Style Selector="^:reduced-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+    <Style Selector="^:no-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type eco:MdTransfer}" TargetType="eco:MdTransfer">

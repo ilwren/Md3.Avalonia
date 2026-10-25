@@ -25,6 +25,16 @@
       </Grid>
 
       <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Merge-heavy history" />
+        <md:MdCard Padding="16">
+          <StackPanel Spacing="12">
+            <md:MdCommitGraph x:Name="MergeGraph" HeadId="mh4" CommitClicked="MergeGraphCommitClicked" />
+            <WrapPanel x:Name="LegendHost" Orientation="Horizontal" ItemSpacing="20" Margin="20,0,8,0" />
+          </StackPanel>
+        </md:MdCard>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample CSharpCode="var graph = new MdCommitGraph&#10;{&#10;    HeadId = &quot;h5&quot;,&#10;    ItemsSource = commits,&#10;};&#10;graph.CommitClicked += (_, node) =&gt; Details.Show(node);" />
       </StackPanel>

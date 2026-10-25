@@ -2,13 +2,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             xmlns:motion="using:Md3.Avalonia.Motion"
              x:Class="Md3.Avalonia.Gallery.Pages.ContributionGridGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Contribution grid" />
         <TextBlock Classes="body" TextWrapping="Wrap"
-                   Text="A GitHub-style activity heatmap: one column per week, seven rows, levels sized against the data's own percentiles. Click a day to inspect it; hover for its tooltip." />
+                   Text="A GitHub-style activity heatmap: one column per week, seven rows, levels sized against the data's own percentiles. Click a single day to read the commits it contains; hover for its tooltip." />
       </StackPanel>
 
       <md:MdCard Padding="16">
@@ -30,7 +31,8 @@
           <md:MdCard Padding="16">
             <StackPanel x:Name="SelectionContent" Spacing="8" />
           </md:MdCard>
-          <md:MdButton x:Name="RegenerateButton" Content="Regenerate" HorizontalAlignment="Left" Click="RegenerateButtonClicked" />
+          <md:MdButton x:Name="RegenerateButton" Content="Regenerate" HorizontalAlignment="Left" Click="RegenerateButtonClicked"
+                       motion:MdMotion.Scheme="None" />
         </StackPanel>
       </Grid>
 

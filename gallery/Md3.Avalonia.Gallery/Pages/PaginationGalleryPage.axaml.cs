@@ -1,10 +1,14 @@
+using System;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Gallery.Pages;
 
@@ -58,9 +62,13 @@ public partial class PaginationGalleryPage : UserControl
          "就是这些。点击继续，工作区即刻上线。"),
     ];
 
+    private const double VerticalDotsPageHeight = 200;
+    private const double VerticalDotsPageSpacing = 16;
+
     private bool _syncing;
     private bool _initialized;
     private Border[]? _numberedPages;
+    private readonly DispatcherTimer _verticalDotsSettleTimer = new();
 
     public PaginationGalleryPage()
     {
@@ -71,12 +79,18 @@ public partial class PaginationGalleryPage : UserControl
         PageStatus.Text = L("Page 1 of 12", "第 1 页，共 12 页");
         DotsStatus.Text = L("Slide 1 of 3", "第 1 张，共 3 张");
         VerticalStatus.Text = L("Page 2 of 6", "第 2 页，共 6 页");
-        VerticalDotsTitle.Text = L(VerticalDotsPages[0].TitleEn, VerticalDotsPages[0].TitleZh);
-        VerticalDotsBody.Text = L(VerticalDotsPages[0].BodyEn, VerticalDotsPages[0].BodyZh);
         VerticalDotsStatus.Text = L("Dots page 1 of 4", "圆点第 1 页，共 4 页");
+
+        _verticalDotsSettleTimer.Tick += (_, _) =>
+        {
+            _verticalDotsSettleTimer.Stop();
+            if (VerticalDotsScroll is not null)
+                VerticalDotsScroll.Transitions = null;
+        };
 
         RebuildPages();
         ShowNumberedPage(NumberedPager.SelectedPageIndex);
+        BuildVerticalDotsPages();
 
         // The per-page accents and the card surface are resolved from theme tokens; a theme
         // switch rebuilds the pages so they stay in step.
@@ -84,6 +98,7 @@ public partial class PaginationGalleryPage : UserControl
         {
             RebuildPages();
             ShowNumberedPage(NumberedPager.SelectedPageIndex);
+            BuildVerticalDotsPages();
         };
 
         // XAML property setters (SelectedPageIndex, SelectedIndex) raise their change events
@@ -177,10 +192,103 @@ public partial class PaginationGalleryPage : UserControl
     private void VerticalDotsPagerChanged(object? sender, PipsPagerSelectedIndexChangedEventArgs e)
     {
         if (!_initialized) return;
-        var page = VerticalDotsPages[VerticalDotsPager.SelectedPageIndex];
-        VerticalDotsTitle.Text = L(page.TitleEn, page.TitleZh);
-        VerticalDotsBody.Text = L(page.BodyEn, page.BodyZh);
         VerticalDotsStatus.Text = L($"Dots page {VerticalDotsPager.SelectedPageIndex + 1} of 4", $"圆点第 {VerticalDotsPager.SelectedPageIndex + 1} 页，共 4 页");
+        ScrollVerticalDotsTo(VerticalDotsPager.SelectedPageIndex);
+    }
+
+    private void VerticalDotsScrollPressed(object? sender, PointerPressedEventArgs e)
+    {
+        // A press on a peeked strip of the neighbour page jumps to it, the way the carousel
+        // does; a press on the centred page stays put.
+        if (!_initialized || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            return;
+
+        var position = e.GetPosition(VerticalDotsHost);
+        var step = VerticalDotsPageHeight + VerticalDotsPageSpacing;
+        var index = (int)Math.Floor((position.Y - VerticalDotsHost.Margin.Top) / step);
+        index = Math.Clamp(index, 0, VerticalDotsPages.Length - 1);
+        if (index == VerticalDotsPager.SelectedPageIndex)
+            return;
+
+        VerticalDotsPager.SelectedPageIndex = index;
+    }
+
+    private void BuildVerticalDotsPages()
+    {
+        VerticalDotsHost.Children.Clear();
+        for (var i = 0; i < VerticalDotsPages.Length; i++)
+        {
+            var spec = VerticalDotsPages[i];
+            VerticalDotsHost.Children.Add(new Border
+            {
+                CornerRadius = new CornerRadius(16),
+                Height = VerticalDotsPageHeight,
+                Margin = new Thickness(14, 0, 14, 0),
+                Padding = new Thickness(24),
+                Background = MdThemeResources.FindBrush(this, "Md.Sys.Color.SurfaceContainer.Brush", ActualThemeVariant),
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Child = new StackPanel
+                {
+                    Spacing = 8,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Children =
+                    {
+                        new TextBlock
+                        {
+                            Text = (i + 1).ToString(),
+                            FontSize = 34,
+                            FontWeight = FontWeight.Bold,
+                            Foreground = MdThemeResources.FindBrush(this, "Md.Sys.Color.Primary.Brush", ActualThemeVariant),
+                        },
+                        new TextBlock
+                        {
+                            Text = L(spec.TitleEn, spec.TitleZh),
+                            FontSize = 18,
+                            FontWeight = FontWeight.SemiBold,
+                        },
+                        new TextBlock
+                        {
+                            Text = L(spec.BodyEn, spec.BodyZh),
+                            FontSize = 13,
+                            TextWrapping = TextWrapping.Wrap,
+                        },
+                    },
+                },
+            });
+        }
+    }
+
+    private void ScrollVerticalDotsTo(int index)
+    {
+        var scroll = VerticalDotsScroll;
+        var viewport = scroll.ActualHeight;
+        if (viewport <= 0)
+            return; // Not laid out yet; offset zero already centres nothing and the first
+                   // navigation will position the stack.
+
+        // Center the selected page in the viewport, clamped so the first and last page rest
+        // at the stack's ends - that is what leaves a strip of the neighbour peeking in.
+        var step = VerticalDotsPageHeight + VerticalDotsPageSpacing;
+        var target = VerticalDotsHost.Margin.Top + index * step + VerticalDotsPageHeight / 2 - viewport / 2;
+        target = Math.Clamp(target, 0, Math.Max(0, scroll.Extent.Height - viewport));
+
+        // Same settle pattern as the carousel: attach the transition, move the offset, then
+        // clear the transition once the run finishes so later scrolls do not inherit it.
+        scroll.Transitions = MdMotionTransitions.Collect(
+            MdMotionTransitions.CreateVector(this, ScrollViewer.OffsetProperty));
+        scroll.Offset = new Vector(0, target);
+
+        var spec = MdMotion.Resolve(this, MdMotionKind.Spatial, MdMotionSpeed.Default);
+        if (spec.IsEnabled)
+        {
+            _verticalDotsSettleTimer.Stop();
+            _verticalDotsSettleTimer.Interval = spec.Duration + TimeSpan.FromMilliseconds(20);
+            _verticalDotsSettleTimer.Start();
+        }
+        else
+        {
+            scroll.Transitions = null;
+        }
     }
 
     private void VerticalPagerChanged(object? sender, PipsPagerSelectedIndexChangedEventArgs e)

@@ -59,18 +59,26 @@
 
       <StackPanel Spacing="10" MaxWidth="760" HorizontalAlignment="Stretch">
         <TextBlock Classes="h2" Text="Dots, vertical" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="The vertical pager steps the page stack instead of swapping one block for another: every step keeps a strip of the neighbouring pages in view and eases between them." />
         <md:MdCard Padding="24">
-          <StackPanel Orientation="Horizontal" Spacing="24">
+          <!-- The viewport takes whatever the card leaves so the demo still fits a narrow
+               window; a fixed 380 dip next to the pager and padding overflowed 480 dip. -->
+          <Grid ColumnDefinitions="Auto,*" ColumnSpacing="24">
             <md:MdPagination x:Name="VerticalDotsPager" DisplayMode="Dots" Orientation="Vertical" NumberOfPages="4" SelectedPageIndex="0"
                              SelectedIndexChanged="VerticalDotsPagerChanged" VerticalAlignment="Center"
                              motion:MdMotion.Scheme="None" />
-            <StackPanel Spacing="8" VerticalAlignment="Center" MinWidth="240">
-              <TextBlock x:Name="VerticalDotsTitle" Classes="h2" Text="Onboarding" />
-              <TextBlock x:Name="VerticalDotsBody" Classes="body" TextWrapping="Wrap" />
-              <TextBlock x:Name="VerticalDotsStatus" Classes="body" Text="Dots page 1 of 4" />
-            </StackPanel>
-          </StackPanel>
+            <Border Grid.Column="1" Height="300" MinWidth="280" CornerRadius="16" ClipToBounds="True"
+                    Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+              <md:MdScrollViewer x:Name="VerticalDotsScroll"
+                                 VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled"
+                                 PointerPressed="VerticalDotsScrollPressed">
+                <StackPanel x:Name="VerticalDotsHost" Spacing="16" Margin="0,24" />
+              </md:MdScrollViewer>
+            </Border>
+          </Grid>
         </md:MdCard>
+        <TextBlock x:Name="VerticalDotsStatus" Classes="body" Text="Dots page 1 of 4" />
       </StackPanel>
 
       <StackPanel Spacing="10" MaxWidth="760" HorizontalAlignment="Stretch">

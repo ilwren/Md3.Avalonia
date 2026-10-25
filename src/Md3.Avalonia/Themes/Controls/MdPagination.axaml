@@ -69,9 +69,13 @@
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdPagination">
         <StackPanel Orientation="{TemplateBinding Orientation}" Spacing="4">
+          <!-- Pagers are clicked rapidly while turning pages, so the buttons stay quiet: a
+               null state-layer brush switches off both the press flash and the ripple, which
+               otherwise strobe on every step. -->
           <md:MdIconButton x:Name="PART_PreviousButton"
                            AutomationProperties.Name="Previous page"
                            Icon="{DynamicResource Md.Icon.ChevronLeft}"
+                           StateLayerBrush="{x:Null}"
                            IsVisible="{TemplateBinding IsPreviousButtonVisible}"
                            HorizontalAlignment="Center" VerticalAlignment="Center" />
           <ListBox x:Name="PART_PipsPagerList"
@@ -104,6 +108,7 @@
           <md:MdIconButton x:Name="PART_NextButton"
                            AutomationProperties.Name="Next page"
                            Icon="{DynamicResource Md.Icon.ChevronRight}"
+                           StateLayerBrush="{x:Null}"
                            IsVisible="{TemplateBinding IsNextButtonVisible}"
                            HorizontalAlignment="Center" VerticalAlignment="Center" />
         </StackPanel>

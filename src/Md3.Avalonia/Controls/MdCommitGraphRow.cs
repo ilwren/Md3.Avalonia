@@ -39,7 +39,10 @@ internal sealed class CommitGraphRow : Grid
         Grid.SetColumn(LaneHost, 0);
         ContentPresenter.HorizontalAlignment = HorizontalAlignment.Stretch;
         ContentPresenter.VerticalAlignment = VerticalAlignment.Center;
-        ContentPresenter.Margin = new Thickness(8, 0, 0, 0);
+        // Keep the message block clear of the lane tree: the tree's rightmost node and the
+        // selection highlight live in the lane column, so the text needs a visible gutter
+        // before it starts instead of sitting against the lines.
+        ContentPresenter.Margin = new Thickness(20, 0, 8, 0);
         Grid.SetColumn(ContentPresenter, 1);
         Children.Add(_selectionBackground);
         Children.Add(LaneHost);
@@ -75,8 +78,8 @@ internal sealed class CommitGraphRow : Grid
 /// Draws the connectors and node of one commit row: vertical lane lines in the upper and lower
 /// half-strips, cubic curves for branch/merge transitions and the commit node (plus a head
 /// ring). First-parent links are solid; the segments a merge absorbs are dashed (the IntelliJ
-/// commit-log look), and the selected row gets a thicker neutral halo under its elements so a
-/// single commit stands out in a dense history.
+/// commit-log look). The selected row is picked out by the soft background the row paints, not
+/// by extra rings in the tree itself.
 /// </summary>
 internal sealed class CommitGraphLaneHost : Control
 {
@@ -101,10 +104,6 @@ internal sealed class CommitGraphLaneHost : Control
         var nodeSize = owner.NodeSize;
         var height = Bounds.Height;
         var mid = height / 2;
-        var selected = _node is not null && owner.SelectedId == _node.Id;
-        var haloBrush = selected
-            ? MdThemeResources.FindBrush(this, "Md.Sys.Color.Outline.Brush", owner.ActualThemeVariant)
-            : null;
 
         static double LaneX(int lane, double laneWidth) => lane * laneWidth + laneWidth / 2;
 
@@ -123,28 +122,6 @@ internal sealed class CommitGraphLaneHost : Control
         {
             if (brush is null)
                 return;
-            if (haloBrush is not null)
-            {
-                var haloPen = MakePen(haloBrush, 4, false, height);
-                if (curve)
-                {
-                    var halo = new StreamGeometry();
-                    using (var figure = halo.Open())
-                    {
-                        figure.BeginFigure(from, isFilled: false);
-                        figure.CubicBezierTo(
-                            new Point(from.X, height * 0.75),
-                            new Point(to.X, height * 0.75),
-                            to);
-                        figure.EndFigure(false);
-                    }
-                    context.DrawGeometry(null, haloPen, halo);
-                }
-                else
-                {
-                    context.DrawLine(haloPen, from, to);
-                }
-            }
 
             var pen = MakePen(brush, 2, !active, height);
             if (curve)
@@ -209,8 +186,6 @@ internal sealed class CommitGraphLaneHost : Control
             return;
 
         var center = new Point(LaneX(geometry.Lane, laneWidth), mid);
-        if (haloBrush is not null)
-            context.DrawEllipse(null, MakePen(haloBrush, 4, false, height), center, nodeSize / 2 + 3.5, nodeSize / 2 + 3.5);
         if (geometry.IsHead)
             context.DrawEllipse(null, new Pen(nodeBrush, 2), center, nodeSize / 2 + 3, nodeSize / 2 + 3);
         context.DrawEllipse(nodeBrush, null, center, nodeSize / 2, nodeSize / 2);

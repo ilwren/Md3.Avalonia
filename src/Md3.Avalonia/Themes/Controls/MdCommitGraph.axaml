@@ -46,7 +46,9 @@
     <Setter Property="ItemTemplate">
       <DataTemplate x:DataType="md:MdCommitNode">
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
-          <StackPanel Spacing="2">
+          <!-- Clip the message block at its column so a long author/date/tag line is cut off
+               at the gutter instead of running over the short id in the next column. -->
+          <StackPanel Spacing="2" ClipToBounds="True">
             <TextBlock Text="{Binding Message}"
                        FontSize="13"
                        FontWeight="Medium"
