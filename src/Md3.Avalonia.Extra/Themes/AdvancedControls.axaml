@@ -612,6 +612,11 @@
                 <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
               </Style>
             </Popup.Styles>
+            <!-- A pure scale from the top-left anchor: the old entrance also translated the
+                 surface up while it scaled in, so on the first open with nothing selected the
+                 menu visibly overlapped the field until the menu was clicked. Shrinking towards
+                 the top-left anchor keeps the surface's top edge on the anchor's bottom edge
+                 for the whole animation. -->
             <Border Name="PART_Surface"
                     Margin="12,14,12,16"
                     MinWidth="{Binding Bounds.Width, ElementName=PART_Anchor}"
@@ -623,11 +628,6 @@
                     BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}"
                     ClipToBounds="True"
                     Opacity="0"
-                    <!-- A pure scale from the top-left anchor: any translate with a negative
-                         Y moved the open surface up over the field's bottom edge while the
-                         entrance ran, so with nothing selected the menu visibly overlapped
-                         the cascader. Shrinking towards the top-left keeps the surface's top
-                         edge on the anchor's bottom edge for the whole animation. -->
                     RenderTransform="scale(0.88)"
                     RenderTransformOrigin="0%,0%">
               <ItemsControl Name="PART_Columns" Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding Columns}">
