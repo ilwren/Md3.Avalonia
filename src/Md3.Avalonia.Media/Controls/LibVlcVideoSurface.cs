@@ -62,8 +62,8 @@ public sealed class LibVlcVideoSurface : UserControl
         _frameWidth = w;
         _frameHeight = h;
         _framePitch = pitch;
-        // LibVLC passes this private pointer to the lock, display, and cleanup callbacks.
-        // Keep it as the raw allocation address; it is not a managed GCHandle.
+        // Keep the allocation on this provider. LibVLC uses separate opaque values for
+        // format/cleanup and frame callbacks, so frame callbacks must use this field.
         opaque = buffer;
 
         pitches = (uint)pitch;
@@ -82,16 +82,18 @@ public sealed class LibVlcVideoSurface : UserControl
 
     private IntPtr LockVideo(IntPtr opaque, IntPtr planes)
     {
-        if (opaque == IntPtr.Zero || planes == IntPtr.Zero) return IntPtr.Zero;
-        Marshal.WriteIntPtr(planes, opaque);
-        return opaque;
+        var buffer = Volatile.Read(ref _frameBuffer);
+        if (buffer == IntPtr.Zero || planes == IntPtr.Zero) return IntPtr.Zero;
+        Marshal.WriteIntPtr(planes, buffer);
+        return buffer;
     }
 
     private void UnlockVideo(IntPtr opaque, IntPtr picture, IntPtr planes) { }
 
     private void DisplayVideo(IntPtr opaque, IntPtr picture)
     {
-        if (opaque == IntPtr.Zero || opaque != Volatile.Read(ref _frameBuffer) || Volatile.Read(ref _disposed) != 0) return;
+        var buffer = Volatile.Read(ref _frameBuffer);
+        if (buffer == IntPtr.Zero || Volatile.Read(ref _disposed) != 0) return;
 
         var width = _frameWidth;
         var height = _frameHeight;
@@ -102,7 +104,7 @@ public sealed class LibVlcVideoSurface : UserControl
         var packedStride = checked(width * 4);
         var frame = new byte[checked(packedStride * height)];
         for (var row = 0; row < height; row++)
-            Marshal.Copy(IntPtr.Add(opaque, row * pitch), frame, row * packedStride, packedStride);
+            Marshal.Copy(IntPtr.Add(buffer, row * pitch), frame, row * packedStride, packedStride);
 
         Interlocked.Exchange(ref _pendingFrame, new FrameData(frame, width, height)); // Drop older frames if the UI thread is behind.
         if (Interlocked.Exchange(ref _renderScheduled, 1) == 0)
@@ -139,14 +141,11 @@ public sealed class LibVlcVideoSurface : UserControl
 
     private void CleanupCallback(ref IntPtr opaque)
     {
-        if (opaque != IntPtr.Zero)
-        {
-            // LibVLC supplies the raw buffer pointer returned from VideoFormatCallback.
-            // Treating it as a GCHandle caused the AccessViolationException reported by callers.
-            if (Interlocked.CompareExchange(ref _frameBuffer, IntPtr.Zero, opaque) == opaque)
-                Marshal.FreeHGlobal(opaque);
-            opaque = IntPtr.Zero;
-        }
+        // LibVLC passes a format-callback opaque value here, distinct from the opaque
+        // used by SetVideoCallbacks. Own and release the allocation through our field.
+        var buffer = Interlocked.Exchange(ref _frameBuffer, IntPtr.Zero);
+        if (buffer != IntPtr.Zero)
+            Marshal.FreeHGlobal(buffer);
 
         GC.KeepAlive(_callbacks);
         Dispatcher.UIThread.Post(() =>
