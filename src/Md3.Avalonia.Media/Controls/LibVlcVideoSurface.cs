@@ -19,18 +19,19 @@ namespace Md3.Avalonia.Media.Controls;
 /// </remarks>
 public sealed class LibVlcVideoSurface : UserControl
 {
-    private readonly Image _image = new() { Stretch = Avalonia.Media.Stretch.Uniform };
+    private readonly Image _image = new() { Stretch = global::Avalonia.Media.Stretch.Uniform };
     // Keep callback delegates alive for as long as LibVLC may call them.
     private readonly object[] _callbacks;
     private FrameData? _pendingFrame;
     private int _renderScheduled;
+    private int _disposed;
     private WriteableBitmap? _bitmap;
 
     /// <summary>Creates an Avalonia-rendered video surface and registers its LibVLC callbacks.</summary>
     public LibVlcVideoSurface(MediaPlayer mediaPlayer)
     {
         ArgumentNullException.ThrowIfNull(mediaPlayer);
-        Background = Avalonia.Media.Brushes.Black;
+        Background = global::Avalonia.Media.Brushes.Black;
         Content = _image;
 
         var format = new MediaPlayer.LibVLCVideoFormatCb(VideoFormatCallback);
