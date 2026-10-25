@@ -2,10 +2,13 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Interactivity;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Gallery.Pages;
+using Md3.Avalonia.Motion;
 using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
@@ -90,6 +93,42 @@ public sealed class MdPaginationTests
 
         Assert.Contains(":vertical", pager.Classes);
         Assert.DoesNotContain(":horizontal", pager.Classes);
+    }
+
+    [AvaloniaFact]
+    public void Vertical_Dots_Next_Button_Scrolls_To_The_Next_Page()
+    {
+        Application.Current!.RequestedThemeVariant = ThemeVariant.Light;
+        var page = new PaginationGalleryPage();
+        MdMotion.SetScheme(page, MdMotionScheme.None);
+        var window = new Window { Width = 1000, Height = 900, Content = page };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+
+            var pager = page.GetVisualDescendants().OfType<MdPagination>()
+                .Single(control => control.Name == "VerticalDotsPager");
+            var scroll = page.GetVisualDescendants().OfType<MdScrollViewer>()
+                .Single(control => control.Name == "VerticalDotsScroll");
+            var next = pager.GetVisualDescendants().OfType<Button>()
+                .Single(button => button.Name == "PART_NextButton");
+
+            // Hidden suppresses only the bar. Disabled suppresses the scroll axis itself and
+            // coerces every Offset assignment back to zero.
+            Assert.Equal(ScrollBarVisibility.Hidden, scroll.VerticalScrollBarVisibility);
+            Assert.True(scroll.Extent.Height > scroll.Viewport.Height);
+            Assert.Equal(0, pager.SelectedPageIndex);
+            Assert.Equal(0, scroll.Offset.Y);
+
+            next.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(1, pager.SelectedPageIndex);
+            Assert.True(scroll.Offset.Y > 0,
+                $"the next page was selected but the content offset stayed at {scroll.Offset.Y}");
+        }
+        finally { window.Close(); }
     }
 
     private static IDisposable Show(Control content) => new WindowScope(ShowWindow(content));

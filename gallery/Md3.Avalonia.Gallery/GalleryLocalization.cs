@@ -472,7 +472,7 @@ internal static class GalleryLocalization
         ["Merge-heavy history"]="合并密集的历史",
         ["History"]="历史",
         ["Contribution grid"]="贡献图",
-        ["A GitHub-style activity heatmap: one column per week, seven rows, levels sized against the data's own percentiles. Click a single day to read the commits it contains; hover for its tooltip."]="GitHub 风格的贡献热力图：每周为一列、共七行，等级按数据自身百分位划分。单击某一天查看其中的提交，悬停显示提示。",
+        ["A GitHub-style activity heatmap with adjustable cells. This sample uses larger touch-friendly cells; increase CellSize and CellSpacing for mobile, or use the compact density below. Click a single day to read its commits."]="支持调整单元格的 GitHub 风格贡献热力图。此示例使用更适合触摸的大单元格；移动端可增大 CellSize 和 CellSpacing，也可使用下方的紧凑密度。单击某一天可查看其提交。",
         ["The vertical pager steps the page stack instead of swapping one block for another: every step keeps a strip of the neighbouring pages in view and eases between them."]="垂直翻页器滚动的是整叠页面，而不是换掉一整块内容：每翻一步都留出一小条相邻页面，并在其间平滑过渡。",
         ["Stats"]="统计", ["Regenerate"]="重新生成", ["Compact"]="紧凑",
         ["Smaller cells and tighter spacing fit a whole year in a sidebar."]="更小的格子与更紧的间距，能让一整年放进侧边栏。",

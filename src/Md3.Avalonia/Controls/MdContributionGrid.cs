@@ -82,7 +82,10 @@ public class MdContributionGrid : TemplatedControl
         set => SetValue(DaysProperty, value);
     }
 
-    /// <summary>Gets or sets the edge length of one day cell.</summary>
+    /// <summary>
+    /// Gets or sets the edge length of one day cell and its pointer target. Increase this for
+    /// touch layouts; the grid remains horizontally scrollable when a year no longer fits.
+    /// </summary>
     public double CellSize
     {
         get => GetValue(CellSizeProperty);

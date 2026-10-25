@@ -9,12 +9,13 @@
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Contribution grid" />
         <TextBlock Classes="body" TextWrapping="Wrap"
-                   Text="A GitHub-style activity heatmap: one column per week, seven rows, levels sized against the data's own percentiles. Click a single day to read the commits it contains; hover for its tooltip." />
+                   Text="A GitHub-style activity heatmap with adjustable cells. This sample uses larger touch-friendly cells; increase CellSize and CellSpacing for mobile, or use the compact density below. Click a single day to read its commits." />
       </StackPanel>
 
       <md:MdCard Padding="16" IsInteractive="False">
         <md:MdScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-          <md:MdContributionGrid x:Name="DemoGrid" DayClicked="DemoGridDayClicked" />
+          <md:MdContributionGrid x:Name="DemoGrid" CellSize="20" CellSpacing="4"
+                                 DayClicked="DemoGridDayClicked" />
         </md:MdScrollViewer>
       </md:MdCard>
 
@@ -49,7 +50,7 @@
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
-        <gallery:CodeExample CSharpCode="var grid = new MdContributionGrid&#10;{&#10;    Days = days.Select(d =&gt; new MdContributionDay { Date = d, Value = counts[d] }).ToList(),&#10;};&#10;grid.DayClicked += (_, day) =&gt; Status.Text = $&quot;{day.Value} on {day.Date:yyyy-MM-dd}&quot;;" />
+        <gallery:CodeExample CSharpCode="var grid = new MdContributionGrid&#10;{&#10;    CellSize = isTouch ? 20 : 12,&#10;    CellSpacing = isTouch ? 4 : 3,&#10;    Days = days.Select(d =&gt; new MdContributionDay { Date = d, Value = counts[d] }).ToList(),&#10;};&#10;grid.DayClicked += (_, day) =&gt; Status.Text = $&quot;{day.Value} on {day.Date:yyyy-MM-dd}&quot;;" />
       </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>

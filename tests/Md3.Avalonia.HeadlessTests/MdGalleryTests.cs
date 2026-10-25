@@ -212,6 +212,14 @@ public sealed class MdGalleryTests
                 Assert.NotEmpty(cards);
                 Assert.All(cards, card => Assert.False(card.IsInteractive,
                     "presentational graph cards must not show a whole-card state layer or ripple"));
+
+                var touchGrid = page.GetVisualDescendants().OfType<MdContributionGrid>()
+                    .SingleOrDefault(grid => grid.Name == "DemoGrid");
+                if (touchGrid is not null)
+                {
+                    Assert.Equal(20, touchGrid.CellSize);
+                    Assert.Equal(4, touchGrid.CellSpacing);
+                }
             }
             finally { host.Close(); }
         }

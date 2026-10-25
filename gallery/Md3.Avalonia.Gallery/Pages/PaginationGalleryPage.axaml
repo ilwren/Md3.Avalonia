@@ -70,8 +70,10 @@
                              motion:MdMotion.Scheme="None" />
             <Border Grid.Column="1" Height="300" MinWidth="280" CornerRadius="16" ClipToBounds="True"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+              <!-- Hidden keeps vertical scrolling enabled while suppressing the bar. Disabled
+                   disables the axis itself, which coerces every programmatic Offset back to 0. -->
               <md:MdScrollViewer x:Name="VerticalDotsScroll"
-                                 VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled"
+                                 VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled"
                                  PointerPressed="VerticalDotsScrollPressed">
                 <StackPanel x:Name="VerticalDotsHost" Spacing="16" Margin="0,24" />
               </md:MdScrollViewer>

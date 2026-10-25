@@ -106,6 +106,26 @@ public sealed class MdContributionGridTests
     }
 
     [AvaloniaFact]
+    public void Cell_Metrics_Can_Expand_The_Per_Day_Target_For_Touch()
+    {
+        var grid = new MdContributionGrid
+        {
+            CellSize = 20,
+            CellSpacing = 4,
+            Days = new[] { Day(new DateTime(2025, 6, 2), 5) }, // Monday of week 0
+        };
+        var host = new ContributionCellsHost();
+        host.Attach(grid);
+
+        // The step is now 24 instead of the desktop default 15. Monday occupies y [24,44),
+        // while the four-dip strip after Sunday's cell stays a non-clickable separator.
+        var monday = host.DayAt(new Point(10, 30));
+        Assert.NotNull(monday);
+        Assert.Equal(new DateTime(2025, 6, 2), monday!.Date.Date);
+        Assert.Null(host.DayAt(new Point(10, 22)));
+    }
+
+    [AvaloniaFact]
     public void Clicking_A_Cell_Raises_Day_Clicked_With_That_Day()
     {
         var grid = new MdContributionGrid

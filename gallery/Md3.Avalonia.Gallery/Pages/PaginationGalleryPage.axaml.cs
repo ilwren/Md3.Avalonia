@@ -261,17 +261,19 @@ public partial class PaginationGalleryPage : UserControl
     private void ScrollVerticalDotsTo(int index)
     {
         var scroll = VerticalDotsScroll;
-        // Bounds, not ActualHeight: the 12 line moved the actual-size pair off Control.
-        var viewport = scroll.Bounds.Height;
+        // Bounds, not ActualHeight: the 12 line moved the actual-size pair off Control. Prefer
+        // the native viewport/extent once layout has populated them and keep measured-size
+        // fallbacks for the first input immediately after the page is attached.
+        var viewport = Math.Max(scroll.Viewport.Height, scroll.Bounds.Height);
         if (viewport <= 0)
-            return; // Not laid out yet; offset zero already centres nothing and the first
-                   // navigation will position the stack.
+            return; // Not laid out yet; offset zero already centres the first page.
 
         // Center the selected page in the viewport, clamped so the first and last page rest
         // at the stack's ends - that is what leaves a strip of the neighbour peeking in.
         var step = VerticalDotsPageHeight + VerticalDotsPageSpacing;
         var target = VerticalDotsHost.Margin.Top + index * step + VerticalDotsPageHeight / 2 - viewport / 2;
-        target = Math.Clamp(target, 0, Math.Max(0, scroll.Extent.Height - viewport));
+        var extent = Math.Max(scroll.Extent.Height, VerticalDotsHost.DesiredSize.Height);
+        target = Math.Clamp(target, 0, Math.Max(0, extent - viewport));
 
         // Same settle pattern as the carousel: attach the transition, move the offset, then
         // clear the transition once the run finishes so later scrolls do not inherit it.
