@@ -7,7 +7,7 @@ using GalleryApp = Md3.Avalonia.Gallery.App;
 namespace Md3.Avalonia.Gallery.Android;
 
 [Activity(
-    Label = "Material 3 Gallery",
+    Label = "Material 3 for Avalonia 11",
     Theme = "@style/MyTheme.NoActionBar",
     Icon = "@drawable/icon",
     MainLauncher = true,

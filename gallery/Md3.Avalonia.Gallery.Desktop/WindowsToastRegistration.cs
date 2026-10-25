@@ -33,7 +33,7 @@ internal static class WindowsToastRegistration
             throw new InvalidOperationException("Windows did not provide the current user's Start-menu Programs folder.");
 
         Directory.CreateDirectory(programsPath);
-        var shortcutPath = Path.Combine(programsPath, "Material 3 for Avalonia Gallery.lnk");
+        var shortcutPath = Path.Combine(programsPath, "Material 3 for Avalonia 11 Gallery.lnk");
         var shortcutAlreadyExisted = File.Exists(shortcutPath);
         var linkType = Type.GetTypeFromCLSID(ShellLinkClassId, throwOnError: true)
             ?? throw new InvalidOperationException("Windows ShellLink is unavailable.");
@@ -45,7 +45,7 @@ internal static class WindowsToastRegistration
             var shellLink = (IShellLinkW)shellLinkObject;
             ThrowIfFailed(shellLink.SetPath(executablePath));
             ThrowIfFailed(shellLink.SetWorkingDirectory(Path.GetDirectoryName(executablePath) ?? programsPath));
-            ThrowIfFailed(shellLink.SetDescription("Material 3 for Avalonia Gallery"));
+            ThrowIfFailed(shellLink.SetDescription("Material 3 for Avalonia 11 Gallery"));
             ThrowIfFailed(shellLink.SetIconLocation(executablePath, 0));
 
             var propertyStore = (IPropertyStore)shellLinkObject;

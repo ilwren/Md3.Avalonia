@@ -64,7 +64,7 @@ try {
         -p:PublishAot=true -p:TreatWarningsAsErrors=false --nologo -o $Output
     if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed with exit code $LASTEXITCODE" }
 
-    $appName = "Md3.Avalonia.Gallery.Desktop"
+    $appName = "Md3.Avalonia11.Gallery.Desktop"
     $bin = if ($Rid -like "win-*") { Join-Path $Output "$appName.exe" } else { Join-Path $Output $appName }
     if (-not (Test-Path $bin)) { throw "no native binary was produced at $bin" }
 

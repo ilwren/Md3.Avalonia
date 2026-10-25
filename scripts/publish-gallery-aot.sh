@@ -95,7 +95,7 @@ dotnet publish "$PROJECT" \
   -p:TreatWarningsAsErrors=false \
   --nologo -o "$OUTPUT"
 
-APP_NAME="Md3.Avalonia.Gallery.Desktop"
+APP_NAME="Md3.Avalonia11.Gallery.Desktop"
 if [[ "$RID" == win-* ]]; then BIN="$OUTPUT/$APP_NAME.exe"; else BIN="$OUTPUT/$APP_NAME"; fi
 
 [[ -f "$BIN" ]] || { echo "error: no native binary was produced at $BIN" >&2; exit 1; }

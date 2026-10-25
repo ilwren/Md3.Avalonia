@@ -8,7 +8,7 @@
         Width="1440" Height="900" MinWidth="360" MinHeight="600"
         Background="{DynamicResource Md.Sys.Color.Surface.Brush}"
         Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
-        Title="Material 3 for Avalonia — Gallery"
+        Title="Material 3 for Avalonia 11 — Gallery"
         Icon="avares://Md3.Avalonia.Gallery/Assets/logo.png">
   <Window.Styles>
     <Style Selector="TextBlock.h1"><Setter Property="FontSize" Value="48" /><Setter Property="FontWeight" Value="Normal" /><Setter Property="LineHeight" Value="56" /></Style>

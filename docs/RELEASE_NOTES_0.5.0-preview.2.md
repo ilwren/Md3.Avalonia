@@ -24,4 +24,10 @@
 
 - 主导航、紧凑品牌位、窗口图标与托盘图标统一使用仓库根目录的 `logo.png`，移除旧的紫色星形托盘资源。
 
+## 发布防覆盖与程序身份
+
+- Avalonia 11 使用独立的 `-avalonia11` Release tag、`gallery-avalonia11-*` 压缩包与 `SHA256SUMS-avalonia11.txt`，Release 标题为 `Md3.Avalonia11`；GitHub 自动生成的 Source code 仍指向 `main`。
+- 桌面可执行文件改为 `Md3.Avalonia11.Gallery.Desktop`，Android ApplicationId 改为 `io.arena.md3avalonia11.gallery`，可与 main 的程序并排安装且不会生成同名 APK；Windows 通知身份和开始菜单快捷方式同步隔离。
+- 发布工作流遇到已有 tag 或 GitHub Release 会停止，不再向已有 Release 重新上传或覆盖同名资产；NuGet 推送失败时只重跑 `push-nuget` job。
+
 本次变更包括 Avalonia 11 迁移、最低共同依赖基线、Gallery 品牌资源、文档完善与版本元数据校对。

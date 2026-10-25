@@ -21,6 +21,7 @@
 ### Packaging
 
 - Added shared NuGet repository metadata pointing all packages to the GitHub source repository.
+- Separated Avalonia 11 Release tags, Gallery/APK asset names, desktop executables, Windows notification identity, and Android ApplicationId from main; existing GitHub Releases are no longer reused or overwritten. Avalonia 11 Release Source code archives continue to target `main`.
 - Pinned the desktop Gallery's `Tmds.DBus.Protocol` dependency to the patched `0.21.3` backport because Avalonia.FreeDesktop `11.3.13` otherwise resolves the vulnerable `0.21.2` release (GHSA-xrw6-gwf8-vvr9).
 
 ## [0.5.0-preview.1] - 2026-10-19

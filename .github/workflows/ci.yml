@@ -56,6 +56,9 @@ jobs:
         # Check that DocFX covers all packable projects and public interfaces have bilingual XML docs.
         run: python3 scripts/check-api-doc-coverage.py
 
+      - name: Check release naming and overwrite protection
+        run: python3 scripts/check-release-isolation.py
+
       - name: Check Gallery localization coverage
         # Defect #29: the Gallery translates by key match, so an entry that was never written leaves
         # a page quietly half-English and nothing fails. This measures the gap and fails on a

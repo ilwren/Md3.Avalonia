@@ -34,6 +34,9 @@ jobs:
       version: ${{ steps.resolve.outputs.version }}
       tag: ${{ steps.resolve.outputs.tag }}
       release_type: ${{ steps.resolve.outputs.release_type }}
+      release_name: ${{ steps.resolve.outputs.release_name }}
+      release_target: ${{ steps.resolve.outputs.release_target }}
+      asset_suffix: ${{ steps.resolve.outputs.asset_suffix }}
       android_version_code: ${{ steps.resolve.outputs.android_version_code }}
     steps:
       - name: Checkout repository
@@ -48,8 +51,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
-            echo "Run this workflow from the main branch." >&2
+          if [[ "$GITHUB_REF" != "refs/heads/main" && "$GITHUB_REF" != "refs/heads/avalonia-11" ]]; then
+            echo "Run this workflow from main or avalonia-11." >&2
             exit 1
           fi
           if [[ ! "$BASE_VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
@@ -75,9 +78,22 @@ jobs:
           esac
 
           TAG="v${VERSION}"
+          RELEASE_NAME="Md3.Avalonia"
+          RELEASE_TARGET="$GITHUB_SHA"
+          ASSET_SUFFIX=""
+          if [[ "$GITHUB_REF" == "refs/heads/avalonia-11" ]]; then
+            # Keep this release line separate from main at every user-facing boundary. The
+            # binaries are built from this branch, while GitHub's Source code archives still
+            # deliberately point at main as requested by the repository's release policy.
+            TAG="v${VERSION}-avalonia11"
+            RELEASE_NAME="Md3.Avalonia11"
+            RELEASE_TARGET="main"
+            ASSET_SUFFIX="-avalonia11"
+          fi
+
           remote_tag="$(git ls-remote --tags origin "refs/tags/${TAG}")"
           if [[ -n "$remote_tag" ]]; then
-            echo "Tag ${TAG} already exists; choose a new version." >&2
+            echo "Tag ${TAG} already exists; choose a new version. Existing releases are never reused." >&2
             exit 1
           fi
 
@@ -87,8 +103,11 @@ jobs:
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
           echo "release_type=${RELEASE_TYPE}" >> "$GITHUB_OUTPUT"
+          echo "release_name=${RELEASE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "release_target=${RELEASE_TARGET}" >> "$GITHUB_OUTPUT"
+          echo "asset_suffix=${ASSET_SUFFIX}" >> "$GITHUB_OUTPUT"
           echo "android_version_code=${ANDROID_VERSION_CODE}" >> "$GITHUB_OUTPUT"
-          echo "Publishing ${RELEASE_TYPE} version ${VERSION} (${TAG})."
+          echo "Publishing ${RELEASE_TYPE} version ${VERSION} (${TAG}); source target ${RELEASE_TARGET}."
 
   test:
     name: Headless tests
@@ -141,7 +160,7 @@ jobs:
       - name: Upload NuGet packages
         uses: actions/upload-artifact@v4
         with:
-          name: release-nuget
+          name: release-nuget${{ needs.prepare.outputs.asset_suffix }}
           path: artifacts/nuget/*
           if-no-files-found: error
           retention-days: 7
@@ -208,7 +227,7 @@ jobs:
         shell: bash
         run: |
           (cd "artifacts/desktop-${{ matrix.rid }}" && \
-            zip -qr "$GITHUB_WORKSPACE/artifacts/gallery-${{ matrix.rid }}.zip" .)
+            zip -qr "$GITHUB_WORKSPACE/artifacts/gallery${{ needs.prepare.outputs.asset_suffix }}-${{ matrix.rid }}.zip" .)
 
       - name: Archive Windows desktop Gallery
         if: matrix.rid == 'win-x64'
@@ -216,14 +235,13 @@ jobs:
         run: |
           Compress-Archive `
             -Path "artifacts/desktop-win-x64/*" `
-            -DestinationPath "artifacts/gallery-win-x64.zip" `
-            -Force
+            -DestinationPath "artifacts/gallery${{ needs.prepare.outputs.asset_suffix }}-win-x64.zip"
 
       - name: Upload desktop Gallery archive
         uses: actions/upload-artifact@v4
         with:
-          name: gallery-desktop-${{ matrix.rid }}
-          path: artifacts/gallery-${{ matrix.rid }}.zip
+          name: gallery-desktop${{ needs.prepare.outputs.asset_suffix }}-${{ matrix.rid }}
+          path: artifacts/gallery${{ needs.prepare.outputs.asset_suffix }}-${{ matrix.rid }}.zip
           if-no-files-found: error
           retention-days: 7
 
@@ -272,7 +290,7 @@ jobs:
       - name: Upload Android Gallery
         uses: actions/upload-artifact@v4
         with:
-          name: gallery-android
+          name: gallery-android${{ needs.prepare.outputs.asset_suffix }}
           path: artifacts/android/*.apk
           if-no-files-found: error
           retention-days: 7
@@ -296,18 +314,36 @@ jobs:
       - name: Package Gallery assets and checksums
         env:
           RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
+          RELEASE_ASSET_SUFFIX: ${{ needs.prepare.outputs.asset_suffix }}
         run: |
           set -euo pipefail
           mkdir -p release-bundle
+
+          # Never let two inputs silently become one same-named Release asset.
+          copy_asset() {
+            local source="$1"
+            local destination="release-bundle/$(basename "$source")"
+            if [[ -e "$destination" ]]; then
+              echo "Duplicate release asset name: $(basename "$source")" >&2
+              exit 1
+            fi
+            cp "$source" "$destination"
+          }
+
           for rid in linux-x64 win-x64 osx-x64; do
-            archive="release-artifacts/gallery-desktop-${rid}/gallery-${rid}.zip"
+            archive="release-artifacts/gallery-desktop${RELEASE_ASSET_SUFFIX}-${rid}/gallery${RELEASE_ASSET_SUFFIX}-${rid}.zip"
             test -f "$archive"
-            cp "$archive" release-bundle/
+            copy_asset "$archive"
           done
-          find release-artifacts/gallery-android -maxdepth 1 -type f -name '*.apk' -exec cp {} release-bundle/ \;
+          while IFS= read -r -d '' apk; do
+            copy_asset "$apk"
+          done < <(find "release-artifacts/gallery-android${RELEASE_ASSET_SUFFIX}" -maxdepth 1 -type f -name '*.apk' -print0)
           test -n "$(find release-bundle -maxdepth 1 -type f -name '*.apk' -print -quit)"
-          cp release-artifacts/release-nuget/* release-bundle/
-          (cd release-bundle && sha256sum * > SHA256SUMS.txt)
+          for package in release-artifacts/release-nuget${RELEASE_ASSET_SUFFIX}/*; do
+            copy_asset "$package"
+          done
+          checksum_file="SHA256SUMS${RELEASE_ASSET_SUFFIX}.txt"
+          (cd release-bundle && sha256sum * > "$checksum_file")
           echo "Prepared release bundle for ${RELEASE_VERSION}:"
           ls -lh release-bundle
 
@@ -320,25 +356,32 @@ jobs:
           RELEASE_VERSION: ${{ needs.prepare.outputs.version }}
           RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
           RELEASE_TYPE: ${{ needs.prepare.outputs.release_type }}
+          RELEASE_NAME: ${{ needs.prepare.outputs.release_name }}
+          RELEASE_TARGET: ${{ needs.prepare.outputs.release_target }}
+          RELEASE_ASSET_SUFFIX: ${{ needs.prepare.outputs.asset_suffix }}
         run: |
           set -euo pipefail
-          # Re-run safe: a second run of this job must not fail on a tag that already exists,
-          # otherwise recovering from a later failure would need a manual release delete.
+          # A re-run must never mutate an existing Release. In particular, do not replace this
+          # guard with a clobbering upload: published assets are immutable here.
           if gh release view "$RELEASE_TAG" --json tagName >/dev/null 2>&1; then
-            echo "Release ${RELEASE_TAG} already exists; uploading assets into it."
-            gh release upload "$RELEASE_TAG" release-bundle/* --clobber
-          else
-            release_args=(
-              "$RELEASE_TAG"
-              --title "Md3.Avalonia ${RELEASE_VERSION}"
-              --target "$GITHUB_SHA"
-              --generate-notes
-            )
-            if [[ "$RELEASE_TYPE" == "preview" ]]; then
-              release_args+=(--prerelease)
-            fi
-            gh release create "${release_args[@]}" release-bundle/*
+            echo "Release ${RELEASE_TAG} already exists; refusing to upload or replace assets." >&2
+            exit 1
           fi
+
+          release_args=(
+            "$RELEASE_TAG"
+            --title "${RELEASE_NAME} ${RELEASE_VERSION}"
+            --target "$RELEASE_TARGET"
+          )
+          if [[ -n "$RELEASE_ASSET_SUFFIX" ]]; then
+            release_args+=(--notes "Avalonia 11 packages and Gallery built from ${GITHUB_SHA} on ${GITHUB_REF_NAME}. GitHub Source code archives intentionally target main; all uploaded package and program assets use Avalonia11-specific names.")
+          else
+            release_args+=(--generate-notes)
+          fi
+          if [[ "$RELEASE_TYPE" == "preview" ]]; then
+            release_args+=(--prerelease)
+          fi
+          gh release create "${release_args[@]}" release-bundle/*
 
   # Deliberately a separate job. If the push fails, the Release above already exists with the
   # packages attached, and "Re-run failed jobs" retries only this job - the Release job is not
@@ -366,7 +409,7 @@ jobs:
       - name: Download NuGet packages
         uses: actions/download-artifact@v4
         with:
-          name: release-nuget
+          name: release-nuget${{ needs.prepare.outputs.asset_suffix }}
           path: release-artifacts/release-nuget
 
       - name: Publish packages to NuGet.org

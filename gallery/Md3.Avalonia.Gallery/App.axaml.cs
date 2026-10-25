@@ -47,7 +47,7 @@ public partial class App : Application
         var trayIcon = new TrayIcon
         {
             Icon = LoadTrayIcon(),
-            ToolTipText = "Md3.Avalonia Gallery",
+            ToolTipText = "Md3.Avalonia11 Gallery",
             Menu = BuildTrayMenu(desktop),
             IsVisible = true,
         };
