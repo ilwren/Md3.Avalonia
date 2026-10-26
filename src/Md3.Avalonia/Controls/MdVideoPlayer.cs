@@ -8,6 +8,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Md3.Avalonia.Localization;
+using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Controls;
 
@@ -21,13 +22,15 @@ namespace Md3.Avalonia.Controls;
 /// package supplies a desktop implementation. Keeping decoding out of the core control preserves
 /// Android and NativeAOT compatibility for applications that use another media engine.
 /// </remarks>
+[TemplatePart("PART_CenterPlayButton", typeof(MdIconButton))]
 [TemplatePart("PART_PlayPauseButton", typeof(MdIconButton))]
+[TemplatePart("PART_Controls", typeof(Border))]
 [TemplatePart("PART_MuteButton", typeof(MdIconButton))]
 [TemplatePart("PART_FullScreenButton", typeof(MdIconButton))]
 [TemplatePart("PART_SeekSlider", typeof(MdSlider))]
 [TemplatePart("PART_VolumeSlider", typeof(MdSlider))]
 [TemplatePart("PART_RateButton", typeof(MdButton))]
-[PseudoClasses(":playing", ":paused", ":muted", ":buffering", ":live", ":full-screen", ":has-media", ":error", ":compact", ":controls-hidden")]
+[PseudoClasses(":playing", ":paused", ":muted", ":buffering", ":live", ":full-screen", ":has-media", ":error", ":compact", ":controls-hidden", ":reduced-motion", ":no-motion")]
 public class MdVideoPlayer : TemplatedControl
 {
     public static readonly StyledProperty<object?> MediaContentProperty =
@@ -90,6 +93,8 @@ public class MdVideoPlayer : TemplatedControl
 
     private static readonly double[] PlaybackRates = [.5, .75, 1, 1.25, 1.5, 2];
     private readonly DispatcherTimer _controlsTimer;
+    private Border? _controlsSurface;
+    private MdIconButton? _centerPlayButton;
     private MdIconButton? _playPauseButton;
     private MdIconButton? _muteButton;
     private MdIconButton? _fullScreenButton;
@@ -124,6 +129,7 @@ public class MdVideoPlayer : TemplatedControl
         ErrorMessageProperty.Changed.AddClassHandler<MdVideoPlayer>((player, _) => player.UpdateVisualState());
         BoundsProperty.Changed.AddClassHandler<MdVideoPlayer>((player, _) => player.UpdateVisualState());
         MdLocalization.CultureProperty.Changed.AddClassHandler<MdVideoPlayer>((player, _) => player.UpdateLocalizedText());
+        MdMotion.SchemeProperty.Changed.AddClassHandler<MdVideoPlayer>((player, _) => player.UpdateMotion());
     }
 
     public MdVideoPlayer()
@@ -217,12 +223,15 @@ public class MdVideoPlayer : TemplatedControl
     {
         DetachTemplateParts();
         base.OnApplyTemplate(e);
+        _controlsSurface = e.NameScope.Find<Border>("PART_Controls");
+        _centerPlayButton = e.NameScope.Find<MdIconButton>("PART_CenterPlayButton");
         _playPauseButton = e.NameScope.Find<MdIconButton>("PART_PlayPauseButton");
         _muteButton = e.NameScope.Find<MdIconButton>("PART_MuteButton");
         _fullScreenButton = e.NameScope.Find<MdIconButton>("PART_FullScreenButton");
         _seekSlider = e.NameScope.Find<MdSlider>("PART_SeekSlider");
         _volumeSlider = e.NameScope.Find<MdSlider>("PART_VolumeSlider");
         _rateButton = e.NameScope.Find<MdButton>("PART_RateButton");
+        if (_centerPlayButton is not null) _centerPlayButton.Click += OnPlayPauseClick;
         if (_playPauseButton is not null) _playPauseButton.Click += OnPlayPauseClick;
         if (_muteButton is not null) _muteButton.Click += OnMuteClick;
         if (_fullScreenButton is not null) _fullScreenButton.Click += OnFullScreenClick;
@@ -231,6 +240,7 @@ public class MdVideoPlayer : TemplatedControl
         if (_rateButton is not null) _rateButton.Click += OnRateClick;
         SyncTemplate();
         UpdateLocalizedText();
+        UpdateMotion();
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)
@@ -406,12 +416,27 @@ public class MdVideoPlayer : TemplatedControl
         SetAndRaise(PlaybackErrorTextProperty, ref _playbackErrorText,
             MdLocalization.GetString("VideoPlaybackError", this));
         SetAndRaise(LiveTextProperty, ref _liveText, MdLocalization.GetString("VideoLive", this));
+        if (_centerPlayButton is not null) AutomationProperties.SetName(_centerPlayButton, PlayPauseText);
         if (_playPauseButton is not null) AutomationProperties.SetName(_playPauseButton, PlayPauseText);
         if (_muteButton is not null) AutomationProperties.SetName(_muteButton, MuteText);
         if (_fullScreenButton is not null) AutomationProperties.SetName(_fullScreenButton, FullScreenText);
         if (_seekSlider is not null) AutomationProperties.SetName(_seekSlider, MdLocalization.GetString("VideoTimeline", this));
         if (_volumeSlider is not null) AutomationProperties.SetName(_volumeSlider, MdLocalization.GetString("VideoVolume", this));
         if (_rateButton is not null) AutomationProperties.SetName(_rateButton, MdLocalization.GetString("VideoPlaybackSpeed", this));
+    }
+
+    private void UpdateMotion()
+    {
+        var scheme = MdMotion.GetScheme(this);
+        PseudoClasses.Set(":reduced-motion", scheme == MdMotionScheme.Reduced);
+        PseudoClasses.Set(":no-motion", scheme == MdMotionScheme.None);
+        if (_controlsSurface is not null)
+            _controlsSurface.Transitions = MdMotionTransitions.Collect(
+                MdMotionTransitions.CreateDouble(
+                    this,
+                    OpacityProperty,
+                    MdMotionKind.Effects,
+                    MdMotionSpeed.Fast));
     }
 
     private void UpdateVisualState()
@@ -431,12 +456,15 @@ public class MdVideoPlayer : TemplatedControl
 
     private void DetachTemplateParts()
     {
+        if (_centerPlayButton is not null) _centerPlayButton.Click -= OnPlayPauseClick;
         if (_playPauseButton is not null) _playPauseButton.Click -= OnPlayPauseClick;
         if (_muteButton is not null) _muteButton.Click -= OnMuteClick;
         if (_fullScreenButton is not null) _fullScreenButton.Click -= OnFullScreenClick;
         if (_seekSlider is not null) _seekSlider.PropertyChanged -= OnSeekSliderChanged;
         if (_volumeSlider is not null) _volumeSlider.PropertyChanged -= OnVolumeSliderChanged;
         if (_rateButton is not null) _rateButton.Click -= OnRateClick;
+        _controlsSurface = null;
+        _centerPlayButton = null;
         _playPauseButton = null;
         _muteButton = null;
         _fullScreenButton = null;

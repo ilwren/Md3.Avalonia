@@ -45,18 +45,28 @@ surface controls. It provides:
 - an expanded transport with volume/rate and a compact transport that keeps the critical actions;
 - component geometry under `Md.Comp.VideoPlayer.*` and runtime system colors/type roles.
 
-The controls remain outside the media viewport, and composited backends can place custom overlays
-inside their own `MediaContent`. The core does not pretend
-to implement fullscreen window ownership: it changes and reports player state while the host decides
-how its window, dialog, mobile orientation, or picture-in-picture surface should change.
+The follow-up visual pass keeps the renderer and transport in one clipped surface. A transparent-to-
+black bottom scrim holds title, seek and the compact desktop action row, while a large center action
+appears only when paused. Controls fade as a group and never reserve a detached footer below the
+picture. Composited backends can still place custom overlays inside their own `MediaContent`. The
+core does not pretend to implement fullscreen window ownership: it changes and reports player state
+while the host decides how its window, dialog, mobile orientation, or picture-in-picture surface
+should change.
 
 ## 3. Flutter equivalents studied last
 
-[`fluttercommunity/chewie`](https://github.com/fluttercommunity/chewie) was the primary Flutter
+[`media_kit_video`](https://github.com/media-kit/media-kit/tree/main/media_kit_video) is the primary
+visual reference for the follow-up. Its Material desktop theme overlays a 56 dp bottom button bar and
+seek track on the picture, fades controls in about 150 ms, enlarges the seek track on hover, and
+separates normal/fullscreen configuration. Its mobile Material theme adds a center play action,
+backdrop and gesture regions. `MdVideoPlayer` adopts the visual hierarchy—not its Dart code or red
+accent—using Material system roles, the existing backend-neutral events and Avalonia composition.
+
+[`fluttercommunity/chewie`](https://github.com/fluttercommunity/chewie) remains the main architecture
 reference. Its separation of a low-level `video_player` controller from a Material/Cupertino control
-shell matches the chosen backend-neutral architecture. Its desktop controls, playback speed,
-subtitles/options extensibility, localized labels, fullscreen request and configurable controls
-informed the state and request seam.
+shell matches the chosen backend-neutral architecture. Its in-picture bottom bar, center action,
+250 ms control opacity, playback speed, localized labels and fullscreen request informed the revised
+shell and the existing state/request seam.
 
 [`better_player`](https://github.com/jhomlala/betterplayer) was reviewed for advanced use cases:
 live streams, buffering, subtitles/audio tracks, HLS quality selection, retry, playlist and
@@ -69,6 +79,11 @@ assets, icon data or visual trade dress was copied.
 The shared Gallery embeds `Assets/Media/material-motion.mp4`, an eight-second 640×360 H.264/AAC file containing only procedural pixels and synthesized tones. `scripts/generate-gallery-video.py` reproducibly creates it from scratch; no third-party footage, image, font, or audio asset is included. A regular managed desktop host conditionally references `Md3.Avalonia.LibVLC`, extracts the embedded resource to a stable temporary file, and supplies an `MdLibVlcVideoPlayer` through `GalleryVideoBackend.Factory`. This exercises an actual local file, composited decoded frames, audio, duration, seeking, volume, rate, looping and end events.
 
 Android, headless tests and `PublishAot=true` leave the factory unset and continue to render the deterministic backend-neutral demonstration. Linux requires system LibVLC; Windows/macOS hosts likewise follow the adapter's documented native deployment requirement. Missing native LibVLC is surfaced in the player's error state rather than taking down the Gallery.
+
+`scripts/run-gallery-libvlc.sh` and `scripts/run-gallery-libvlc.ps1` orchestrate repository development:
+they discover an installed VLC, validate its plugin directory, set loader variables only for the
+child process, and run the non-AOT desktop Gallery. `--check-only` validates discovery. They do not
+install VLC or make a native package part of the shared project graph.
 
 ## Platform and licensing boundary
 

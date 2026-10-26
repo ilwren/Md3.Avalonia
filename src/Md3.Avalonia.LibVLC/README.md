@@ -22,6 +22,21 @@ The application must also deploy native LibVLC. Common choices are
 Linux. This adapter intentionally does not bundle native binaries or codecs. It targets desktop
 Avalonia and is not part of the Android or core NativeAOT dependency graph.
 
+For repository development, the launch helpers locate an installed VLC distribution, validate its
+plugin directory, set the process-local loader variables, and run the managed desktop Gallery:
+
+```bash
+scripts/run-gallery-libvlc.sh --vlc-home /path/to/vlc
+# Validate discovery without launching:
+scripts/run-gallery-libvlc.sh --check-only --vlc-home /path/to/vlc
+```
+
+```powershell
+.\scripts\run-gallery-libvlc.ps1 -VlcHome 'C:\Program Files\VideoLAN\VLC'
+```
+
+The scripts never install VLC, modify system loader paths, or add LibVLC to Android/NativeAOT.
+
 Video frames are decoded by LibVLC into BGRA memory and copied into an Avalonia `WriteableBitmap`.
 Unlike a `NativeControlHost`/`VideoView`, this composited surface follows Avalonia clipping,
 scrolling, transforms and z-order, so it does not flash outside a scroller's viewport. The tradeoff

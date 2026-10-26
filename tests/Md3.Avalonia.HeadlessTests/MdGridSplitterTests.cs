@@ -3,12 +3,14 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Gallery;
 using Md3.Avalonia.Gallery.Pages;
 using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
@@ -204,12 +206,48 @@ public sealed class MdGridSplitterTests
         var rowSplitter = page.FindControl<MdGridSplitter>("RowSplitter")!;
 
         Assert.Equal(columnDemo.ColumnDefinitions[0].Width, columnDemo.ColumnDefinitions[2].Width);
-        Assert.Equal(120, columnDemo.ColumnDefinitions[0].MinWidth);
-        Assert.Equal(120, columnDemo.ColumnDefinitions[2].MinWidth);
+        Assert.Equal(96, columnDemo.ColumnDefinitions[0].MinWidth);
+        Assert.Equal(16, columnDemo.ColumnDefinitions[1].Width.Value);
+        Assert.Equal(GridUnitType.Pixel, columnDemo.ColumnDefinitions[1].Width.GridUnitType);
+        Assert.Equal(96, columnDemo.ColumnDefinitions[2].MinWidth);
         Assert.Equal(rowDemo.RowDefinitions[0].Height, rowDemo.RowDefinitions[2].Height);
         Assert.Equal(80, rowDemo.RowDefinitions[0].MinHeight);
         Assert.Equal(80, rowDemo.RowDefinitions[2].MinHeight);
         Assert.False(rowSplitter.ShowsPreview);
+    }
+
+    [AvaloniaFact]
+    public void Gallery_Column_Demo_Resizes_From_A_Real_Pointer_Drag()
+    {
+        var gallery = new MainWindow { Width = 1180, Height = 820 };
+        gallery.Show();
+        try
+        {
+            Assert.True(gallery.NavigateToIndexedPage("Grid splitter"));
+            Dispatcher.UIThread.RunJobs();
+
+            var page = Assert.IsType<GridSplitterGalleryPage>(gallery.CurrentPage);
+            var grid = page.FindControl<Grid>("ColumnDemo")!;
+            var splitter = page.FindControl<MdGridSplitter>("ColumnSplitter")!;
+            var before = grid.ColumnDefinitions[0].ActualWidth;
+            var start = splitter.TranslatePoint(
+                new Point(splitter.Bounds.Width / 2, splitter.Bounds.Height / 2), gallery)!.Value;
+            var end = start.WithX(start.X + 72);
+
+            gallery.MouseMove(start, RawInputModifiers.None);
+            gallery.MouseDown(start, MouseButton.Left, RawInputModifiers.None);
+            gallery.MouseMove(end, RawInputModifiers.LeftMouseButton);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(grid.ColumnDefinitions[0].ActualWidth > before + 60,
+                $"Expected a live horizontal resize; before={before}, after={grid.ColumnDefinitions[0].ActualWidth}.");
+
+            gallery.MouseUp(end, MouseButton.Left, RawInputModifiers.None);
+        }
+        finally
+        {
+            gallery.Close();
+        }
     }
 
     private static Grid ColumnGrid(MdGridSplitter splitter, string definitions) => new()

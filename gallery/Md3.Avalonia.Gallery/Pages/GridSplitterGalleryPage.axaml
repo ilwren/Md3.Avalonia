@@ -18,9 +18,9 @@
         <Border Classes="gallery-section" Padding="0" ClipToBounds="True">
           <Grid x:Name="ColumnDemo" Height="300">
             <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="*" MinWidth="120" />
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="*" MinWidth="120" />
+              <ColumnDefinition Width="*" MinWidth="96" />
+              <ColumnDefinition Width="16" />
+              <ColumnDefinition Width="*" MinWidth="96" />
             </Grid.ColumnDefinitions>
             <Border Grid.Column="0" Padding="24" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}">
               <StackPanel Spacing="6">
@@ -30,7 +30,9 @@
             </Border>
             <md:MdGridSplitter x:Name="ColumnSplitter" Grid.Column="1"
                                ResizeDirection="Columns" ResizeBehavior="PreviousAndNext"
-                               DragDelta="OnSplitterDragDelta" DragCompleted="OnSplitterDragCompleted"
+                               ShowsPreview="False" DragIncrement="1"
+                               md:MdScrollViewer.SuppressMouseDragScrolling="True"
+                               DragCompleted="OnSplitterDragCompleted"
                                SplitReset="OnSplitterReset" />
             <Border Grid.Column="2" Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}">
               <StackPanel Spacing="6">
@@ -63,8 +65,9 @@
             </Border>
             <md:MdGridSplitter x:Name="RowSplitter" Grid.Row="1"
                                ResizeDirection="Rows" ResizeBehavior="PreviousAndNext"
-                               ShowsPreview="False" ShowHandle="False"
-                               DragDelta="OnSplitterDragDelta" DragCompleted="OnSplitterDragCompleted"
+                               ShowsPreview="False" ShowHandle="False" DragIncrement="1"
+                               md:MdScrollViewer.SuppressMouseDragScrolling="True"
+                               DragCompleted="OnSplitterDragCompleted"
                                SplitReset="OnSplitterReset" />
             <Border Grid.Row="2" Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
               <StackPanel Spacing="6">

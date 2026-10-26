@@ -15,8 +15,6 @@ public partial class GridSplitterGalleryPage : UserControl
         AttachedToVisualTree += (_, _) => Dispatcher.UIThread.Post(UpdateStatus, DispatcherPriority.Loaded);
     }
 
-    private void OnSplitterDragDelta(object? sender, VectorEventArgs e) => ScheduleStatusUpdate();
-
     private void OnSplitterDragCompleted(object? sender, VectorEventArgs e) => ScheduleStatusUpdate();
 
     private void OnSplitterReset(object? sender, EventArgs e) => ScheduleStatusUpdate();
