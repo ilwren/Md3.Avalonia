@@ -152,7 +152,6 @@
             <md:MdButton x:Name="ExpansionPanelNav" Content="Expansion panels" Variant="Text" HorizontalContentAlignment="Left" Click="ShowExpansionPanels" />
             <md:MdButton x:Name="FabNav" Content="FABs" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFabs" />
             <md:MdButton x:Name="FileSystemPickerNav" Content="File-system picker" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFileSystemPicker" />
-            <md:MdButton x:Name="VideoPlayerNav" Content="Video player" Variant="Text" HorizontalContentAlignment="Left" Click="ShowVideoPlayer" />
             <md:MdButton x:Name="FormValidationNav" Content="Form validation" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFormValidation" />
             <md:MdButton x:Name="GridTileNav" Content="Grid tiles" Variant="Text" HorizontalContentAlignment="Left" Click="ShowGridTiles" />
             <md:MdButton x:Name="HoverCardNav" Content="Hover cards" Variant="Text" HorizontalContentAlignment="Left" Click="ShowHoverCard" />
@@ -205,6 +204,7 @@
             <md:MdButton x:Name="TooltipNav" Content="Tooltips" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTooltips" />
             <md:MdButton x:Name="TransferNav" Content="Transfer" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTransfer" />
             <md:MdButton x:Name="TreeViewNav" Content="Tree view" Variant="Text" HorizontalContentAlignment="Left" Click="ShowTreeView" />
+            <md:MdButton x:Name="VideoPlayerNav" Content="Video player" Variant="Text" HorizontalContentAlignment="Left" Click="ShowVideoPlayer" />
             <md:MdButton x:Name="WaterfallNav" Content="Waterfall" Variant="Text" HorizontalContentAlignment="Left" Click="ShowWaterfall" />
             <md:MdButton x:Name="WaveformNav" Content="Waveform" Variant="Text" HorizontalContentAlignment="Left" Click="ShowWaveform" />
               </StackPanel>

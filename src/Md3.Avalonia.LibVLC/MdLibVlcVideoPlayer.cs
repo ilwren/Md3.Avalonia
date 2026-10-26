@@ -3,6 +3,7 @@ using Avalonia.Threading;
 using LibVLCSharp.Avalonia;
 using LibVLCSharp.Shared;
 using Md3.Avalonia.Controls;
+using VlcEngine = LibVLCSharp.Shared.LibVLC;
 
 namespace Md3.Avalonia.LibVLC;
 
@@ -22,7 +23,7 @@ public sealed class MdLibVlcVideoPlayer : MdVideoPlayer, IDisposable
         AvaloniaProperty.Register<MdLibVlcVideoPlayer, bool>(nameof(Loop));
 
     private readonly VideoView _videoView = new();
-    private LibVLC? _libVlc;
+    private VlcEngine? _libVlc;
     private MediaPlayer? _mediaPlayer;
     private Media? _media;
     private bool _disposed;
@@ -123,7 +124,7 @@ public sealed class MdLibVlcVideoPlayer : MdVideoPlayer, IDisposable
         ThrowIfDisposed();
         if (_mediaPlayer is not null) return;
         Core.Initialize();
-        _libVlc = LibVlcOptions.Count == 0 ? new LibVLC() : new LibVLC(LibVlcOptions.ToArray());
+        _libVlc = LibVlcOptions.Count == 0 ? new VlcEngine() : new VlcEngine(LibVlcOptions.ToArray());
         _mediaPlayer = new MediaPlayer(_libVlc)
         {
             Volume = (int)Math.Round(Math.Clamp(Volume, 0, 1) * 100),

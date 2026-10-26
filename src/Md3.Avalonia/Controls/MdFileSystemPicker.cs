@@ -114,6 +114,10 @@ public sealed class MdFileSystemPicker : TemplatedControl
     public static readonly StyledProperty<object?> OpenFolderTextProperty =
         AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(OpenFolderText), "Open folder");
 
+    public static readonly DirectProperty<MdFileSystemPicker, bool> IsPowerlineBreadcrumbProperty =
+        AvaloniaProperty.RegisterDirect<MdFileSystemPicker, bool>(
+            nameof(IsPowerlineBreadcrumb), control => control.IsPowerlineBreadcrumb);
+
     public static readonly DirectProperty<MdFileSystemPicker, IReadOnlyList<MdFileSystemEntry>> EntriesProperty =
         AvaloniaProperty.RegisterDirect<MdFileSystemPicker, IReadOnlyList<MdFileSystemEntry>>(
             nameof(Entries), control => control.Entries);
@@ -150,6 +154,7 @@ public sealed class MdFileSystemPicker : TemplatedControl
         AvaloniaProperty.RegisterDirect<MdFileSystemPicker, bool>(
             nameof(CanConfirm), control => control.CanConfirm);
 
+    private bool _isPowerlineBreadcrumb;
     private IReadOnlyList<MdFileSystemEntry> _entries = Array.Empty<MdFileSystemEntry>();
     private IReadOnlyList<MdFileSystemPathSegment> _pathSegments = Array.Empty<MdFileSystemPathSegment>();
     private IReadOnlyList<string> _selectedPaths = Array.Empty<string>();
@@ -201,7 +206,7 @@ public sealed class MdFileSystemPicker : TemplatedControl
         InitialDirectoryProperty.Changed.AddClassHandler<MdFileSystemPicker>((control, _) => control.OnInitialDirectoryChanged());
         FilePatternsProperty.Changed.AddClassHandler<MdFileSystemPicker>((control, _) => control.OnOptionsChanged(reload: true));
         ShowHiddenItemsProperty.Changed.AddClassHandler<MdFileSystemPicker>((control, _) => control.OnOptionsChanged(reload: true));
-        BreadcrumbStyleProperty.Changed.AddClassHandler<MdFileSystemPicker>((control, _) => control.UpdatePseudoClasses());
+        BreadcrumbStyleProperty.Changed.AddClassHandler<MdFileSystemPicker>((control, _) => control.UpdateBreadcrumbStyle());
         MdLocalization.CultureProperty.Changed.AddClassHandler<MdFileSystemPicker>((control, _) => control.OnCultureChanged());
         BoundsProperty.Changed.AddClassHandler<MdFileSystemPicker>((control, _) => control.UpdatePseudoClasses());
     }
@@ -235,6 +240,9 @@ public sealed class MdFileSystemPicker : TemplatedControl
 
     /// <summary>The built-in visual treatment used for breadcrumb path segments.</summary>
     public MdFileSystemBreadcrumbStyle BreadcrumbStyle { get => GetValue(BreadcrumbStyleProperty); set => SetValue(BreadcrumbStyleProperty, value); }
+
+    /// <summary>Whether the effective breadcrumb treatment is <see cref="MdFileSystemBreadcrumbStyle.Powerline"/>.</summary>
+    public bool IsPowerlineBreadcrumb => _isPowerlineBreadcrumb;
 
     /// <summary>Header title. A locally supplied value is preserved across culture and mode changes.</summary>
     public object? Title { get => GetValue(TitleProperty); set => SetValue(TitleProperty, value); }
@@ -585,6 +593,15 @@ public sealed class MdFileSystemPicker : TemplatedControl
             ? SelectionMode.Multiple | SelectionMode.Toggle
             : SelectionMode.Single | SelectionMode.Toggle;
         _itemsHost.UnselectAll();
+    }
+
+    private void UpdateBreadcrumbStyle()
+    {
+        SetAndRaise(
+            IsPowerlineBreadcrumbProperty,
+            ref _isPowerlineBreadcrumb,
+            BreadcrumbStyle == MdFileSystemBreadcrumbStyle.Powerline);
+        UpdatePseudoClasses();
     }
 
     private void UpdatePseudoClasses()

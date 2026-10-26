@@ -154,23 +154,39 @@
                                      MinWidth="0" Padding="0" Size="ExtraSmall" Variant="Text"
                                      Tag="{Binding}">
                           <Grid>
-                            <StackPanel Classes="standard-segment" Orientation="Horizontal" VerticalAlignment="Center">
+                            <StackPanel Classes="standard-segment" Orientation="Horizontal" VerticalAlignment="Center"
+                                        IsVisible="{Binding IsPowerlineBreadcrumb, RelativeSource={RelativeSource AncestorType=md:MdFileSystemPicker}, Converter={x:Static BoolConverters.Not}}">
                               <TextBlock Margin="10,0" VerticalAlignment="Center" Text="{Binding Label}" />
                               <TextBlock Margin="0,0,2,0" VerticalAlignment="Center" Text="›"
                                          IsVisible="{Binding IsCurrent, Converter={x:Static BoolConverters.Not}}"
                                          Foreground="{DynamicResource Md.Sys.Color.Outline.Brush}" />
                             </StackPanel>
-                            <Grid Classes="powerline-segment" Height="40" IsVisible="False"
+                            <Grid Classes="powerline-segment" Height="40"
+                                  IsVisible="{Binding IsPowerlineBreadcrumb, RelativeSource={RelativeSource AncestorType=md:MdFileSystemPicker}}"
                                   ColumnDefinitions="Auto,8" Margin="0,0,1,0">
-                              <Border x:Name="PART_PowerlineBody" Grid.Column="0" Padding="13,0,9,0"
-                                      Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
-                                      CornerRadius="8,0,0,8">
-                                <TextBlock VerticalAlignment="Center" Text="{Binding Label}"
-                                           Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
-                              </Border>
-                              <Path x:Name="PART_PowerlineTip" Grid.Column="1" Width="8" Height="40"
-                                    Data="M0,0 L8,20 L0,40 Z" Stretch="Fill"
-                                    Fill="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
+                              <Grid Grid.Column="0">
+                                <Border Padding="13,0,9,0"
+                                        Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
+                                        CornerRadius="8,0,0,8"
+                                        IsVisible="{Binding IsCurrent, Converter={x:Static BoolConverters.Not}}">
+                                  <TextBlock VerticalAlignment="Center" Text="{Binding Label}"
+                                             Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
+                                </Border>
+                                <Border Padding="13,0,9,0"
+                                        Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
+                                        CornerRadius="8,0,0,8" IsVisible="{Binding IsCurrent}">
+                                  <TextBlock VerticalAlignment="Center" Text="{Binding Label}"
+                                             Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" />
+                                </Border>
+                              </Grid>
+                              <Grid Grid.Column="1" Width="8" Height="40">
+                                <Path Data="M0,0 L8,20 L0,40 Z" Stretch="Fill"
+                                      Fill="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
+                                      IsVisible="{Binding IsCurrent, Converter={x:Static BoolConverters.Not}}" />
+                                <Path Data="M0,0 L8,20 L0,40 Z" Stretch="Fill"
+                                      Fill="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
+                                      IsVisible="{Binding IsCurrent}" />
+                              </Grid>
                             </Grid>
                           </Grid>
                         </md:MdButton>
@@ -378,14 +394,6 @@
       </ControlTemplate>
     </Setter>
 
-    <Style Selector="^:powerline-breadcrumb /template/ StackPanel.standard-segment"><Setter Property="IsVisible" Value="False" /></Style>
-    <Style Selector="^:powerline-breadcrumb /template/ Grid.powerline-segment"><Setter Property="IsVisible" Value="True" /></Style>
-    <Style Selector="^:powerline-breadcrumb /template/ md|MdButton.breadcrumb-segment.current Border#PART_PowerlineBody">
-      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
-    </Style>
-    <Style Selector="^:powerline-breadcrumb /template/ md|MdButton.breadcrumb-segment.current Path#PART_PowerlineTip">
-      <Setter Property="Fill" Value="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
-    </Style>
     <Style Selector="^:editing-path /template/ ScrollViewer#PART_BreadcrumbScroller"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:editing-path /template/ md|MdTextBox#PART_PathBox"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:folder-mode /template/ TextBlock#PART_FileModeLabel"><Setter Property="IsVisible" Value="False" /></Style>
