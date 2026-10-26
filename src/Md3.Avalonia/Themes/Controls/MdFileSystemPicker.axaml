@@ -154,15 +154,13 @@
                                      MinWidth="0" Padding="0" Size="ExtraSmall" Variant="Text"
                                      Tag="{Binding}">
                           <Grid>
-                            <StackPanel Classes="standard-segment" Orientation="Horizontal" VerticalAlignment="Center"
-                                        IsVisible="{Binding IsPowerlineBreadcrumb, RelativeSource={RelativeSource AncestorType=md:MdFileSystemPicker}, Converter={x:Static BoolConverters.Not}}">
+                            <StackPanel Classes="standard-segment" Orientation="Horizontal" VerticalAlignment="Center">
                               <TextBlock Margin="10,0" VerticalAlignment="Center" Text="{Binding Label}" />
                               <TextBlock Margin="0,0,2,0" VerticalAlignment="Center" Text="›"
                                          IsVisible="{Binding IsCurrent, Converter={x:Static BoolConverters.Not}}"
                                          Foreground="{DynamicResource Md.Sys.Color.Outline.Brush}" />
                             </StackPanel>
-                            <Grid Classes="powerline-segment" Height="40"
-                                  IsVisible="{Binding IsPowerlineBreadcrumb, RelativeSource={RelativeSource AncestorType=md:MdFileSystemPicker}}"
+                            <Grid Classes="powerline-segment" Height="40" IsVisible="False"
                                   ColumnDefinitions="Auto,8" Margin="0,0,1,0">
                               <Grid Grid.Column="0">
                                 <Border Padding="13,0,9,0"

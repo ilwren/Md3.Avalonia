@@ -369,6 +369,7 @@ public sealed class MdFileSystemPicker : TemplatedControl
         ConfigureSelectionMode();
         if (_pathBox is not null) _pathBox.Text = CurrentDirectory;
         UpdateSelectionState();
+        Dispatcher.UIThread.Post(ApplyBreadcrumbStyleToTemplate, DispatcherPriority.Loaded);
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -468,6 +469,7 @@ public sealed class MdFileSystemPicker : TemplatedControl
                 _itemsHost?.UnselectAll();
                 UpdateSelectionState();
                 UpdatePseudoClasses();
+                Dispatcher.UIThread.Post(ApplyBreadcrumbStyleToTemplate, DispatcherPriority.Loaded);
             });
             return true;
         }
@@ -602,6 +604,17 @@ public sealed class MdFileSystemPicker : TemplatedControl
             ref _isPowerlineBreadcrumb,
             BreadcrumbStyle == MdFileSystemBreadcrumbStyle.Powerline);
         UpdatePseudoClasses();
+        ApplyBreadcrumbStyleToTemplate();
+    }
+
+    private void ApplyBreadcrumbStyleToTemplate()
+    {
+        foreach (var panel in this.GetVisualDescendants().OfType<StackPanel>())
+            if (panel.Classes.Contains("standard-segment"))
+                panel.IsVisible = !IsPowerlineBreadcrumb;
+        foreach (var grid in this.GetVisualDescendants().OfType<Grid>())
+            if (grid.Classes.Contains("powerline-segment"))
+                grid.IsVisible = IsPowerlineBreadcrumb;
     }
 
     private void UpdatePseudoClasses()

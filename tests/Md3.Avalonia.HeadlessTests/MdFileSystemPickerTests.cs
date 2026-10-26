@@ -1,4 +1,5 @@
 using System.Globalization;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
@@ -117,13 +118,17 @@ public sealed class MdFileSystemPickerTests
 
             var list = picker.GetVisualDescendants().OfType<MdList>()
                 .Single(control => control.Name == "PART_ItemsHost");
-            Assert.True(list.SelectionMode.HasFlag(SelectionMode.Toggle));
+            Assert.True(
+                list.SelectionMode.HasFlag(SelectionMode.Toggle),
+                $"single-selection list should include Toggle; actual mode was {list.SelectionMode}");
 
             picker.BreadcrumbStyle = MdFileSystemBreadcrumbStyle.Powerline;
             Dispatcher.UIThread.RunJobs();
             var powerline = picker.GetVisualDescendants().OfType<Grid>()
                 .First(control => control.Classes.Contains("powerline-segment"));
-            Assert.True(powerline.IsVisible);
+            Assert.True(
+                powerline.IsVisible,
+                $"powerline visual should be visible; property={picker.IsPowerlineBreadcrumb}, local={powerline.GetValue(Visual.IsVisibleProperty)}");
 
             MdLocalization.SetCulture(picker, CultureInfo.GetCultureInfo("zh-CN"));
             Dispatcher.UIThread.RunJobs();
