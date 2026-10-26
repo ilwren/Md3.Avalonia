@@ -80,6 +80,12 @@ public partial class FileSystemPickerGalleryPage : UserControl
             {
                 throw new InvalidOperationException("The AOT picker returned an invalid filtered entry set.");
             }
+            if (PathPicker.PathSegments.Count == 0 ||
+                !string.Equals(PathPicker.PathSegments[^1].FullPath, Path.GetFullPath(root), StringComparison.Ordinal) ||
+                !PathPicker.PathSegments[^1].IsCurrent)
+            {
+                throw new InvalidOperationException("The AOT picker did not build normalized breadcrumb segments.");
+            }
 
             list.SelectedItem = file;
             if (PathPicker.SelectedPaths.Count != 1 ||

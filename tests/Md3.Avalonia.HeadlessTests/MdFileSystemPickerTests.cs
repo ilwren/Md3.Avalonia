@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
@@ -80,6 +81,54 @@ public sealed class MdFileSystemPickerTests
         }
         finally
         {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task Breadcrumb_Path_Editing_And_Responsive_Quick_Access_Are_Available()
+    {
+        var root = CreateFixture();
+        var nested = Path.Combine(root, "folder", "nested");
+        Directory.CreateDirectory(nested);
+        var picker = new MdFileSystemPicker();
+        var window = new Window { Width = 920, Height = 620, Content = picker };
+        window.Show();
+        try
+        {
+            Assert.True(await picker.NavigateAsync(nested));
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.NotEmpty(picker.PathSegments);
+            Assert.Equal(Path.GetFullPath(nested), picker.PathSegments[^1].FullPath);
+            Assert.Equal("nested", picker.PathSegments[^1].Label);
+            Assert.True(picker.PathSegments[^1].IsCurrent);
+            Assert.All(picker.PathSegments.Take(picker.PathSegments.Count - 1), segment => Assert.False(segment.IsCurrent));
+            Assert.All(picker.PathSegments, segment => Assert.True(Path.IsPathFullyQualified(segment.FullPath)));
+
+            var quickAccess = picker.GetVisualDescendants().OfType<Border>()
+                .Single(control => control.Name == "PART_QuickAccess");
+            var compactHome = picker.GetVisualDescendants().OfType<MdIconButton>()
+                .Single(control => control.Name == "PART_CompactHomeButton");
+            Assert.True(quickAccess.IsVisible);
+            Assert.False(compactHome.IsVisible);
+
+            var pathToggle = picker.GetVisualDescendants().OfType<MdIconButton>()
+                .Single(control => control.Name == "PART_PathToggleButton");
+            var pathBox = picker.GetVisualDescendants().OfType<MdTextBox>()
+                .Single(control => control.Name == "PART_PathBox");
+            pathToggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(pathBox.IsVisible);
+
+            window.Width = 680;
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(quickAccess.IsVisible);
+            Assert.True(compactHome.IsVisible);
+        }
+        finally
+        {
+            window.Close();
             Directory.Delete(root, recursive: true);
         }
     }

@@ -5,10 +5,57 @@
   <StreamGeometry x:Key="Md.FileSystemPicker.FileGeometry">M6 3H14L19 8V21H6ZM13 4.5V9H17.5</StreamGeometry>
   <StreamGeometry x:Key="Md.FileSystemPicker.UpGeometry">M5 14L12 7L19 14M12 7V20</StreamGeometry>
   <StreamGeometry x:Key="Md.FileSystemPicker.RefreshGeometry">M20 11A8 8 0 1 1 17.66 5.34L20 7.68M20 3V8H15</StreamGeometry>
+  <StreamGeometry x:Key="Md.FileSystemPicker.HomeGeometry">M3.5 10.5L12 3.5L20.5 10.5V20H14.5V14H9.5V20H3.5Z</StreamGeometry>
+  <StreamGeometry x:Key="Md.FileSystemPicker.StorageGeometry">M4 5H20V19H4ZM4 9H20M16.5 14.5H17.5</StreamGeometry>
+  <StreamGeometry x:Key="Md.FileSystemPicker.EditGeometry">M4 20L5 15.5L15.8 4.7C16.45 4.05 17.5 4.05 18.15 4.7L19.3 5.85C19.95 6.5 19.95 7.55 19.3 8.2L8.5 19ZM14.5 6L18 9.5</StreamGeometry>
+  <StreamGeometry x:Key="Md.FileSystemPicker.CheckGeometry">M5 12.5L10 17.5L19 7.5</StreamGeometry>
 
-  <ControlTheme x:Key="MdFileSystemPickerItemTheme" TargetType="ListBoxItem" BasedOn="{StaticResource MdListGeneratedItemTheme}">
+  <ControlTheme x:Key="MdFileSystemPickerItemTheme" TargetType="ListBoxItem">
     <Setter Property="MinHeight" Value="{DynamicResource Md.Comp.FileSystemPicker.Item.MinHeight}" />
-    <Setter Property="Padding" Value="12,6" />
+    <Setter Property="Padding" Value="{DynamicResource Md.Comp.FileSystemPicker.Item.Padding}" />
+    <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Md.Comp.FileSystemPicker.Item.Shape}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ListBoxItem">
+        <Border x:Name="PART_Container"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                ClipToBounds="True">
+          <Grid>
+            <ContentPresenter Margin="{TemplateBinding Padding}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Foreground="{TemplateBinding Foreground}" />
+            <Border x:Name="PART_StateLayer"
+                    Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                    IsHitTestVisible="False" Opacity="0" />
+            <md:MdRipplePresenter RippleBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+            <Border x:Name="PART_FocusIndicator" Margin="2"
+                    BorderBrush="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                    BorderThickness="2" CornerRadius="{TemplateBinding CornerRadius}"
+                    IsHitTestVisible="False" Opacity="0" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:selected">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.10" /></Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusIndicator"><Setter Property="Opacity" Value="1" /></Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdFileSystemPicker}" TargetType="md:MdFileSystemPicker">
@@ -20,16 +67,10 @@
                 Padding="{DynamicResource Md.Comp.FileSystemPicker.Content.Padding}"
                 Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
                 CornerRadius="{DynamicResource Md.Comp.FileSystemPicker.Container.Shape}">
-          <Grid RowDefinitions="Auto,Auto,*,Auto,Auto"
+          <Grid RowDefinitions="Auto,Auto,*,Auto"
                 RowSpacing="{DynamicResource Md.Comp.FileSystemPicker.Section.Spacing}">
-            <TextBlock x:Name="PART_Title" Grid.Row="0"
-                       FontSize="{DynamicResource Md.Sys.TypeScale.HeadlineSmall.Size}"
-                       LineHeight="{DynamicResource Md.Sys.TypeScale.HeadlineSmall.LineHeight}"
-                       Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
-                       Text="{TemplateBinding Title}" TextWrapping="Wrap" />
-
-            <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,*,Auto"
-                  ColumnSpacing="{DynamicResource Md.Comp.FileSystemPicker.Toolbar.Spacing}">
+            <!-- NFile-inspired hierarchy: app-bar title/path first, compact actions at the edge. -->
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="4">
               <md:MdIconButton x:Name="PART_UpButton" Grid.Column="0"
                                IsEnabled="{TemplateBinding CanGoUp}"
                                AutomationProperties.Name="Parent folder" ToolTip.Tip="Parent folder">
@@ -39,12 +80,26 @@
                         StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round" />
                 </md:MdIconButton.Icon>
               </md:MdIconButton>
-              <md:MdButton x:Name="PART_HomeButton" Grid.Column="1" Content="Home" Variant="Text"
-                           Size="ExtraSmall" AutomationProperties.Name="Home folder" />
-              <md:MdTextBox x:Name="PART_PathBox" Grid.Column="2" MinWidth="0"
-                            Label="{TemplateBinding PathLabel}" Text="{TemplateBinding CurrentDirectory}"
-                            Variant="Outlined" ShowClearButton="False"
-                            AutomationProperties.Name="File-system location" />
+
+              <StackPanel Grid.Column="1" Margin="8,2,8,2" VerticalAlignment="Center" Spacing="1">
+                <TextBlock x:Name="PART_Title"
+                           FontSize="{DynamicResource Md.Sys.TypeScale.TitleLarge.Size}"
+                           LineHeight="{DynamicResource Md.Sys.TypeScale.TitleLarge.LineHeight}"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                           Text="{TemplateBinding Title}" TextTrimming="CharacterEllipsis" />
+                <TextBlock FontSize="{DynamicResource Md.Sys.TypeScale.BodySmall.Size}"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                           Text="{TemplateBinding CurrentDirectory}" TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+
+              <md:MdIconButton x:Name="PART_CompactHomeButton" Grid.Column="2" IsVisible="False"
+                               AutomationProperties.Name="Home folder" ToolTip.Tip="Home folder">
+                <md:MdIconButton.Icon>
+                  <Path Width="20" Height="20" Data="{StaticResource Md.FileSystemPicker.HomeGeometry}"
+                        Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </md:MdIconButton.Icon>
+              </md:MdIconButton>
               <md:MdIconButton x:Name="PART_RefreshButton" Grid.Column="3"
                                AutomationProperties.Name="Refresh folder" ToolTip.Tip="Refresh folder">
                 <md:MdIconButton.Icon>
@@ -53,108 +108,236 @@
                         StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round" />
                 </md:MdIconButton.Icon>
               </md:MdIconButton>
+              <md:MdIconButton x:Name="PART_PathToggleButton" Grid.Column="4"
+                               AutomationProperties.Name="Edit full path" ToolTip.Tip="Edit full path">
+                <md:MdIconButton.Icon>
+                  <Path Width="20" Height="20" Data="{StaticResource Md.FileSystemPicker.EditGeometry}"
+                        Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                        StrokeThickness="1.8" StrokeLineCap="Round" StrokeJoin="Round" />
+                </md:MdIconButton.Icon>
+              </md:MdIconButton>
             </Grid>
 
-            <Border Grid.Row="2" MinHeight="0"
+            <!-- Breadcrumbs are the calm default. The full path editor appears only on demand. -->
+            <Border Grid.Row="1" MinHeight="{DynamicResource Md.Comp.FileSystemPicker.Path.MinHeight}" Padding="6,4"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
-                    BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1"
-                    CornerRadius="{DynamicResource Md.Comp.FileSystemPicker.List.Shape}" ClipToBounds="True">
-              <Grid MinHeight="0">
-                <md:MdList x:Name="PART_ItemsHost" MinHeight="0"
-                           ItemsSource="{TemplateBinding Entries}"
-                           ItemContainerTheme="{StaticResource MdFileSystemPickerItemTheme}"
-                           AutomationProperties.Name="Files and folders">
-                  <md:MdList.ItemTemplate>
-                    <DataTemplate x:DataType="md:MdFileSystemEntry">
-                      <Grid MinHeight="44" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Background="Transparent">
-                        <Grid Width="{DynamicResource Md.Comp.FileSystemPicker.Icon.Size}"
-                              Height="{DynamicResource Md.Comp.FileSystemPicker.Icon.Size}"
-                              VerticalAlignment="Center">
-                          <Path Data="{StaticResource Md.FileSystemPicker.FolderGeometry}"
-                                Fill="{DynamicResource Md.Sys.Color.Secondary.Brush}"
-                                IsVisible="{Binding IsDirectory}" />
-                          <Path Data="{StaticResource Md.FileSystemPicker.FileGeometry}"
-                                Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
-                                StrokeThickness="1.7" StrokeJoin="Round"
-                                IsVisible="{Binding IsDirectory, Converter={x:Static BoolConverters.Not}}" />
-                        </Grid>
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                          <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"
-                                     Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
-                          <TextBlock Text="{Binding Details}" TextTrimming="CharacterEllipsis"
-                                     FontSize="{DynamicResource Md.Sys.TypeScale.BodySmall.Size}"
-                                     Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                    CornerRadius="{DynamicResource Md.Comp.FileSystemPicker.Path.Shape}">
+              <Grid>
+                <ScrollViewer x:Name="PART_BreadcrumbScroller"
+                              HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                  <ItemsControl x:Name="PART_BreadcrumbHost" ItemsSource="{TemplateBinding PathSegments}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="md:MdFileSystemPathSegment">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                          <md:MdButton x:Name="PART_PathSegmentButton"
+                                       MinWidth="0" Padding="10,0" Size="ExtraSmall" Variant="Text"
+                                       Content="{Binding Label}" Tag="{Binding}" />
+                          <TextBlock Margin="0,0,2,0" VerticalAlignment="Center" Text="›"
+                                     IsVisible="{Binding IsCurrent, Converter={x:Static BoolConverters.Not}}"
+                                     Foreground="{DynamicResource Md.Sys.Color.Outline.Brush}" />
                         </StackPanel>
-                        <md:MdIconButton x:Name="PART_OpenEntryButton" Grid.Column="2"
-                                         Tag="{Binding}" IsVisible="{Binding IsDirectory}"
-                                         Icon="{DynamicResource Md.Icon.ChevronRight}"
-                                         Size="ExtraSmall" AutomationProperties.Name="Open folder" />
-                      </Grid>
-                    </DataTemplate>
-                  </md:MdList.ItemTemplate>
-                </md:MdList>
-
-                <StackPanel x:Name="PART_EmptyState" Margin="24" HorizontalAlignment="Center"
-                            VerticalAlignment="Center" Spacing="8" IsVisible="False">
-                  <TextBlock HorizontalAlignment="Center" FontSize="32" Text="—"
-                             Foreground="{DynamicResource Md.Sys.Color.Outline.Brush}" />
-                  <TextBlock MaxWidth="320" HorizontalAlignment="Center" TextAlignment="Center"
-                             TextWrapping="Wrap" Text="{TemplateBinding EmptyText}"
-                             Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-                </StackPanel>
-
-                <StackPanel x:Name="PART_LoadingState" Margin="24" HorizontalAlignment="Center"
-                            VerticalAlignment="Center" Spacing="12" IsVisible="False">
-                  <md:MdCircularProgressIndicator Width="40" Height="40" IsIndeterminate="True" />
-                  <TextBlock HorizontalAlignment="Center" Text="Loading folder…"
-                             Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-                </StackPanel>
-
-                <StackPanel x:Name="PART_ErrorState" Margin="24" HorizontalAlignment="Center"
-                            VerticalAlignment="Center" Spacing="8" IsVisible="False">
-                  <TextBlock HorizontalAlignment="Center" FontSize="24" Text="!"
-                             Foreground="{DynamicResource Md.Sys.Color.Error.Brush}" />
-                  <TextBlock MaxWidth="420" HorizontalAlignment="Center" TextAlignment="Center"
-                             TextWrapping="Wrap" Text="{TemplateBinding ErrorMessage}"
-                             Foreground="{DynamicResource Md.Sys.Color.OnErrorContainer.Brush}" />
-                  <TextBlock MaxWidth="420" HorizontalAlignment="Center" TextAlignment="Center"
-                             TextWrapping="Wrap" Text="Enter another accessible path or go to Home."
-                             Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-                </StackPanel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </ScrollViewer>
+                <md:MdTextBox x:Name="PART_PathBox" Margin="2" MinWidth="0" IsVisible="False"
+                              Label="{TemplateBinding PathLabel}" Text="{TemplateBinding CurrentDirectory}"
+                              Variant="Outlined" ShowClearButton="False"
+                              AutomationProperties.Name="File-system location" />
               </Grid>
             </Border>
 
-            <Grid Grid.Row="3" ColumnDefinitions="*,Auto" ColumnSpacing="12">
-              <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{TemplateBinding SelectionSummary}"
-                         TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
-                         Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-              <md:MdCheckBox Grid.Column="1" VerticalAlignment="Center" Content="Show hidden"
-                             IsChecked="{TemplateBinding ShowHiddenItems, Mode=TwoWay}" />
+            <Grid Grid.Row="2" MinHeight="0" ColumnDefinitions="Auto,*"
+                  ColumnSpacing="{DynamicResource Md.Comp.FileSystemPicker.Section.Spacing}">
+              <Border x:Name="PART_QuickAccess" Grid.Column="0"
+                      Width="{DynamicResource Md.Comp.FileSystemPicker.QuickAccess.Width}" Padding="12"
+                      Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                      CornerRadius="{DynamicResource Md.Comp.FileSystemPicker.List.Shape}">
+                <StackPanel Spacing="6">
+                  <TextBlock Margin="10,4,10,8" FontSize="{DynamicResource Md.Sys.TypeScale.LabelMedium.Size}"
+                             Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="QUICK ACCESS" />
+                  <md:MdButton x:Name="PART_HomeButton" Content="Home" Variant="Text" Size="ExtraSmall"
+                               HorizontalContentAlignment="Left" AutomationProperties.Name="Home folder">
+                    <md:MdButton.LeadingIcon>
+                      <Path Width="20" Height="20" Data="{StaticResource Md.FileSystemPicker.HomeGeometry}"
+                            Fill="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+                    </md:MdButton.LeadingIcon>
+                  </md:MdButton>
+                  <md:MdButton x:Name="PART_RootButton" Content="File-system root" Variant="Text" Size="ExtraSmall"
+                               HorizontalContentAlignment="Left" AutomationProperties.Name="File-system root">
+                    <md:MdButton.LeadingIcon>
+                      <Path Width="20" Height="20" Data="{StaticResource Md.FileSystemPicker.StorageGeometry}"
+                            Stroke="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                            StrokeThickness="1.8" StrokeJoin="Round" />
+                    </md:MdButton.LeadingIcon>
+                  </md:MdButton>
+                  <Border Margin="0,6,0,2" Height="1"
+                          Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+                  <Border Padding="12,8" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
+                          CornerRadius="{DynamicResource Md.Comp.FileSystemPicker.Mode.Shape}">
+                    <StackPanel>
+                      <TextBlock x:Name="PART_FileModeLabel" FontWeight="Medium" Text="Files" />
+                      <TextBlock x:Name="PART_FolderModeLabel" FontWeight="Medium" Text="Folders" IsVisible="False" />
+                      <TextBlock FontSize="{DynamicResource Md.Sys.TypeScale.BodySmall.Size}"
+                                 Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}"
+                                 Text="Selection mode" />
+                    </StackPanel>
+                  </Border>
+                  <md:MdCheckBox Margin="2,4,0,0" Content="Show hidden"
+                                 IsChecked="{TemplateBinding ShowHiddenItems, Mode=TwoWay}" />
+                </StackPanel>
+              </Border>
+
+              <Border x:Name="PART_FileListSurface" Grid.Column="1" MinHeight="0" Padding="8"
+                      Background="{DynamicResource Md.Sys.Color.SurfaceContainerLowest.Brush}"
+                      CornerRadius="{DynamicResource Md.Comp.FileSystemPicker.List.Shape}"
+                      ClipToBounds="True">
+                <Grid MinHeight="0">
+                  <md:MdList x:Name="PART_ItemsHost" MinHeight="0" ItemSpacing="6"
+                             ItemsSource="{TemplateBinding Entries}"
+                             ItemContainerTheme="{StaticResource MdFileSystemPickerItemTheme}"
+                             AutomationProperties.Name="Files and folders">
+                    <md:MdList.ItemTemplate>
+                      <DataTemplate x:DataType="md:MdFileSystemEntry">
+                        <Grid MinHeight="{DynamicResource Md.Comp.FileSystemPicker.Item.ContentMinHeight}"
+                              ColumnDefinitions="Auto,*,48" ColumnSpacing="14" Background="Transparent">
+                          <Border Width="{DynamicResource Md.Comp.FileSystemPicker.Icon.ContainerSize}"
+                                  Height="{DynamicResource Md.Comp.FileSystemPicker.Icon.ContainerSize}"
+                                  VerticalAlignment="Center"
+                                  Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
+                                  CornerRadius="{DynamicResource Md.Comp.FileSystemPicker.Icon.Shape}">
+                            <Grid Margin="11">
+                              <Path Data="{StaticResource Md.FileSystemPicker.FolderGeometry}"
+                                    Fill="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                                    IsVisible="{Binding IsDirectory}" />
+                              <Path Data="{StaticResource Md.FileSystemPicker.FileGeometry}"
+                                    Stroke="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}"
+                                    StrokeThickness="1.7" StrokeJoin="Round"
+                                    IsVisible="{Binding IsDirectory, Converter={x:Static BoolConverters.Not}}" />
+                            </Grid>
+                          </Border>
+                          <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                            <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"
+                                       FontSize="{DynamicResource Md.Sys.TypeScale.BodyLarge.Size}"
+                                       FontWeight="Medium"
+                                       Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+                            <TextBlock Text="{Binding Details}" TextTrimming="CharacterEllipsis"
+                                       FontSize="{DynamicResource Md.Sys.TypeScale.BodySmall.Size}"
+                                       Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                          </StackPanel>
+                          <Grid Grid.Column="2" Width="48" Height="48" VerticalAlignment="Center">
+                            <md:MdIconButton x:Name="PART_OpenEntryButton"
+                                             Tag="{Binding}" IsVisible="{Binding IsDirectory}"
+                                             Icon="{DynamicResource Md.Icon.ChevronRight}"
+                                             Size="ExtraSmall" AutomationProperties.Name="Open folder" />
+                            <Border Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                                    CornerRadius="{DynamicResource Md.Comp.FileSystemPicker.Selection.Shape}"
+                                    IsHitTestVisible="False"
+                                    IsVisible="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}">
+                              <Path Width="18" Height="18" Data="{StaticResource Md.FileSystemPicker.CheckGeometry}"
+                                    Stroke="{DynamicResource Md.Sys.Color.OnPrimary.Brush}"
+                                    StrokeThickness="2.2" StrokeLineCap="Round" StrokeJoin="Round" />
+                            </Border>
+                          </Grid>
+                        </Grid>
+                      </DataTemplate>
+                    </md:MdList.ItemTemplate>
+                  </md:MdList>
+
+                  <StackPanel x:Name="PART_EmptyState" Margin="24" HorizontalAlignment="Center"
+                              VerticalAlignment="Center" Spacing="8" IsVisible="False">
+                    <Border Width="56" Height="56" HorizontalAlignment="Center"
+                            Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
+                            CornerRadius="{DynamicResource Md.Comp.FileSystemPicker.State.Shape}">
+                      <Path Margin="14" Data="{StaticResource Md.FileSystemPicker.FolderGeometry}"
+                            Fill="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
+                    </Border>
+                    <TextBlock MaxWidth="320" HorizontalAlignment="Center" TextAlignment="Center"
+                               TextWrapping="Wrap" Text="{TemplateBinding EmptyText}"
+                               Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                  </StackPanel>
+
+                  <StackPanel x:Name="PART_LoadingState" Margin="24" HorizontalAlignment="Center"
+                              VerticalAlignment="Center" Spacing="12" IsVisible="False">
+                    <md:MdCircularProgressIndicator Width="40" Height="40" IsIndeterminate="True" />
+                    <TextBlock HorizontalAlignment="Center" Text="Loading folder…"
+                               Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                  </StackPanel>
+
+                  <StackPanel x:Name="PART_ErrorState" Margin="24" HorizontalAlignment="Center"
+                              VerticalAlignment="Center" Spacing="8" IsVisible="False">
+                    <Border Width="52" Height="52" HorizontalAlignment="Center"
+                            Background="{DynamicResource Md.Sys.Color.ErrorContainer.Brush}"
+                            CornerRadius="{DynamicResource Md.Comp.FileSystemPicker.State.Shape}">
+                      <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                                 FontSize="{DynamicResource Md.Sys.TypeScale.HeadlineSmall.Size}" Text="!"
+                                 Foreground="{DynamicResource Md.Sys.Color.OnErrorContainer.Brush}" />
+                    </Border>
+                    <TextBlock MaxWidth="420" HorizontalAlignment="Center" TextAlignment="Center"
+                               TextWrapping="Wrap" Text="{TemplateBinding ErrorMessage}"
+                               Foreground="{DynamicResource Md.Sys.Color.OnErrorContainer.Brush}" />
+                    <TextBlock MaxWidth="420" HorizontalAlignment="Center" TextAlignment="Center"
+                               TextWrapping="Wrap" Text="Enter another accessible path or go to Home."
+                               Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                  </StackPanel>
+                </Grid>
+              </Border>
             </Grid>
 
-            <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-              <md:MdButton x:Name="PART_CancelButton" Content="{TemplateBinding CancelText}"
-                           Variant="Text" Size="ExtraSmall" />
-              <md:MdButton x:Name="PART_ConfirmButton" Content="{TemplateBinding ConfirmText}"
-                           Variant="Filled" Size="ExtraSmall" IsEnabled="{TemplateBinding CanConfirm}" />
-            </StackPanel>
+            <Border Grid.Row="3" Padding="12,8"
+                    Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+                    CornerRadius="{DynamicResource Md.Comp.FileSystemPicker.Footer.Shape}">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="1">
+                  <TextBlock VerticalAlignment="Center" Text="{TemplateBinding SelectionSummary}"
+                             TextTrimming="CharacterEllipsis"
+                             Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                  <md:MdCheckBox x:Name="PART_CompactOptions" Content="Show hidden" IsVisible="False"
+                                 IsChecked="{TemplateBinding ShowHiddenItems, Mode=TwoWay}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
+                  <md:MdButton x:Name="PART_CancelButton" Content="{TemplateBinding CancelText}"
+                               Variant="Text" Size="ExtraSmall" />
+                  <md:MdButton x:Name="PART_ConfirmButton" Content="{TemplateBinding ConfirmText}"
+                               Variant="Filled" Size="ExtraSmall" IsEnabled="{TemplateBinding CanConfirm}" />
+                </StackPanel>
+              </Grid>
+            </Border>
           </Grid>
         </Border>
       </ControlTemplate>
     </Setter>
+
+    <Style Selector="^:editing-path /template/ ScrollViewer#PART_BreadcrumbScroller"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:editing-path /template/ md|MdTextBox#PART_PathBox"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:folder-mode /template/ TextBlock#PART_FileModeLabel"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:folder-mode /template/ TextBlock#PART_FolderModeLabel"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:loading /template/ md|MdList#PART_ItemsHost"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:loading /template/ StackPanel#PART_LoadingState"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:empty /template/ md|MdList#PART_ItemsHost"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:empty /template/ StackPanel#PART_EmptyState"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:error /template/ md|MdList#PART_ItemsHost"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:error /template/ StackPanel#PART_ErrorState"><Setter Property="IsVisible" Value="True" /></Style>
+
     <Style Selector="^:compact /template/ Border#PART_Container">
       <Setter Property="Padding" Value="{DynamicResource Md.Comp.FileSystemPicker.Compact.Content.Padding}" />
       <Setter Property="CornerRadius" Value="0" />
     </Style>
+    <Style Selector="^:compact /template/ Border#PART_QuickAccess"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:compact /template/ Border#PART_FileListSurface">
+      <Setter Property="Grid.Column" Value="0" />
+      <Setter Property="Grid.ColumnSpan" Value="2" />
+      <Setter Property="CornerRadius" Value="{DynamicResource Md.Comp.FileSystemPicker.Compact.List.Shape}" />
+    </Style>
+    <Style Selector="^:compact /template/ md|MdIconButton#PART_CompactHomeButton"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:compact /template/ md|MdCheckBox#PART_CompactOptions"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:compact /template/ TextBlock#PART_Title">
-      <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.TitleLarge.Size}" />
-      <Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.TitleLarge.LineHeight}" />
+      <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.TitleMedium.Size}" />
+      <Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.TitleMedium.LineHeight}" />
     </Style>
   </ControlTheme>
 </ResourceDictionary>

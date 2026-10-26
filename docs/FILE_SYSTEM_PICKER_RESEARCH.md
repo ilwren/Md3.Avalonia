@@ -1,6 +1,6 @@
 # Direct-path file-system picker research
 
-Research date: 2026-10-25
+Research dates: 2026-10-25 (behavior), 2026-10-26 (visual redesign)
 
 This note records the required pre-implementation sequence for `MdFileSystemPicker`. The control is
 an Md3.Avalonia project decision, not an official Material component.
@@ -29,10 +29,13 @@ a scoped `ControlTheme` and `PART_` contract. Its template uses the existing `Md
 `MdButton`, `MdIconButton`, `MdCheckBox`, and progress controls. Component geometry and spacing live
 under `Md.Comp.FileSystemPicker.*`; colors and type use runtime `DynamicResource` system tokens.
 
-The desktop column table was replaced with 56-DIP touch rows, a compact detail line, and an explicit
-open-folder affordance. The layout reflows without a sidebar, supports full-screen phone dialogs,
-and has visible loading, empty, and permission/error states. Enter/double-click activates a row;
-F5 refreshes; Back goes up when focus is not editing the path. Folder mode can choose the current
+The desktop column table was replaced with touch rows, a compact detail line, and an explicit
+open-folder affordance. The second visual pass gives each entry a 48-DIP tonal icon tile, a clear
+selected container and trailing check, breadcrumb-first navigation, an on-demand raw path editor,
+a fixed confirmation surface, and an expanded-width quick-access rail. The rail collapses on phones,
+where Home moves into the app-bar actions and the picker remains suitable for a full-screen dialog.
+Loading, empty, and permission/error states remain visible. Enter/double-click activates a row; F5
+refreshes; Back goes up when focus is not editing the path. Folder mode can choose the current
 location, avoiding a touch-hostile distinction between selecting and opening the same row.
 
 ## 3. Flutter equivalent studied last
@@ -50,6 +53,27 @@ directory; confirm text; cancellation represented by no result; and extension gr
 a leading dot. The transport did **not** carry over: Flutter delegates to platform dialogs (and on
 Android therefore platform document-provider behavior), while this control intentionally browses
 only process-accessible real file-system paths.
+
+The visual-redesign pass also studied Flutter implementations that draw their own browser:
+
+- [`andyduke/filesystem_picker`](https://github.com/andyduke/filesystem_picker), especially its
+  [`picker_page.dart`](https://github.com/andyduke/filesystem_picker/blob/master/package/lib/src/picker_page.dart),
+  [`breadcrumbs.dart`](https://github.com/andyduke/filesystem_picker/blob/master/package/lib/src/breadcrumbs.dart),
+  and full-screen/dialog/bottom-sheet presentation. Its hierarchy and shortcuts are useful, while
+  its older Material 2 styling was not copied.
+- [`Senzme/NFile`'s internal picker](https://github.com/Senzme/NFile/blob/main/lib/ui/screens/internal_file_picker_screen.dart)
+  informed the title/path app-bar hierarchy, 48-DIP tonal icon tiles, selected row treatment,
+  storage shortcut surface, and selection-aware confirmation. NFile is GPL-3.0: no source, custom
+  icons, textures, or assets were copied; these generic interaction ideas were independently
+  re-composed from existing Md3.Avalonia controls and tokens.
+- [`DevsOnFlutter/file_manager`](https://github.com/DevsOnFlutter/file_manager) reinforced the
+  separation between file-system enumeration and replaceable list/grid presentation. ZenFile was
+  reviewed as a richer NFile derivative, but its neon/glass brand treatment and dual-pane manager
+  chrome were deliberately excluded from this focused MD3 picker.
+
+The resulting visual direction is therefore NFile's mobile information hierarchy plus
+`filesystem_picker`'s breadcrumb clarity, constrained to standard Material 3 surfaces, typography,
+state colors, touch targets, and this repository's own icon geometry.
 
 ## Platform boundary
 

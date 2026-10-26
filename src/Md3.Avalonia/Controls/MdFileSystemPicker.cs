@@ -24,13 +24,17 @@ namespace Md3.Avalonia.Controls;
 /// permissions themselves.
 /// </remarks>
 [TemplatePart("PART_PathBox", typeof(MdTextBox))]
+[TemplatePart("PART_BreadcrumbHost", typeof(ItemsControl))]
 [TemplatePart("PART_ItemsHost", typeof(MdList))]
 [TemplatePart("PART_UpButton", typeof(MdIconButton))]
 [TemplatePart("PART_HomeButton", typeof(MdButton))]
+[TemplatePart("PART_RootButton", typeof(MdButton))]
+[TemplatePart("PART_CompactHomeButton", typeof(MdIconButton))]
+[TemplatePart("PART_PathToggleButton", typeof(MdIconButton))]
 [TemplatePart("PART_RefreshButton", typeof(MdIconButton))]
 [TemplatePart("PART_ConfirmButton", typeof(MdButton))]
 [TemplatePart("PART_CancelButton", typeof(MdButton))]
-[PseudoClasses(":file-mode", ":folder-mode", ":multiple", ":compact", ":loading", ":empty", ":error")]
+[PseudoClasses(":file-mode", ":folder-mode", ":multiple", ":compact", ":editing-path", ":loading", ":empty", ":error")]
 public sealed class MdFileSystemPicker : TemplatedControl
 {
     public static readonly StyledProperty<MdFileSystemPickerMode> ModeProperty =
@@ -67,6 +71,10 @@ public sealed class MdFileSystemPicker : TemplatedControl
         AvaloniaProperty.RegisterDirect<MdFileSystemPicker, IReadOnlyList<MdFileSystemEntry>>(
             nameof(Entries), control => control.Entries);
 
+    public static readonly DirectProperty<MdFileSystemPicker, IReadOnlyList<MdFileSystemPathSegment>> PathSegmentsProperty =
+        AvaloniaProperty.RegisterDirect<MdFileSystemPicker, IReadOnlyList<MdFileSystemPathSegment>>(
+            nameof(PathSegments), control => control.PathSegments);
+
     public static readonly DirectProperty<MdFileSystemPicker, IReadOnlyList<string>> SelectedPathsProperty =
         AvaloniaProperty.RegisterDirect<MdFileSystemPicker, IReadOnlyList<string>>(
             nameof(SelectedPaths), control => control.SelectedPaths);
@@ -96,6 +104,7 @@ public sealed class MdFileSystemPicker : TemplatedControl
             nameof(CanConfirm), control => control.CanConfirm);
 
     private IReadOnlyList<MdFileSystemEntry> _entries = Array.Empty<MdFileSystemEntry>();
+    private IReadOnlyList<MdFileSystemPathSegment> _pathSegments = Array.Empty<MdFileSystemPathSegment>();
     private IReadOnlyList<string> _selectedPaths = Array.Empty<string>();
     private string? _currentDirectory;
     private string? _errorMessage;
@@ -107,12 +116,17 @@ public sealed class MdFileSystemPicker : TemplatedControl
     private int _navigationVersion;
     private CancellationTokenSource? _navigationCancellation;
     private MdTextBox? _pathBox;
+    private ItemsControl? _breadcrumbHost;
     private MdList? _itemsHost;
     private MdIconButton? _upButton;
     private MdButton? _homeButton;
+    private MdButton? _rootButton;
+    private MdIconButton? _compactHomeButton;
+    private MdIconButton? _pathToggleButton;
     private MdIconButton? _refreshButton;
     private MdButton? _confirmButton;
     private MdButton? _cancelButton;
+    private bool _isEditingPath;
 
     static MdFileSystemPicker()
     {
@@ -161,6 +175,13 @@ public sealed class MdFileSystemPicker : TemplatedControl
     {
         get => _entries;
         private set => SetAndRaise(EntriesProperty, ref _entries, value);
+    }
+
+    /// <summary>The root-to-current-directory segments displayed by the breadcrumb path bar.</summary>
+    public IReadOnlyList<MdFileSystemPathSegment> PathSegments
+    {
+        get => _pathSegments;
+        private set => SetAndRaise(PathSegmentsProperty, ref _pathSegments, value);
     }
 
     /// <summary>The normalized absolute paths represented by the current valid selection.</summary>
@@ -222,14 +243,19 @@ public sealed class MdFileSystemPicker : TemplatedControl
         DetachTemplateParts();
         base.OnApplyTemplate(e);
         _pathBox = e.NameScope.Find<MdTextBox>("PART_PathBox");
+        _breadcrumbHost = e.NameScope.Find<ItemsControl>("PART_BreadcrumbHost");
         _itemsHost = e.NameScope.Find<MdList>("PART_ItemsHost");
         _upButton = e.NameScope.Find<MdIconButton>("PART_UpButton");
         _homeButton = e.NameScope.Find<MdButton>("PART_HomeButton");
+        _rootButton = e.NameScope.Find<MdButton>("PART_RootButton");
+        _compactHomeButton = e.NameScope.Find<MdIconButton>("PART_CompactHomeButton");
+        _pathToggleButton = e.NameScope.Find<MdIconButton>("PART_PathToggleButton");
         _refreshButton = e.NameScope.Find<MdIconButton>("PART_RefreshButton");
         _confirmButton = e.NameScope.Find<MdButton>("PART_ConfirmButton");
         _cancelButton = e.NameScope.Find<MdButton>("PART_CancelButton");
 
         if (_pathBox is not null) _pathBox.KeyDown += OnPathKeyDown;
+        if (_breadcrumbHost is not null) _breadcrumbHost.AddHandler(Button.ClickEvent, OnPathSegmentClicked);
         if (_itemsHost is not null)
         {
             _itemsHost.SelectionChanged += OnSelectionChanged;
@@ -238,6 +264,9 @@ public sealed class MdFileSystemPicker : TemplatedControl
         }
         if (_upButton is not null) _upButton.Click += OnUpClick;
         if (_homeButton is not null) _homeButton.Click += OnHomeClick;
+        if (_rootButton is not null) _rootButton.Click += OnRootClick;
+        if (_compactHomeButton is not null) _compactHomeButton.Click += OnHomeClick;
+        if (_pathToggleButton is not null) _pathToggleButton.Click += OnPathToggleClick;
         if (_refreshButton is not null) _refreshButton.Click += OnRefreshClick;
         if (_confirmButton is not null) _confirmButton.Click += OnConfirmClick;
         if (_cancelButton is not null) _cancelButton.Click += OnCancelClick;
@@ -330,10 +359,12 @@ public sealed class MdFileSystemPicker : TemplatedControl
             await RunOnUiThreadAsync(() =>
             {
                 CurrentDirectory = fullPath;
+                PathSegments = BuildPathSegments(fullPath);
                 Entries = entries;
                 ErrorMessage = null;
                 IsLoading = false;
                 CanGoUp = Directory.GetParent(fullPath) is not null;
+                _isEditingPath = false;
                 if (_pathBox is not null) _pathBox.Text = fullPath;
                 _itemsHost?.UnselectAll();
                 UpdateSelectionState();
@@ -375,6 +406,14 @@ public sealed class MdFileSystemPicker : TemplatedControl
     /// <summary>Opens the current user's home directory, falling back to application data.</summary>
     public Task<bool> GoHomeAsync(CancellationToken cancellationToken = default) =>
         NavigateAsync(ResolveHomeDirectory(), cancellationToken);
+
+    /// <summary>Opens the file-system root that contains the current directory.</summary>
+    public Task<bool> GoToRootAsync(CancellationToken cancellationToken = default)
+    {
+        var current = CurrentDirectory ?? ResolveStartDirectory();
+        var root = Path.GetPathRoot(Path.GetFullPath(current));
+        return NavigateAsync(string.IsNullOrWhiteSpace(root) ? current : root, cancellationToken);
+    }
 
     /// <summary>Confirms the valid selection, or the current directory in folder mode.</summary>
     public void ConfirmSelection()
@@ -419,7 +458,8 @@ public sealed class MdFileSystemPicker : TemplatedControl
         PseudoClasses.Set(":file-mode", Mode == MdFileSystemPickerMode.File);
         PseudoClasses.Set(":folder-mode", Mode == MdFileSystemPickerMode.Folder);
         PseudoClasses.Set(":multiple", AllowMultiple);
-        PseudoClasses.Set(":compact", Bounds.Width > 0 && Bounds.Width < 600);
+        PseudoClasses.Set(":compact", Bounds.Width > 0 && Bounds.Width < 760);
+        PseudoClasses.Set(":editing-path", _isEditingPath);
         PseudoClasses.Set(":loading", IsLoading);
         PseudoClasses.Set(":empty", !IsLoading && ErrorMessage is null && Entries.Count == 0);
         PseudoClasses.Set(":error", !string.IsNullOrWhiteSpace(ErrorMessage));
@@ -477,15 +517,50 @@ public sealed class MdFileSystemPicker : TemplatedControl
         }
     }
 
+    private void OnPathSegmentClicked(object? sender, RoutedEventArgs e)
+    {
+        if (e.Source is Button { Name: "PART_PathSegmentButton", Tag: MdFileSystemPathSegment segment } &&
+            !segment.IsCurrent)
+        {
+            _ = NavigateAsync(segment.FullPath);
+            e.Handled = true;
+        }
+    }
+
     private void OnPathKeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.Key != Key.Enter || _pathBox is null) return;
-        _ = NavigateAsync(_pathBox.Text);
-        e.Handled = true;
+        if (_pathBox is null) return;
+        if (e.Key == Key.Escape)
+        {
+            _isEditingPath = false;
+            _pathBox.Text = CurrentDirectory;
+            UpdatePseudoClasses();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Enter)
+        {
+            _ = NavigateAsync(_pathBox.Text);
+            e.Handled = true;
+        }
+    }
+
+    private void OnPathToggleClick(object? sender, RoutedEventArgs e)
+    {
+        _isEditingPath = !_isEditingPath;
+        if (!_isEditingPath && _pathBox is not null)
+            _pathBox.Text = CurrentDirectory;
+        UpdatePseudoClasses();
+        if (!_isEditingPath || _pathBox is null) return;
+        Dispatcher.UIThread.Post(() =>
+        {
+            _pathBox.Focus();
+            _pathBox.SelectAll();
+        }, DispatcherPriority.Input);
     }
 
     private void OnUpClick(object? sender, RoutedEventArgs e) => _ = GoUpAsync();
     private void OnHomeClick(object? sender, RoutedEventArgs e) => _ = GoHomeAsync();
+    private void OnRootClick(object? sender, RoutedEventArgs e) => _ = GoToRootAsync();
     private void OnRefreshClick(object? sender, RoutedEventArgs e) => _ = RefreshAsync();
     private void OnConfirmClick(object? sender, RoutedEventArgs e) => ConfirmSelection();
     private void OnCancelClick(object? sender, RoutedEventArgs e) => CancelRequested?.Invoke(this, EventArgs.Empty);
@@ -493,6 +568,7 @@ public sealed class MdFileSystemPicker : TemplatedControl
     private void DetachTemplateParts()
     {
         if (_pathBox is not null) _pathBox.KeyDown -= OnPathKeyDown;
+        if (_breadcrumbHost is not null) _breadcrumbHost.RemoveHandler(Button.ClickEvent, OnPathSegmentClicked);
         if (_itemsHost is not null)
         {
             _itemsHost.SelectionChanged -= OnSelectionChanged;
@@ -501,13 +577,20 @@ public sealed class MdFileSystemPicker : TemplatedControl
         }
         if (_upButton is not null) _upButton.Click -= OnUpClick;
         if (_homeButton is not null) _homeButton.Click -= OnHomeClick;
+        if (_rootButton is not null) _rootButton.Click -= OnRootClick;
+        if (_compactHomeButton is not null) _compactHomeButton.Click -= OnHomeClick;
+        if (_pathToggleButton is not null) _pathToggleButton.Click -= OnPathToggleClick;
         if (_refreshButton is not null) _refreshButton.Click -= OnRefreshClick;
         if (_confirmButton is not null) _confirmButton.Click -= OnConfirmClick;
         if (_cancelButton is not null) _cancelButton.Click -= OnCancelClick;
         _pathBox = null;
+        _breadcrumbHost = null;
         _itemsHost = null;
         _upButton = null;
         _homeButton = null;
+        _rootButton = null;
+        _compactHomeButton = null;
+        _pathToggleButton = null;
         _refreshButton = null;
         _confirmButton = null;
         _cancelButton = null;
@@ -599,6 +682,38 @@ public sealed class MdFileSystemPicker : TemplatedControl
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray()
         ?? Array.Empty<string>();
+
+    private static IReadOnlyList<MdFileSystemPathSegment> BuildPathSegments(string directory)
+    {
+        var fullPath = Path.GetFullPath(directory);
+        var root = Path.GetPathRoot(fullPath) ?? string.Empty;
+        var values = new List<(string Label, string FullPath)>();
+        if (!string.IsNullOrEmpty(root))
+        {
+            var trimmedRoot = root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            values.Add((string.IsNullOrEmpty(trimmedRoot) ? root : trimmedRoot, Path.GetFullPath(root)));
+        }
+
+        var relative = fullPath[root.Length..];
+        var parts = relative.Split(
+            [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
+            StringSplitOptions.RemoveEmptyEntries);
+        var current = root;
+        foreach (var part in parts)
+        {
+            current = string.IsNullOrEmpty(current) ? part : Path.Combine(current, part);
+            values.Add((part, Path.GetFullPath(current)));
+        }
+
+        if (values.Count == 0)
+            values.Add((fullPath, fullPath));
+        return values
+            .Select((value, index) => new MdFileSystemPathSegment(
+                value.Label,
+                value.FullPath,
+                index == values.Count - 1))
+            .ToArray();
+    }
 
     private string ResolveStartDirectory()
     {

@@ -8,9 +8,9 @@
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="File-system picker" />
         <TextBlock Classes="body" MaxWidth="820" HorizontalAlignment="Left" TextWrapping="Wrap"
-                   Text="Browse real file-system paths with Material controls. This picker does not call Avalonia StorageProvider, a native file picker, or Android SAF." />
+                   Text="Breadcrumb-first navigation, quick locations, tonal file rows, and a fixed selection surface browse real paths without Avalonia StorageProvider, a native picker, or Android SAF." />
         <TextBlock Classes="body" MaxWidth="820" HorizontalAlignment="Left" TextWrapping="Wrap" Opacity="0.76"
-                   Text="The process still needs operating-system permission for every location. On Android, app-private paths work directly; scoped storage and the application sandbox are not bypassed." />
+                   Text="Expanded widths expose a quick-access rail; compact widths move Home into the app bar. The process still needs operating-system permission for every location, and Android scoped storage is not bypassed." />
       </StackPanel>
 
       <WrapPanel>
