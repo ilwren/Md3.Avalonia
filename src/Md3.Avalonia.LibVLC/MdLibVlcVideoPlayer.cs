@@ -299,11 +299,7 @@ public sealed class MdLibVlcVideoPlayer : MdVideoPlayer, IDisposable
         }
     }
 
-    private void OnVideoCleanup(ref IntPtr opaque)
-    {
-        ReleaseVideoBuffer();
-        opaque = IntPtr.Zero;
-    }
+    private void OnVideoCleanup(ref IntPtr opaque) => ReleaseVideoBuffer();
 
     private void RenderLatestFrame(long generation)
     {

@@ -15,7 +15,7 @@ following existing controls were evaluated:
   platform dependency. The upstream Avalonia `VideoView` was tested first, but its native child
   surface/floating-window airspace model produced stale or briefly visible frames while an ancestor
   scrolled. The adapter therefore uses LibVLC's decoded-frame callbacks and copies BGRA frames into
-  an Avalonia `WriteableBitmap`. This costs one CPU-side copy but gives the media normal Avalonia
+  an Avalonia `WriteableBitmap`. This costs CPU-side frame copies but gives the media normal Avalonia
   clipping, scrolling, transforms and z-order.
 - [Iciclecreek.Avalonia.Controls.Media](https://github.com/tomlm/Iciclecreek.Avalonia.Controls.Media)
   demonstrated a useful view-model separation for play/pause, mute, rate, time, length and seek.

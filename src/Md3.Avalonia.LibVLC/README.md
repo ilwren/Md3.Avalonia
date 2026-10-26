@@ -25,7 +25,7 @@ Avalonia and is not part of the Android or core NativeAOT dependency graph.
 Video frames are decoded by LibVLC into BGRA memory and copied into an Avalonia `WriteableBitmap`.
 Unlike a `NativeControlHost`/`VideoView`, this composited surface follows Avalonia clipping,
 scrolling, transforms and z-order, so it does not flash outside a scroller's viewport. The tradeoff
-is one CPU-side frame copy; this backend favors predictable Material UI composition over native
+is CPU-side frame copying; this backend favors predictable Material UI composition over native
 video-surface throughput. Audio continues through LibVLC's normal platform output.
 
 The host handles fullscreen window ownership through the inherited `PlaybackRequested` event and
