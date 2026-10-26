@@ -175,9 +175,10 @@ public sealed class MdLibVlcVideoPlayer : MdVideoPlayer, IDisposable
                     break;
             }
         }
-        catch (Exception exception) when (exception is VLCException or ObjectDisposedException)
+        catch (Exception exception) when (exception is VLCException or DllNotFoundException or TypeInitializationException or ObjectDisposedException)
         {
             ErrorMessage = exception.Message;
+            IsPlaying = false;
         }
     }
 

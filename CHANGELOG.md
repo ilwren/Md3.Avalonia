@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added backend-neutral `MdVideoPlayer` with a responsive Material 3 transport, typed playback requests, keyboard control, English/Chinese accessibility text, buffering/live/error states, and renderer content slots. Added optional `Md3.Avalonia.LibVLC` for real desktop file/network playback without adding LibVLC or native binaries to core, Android, or NativeAOT graphs.
+- Added backend-neutral `MdVideoPlayer` with a responsive Material 3 transport, typed playback requests, keyboard control, English/Chinese accessibility text, buffering/live/error states, and renderer content slots. Added optional `Md3.Avalonia.LibVLC` for real desktop file/network playback without adding LibVLC or native binaries to core, Android, or NativeAOT graphs. The regular desktop Gallery now extracts and opens its repository-generated eight-second H.264/AAC sample through that adapter, while unsupported hosts keep the deterministic fallback.
 
 ### Changed
 

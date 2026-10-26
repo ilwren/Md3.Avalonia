@@ -177,7 +177,7 @@ python3 scripts/verify-fonts.py
 
 `MdFileSystemPicker` 是由库内 `Md*` 组件组成的真实路径浏览器，文件/文件夹模式、过滤、可取消单选/多选、Standard/Powerline breadcrumb、路径输入、上级/Home/刷新以及错误/空状态均在控件内完成；可见文字随继承的中英文 culture 切换，也可逐项覆盖。全部图标在固定透明 viewport 中水平、垂直居中。它不调用 Avalonia `StorageProvider`、系统 file picker 或 Android SAF。返回值是 `System.IO` 可直接使用的规范化绝对路径，但它不会绕过 Android scoped storage、应用沙箱或操作系统权限，宿主仍须选择可访问的起始目录并自行处理平台权限。
 
-`MdVideoPlayer` 提供不绑定解码器的 Material 3 transport、响应式 compact 模式、本地化、键盘控制、buffer/live/error 状态与 typed playback request。渲染器放入 `MediaContent`，因此核心包继续保持 Android/NativeAOT 安全。需要桌面真播放时单独安装 `Md3.Avalonia.LibVLC` 并部署目标平台的 native LibVLC；详见 [`docs/VIDEO_PLAYER_RESEARCH.md`](docs/VIDEO_PLAYER_RESEARCH.md)。
+`MdVideoPlayer` 提供不绑定解码器的 Material 3 transport、响应式 compact 模式、本地化、键盘控制、buffer/live/error 状态与 typed playback request。渲染器放入 `MediaContent`，因此核心包继续保持 Android/NativeAOT 安全。需要桌面真播放时单独安装 `Md3.Avalonia.LibVLC` 并部署目标平台的 native LibVLC。常规桌面 Gallery 会提取并播放仓库自行生成的 8 秒 H.264/AAC 本地示例；Android、Headless 与 NativeAOT 仍使用无 native 依赖的确定性 fallback。详见 [`docs/VIDEO_PLAYER_RESEARCH.md`](docs/VIDEO_PLAYER_RESEARCH.md)。
 
 全部按钮、Icon Button 与 FAB 模板都接入 `MdRipplePresenter`：按下位置产生涟漪，裁切到完整 container shape，并支持 Expressive / Standard / Reduced / None 四种 motion scheme。`MdButton` 的 Elevated 配置为 M3 已标记 deprecated 的兼容项，新界面应优先选用其他配置。
 

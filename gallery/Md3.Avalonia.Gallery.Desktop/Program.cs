@@ -1,5 +1,9 @@
 using System;
 using Avalonia;
+using Md3.Avalonia.Gallery;
+#if MD3_GALLERY_LIBVLC
+using Md3.Avalonia.LibVLC;
+#endif
 
 namespace Md3.Avalonia.Gallery.Desktop;
 
@@ -11,6 +15,16 @@ internal static class Program
     [STAThread]
     public static void Main(string[] args)
     {
+#if MD3_GALLERY_LIBVLC
+        // The shared Gallery never references LibVLC directly. Only the regular desktop host
+        // supplies this factory; NativeAOT and Android retain the backend-neutral graph.
+        GalleryVideoBackend.Factory = source => new MdLibVlcVideoPlayer
+        {
+            AutoPlay = false,
+            Loop = true,
+            Source = source
+        };
+#endif
 #if WINDOWS
         try
         {

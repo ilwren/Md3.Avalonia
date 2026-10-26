@@ -63,6 +63,12 @@ picture-in-picture. This first control intentionally implements the stable trans
 leaves decoder-specific tracks, DRM, caching and streaming policy to the backend. No Dart source,
 assets, icon data or visual trade dress was copied.
 
+## Gallery validation asset
+
+The shared Gallery embeds `Assets/Media/material-motion.mp4`, an eight-second 640×360 H.264/AAC file containing only procedural pixels and synthesized tones. `scripts/generate-gallery-video.py` reproducibly creates it from scratch; no third-party footage, image, font, or audio asset is included. A regular managed desktop host conditionally references `Md3.Avalonia.LibVLC`, extracts the embedded resource to a stable temporary file, and supplies an `MdLibVlcVideoPlayer` through `GalleryVideoBackend.Factory`. This exercises an actual local file, native video surface, audio, duration, seeking, volume, rate, looping and end events.
+
+Android, headless tests and `PublishAot=true` leave the factory unset and continue to render the deterministic backend-neutral demonstration. Linux requires system LibVLC; Windows/macOS hosts likewise follow the adapter's documented native deployment requirement. Missing native LibVLC is surfaced in the player's error state rather than taking down the Gallery.
+
 ## Platform and licensing boundary
 
 `MdVideoPlayer` itself decodes nothing. `MdLibVlcVideoPlayer` requires a native LibVLC deployment and
