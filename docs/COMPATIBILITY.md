@@ -28,7 +28,7 @@ The core runtime package references only `Avalonia` and `MaterialColorUtilities`
 
 ## Optional desktop video backend
 
-The core `MdVideoPlayer` is a renderer-neutral Avalonia control and introduces no native dependency. `Md3.Avalonia.LibVLC` separately targets `net8.0;net10.0`, depends on LibVLCSharp.Avalonia, and requires the host to deploy native LibVLC for Windows, macOS, or Linux. It is deliberately marked non-trimmable/non-AOT-compatible and must not be referenced by the Android Gallery or core NativeAOT graph. See [VIDEO_PLAYER_RESEARCH.md](VIDEO_PLAYER_RESEARCH.md) and the [adapter README](../src/Md3.Avalonia.LibVLC/README.md).
+The core `MdVideoPlayer` is a renderer-neutral Avalonia control and introduces no native dependency. `Md3.Avalonia.LibVLC` separately targets `net8.0;net10.0`, depends on LibVLCSharp, composites decoded frames into an Avalonia bitmap, and requires the host to deploy native LibVLC for Windows, macOS, or Linux. It is deliberately marked non-trimmable/non-AOT-compatible and must not be referenced by the Android Gallery or core NativeAOT graph. See [VIDEO_PLAYER_RESEARCH.md](VIDEO_PLAYER_RESEARCH.md) and the [adapter README](../src/Md3.Avalonia.LibVLC/README.md).
 
 ## Android boundary
 

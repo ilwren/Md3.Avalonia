@@ -1,17 +1,23 @@
+using System.Runtime.InteropServices;
 using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using Avalonia.Threading;
-using LibVLCSharp.Avalonia;
 using LibVLCSharp.Shared;
 using Md3.Avalonia.Controls;
 using VlcEngine = LibVLCSharp.Shared.LibVLC;
 
 namespace Md3.Avalonia.LibVLC;
 
-/// <summary>A desktop <see cref="MdVideoPlayer"/> backed by LibVLCSharp's Avalonia VideoView.</summary>
+/// <summary>A desktop <see cref="MdVideoPlayer"/> backed by LibVLCSharp and a composited Avalonia frame surface.</summary>
 /// <remarks>
 /// The host must deploy a compatible native LibVLC distribution, such as VideoLAN.LibVLC.Windows
-/// or VideoLAN.LibVLC.Mac, or install LibVLC through the Linux package manager. The adapter does
-/// not bundle native codecs and is not part of the core Android/NativeAOT dependency graph.
+/// or VideoLAN.LibVLC.Mac, or install LibVLC through the Linux package manager. Decoded frames are
+/// copied into a writeable bitmap instead of a native child window, so the player clips and scrolls
+/// with the Avalonia visual tree without native-airspace flashing. The adapter does not bundle
+/// native codecs and is not part of the core Android/NativeAOT dependency graph.
 /// </remarks>
 public sealed class MdLibVlcVideoPlayer : MdVideoPlayer, IDisposable
 {
@@ -22,10 +28,24 @@ public sealed class MdLibVlcVideoPlayer : MdVideoPlayer, IDisposable
     public static readonly StyledProperty<bool> LoopProperty =
         AvaloniaProperty.Register<MdLibVlcVideoPlayer, bool>(nameof(Loop));
 
-    private readonly VideoView _videoView = new();
+    private readonly Image _videoSurface = new()
+    {
+        Stretch = Stretch.Uniform,
+        HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
+        VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch
+    };
+    private readonly object _videoSync = new();
     private VlcEngine? _libVlc;
     private MediaPlayer? _mediaPlayer;
     private Media? _media;
+    private WriteableBitmap? _videoBitmap;
+    private IntPtr _videoBuffer;
+    private byte[]? _latestFrame;
+    private int _videoWidth;
+    private int _videoHeight;
+    private int _videoPitch;
+    private long _videoGeneration;
+    private bool _renderPending;
     private bool _disposed;
 
     static MdLibVlcVideoPlayer()
@@ -35,7 +55,7 @@ public sealed class MdLibVlcVideoPlayer : MdVideoPlayer, IDisposable
 
     public MdLibVlcVideoPlayer()
     {
-        MediaContent = _videoView;
+        MediaContent = _videoSurface;
         PlaybackRequested += OnPlaybackRequested;
     }
 
@@ -70,13 +90,16 @@ public sealed class MdLibVlcVideoPlayer : MdVideoPlayer, IDisposable
         _disposed = true;
         PlaybackRequested -= OnPlaybackRequested;
         DetachPlayerEvents();
-        _videoView.MediaPlayer = null;
+        _mediaPlayer?.Stop();
+        if (_mediaPlayer is not null) _mediaPlayer.Media = null;
         _media?.Dispose();
         _media = null;
         _mediaPlayer?.Dispose();
         _mediaPlayer = null;
         _libVlc?.Dispose();
         _libVlc = null;
+        ReleaseVideoBuffer();
+        ResetVideoSurface();
         MediaContent = null;
         GC.SuppressFinalize(this);
     }
@@ -97,11 +120,15 @@ public sealed class MdLibVlcVideoPlayer : MdVideoPlayer, IDisposable
             BufferProgress = 0;
             IsSeekable = false;
             ErrorMessage = null;
+            ReleaseVideoBuffer();
+            ResetVideoSurface();
             return;
         }
         try
         {
             EnsurePlayer();
+            _mediaPlayer!.Stop();
+            _mediaPlayer.Media = null;
             _media?.Dispose();
             _media = new Media(_libVlc!, Source);
             _mediaPlayer!.Media = _media;
@@ -131,8 +158,9 @@ public sealed class MdLibVlcVideoPlayer : MdVideoPlayer, IDisposable
             Mute = IsMuted
         };
         _mediaPlayer.SetRate((float)Math.Clamp(PlaybackRate, .25, 4));
+        _mediaPlayer.SetVideoFormatCallbacks(OnVideoFormat, OnVideoCleanup);
+        _mediaPlayer.SetVideoCallbacks(OnVideoLock, null, OnVideoDisplay);
         AttachPlayerEvents();
-        _videoView.MediaPlayer = _mediaPlayer;
     }
 
     private void OnPlaybackRequested(object? sender, MdPlaybackRequestEventArgs e)
@@ -181,6 +209,186 @@ public sealed class MdLibVlcVideoPlayer : MdVideoPlayer, IDisposable
             IsPlaying = false;
         }
     }
+
+    private uint OnVideoFormat(
+        ref IntPtr opaque,
+        IntPtr chroma,
+        ref uint width,
+        ref uint height,
+        ref uint pitches,
+        ref uint lines)
+    {
+        try
+        {
+            if (_disposed || chroma == IntPtr.Zero || width == 0 || height == 0) return 0;
+
+            var pitch = ((ulong)width * 4 + 31) & ~31UL;
+            var lineCount = ((ulong)height + 31) & ~31UL;
+            var allocationSize = pitch * lineCount;
+            var visibleSize = pitch * height;
+            if (pitch > int.MaxValue || lineCount > uint.MaxValue ||
+                allocationSize > int.MaxValue || visibleSize > int.MaxValue)
+                return 0;
+
+            // RV32 is BGRX on the little-endian desktop platforms supported by this adapter.
+            Marshal.WriteByte(chroma, 0, (byte)'R');
+            Marshal.WriteByte(chroma, 1, (byte)'V');
+            Marshal.WriteByte(chroma, 2, (byte)'3');
+            Marshal.WriteByte(chroma, 3, (byte)'2');
+
+            lock (_videoSync)
+            {
+                ReleaseVideoBufferLocked();
+                _latestFrame = null;
+                _videoWidth = 0;
+                _videoHeight = 0;
+                _videoPitch = 0;
+                _renderPending = false;
+                _videoGeneration++;
+
+                _videoBuffer = Marshal.AllocHGlobal((int)allocationSize);
+                _latestFrame = new byte[(int)visibleSize];
+                _videoWidth = checked((int)width);
+                _videoHeight = checked((int)height);
+                _videoPitch = (int)pitch;
+            }
+
+            opaque = IntPtr.Zero;
+            pitches = (uint)pitch;
+            lines = (uint)lineCount;
+            return 1;
+        }
+        catch (Exception exception)
+        {
+            ReleaseVideoBuffer();
+            ReportVideoRenderingError(exception);
+            return 0;
+        }
+    }
+
+    private IntPtr OnVideoLock(IntPtr opaque, IntPtr planes)
+    {
+        lock (_videoSync)
+        {
+            if (_disposed || _videoBuffer == IntPtr.Zero || planes == IntPtr.Zero) return IntPtr.Zero;
+            Marshal.WriteIntPtr(planes, _videoBuffer);
+            return IntPtr.Zero;
+        }
+    }
+
+    private void OnVideoDisplay(IntPtr opaque, IntPtr picture)
+    {
+        try
+        {
+            long generation;
+            lock (_videoSync)
+            {
+                if (_disposed || _videoBuffer == IntPtr.Zero || _latestFrame is null) return;
+                Marshal.Copy(_videoBuffer, _latestFrame, 0, _latestFrame.Length);
+                if (_renderPending) return;
+                _renderPending = true;
+                generation = _videoGeneration;
+            }
+
+            Dispatcher.UIThread.Post(() => RenderLatestFrame(generation), DispatcherPriority.Render);
+        }
+        catch (Exception exception)
+        {
+            ReportVideoRenderingError(exception);
+        }
+    }
+
+    private void OnVideoCleanup(ref IntPtr opaque)
+    {
+        ReleaseVideoBuffer();
+        opaque = IntPtr.Zero;
+    }
+
+    private void RenderLatestFrame(long generation)
+    {
+        try
+        {
+            lock (_videoSync)
+            {
+                if (_disposed || generation != _videoGeneration || _latestFrame is null ||
+                    _videoWidth <= 0 || _videoHeight <= 0 || _videoPitch <= 0)
+                    return;
+
+                if (_videoBitmap?.PixelSize != new PixelSize(_videoWidth, _videoHeight))
+                {
+                    _videoSurface.Source = null;
+                    _videoBitmap?.Dispose();
+                    _videoBitmap = new WriteableBitmap(
+                        new PixelSize(_videoWidth, _videoHeight),
+                        new Vector(96, 96),
+                        PixelFormat.Bgra8888,
+                        AlphaFormat.Opaque);
+                    _videoSurface.Source = _videoBitmap;
+                }
+
+                using var framebuffer = _videoBitmap.Lock();
+                var rowBytes = checked(_videoWidth * 4);
+                for (var row = 0; row < _videoHeight; row++)
+                {
+                    Marshal.Copy(
+                        _latestFrame,
+                        row * _videoPitch,
+                        IntPtr.Add(framebuffer.Address, row * framebuffer.RowBytes),
+                        rowBytes);
+                }
+                _videoSurface.InvalidateVisual();
+                _renderPending = false;
+            }
+        }
+        catch (Exception exception)
+        {
+            lock (_videoSync)
+            {
+                if (generation == _videoGeneration) _renderPending = false;
+            }
+            ReportVideoRenderingError(exception);
+        }
+    }
+
+    private void ReleaseVideoBuffer()
+    {
+        lock (_videoSync)
+        {
+            ReleaseVideoBufferLocked();
+            _latestFrame = null;
+            _videoWidth = 0;
+            _videoHeight = 0;
+            _videoPitch = 0;
+            _renderPending = false;
+            _videoGeneration++;
+        }
+    }
+
+    private void ReleaseVideoBufferLocked()
+    {
+        if (_videoBuffer == IntPtr.Zero) return;
+        Marshal.FreeHGlobal(_videoBuffer);
+        _videoBuffer = IntPtr.Zero;
+    }
+
+    private void ResetVideoSurface()
+    {
+        void Reset()
+        {
+            _videoSurface.Source = null;
+            _videoBitmap?.Dispose();
+            _videoBitmap = null;
+        }
+
+        if (Dispatcher.UIThread.CheckAccess()) Reset();
+        else Dispatcher.UIThread.Post(Reset, DispatcherPriority.Render);
+    }
+
+    private void ReportVideoRenderingError(Exception exception) => Dispatch(() =>
+    {
+        ErrorMessage = $"LibVLC could not render the decoded video frame: {exception.Message}";
+        IsPlaying = false;
+    });
 
     private void AttachPlayerEvents()
     {

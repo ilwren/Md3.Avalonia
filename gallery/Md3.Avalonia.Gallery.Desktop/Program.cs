@@ -20,7 +20,7 @@ internal static class Program
         // supplies this factory; NativeAOT and Android retain the backend-neutral graph.
         GalleryVideoBackend.Factory = source => new MdLibVlcVideoPlayer
         {
-            AutoPlay = false,
+            AutoPlay = true,
             Loop = true,
             Source = source
         };

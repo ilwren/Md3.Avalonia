@@ -17,13 +17,13 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <IsPackable>true</IsPackable>
-    <!-- LibVLC and its native VideoView are intentionally isolated from the NativeAOT-safe core. -->
+    <!-- LibVLC and its decoded-frame callbacks are intentionally isolated from the NativeAOT-safe core. -->
     <IsTrimmable>false</IsTrimmable>
     <IsAotCompatible>false</IsAotCompatible>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" />
-    <PackageReference Include="LibVLCSharp.Avalonia" />
+    <PackageReference Include="LibVLCSharp" />
     <ProjectReference Include="../Md3.Avalonia/Md3.Avalonia.csproj" />
   </ItemGroup>
   <ItemGroup>

@@ -10,12 +10,13 @@ its public seam with existing Material controls second, and study Flutter equiva
 Avalonia 12 does not provide an open-source media decoder in the base `Avalonia` package. The
 following existing controls were evaluated:
 
-- [LibVLCSharp.Avalonia 3.10.2](https://github.com/videolan/libvlcsharp/tree/3.10.2/src/LibVLCSharp.Avalonia)
-  is the selected optional desktop backend. Its `VideoView` exposes a `MediaPlayer` while native
-  LibVLC remains a separately deployed platform dependency. Version 3.10.2 contains explicit
-  Avalonia 11/12 compatibility. Because it uses a native video surface and a floating Avalonia
-  overlay to work around airspace, the independent Material transport is placed below the video,
-  not drawn as an unreliable sibling over it.
+- [LibVLCSharp 3.10.2](https://github.com/videolan/libvlcsharp/tree/3.10.2/src/LibVLCSharp)
+  is the selected optional desktop backend while native LibVLC remains a separately deployed
+  platform dependency. The upstream Avalonia `VideoView` was tested first, but its native child
+  surface/floating-window airspace model produced stale or briefly visible frames while an ancestor
+  scrolled. The adapter therefore uses LibVLC's decoded-frame callbacks and copies BGRA frames into
+  an Avalonia `WriteableBitmap`. This costs one CPU-side copy but gives the media normal Avalonia
+  clipping, scrolling, transforms and z-order.
 - [Iciclecreek.Avalonia.Controls.Media](https://github.com/tomlm/Iciclecreek.Avalonia.Controls.Media)
   demonstrated a useful view-model separation for play/pause, mute, rate, time, length and seek.
   It was not selected as a dependency because it wraps an older unofficial VideoView fork.
@@ -44,8 +45,8 @@ surface controls. It provides:
 - an expanded transport with volume/rate and a compact transport that keeps the critical actions;
 - component geometry under `Md.Comp.VideoPlayer.*` and runtime system colors/type roles.
 
-The controls remain outside the media viewport so native surfaces cannot obscure them. Composited
-backends can still place custom overlays inside their own `MediaContent`. The core does not pretend
+The controls remain outside the media viewport, and composited backends can place custom overlays
+inside their own `MediaContent`. The core does not pretend
 to implement fullscreen window ownership: it changes and reports player state while the host decides
 how its window, dialog, mobile orientation, or picture-in-picture surface should change.
 
@@ -65,7 +66,7 @@ assets, icon data or visual trade dress was copied.
 
 ## Gallery validation asset
 
-The shared Gallery embeds `Assets/Media/material-motion.mp4`, an eight-second 640×360 H.264/AAC file containing only procedural pixels and synthesized tones. `scripts/generate-gallery-video.py` reproducibly creates it from scratch; no third-party footage, image, font, or audio asset is included. A regular managed desktop host conditionally references `Md3.Avalonia.LibVLC`, extracts the embedded resource to a stable temporary file, and supplies an `MdLibVlcVideoPlayer` through `GalleryVideoBackend.Factory`. This exercises an actual local file, native video surface, audio, duration, seeking, volume, rate, looping and end events.
+The shared Gallery embeds `Assets/Media/material-motion.mp4`, an eight-second 640×360 H.264/AAC file containing only procedural pixels and synthesized tones. `scripts/generate-gallery-video.py` reproducibly creates it from scratch; no third-party footage, image, font, or audio asset is included. A regular managed desktop host conditionally references `Md3.Avalonia.LibVLC`, extracts the embedded resource to a stable temporary file, and supplies an `MdLibVlcVideoPlayer` through `GalleryVideoBackend.Factory`. This exercises an actual local file, composited decoded frames, audio, duration, seeking, volume, rate, looping and end events.
 
 Android, headless tests and `PublishAot=true` leave the factory unset and continue to render the deterministic backend-neutral demonstration. Linux requires system LibVLC; Windows/macOS hosts likewise follow the adapter's documented native deployment requirement. Missing native LibVLC is surfaced in the player's error state rather than taking down the Gallery.
 

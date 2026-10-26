@@ -36,7 +36,7 @@
                       Data="M0 180L180 70L280 125L430 25L620 180Z" Fill="#B8121B2D" />
                 <StackPanel Margin="34" HorizontalAlignment="Left" VerticalAlignment="Bottom" Spacing="4">
                   <TextBlock FontSize="28" FontWeight="Medium" Foreground="White" Text="Renderer content" />
-                  <TextBlock Foreground="#D8FFFFFF" Text="Replace this visual with LibVLC VideoView, FFmpeg, or a native backend." />
+                  <TextBlock Foreground="#D8FFFFFF" Text="Replace this visual with composited LibVLC frames, FFmpeg, or another backend." />
                 </StackPanel>
               </Grid>
             </Border>
