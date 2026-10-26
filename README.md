@@ -162,7 +162,7 @@ python3 scripts/verify-fonts.py
 
 ## 控件总览
 
-完整 API 见 [`docs/API.md`](docs/API.md)，覆盖全部 371 个公共类型；`scripts/check-api-doc-coverage.py` 会在 CI 中断言这一覆盖率。下表只列出各分组的主要类型。
+完整 API 见 [`docs/API.md`](docs/API.md)，覆盖全部 372 个公共类型；`scripts/check-api-doc-coverage.py` 会在 CI 中断言这一覆盖率。下表只列出各分组的主要类型。
 
 | 分组 | 主要类型 |
 |---|---|
@@ -173,11 +173,13 @@ python3 scripts/verify-fonts.py
 | 容器与浮层 | `MdCard`、`MdDialog`、`MdDialogHost`、`MdMenu`、`MdPopover`、`MdTooltip`、`MdSnackbar`、`MdBanner`、`MdSheetHost`、`MdExpansionPanelList`、`MdFloatingWindow`、`MdBorderlessWindow` |
 | 数据展示 | `MdList`、`MdDataTable`、`MdDataGrid`、`MdCarousel`、`MdCalendar`、`MdTreeView`、`MdAvatar`、`MdBadge`、`MdChip`、`MdTimeline`、`MdWaveform`、`MdChart` |
 | 反馈与进度 | `MdCircularProgressIndicator`、`MdLinearProgressIndicator`、`MdLoadingIndicator`、`MdSkeleton`、`MdRefreshIndicator`、`MdSpinKit`、`MdStateLayer`、`MdFocusRing` |
-| 布局与动效 | `MdSurface`、`MdAdaptiveLayout`、`MdScrollViewer`、`MdWaterfall`、`MdMasonryPanel`、`MdStaggeredPanel`、`MdAnimationSequence`、`MdAnimatedText`、`MdRevealHost`、`MdMorphPanel`、`MdHero` |
+| 布局与动效 | `MdSurface`、`MdAdaptiveLayout`、`MdGridSplitter`、`MdScrollViewer`、`MdWaterfall`、`MdMasonryPanel`、`MdStaggeredPanel`、`MdAnimationSequence`、`MdAnimatedText`、`MdRevealHost`、`MdMorphPanel`、`MdHero` |
 
 `MdFileSystemPicker` 是由库内 `Md*` 组件组成的真实路径浏览器，文件/文件夹模式、过滤、可取消单选/多选、Standard/Powerline breadcrumb、路径输入、上级/Home/刷新以及错误/空状态均在控件内完成；可见文字随继承的中英文 culture 切换，也可逐项覆盖。全部图标在固定透明 viewport 中水平、垂直居中。它不调用 Avalonia `StorageProvider`、系统 file picker 或 Android SAF。返回值是 `System.IO` 可直接使用的规范化绝对路径，但它不会绕过 Android scoped storage、应用沙箱或操作系统权限，宿主仍须选择可访问的起始目录并自行处理平台权限。
 
 `MdVideoPlayer` 提供不绑定解码器的 Material 3 transport、响应式 compact 模式、本地化、键盘控制、buffer/live/error 状态与 typed playback request。渲染器放入 `MediaContent`，因此核心包继续保持 Android/NativeAOT 安全。需要桌面真播放时单独安装 `Md3.Avalonia.LibVLC` 并部署目标平台的 native LibVLC。常规桌面 Gallery 会提取并播放仓库自行生成的 8 秒 H.264/AAC 本地示例；Android、Headless 与 NativeAOT 仍使用无 native 依赖的确定性 fallback。详见 [`docs/VIDEO_PLAYER_RESEARCH.md`](docs/VIDEO_PLAYER_RESEARCH.md)。
+
+`MdGridSplitter` 直接复用 Avalonia 的行列调整、预览、键盘和约束引擎，并在外层提供 Material 3 状态视觉、12 dp 透明命中轨道、2 dp 可见分隔线、可选圆角把手及双击等分。它同时支持行与列，`ResetToEqual()` 可由命令调用；详见 [`docs/GRID_SPLITTER_RESEARCH.md`](docs/GRID_SPLITTER_RESEARCH.md)。
 
 全部按钮、Icon Button 与 FAB 模板都接入 `MdRipplePresenter`：按下位置产生涟漪，裁切到完整 container shape，并支持 Expressive / Standard / Reduced / None 四种 motion scheme。`MdButton` 的 Elevated 配置为 M3 已标记 deprecated 的兼容项，新界面应优先选用其他配置。
 

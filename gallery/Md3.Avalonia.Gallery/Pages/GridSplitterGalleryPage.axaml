@@ -1,0 +1,90 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.GridSplitterGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,28">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Grid splitter" />
+        <TextBlock Classes="body" MaxWidth="840" HorizontalAlignment="Left" TextWrapping="Wrap"
+                   Text="A Material 3 divider built on Avalonia's proven GridSplitter resize engine, with a forgiving interaction track, keyboard support, preview mode and double-tap reset." />
+        <TextBlock Classes="body" MaxWidth="840" HorizontalAlignment="Left" TextWrapping="Wrap" Opacity="0.76"
+                   Text="Drag the grip, focus it and use the arrow keys, or double-tap it to equalize the adjacent star-sized panes." />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Resize columns" />
+        <Border Classes="gallery-section" Padding="0" ClipToBounds="True">
+          <Grid x:Name="ColumnDemo" Height="300">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="2*" MinWidth="150" />
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="*" MinWidth="150" />
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Padding="24" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}">
+              <StackPanel Spacing="6">
+                <TextBlock Classes="h3" Text="Navigation pane" />
+                <TextBlock Classes="body" TextWrapping="Wrap" Text="The transparent 12 dp track is easier to acquire than the visible 2 dp divider." />
+              </StackPanel>
+            </Border>
+            <md:MdGridSplitter x:Name="ColumnSplitter" Grid.Column="1"
+                               ResizeDirection="Columns" ResizeBehavior="PreviousAndNext"
+                               DragDelta="OnSplitterChanged" DragCompleted="OnSplitterChanged"
+                               SplitReset="OnSplitterChanged" />
+            <Border Grid.Column="2" Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}">
+              <StackPanel Spacing="6">
+                <TextBlock Classes="h3" Text="Content pane" />
+                <TextBlock Classes="body" TextWrapping="Wrap" Text="Minimum widths remain enforced by Avalonia while the Material shell supplies state and grip visuals." />
+              </StackPanel>
+            </Border>
+          </Grid>
+        </Border>
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+          <TextBlock x:Name="ColumnStatus" Classes="body" VerticalAlignment="Center" Text="Pane sizes" />
+          <md:MdButton Grid.Column="1" Content="Equalize columns" Variant="Tonal" Click="EqualizeColumns" />
+        </Grid>
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Resize rows with preview" />
+        <Border Classes="gallery-section" Padding="0" ClipToBounds="True">
+          <Grid x:Name="RowDemo" Height="380">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="*" MinHeight="100" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="2*" MinHeight="120" />
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" Padding="24" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}">
+              <StackPanel Spacing="6">
+                <TextBlock Classes="h3" Text="Preview pane" />
+                <TextBlock Classes="body" TextWrapping="Wrap" Text="ShowsPreview moves a primary-color guide and commits the row sizes when the drag ends." />
+              </StackPanel>
+            </Border>
+            <md:MdGridSplitter x:Name="RowSplitter" Grid.Row="1"
+                               ResizeDirection="Rows" ResizeBehavior="PreviousAndNext"
+                               ShowsPreview="True" ShowHandle="False"
+                               DragDelta="OnSplitterChanged" DragCompleted="OnSplitterChanged"
+                               SplitReset="OnSplitterChanged" />
+            <Border Grid.Row="2" Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+              <StackPanel Spacing="6">
+                <TextBlock Classes="h3" Text="Details pane" />
+                <TextBlock Classes="body" TextWrapping="Wrap" Text="ShowHandle can hide the rounded grip while retaining the same hit area, focus ring and resize cursor." />
+              </StackPanel>
+            </Border>
+          </Grid>
+        </Border>
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+          <TextBlock x:Name="RowStatus" Classes="body" VerticalAlignment="Center" Text="Pane sizes" />
+          <md:MdButton Grid.Column="1" Content="Equalize rows" Variant="Tonal" Click="EqualizeRows" />
+        </Grid>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;Grid ColumnDefinitions=&quot;*,Auto,2*&quot;&gt;&#10;  &lt;Border Grid.Column=&quot;0&quot; /&gt;&#10;  &lt;md:MdGridSplitter Grid.Column=&quot;1&quot;&#10;                     ResizeDirection=&quot;Columns&quot;&#10;                     ResizeBehavior=&quot;PreviousAndNext&quot;&#10;                     ShowsPreview=&quot;True&quot; /&gt;&#10;  &lt;Border Grid.Column=&quot;2&quot; /&gt;&#10;&lt;/Grid&gt;"
+                             CSharpCode="// Optional command equivalent to the default double-tap gesture:&#10;if (splitter.ResetToEqual())&#10;{&#10;    // SplitReset has now been raised.&#10;}&#10;&#10;// Disable the built-in gesture when the host owns double-tap:&#10;splitter.ResetOnDoubleTapped = false;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

@@ -1,0 +1,94 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdGridSplitter}" TargetType="md:MdGridSplitter">
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="MinWidth" Value="{DynamicResource Md.Comp.GridSplitter.Track.Thickness}" />
+    <Setter Property="MinHeight" Value="{DynamicResource Md.Comp.GridSplitter.Track.Thickness}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="ResizeBehavior" Value="PreviousAndNext" />
+    <Setter Property="PreviewContent">
+      <Template>
+        <Border Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                CornerRadius="{DynamicResource Md.Comp.GridSplitter.Divider.Shape}"
+                Opacity="{DynamicResource Md.Comp.GridSplitter.Preview.Opacity}" />
+      </Template>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdGridSplitter">
+        <!-- The transparent track owns input; the visible divider remains deliberately quiet. -->
+        <Border x:Name="PART_InteractionTrack" Background="{TemplateBinding Background}">
+          <Grid>
+            <Grid x:Name="PART_ColumnVisual" IsVisible="False" IsHitTestVisible="False">
+              <Border x:Name="PART_ColumnDivider"
+                      Width="{DynamicResource Md.Comp.GridSplitter.Divider.Thickness}"
+                      HorizontalAlignment="Center" VerticalAlignment="Stretch"
+                      Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                      CornerRadius="{DynamicResource Md.Comp.GridSplitter.Divider.Shape}" />
+              <Border x:Name="PART_ColumnHandle"
+                      Width="{DynamicResource Md.Comp.GridSplitter.Handle.Thickness}"
+                      Height="{DynamicResource Md.Comp.GridSplitter.Handle.Length}"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Background="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                      CornerRadius="{DynamicResource Md.Comp.GridSplitter.Handle.Shape}"
+                      IsVisible="{TemplateBinding ShowHandle}" />
+            </Grid>
+
+            <Grid x:Name="PART_RowVisual" IsVisible="False" IsHitTestVisible="False">
+              <Border x:Name="PART_RowDivider"
+                      Height="{DynamicResource Md.Comp.GridSplitter.Divider.Thickness}"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                      Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                      CornerRadius="{DynamicResource Md.Comp.GridSplitter.Divider.Shape}" />
+              <Border x:Name="PART_RowHandle"
+                      Width="{DynamicResource Md.Comp.GridSplitter.Handle.Length}"
+                      Height="{DynamicResource Md.Comp.GridSplitter.Handle.Thickness}"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Background="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                      CornerRadius="{DynamicResource Md.Comp.GridSplitter.Handle.Shape}"
+                      IsVisible="{TemplateBinding ShowHandle}" />
+            </Grid>
+
+            <Border x:Name="PART_FocusIndicator" Margin="1"
+                    BorderBrush="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                    BorderThickness="{DynamicResource Md.Comp.GridSplitter.Focus.Thickness}"
+                    CornerRadius="{DynamicResource Md.Comp.GridSplitter.Focus.Shape}"
+                    IsHitTestVisible="False" IsVisible="False" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:columns /template/ Grid#PART_ColumnVisual">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:rows /template/ Grid#PART_RowVisual">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_ColumnDivider">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_RowDivider">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusIndicator">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:dragging /template/ Border#PART_ColumnDivider">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:dragging /template/ Border#PART_RowDivider">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:dragging /template/ Border#PART_ColumnHandle">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:dragging /template/ Border#PART_RowHandle">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:disabled /template/ Border#PART_InteractionTrack">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Comp.GridSplitter.Disabled.Opacity}" />
+    </Style>
+  </ControlTheme>
+</ResourceDictionary>

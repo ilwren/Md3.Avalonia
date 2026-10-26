@@ -61,7 +61,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             SignaturePadNav,
             NumericNav, ThemeResourcesNav, SymbolsNav, MotionNav,
             BannerNav, DataTableNav, PaginatedTableNav, DismissibleNav, ExpansionPanelNav,
-            GridTileNav, RefreshNav, ReorderableListNav, StepperNav,
+            GridTileNav, GridSplitterNav, RefreshNav, ReorderableListNav, StepperNav,
             CommitGraphNav, ContributionGridNav, MaskedTextBoxNav, PaginationNav,
             FormValidationNav, SimpleDialogNav, AboutDialogNav, PickerRestoreNav,
             DraggableSheetNav, KeyboardAvoidNav, AdaptiveControlsNav, FocusHeroNav,
@@ -174,6 +174,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             Entry("Dismissible", "dismissible swipe to dismiss restore slidable", DismissibleNav, () => new DismissibleGalleryPage()),
             Entry("Expansion panels", "expansion panel accordion expand collapse", ExpansionPanelNav, () => new ExpansionPanelGalleryPage()),
             Entry("Grid tiles", "grid tile bar media footer favorite", GridTileNav, () => new GridTileGalleryPage()),
+            Entry("Grid splitter", "grid splitter divider resize pane row column preview equalize", GridSplitterNav, () => new GridSplitterGalleryPage()),
             Entry("Pull to refresh", "refresh indicator pull to refresh swipe reload", RefreshNav, () => new RefreshIndicatorGalleryPage()),
             Entry("Reorderable list", "reorderable list drag reorder move up down", ReorderableListNav, () => new ReorderableListGalleryPage()),
             Entry("Stepper", "stepper wizard steps flow continue", StepperNav, () => new StepperGalleryPage()),
@@ -336,6 +337,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
     private void ShowDismissible(object? s, RoutedEventArgs e) => Navigate(new DismissibleGalleryPage(), DismissibleNav);
     private void ShowExpansionPanels(object? s, RoutedEventArgs e) => Navigate(new ExpansionPanelGalleryPage(), ExpansionPanelNav);
     private void ShowGridTiles(object? s, RoutedEventArgs e) => Navigate(new GridTileGalleryPage(), GridTileNav);
+    private void ShowGridSplitter(object? s, RoutedEventArgs e) => Navigate(new GridSplitterGalleryPage(), GridSplitterNav);
     private void ShowRefresh(object? s, RoutedEventArgs e) => Navigate(new RefreshIndicatorGalleryPage(), RefreshNav);
     private void ShowReorderableList(object? s, RoutedEventArgs e) => Navigate(new ReorderableListGalleryPage(), ReorderableListNav);
     private void ShowStepper(object? s, RoutedEventArgs e) => Navigate(new StepperGalleryPage(), StepperNav);
