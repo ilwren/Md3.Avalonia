@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 
@@ -12,7 +13,13 @@ public partial class GridSplitterGalleryPage : UserControl
         AttachedToVisualTree += (_, _) => Dispatcher.UIThread.Post(UpdateStatus, DispatcherPriority.Loaded);
     }
 
-    private void OnSplitterChanged(object? sender, EventArgs e) =>
+    private void OnSplitterDragDelta(object? sender, VectorEventArgs e) => ScheduleStatusUpdate();
+
+    private void OnSplitterDragCompleted(object? sender, VectorEventArgs e) => ScheduleStatusUpdate();
+
+    private void OnSplitterReset(object? sender, EventArgs e) => ScheduleStatusUpdate();
+
+    private void ScheduleStatusUpdate() =>
         Dispatcher.UIThread.Post(UpdateStatus, DispatcherPriority.Render);
 
     private void EqualizeColumns(object? sender, RoutedEventArgs e)

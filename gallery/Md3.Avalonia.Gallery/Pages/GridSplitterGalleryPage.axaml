@@ -30,8 +30,8 @@
             </Border>
             <md:MdGridSplitter x:Name="ColumnSplitter" Grid.Column="1"
                                ResizeDirection="Columns" ResizeBehavior="PreviousAndNext"
-                               DragDelta="OnSplitterChanged" DragCompleted="OnSplitterChanged"
-                               SplitReset="OnSplitterChanged" />
+                               DragDelta="OnSplitterDragDelta" DragCompleted="OnSplitterDragCompleted"
+                               SplitReset="OnSplitterReset" />
             <Border Grid.Column="2" Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}">
               <StackPanel Spacing="6">
                 <TextBlock Classes="h3" Text="Content pane" />
@@ -64,8 +64,8 @@
             <md:MdGridSplitter x:Name="RowSplitter" Grid.Row="1"
                                ResizeDirection="Rows" ResizeBehavior="PreviousAndNext"
                                ShowsPreview="True" ShowHandle="False"
-                               DragDelta="OnSplitterChanged" DragCompleted="OnSplitterChanged"
-                               SplitReset="OnSplitterChanged" />
+                               DragDelta="OnSplitterDragDelta" DragCompleted="OnSplitterDragCompleted"
+                               SplitReset="OnSplitterReset" />
             <Border Grid.Row="2" Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
               <StackPanel Spacing="6">
                 <TextBlock Classes="h3" Text="Details pane" />
