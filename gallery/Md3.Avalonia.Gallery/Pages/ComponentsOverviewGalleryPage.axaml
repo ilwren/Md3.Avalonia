@@ -63,8 +63,8 @@
             <md:MdButton Content="Docking" Tag="Docking" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Draggable tabs" Tag="Draggable tabs" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Expansion panels" Tag="Expansion panels" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
-            <md:MdButton Content="Grid tiles" Tag="Grid tiles" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Grid splitter" Tag="Grid splitter" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Grid tiles" Tag="Grid tiles" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Lists" Tag="Lists" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Markdown" Tag="Markdown" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Masked text field" Tag="Masked text field" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
