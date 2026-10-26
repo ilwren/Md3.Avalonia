@@ -146,6 +146,9 @@ public sealed class MdFileSystemPickerTests
             pathToggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Dispatcher.UIThread.RunJobs();
             Assert.True(pathBox.IsVisible);
+            Assert.True(await picker.RefreshAsync());
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(pathBox.IsVisible);
 
             window.Width = 680;
             Dispatcher.UIThread.RunJobs();

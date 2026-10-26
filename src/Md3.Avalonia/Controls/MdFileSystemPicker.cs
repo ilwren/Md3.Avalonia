@@ -458,14 +458,15 @@ public sealed class MdFileSystemPicker : TemplatedControl
 
             await RunOnUiThreadAsync(() =>
             {
+                var directoryChanged = !PathComparer.Equals(CurrentDirectory, fullPath);
                 CurrentDirectory = fullPath;
                 PathSegments = BuildPathSegments(fullPath);
                 Entries = entries;
                 ErrorMessage = null;
                 IsLoading = false;
                 CanGoUp = Directory.GetParent(fullPath) is not null;
-                _isEditingPath = false;
-                if (_pathBox is not null) _pathBox.Text = fullPath;
+                if (directoryChanged) _isEditingPath = false;
+                if (_pathBox is not null && directoryChanged) _pathBox.Text = fullPath;
                 _itemsHost?.UnselectAll();
                 UpdateSelectionState();
                 UpdatePseudoClasses();
