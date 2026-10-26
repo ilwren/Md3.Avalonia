@@ -6,6 +6,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Md3.Avalonia.Localization;
+using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Controls;
 
@@ -20,7 +21,7 @@ namespace Md3.Avalonia.Controls;
 /// common two-pane layout. Dragging, preview mode, keyboard arrows, min/max constraints and Escape
 /// cancellation are inherited from Avalonia's <see cref="GridSplitter"/>.
 /// </remarks>
-[PseudoClasses(":columns", ":rows", ":dragging")]
+[PseudoClasses(":columns", ":rows", ":dragging", ":reduced-motion", ":no-motion")]
 public class MdGridSplitter : GridSplitter
 {
     /// <summary>Defines the <see cref="ShowHandle"/> property.</summary>
@@ -31,6 +32,12 @@ public class MdGridSplitter : GridSplitter
     public static readonly StyledProperty<bool> ResetOnDoubleTappedProperty =
         AvaloniaProperty.Register<MdGridSplitter, bool>(nameof(ResetOnDoubleTapped), true);
 
+    private Border? _columnStateLayer;
+    private Border? _columnDivider;
+    private Border? _columnHandle;
+    private Border? _rowStateLayer;
+    private Border? _rowDivider;
+    private Border? _rowHandle;
     private string? _ownedAutomationName;
 
     static MdGridSplitter()
@@ -40,6 +47,7 @@ public class MdGridSplitter : GridSplitter
         VerticalAlignmentProperty.Changed.AddClassHandler<MdGridSplitter>((splitter, _) => splitter.UpdateDirectionState());
         BoundsProperty.Changed.AddClassHandler<MdGridSplitter>((splitter, _) => splitter.UpdateDirectionState());
         MdLocalization.CultureProperty.Changed.AddClassHandler<MdGridSplitter>((splitter, _) => splitter.UpdateAutomationName());
+        MdMotion.SchemeProperty.Changed.AddClassHandler<MdGridSplitter>((splitter, _) => splitter.UpdateMotion());
     }
 
     /// <summary>Initializes a new Material grid splitter.</summary>
@@ -111,6 +119,18 @@ public class MdGridSplitter : GridSplitter
             : TryEqualizeRows(grid, firstIndex, secondIndex);
         if (changed) SplitReset?.Invoke(this, EventArgs.Empty);
         return changed;
+    }
+
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        base.OnApplyTemplate(e);
+        _columnStateLayer = e.NameScope.Find<Border>("PART_ColumnStateLayer");
+        _columnDivider = e.NameScope.Find<Border>("PART_ColumnDivider");
+        _columnHandle = e.NameScope.Find<Border>("PART_ColumnHandle");
+        _rowStateLayer = e.NameScope.Find<Border>("PART_RowStateLayer");
+        _rowDivider = e.NameScope.Find<Border>("PART_RowDivider");
+        _rowHandle = e.NameScope.Find<Border>("PART_RowHandle");
+        UpdateMotion();
     }
 
     protected override Size ArrangeOverride(Size finalSize)
@@ -255,6 +275,54 @@ public class MdGridSplitter : GridSplitter
         secondLength = totalLength - firstLength;
         return double.IsFinite(firstLength) && double.IsFinite(secondLength) &&
                firstLength >= 0 && secondLength >= 0;
+    }
+
+    private void UpdateMotion()
+    {
+        var scheme = MdMotion.GetScheme(this);
+        PseudoClasses.Set(":reduced-motion", scheme == MdMotionScheme.Reduced);
+        PseudoClasses.Set(":no-motion", scheme == MdMotionScheme.None);
+
+        foreach (var stateLayer in new[] { _columnStateLayer, _rowStateLayer })
+        {
+            if (stateLayer is not null)
+                stateLayer.Transitions = MdMotionTransitions.Collect(
+                    MdMotionTransitions.CreateDouble(
+                        this,
+                        OpacityProperty,
+                        MdMotionKind.Effects,
+                        MdMotionSpeed.Fast));
+        }
+
+        foreach (var divider in new[] { _columnDivider, _rowDivider })
+        {
+            if (divider is not null)
+                divider.Transitions = MdMotionTransitions.Collect(
+                    MdMotionTransitions.CreateBrush(
+                        this,
+                        Border.BackgroundProperty,
+                        MdMotionSpeed.Fast));
+        }
+
+        foreach (var handle in new[] { _columnHandle, _rowHandle })
+        {
+            if (handle is not null)
+                handle.Transitions = MdMotionTransitions.Collect(
+                    MdMotionTransitions.CreateDouble(
+                        this,
+                        WidthProperty,
+                        MdMotionKind.Spatial,
+                        MdMotionSpeed.Fast),
+                    MdMotionTransitions.CreateDouble(
+                        this,
+                        HeightProperty,
+                        MdMotionKind.Spatial,
+                        MdMotionSpeed.Fast),
+                    MdMotionTransitions.CreateBrush(
+                        this,
+                        Border.BackgroundProperty,
+                        MdMotionSpeed.Fast));
+        }
     }
 
     private void UpdateDirectionState()

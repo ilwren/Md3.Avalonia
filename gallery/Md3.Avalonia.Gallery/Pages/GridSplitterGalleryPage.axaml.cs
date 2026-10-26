@@ -7,6 +7,8 @@ namespace Md3.Avalonia.Gallery.Pages;
 
 public partial class GridSplitterGalleryPage : UserControl
 {
+    private bool _statusUpdatePending;
+
     public GridSplitterGalleryPage()
     {
         InitializeComponent();
@@ -19,8 +21,16 @@ public partial class GridSplitterGalleryPage : UserControl
 
     private void OnSplitterReset(object? sender, EventArgs e) => ScheduleStatusUpdate();
 
-    private void ScheduleStatusUpdate() =>
-        Dispatcher.UIThread.Post(UpdateStatus, DispatcherPriority.Render);
+    private void ScheduleStatusUpdate()
+    {
+        if (_statusUpdatePending) return;
+        _statusUpdatePending = true;
+        Dispatcher.UIThread.Post(() =>
+        {
+            _statusUpdatePending = false;
+            UpdateStatus();
+        }, DispatcherPriority.Render);
+    }
 
     private void EqualizeColumns(object? sender, RoutedEventArgs e)
     {

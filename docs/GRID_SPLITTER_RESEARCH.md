@@ -50,9 +50,16 @@ application assigns another double-tap gesture. The inherited `ResizeDirection`,
 [`multi_split_view`](https://github.com/caduandrade/multi_split_view) was the primary Flutter
 reference. Its `MultiSplitViewThemeData` separates divider thickness from an additional handle
 buffer, its divider builder receives highlighted and dragging states, and its default painters support
-rounded groove affordances. Its horizontal/vertical cursor switching, drag lifecycle callbacks,
+rounded groove affordances. `DividerWidget` drives those painter values through an animation
+controller; the stock painters tween color, groove thickness and groove length over 250 ms rather
+than animating pane geometry. Its horizontal/vertical cursor switching, drag lifecycle callbacks,
 configurable painter and controller-managed proportions reinforce the selected separation between
 Avalonia's resize engine and the Material visual/interaction shell.
+
+The Gallery follow-up adopts that distinction: pane definitions update directly on every native drag
+delta when `ShowsPreview="False"`, while only the divider's state layer, color and grip dimensions
+animate. The visual transitions use the inherited `MdMotion` scheme and disappear under the `None`
+scheme; layout itself is never eased behind the pointer.
 
 The first `MdGridSplitter` intentionally stays a single-grid divider rather than introducing a second
 pane-layout container. Applications that need multi-pane persistence can bind Avalonia row/column

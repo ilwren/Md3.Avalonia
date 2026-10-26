@@ -9,7 +9,9 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Gallery.Pages;
 using Md3.Avalonia.Localization;
+using Md3.Avalonia.Motion;
 using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
@@ -144,10 +146,13 @@ public sealed class MdGridSplitterTests
                 RoutedEvent = Thumb.DragDeltaEvent,
                 Vector = new Vector(40, 0)
             });
-            splitter.RaiseEvent(new VectorEventArgs { RoutedEvent = Thumb.DragCompletedEvent });
             Dispatcher.UIThread.RunJobs();
 
+            // Live mode must expose the resized layout before pointer release.
             Assert.True(grid.ColumnDefinitions[0].ActualWidth > before);
+
+            splitter.RaiseEvent(new VectorEventArgs { RoutedEvent = Thumb.DragCompletedEvent });
+            Dispatcher.UIThread.RunJobs();
             Assert.Equal(12, splitter.Bounds.Width, 1);
             Assert.False(splitter.GetVisualDescendants().OfType<Border>()
                 .Single(control => control.Name == "PART_ColumnHandle").IsVisible);
@@ -156,6 +161,55 @@ public sealed class MdGridSplitterTests
         {
             window.Close();
         }
+    }
+
+    [AvaloniaFact]
+    public void Material_State_Motion_Uses_Theme_Scheme_And_Can_Be_Disabled()
+    {
+        var splitter = new MdGridSplitter
+        {
+            [Grid.ColumnProperty] = 1,
+            ResizeDirection = GridResizeDirection.Columns
+        };
+        MdMotion.SetScheme(splitter, MdMotionScheme.Expressive);
+        var window = new Window { Width = 612, Height = 240, Content = ColumnGrid(splitter, "*,Auto,*") };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var stateLayer = splitter.GetVisualDescendants().OfType<Border>()
+                .Single(control => control.Name == "PART_ColumnStateLayer");
+            var handle = splitter.GetVisualDescendants().OfType<Border>()
+                .Single(control => control.Name == "PART_ColumnHandle");
+            Assert.NotNull(stateLayer.Transitions);
+            Assert.NotNull(handle.Transitions);
+
+            MdMotion.SetScheme(splitter, MdMotionScheme.None);
+
+            Assert.Null(stateLayer.Transitions);
+            Assert.Null(handle.Transitions);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Gallery_Demos_Start_With_Useful_Travel_And_Live_Row_Updates()
+    {
+        var page = new GridSplitterGalleryPage();
+        var columnDemo = page.FindControl<Grid>("ColumnDemo")!;
+        var rowDemo = page.FindControl<Grid>("RowDemo")!;
+        var rowSplitter = page.FindControl<MdGridSplitter>("RowSplitter")!;
+
+        Assert.Equal(columnDemo.ColumnDefinitions[0].Width, columnDemo.ColumnDefinitions[2].Width);
+        Assert.Equal(120, columnDemo.ColumnDefinitions[0].MinWidth);
+        Assert.Equal(120, columnDemo.ColumnDefinitions[2].MinWidth);
+        Assert.Equal(rowDemo.RowDefinitions[0].Height, rowDemo.RowDefinitions[2].Height);
+        Assert.Equal(80, rowDemo.RowDefinitions[0].MinHeight);
+        Assert.Equal(80, rowDemo.RowDefinitions[2].MinHeight);
+        Assert.False(rowSplitter.ShowsPreview);
     }
 
     private static Grid ColumnGrid(MdGridSplitter splitter, string definitions) => new()

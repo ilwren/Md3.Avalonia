@@ -6,6 +6,11 @@
   <x:Double x:Key="Md.Comp.GridSplitter.Divider.Thickness">2</x:Double>
   <x:Double x:Key="Md.Comp.GridSplitter.Handle.Thickness">4</x:Double>
   <x:Double x:Key="Md.Comp.GridSplitter.Handle.Length">32</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.Handle.ActiveThickness">6</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.Handle.ActiveLength">40</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.StateLayer.Thickness">8</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.StateLayer.HoverOpacity">0.08</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.StateLayer.DraggedOpacity">0.16</x:Double>
   <CornerRadius x:Key="Md.Comp.GridSplitter.Divider.Shape">1</CornerRadius>
   <CornerRadius x:Key="Md.Comp.GridSplitter.Handle.Shape">2</CornerRadius>
   <CornerRadius x:Key="Md.Comp.GridSplitter.Focus.Shape">6</CornerRadius>

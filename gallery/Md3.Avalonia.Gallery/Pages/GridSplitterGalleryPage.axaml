@@ -18,9 +18,9 @@
         <Border Classes="gallery-section" Padding="0" ClipToBounds="True">
           <Grid x:Name="ColumnDemo" Height="300">
             <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="2*" MinWidth="150" />
+              <ColumnDefinition Width="*" MinWidth="120" />
               <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="*" MinWidth="150" />
+              <ColumnDefinition Width="*" MinWidth="120" />
             </Grid.ColumnDefinitions>
             <Border Grid.Column="0" Padding="24" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}">
               <StackPanel Spacing="6">
@@ -47,23 +47,23 @@
       </StackPanel>
 
       <StackPanel Spacing="12">
-        <TextBlock Classes="h2" Text="Resize rows with preview" />
+        <TextBlock Classes="h2" Text="Live row resizing" />
         <Border Classes="gallery-section" Padding="0" ClipToBounds="True">
           <Grid x:Name="RowDemo" Height="380">
             <Grid.RowDefinitions>
-              <RowDefinition Height="*" MinHeight="100" />
+              <RowDefinition Height="*" MinHeight="80" />
               <RowDefinition Height="Auto" />
-              <RowDefinition Height="2*" MinHeight="120" />
+              <RowDefinition Height="*" MinHeight="80" />
             </Grid.RowDefinitions>
             <Border Grid.Row="0" Padding="24" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}">
               <StackPanel Spacing="6">
-                <TextBlock Classes="h3" Text="Preview pane" />
-                <TextBlock Classes="body" TextWrapping="Wrap" Text="ShowsPreview moves a primary-color guide and commits the row sizes when the drag ends." />
+                <TextBlock Classes="h3" Text="Top pane" />
+                <TextBlock Classes="body" TextWrapping="Wrap" Text="Live mode updates both rows on every drag delta, so the result follows the pointer instead of waiting for release." />
               </StackPanel>
             </Border>
             <md:MdGridSplitter x:Name="RowSplitter" Grid.Row="1"
                                ResizeDirection="Rows" ResizeBehavior="PreviousAndNext"
-                               ShowsPreview="True" ShowHandle="False"
+                               ShowsPreview="False" ShowHandle="False"
                                DragDelta="OnSplitterDragDelta" DragCompleted="OnSplitterDragCompleted"
                                SplitReset="OnSplitterReset" />
             <Border Grid.Row="2" Padding="24" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
@@ -82,7 +82,7 @@
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
-        <gallery:CodeExample XamlCode="&lt;Grid ColumnDefinitions=&quot;*,Auto,2*&quot;&gt;&#10;  &lt;Border Grid.Column=&quot;0&quot; /&gt;&#10;  &lt;md:MdGridSplitter Grid.Column=&quot;1&quot;&#10;                     ResizeDirection=&quot;Columns&quot;&#10;                     ResizeBehavior=&quot;PreviousAndNext&quot;&#10;                     ShowsPreview=&quot;True&quot; /&gt;&#10;  &lt;Border Grid.Column=&quot;2&quot; /&gt;&#10;&lt;/Grid&gt;"
+        <gallery:CodeExample XamlCode="&lt;Grid ColumnDefinitions=&quot;*,Auto,2*&quot;&gt;&#10;  &lt;Border Grid.Column=&quot;0&quot; /&gt;&#10;  &lt;md:MdGridSplitter Grid.Column=&quot;1&quot;&#10;                     ResizeDirection=&quot;Columns&quot;&#10;                     ResizeBehavior=&quot;PreviousAndNext&quot;&#10;                     ShowsPreview=&quot;False&quot; /&gt;&#10;  &lt;Border Grid.Column=&quot;2&quot; /&gt;&#10;&lt;/Grid&gt;"
                              CSharpCode="// Optional command equivalent to the default double-tap gesture:&#10;if (splitter.ResetToEqual())&#10;{&#10;    // SplitReset has now been raised.&#10;}&#10;&#10;// Disable the built-in gesture when the host owns double-tap:&#10;splitter.ResetOnDoubleTapped = false;" />
       </StackPanel>
     </StackPanel>

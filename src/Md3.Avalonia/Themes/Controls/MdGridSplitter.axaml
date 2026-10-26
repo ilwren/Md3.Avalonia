@@ -21,6 +21,12 @@
         <Border x:Name="PART_InteractionTrack" Background="{TemplateBinding Background}">
           <Grid>
             <Grid x:Name="PART_ColumnVisual" IsVisible="False" IsHitTestVisible="False">
+              <Border x:Name="PART_ColumnStateLayer"
+                      Width="{DynamicResource Md.Comp.GridSplitter.StateLayer.Thickness}"
+                      HorizontalAlignment="Center" VerticalAlignment="Stretch"
+                      Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                      CornerRadius="{DynamicResource Md.Comp.GridSplitter.Focus.Shape}"
+                      Opacity="0" />
               <Border x:Name="PART_ColumnDivider"
                       Width="{DynamicResource Md.Comp.GridSplitter.Divider.Thickness}"
                       HorizontalAlignment="Center" VerticalAlignment="Stretch"
@@ -36,6 +42,12 @@
             </Grid>
 
             <Grid x:Name="PART_RowVisual" IsVisible="False" IsHitTestVisible="False">
+              <Border x:Name="PART_RowStateLayer"
+                      Height="{DynamicResource Md.Comp.GridSplitter.StateLayer.Thickness}"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                      Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                      CornerRadius="{DynamicResource Md.Comp.GridSplitter.Focus.Shape}"
+                      Opacity="0" />
               <Border x:Name="PART_RowDivider"
                       Height="{DynamicResource Md.Comp.GridSplitter.Divider.Thickness}"
                       HorizontalAlignment="Stretch" VerticalAlignment="Center"
@@ -66,14 +78,34 @@
     <Style Selector="^:rows /template/ Grid#PART_RowVisual">
       <Setter Property="IsVisible" Value="True" />
     </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_ColumnStateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Comp.GridSplitter.StateLayer.HoverOpacity}" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_RowStateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Comp.GridSplitter.StateLayer.HoverOpacity}" />
+    </Style>
     <Style Selector="^:pointerover /template/ Border#PART_ColumnDivider">
       <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
     </Style>
     <Style Selector="^:pointerover /template/ Border#PART_RowDivider">
       <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
     </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_ColumnHandle">
+      <Setter Property="Width" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveThickness}" />
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveLength}" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_RowHandle">
+      <Setter Property="Width" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveLength}" />
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveThickness}" />
+    </Style>
     <Style Selector="^:focus-visible /template/ Border#PART_FocusIndicator">
       <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:dragging /template/ Border#PART_ColumnStateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Comp.GridSplitter.StateLayer.DraggedOpacity}" />
+    </Style>
+    <Style Selector="^:dragging /template/ Border#PART_RowStateLayer">
+      <Setter Property="Opacity" Value="{DynamicResource Md.Comp.GridSplitter.StateLayer.DraggedOpacity}" />
     </Style>
     <Style Selector="^:dragging /template/ Border#PART_ColumnDivider">
       <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
@@ -82,9 +114,13 @@
       <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
     </Style>
     <Style Selector="^:dragging /template/ Border#PART_ColumnHandle">
+      <Setter Property="Width" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveThickness}" />
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveLength}" />
       <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
     </Style>
     <Style Selector="^:dragging /template/ Border#PART_RowHandle">
+      <Setter Property="Width" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveLength}" />
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveThickness}" />
       <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
     </Style>
     <Style Selector="^:disabled /template/ Border#PART_InteractionTrack">
