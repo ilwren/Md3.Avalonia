@@ -1,4 +1,4 @@
-# Build the release NuGet packages for all seven Md3.Avalonia packages.
+# Build the release NuGet packages for all Md3.Avalonia packages.
 # Requires Java 17 and the .NET Android workload: dotnet workload install android.
 [CmdletBinding()]
 param(
@@ -35,7 +35,8 @@ $projects = @(
     (Join-Path $root "src/Md3.Avalonia.NodifyM/Md3.Avalonia.NodifyM.csproj"),
     (Join-Path $root "src/Md3.Avalonia.Mapsui/Md3.Avalonia.Mapsui.csproj"),
     (Join-Path $root "src/Md3.Avalonia.InkCanvas/Md3.Avalonia.InkCanvas.csproj"),
-    (Join-Path $root "src/Md3.Avalonia.Notifications/Md3.Avalonia.Notifications.csproj")
+    (Join-Path $root "src/Md3.Avalonia.Notifications/Md3.Avalonia.Notifications.csproj"),
+    (Join-Path $root "src/Md3.Avalonia.LibVLC/Md3.Avalonia.LibVLC.csproj")
 )
 
 if ($SkipFontCheck) {
@@ -98,7 +99,7 @@ foreach ($proj in $projects) {
 Write-Host ""
 Write-Host "Built packages:" -ForegroundColor Green
 Get-ChildItem $outputDir -Filter *.nupkg | Sort-Object LastWriteTime -Descending |
-    Select-Object -First 18 | ForEach-Object { Write-Host "  $($_.FullName)" -ForegroundColor Green }
+    Select-Object -First 19 | ForEach-Object { Write-Host "  $($_.FullName)" -ForegroundColor Green }
 if (-not $Local -and -not $Version) {
     Write-Host ""
     Write-Host "WARNING: the version is unchanged. NuGet will keep restoring the previously cached" -ForegroundColor Yellow

@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.VideoPlayerGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,28">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Video player" />
+        <TextBlock Classes="body" MaxWidth="840" HorizontalAlignment="Left" TextWrapping="Wrap"
+                   Text="A backend-neutral Material 3 transport surface with responsive controls, keyboard shortcuts, localization, buffering and live states." />
+        <TextBlock Classes="body" MaxWidth="840" HorizontalAlignment="Left" TextWrapping="Wrap" Opacity="0.76"
+                   Text="This Gallery uses a deterministic simulated renderer. Add Md3.Avalonia.LibVLC for real desktop file and network playback, or host another renderer in MediaContent." />
+      </StackPanel>
+
+      <md:MdVideoPlayer x:Name="Player" Height="500"
+                        Title="Mountain light"
+                        SupportingText="Backend-neutral composited preview"
+                        Duration="00:04:12" Position="00:00:36"
+                        PlaybackRequested="OnPlaybackRequested">
+        <md:MdVideoPlayer.MediaContent>
+          <Border>
+            <Border.Background>
+              <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Offset="0" Color="#FF18243E" />
+                <GradientStop Offset="0.5" Color="#FF334F64" />
+                <GradientStop Offset="1" Color="#FFB76E52" />
+              </LinearGradientBrush>
+            </Border.Background>
+            <Grid>
+              <Ellipse Width="220" Height="220" Margin="0,0,110,60" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                       Fill="#50FFF0CF" />
+              <Path HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="190" Stretch="Fill"
+                    Data="M0 180L180 70L280 125L430 25L620 180Z" Fill="#B8121B2D" />
+              <StackPanel Margin="34" HorizontalAlignment="Left" VerticalAlignment="Bottom" Spacing="4">
+                <TextBlock FontSize="28" FontWeight="Medium" Foreground="White" Text="Renderer content" />
+                <TextBlock Foreground="#D8FFFFFF" Text="Replace this visual with LibVLC VideoView, FFmpeg, or a native backend." />
+              </StackPanel>
+            </Grid>
+          </Border>
+        </md:MdVideoPlayer.MediaContent>
+      </md:MdVideoPlayer>
+
+      <TextBlock x:Name="PlayerStatus" Classes="body" Text="Paused at 0:36." />
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdVideoPlayer MediaContent=&quot;{Binding Renderer}&quot;&#10;                  Title=&quot;Episode 1&quot;&#10;                  Position=&quot;{Binding Position}&quot;&#10;                  Duration=&quot;{Binding Duration}&quot;&#10;                  PlaybackRequested=&quot;OnPlaybackRequested&quot; /&gt;"
+                             CSharpCode="// Optional desktop adapter with actual LibVLC playback:&#10;var player = new MdLibVlcVideoPlayer&#10;{&#10;    Source = new Uri(&quot;file:///videos/episode.mp4&quot;),&#10;    AutoPlay = true&#10;};&#10;// Deploy a native LibVLC package separately for the target OS." />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

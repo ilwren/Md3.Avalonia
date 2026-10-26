@@ -60,9 +60,11 @@ This document is the public entry point for the `0.5.0-preview.1` API. Preview A
 <!-- Optional native system notifications for Windows, macOS, Linux and Android. Independent of
      Avalonia themes, so there is nothing to register in Application.Styles: -->
 <PackageReference Include="Md3.Avalonia.Notifications" Version="0.5.0-preview.1" />
+<!-- Optional real desktop video playback. The host separately deploys native LibVLC: -->
+<PackageReference Include="Md3.Avalonia.LibVLC" Version="0.5.0-preview.1" />
 ```
 
-All eighteen packages are versioned together. The five core-family packages (`Md3.Avalonia`, `Md3.Avalonia.Icons`, `Md3.Avalonia.Icons.Lite`, `Md3.Avalonia.Extra`, `Md3.Avalonia.DataGrid`) provide `net8.0` and `net10.0` assets, and the twelve opt-in third-party theme packages provide `net10.0` only. `Md3.Avalonia.Notifications` adds `net8.0-windows10.0.19041.0`, `net10.0-windows10.0.19041.0` and, when the pack scripts opt in, `net10.0-android`. The Gallery host itself targets .NET 10 only. Add only the optional packages your application uses; choose **one** icon provider:
+All nineteen packages are versioned together. The five core-family packages (`Md3.Avalonia`, `Md3.Avalonia.Icons`, `Md3.Avalonia.Icons.Lite`, `Md3.Avalonia.Extra`, `Md3.Avalonia.DataGrid`) provide `net8.0` and `net10.0` assets, and the twelve opt-in third-party theme packages provide `net10.0` only. `Md3.Avalonia.Notifications` adds `net8.0-windows10.0.19041.0`, `net10.0-windows10.0.19041.0` and, when the pack scripts opt in, `net10.0-android`; the optional desktop-only `Md3.Avalonia.LibVLC` adapter provides `net8.0` and `net10.0`. The Gallery host itself targets .NET 10 only. Add only the optional packages your application uses; choose **one** icon provider:
 
 | NuGet package | Purpose | Theme/resource registration |
 |---|---|---|
@@ -84,6 +86,7 @@ All eighteen packages are versioned together. The five core-family packages (`Md
 | `Md3.Avalonia.Mapsui` | Material theme for the Mapsui map control | Map-level `MaterialMapsuiTheme.Follow` |
 | `Md3.Avalonia.InkCanvas` | Material theme for the DotNetCampus ink canvas, plus `MdSignaturePad` | `MaterialInkCanvasTheme` |
 | `Md3.Avalonia.Notifications` | Unified Windows, macOS, Linux and Android system notifications; independent of Avalonia themes | `IMdSystemNotificationService` / `MdSystemNotificationService` |
+| `Md3.Avalonia.LibVLC` | Optional actual desktop video playback for `MdVideoPlayer`; native LibVLC is host-deployed | `MdLibVlcVideoPlayer` (reuses core `MaterialTheme`) |
 
 Register the core theme; register optional themes only when their packages are referenced:
 
@@ -137,6 +140,7 @@ await notifications.ShowAsync(new MdSystemNotification("Ready", "The export has 
 | `Md3.Avalonia.Extra.Infrastructure` | Density, paging, async-state, shortcut, overlay and focus-return contracts |
 | `Md3.Avalonia.Extra.Themes` | Opt-in `ExtraTheme` resource provider |
 | `Md3.Avalonia.Notifications` | Standalone native system-notification service and models |
+| `Md3.Avalonia.LibVLC` | Optional desktop LibVLCSharp backend for `MdVideoPlayer` |
 
 ## Components
 
@@ -144,6 +148,7 @@ await notifications.ShowAsync(new MdSystemNotification("Ready", "The export has 
 - Selection and input: `MdTextBox`, `MdMaskedTextBox`, `MdCheckBox`, `MdRadioButton`, `MdComboBox`, `MdAutoCompleteBox`, `MdNumericBox`, `MdSwitch`, `MdSlider`, `MdRangeSlider`, `MdSegmentedButtonGroup`, `MdSegmentedButton`.
 - Content: `MdCard`, `MdCarousel`, `MdCarouselItem`, `MdChip`, `MdAssistChip`, `MdFilterChip`, `MdInputChip`, `MdSuggestionChip`, `MdList`, `MdListItem`, `MdDivider`, `MdCommitGraph`, `MdCommitNode`, `MdContributionGrid`, `MdContributionDay`.
 - Pickers: `MdDatePicker`, `MdDatePickerDialog`, `MdDateRangePicker`, `MdTimePicker`, `MdTimePickerDialog`, the interactive `MdTimeDial`/`MdTimeDialPart` clock-face API, and the direct-path `MdFileSystemPicker` with `MdFileSystemPathSegment` breadcrumb models.
+- Media: backend-neutral `MdVideoPlayer`, `MdPlaybackRequest`, and `MdPlaybackRequestEventArgs`; optional desktop `MdLibVlcVideoPlayer` playback.
 - Navigation: `MdTopAppBar`, `MdBottomAppBar`, `MdNavigationBar`, `MdNavigationBarItem`, `MdNavigationDrawer`, `MdNavigationRail`, `MdTabs`, `MdTabItem`, `MdTabsView`, `MdTabView`, `MdTabViewItem`, `MdPagination`.
 - Tabs come in two shapes. `MdTabView` carries its own tab strip and content, like a classic `TabControl`. `MdTabs` is only the bar, for the common Material case where it sits in an app bar or header away from the pages; pair it with `MdTabsView`, whose children are the pages matched to the bar's tabs by position, and whose `Tabs` property keeps selection in step both ways. This mirrors Flutter's `TabBar` and `TabBarView`.
 - Transient surfaces: `MdDialog`, `MdDialogHost`, `MdDialogService`, `IMdDialogService`, `MdDialogServiceExtensions`, `MdDropdownMenu`, `MdMenuAnchor`, `MdMenu`, `MdMenuItem`, `MdSheetHost`, `MdSnackbar`, `MdSnackbarHost`, `MdSnackbarService`, `IMdSnackbarService`, `MdTooltip`, `MdTooltipHost`.
@@ -181,7 +186,8 @@ The following catalog covers the public control surface shipped by the core pack
 | **Mobile platform integration** | `MdSafeArea`, `MdBackNavigation`, `MdBackScope`, `MdKeyboardAvoidingHost` |
 | **Settings and preference surfaces** | `MdSettingsGroup`, `MdSettingsCard`, `MdSettingsExpander` |
 | **Feedback and status** | `MdLoadingIndicator`, `MdLinearProgressIndicator`, `MdCircularProgressIndicator`, `MdAdaptiveProgressIndicator`, `MdBadge`, `MdBadgedBox`, `MdRefreshIndicator`, `MdSnackbar`, `MdSnackbarHost`, `MdSnackbarService` |
-| **Pickers and calendars** | `MdDatePicker`, `MdDatePickerDialog`, `MdDateRangePicker`, `MdCalendarGrid`, `MdCalendarDay`, `MdTimePicker`, `MdTimePickerDialog`, `MdTimeDial`, `MdTimeDialPart`, `MdPickerRestorationStore`, `MdFileSystemPicker`, `MdFileSystemPickerMode`, `MdFileSystemEntry`, `MdFileSystemSelectionEventArgs`, `MdFileSystemNavigationFailedEventArgs` |
+| **Pickers and calendars** | `MdDatePicker`, `MdDatePickerDialog`, `MdDateRangePicker`, `MdCalendarGrid`, `MdCalendarDay`, `MdTimePicker`, `MdTimePickerDialog`, `MdTimeDial`, `MdTimeDialPart`, `MdPickerRestorationStore`, `MdFileSystemPicker`, `MdFileSystemPickerMode`, `MdFileSystemBreadcrumbStyle`, `MdFileSystemEntry`, `MdFileSystemPathSegment`, `MdFileSystemSelectionEventArgs`, `MdFileSystemNavigationFailedEventArgs` |
+| **Media** | `MdVideoPlayer`, `MdPlaybackRequest`, `MdPlaybackRequestEventArgs` |
 | **Lists and interaction patterns** | `MdReorderableList`, `MdDismissible`, `MdStepper`, `MdStep`, `MdHero`, `MdFocusTraversalGroup`, `MdShortcutScope` |
 | **Foundations and icons** | `MdText`, `MdIcon`, `MdSymbolPresenter`, `MdStateLayer`, `MdRipplePresenter`, `MdFocusRing`, `MdScrollViewer`, `MdScrollBar`, `MdSliderThumb`, `MdWindow` |
 | **Window chrome** | `MdBorderlessWindow`, `MdWindowTitleBar`, `MdCaptionButton`, `MdWindowCaptionButton`, `MdWindowDragRegion`, `MdWindowResizeGrip`, `IMdWindowPlatformAdapter`, `MdWindowPlatformAdapterResolver`, `MdWindowsWindowPlatformAdapter`, `MdMacOsWindowPlatformAdapter`, `MdLinuxWindowPlatformAdapter`, `MdAvaloniaWindowPlatformAdapter`, `MdAndroidWindowPlatformAdapter` |
@@ -203,7 +209,8 @@ Most core controls expose styled properties, bindable `Items`/`ItemsSource` wher
 | `MdNavigationBar`, `MdNavigationRail`, `MdNavigationDrawer` | Primary application navigation | item collections, selected index/item, placement/layout and `ItemInvoked` |
 | `MdTabs`, `MdTabView` | Peer navigation and document views | tab collections, selected item/index, closable/reorderable view items |
 | `MdDatePicker`, `MdDateRangePicker`, `MdTimePicker` | Date, date range, and time selection | selected value(s), mode, dialogs, validation, restoration and `ShowAsync` |
-| `MdFileSystemPicker` | Direct file-system file/folder selection | `Mode`, `InitialDirectory`, `CurrentDirectory`, `FilePatterns`, `ShowHiddenItems`, `AllowMultiple`, `Entries`, `SelectedPaths`, `NavigateAsync`/`RefreshAsync`/`GoUpAsync`/`GoHomeAsync`, `SelectionConfirmed`, `CancelRequested`, `NavigationFailed` |
+| `MdFileSystemPicker` | Direct file-system file/folder selection | `Mode`, `BreadcrumbStyle`, localized/customizable labels, `InitialDirectory`, `CurrentDirectory`, `FilePatterns`, `ShowHiddenItems`, `AllowMultiple`, `Entries`, `PathSegments`, `SelectedPaths`, `NavigateAsync`/`RefreshAsync`/`GoUpAsync`/`GoHomeAsync`/`GoToRootAsync`, `SelectionConfirmed`, `CancelRequested`, `NavigationFailed` |
+| `MdVideoPlayer` | Backend-neutral video transport | `MediaContent`, `PosterContent`, `Position`, `Duration`, `Volume`, `PlaybackRate`, buffering/live/fullscreen state, keyboard transport, `Play`/`Pause`/`Seek`/`SeekBy`, and `PlaybackRequested`; use optional `MdLibVlcVideoPlayer` for desktop playback |
 | `MdSnackbarHost`, `MdSnackbarService` | Queued transient messages | `Show`, `ShowAsync`, `Dismiss`, action/result, queue and shared service injection |
 | `MdCarousel`, `MdRefreshIndicator`, `MdReorderableList` | Touch-friendly content interaction | controller/provider APIs, navigation, refresh callbacks, reorder callbacks |
 | `MdMaskedTextBox` | Mask-constrained text input | `Mask` (literals are filled in while typing), `PromptChar`, `HidePromptOnLeave`, `MaskCompleted`/`MaskFull`; field state through `Label`, `PrefixText`, `SupportingText`, `ErrorText`, `IsError` and `MdMaskedTextBoxVariant` |
@@ -383,7 +390,9 @@ An `MdSnackbar` is a visual control, so calling `Show()` on an instance that was
 
 Direct APIs include `Show`/`Dismiss` on transient components, `ShowAsync`/`Show`/`Close` on `MdDialogHost` and `IMdDialogService`, `Show`/`ShowAsync`/`Dismiss` on `MdSnackbarHost` and `IMdSnackbarService`, `NavigateAsync`/`RefreshAsync`/`GoUpAsync`/`GoHomeAsync`/`GoToRootAsync`/`ConfirmSelection` on `MdFileSystemPicker`, direct collection APIs inherited from Avalonia item controls, and standard routed events. Ecosystem controls additionally expose provider delegates and direct state-machine methods such as `LoadNextPageAsync`, `RefreshAsync`, `SearchAsync`, `SelectDate`, `MoveToTarget`, `Execute`, `Submit`, `PlayAsync`, `NotifyOwnerScrolled`, `MdPinInput.SetCode`/`Clear`, `MdTreeView.ExpandAll`/`CollapseAll`/`SelectById`, `MdTagInput.AddTag`/`RemoveTag`/`ClearTags`, and `MdRating.SetValueFromPosition`.
 
-`MdFileSystemPicker` is an in-process browser built from the library's `MdTextBox`, `MdList`, `MdButton`, `MdIconButton`, `MdCheckBox`, and progress controls (the ordered Avalonia/redesign/Flutter source study is recorded in [FILE_SYSTEM_PICKER_RESEARCH.md](FILE_SYSTEM_PICKER_RESEARCH.md)). It never invokes Avalonia `StorageProvider`, a native file dialog, or Android SAF: `MdFileSystemSelectionEventArgs.Paths` therefore contains normalized absolute paths from `System.IO`. `Mode="File"` keeps directories visible for navigation and applies `FilePatterns` only to files; `Mode="Folder"` lists directories and can confirm the current directory. `PathSegments` exposes normalized root-to-current `MdFileSystemPathSegment` entries used by the breadcrumb-first path surface; the raw path editor appears on demand. Expanded layouts add Home/root quick access while compact layouts move Home into the app bar. Entry rows use 48-DIP tonal icon containers, supporting metadata, a selected container/check, and a fixed confirmation surface. Multi-selection, hidden-item display, Home/parent/root/refresh actions, empty/loading/error states, double-click/Enter activation, and explicit per-folder open buttons are included. This is not a sandbox escape: Android scoped storage, macOS sandbox entitlements, Unix permissions, and Windows ACLs still determine which paths can be enumerated. Start in an app-accessible directory and let the host own any platform permission flow.
+`MdFileSystemPicker` is an in-process browser built from the library's `MdTextBox`, `MdList`, `MdButton`, `MdIconButton`, `MdCheckBox`, and progress controls (the ordered Avalonia/redesign/Flutter source study is recorded in [FILE_SYSTEM_PICKER_RESEARCH.md](FILE_SYSTEM_PICKER_RESEARCH.md)). It never invokes Avalonia `StorageProvider`, a native file dialog, or Android SAF: `MdFileSystemSelectionEventArgs.Paths` therefore contains normalized absolute paths from `System.IO`. `Mode="File"` keeps directories visible for navigation and applies `FilePatterns` only to files; `Mode="Folder"` lists directories and can confirm the current directory. `PathSegments` exposes normalized root-to-current `MdFileSystemPathSegment` entries used by the breadcrumb-first path surface; the raw path editor appears on demand. `BreadcrumbStyle` selects the standard chevron or connected powerline treatment. All visible labels and automation actions follow inherited `MdLocalization.Culture` (English/Chinese), while locally assigned `Title`, `PathLabel`, action and state-text properties are preserved as host overrides. Expanded layouts add Home/root quick access while compact layouts move Home into the app bar. Entry rows use centered 24-DIP icon viewports inside 48-DIP tonal containers, supporting metadata, a selected container/check, and a fixed confirmation surface. Single and multiple modes both support toggling an already selected row off. This is not a sandbox escape: Android scoped storage, macOS sandbox entitlements, Unix permissions, and Windows ACLs still determine which paths can be enumerated. Start in an app-accessible directory and let the host own any platform permission flow.
+
+`MdVideoPlayer` is the backend-neutral Material transport documented in [VIDEO_PLAYER_RESEARCH.md](VIDEO_PLAYER_RESEARCH.md). `MediaContent` hosts a composited or native renderer; state properties drive the UI, and typed `MdPlaybackRequestEventArgs` carry play/pause/stop, absolute seek/skip targets, mute, volume, rate and fullscreen requests to the backend. The core stays Android- and NativeAOT-safe because it contains no decoder. `Md3.Avalonia.LibVLC` adds `MdLibVlcVideoPlayer`, which adapts LibVLCSharp 3.10.2 for real desktop file/network playback; the application must deploy native LibVLC separately.
 
 `MdCarousel` supports a bindable `MdCarouselController`, `ScrollTo`, autoplay, pointer-hover pause and finite or wrapping navigation. Weighted variants use viewport-fitted scroll/controller keylines and constrain `SmallItemWidth` to Material's 40–56 DIP range; pointer selection does not resize an item. `MdRefreshIndicator.RequestRefreshAsync` accepts a cancelable provider-neutral handler.
 
@@ -1195,7 +1204,7 @@ is where every member this section names lives.
 
 ## Trimming
 
-All eighteen packages declare `IsTrimmable` and `IsAotCompatible` and build with the IL2xxx/IL3xxx analyzers enabled. This describes the library assemblies; application-owned reflection, dynamic XAML, and third-party code may still require preservation or selectors in the consuming app.
+The eighteen non-LibVLC packages declare `IsTrimmable` and `IsAotCompatible` and build with the IL2xxx/IL3xxx analyzers enabled. The optional `Md3.Avalonia.LibVLC` native desktop adapter explicitly declares neither compatibility and is excluded from the core/Android dependency graph. These declarations describe the library assemblies; application-owned reflection, dynamic XAML, and third-party code may still require preservation or selectors in the consuming app.
 
 The Linux x64 AOT probe publishes the desktop Gallery with `PublishAot=true`, checks that the output is a native executable without a managed Gallery assembly beside it, and smoke-runs that binary under xvfb. Its `file-system-picker` scenario opens the actual Gallery page inside the native process, materializes the control template and compiled bindings, enumerates and filters a temporary real directory, selects an entry, confirms its normalized path, and must write a success marker before the workflow passes. The probe reports linker diagnostics but does not claim zero diagnostics for every downstream app or validate Windows, macOS, or Android AOT.
 
@@ -1270,6 +1279,7 @@ Every public enum and its members are listed below. To print the current member 
 | `MdFabMenuExpansionDirection` | `Up` · `Down` |
 | `MdFabSize` | `Small` · `Regular` · `Medium` · `Large` |
 | `MdFileSystemPickerMode` | `File` · `Folder` |
+| `MdFileSystemBreadcrumbStyle` | `Standard` · `Powerline` |
 | `MdFocusTraversalPolicy` | `VisualOrder` · `TabIndex` · `ReadingOrder` |
 | `MdIconButtonVariant` | `Standard` · `Filled` · `Tonal` · `Outlined` |
 | `MdIconButtonWidth` | `Narrow` · `Default` · `Wide` |
@@ -1283,7 +1293,7 @@ Every public enum and its members are listed below. To print the current member 
 | `MdNavigationDrawerPlacement` | `Left` · `Right` |
 | `MdNavigationSuiteMode` | `Auto` · `NavigationBar` · `NavigationRail` · `NavigationDrawer` |
 | `MdPaginationDisplayMode` | `Numbers` · `Dots` |
-| `MdPlaybackRequest` | `Play` · `Pause` · `Previous` · `Next` · `Rewind` · `Forward` · `Mute` · `Unmute` · `EnterFullScreen` · `ExitFullScreen` |
+| `MdPlaybackRequest` | `Play` · `Pause` · `Stop` · `Previous` · `Next` · `Rewind` · `Forward` · `Seek` · `Mute` · `Unmute` · `SetVolume` · `SetPlaybackRate` · `EnterFullScreen` · `ExitFullScreen` |
 | `MdProgressShape` | `Flat` · `Wavy` |
 | `MdSafeAreaEdges` | `None` · `Left` · `Top` · `Right` · `Bottom` · `Horizontal` · `Vertical` · `All` |
 | `MdScrollbarThumbVisibility` | `Auto` · `Always` · `Hidden` |

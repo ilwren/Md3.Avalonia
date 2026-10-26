@@ -1,9 +1,11 @@
+using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Localization;
 using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
@@ -112,6 +114,25 @@ public sealed class MdFileSystemPickerTests
                 .Single(control => control.Name == "PART_CompactHomeButton");
             Assert.True(quickAccess.IsVisible);
             Assert.False(compactHome.IsVisible);
+
+            var list = picker.GetVisualDescendants().OfType<MdList>()
+                .Single(control => control.Name == "PART_ItemsHost");
+            Assert.True(list.SelectionMode.HasFlag(SelectionMode.Toggle));
+
+            picker.BreadcrumbStyle = MdFileSystemBreadcrumbStyle.Powerline;
+            Dispatcher.UIThread.RunJobs();
+            var powerline = picker.GetVisualDescendants().OfType<Grid>()
+                .First(control => control.Classes.Contains("powerline-segment"));
+            Assert.True(powerline.IsVisible);
+
+            MdLocalization.SetCulture(picker, CultureInfo.GetCultureInfo("zh-CN"));
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal("位置", picker.PathLabel);
+            Assert.Equal("快捷访问", picker.QuickAccessText);
+            Assert.Equal("显示隐藏项目", picker.ShowHiddenText);
+            picker.Title = "Custom browser";
+            MdLocalization.SetCulture(picker, CultureInfo.GetCultureInfo("en-US"));
+            Assert.Equal("Custom browser", picker.Title);
 
             var pathToggle = picker.GetVisualDescendants().OfType<MdIconButton>()
                 .Single(control => control.Name == "PART_PathToggleButton");

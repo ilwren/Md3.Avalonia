@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Added backend-neutral `MdVideoPlayer` with a responsive Material 3 transport, typed playback requests, keyboard control, English/Chinese accessibility text, buffering/live/error states, and renderer content slots. Added optional `Md3.Avalonia.LibVLC` for real desktop file/network playback without adding LibVLC or native binaries to core, Android, or NativeAOT graphs.
+
+### Changed
+
+- `MdFileSystemPicker` now localizes visible text and culture-sensitive entry details, preserves host text overrides, supports `Standard`/`Powerline` breadcrumbs, centers every glyph in a fixed transparent viewport, and lets single selection toggle off like multiple selection.
+
 ## [0.5.0-preview.1] - 2026-10-18
 
 ### Added

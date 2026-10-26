@@ -16,6 +16,7 @@
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/ToolbarTokens.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/ContainmentTokens.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/FileSystemPickerTokens.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Tokens/VideoPlayerTokens.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdTopLevel.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdFoundation.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdDesktopAdapters.axaml" />
@@ -66,6 +67,7 @@
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdPagination.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdMaskedTextBox.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdFileSystemPicker.axaml" />
+        <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdVideoPlayer.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdCommitGraph.axaml" />
         <ResourceInclude Source="avares://Md3.Avalonia/Themes/Controls/MdContributionGrid.axaml" />
       </ResourceDictionary.MergedDictionaries>

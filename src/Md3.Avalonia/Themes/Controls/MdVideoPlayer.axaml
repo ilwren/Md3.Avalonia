@@ -1,0 +1,196 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <StreamGeometry x:Key="Md.VideoPlayer.PlayGeometry">M8 5V19L19 12Z</StreamGeometry>
+  <StreamGeometry x:Key="Md.VideoPlayer.PauseGeometry">M7 5H10V19H7ZM14 5H17V19H14Z</StreamGeometry>
+  <StreamGeometry x:Key="Md.VideoPlayer.VolumeGeometry">M4 10V14H8L13 18V6L8 10ZM16 9C17.2 10.2 17.2 13.8 16 15M18.5 6.5C21.2 9.2 21.2 14.8 18.5 17.5</StreamGeometry>
+  <StreamGeometry x:Key="Md.VideoPlayer.MutedGeometry">M4 10V14H8L13 18V6L8 10ZM16 9L21 14M21 9L16 14</StreamGeometry>
+  <StreamGeometry x:Key="Md.VideoPlayer.FullScreenGeometry">M4 9V4H9M15 4H20V9M20 15V20H15M9 20H4V15</StreamGeometry>
+  <StreamGeometry x:Key="Md.VideoPlayer.ExitFullScreenGeometry">M9 4V9H4M20 9H15V4M15 20V15H20M4 15H9V20</StreamGeometry>
+  <StreamGeometry x:Key="Md.VideoPlayer.VideoGeometry">M4 6H16V18H4ZM16 10L21 7V17L16 14Z</StreamGeometry>
+
+  <ControlTheme x:Key="{x:Type md:MdVideoPlayer}" TargetType="md:MdVideoPlayer">
+    <Setter Property="MinHeight" Value="{DynamicResource Md.Comp.VideoPlayer.MinHeight}" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdVideoPlayer">
+        <Border x:Name="PART_Container"
+                Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                BorderThickness="1"
+                CornerRadius="{DynamicResource Md.Comp.VideoPlayer.Container.Shape}"
+                ClipToBounds="True">
+          <Grid RowDefinitions="*,Auto">
+            <Border Grid.Row="0" MinHeight="{DynamicResource Md.Comp.VideoPlayer.Media.MinHeight}"
+                    Background="{DynamicResource Md.Sys.Color.InverseSurface.Brush}"
+                    CornerRadius="{DynamicResource Md.Comp.VideoPlayer.Media.Shape}"
+                    ClipToBounds="True">
+              <Grid>
+                <ContentPresenter x:Name="PART_MediaPresenter"
+                                  Content="{TemplateBinding MediaContent}"
+                                  HorizontalContentAlignment="Stretch"
+                                  VerticalContentAlignment="Stretch" />
+                <Grid x:Name="PART_Poster" Background="{DynamicResource Md.Sys.Color.InverseSurface.Brush}">
+                  <ContentPresenter Content="{TemplateBinding PosterContent}"
+                                    HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch" />
+                  <Border Width="{DynamicResource Md.Comp.VideoPlayer.PosterIcon.Size}"
+                          Height="{DynamicResource Md.Comp.VideoPlayer.PosterIcon.Size}"
+                          HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
+                          CornerRadius="{DynamicResource Md.Comp.VideoPlayer.PosterIcon.Shape}">
+                    <Viewbox Width="34" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center">
+                      <Canvas Width="24" Height="24">
+                        <Path Data="{StaticResource Md.VideoPlayer.VideoGeometry}"
+                              Fill="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" />
+                      </Canvas>
+                    </Viewbox>
+                  </Border>
+                </Grid>
+                <Border x:Name="PART_Error" Margin="24" Padding="20"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Background="{DynamicResource Md.Sys.Color.ErrorContainer.Brush}"
+                        CornerRadius="16" IsVisible="False">
+                  <StackPanel MaxWidth="420" Spacing="6">
+                    <TextBlock HorizontalAlignment="Center" FontWeight="Medium"
+                               Foreground="{DynamicResource Md.Sys.Color.OnErrorContainer.Brush}"
+                               Text="{TemplateBinding PlaybackErrorText}" />
+                    <TextBlock Text="{TemplateBinding ErrorMessage}" TextWrapping="Wrap" TextAlignment="Center"
+                               Foreground="{DynamicResource Md.Sys.Color.OnErrorContainer.Brush}" />
+                  </StackPanel>
+                </Border>
+              </Grid>
+            </Border>
+
+            <!-- Controls stay outside native video surfaces, avoiding LibVLC/Avalonia airspace
+                 overlap while remaining a single keyboard and automation surface. -->
+            <Border x:Name="PART_Controls" Grid.Row="1"
+                    Padding="{DynamicResource Md.Comp.VideoPlayer.Controls.Padding}"
+                    Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                    CornerRadius="{DynamicResource Md.Comp.VideoPlayer.Controls.Shape}">
+              <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                  <StackPanel Spacing="2">
+                    <TextBlock FontSize="{DynamicResource Md.Sys.TypeScale.TitleMedium.Size}"
+                               FontWeight="Medium" Text="{TemplateBinding Title}"
+                               TextTrimming="CharacterEllipsis" />
+                    <TextBlock FontSize="{DynamicResource Md.Sys.TypeScale.BodySmall.Size}"
+                               Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                               Text="{TemplateBinding SupportingText}" TextTrimming="CharacterEllipsis" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Spacing="6">
+                    <md:MdCircularProgressIndicator x:Name="PART_BufferingIndicator"
+                                                    Width="22" Height="22" IsIndeterminate="True" IsVisible="False" />
+                    <Border x:Name="PART_LiveBadge" Padding="8,4"
+                            Background="{DynamicResource Md.Sys.Color.ErrorContainer.Brush}"
+                            CornerRadius="10" IsVisible="False">
+                      <TextBlock FontSize="{DynamicResource Md.Sys.TypeScale.LabelSmall.Size}"
+                                 Foreground="{DynamicResource Md.Sys.Color.OnErrorContainer.Brush}" Text="{TemplateBinding LiveText}" />
+                    </Border>
+                    <TextBlock VerticalAlignment="Center" FontSize="{DynamicResource Md.Sys.TypeScale.LabelMedium.Size}"
+                               Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}">
+                      <Run Text="{TemplateBinding PositionText}" /><Run Text=" / " /><Run Text="{TemplateBinding DurationText}" />
+                    </TextBlock>
+                  </StackPanel>
+                </Grid>
+
+                <md:MdSlider x:Name="PART_SeekSlider" Grid.Row="1" Minimum="0" Maximum="1000"
+                             ShowStopIndicator="False" ShowValueIndicator="False"
+                             IsEnabled="{TemplateBinding IsSeekable}" />
+
+                <Grid Grid.Row="2" ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="8">
+                  <md:MdIconButton x:Name="PART_PlayPauseButton" Grid.Column="0" Size="ExtraSmall"
+                                   Variant="Tonal" ToolTip.Tip="{TemplateBinding PlayPauseText}">
+                    <md:MdIconButton.Icon>
+                      <Grid Width="20" Height="20">
+                        <Viewbox x:Name="PART_PlayIcon" Width="20" Height="20">
+                          <Canvas Width="24" Height="24">
+                            <Path Data="{StaticResource Md.VideoPlayer.PlayGeometry}"
+                                  Fill="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
+                          </Canvas>
+                        </Viewbox>
+                        <Viewbox x:Name="PART_PauseIcon" Width="20" Height="20" IsVisible="False">
+                          <Canvas Width="24" Height="24">
+                            <Path Data="{StaticResource Md.VideoPlayer.PauseGeometry}"
+                                  Fill="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
+                          </Canvas>
+                        </Viewbox>
+                      </Grid>
+                    </md:MdIconButton.Icon>
+                  </md:MdIconButton>
+
+                  <md:MdIconButton x:Name="PART_MuteButton" Grid.Column="1" Size="ExtraSmall"
+                                   ToolTip.Tip="{TemplateBinding MuteText}">
+                    <md:MdIconButton.Icon>
+                      <Grid Width="20" Height="20">
+                        <Viewbox x:Name="PART_VolumeIcon" Width="20" Height="20">
+                          <Canvas Width="24" Height="24">
+                            <Path Data="{StaticResource Md.VideoPlayer.VolumeGeometry}"
+                                  Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                                  StrokeThickness="1.8" StrokeLineCap="Round" StrokeJoin="Round" />
+                          </Canvas>
+                        </Viewbox>
+                        <Viewbox x:Name="PART_MutedIcon" Width="20" Height="20" IsVisible="False">
+                          <Canvas Width="24" Height="24">
+                            <Path Data="{StaticResource Md.VideoPlayer.MutedGeometry}"
+                                  Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                                  StrokeThickness="1.8" StrokeLineCap="Round" StrokeJoin="Round" />
+                          </Canvas>
+                        </Viewbox>
+                      </Grid>
+                    </md:MdIconButton.Icon>
+                  </md:MdIconButton>
+
+                  <md:MdSlider x:Name="PART_VolumeSlider" Grid.Column="2" Width="128"
+                               HorizontalAlignment="Left" VerticalAlignment="Center"
+                               Minimum="0" Maximum="100" ShowStopIndicator="False" ShowValueIndicator="False" />
+
+                  <md:MdButton x:Name="PART_RateButton" Grid.Column="3" MinWidth="52"
+                               Content="{TemplateBinding RateText}" Size="ExtraSmall" Variant="Text" />
+
+                  <md:MdIconButton x:Name="PART_FullScreenButton" Grid.Column="4" Size="ExtraSmall"
+                                   ToolTip.Tip="{TemplateBinding FullScreenText}">
+                    <md:MdIconButton.Icon>
+                      <Grid Width="20" Height="20">
+                        <Viewbox x:Name="PART_EnterFullScreenIcon" Width="20" Height="20">
+                          <Canvas Width="24" Height="24">
+                            <Path Data="{StaticResource Md.VideoPlayer.FullScreenGeometry}"
+                                  Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                                  StrokeThickness="1.8" StrokeLineCap="Round" StrokeJoin="Round" />
+                          </Canvas>
+                        </Viewbox>
+                        <Viewbox x:Name="PART_ExitFullScreenIcon" Width="20" Height="20" IsVisible="False">
+                          <Canvas Width="24" Height="24">
+                            <Path Data="{StaticResource Md.VideoPlayer.ExitFullScreenGeometry}"
+                                  Stroke="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                                  StrokeThickness="1.8" StrokeLineCap="Round" StrokeJoin="Round" />
+                          </Canvas>
+                        </Viewbox>
+                      </Grid>
+                    </md:MdIconButton.Icon>
+                  </md:MdIconButton>
+                </Grid>
+              </Grid>
+            </Border>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:has-media /template/ Grid#PART_Poster"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:playing /template/ Viewbox#PART_PlayIcon"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:playing /template/ Viewbox#PART_PauseIcon"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:muted /template/ Viewbox#PART_VolumeIcon"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:muted /template/ Viewbox#PART_MutedIcon"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:buffering /template/ md|MdCircularProgressIndicator#PART_BufferingIndicator"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:live /template/ Border#PART_LiveBadge"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:live /template/ md|MdSlider#PART_SeekSlider"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:full-screen /template/ Viewbox#PART_EnterFullScreenIcon"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:full-screen /template/ Viewbox#PART_ExitFullScreenIcon"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:error /template/ Border#PART_Error"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:controls-hidden /template/ Border#PART_Controls"><Setter Property="Opacity" Value="0" /><Setter Property="IsHitTestVisible" Value="False" /></Style>
+    <Style Selector="^:compact /template/ Border#PART_Controls"><Setter Property="Padding" Value="{DynamicResource Md.Comp.VideoPlayer.Compact.Controls.Padding}" /></Style>
+    <Style Selector="^:compact /template/ md|MdSlider#PART_VolumeSlider"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:compact /template/ md|MdButton#PART_RateButton"><Setter Property="IsVisible" Value="False" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

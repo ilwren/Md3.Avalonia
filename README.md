@@ -17,7 +17,7 @@ https://github.com/user-attachments/assets/53c05bc6-f1b5-4076-8b62-c4a7a2b819bf
 - 18 个可独立安装的 NuGet 包，第三方生态主题全部 opt-in
 - 每个控件使用独立 CLR 类型与 scoped `ControlTheme`，不覆盖 Avalonia 原生控件
 - 核心包不依赖 `Avalonia.Themes.Fluent` 或 `Avalonia.Themes.Simple`
-- 桌面与 Android 双端，全部包声明 `IsTrimmable` 与 `IsAotCompatible`
+- 桌面与 Android 双端；除可选 native LibVLC adapter 外，其余包声明 `IsTrimmable` 与 `IsAotCompatible`
 
 > **当前版本 `0.5.0-preview.1`。** 预览版 API 仍可能做兼容性调整，NuGet 安装示例需在该版本发布后才可用。屏幕阅读器与 Android 真机等人工验收状态见 [已知边界](#已知边界)。
 
@@ -97,7 +97,7 @@ dotnet add package Md3.Avalonia.Icons --version 0.5.0-preview.1
 
 ## NuGet 包
 
-十八个包版本统一，均可独立安装；不使用就不会被引入。
+十九个包版本统一，均可独立安装；不使用就不会被引入。
 
 | 包 | 能力 | 主题注册 | 目标框架 |
 |---|---|---|---|
@@ -107,6 +107,7 @@ dotnet add package Md3.Avalonia.Icons --version 0.5.0-preview.1
 | `Md3.Avalonia.Extra` | Flutter-inspired 扩展控件 | `ExtraTheme` | `net8.0;net10.0` |
 | `Md3.Avalonia.DataGrid` | Avalonia 原生 `DataGrid` 主题 | `MaterialDataGridTheme` | `net8.0;net10.0` |
 | `Md3.Avalonia.Notifications` | Windows / macOS / Linux / Android 系统通知 | 无（独立于 UI 主题） | `net8.0;net10.0` + Windows 专用 |
+| `Md3.Avalonia.LibVLC` | 可选桌面 LibVLC 真视频播放后端（native runtime 由宿主部署） | 复用核心 `MaterialTheme` | `net8.0;net10.0` |
 | `Md3.Avalonia.AvaloniaEdit` | AvaloniaEdit 编辑器主题 | `MaterialAvaloniaEditTheme` | `net10.0` |
 | `Md3.Avalonia.AvaloniaHex` | AvaloniaHex 十六进制编辑器主题 | `MaterialAvaloniaHexTheme` | `net10.0` |
 | `Md3.Avalonia.Dock` | Dock 停靠布局主题 | `MaterialDockTheme` | `net10.0` |
@@ -161,19 +162,22 @@ python3 scripts/verify-fonts.py
 
 ## 控件总览
 
-完整 API 见 [`docs/API.md`](docs/API.md)，覆盖全部 368 个公共类型；`scripts/check-api-doc-coverage.py` 会在 CI 中断言这一覆盖率。下表只列出各分组的主要类型。
+完整 API 见 [`docs/API.md`](docs/API.md)，覆盖全部 371 个公共类型；`scripts/check-api-doc-coverage.py` 会在 CI 中断言这一覆盖率。下表只列出各分组的主要类型。
 
 | 分组 | 主要类型 |
 |---|---|
 | 按钮 | `MdButton`、`MdToggleButton`、`MdIconButton`、`MdToggleIconButton`、`MdSplitButton`、`MdStandardButtonGroup`、`MdConnectedButtonGroup`、`MdFloatingActionButton`、`MdExtendedFloatingActionButton`、`MdFabMenu` |
 | 输入 | `MdTextBox`、`MdCheckBox`、`MdRadioButton`、`MdComboBox`、`MdAutoCompleteBox`、`MdSlider`、`MdSwitch`、`MdDatePicker`、`MdTimePicker`、`MdFileSystemPicker`、`MdPinInput`、`MdTagInput`、`MdForm` |
+| 媒体 | 后端无关 `MdVideoPlayer`；桌面真播放可选 `MdLibVlcVideoPlayer` |
 | 导航 | `MdNavigationDrawer`、`MdNavigationBar`、`MdTabs`、`MdToolbar`、`MdTopAppBar`、`MdBottomAppBar`、`MdSearchBar`、`MdSearchView`、`MdCommandPalette`、`MdBreadcrumb` |
 | 容器与浮层 | `MdCard`、`MdDialog`、`MdDialogHost`、`MdMenu`、`MdPopover`、`MdTooltip`、`MdSnackbar`、`MdBanner`、`MdSheetHost`、`MdExpansionPanelList`、`MdFloatingWindow`、`MdBorderlessWindow` |
 | 数据展示 | `MdList`、`MdDataTable`、`MdDataGrid`、`MdCarousel`、`MdCalendar`、`MdTreeView`、`MdAvatar`、`MdBadge`、`MdChip`、`MdTimeline`、`MdWaveform`、`MdChart` |
 | 反馈与进度 | `MdCircularProgressIndicator`、`MdLinearProgressIndicator`、`MdLoadingIndicator`、`MdSkeleton`、`MdRefreshIndicator`、`MdSpinKit`、`MdStateLayer`、`MdFocusRing` |
 | 布局与动效 | `MdSurface`、`MdAdaptiveLayout`、`MdScrollViewer`、`MdWaterfall`、`MdMasonryPanel`、`MdStaggeredPanel`、`MdAnimationSequence`、`MdAnimatedText`、`MdRevealHost`、`MdMorphPanel`、`MdHero` |
 
-`MdFileSystemPicker` 是由库内 `Md*` 组件组成的真实路径浏览器，文件/文件夹模式、过滤、单选/多选、路径输入、上级/Home/刷新以及错误/空状态均在控件内完成；它不调用 Avalonia `StorageProvider`、系统 file picker 或 Android SAF。返回值是 `System.IO` 可直接使用的规范化绝对路径，但它不会绕过 Android scoped storage、应用沙箱或操作系统权限，宿主仍须选择可访问的起始目录并自行处理平台权限。
+`MdFileSystemPicker` 是由库内 `Md*` 组件组成的真实路径浏览器，文件/文件夹模式、过滤、可取消单选/多选、Standard/Powerline breadcrumb、路径输入、上级/Home/刷新以及错误/空状态均在控件内完成；可见文字随继承的中英文 culture 切换，也可逐项覆盖。全部图标在固定透明 viewport 中水平、垂直居中。它不调用 Avalonia `StorageProvider`、系统 file picker 或 Android SAF。返回值是 `System.IO` 可直接使用的规范化绝对路径，但它不会绕过 Android scoped storage、应用沙箱或操作系统权限，宿主仍须选择可访问的起始目录并自行处理平台权限。
+
+`MdVideoPlayer` 提供不绑定解码器的 Material 3 transport、响应式 compact 模式、本地化、键盘控制、buffer/live/error 状态与 typed playback request。渲染器放入 `MediaContent`，因此核心包继续保持 Android/NativeAOT 安全。需要桌面真播放时单独安装 `Md3.Avalonia.LibVLC` 并部署目标平台的 native LibVLC；详见 [`docs/VIDEO_PLAYER_RESEARCH.md`](docs/VIDEO_PLAYER_RESEARCH.md)。
 
 全部按钮、Icon Button 与 FAB 模板都接入 `MdRipplePresenter`：按下位置产生涟漪，裁切到完整 container shape，并支持 Expressive / Standard / Reduced / None 四种 motion scheme。`MdButton` 的 Elevated 配置为 M3 已标记 deprecated 的兼容项，新界面应优先选用其他配置。
 
@@ -187,12 +191,13 @@ src/Md3.Avalonia/                  # 核心控件与设计令牌，不依赖具�
 ├─ Motion/                         # motion scheme、spring 令牌与转场
 └─ Themes/
    ├─ MaterialTheme.axaml
-   ├─ Tokens/                      # 11 个令牌字典
+   ├─ Tokens/                      # 13 个令牌字典
    └─ Controls/                    # 每类控件的 scoped ControlTheme
 src/Md3.Avalonia.Icons/            # 图标 provider，内嵌完整官方 TTF
 src/Md3.Avalonia.Extra/            # Flutter-inspired 扩展控件
 src/Md3.Avalonia.<Vendor>/         # 12 个 opt-in 第三方主题包，各自唯一引入上游依赖
 src/Md3.Avalonia.Notifications/    # 原生系统通知，独立于 Avalonia UI
+src/Md3.Avalonia.LibVLC/           # 可选桌面 LibVLCSharp 真播放适配器
 
 gallery/Md3.Avalonia.Gallery/          # 桌面 Gallery：108 个组件页 + Theme Lab
 gallery/Md3.Avalonia.Gallery.Android/  # net10.0-android single-view 宿主
@@ -208,7 +213,7 @@ spec-snapshot/                         # 外部来源的期望值 oracle 与棘�
 
 ```bash
 python3 scripts/verify-fonts.py     # 校验内嵌字体
-bash scripts/build-nuget.sh         # 构建十八个 .nupkg / .snupkg
+bash scripts/build-nuget.sh         # 构建十九个 .nupkg / .snupkg
 
 dotnet build gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj -c Release
 dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release
@@ -238,7 +243,7 @@ bash scripts/publish-gallery-aot.sh --rid linux-x64 --smoke-scenario file-system
 
 脚本会断言产物是原生可执行文件且旁边没有托管 dll。`--smoke` 在 xvfb 下实际启动该二进制；`--smoke-scenario file-system-picker` 还会在原生进程中打开该 Gallery 页面，实例化控件模板，枚举临时真实目录，并验证过滤、选择和确认路径，只有进程写出成功标记才会通过。`.github/workflows/aot-probe.yml` 在 main 与 arena 分支上运行该定向场景。
 
-发布门禁会构建十八个包，并严格检查十八个 `.nupkg`、十八个 `.snupkg`、统一版本与已内嵌的官方字体。发布使用 NuGet Trusted Publishing，配置步骤见 [`docs/PUBLISHING.md`](docs/PUBLISHING.md)。
+发布门禁会构建十九个包，并严格检查十九个 `.nupkg`、十九个 `.snupkg`、统一版本与已内嵌的官方字体。发布使用 NuGet Trusted Publishing，配置步骤见 [`docs/PUBLISHING.md`](docs/PUBLISHING.md)。
 
 每次 build、test 或 pack 结束后必须立即清理编译产物。仓库不交付 `bin/`、`obj/`、`TestResults/`、DLL、PDB、NuGet 包、APK 或 AAB；`docs/*.png` 是保留的文档参考图。
 
@@ -257,12 +262,13 @@ bash scripts/publish-gallery-aot.sh --rid linux-x64 --smoke-scenario file-system
 | [`docs/COMPONENT_QUALITY_CHECKLIST.md`](docs/COMPONENT_QUALITY_CHECKLIST.md) | 重复缺陷复核清单 |
 | [`docs/BORDERLESS_WINDOW_PLAN.md`](docs/BORDERLESS_WINDOW_PLAN.md) | 无边框窗口的 API 与平台限制 |
 | [`src/Md3.Avalonia.Notifications/README.md`](src/Md3.Avalonia.Notifications/README.md) | 系统通知的用法与平台前置条件 |
+| [`src/Md3.Avalonia.LibVLC/README.md`](src/Md3.Avalonia.LibVLC/README.md) | 可选视频后端与 native LibVLC 部署边界 |
 
 ## 已知边界
 
 - **人工验收未签署。** Narrator、VoiceOver、Orca 与 TalkBack 必须由具备对应 OS 与辅助技术的人员按发布清单验收；Android APK 构建成功不等于真机验收，ARM64、旋转、生命周期与 TalkBack 仍需在设备上签署，结果记录于 [`docs/RELEASE_VALIDATION.md`](docs/RELEASE_VALIDATION.md)。
 - **动效。** Ripple、spring 令牌与继承式 motion scheme 已建立，shared-axis、fade-through、container transform 与 animated visibility 四种 M3 转场已实化（`MdRevealHost` 让出布局空间并裁剪，`MdMorphPanel` 插值两端尺寸），但对 `Control` 类型的内容不做退场叠化。
-- **AOT。** 十八个包均声明 `IsTrimmable` + `IsAotCompatible` 并启用相应分析器，主题 JSON 使用源生成序列化；Linux x64 原生 Gallery 已发布并在 xvfb 下 smoke-run。AOT workflow 会报告诊断，但诊断数为零不代表 Windows、macOS、Android 或使用方应用的 AOT 验收已通过。
+- **AOT。** 除可选 native `Md3.Avalonia.LibVLC` adapter 外，其余十八个包均声明 `IsTrimmable` + `IsAotCompatible` 并启用相应分析器，主题 JSON 使用源生成序列化；Linux x64 原生 Gallery 已发布并在 xvfb 下 smoke-run。LibVLC adapter 明确不是 trimming/AOT 兼容包，也不会进入核心或 Android 依赖图。AOT workflow 会报告诊断，但诊断数为零不代表 Windows、macOS、Android 或使用方应用的 AOT 验收已通过。
 - **Android 返回手势与安全区。** `MdBackNavigation` 覆盖 dialog、sheet、drawer、search、menu、FAB menu 与两个 picker，`MdSafeArea` 提供按边内缩；headless 行为有回归测试，真机手势动画与挖孔几何仍需人工验收。
 - **RTL 与多语种。** 相关适配代码持续保留，但完整 RTL/多语种布局与屏幕阅读器人工验收当前不作为预览版阻塞项。
 - **字体来源。** 完整 Material Symbols Rounded variable TTF 与真实 Lite 子集已提交并自动打包；CI 以固定 upstream commit、SHA-256、variable tables 与 glyph 数量阻止占位或替代字体混入发布。

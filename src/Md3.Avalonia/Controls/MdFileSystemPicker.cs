@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO.Enumeration;
 using System.Security;
 using Avalonia;
@@ -10,6 +11,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Md3.Avalonia.Localization;
 
 namespace Md3.Avalonia.Controls;
 
@@ -34,7 +36,7 @@ namespace Md3.Avalonia.Controls;
 [TemplatePart("PART_RefreshButton", typeof(MdIconButton))]
 [TemplatePart("PART_ConfirmButton", typeof(MdButton))]
 [TemplatePart("PART_CancelButton", typeof(MdButton))]
-[PseudoClasses(":file-mode", ":folder-mode", ":multiple", ":compact", ":editing-path", ":loading", ":empty", ":error")]
+[PseudoClasses(":file-mode", ":folder-mode", ":multiple", ":compact", ":powerline-breadcrumb", ":editing-path", ":loading", ":empty", ":error")]
 public sealed class MdFileSystemPicker : TemplatedControl
 {
     public static readonly StyledProperty<MdFileSystemPickerMode> ModeProperty =
@@ -52,6 +54,9 @@ public sealed class MdFileSystemPicker : TemplatedControl
     public static readonly StyledProperty<bool> ShowHiddenItemsProperty =
         AvaloniaProperty.Register<MdFileSystemPicker, bool>(nameof(ShowHiddenItems));
 
+    public static readonly StyledProperty<MdFileSystemBreadcrumbStyle> BreadcrumbStyleProperty =
+        AvaloniaProperty.Register<MdFileSystemPicker, MdFileSystemBreadcrumbStyle>(nameof(BreadcrumbStyle));
+
     public static readonly StyledProperty<object?> TitleProperty =
         AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(Title), "Choose a file-system path");
 
@@ -66,6 +71,48 @@ public sealed class MdFileSystemPicker : TemplatedControl
 
     public static readonly StyledProperty<object?> EmptyTextProperty =
         AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(EmptyText), "No matching items in this folder.");
+
+    public static readonly StyledProperty<object?> QuickAccessTextProperty =
+        AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(QuickAccessText), "Quick access");
+
+    public static readonly StyledProperty<object?> HomeTextProperty =
+        AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(HomeText), "Home");
+
+    public static readonly StyledProperty<object?> RootTextProperty =
+        AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(RootText), "File-system root");
+
+    public static readonly StyledProperty<object?> FilesTextProperty =
+        AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(FilesText), "Files");
+
+    public static readonly StyledProperty<object?> FoldersTextProperty =
+        AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(FoldersText), "Folders");
+
+    public static readonly StyledProperty<object?> SelectionModeTextProperty =
+        AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(SelectionModeText), "Selection mode");
+
+    public static readonly StyledProperty<object?> ShowHiddenTextProperty =
+        AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(ShowHiddenText), "Show hidden");
+
+    public static readonly StyledProperty<object?> LoadingTextProperty =
+        AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(LoadingText), "Loading folder…");
+
+    public static readonly StyledProperty<object?> ErrorHintTextProperty =
+        AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(ErrorHintText), "Enter another accessible path or go to Home.");
+
+    public static readonly StyledProperty<object?> ParentFolderTextProperty =
+        AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(ParentFolderText), "Parent folder");
+
+    public static readonly StyledProperty<object?> RefreshTextProperty =
+        AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(RefreshText), "Refresh folder");
+
+    public static readonly StyledProperty<object?> EditPathTextProperty =
+        AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(EditPathText), "Edit full path");
+
+    public static readonly StyledProperty<object?> EntriesTextProperty =
+        AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(EntriesText), "Files and folders");
+
+    public static readonly StyledProperty<object?> OpenFolderTextProperty =
+        AvaloniaProperty.Register<MdFileSystemPicker, object?>(nameof(OpenFolderText), "Open folder");
 
     public static readonly DirectProperty<MdFileSystemPicker, IReadOnlyList<MdFileSystemEntry>> EntriesProperty =
         AvaloniaProperty.RegisterDirect<MdFileSystemPicker, IReadOnlyList<MdFileSystemEntry>>(
@@ -127,6 +174,25 @@ public sealed class MdFileSystemPicker : TemplatedControl
     private MdButton? _confirmButton;
     private MdButton? _cancelButton;
     private bool _isEditingPath;
+    private object? _defaultTitle = "Choose a file-system path";
+    private object? _defaultPathLabel = "Location";
+    private object? _defaultConfirmText = "Choose";
+    private object? _defaultCancelText = "Cancel";
+    private object? _defaultEmptyText = "No matching items in this folder.";
+    private object? _defaultQuickAccessText = "Quick access";
+    private object? _defaultHomeText = "Home";
+    private object? _defaultRootText = "File-system root";
+    private object? _defaultFilesText = "Files";
+    private object? _defaultFoldersText = "Folders";
+    private object? _defaultSelectionModeText = "Selection mode";
+    private object? _defaultShowHiddenText = "Show hidden";
+    private object? _defaultLoadingText = "Loading folder…";
+    private object? _defaultErrorHintText = "Enter another accessible path or go to Home.";
+    private object? _defaultParentFolderText = "Parent folder";
+    private object? _defaultRefreshText = "Refresh folder";
+    private object? _defaultEditPathText = "Edit full path";
+    private object? _defaultEntriesText = "Files and folders";
+    private object? _defaultOpenFolderText = "Open folder";
 
     static MdFileSystemPicker()
     {
@@ -135,12 +201,15 @@ public sealed class MdFileSystemPicker : TemplatedControl
         InitialDirectoryProperty.Changed.AddClassHandler<MdFileSystemPicker>((control, _) => control.OnInitialDirectoryChanged());
         FilePatternsProperty.Changed.AddClassHandler<MdFileSystemPicker>((control, _) => control.OnOptionsChanged(reload: true));
         ShowHiddenItemsProperty.Changed.AddClassHandler<MdFileSystemPicker>((control, _) => control.OnOptionsChanged(reload: true));
+        BreadcrumbStyleProperty.Changed.AddClassHandler<MdFileSystemPicker>((control, _) => control.UpdatePseudoClasses());
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdFileSystemPicker>((control, _) => control.OnCultureChanged());
         BoundsProperty.Changed.AddClassHandler<MdFileSystemPicker>((control, _) => control.UpdatePseudoClasses());
     }
 
     public MdFileSystemPicker()
     {
         Focusable = true;
+        UpdateLocalizedText();
         UpdatePseudoClasses();
         UpdateSelectionState();
     }
@@ -164,11 +233,29 @@ public sealed class MdFileSystemPicker : TemplatedControl
     /// <summary>Whether hidden entries are shown.</summary>
     public bool ShowHiddenItems { get => GetValue(ShowHiddenItemsProperty); set => SetValue(ShowHiddenItemsProperty, value); }
 
+    /// <summary>The built-in visual treatment used for breadcrumb path segments.</summary>
+    public MdFileSystemBreadcrumbStyle BreadcrumbStyle { get => GetValue(BreadcrumbStyleProperty); set => SetValue(BreadcrumbStyleProperty, value); }
+
+    /// <summary>Header title. A locally supplied value is preserved across culture and mode changes.</summary>
     public object? Title { get => GetValue(TitleProperty); set => SetValue(TitleProperty, value); }
     public object? PathLabel { get => GetValue(PathLabelProperty); set => SetValue(PathLabelProperty, value); }
     public object? ConfirmText { get => GetValue(ConfirmTextProperty); set => SetValue(ConfirmTextProperty, value); }
     public object? CancelText { get => GetValue(CancelTextProperty); set => SetValue(CancelTextProperty, value); }
     public object? EmptyText { get => GetValue(EmptyTextProperty); set => SetValue(EmptyTextProperty, value); }
+    public object? QuickAccessText { get => GetValue(QuickAccessTextProperty); set => SetValue(QuickAccessTextProperty, value); }
+    public object? HomeText { get => GetValue(HomeTextProperty); set => SetValue(HomeTextProperty, value); }
+    public object? RootText { get => GetValue(RootTextProperty); set => SetValue(RootTextProperty, value); }
+    public object? FilesText { get => GetValue(FilesTextProperty); set => SetValue(FilesTextProperty, value); }
+    public object? FoldersText { get => GetValue(FoldersTextProperty); set => SetValue(FoldersTextProperty, value); }
+    public object? SelectionModeText { get => GetValue(SelectionModeTextProperty); set => SetValue(SelectionModeTextProperty, value); }
+    public object? ShowHiddenText { get => GetValue(ShowHiddenTextProperty); set => SetValue(ShowHiddenTextProperty, value); }
+    public object? LoadingText { get => GetValue(LoadingTextProperty); set => SetValue(LoadingTextProperty, value); }
+    public object? ErrorHintText { get => GetValue(ErrorHintTextProperty); set => SetValue(ErrorHintTextProperty, value); }
+    public object? ParentFolderText { get => GetValue(ParentFolderTextProperty); set => SetValue(ParentFolderTextProperty, value); }
+    public object? RefreshText { get => GetValue(RefreshTextProperty); set => SetValue(RefreshTextProperty, value); }
+    public object? EditPathText { get => GetValue(EditPathTextProperty); set => SetValue(EditPathTextProperty, value); }
+    public object? EntriesText { get => GetValue(EntriesTextProperty); set => SetValue(EntriesTextProperty, value); }
+    public object? OpenFolderText { get => GetValue(OpenFolderTextProperty); set => SetValue(OpenFolderTextProperty, value); }
 
     /// <summary>The directory entries currently visible after mode and pattern filtering.</summary>
     public IReadOnlyList<MdFileSystemEntry> Entries
@@ -351,7 +438,11 @@ public sealed class MdFileSystemPicker : TemplatedControl
 
         try
         {
-            var options = new EnumerationOptionsSnapshot(Mode, ShowHiddenItems, NormalizePatterns(FilePatterns));
+            var options = new EnumerationOptionsSnapshot(
+                Mode,
+                ShowHiddenItems,
+                NormalizePatterns(FilePatterns),
+                MdLocalization.ResolveCulture(this));
             var entries = await Task.Run(() => Enumerate(fullPath, options, navigation.Token), navigation.Token);
             navigation.Token.ThrowIfCancellationRequested();
             if (version != _navigationVersion) return false;
@@ -431,6 +522,7 @@ public sealed class MdFileSystemPicker : TemplatedControl
 
     private void OnOptionsChanged(bool reload)
     {
+        UpdateLocalizedText();
         ConfigureSelectionMode();
         UpdatePseudoClasses();
         UpdateSelectionState();
@@ -444,12 +536,54 @@ public sealed class MdFileSystemPicker : TemplatedControl
             _ = NavigateAsync(InitialDirectory);
     }
 
+    private void OnCultureChanged()
+    {
+        UpdateLocalizedText();
+        UpdateSelectionState();
+        if (_isAttached && CurrentDirectory is not null)
+            _ = RefreshAsync();
+    }
+
+    private void UpdateLocalizedText()
+    {
+        UpdateLocalizedProperty(TitleProperty, ref _defaultTitle,
+            Mode == MdFileSystemPickerMode.Folder ? "FileSystemChooseFolder" : "FileSystemChooseFile");
+        UpdateLocalizedProperty(PathLabelProperty, ref _defaultPathLabel, "FileSystemLocation");
+        UpdateLocalizedProperty(ConfirmTextProperty, ref _defaultConfirmText, "FileSystemChoose");
+        UpdateLocalizedProperty(CancelTextProperty, ref _defaultCancelText, "Cancel");
+        UpdateLocalizedProperty(EmptyTextProperty, ref _defaultEmptyText, "FileSystemEmpty");
+        UpdateLocalizedProperty(QuickAccessTextProperty, ref _defaultQuickAccessText, "FileSystemQuickAccess");
+        UpdateLocalizedProperty(HomeTextProperty, ref _defaultHomeText, "FileSystemHome");
+        UpdateLocalizedProperty(RootTextProperty, ref _defaultRootText, "FileSystemRoot");
+        UpdateLocalizedProperty(FilesTextProperty, ref _defaultFilesText, "FileSystemFiles");
+        UpdateLocalizedProperty(FoldersTextProperty, ref _defaultFoldersText, "FileSystemFolders");
+        UpdateLocalizedProperty(SelectionModeTextProperty, ref _defaultSelectionModeText, "FileSystemSelectionMode");
+        UpdateLocalizedProperty(ShowHiddenTextProperty, ref _defaultShowHiddenText, "FileSystemShowHidden");
+        UpdateLocalizedProperty(LoadingTextProperty, ref _defaultLoadingText, "FileSystemLoading");
+        UpdateLocalizedProperty(ErrorHintTextProperty, ref _defaultErrorHintText, "FileSystemErrorHint");
+        UpdateLocalizedProperty(ParentFolderTextProperty, ref _defaultParentFolderText, "FileSystemParentFolder");
+        UpdateLocalizedProperty(RefreshTextProperty, ref _defaultRefreshText, "FileSystemRefresh");
+        UpdateLocalizedProperty(EditPathTextProperty, ref _defaultEditPathText, "FileSystemEditPath");
+        UpdateLocalizedProperty(EntriesTextProperty, ref _defaultEntriesText, "FileSystemEntries");
+        UpdateLocalizedProperty(OpenFolderTextProperty, ref _defaultOpenFolderText, "FileSystemOpenFolder");
+    }
+
+    private void UpdateLocalizedProperty(
+        StyledProperty<object?> property,
+        ref object? defaultValue,
+        string localizationKey)
+    {
+        if (!Equals(GetValue(property), defaultValue)) return;
+        defaultValue = MdLocalization.GetString(localizationKey, this);
+        SetCurrentValue(property, defaultValue);
+    }
+
     private void ConfigureSelectionMode()
     {
         if (_itemsHost is null) return;
         _itemsHost.SelectionMode = AllowMultiple
             ? SelectionMode.Multiple | SelectionMode.Toggle
-            : SelectionMode.Single;
+            : SelectionMode.Single | SelectionMode.Toggle;
         _itemsHost.UnselectAll();
     }
 
@@ -459,6 +593,7 @@ public sealed class MdFileSystemPicker : TemplatedControl
         PseudoClasses.Set(":folder-mode", Mode == MdFileSystemPickerMode.Folder);
         PseudoClasses.Set(":multiple", AllowMultiple);
         PseudoClasses.Set(":compact", Bounds.Width > 0 && Bounds.Width < 760);
+        PseudoClasses.Set(":powerline-breadcrumb", BreadcrumbStyle == MdFileSystemBreadcrumbStyle.Powerline);
         PseudoClasses.Set(":editing-path", _isEditingPath);
         PseudoClasses.Set(":loading", IsLoading);
         PseudoClasses.Set(":empty", !IsLoading && ErrorMessage is null && Entries.Count == 0);
@@ -483,11 +618,13 @@ public sealed class MdFileSystemPicker : TemplatedControl
                      (paths.Length > 0 || Mode == MdFileSystemPickerMode.Folder && CurrentDirectory is not null);
         SelectionSummary = paths.Length switch
         {
-            > 1 => $"{paths.Length} items selected",
+            > 1 => MdLocalization.Format("FileSystemItemsSelected", this, paths.Length),
             1 => paths[0],
             _ when Mode == MdFileSystemPickerMode.Folder && CurrentDirectory is not null =>
-                "Choose selects the current folder.",
-            _ => "No file selected."
+                MdLocalization.GetString("FileSystemChooseCurrentFolder", this),
+            _ when Mode == MdFileSystemPickerMode.Folder =>
+                MdLocalization.GetString("FileSystemNoFolderSelected", this),
+            _ => MdLocalization.GetString("FileSystemNoFileSelected", this)
         };
     }
 
@@ -649,7 +786,8 @@ public sealed class MdFileSystemPicker : TemplatedControl
                     Path.GetFullPath(info.FullName),
                     isDirectory,
                     info.LastWriteTime,
-                    size));
+                    size,
+                    options.Culture));
             }
             catch (Exception exception) when (IsExpectedFileSystemFailure(exception))
             {
@@ -659,7 +797,7 @@ public sealed class MdFileSystemPicker : TemplatedControl
 
         return entries
             .OrderByDescending(entry => entry.IsDirectory)
-            .ThenBy(entry => entry.Name, StringComparer.CurrentCultureIgnoreCase)
+            .ThenBy(entry => entry.Name, StringComparer.Create(options.Culture, ignoreCase: true))
             .ToArray();
     }
 
@@ -756,7 +894,8 @@ public sealed class MdFileSystemPicker : TemplatedControl
     private sealed record EnumerationOptionsSnapshot(
         MdFileSystemPickerMode Mode,
         bool ShowHiddenItems,
-        IReadOnlyList<string> Patterns);
+        IReadOnlyList<string> Patterns,
+        CultureInfo Culture);
 }
 
 internal sealed class MdFileSystemPickerAutomationPeer(MdFileSystemPicker owner) : ControlAutomationPeer(owner)

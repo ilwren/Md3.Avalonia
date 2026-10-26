@@ -4,12 +4,16 @@ public enum MdPlaybackRequest
 {
     Play,
     Pause,
+    Stop,
     Previous,
     Next,
     Rewind,
     Forward,
+    Seek,
     Mute,
     Unmute,
+    SetVolume,
+    SetPlaybackRate,
     EnterFullScreen,
     ExitFullScreen
 }

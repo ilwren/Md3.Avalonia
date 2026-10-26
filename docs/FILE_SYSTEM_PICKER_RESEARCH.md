@@ -75,6 +75,17 @@ The resulting visual direction is therefore NFile's mobile information hierarchy
 `filesystem_picker`'s breadcrumb clarity, constrained to standard Material 3 surfaces, typography,
 state colors, touch targets, and this repository's own icon geometry.
 
+## Follow-up interaction and presentation decisions
+
+The responsive redesign was subsequently hardened in four areas:
+
+- every glyph is drawn in a fixed 24×24 transparent `Canvas` and scaled by a centered `Viewbox`, so asymmetric path bounds cannot move the visual viewport off-center;
+- single selection uses Avalonia's native `SelectionMode.Single | SelectionMode.Toggle`, matching multiple mode's ability to clear an accidental selection;
+- `BreadcrumbStyle` exposes `Standard` and connected `Powerline` presentations without changing path semantics;
+- visible labels, state messages, entry type/date/number formatting, tooltips and automation names follow inherited `MdLocalization.Culture` (English/Chinese). Public text properties such as `Title`, `PathLabel`, action labels and state labels remain locally overridable and are not overwritten by later culture changes.
+
+These are additive clean-room decisions built from the same Avalonia selection/localization primitives; no reference package source or icon asset was copied.
+
 ## Platform boundary
 
 Not using SAF does not defeat Android scoped storage. App-private directories work directly. Shared
