@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -31,8 +32,8 @@ public sealed class MdLibVlcVideoPlayer : MdVideoPlayer, IDisposable
     private readonly Image _videoSurface = new()
     {
         Stretch = Stretch.Uniform,
-        HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Stretch,
-        VerticalAlignment = Avalonia.Layout.VerticalAlignment.Stretch
+        HorizontalAlignment = HorizontalAlignment.Stretch,
+        VerticalAlignment = VerticalAlignment.Stretch
     };
     private readonly object _videoSync = new();
     private VlcEngine? _libVlc;
