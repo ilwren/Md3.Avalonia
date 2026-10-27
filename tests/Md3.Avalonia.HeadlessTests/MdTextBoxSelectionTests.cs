@@ -257,6 +257,42 @@ public class MdTextBoxSelectionTests
     }
 
     [AvaloniaFact]
+    public void PointerDrag_Then_Type_Replaces_The_Dragged_Range_At_The_Visible_Caret()
+    {
+        using var host = Show(new MdTextBox { Text = Latin });
+
+        DragCharacters(host, 4, 18);
+        Assert.NotEqual(host.Box.SelectionStart, host.Box.SelectionEnd);
+        TypeOverCurrentSelection(host, Latin, "X", "typing after a real pointer drag");
+    }
+
+    [AvaloniaFact]
+    public void Cjk_DoubleClick_Then_Type_Uses_The_Rendered_Selection_And_Caret()
+    {
+        using var host = Show(new MdTextBox { Text = Cjk });
+
+        DoubleClickCharacter(host, 5);
+        var low = Math.Min(host.Box.SelectionStart, host.Box.SelectionEnd);
+        var high = Math.Max(host.Box.SelectionStart, host.Box.SelectionEnd);
+        Assert.True((low == 5 && high == 6) || (low == 5 && high == 5),
+            $"CJK double click produced unexpected selection [{host.Box.SelectionStart},{host.Box.SelectionEnd}]");
+        TypeOverCurrentSelection(host, Cjk, "替", "typing after a CJK double click");
+    }
+
+    [AvaloniaFact]
+    public void Latin_DoubleClick_Then_Type_Uses_The_Rendered_Selection_And_Caret()
+    {
+        using var host = Show(new MdTextBox { Text = Latin });
+
+        DoubleClickCharacter(host, 14);
+        var low = Math.Min(host.Box.SelectionStart, host.Box.SelectionEnd);
+        var high = Math.Max(host.Box.SelectionStart, host.Box.SelectionEnd);
+        Assert.True((low == 9 && high == 17) || (low == 14 && high == 14),
+            $"Latin double click produced unexpected selection [{host.Box.SelectionStart},{host.Box.SelectionEnd}]");
+        TypeOverCurrentSelection(host, Latin, "word", "typing after a Latin double click");
+    }
+
+    [AvaloniaFact]
     public void Click_Right_Of_The_Text_Puts_Caret_At_End_Without_Selection()
     {
         using var host = Show(new MdTextBox
@@ -367,6 +403,12 @@ public class MdTextBoxSelectionTests
         Dispatcher.UIThread.RunJobs();
     }
 
+    private static void DoubleClickCharacter(Host host, int index)
+    {
+        ClickCharacter(host, index);
+        ClickCharacter(host, index);
+    }
+
     private static void DragCharacters(Host host, int from, int to)
     {
         var start = CharacterPoint(host, from);
@@ -376,6 +418,21 @@ public class MdTextBoxSelectionTests
         MoveInSteps(host, start, end);
         host.Window.MouseUp(end, MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
+    }
+
+    private static void TypeOverCurrentSelection(Host host, string original, string replacement, string what)
+    {
+        var low = Math.Min(host.Box.SelectionStart, host.Box.SelectionEnd);
+        var high = Math.Max(host.Box.SelectionStart, host.Box.SelectionEnd);
+        var expected = original.Remove(low, high - low).Insert(low, replacement);
+        var expectedCaret = low + replacement.Length;
+
+        host.Window.KeyTextInput(replacement);
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(expected, host.Box.Text);
+        AssertSelection(host, what, expectedCaret, expectedCaret, expectedCaret);
+        Assert.Equal(host.Box.CaretIndex, host.Presenter.CaretIndex);
     }
 
     private static void MoveInSteps(Host host, Point from, Point to)
@@ -388,29 +445,28 @@ public class MdTextBoxSelectionTests
             host.Window.MouseMove(new Point(
                 from.X + (to.X - from.X) * t,
                 from.Y + (to.Y - from.Y) * t),
-                RawInputModifiers.None);
+                RawInputModifiers.LeftMouseButton);
             Dispatcher.UIThread.RunJobs();
         }
     }
 
     /// <summary>
-    /// Headless pointer moves carry no live button-held state, so the core's move-time selection
-    /// extension (which gates on the pressed button) does not replay here: after a press-drag-
-    /// release the field holds either the press-point caret or a selection the platform was able
-    /// to extend. The defect being pinned is the anchor: the selection must start at the press
-    /// point, never at the beginning of the text.
+    /// The move events retain the left-button modifier so Avalonia's real pointer-capture and
+    /// move-time selection extension execute. Selection orientation differs between the stock
+    /// pipeline and the CJK guard, so either endpoint may be the original press anchor.
     /// </summary>
     private static void AssertPressAnchored(Host host, string what, int pressedIndex, int maxEndExclusive = int.MaxValue)
     {
         var start = host.Box.SelectionStart;
         var end = host.Box.SelectionEnd;
         var caret = host.Box.CaretIndex;
-        var high = Math.Min(pressedIndex + 1, maxEndExclusive - 1);
-        Assert.True(start >= pressedIndex - 1 && start <= high,
+        var low = Math.Min(start, end);
+        var high = Math.Max(start, end);
+        Assert.True(Math.Abs(start - pressedIndex) <= 1 || Math.Abs(end - pressedIndex) <= 1,
             $"{what}: the selection [{start},{end}] must be anchored at the press point " +
             $"(character {pressedIndex}), never at the start of the text");
-        Assert.True(end >= start, $"{what}: the selection end {end} is before its start {start}");
-        Assert.True(end < maxEndExclusive,
+        Assert.True(low >= 0, $"{what}: the selection [{start},{end}] starts before the text");
+        Assert.True(high < maxEndExclusive,
             $"{what}: the selection [{start},{end}] ran past character {maxEndExclusive - 1}; " +
             "a CJK drag must not extend to the whole run");
         Assert.True(Math.Abs(caret - start) <= 1 || Math.Abs(caret - end) <= 1,
