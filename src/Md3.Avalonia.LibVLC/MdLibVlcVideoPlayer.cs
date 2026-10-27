@@ -173,14 +173,16 @@ public sealed class MdLibVlcVideoPlayer : MdVideoPlayer, IDisposable
             {
                 EnsurePlayer();
                 if (_mediaPlayer!.Media is null && Source is not null) OpenSource();
-                _mediaPlayer.Play();
+                ResumeOrRestartPlayback();
                 return;
             }
             if (_mediaPlayer is null) return;
             switch (e.Request)
             {
                 case MdPlaybackRequest.Pause:
-                    _mediaPlayer.Pause();
+                    // Pause() is a toggle in LibVLCSharp. An explicit value prevents a
+                    // repeated or delayed request from accidentally resuming playback.
+                    _mediaPlayer.SetPause(true);
                     break;
                 case MdPlaybackRequest.Stop:
                     _mediaPlayer.Stop();
@@ -209,6 +211,28 @@ public sealed class MdLibVlcVideoPlayer : MdVideoPlayer, IDisposable
             ErrorMessage = exception.Message;
             IsPlaying = false;
         }
+    }
+
+    private void ResumeOrRestartPlayback()
+    {
+        if (_mediaPlayer is null) return;
+
+        if (_mediaPlayer.State == VLCState.Paused)
+        {
+            // MediaPlayer.Play() intentionally does nothing once playback has started;
+            // SetPause(false) is LibVLC's explicit resume operation.
+            _mediaPlayer.SetPause(false);
+            return;
+        }
+
+        if (_mediaPlayer.State == VLCState.Ended)
+        {
+            // Move Ended back to a fresh playback state before replaying. Stop() also
+            // rewinds the retained Media to its beginning, matching the loop path below.
+            _mediaPlayer.Stop();
+        }
+
+        _mediaPlayer.Play();
     }
 
     private uint OnVideoFormat(

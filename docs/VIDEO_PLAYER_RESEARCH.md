@@ -1,6 +1,6 @@
 # Video-player control research
 
-Research date: 2026-10-26
+Research date: 2026-10-27
 
 `MdVideoPlayer` follows the project's required sequence: inspect an Avalonia control first, redesign
 its public seam with existing Material controls second, and study Flutter equivalents last.
@@ -45,13 +45,16 @@ surface controls. It provides:
 - an expanded transport with volume/rate and a compact transport that keeps the critical actions;
 - component geometry under `Md.Comp.VideoPlayer.*` and runtime system colors/type roles.
 
-The follow-up visual pass keeps the renderer and transport in one clipped surface. A transparent-to-
-black bottom scrim holds title, seek and the compact desktop action row, while a large center action
-appears only when paused. Controls fade as a group and never reserve a detached footer below the
-picture. Composited backends can still place custom overlays inside their own `MediaContent`. The
-core does not pretend to implement fullscreen window ownership: it changes and reports player state
-while the host decides how its window, dialog, mobile orientation, or picture-in-picture surface
-should change.
+The second visual pass keeps the renderer and transport in one clipped surface but removes the
+previous heavy bottom gradient and duplicate play actions. A quiet full-frame veil carries compact
+metadata, a stable three-action rewind/play/forward cluster stays in the visual center, and seek,
+time, volume, rate and fullscreen share one rounded floating dock. The play action remains in the
+same location while its glyph changes, so pause does not make the target disappear. Compact mode
+removes only the nonessential volume track, rate action and supporting line. Controls fade as a group
+and never reserve a detached footer below the picture. Composited backends can still place custom
+overlays inside their own `MediaContent`. The core does not pretend to implement fullscreen window
+ownership: it changes and reports player state while the host decides how its window, dialog, mobile
+orientation, or picture-in-picture surface should change.
 
 ## 3. Flutter equivalents studied last
 
@@ -68,11 +71,29 @@ shell matches the chosen backend-neutral architecture. Its in-picture bottom bar
 250 ms control opacity, playback speed, localized labels and fullscreen request informed the revised
 shell and the existing state/request seam.
 
-[`better_player`](https://github.com/jhomlala/betterplayer) was reviewed for advanced use cases:
-live streams, buffering, subtitles/audio tracks, HLS quality selection, retry, playlist and
-picture-in-picture. This first control intentionally implements the stable transport foundation and
-leaves decoder-specific tracks, DRM, caching and streaming policy to the backend. No Dart source,
-assets, icon data or visual trade dress was copied.
+[`better_player`](https://github.com/jhomlala/betterplayer) was reviewed again for the second visual
+pass, down to its Material top bar, middle row and bottom bar. Its center rewind/play/forward grouping,
+explicit finished-video replay action, stable circular hit targets, bottom-bar slide/fade transition
+and progress-first hierarchy directly informed the new control grouping. Live streams, buffering,
+subtitles/audio tracks, HLS quality selection, retry, playlist and picture-in-picture remain useful
+future references; decoder-specific tracks, DRM, caching and streaming policy stay in the backend.
+
+[`pod_player`](https://github.com/newtaDev/pod_player) provided a simpler desktop/web counterpoint:
+a restrained `black38` video veil, progress above one concise action row, stable play/pause action,
+and separate mobile/web overlays. It reinforced reducing decorative layers instead of adding more
+Material containers. `MdVideoPlayer` combines that restraint with a single rounded Material 3 dock
+rather than copying PodPlayer's visuals.
+
+No Dart source, assets, icon data or visual trade dress was copied from any reference.
+
+## Pause, resume and replay semantics
+
+LibVLCSharp's `MediaPlayer.Play()` starts stopped media but intentionally has no effect when playback
+has already started. Its parameterless `Pause()` toggles state. The adapter therefore maps Pause to
+`SetPause(true)`, maps Play from `VLCState.Paused` to `SetPause(false)`, and maps Play from
+`VLCState.Ended` through Stop and a fresh Play. This keeps duplicate transport requests idempotent
+and gives the same button an explicit replay path at end-of-media. BetterPlayer's distinction between
+resume and finished-video replay was used as the UI-state reference.
 
 ## Gallery validation asset
 

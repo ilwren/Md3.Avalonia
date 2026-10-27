@@ -38,7 +38,25 @@ public sealed class MdVideoPlayerTests
             Assert.Equal(MdPlaybackRequest.Play, Assert.Single(requests).Request);
 
             requests.Clear();
-            player.SeekBy(TimeSpan.FromSeconds(10));
+            player.IsPlaying = true;
+            play.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.Equal(MdPlaybackRequest.Pause, Assert.Single(requests).Request);
+
+            requests.Clear();
+            player.IsPlaying = false;
+            play.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.Equal(MdPlaybackRequest.Play, Assert.Single(requests).Request);
+
+            requests.Clear();
+            player.Position = player.Duration;
+            play.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.Equal(MdPlaybackRequest.Play, Assert.Single(requests).Request);
+
+            requests.Clear();
+            player.Position = TimeSpan.FromSeconds(35);
+            var forwardButton = player.GetVisualDescendants().OfType<MdIconButton>()
+                .Single(control => control.Name == "PART_ForwardButton");
+            forwardButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             var forward = Assert.Single(requests);
             Assert.Equal(MdPlaybackRequest.Forward, forward.Request);
             Assert.Equal(TimeSpan.FromSeconds(45), forward.Position);
@@ -65,6 +83,8 @@ public sealed class MdVideoPlayerTests
         {
             Dispatcher.UIThread.RunJobs();
             Assert.Equal("播放", player.PlayPauseText);
+            Assert.Equal("后退 10 秒", player.RewindText);
+            Assert.Equal("前进 10 秒", player.ForwardText);
             Assert.Equal("静音", player.MuteText);
             Assert.Equal("进入全屏", player.FullScreenText);
 
@@ -86,7 +106,7 @@ public sealed class MdVideoPlayerTests
     }
 
     [AvaloniaFact]
-    public void Transport_Is_An_InPicture_Overlay_With_A_Central_Paused_Action_And_Motion()
+    public void Transport_Is_A_Sparse_InPicture_Overlay_With_Central_Actions_And_A_Floating_Dock()
     {
         var player = new MdVideoPlayer
         {
@@ -104,14 +124,23 @@ public sealed class MdVideoPlayerTests
             var controls = player.GetVisualDescendants().OfType<Border>()
                 .Single(control => control.Name == "PART_Controls");
             var centerPlay = player.GetVisualDescendants().OfType<MdIconButton>()
-                .Single(control => control.Name == "PART_CenterPlayButton");
+                .Single(control => control.Name == "PART_PlayPauseButton");
+            var rewind = player.GetVisualDescendants().OfType<MdIconButton>()
+                .Single(control => control.Name == "PART_RewindButton");
+            var forward = player.GetVisualDescendants().OfType<MdIconButton>()
+                .Single(control => control.Name == "PART_ForwardButton");
+            var dock = player.GetVisualDescendants().OfType<Border>()
+                .Single(control => control.Name == "PART_TransportDock");
 
             Assert.True(controls.Bounds.Height > 400);
             Assert.True(centerPlay.IsVisible);
+            Assert.True(rewind.IsVisible);
+            Assert.True(forward.IsVisible);
+            Assert.True(dock.Bounds.Width > 600);
             Assert.NotNull(controls.Transitions);
 
             player.IsPlaying = true;
-            Assert.False(centerPlay.IsVisible);
+            Assert.True(centerPlay.IsVisible);
 
             MdMotion.SetScheme(player, MdMotionScheme.None);
             Assert.Null(controls.Transitions);

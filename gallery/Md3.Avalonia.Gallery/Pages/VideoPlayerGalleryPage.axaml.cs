@@ -25,7 +25,7 @@ public partial class VideoPlayerGalleryPage : UserControl
             {
                 var player = factory(GalleryVideoBackend.ExtractBundledSample());
                 player.Title = "Material motion";
-                player.SupportingText = "Bundled local H.264/AAC sample · LibVLC desktop backend";
+                player.SupportingText = "Local H.264 · LibVLC";
                 player.PlaybackRequested += OnPlaybackRequested;
                 PlayerHost.Content = player;
                 _player = player;
@@ -65,6 +65,8 @@ public partial class VideoPlayerGalleryPage : UserControl
         switch (e.Request)
         {
             case MdPlaybackRequest.Play:
+                if (_player.Duration > TimeSpan.Zero && _player.Position >= _player.Duration)
+                    _player.Position = TimeSpan.Zero;
                 _player.IsPlaying = true;
                 _timer.Start();
                 break;
