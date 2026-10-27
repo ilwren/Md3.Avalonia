@@ -10,8 +10,7 @@
   <SolidColorBrush x:Key="Md.Comp.VideoPlayer.Controls.Scrim" Color="#3D000000" />
   <Thickness x:Key="Md.Comp.VideoPlayer.Controls.Padding">20</Thickness>
   <Thickness x:Key="Md.Comp.VideoPlayer.Compact.Controls.Padding">12</Thickness>
-  <StaticResource x:Key="Md.Comp.VideoPlayer.Overlay.Foreground"
-                  ResourceKey="Md.Sys.Color.InverseOnSurface.Brush" />
+  <SolidColorBrush x:Key="Md.Comp.VideoPlayer.Overlay.Foreground" Color="#FFFFFFFF" />
   <SolidColorBrush x:Key="Md.Comp.VideoPlayer.Overlay.SecondaryForeground" Color="#C7FFFFFF" />
 
   <SolidColorBrush x:Key="Md.Comp.VideoPlayer.TransportDock.Surface" Color="#D919191D" />
