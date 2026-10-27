@@ -77,9 +77,15 @@ internal static class MdWordSelectionGuard
 
         var currentStart = box.SelectionStart;
         var currentEnd = box.SelectionEnd;
-        if (Math.Min(currentStart, currentEnd) == start && Math.Max(currentStart, currentEnd) == end)
-            return;
+        var rangeAlreadyCorrect = Math.Min(currentStart, currentEnd) == start &&
+                                  Math.Max(currentStart, currentEnd) == end;
+        if (box.CaretIndex == caret && rangeAlreadyCorrect) return;
 
+        // The presenter is the visual pointer target while TextBox.CaretIndex is the insertion
+        // target. Selecting a non-empty range does not make Avalonia copy one to the other, so a
+        // previous caret could otherwise remain the next insertion point after this correction.
+        // Set the caret first (which temporarily collapses selection), then restore the word range.
+        box.SetCurrentValue(TextBox.CaretIndexProperty, caret);
         box.SetCurrentValue(TextBox.SelectionStartProperty, start);
         box.SetCurrentValue(TextBox.SelectionEndProperty, end);
         SetPreemptedState(box, new State { WordStart = start, WordEnd = end });

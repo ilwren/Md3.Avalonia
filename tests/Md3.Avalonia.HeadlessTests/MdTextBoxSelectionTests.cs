@@ -288,6 +288,36 @@ public class MdTextBoxSelectionTests
             $"clicking empty space to the right of the text must not select; got [{start},{end}]");
     }
 
+    [AvaloniaFact]
+    public void Selection_Then_ClickAtEnd_And_Type_Appends_At_The_Visible_Caret()
+    {
+        using var host = Show(new MdTextBox
+        {
+            Variant = MdTextBoxVariant.Filled,
+            Label = "项目名称",
+            Width = 500,
+            Text = Latin
+        });
+
+        host.Box.SelectionStart = 3;
+        host.Box.SelectionEnd = 12;
+        ClickCharacter(host, Latin.Length);
+        AssertSelection(host, "clicking the end after an old selection", Latin.Length, Latin.Length, Latin.Length);
+        Assert.Equal(host.Box.CaretIndex, host.Presenter.CaretIndex);
+
+        host.Window.KeyTextInput("!");
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(Latin + "!", host.Box.Text);
+        AssertSelection(
+            host,
+            "typing after the visible end caret",
+            Latin.Length + 1,
+            Latin.Length + 1,
+            Latin.Length + 1);
+        Assert.Equal(host.Box.CaretIndex, host.Presenter.CaretIndex);
+    }
+
     private sealed record Host(Window Window, MdTextBox Box, TextPresenter Presenter) : IDisposable
     {
         public void Dispose() => Window.Close();

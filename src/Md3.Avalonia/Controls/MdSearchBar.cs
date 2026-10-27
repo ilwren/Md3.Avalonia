@@ -64,6 +64,7 @@ public sealed class MdSearchBar : TextBox
     {
         base.OnPointerPressed(e);
         MdWordSelectionGuard.CorrectAfterPress(this, e, _textPresenter);
+        MdTextCaretSynchronizer.CopyCollapsedPresenterCaretToTextBox(this, _textPresenter);
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)
@@ -76,6 +77,14 @@ public sealed class MdSearchBar : TextBox
     {
         base.OnPointerReleased(e);
         MdWordSelectionGuard.ClearOnRelease(this, e);
+        MdTextCaretSynchronizer.CopyCollapsedPresenterCaretToTextBox(this, _textPresenter);
+    }
+
+    protected override void OnTextInput(TextInputEventArgs e)
+    {
+        MdTextCaretSynchronizer.CopyCollapsedPresenterCaretToTextBox(this, _textPresenter);
+        base.OnTextInput(e);
+        MdTextCaretSynchronizer.CopyTextBoxStateToPresenter(this, _textPresenter);
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
