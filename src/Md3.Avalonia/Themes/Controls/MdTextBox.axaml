@@ -111,10 +111,13 @@
                                       RenderTransform="scale(1) translate(0px, 0px)"
                                       RenderTransformOrigin="0%,50%" />
 
+                    <!-- Keep the interactive text surface in layout coordinates. The floating label
+                         may animate, but the TextPresenter must not be render-transformed: Avalonia's
+                         TextBox converts every pointer position directly into presenter coordinates
+                         before TextLayout.HitTestPoint chooses the nearest insertion boundary. -->
                     <Grid x:Name="PART_InputRow"
                           ColumnDefinitions="Auto,*,Auto"
-                          VerticalAlignment="Center"
-                          RenderTransform="translate(0px, 0px)">
+                          VerticalAlignment="Center">
                       <TextBlock x:Name="PART_Prefix"
                                  Grid.Column="0"
                                  Margin="0,0,4,0"
@@ -362,15 +365,16 @@
       <Setter Property="Margin" Value="-4,-8,0,0" />
       <Setter Property="Background" Value="Transparent" />
     </Style>
+    <!-- The filled input sits 8 DIP below center once a label slot exists. A 16 DIP top-only
+         margin produces that offset through layout (half the asymmetric margin) without moving the
+         pointer target in a separate render-transform coordinate space. Keeping this offset stable
+         before and after focus also prevents a click from racing label motion. -->
+    <Style Selector="^:filled:has-label:not(:multiline) /template/ Grid#PART_InputRow">
+      <Setter Property="Margin" Value="{DynamicResource Md.Comp.TextField.Input.FloatingMargin}" />
+    </Style>
     <Style Selector="^:multiline:has-label /template/ Grid#PART_InputRow">
       <Setter Property="VerticalAlignment" Value="Top" />
       <Setter Property="Margin" Value="0,28,0,0" />
-    </Style>
-    <Style Selector="^:filled:has-label:not(:empty) /template/ Grid#PART_InputRow">
-      <Setter Property="RenderTransform" Value="translate(0px, 8px)" />
-    </Style>
-    <Style Selector="^:filled:has-label:focus /template/ Grid#PART_InputRow">
-      <Setter Property="RenderTransform" Value="translate(0px, 8px)" />
     </Style>
 
     <!-- Placeholder, prefix and suffix. -->

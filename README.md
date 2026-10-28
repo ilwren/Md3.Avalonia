@@ -10,6 +10,7 @@ https://github.com/user-attachments/assets/53c05bc6-f1b5-4076-8b62-c4a7a2b819bf
 
 [![CI](https://github.com/ilwren/Md3.Avalonia/actions/workflows/ci.yml/badge.svg)](https://github.com/ilwren/Md3.Avalonia/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Project visitors](https://api.visitorbadge.io/api/visitors?path=ilwren%2FMd3.Avalonia&label=Visitors&countColor=%236750A4)](https://visitorbadge.io/status?path=ilwren%2FMd3.Avalonia)
 
 - 369 个公共 API 类型，覆盖按钮、输入、导航、对话框、图表与动效，全部收录在 API 参考中并由脚本门禁校验
 - HCT 动态配色：任意 seed color，6 种 scheme、3 档对比度、49 个色彩角色

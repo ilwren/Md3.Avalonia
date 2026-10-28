@@ -47,6 +47,127 @@ public class MdTextBoxSelectionTests
     }
 
     [AvaloniaFact]
+    public void FocusedField_ClickOnLeftSideOfGlyph_PlacesCaretBeforeGlyph()
+    {
+        using var host = Show(new MdTextBox { Text = Latin });
+        Focus(host);
+
+        ClickInsideGlyph(host, 7, 0.20);
+
+        AssertSelection(host, "clicking the left side of glyph 7", caret: 7, start: 7, end: 7);
+        Assert.Equal(host.Box.CaretIndex, host.Presenter.CaretIndex);
+    }
+
+    [AvaloniaFact]
+    public void FocusedField_ClickJustLeftOfGlyphMidpoint_PlacesCaretBeforeGlyph()
+    {
+        using var host = Show(new MdTextBox { Text = Latin });
+        Focus(host);
+
+        ClickInsideGlyph(host, 12, 0.49);
+
+        AssertSelection(host, "clicking just left of glyph 12's midpoint", caret: 12, start: 12, end: 12);
+        Assert.Equal(host.Box.CaretIndex, host.Presenter.CaretIndex);
+    }
+
+    [AvaloniaFact]
+    public void FocusedField_ClickJustRightOfGlyphMidpoint_PlacesCaretAfterGlyph()
+    {
+        using var host = Show(new MdTextBox { Text = Latin });
+        Focus(host);
+
+        ClickInsideGlyph(host, 18, 0.51);
+
+        AssertSelection(host, "clicking just right of glyph 18's midpoint", caret: 19, start: 19, end: 19);
+        Assert.Equal(host.Box.CaretIndex, host.Presenter.CaretIndex);
+    }
+
+    [AvaloniaFact]
+    public void FocusedFilledLabelWithAffixes_ClickOnRightSideOfGlyph_PlacesCaretAfterGlyph()
+    {
+        using var host = Show(new MdTextBox
+        {
+            Variant = MdTextBoxVariant.Filled,
+            Label = "Repository",
+            PrefixText = "https://",
+            SuffixText = ".git",
+            Text = Latin
+        });
+        Focus(host);
+
+        ClickInsideGlyph(host, 4, 0.80);
+
+        AssertSelection(host, "clicking through the label/prefix/suffix layout on glyph 4", caret: 5, start: 5, end: 5);
+        Assert.Equal(host.Box.CaretIndex, host.Presenter.CaretIndex);
+    }
+
+    [AvaloniaFact]
+    public void FocusedOutlinedLabel_ClickOnLeftSideOfLaterGlyph_PlacesCaretBeforeGlyph()
+    {
+        using var host = Show(new MdTextBox
+        {
+            Variant = MdTextBoxVariant.Outlined,
+            Label = "Platform",
+            Text = Latin
+        });
+        Focus(host);
+
+        ClickInsideGlyph(host, 21, 0.20);
+
+        AssertSelection(host, "clicking a later glyph in the outlined field", caret: 21, start: 21, end: 21);
+        Assert.Equal(host.Box.CaretIndex, host.Presenter.CaretIndex);
+    }
+
+    [AvaloniaFact]
+    public void FocusedMultiLine_ClickOnRightSideOfSecondLineGlyph_PlacesCaretAfterGlyph()
+    {
+        const string text = "first line\nsecond line\nthird line";
+        using var host = Show(new MdTextBox
+        {
+            AcceptsReturn = true,
+            Width = 300,
+            Text = text
+        });
+        Focus(host);
+
+        // Index 15 is the fourth glyph on the second explicit line.
+        ClickInsideGlyph(host, 15, 0.80);
+
+        AssertSelection(host, "clicking the right side of a second-line glyph", caret: 16, start: 16, end: 16);
+        Assert.Equal(host.Box.CaretIndex, host.Presenter.CaretIndex);
+    }
+
+    [AvaloniaFact]
+    public void FocusedHorizontallyScrolledField_ClickUsesVisibleGlyphCoordinates()
+    {
+        var text = string.Concat(Enumerable.Repeat(Latin + " ", 5));
+        using var host = Show(new MdTextBox
+        {
+            Width = 220,
+            Text = text
+        });
+        Focus(host);
+
+        host.Box.CaretIndex = text.Length;
+        Dispatcher.UIThread.RunJobs();
+        Dispatcher.UIThread.RunJobs(); // flush the presenter's AfterRender BringIntoView callback
+
+        var scrollViewer = host.Box.GetVisualDescendants().OfType<ScrollViewer>().First();
+        Assert.True(scrollViewer.Offset.X > 0,
+            $"the long single-line field must be horizontally scrolled, offset was {scrollViewer.Offset}");
+
+        ClickInsideGlyph(host, text.Length - 3, 0.20);
+
+        AssertSelection(
+            host,
+            "clicking a visible glyph after horizontal scrolling",
+            caret: text.Length - 3,
+            start: text.Length - 3,
+            end: text.Length - 3);
+        Assert.Equal(host.Box.CaretIndex, host.Presenter.CaretIndex);
+    }
+
+    [AvaloniaFact]
     public void FilledWithLabel_DragLeftToRight_Anchors_At_The_Press_Point()
     {
         using var host = Show(new MdTextBox
@@ -392,6 +513,35 @@ public class MdTextBoxSelectionTests
         var local = new Point(rect.Left + rect.Width / 2, rect.Top + rect.Height / 2);
         return host.Presenter.TranslatePoint(local, host.Window)
             ?? throw new InvalidOperationException("could not translate the caret point to window space");
+    }
+
+    private static void Focus(Host host)
+    {
+        host.Box.Focus();
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(host.Box.IsFocused, "the field must be focused before exercising focused pointer hit testing");
+    }
+
+    /// <summary>
+    /// Clicks at an actual point inside one glyph's advance box. Caret-position helpers click an
+    /// insertion boundary and cannot detect a one-glyph pointer offset; this deliberately exercises
+    /// TextLayout's leading/trailing half decision instead.
+    /// </summary>
+    private static void ClickInsideGlyph(Host host, int glyphIndex, double fraction)
+    {
+        Assert.InRange(fraction, 0.0, 1.0);
+        var rect = host.Presenter.TextLayout.HitTestTextPosition(glyphIndex);
+        Assert.True(rect.Width > 1,
+            $"glyph {glyphIndex} must have a measurable advance box, got {rect}");
+
+        var local = new Point(rect.Left + rect.Width * fraction, rect.Top + rect.Height / 2);
+        var point = host.Presenter.TranslatePoint(local, host.Window)
+            ?? throw new InvalidOperationException("could not translate the glyph point to window space");
+
+        host.Window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+        host.Window.MouseUp(point, MouseButton.Left, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
     }
 
     private static void ClickCharacter(Host host, int index)

@@ -100,7 +100,6 @@ public class MdTextBox : TextBox
     private string _characterCounterText = "0";
     private Button? _clearButton;
     private ContentPresenter? _labelPresenter;
-    private Grid? _inputRow;
     private TextPresenter? _textPresenter;
     private bool _generatedAutomationName;
 
@@ -274,7 +273,6 @@ public class MdTextBox : TextBox
         base.OnApplyTemplate(e);
         _clearButton = e.NameScope.Find<Button>("PART_ClearButton");
         _labelPresenter = e.NameScope.Find<ContentPresenter>("PART_Label");
-        _inputRow = e.NameScope.Find<Grid>("PART_InputRow");
         _textPresenter = e.NameScope.Find<TextPresenter>("PART_TextPresenter");
         if (_clearButton is not null)
         {
@@ -322,9 +320,6 @@ public class MdTextBox : TextBox
             _labelPresenter.Transitions = MdMotionTransitions.Collect(
                 MdMotionTransitions.CreateTransform(this, RenderTransformProperty, MdMotionSpeed.Fast),
                 MdMotionTransitions.CreateBrush(this, ForegroundProperty, MdMotionSpeed.Fast));
-        if (_inputRow is not null)
-            _inputRow.Transitions = MdMotionTransitions.Collect(
-                MdMotionTransitions.CreateTransform(this, RenderTransformProperty, MdMotionSpeed.Fast));
     }
 
     private void OnClearButtonClick(object? sender, RoutedEventArgs e)

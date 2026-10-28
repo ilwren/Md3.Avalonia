@@ -1,6 +1,6 @@
 # TextBox caret synchronization research
 
-Research date: 2026-10-27
+Research dates: 2026-10-27–2026-10-28
 
 ## Reported scenario
 
@@ -37,14 +37,45 @@ The `0.5.0-preview.2` control retained Avalonia's `TextBox` editing implementati
 - a localized context menu;
 - label/input-row motion and Material colors.
 
-The release did not override `OnKeyDown` or `OnTextInput`. Padding, label animation and icon columns
-do not choose the insertion index. The incorrect insertion occurs only when the visual presenter and
-the logical `TextBox` state stop satisfying the synchronization invariant.
+The release did not override `OnKeyDown` or `OnTextInput`. Padding and icon columns do not choose the
+insertion index. The incorrect insertion occurs when the visual presenter and the logical `TextBox`
+state stop satisfying the synchronization invariant.
 
 A later CJK selection correction on this branch added another relevant difference from stock
 Avalonia: it re-anchors `SelectionStart` and `SelectionEnd` after Avalonia's pointer handler. A
 non-empty selection does not automatically copy the presenter's caret back to `TextBox.CaretIndex`,
 so that correction also needs to synchronize the logical caret explicitly.
+
+## Pointer hit-testing parity (2026-10-28)
+
+A second report concerned the click itself: in an already focused field the caret should feel like it
+lands exactly at the pointed insertion boundary, not merely somewhere near the selected character.
+The 12.1.2 source and Fluent template were checked again end to end:
+
+1. `TextBox.OnPointerPressed` asks the event for `GetPosition(PART_TextPresenter)`;
+2. `TextPresenter.MoveCaretToPoint` passes that local point to `TextLayout.HitTestPoint`;
+3. the text formatter chooses the leading or trailing `CharacterHit` for the glyph under the point;
+4. `SelectionStart`/`SelectionEnd` collapse at the presenter's resulting `CaretIndex`;
+5. drag moves use the same presenter coordinate space after clamping to its bounds.
+
+The Fluent template therefore keeps its interactive `TextPresenter` in ordinary measured/arranged
+layout. The Material template had one additional difference: the grid containing the presenter,
+scroll viewer, prefix and suffix was render-translated by 8 DIP when a filled label floated, and the
+transform itself had a transition. Although the index calculation still belongs to Avalonia, this
+made the surface seen by the pointer a moving render coordinate space rather than the stable layout
+space used by the reference template. It also made exact pointer regressions easy to miss: the old
+tests generated points from caret boundaries and asserted only a target index or a loose ±1 range.
+
+The filled-label offset is now represented by a stable asymmetric layout margin. Only the
+non-interactive label is transformed/animated; the input row and `TextPresenter` are never
+render-transformed. The resulting presenter-local point is the same point the user sees throughout
+focus and label motion, including with affixes and horizontal scrolling.
+
+New headless regressions click real positions inside glyph advance boxes rather than clicking a caret
+boundary. They pin the leading side, both sides immediately around the midpoint, the trailing side,
+several character indices, filled/outlined labels, prefix/suffix columns, a second line, and a
+horizontally scrolled single-line field. Every case checks the logical caret, collapsed selection and
+visual presenter caret exactly (no ±1 tolerance).
 
 ## Resolution
 
@@ -54,9 +85,12 @@ The Material text controls now enforce synchronization at their custom-template 
    `TextBox.CaretIndex`;
 2. after committed text input, text and logical caret are explicitly copied back to the presenter,
    mirroring Avalonia's upstream fix;
-3. the CJK word-selection correction sets the logical caret before restoring its corrected range.
+3. the CJK word-selection correction sets the logical caret before restoring its corrected range;
+4. the `MdTextBox` input row stays in measured layout coordinates while only its floating label uses
+   a render transform, matching the official template's hit-test geometry.
 
-The same boundary is used by `MdTextBox` and `MdSearchBar`. Regression coverage drives real headless
-keyboard input for reverse selection, replacement, a following character, and selection followed by
+The same synchronization boundary is used by `MdTextBox` and `MdSearchBar`. Regression coverage
+also drives real headless keyboard input for reverse selection, replacement, a following character,
+and selection followed by
 a pointer click at the text end. Every step checks text, selection, logical caret, and presenter
 caret rather than checking only the final string.
