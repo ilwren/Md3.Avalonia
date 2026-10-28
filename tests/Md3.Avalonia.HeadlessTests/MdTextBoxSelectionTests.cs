@@ -141,18 +141,25 @@ public class MdTextBoxSelectionTests
     public void FocusedHorizontallyScrolledField_ClickUsesVisibleGlyphCoordinates()
     {
         var text = string.Concat(Enumerable.Repeat(Latin + " ", 5));
-        using var host = Show(new MdTextBox
+        var box = new MdTextBox
         {
             Width = 220,
             Text = text
-        });
+        };
+        // TextBox normally supplies Hidden at style priority for a single-line field. Make the
+        // scroll contract explicit at local priority so this regression does not depend on style
+        // binding order in the headless host.
+        ScrollViewer.SetHorizontalScrollBarVisibility(box, ScrollBarVisibility.Hidden);
+
+        using var host = Show(box);
         Focus(host);
 
-        host.Box.CaretIndex = text.Length;
-        Dispatcher.UIThread.RunJobs();
-        Dispatcher.UIThread.RunJobs(); // flush the presenter's AfterRender BringIntoView callback
-
         var scrollViewer = host.Box.GetVisualDescendants().OfType<ScrollViewer>().First();
+        var maximumOffset = scrollViewer.Extent.Width - scrollViewer.Viewport.Width;
+        Assert.True(maximumOffset > 0,
+            $"the long line must exceed its viewport; extent={scrollViewer.Extent}, viewport={scrollViewer.Viewport}");
+        scrollViewer.Offset = new Vector(maximumOffset, 0);
+        Dispatcher.UIThread.RunJobs();
         Assert.True(scrollViewer.Offset.X > 0,
             $"the long single-line field must be horizontally scrolled, offset was {scrollViewer.Offset}");
 
