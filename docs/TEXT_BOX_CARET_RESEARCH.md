@@ -69,7 +69,15 @@ tests generated points from caret boundaries and asserted only a target index or
 The filled-label offset is now represented by a stable asymmetric layout margin. Only the
 non-interactive label is transformed/animated; the input row and `TextPresenter` are never
 render-transformed. The resulting presenter-local point is the same point the user sees throughout
-focus and label motion, including with affixes and horizontal scrolling.
+focus and label motion, including with affixes.
+
+The horizontal-scroll regression exposed a second template-only difference. `MaterialTheme` does not
+install a global theme for Avalonia's native `ScrollViewer` (doing so would violate the library's
+scoping contract), so a native `ScrollViewer` inside the text-field template had no measured
+scroll-content viewport in a Material-only host. `PART_ScrollViewer` now uses `MdScrollViewer`, which
+is a `ScrollViewer` subclass with the library's scoped template. Avalonia's base `TextBox` still finds
+and owns the part, while long lines now have a real extent, viewport and offset. Pointer-to-presenter
+translation therefore remains exact after horizontal caret scrolling too.
 
 New headless regressions click real positions inside glyph advance boxes rather than clicking a caret
 boundary. They pin the leading side, both sides immediately around the midpoint, the trailing side,
@@ -87,7 +95,9 @@ The Material text controls now enforce synchronization at their custom-template 
    mirroring Avalonia's upstream fix;
 3. the CJK word-selection correction sets the logical caret before restoring its corrected range;
 4. the `MdTextBox` input row stays in measured layout coordinates while only its floating label uses
-   a render transform, matching the official template's hit-test geometry.
+   a render transform, matching the official template's hit-test geometry;
+5. `PART_ScrollViewer` uses the scoped `MdScrollViewer` theme so horizontal scrolling has real
+   viewport geometry without requiring Fluent/Simple global styles.
 
 The same synchronization boundary is used by `MdTextBox` and `MdSearchBar`. Regression coverage
 also drives real headless keyboard input for reverse selection, replacement, a following character,

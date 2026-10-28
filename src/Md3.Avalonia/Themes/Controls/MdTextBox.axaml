@@ -127,13 +127,18 @@
                                  IsVisible="False"
                                  Text="{TemplateBinding PrefixText}" />
 
-                      <ScrollViewer x:Name="PART_ScrollViewer"
-                                    Grid.Column="1"
-                                    HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
-                                    VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
-                                    IsScrollChainingEnabled="{TemplateBinding (ScrollViewer.IsScrollChainingEnabled)}"
-                                    AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}"
-                                    BringIntoViewOnFocusChange="{TemplateBinding (ScrollViewer.BringIntoViewOnFocusChange)}">
+                      <!-- Use the library's themed ScrollViewer: MaterialTheme intentionally does
+                           not install a global theme for Avalonia's native ScrollViewer, while the
+                           TextBox contract still requires a measured viewport and a real offset for
+                           horizontal caret scrolling. MdScrollViewer remains a ScrollViewer, so the
+                           base TextBox finds PART_ScrollViewer and owns it exactly as upstream does. -->
+                      <md:MdScrollViewer x:Name="PART_ScrollViewer"
+                                         Grid.Column="1"
+                                         HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                                         VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
+                                         IsScrollChainingEnabled="{TemplateBinding (ScrollViewer.IsScrollChainingEnabled)}"
+                                         AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}"
+                                         BringIntoViewOnFocusChange="{TemplateBinding (ScrollViewer.BringIntoViewOnFocusChange)}">
                         <Panel>
                           <TextBlock x:Name="PART_Placeholder"
                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -174,12 +179,12 @@
                                          TextAlignment="{TemplateBinding TextAlignment}"
                                          TextWrapping="{TemplateBinding TextWrapping}" />
                         </Panel>
-                        <ScrollViewer.Styles>
+                        <md:MdScrollViewer.Styles>
                           <Style Selector="ScrollContentPresenter#PART_ContentPresenter">
                             <Setter Property="Cursor" Value="IBeam" />
                           </Style>
-                        </ScrollViewer.Styles>
-                      </ScrollViewer>
+                        </md:MdScrollViewer.Styles>
+                      </md:MdScrollViewer>
 
                       <TextBlock x:Name="PART_Suffix"
                                  Grid.Column="2"
