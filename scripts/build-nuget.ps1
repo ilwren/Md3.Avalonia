@@ -52,7 +52,7 @@ if ($Version -and $Local) {
     throw "-Version and -Local cannot be combined."
 }
 if ($Version -and $Version -notmatch '^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$') {
-    throw "Invalid package version '$Version'. Use SemVer such as 0.4.6 or 0.4.6-preview.1."
+    throw "Invalid package version '$Version'. Use SemVer such as 0.5.6 or 0.5.6-preview.1."
 }
 
 $versionArgs = @()

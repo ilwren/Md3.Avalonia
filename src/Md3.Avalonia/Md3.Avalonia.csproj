@@ -5,13 +5,13 @@
     <AssemblyName>Md3.Avalonia</AssemblyName>
     <Description>Material Design 3 and Material 3 Expressive controls, dynamic HCT theming, motion, localization and desktop adapters for Avalonia 12.</Description>
     <PackageId>Md3.Avalonia</PackageId>
-    <Version>0.5.0-preview.1</Version>
+    <Version>0.5.6-preview.1</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;material-design;material-3;controls;android;desktop;hct;mvvm</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>logo-128.png</PackageIcon>
-    <PackageReleaseNotes>0.4.6-preview.1: Restored .NET 8 assets alongside .NET 10 across the NuGet packages; added standalone Notifications and breadcrumb path conversion; unified Extra controls on ExtraTheme; improved RichEditor dark-mode text and updated BeforeAfter first-drag focus/scroll handling (desktop acceptance pending).</PackageReleaseNotes>
+    <PackageReleaseNotes>0.5.6-preview.1: Added six standalone controls (CommitGraph, ContributionGrid, Pagination, MaskedTextBox, FileSystemPicker, and GridSplitter), expanded Carousel and Stepper behavior, and synchronized TextBox visual and logical carets. The unreleased VideoPlayer and LibVLC adapter were removed.</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>

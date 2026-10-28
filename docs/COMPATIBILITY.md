@@ -16,7 +16,7 @@ The core runtime package references only `Avalonia` and `MaterialColorUtilities`
 
 ## Versioning
 
-- Current source package baseline: `0.4.6-preview.1` (publication pending); the `0.4.5-preview.1` notes and validation evidence describe the previous baseline and are historical records.
+- Current source package baseline: `0.5.6-preview.1` (publication pending); earlier release notes and validation evidence remain historical records.
 - Preview packages may adjust API after a changelog entry and migration note.
 - Stable releases follow Semantic Versioning.
 - Avalonia minor-version upgrades are validated by Release builds for both supported .NET package TFMs, headless tests, package validation, and the platform matrix before the supported baseline changes.

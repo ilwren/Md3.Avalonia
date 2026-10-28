@@ -19,7 +19,7 @@ https://github.com/user-attachments/assets/53c05bc6-f1b5-4076-8b62-c4a7a2b819bf
 - 核心包不依赖 `Avalonia.Themes.Fluent` 或 `Avalonia.Themes.Simple`
 - 桌面与 Android 双端；全部包均声明 `IsTrimmable` 与 `IsAotCompatible`
 
-> **当前版本 `0.5.0-preview.1`。** 预览版 API 仍可能做兼容性调整，NuGet 安装示例需在该版本发布后才可用。屏幕阅读器与 Android 真机等人工验收状态见 [已知边界](#已知边界)。
+> **当前版本 `0.5.6-preview.1`。** 预览版 API 仍可能做兼容性调整，NuGet 安装示例需在该版本发布后才可用。屏幕阅读器与 Android 真机等人工验收状态见 [已知边界](#已知边界)。
 
 ## 目录
 
@@ -48,13 +48,13 @@ https://github.com/user-attachments/assets/53c05bc6-f1b5-4076-8b62-c4a7a2b819bf
 ## 安装
 
 ```bash
-dotnet add package Md3.Avalonia --version 0.5.0-preview.1
+dotnet add package Md3.Avalonia --version 0.5.6-preview.1
 ```
 
 按需添加可选包，全部包版本一致：
 
 ```bash
-dotnet add package Md3.Avalonia.Icons --version 0.5.0-preview.1
+dotnet add package Md3.Avalonia.Icons --version 0.5.6-preview.1
 ```
 
 ## 快速开始
@@ -251,7 +251,7 @@ bash scripts/publish-gallery-aot.sh --rid linux-x64 --smoke-scenario file-system
 | [`CHANGELOG.md`](CHANGELOG.md) | 版本变更记录 |
 | [`docs/API.md`](docs/API.md) | 全部公共类型的 API 参考，含 trimming 与 AOT 说明 |
 | [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) | 目标框架、平台与依赖兼容策略 |
-| [`docs/RELEASE_NOTES_0.5.0-preview.1.md`](docs/RELEASE_NOTES_0.5.0-preview.1.md) | 本版变更说明 |
+| [`docs/RELEASE_NOTES_0.5.6-preview.1.md`](docs/RELEASE_NOTES_0.5.6-preview.1.md) | 本版变更说明 |
 | [`docs/RELEASE_VALIDATION.md`](docs/RELEASE_VALIDATION.md) | 人工验收清单与签署状态 |
 | [`docs/PUBLISHING.md`](docs/PUBLISHING.md) | 发布流程与 NuGet Trusted Publishing 配置 |
 | [`docs/SPEC_VERIFICATION.md`](docs/SPEC_VERIFICATION.md) | 规范一致性分层校验与已知差距 |

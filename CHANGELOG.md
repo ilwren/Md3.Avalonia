@@ -8,8 +8,13 @@
 
 ### Changed
 
+- Advanced the unified package version from `0.5.0-preview.1` to `0.5.6-preview.1`: one patch increment for each of the six new standalone controls (`MdCommitGraph`, `MdContributionGrid`, `MdPagination`, `MdMaskedTextBox`, `MdFileSystemPicker`, and `MdGridSplitter`).
 - `MdTextBox` and `MdSearchBar` now explicitly keep Avalonia's logical `TextBox.CaretIndex` synchronized with the visual `TextPresenter` after pointer placement, reverse-selection replacement, and committed input, preventing the next character from being inserted away from the rendered caret.
 - `MdFileSystemPicker` now localizes visible text and culture-sensitive entry details, preserves host text overrides, supports `Standard`/`Powerline` breadcrumbs, centers every glyph in a fixed transparent viewport, and lets single selection toggle off like multiple selection.
+
+### Removed
+
+- Removed the unreleased `MdVideoPlayer`, playback-request API, optional `Md3.Avalonia.LibVLC` adapter, Gallery sample, generated media asset, scripts, tests, and associated documentation.
 
 ## [0.5.0-preview.1] - 2026-10-18
 

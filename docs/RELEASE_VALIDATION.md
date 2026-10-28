@@ -3,7 +3,7 @@
 Validated package baseline: `0.4.5-preview.1` (historical; publication status is not asserted here)
 Automated baseline date: 2026-10-12
 
-> This record describes the six-package `0.4.5-preview.1` validation baseline, not the current `0.4.6-preview.1` source baseline. The new standalone Notifications package and any later code are not covered by the automated evidence below; the Notifications manual checks in the matrix are still pending for `0.4.6-preview.1`.
+> This record describes the six-package `0.4.5-preview.1` validation baseline, not the current `0.5.6-preview.1` source baseline. The new standalone Notifications package and any later code are not covered by the automated evidence below; the Notifications manual checks in the matrix are still pending for `0.4.6-preview.1`.
 
 ## Automated gates
 
@@ -33,7 +33,7 @@ Automated evidence for code commit [`258abb6`](https://github.com/ilwren/Md3.Ava
 - [Multi-platform Gallery run `38224348901`](https://github.com/ilwren/Md3.Avalonia/actions/runs/38224348901) passed Linux, Windows and macOS desktop publish plus Android APK build/upload. APK compilation is not physical-device sign-off.
 - [Linux x64 AOT probe `38224348903`](https://github.com/ilwren/Md3.Avalonia/actions/runs/38224348903) passed native executable verification and xvfb smoke test. It reported `Binding(String)` trim/dynamic-code warnings in `gallery/Md3.Avalonia.Gallery/Pages/DataGridGalleryPage.axaml.cs:23–25`; this is not a zero-diagnostic result and does not sign off other platforms or consuming-app behavior.
 
-## Pending validation for `0.4.6-preview.1`
+## Pending validation for `0.5.6-preview.1`
 
 The current source baseline has not been validated by the historical CI evidence above. Before publishing, confirm:
 

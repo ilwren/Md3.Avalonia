@@ -5,7 +5,7 @@
     <AssemblyName>Md3.Avalonia.Markdown</AssemblyName>
     <Description>Material Design 3 style collection for Markdown.Avalonia. Opt-in package: it carries the Markdown.Avalonia.Tight dependency so the core Material packages do not have to.</Description>
     <PackageId>Md3.Avalonia.Markdown</PackageId>
-    <Version>0.5.0-preview.1</Version>
+    <Version>0.5.6-preview.1</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;markdown;markdown-viewer;document;theme;material-design-3</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
