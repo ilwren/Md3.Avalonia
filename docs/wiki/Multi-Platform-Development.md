@@ -1,6 +1,6 @@
 # Multi-Platform Development
 
-The nineteen NuGet libraries use Avalonia 12.1.2. The five core-family packages target **.NET 8 and .NET 10** (`net8.0;net10.0`); the twelve opt-in third-party theme packages target **.NET 10** only, following the TFMs their upstream libraries publish. Notifications adds platform TFMs, while the optional desktop LibVLC adapter targets `net8.0;net10.0` and is intentionally excluded from Android and NativeAOT support.
+The eighteen NuGet libraries use Avalonia 12.1.2. The five core-family packages target **.NET 8 and .NET 10** (`net8.0;net10.0`); the twelve opt-in third-party theme packages target **.NET 10** only, following the TFMs their upstream libraries publish. Notifications adds platform-specific TFMs.
 
 ---
 

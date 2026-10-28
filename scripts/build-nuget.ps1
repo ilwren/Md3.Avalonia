@@ -35,8 +35,7 @@ $projects = @(
     (Join-Path $root "src/Md3.Avalonia.NodifyM/Md3.Avalonia.NodifyM.csproj"),
     (Join-Path $root "src/Md3.Avalonia.Mapsui/Md3.Avalonia.Mapsui.csproj"),
     (Join-Path $root "src/Md3.Avalonia.InkCanvas/Md3.Avalonia.InkCanvas.csproj"),
-    (Join-Path $root "src/Md3.Avalonia.Notifications/Md3.Avalonia.Notifications.csproj"),
-    (Join-Path $root "src/Md3.Avalonia.LibVLC/Md3.Avalonia.LibVLC.csproj")
+    (Join-Path $root "src/Md3.Avalonia.Notifications/Md3.Avalonia.Notifications.csproj")
 )
 
 if ($SkipFontCheck) {

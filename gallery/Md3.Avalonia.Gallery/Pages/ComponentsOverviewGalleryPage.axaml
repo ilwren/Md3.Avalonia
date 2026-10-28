@@ -163,7 +163,6 @@
             <md:MdButton Content="Slider" Tag="Slider" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Switch" Tag="Switch" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Transfer" Tag="Transfer" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
-            <md:MdButton Content="Video player" Tag="Video player" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
           </StackPanel>
         </Border>
 

@@ -9,8 +9,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <!-- NativeAOT intentionally keeps the desktop host on the backend-neutral core player. -->
-    <DefineConstants Condition="'$(PublishAot)' != 'true'">$(DefineConstants);MD3_GALLERY_LIBVLC</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,7 +23,5 @@
          fallback. Excluding its assets leaves Avalonia's build in place. -->
     <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" ExcludeAssets="all" />
     <ProjectReference Include="../Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" />
-    <ProjectReference Include="../../src/Md3.Avalonia.LibVLC/Md3.Avalonia.LibVLC.csproj"
-                      Condition="'$(PublishAot)' != 'true'" />
   </ItemGroup>
 </Project>

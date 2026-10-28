@@ -1,6 +1,6 @@
 # Release workflow
 
-The repository publishes releases through `.github/workflows/publish-release.yml`. It is intentionally manual: it runs the headless test suite, packs all nineteen NuGet packages, builds Gallery for Linux, Windows, macOS, and Android, pushes the packages to NuGet.org, then creates a GitHub Release with the Gallery downloads, NuGet packages, symbol packages, and `SHA256SUMS.txt`.
+The repository publishes releases through `.github/workflows/publish-release.yml`. It is intentionally manual: it runs the headless test suite, packs all eighteen NuGet packages, builds Gallery for Linux, Windows, macOS, and Android, pushes the packages to NuGet.org, then creates a GitHub Release with the Gallery downloads, NuGet packages, symbol packages, and `SHA256SUMS.txt`.
 
 Publishing uses **NuGet Trusted Publishing** rather than a stored API key. The publish job asks GitHub for an OpenID Connect token, exchanges it at `https://www.nuget.org/api/v2/token` for an API key that nuget.org expires after about twenty minutes, pushes every package with that key, and then lets it lapse. There is no `NUGET_API_KEY` secret in this repository, and nothing long-lived is stored anywhere.
 
@@ -30,9 +30,9 @@ Notes on the fields that cause the most failed first pushes:
 - **Environment** is matched against the `environment` claim. Because the publish job declares no `environment:`, the claim is absent, so the field must stay empty. Setting it here would make every run fail.
 - If this workflow is ever moved into a reusable workflow, the claim that nuget.org sees is `job_workflow_ref` — the *called* file — not this one. The policy would have to name the reusable file instead.
 
-### 3. Pushing all nineteen packages with one policy
+### 3. Pushing all eighteen packages with one policy
 
-This is the part that matters for a repository this size. A policy's scope takes **glob patterns**, so nineteen packages do not need nineteen policies — one pattern covers all of them, because every package ID in `scripts/build-nuget.sh` starts with `Md3.Avalonia`:
+This is the part that matters for a repository this size. A policy's scope takes **glob patterns**, so eighteen packages do not need eighteen policies — one pattern covers all of them, because every package ID in `scripts/build-nuget.sh` starts with `Md3.Avalonia`:
 
 ```
 Md3.Avalonia*
@@ -47,7 +47,7 @@ In **Select Scopes**, tick **Push** and choose which of the two push scopes the 
 
 `package:unlist` is separate; tick it only if the workflow should be able to unlist a bad version.
 
-With the glob set to `Md3.Avalonia*`, the single short-lived key the workflow obtains is valid for all nineteen IDs, and the publish step loops over `release-artifacts/release-nuget/*.nupkg` pushing each one with that key. Symbol packages need no separate handling: each `.nupkg` carries the `.snupkg` sitting beside it.
+With the glob set to `Md3.Avalonia*`, the single short-lived key the workflow obtains is valid for all eighteen IDs, and the publish step loops over `release-artifacts/release-nuget/*.nupkg` pushing each one with that key. Symbol packages need no separate handling: each `.nupkg` carries the `.snupkg` sitting beside it.
 
 Using `*` instead would also work, but it authorises the workflow to publish any package the account owns, so the narrower prefix is the better default.
 

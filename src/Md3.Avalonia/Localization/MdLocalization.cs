@@ -54,11 +54,6 @@ public sealed class MdLocalization : AvaloniaObject
                 ["FileSystemOpenFolder"] = "Open folder", ["FileSystemItemsSelected"] = "{0} items selected",
                 ["FileSystemChooseCurrentFolder"] = "Choose selects the current folder.",
                 ["FileSystemNoFolderSelected"] = "No folder selected.", ["FileSystemNoFileSelected"] = "No file selected.",
-                ["VideoPlay"] = "Play", ["VideoPause"] = "Pause", ["VideoMute"] = "Mute", ["VideoUnmute"] = "Unmute",
-                ["VideoRewindSeconds"] = "Rewind {0} seconds", ["VideoForwardSeconds"] = "Forward {0} seconds",
-                ["VideoEnterFullScreen"] = "Enter full screen", ["VideoExitFullScreen"] = "Exit full screen",
-                ["VideoTimeline"] = "Video timeline", ["VideoVolume"] = "Volume", ["VideoPlaybackSpeed"] = "Playback speed",
-                ["VideoPlaybackError"] = "Playback error", ["VideoLive"] = "Live",
                 ["GridSplitterResizeColumns"] = "Resize columns", ["GridSplitterResizeRows"] = "Resize rows",
                 ["RichBold"] = "Bold", ["RichItalic"] = "Italic", ["RichUnderline"] = "Underline", ["RichStrikeThrough"] = "Strikethrough", ["RichHeading"] = "Heading", ["RichQuote"] = "Quote", ["RichCode"] = "Inline code", ["RichLink"] = "Insert link", ["RichBulletedList"] = "Bulleted list", ["RichNumberedList"] = "Numbered list", ["RichUndo"] = "Undo", ["RichRedo"] = "Redo", ["RichHorizontalRule"] = "Horizontal rule", ["RichClearFormatting"] = "Clear formatting"
             },
@@ -103,11 +98,6 @@ public sealed class MdLocalization : AvaloniaObject
                 ["FileSystemOpenFolder"] = "打开文件夹", ["FileSystemItemsSelected"] = "已选择 {0} 个项目",
                 ["FileSystemChooseCurrentFolder"] = "“选择”将返回当前文件夹。",
                 ["FileSystemNoFolderSelected"] = "未选择文件夹。", ["FileSystemNoFileSelected"] = "未选择文件。",
-                ["VideoPlay"] = "播放", ["VideoPause"] = "暂停", ["VideoMute"] = "静音", ["VideoUnmute"] = "取消静音",
-                ["VideoRewindSeconds"] = "后退 {0} 秒", ["VideoForwardSeconds"] = "前进 {0} 秒",
-                ["VideoEnterFullScreen"] = "进入全屏", ["VideoExitFullScreen"] = "退出全屏",
-                ["VideoTimeline"] = "视频时间轴", ["VideoVolume"] = "音量", ["VideoPlaybackSpeed"] = "播放速度",
-                ["VideoPlaybackError"] = "播放错误", ["VideoLive"] = "直播",
                 ["GridSplitterResizeColumns"] = "调整列宽", ["GridSplitterResizeRows"] = "调整行高",
                 ["RichBold"] = "粗体", ["RichItalic"] = "斜体", ["RichUnderline"] = "下划线", ["RichStrikeThrough"] = "删除线", ["RichHeading"] = "标题", ["RichQuote"] = "引用", ["RichCode"] = "行内代码", ["RichLink"] = "插入链接", ["RichBulletedList"] = "项目符号列表", ["RichNumberedList"] = "编号列表", ["RichUndo"] = "撤销", ["RichRedo"] = "重做", ["RichHorizontalRule"] = "水平分隔线", ["RichClearFormatting"] = "清除格式"
             }

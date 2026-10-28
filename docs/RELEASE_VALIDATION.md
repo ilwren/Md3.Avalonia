@@ -37,7 +37,7 @@ Automated evidence for code commit [`258abb6`](https://github.com/ilwren/Md3.Ava
 
 The current source baseline has not been validated by the historical CI evidence above. Before publishing, confirm:
 
-- [ ] All nineteen NuGet packages build and pack against Avalonia 12.1.2: the five core-family packages as `net8.0` and `net10.0`, the twelve opt-in theme packages as `net10.0`, plus the standalone Notifications package and optional desktop LibVLC adapter.
+- [ ] All eighteen NuGet packages build and pack against Avalonia 12.1.2: the five core-family packages as `net8.0` and `net10.0`, the twelve opt-in theme packages as `net10.0`, plus the standalone Notifications package.
 - [ ] `Md3.Avalonia.Notifications` additionally packs `net8.0-windows10.0.19041.0`, `net10.0-windows10.0.19041.0` and, with `-p:IncludeAndroidTarget=true`, `net10.0-android` assets; the Android target retains minimum API 23.
 - [ ] Desktop Gallery, Android Gallery host and headless test project remain .NET 10 targets; the Gallery does not gain a `net8.0` target.
 - [ ] Inspect each `.nupkg` asset group and compile a minimal .NET 8 consumer against the five core-family packages. The twelve `net10.0`-only theme packages cannot be consumed from .NET 8; verify those against a .NET 10 consumer instead.
