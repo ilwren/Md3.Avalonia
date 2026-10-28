@@ -155,7 +155,7 @@ public class MdTextBoxSelectionTests
         using var host = Show(box);
         Focus(host);
 
-        var scrollViewer = host.Box.GetVisualDescendants().OfType<ScrollViewer>().First();
+        var scrollViewer = host.Presenter.GetVisualAncestors().OfType<ScrollViewer>().First();
         var maximumOffset = scrollViewer.Extent.Width - scrollViewer.Viewport.Width;
         Assert.True(maximumOffset > 0,
             $"the long line must exceed its viewport; extent={scrollViewer.Extent}, viewport={scrollViewer.Viewport}");
