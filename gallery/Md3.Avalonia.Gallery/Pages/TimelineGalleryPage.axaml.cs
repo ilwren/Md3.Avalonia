@@ -10,6 +10,13 @@ public partial class TimelineGalleryPage : UserControl
     public TimelineGalleryPage()
     {
         InitializeComponent();
+        TimelineDescription.Text = L(
+            "An ordered sequence of states with continuous vertical or horizontal connectors. Active work uses an accessible progress ring that becomes a static state cue when motion is reduced.",
+            "使用连续垂直或水平连接线表达有序状态。进行中的任务带有可识别的进度环；减少动效时仍保留静态状态提示。");
+        VerticalTitle.Text = L("Vertical · running state", "垂直布局 · 运行中状态");
+        HorizontalDescription.Text = L(
+            "The same item model can follow a horizontal axis. Scroll to inspect every stage on compact windows.",
+            "同一组数据也可沿水平轴展示；在较窄窗口中可滚动查看全部阶段。");
         var now = DateTimeOffset.Now;
         var items = new[]
         {

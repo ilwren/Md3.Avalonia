@@ -1314,7 +1314,7 @@ Every public enum and its members are listed below. To print the current member 
 | `MdWindowCapabilities` | `None` · `Move` · `Resize` · `Minimize` · `Maximize` · `Close` · `SystemMenu` · `All` |
 | `MdWindowPlatform` | `Unknown` · `Windows` · `MacOS` · `Linux` · `Android` |
 
-### Optional (`Md3.Avalonia.Extra`) — 21 enumerations
+### Optional (`Md3.Avalonia.Extra`) — 23 enumerations
 
 | Enum | Members |
 |---|---|
@@ -1335,7 +1335,9 @@ Every public enum and its members are listed below. To print the current member 
 | `MdRevealAxis` | `Vertical` · `Horizontal` · `Both` |
 | `MdSharedAxisKind` | `X` · `Y` · `Z` |
 | `MdSkeletonShape` | `Rectangle` · `RoundedRectangle` · `Circle` · `Text` |
+| `MdSlidableActionPaneMotion` | `Behind` · `Stretch` · `Scroll` · `Drawer` |
 | `MdSpinKitKind` | `RotatingPlain` · `ThreeBounce` · `Wave` · `FadingCircle` · `ChasingDots` |
+| `MdTimelineIndicatorEffect` | `Auto` · `None` · `ProgressRing` |
 | `MdTimelineItemState` | `Neutral` · `Active` · `Completed` · `Error` |
 | `MdTransferLayoutMode` | `Auto` · `Standard` · `Compact` |
 | `MdVisibilityTransition` | `Fade` · `ExpandVertical` · `ExpandHorizontal` · `Scale` · `SlideAndFade` |

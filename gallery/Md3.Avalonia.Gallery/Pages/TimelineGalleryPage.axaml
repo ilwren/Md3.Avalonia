@@ -8,17 +8,17 @@
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Timeline" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="An ordered sequence of states with continuous vertical or horizontal connectors. Active work uses an accessible progress ring that becomes a static state cue when motion is reduced." />
+        <TextBlock x:Name="TimelineDescription" Classes="body" TextWrapping="Wrap" />
       </StackPanel>
 
       <StackPanel Spacing="12">
-        <TextBlock Classes="h2" Text="Vertical · running state" />
+        <TextBlock x:Name="VerticalTitle" Classes="h2" />
         <eco:MdTimeline x:Name="VerticalTimeline" MinWidth="300" HorizontalAlignment="Left" />
       </StackPanel>
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Horizontal" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="The same item model can follow a horizontal axis. Scroll to inspect every stage on compact windows." />
+        <TextBlock x:Name="HorizontalDescription" Classes="body" TextWrapping="Wrap" />
         <md:MdScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
           <eco:MdTimeline x:Name="HorizontalTimeline" Orientation="Horizontal" HorizontalAlignment="Left" />
         </md:MdScrollViewer>

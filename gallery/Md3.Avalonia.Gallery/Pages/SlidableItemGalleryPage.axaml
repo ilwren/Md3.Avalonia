@@ -8,12 +8,12 @@
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Slidable item" />
-        <TextBlock x:Name="SlidableDescription" Classes="body" TextWrapping="Wrap" Text="Drag horizontally to reveal semantic start or end actions. Distance and velocity settle the pane; tap an exposed action to run it, or tap the row to close. Ctrl+Left, Ctrl+Right and Escape provide keyboard access." />
+        <TextBlock x:Name="SlidableDescription" Classes="body" TextWrapping="Wrap" />
       </StackPanel>
 
       <StackPanel Spacing="12">
-        <TextBlock Classes="h2" Text="Behind motion" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="The actions remain behind the row while the foreground tracks the pointer. Opening another item in the same group closes the first." />
+        <TextBlock x:Name="BehindTitle" Classes="h2" />
+        <TextBlock x:Name="BehindDescription" Classes="body" TextWrapping="Wrap" />
         <eco:MdSlidableItem x:Name="BehindSlidable" GroupName="gallery-inbox" ActionExtent="136">
           <eco:MdSlidableItem.StartActions>
             <StackPanel Width="136" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4" IsHitTestVisible="False">
@@ -39,8 +39,8 @@
       </StackPanel>
 
       <StackPanel Spacing="12">
-        <TextBlock Classes="h2" Text="Scroll motion and RTL" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Scroll motion lets the action travel in from the outer edge. In right-to-left flow, start/end panes and physical translation mirror automatically." />
+        <TextBlock x:Name="ScrollTitle" Classes="h2" />
+        <TextBlock x:Name="ScrollDescription" Classes="body" TextWrapping="Wrap" />
         <eco:MdSlidableItem x:Name="ScrollSlidable" GroupName="gallery-inbox" ActionExtent="136" ActionPaneMotion="Scroll" FlowDirection="RightToLeft">
           <eco:MdSlidableItem.StartActions>
             <StackPanel Width="136" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4" IsHitTestVisible="False">
@@ -62,7 +62,7 @@
             </StackPanel>
           </Grid>
         </eco:MdSlidableItem>
-        <TextBlock x:Name="ActionStatus" Classes="body" Text="No action selected yet." AutomationProperties.LiveSetting="Polite" />
+        <TextBlock x:Name="ActionStatus" Classes="body" AutomationProperties.LiveSetting="Polite" />
       </StackPanel>
 
       <StackPanel Spacing="10">
