@@ -2,31 +2,73 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
              xmlns:eco="using:Md3.Avalonia.Extra.Controls"
-             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.SlidableItemGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Slidable item" />
-        <TextBlock x:Name="SlidableDescription" Classes="body" TextWrapping="Wrap" Text="A list row that reveals actions when swiped either way. Ctrl+Left, Ctrl+Right and Escape drive it from the keyboard." />
+        <TextBlock x:Name="SlidableDescription" Classes="body" TextWrapping="Wrap" Text="Drag horizontally to reveal semantic start or end actions. Distance and velocity settle the pane; tap an exposed action to run it, or tap the row to close. Ctrl+Left, Ctrl+Right and Escape provide keyboard access." />
       </StackPanel>
 
       <StackPanel Spacing="12">
-        <eco:MdSlidableItem x:Name="Slidable" StartActions="Archive" EndActions="Delete">
-          <Grid ColumnDefinitions="*,Auto" MinHeight="64" Margin="16,0">
-            <StackPanel VerticalAlignment="Center">
-              <TextBlock Text="Swipe this row horizontally" FontWeight="SemiBold" />
-              <TextBlock x:Name="KeyboardHint" Text="Ctrl+Left, Ctrl+Right and Escape also work" Opacity=".7" />
+        <TextBlock Classes="h2" Text="Behind motion" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The actions remain behind the row while the foreground tracks the pointer. Opening another item in the same group closes the first." />
+        <eco:MdSlidableItem x:Name="BehindSlidable" GroupName="gallery-inbox" ActionExtent="136">
+          <eco:MdSlidableItem.StartActions>
+            <StackPanel Width="136" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4" IsHitTestVisible="False">
+              <md:MdIcon Glyph="{x:Static md:MdSymbols.Archive}" Size="22" HorizontalAlignment="Center" />
+              <TextBlock Text="Archive" HorizontalAlignment="Center" FontWeight="SemiBold" />
             </StackPanel>
-            <md:MdButton Grid.Column="1" Content="Close" Variant="Text" Click="CloseSlidable" />
+          </eco:MdSlidableItem.StartActions>
+          <eco:MdSlidableItem.EndActions>
+            <StackPanel Width="136" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4" IsHitTestVisible="False">
+              <md:MdIcon Glyph="{x:Static md:MdSymbols.Delete}" Size="22" HorizontalAlignment="Center" />
+              <TextBlock Text="Delete" HorizontalAlignment="Center" FontWeight="SemiBold" />
+            </StackPanel>
+          </eco:MdSlidableItem.EndActions>
+          <Grid ColumnDefinitions="Auto,*,Auto" MinHeight="76" Margin="16,0" ColumnSpacing="12">
+            <md:MdIcon Glyph="{x:Static md:MdSymbols.Mail}" VerticalAlignment="Center" />
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+              <TextBlock Text="Design review notes" FontWeight="SemiBold" />
+              <TextBlock x:Name="KeyboardHint" Text="Swipe either way · keyboard shortcuts are also available" Opacity=".7" TextWrapping="Wrap" />
+            </StackPanel>
+            <md:MdIconButton Grid.Column="2" Icon="{x:Static md:MdSymbols.Close}" ToolTip.Tip="Close actions" Click="CloseSlidable" />
           </Grid>
         </eco:MdSlidableItem>
       </StackPanel>
 
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Scroll motion and RTL" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Scroll motion lets the action travel in from the outer edge. In right-to-left flow, start/end panes and physical translation mirror automatically." />
+        <eco:MdSlidableItem x:Name="ScrollSlidable" GroupName="gallery-inbox" ActionExtent="136" ActionPaneMotion="Scroll" FlowDirection="RightToLeft">
+          <eco:MdSlidableItem.StartActions>
+            <StackPanel Width="136" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4" IsHitTestVisible="False">
+              <md:MdIcon Glyph="{x:Static md:MdSymbols.Archive}" Size="22" HorizontalAlignment="Center" />
+              <TextBlock Text="Archive" HorizontalAlignment="Center" FontWeight="SemiBold" />
+            </StackPanel>
+          </eco:MdSlidableItem.StartActions>
+          <eco:MdSlidableItem.EndActions>
+            <StackPanel Width="136" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="4" IsHitTestVisible="False">
+              <md:MdIcon Glyph="{x:Static md:MdSymbols.Delete}" Size="22" HorizontalAlignment="Center" />
+              <TextBlock Text="Delete" HorizontalAlignment="Center" FontWeight="SemiBold" />
+            </StackPanel>
+          </eco:MdSlidableItem.EndActions>
+          <Grid ColumnDefinitions="Auto,*" MinHeight="76" Margin="16,0" ColumnSpacing="12">
+            <md:MdIcon Glyph="{x:Static md:MdSymbols.Mail}" VerticalAlignment="Center" />
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+              <TextBlock Text="RTL message row" FontWeight="SemiBold" />
+              <TextBlock Text="The logical start action is on the right" Opacity=".7" />
+            </StackPanel>
+          </Grid>
+        </eco:MdSlidableItem>
+        <TextBlock x:Name="ActionStatus" Classes="body" Text="No action selected yet." AutomationProperties.LiveSetting="Polite" />
+      </StackPanel>
+
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
-        <gallery:CodeExample XamlCode="&lt;eco:MdSlidableItem StartActions=&quot;Archive&quot; EndActions=&quot;Delete&quot;&gt;&#10;  &lt;Grid&gt;...&lt;/Grid&gt;&#10;&lt;/eco:MdSlidableItem&gt;" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdSlidableItem StartActions=&quot;Archive&quot; EndActions=&quot;Delete&quot;&#10;                        ActionPaneMotion=&quot;Scroll&quot; OpenThreshold=&quot;0.5&quot;&#10;                        GroupName=&quot;inbox&quot;&gt;&#10;  &lt;Grid&gt;...&lt;/Grid&gt;&#10;&lt;/eco:MdSlidableItem&gt;"
+                             CSharpCode="item.StartActionCommand = ArchiveCommand;&#10;item.EndActionCommand = DeleteCommand;&#10;item.OpenEnd(); // Offset stays logical in RTL" />
       </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>

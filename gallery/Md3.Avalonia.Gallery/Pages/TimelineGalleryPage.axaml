@@ -2,23 +2,32 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
              xmlns:eco="using:Md3.Avalonia.Extra.Controls"
-             xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.TimelineGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Timeline" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="An ordered sequence of states. Each entry carries a title, a detail line, an optional timestamp, and a completed/active/neutral state." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="An ordered sequence of states with continuous vertical or horizontal connectors. Active work uses an accessible progress ring that becomes a static state cue when motion is reduced." />
       </StackPanel>
 
       <StackPanel Spacing="12">
-        <eco:MdTimeline x:Name="Timeline" MinWidth="260" HorizontalAlignment="Left" />
+        <TextBlock Classes="h2" Text="Vertical · running state" />
+        <eco:MdTimeline x:Name="VerticalTimeline" MinWidth="300" HorizontalAlignment="Left" />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Horizontal" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The same item model can follow a horizontal axis. Scroll to inspect every stage on compact windows." />
+        <md:MdScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+          <eco:MdTimeline x:Name="HorizontalTimeline" Orientation="Horizontal" HorizontalAlignment="Left" />
+        </md:MdScrollViewer>
       </StackPanel>
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
-        <gallery:CodeExample CSharpCode="timeline.ItemsSource = new[]&#10;{&#10;    new MdTimelineItem(&quot;Created&quot;, &quot;Draft created&quot;, timestamp, MdTimelineItemState.Completed),&#10;    new MdTimelineItem(&quot;Review&quot;, &quot;Accessibility and visuals&quot;, timestamp, MdTimelineItemState.Active),&#10;    new MdTimelineItem(&quot;Publish&quot;, &quot;Package validation&quot;, null, MdTimelineItemState.Neutral)&#10;};" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdTimeline Orientation=&quot;Horizontal&quot; /&gt;"
+                             CSharpCode="timeline.ItemsSource = new[]&#10;{&#10;    new MdTimelineItem(&quot;Created&quot;, &quot;Draft created&quot;, timestamp, MdTimelineItemState.Completed),&#10;    // Active + Auto displays the progress ring. Use None to opt out.&#10;    new MdTimelineItem(&quot;Review&quot;, &quot;Running checks&quot;, timestamp, MdTimelineItemState.Active),&#10;    new MdTimelineItem(&quot;Publish&quot;, &quot;Waiting&quot;, null, MdTimelineItemState.Neutral)&#10;};" />
       </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>
