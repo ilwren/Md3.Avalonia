@@ -152,6 +152,30 @@ var result = await DialogHost.ShowAsync(new DeleteDialogModel(item));
 DialogHost.Close(result: true);
 ```
 
+### `MdBannerHost` & `IMdBannerService`
+
+Use `MdBanner.Show()`/`Dismiss()` when the View owns a banner directly. For ViewModels, place an `MdBannerHost` around the shell content, declare type-matched banner views in `DataTemplates`, assign one shared `MdBannerService` to the host, and inject it as `IMdBannerService`. The ViewModel never needs a control reference.
+
+```xml
+<md:MdBannerHost x:Name="BannerHost">
+    <md:MdBannerHost.DataTemplates>
+        <DataTemplate DataType="{x:Type vm:SyncBannerModel}" x:DataType="vm:SyncBannerModel">
+            <md:MdBanner IsDismissible="True">
+                <TextBlock Text="{Binding Message}" />
+            </md:MdBanner>
+        </DataTemplate>
+    </md:MdBannerHost.DataTemplates>
+    <views:Shell />
+</md:MdBannerHost>
+```
+
+```csharp
+var result = await banners.ShowAsync<string>(new SyncBannerModel("Could not synchronize."));
+banners.Close("retry");
+```
+
+Requests are queued, startup requests wait for a host, cancellation/dismissal completes with `null`, and `ReplaceAsync` can supersede a stale persistent status. See [Banner service](../BANNER_SERVICE.md).
+
 ### `MdSnackbarHost` & `IMdSnackbarService`
 
 `MdSnackbar.Show()` changes the state of an existing visual control; it does not attach a newly constructed control to a window. For ViewModels, put an `MdSnackbarHost` in the application shell and share one `MdSnackbarService` instance between that host and the ViewModel.

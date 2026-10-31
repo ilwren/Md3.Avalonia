@@ -4,6 +4,32 @@
   <StreamGeometry x:Key="Md.Flutter.ExpandMore">M5 8L10 13L15 8</StreamGeometry>
   <StreamGeometry x:Key="Md.Flutter.Check">M3 10L8 15L17 5</StreamGeometry>
 
+  <!-- MaterialBanner host: resolves model-specific banner views and keeps them above page content. -->
+  <ControlTheme x:Key="{x:Type md:MdBannerHost}" TargetType="md:MdBannerHost">
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdBannerHost">
+        <Grid RowDefinitions="Auto,*">
+          <ContentPresenter x:Name="PART_BannerPresenter" Grid.Row="0"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Top"
+                            HorizontalContentAlignment="Stretch"
+                            Content="{TemplateBinding Banner}"
+                            ContentTemplate="{TemplateBinding BannerTemplate}"
+                            IsVisible="False" />
+          <ContentPresenter x:Name="PART_MainContent" Grid.Row="1"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:present /template/ ContentPresenter#PART_BannerPresenter">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+
   <!-- MaterialBanner -->
   <ControlTheme x:Key="{x:Type md:MdBanner}" TargetType="md:MdBanner">
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />

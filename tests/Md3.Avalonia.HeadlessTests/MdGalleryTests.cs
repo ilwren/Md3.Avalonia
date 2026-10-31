@@ -19,6 +19,15 @@ namespace Md3.Avalonia.HeadlessTests;
 
 public sealed class MdGalleryTests
 {
+    [Fact]
+    public void Motion_Track_Translation_Uses_The_Measured_Visible_Width()
+    {
+        Assert.Equal(92, MotionGalleryPage.CalculateTrackTranslation(1, 120, 28));
+        Assert.Equal(92, MotionGalleryPage.CalculateTrackTranslation(1.06, 120, 28));
+        Assert.Equal(0, MotionGalleryPage.CalculateTrackTranslation(-0.06, 120, 28));
+        Assert.Equal(0, MotionGalleryPage.CalculateTrackTranslation(1, 20, 28));
+    }
+
     [AvaloniaFact]
     public void Gallery_Shell_And_All_Documentation_Pages_Render()
     {
