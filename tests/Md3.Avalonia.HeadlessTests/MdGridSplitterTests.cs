@@ -147,7 +147,7 @@ public sealed class MdGridSplitterTests
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(240, rows[0].ActualHeight, 1);
-            Assert.Equal(160, rows[2].ActualHeight, 1);
+            Assert.Equal(156, rows[2].ActualHeight, 1); // 412 - the 16-DIP lane - the constrained 240-DIP row.
             Assert.Equal("Resize rows", AutomationProperties.GetName(splitter));
         }
         finally
