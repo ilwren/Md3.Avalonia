@@ -53,8 +53,7 @@ jobs:
         run: python3 scripts/lint-design-tokens.py --github --summary
 
       - name: Check API documentation coverage
-        # docs/API.md drifted into documenting properties that did not exist and omitting
-        # 80 public types. This is static, so it costs nothing to hold the line.
+        # Check that DocFX covers all packable projects and public interfaces have bilingual XML docs.
         run: python3 scripts/check-api-doc-coverage.py
 
       - name: Check Gallery localization coverage

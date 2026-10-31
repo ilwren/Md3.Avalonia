@@ -5,9 +5,22 @@ using Avalonia.VisualTree;
 
 namespace Md3.Avalonia.Controls;
 
-/// <summary>Implemented by Material controls that own one temporary popup surface.</summary>
+/// <summary>Implemented by Material controls that own one temporary popup surface. 由拥有一个 Material 临时弹层的控件实现。</summary>
+/// <remarks>
+/// <para>Built-in popup controls in Core and Extra report their open state to an internal
+/// coordinator. It closes the previously opened built-in popup on the same UI
+/// <see cref="Dispatcher"/> and dismisses an open popup when the offset of an ancestor
+/// <see cref="ScrollViewer"/> changes.</para>
+/// <para>This interface exposes only the state property; the coordinator is internal. Implementing
+/// <see cref="IMdPopupOwner"/> alone does not register a third-party control with the library's
+/// mutual-exclusion behavior. Custom controls remain responsible for their own popup lifecycle.</para>
+/// <para>Core 与 Extra 中的内置弹层控件会将打开状态通知库内协调器。协调器会在同一 UI
+/// <see cref="Dispatcher"/> 上关闭先前打开的内置弹层；锚点祖先中的 <see cref="ScrollViewer"/> 偏移量变化时，也会关闭当前弹层。</para>
+/// <para>此接口只公开状态属性，协调器是内部实现。第三方控件仅实现 <see cref="IMdPopupOwner"/> 并不会自动加入库内互斥行为；自定义控件仍需自行管理弹层生命周期。</para>
+/// </remarks>
 public interface IMdPopupOwner
 {
+    /// <summary>Gets or sets whether this Material control's temporary popup is open. 获取或设置该 Material 控件的临时弹层是否打开。</summary>
     bool IsMaterialPopupOpen { get; set; }
 }
 

@@ -1,5 +1,9 @@
 # Md3.Avalonia public API overview
 
+[English](API.md) | [简体中文](API.zh-CN.md)
+
+The DocFX site also generates per-type pages from the XML documentation emitted by all 18 packable projects. This hand-written overview groups the public surface by scenario; use the generated namespace pages and site search for member-level details.
+
 This document is the public entry point for the `0.5.6-preview.1` API. Preview APIs may still receive compatibility-preserving refinements before the first stable release. The NuGet package also emits `Md3.Avalonia.xml` from the source XML comments for IDE IntelliSense and API documentation generation.
 
 ## Install and register

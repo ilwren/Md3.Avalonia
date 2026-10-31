@@ -4,7 +4,7 @@
                     xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
                     xmlns:md="using:Md3.Avalonia.Controls">
 
-  <!-- Ecosystem controls are self-contained: these scoped collection templates avoid any
+  <!-- Extra controls are self-contained: these scoped collection templates avoid any
        dependency on Avalonia's global FluentTheme. -->
   <ControlTheme x:Key="{x:Type eco:MdBeforeAfter}" TargetType="eco:MdBeforeAfter">
     <Setter Property="Focusable" Value="True" />
@@ -70,8 +70,8 @@
        active and inactive track, so it borrows Primary and SurfaceContainerHighest rather than
        inventing a pair. There is no template: the control draws itself, and the theme only supplies
        the brushes and the shape token it draws with. It lives in this dictionary rather than
-       ExtraControls because AdvancedControls is the one both ExtraTheme and EcosystemTheme merge,
-       so a host gets the same waveform whichever of the two it installs. -->
+       ExtraControls because ExtraTheme merges this dictionary, so every ExtraTheme host receives
+       the same waveform styling. -->
   <ControlTheme x:Key="{x:Type eco:MdWaveform}" TargetType="eco:MdWaveform">
     <Setter Property="Focusable" Value="True" />
     <Setter Property="MinHeight" Value="48" />

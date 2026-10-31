@@ -1,5 +1,7 @@
 # Md3.Avalonia.Notifications
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 A small, standalone .NET library for showing native system notifications on Windows, macOS, Linux, and Android. It has no Avalonia dependency.
 
 ## Install

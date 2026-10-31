@@ -161,7 +161,31 @@ public sealed class MdTimelineItemPresenter : ContentControl
 public enum MdChartKind { Line, Area, Bar }
 public sealed record MdChartPoint(double X, double Y, object? Label = null, object? Value = null);
 public sealed record MdChartSeries(string Name, IReadOnlyList<MdChartPoint> Points, IBrush? Brush = null);
-public interface IMdChartDataProvider { IReadOnlyList<MdChartSeries> GetSeries(); }
+/// <summary>Supplies series data to an <see cref="MdChart"/> on demand. 按需向 <see cref="MdChart"/> 提供数据系列。</summary>
+/// <remarks>
+/// <para><see cref="GetSeries"/> is a synchronous read contract. The provider supplies data only;
+/// <see cref="MdChart"/> owns rendering, axes, pointer hit testing, and selection. The application
+/// owns its data engine, caching, and request strategy.</para>
+/// <para><see cref="MdChart.Provider"/> is a regular CLR property and the chart does not subscribe
+/// to provider changes. Call <see cref="MdChart.RefreshProvider"/> after the data changes, or assign
+/// or bind <see cref="MdChart.Series"/> directly.</para>
+/// <para><see cref="GetSeries"/> 是同步读取契约。此提供器只负责数据；<see cref="MdChart"/> 负责绘制、坐标轴、指针命中测试与选择。数据引擎、缓存及请求策略由应用管理。</para>
+/// <para><see cref="MdChart.Provider"/> 是普通 CLR 属性，图表不会订阅提供器的变化。数据更新后调用 <see cref="MdChart.RefreshProvider"/>，也可以直接赋值或绑定 <see cref="MdChart.Series"/>。</para>
+/// </remarks>
+/// <example>
+/// <para>Refresh the chart explicitly after changing provider-owned data. <c>SalesChartProvider</c>
+/// and <c>repository</c> are application-defined.</para>
+/// <para>提供器中的数据变化后，显式刷新图表。<c>SalesChartProvider</c> 与 <c>repository</c> 由应用定义。</para>
+/// <code language="csharp"><![CDATA[
+/// chart.Provider = new SalesChartProvider(repository);
+/// chart.RefreshProvider();
+/// ]]></code>
+/// </example>
+public interface IMdChartDataProvider
+{
+    /// <summary>Returns the series that should be rendered by the chart. 返回图表应呈现的数据系列。</summary>
+    IReadOnlyList<MdChartSeries> GetSeries();
+}
 
 /// <summary>Provider-neutral lightweight chart. It owns presentation, axes, pointer hit-testing and selection—not a vendor data engine.</summary>
 public sealed class MdChart : Control
@@ -600,17 +624,96 @@ public static class MdRichEditorCommandConverters
     };
 }
 
+/// <summary>Connects <see cref="MdRichEditor"/> to an application-owned document engine. 将 <see cref="MdRichEditor"/> 连接到应用自有的文档引擎。</summary>
+/// <remarks>
+/// <para>The adapter owns document storage and editing semantics; the concrete type of
+/// <see cref="Document"/> is adapter-defined. <see cref="CanExecute"/> reports whether a command is
+/// available for the current document, selection, and optional parameter. The editor's
+/// <c>Execute(command, parameter)</c> returns false when there is no adapter or the command cannot
+/// execute; otherwise it runs the command and returns true.</para>
+/// <para>Raise <see cref="StateChanged"/> after document, selection, command availability, or
+/// formatting state changes so <see cref="MdRichEditor"/> can refresh its toolbar. The built-in
+/// <see cref="MdTextBoxRichEditorAdapter"/> is a lightweight text-box example using text markers;
+/// applications that need full rich-text editing should connect their chosen document engine.</para>
+/// <para>文档存储和编辑语义由适配器负责；<see cref="Document"/> 的具体类型由适配器约定。<see cref="CanExecute"/> 会根据当前文档、选择区及可选参数报告命令是否可用。没有适配器或命令不可执行时，编辑器的 <c>Execute(command, parameter)</c> 返回 false；否则执行命令并返回 true。</para>
+/// <para>文档、选择区、命令可用性或格式状态变化后，请触发 <see cref="StateChanged"/>，使 <see cref="MdRichEditor"/> 刷新工具栏。内置的 <see cref="MdTextBoxRichEditorAdapter"/> 是使用文本标记的轻量文本框示例；需要完整富文本编辑时，应接入应用选择的文档引擎。</para>
+/// </remarks>
+/// <example>
+/// <para>An adapter raises <see cref="StateChanged"/> after updating its document or selection.</para>
+/// <para>适配器在更新文档或选择区后触发 <see cref="StateChanged"/>。</para>
+/// <code language="csharp"><![CDATA[
+/// public sealed class EditorAdapter : IMdRichEditorAdapter
+/// {
+///     public object? Document { get; set; }
+///     public event EventHandler? StateChanged;
+///
+///     public bool CanExecute(MdRichEditorCommand command, object? parameter = null) => true;
+///
+///     public void Execute(MdRichEditorCommand command, object? parameter = null)
+///     {
+///         // Update the document or selection, then notify the host.
+///         // 更新文档或选择区后通知宿主。
+///         StateChanged?.Invoke(this, EventArgs.Empty);
+///     }
+/// }
+///
+/// editor.Adapter = new EditorAdapter();
+/// ]]></code>
+/// </example>
 public interface IMdRichEditorAdapter
 {
+    /// <summary>Gets or replaces the adapter's document value. 获取或替换适配器维护的文档值。</summary>
     object? Document { get; set; }
+
+    /// <summary>Reports whether a command can be executed with the supplied parameter. 报告指定命令及参数当前是否可执行。</summary>
     bool CanExecute(MdRichEditorCommand command, object? parameter = null);
+
+    /// <summary>Executes a command against the current document and selection. 对当前文档和选择区执行命令。</summary>
     void Execute(MdRichEditorCommand command, object? parameter = null);
+
+    /// <summary>Raised when document, selection, or command state changes. 文档、选择区或命令状态变化时触发。</summary>
     event EventHandler? StateChanged;
 }
 
-/// <summary>Optional formatting-state contract used by toggle-style rich-editor commands.</summary>
+/// <summary>Optional formatting-state contract for checked rich-editor toolbar commands. 富文本工具栏切换命令的可选格式状态契约。</summary>
+/// <remarks>
+/// <para>An adapter may implement this alongside <see cref="IMdRichEditorAdapter"/>. When the
+/// toolbar refreshes, <see cref="MdRichEditor"/> queries this interface for toggle state. If the
+/// adapter does not implement it, toggle commands appear unchecked. This interface neither
+/// executes commands nor publishes change notifications; raise
+/// <see cref="IMdRichEditorAdapter.StateChanged"/> when formatting state changes.</para>
+/// <para>适配器可同时实现此接口与 <see cref="IMdRichEditorAdapter"/>。工具栏刷新时，<see cref="MdRichEditor"/> 会通过此接口查询切换状态；若未实现，切换命令会显示为未选中。此接口既不执行命令，也不发布状态变化通知；格式状态变化时请触发 <see cref="IMdRichEditorAdapter.StateChanged"/>。</para>
+/// </remarks>
+/// <example>
+/// <para>Implement both interfaces on the same adapter so toggle buttons reflect the active
+/// selection. Notify the editor through <see cref="IMdRichEditorAdapter.StateChanged"/> whenever
+/// <c>SelectionIsBold</c> changes.</para>
+/// <para>同一适配器可实现这两个接口，使切换按钮反映当前选择区状态。<c>SelectionIsBold</c> 变化时，通过 <see cref="IMdRichEditorAdapter.StateChanged"/> 通知编辑器。</para>
+/// <code language="csharp"><![CDATA[
+/// public sealed class EditorAdapter : IMdRichEditorAdapter, IMdRichEditorStateAdapter
+/// {
+///     public bool SelectionIsBold { get; set; }
+///     public object? Document { get; set; }
+///     public event EventHandler? StateChanged;
+///
+///     public bool CanExecute(MdRichEditorCommand command, object? parameter = null) => true;
+///     public void Execute(MdRichEditorCommand command, object? parameter = null)
+///     {
+///         // Apply the command and raise StateChanged after state updates.
+///         // 执行命令并在状态更新后触发 StateChanged。
+///         StateChanged?.Invoke(this, EventArgs.Empty);
+///     }
+///
+///     public bool IsCommandChecked(MdRichEditorCommand command) =>
+///         command == MdRichEditorCommand.Bold && SelectionIsBold;
+/// }
+///
+/// editor.Adapter = new EditorAdapter();
+/// ]]></code>
+/// </example>
 public interface IMdRichEditorStateAdapter
 {
+    /// <summary>Returns whether the requested toggle command is active at the current selection. 报告当前选择区中指定切换命令是否处于启用状态。</summary>
     bool IsCommandChecked(MdRichEditorCommand command);
 }
 

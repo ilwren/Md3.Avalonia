@@ -15,6 +15,7 @@ namespace Md3.Avalonia.Extra.Controls;
 /// A window that floats inside the application instead of above it: draggable by its title bar,
 /// resizable from its lower-right corner, and able to host anything - a mini player, a chat thread,
 /// an inspector - while the page underneath stays reachable and interactive.
+/// 在应用窗口内部悬浮显示的可拖动、可调整大小的内容容器。
 /// </summary>
 /// <remarks>
 /// <para>

@@ -7,6 +7,7 @@ namespace Md3.Avalonia.Themes;
 /// Material Design 3 chrome for the <c>AvaloniaEdit</c> text editor. Add it after
 /// <c>MaterialTheme</c>; it replaces the editor's own Fluent/Simple style sheets, so do not
 /// include both.
+/// AvaloniaEdit 文本编辑器的 Material Design 3 样式。
 /// </summary>
 /// <remarks>
 /// <para>

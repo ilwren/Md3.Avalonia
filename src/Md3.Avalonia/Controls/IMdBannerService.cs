@@ -5,6 +5,7 @@ namespace Md3.Avalonia.Controls;
 /// <see cref="MdBannerHost"/>. Inject this instead of handing a view model a reference to the
 /// control: the view model names the banner by model object, the host resolves the view from its
 /// <c>DataTemplates</c>, and the same surface keeps working from view code-behind.
+/// 这是供视图模型显示横幅的 UI 无关入口；宿主通过数据模板解析视图，因此无需把控件引用传给视图模型。
 /// </summary>
 public interface IMdBannerService
 {

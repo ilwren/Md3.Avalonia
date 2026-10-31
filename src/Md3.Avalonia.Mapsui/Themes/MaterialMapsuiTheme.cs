@@ -18,6 +18,7 @@ namespace Md3.Avalonia.Themes;
 /// Material 3 appearance for a Mapsui map: the canvas behind the layers, the default vector and label
 /// styles a layer is drawn with, the type scale a label is typeset in, and the Material palette a
 /// thematic map takes its colours from.
+/// 用于 Mapsui 地图的 Material 3 外观配置。
 /// </summary>
 /// <remarks>
 /// <para>

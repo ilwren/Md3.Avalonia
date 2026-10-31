@@ -251,8 +251,18 @@
   待执行的隐藏；原本自适应高度的窗口在动画落地后把 `Height` 交回 `NaN`，继续随内容自适应。
   `Reduced` 下只保留短淡出、去掉位移，`None` 下瞬时完成。
 
+- Added `MdBreadcrumbPathConverter` to turn slash-separated route paths into `MdBreadcrumb` items.
+- Added the standalone `Md3.Avalonia.Notifications` package, with Windows, macOS, Linux, and Android implementations. Host registration and runtime permissions remain platform responsibilities; actual delivery still requires device/OS acceptance.
+
+### Changed
+
+- The core, Extra, Icons, Icons.Lite, and DataGrid packages include `net8.0` and `net10.0` assets; Notifications also provides those targets plus Windows-specific TFMs. The 12 integration and theme packages, including RichEditor, remain `net10.0`-only. The release uses Avalonia `12.1.2`; Gallery remains .NET 10-only.
+- Consolidated Extra control resources under `ExtraTheme` and removed the obsolete `EcosystemTheme` name without a compatibility shim.
+
 ### Fixed
 
+- `MaterialRichEditorTheme` now uses the live M3 `OnSurface` token for default run foreground, improving unstyled text readability in dark mode.
+- `MdBeforeAfter` now defers keyboard focus and suppresses ancestor `BringIntoViewOnFocusChange` during a drag. Headless regressions cover the first left- and top-edge drags, but desktop acceptance remains pending.
 - **A pulsing `MdWaveform` never restarted after an ancestor hid it.** The frame loop lapses when
   `ShouldAnimate` goes false, and that test includes `IsEffectivelyVisible` - but nothing told the
   control when visibility came back. Avalonia exposes `IsEffectivelyVisible` only as a plain CLR
@@ -327,27 +337,6 @@
   translation table is built in a static initialiser, so a key written twice throws the first time a
   page is localized - and the duplicate `Navigation` key above is exactly that. The tests translate a
   page into Chinese and back, and assert every page they are given both changes and restores.
-## [0.4.6-preview.1] - Pending publication
-
-> Source baseline entry; publication, multi-target build verification, and platform acceptance remain pending.
-
-### Added
-
-- Added `MdBreadcrumbPathConverter` for binding slash-separated route paths directly to `MdBreadcrumb`; navigable ancestors use the theme's primary text color, while the current item and separators stay neutral.
-- Added the standalone `Md3.Avalonia.Notifications` package with one title/body API for Windows, macOS, Linux and Android. Windows uses WinRT toast APIs from its Windows-specific .NET target, Linux calls libnotify directly (no helper processes), macOS uses AppKit interop, and Android uses `NotificationManager`; Windows AppUserModelID registration and Android 13+ runtime permission remain host responsibilities. Platform delivery still needs manual verification.
-
-### Changed
-
-- Consolidated Extra control resources under `ExtraTheme`; removed the obsolete `EcosystemTheme` name without a compatibility shim.
-- Added `net8.0` alongside `net10.0` for all seven NuGet packages and aligned Avalonia dependencies to the first stable Avalonia 12 release, `12.0.0` (including `Avalonia.Controls.DataGrid`). The Gallery remains .NET 10-only.
-
-### Verification pending
-
-- Updated `MdBeforeAfter` to defer keyboard focus until after a drag and suppress ancestor `BringIntoViewOnFocusChange` during that transition; headless regressions cover the first left-edge and top-edge drags through release. The reported desktop first-drag/position/scroll issue remains unverified and requires desktop re-test; this code/headless coverage is not desktop sign-off.
-
-### Fixed
-
-- `MaterialRichEditorTheme` now sets the editor's default run foreground from the live M3 `OnSurface` token, so unstyled document text remains readable in dark mode. The opt-in package uses the MIT-maintained `OlivierJC.AvaloniaRichEditor` fork until the corresponding upstream package release is available.
 
 ## [0.4.5-preview.1] - 2026-10-12
 
@@ -661,8 +650,6 @@ For details, see [`docs/RELEASE_NOTES_0.4.5-preview.1.md`](docs/RELEASE_NOTES_0.
 
 - CI jobs are bounded by a timeout; a deadlocked test previously held a runner for six hours.
 
-For details, see [`docs/RELEASE_NOTES_0.4.0-preview.1.md`](docs/RELEASE_NOTES_0.4.0-preview.1.md).
-
 ## [0.3.5-preview.1] - 2026-10-04
 
 Previously numbered `3.1.0-preview.1`, which was a typo for `0.3.1-preview.1`. The packages
@@ -710,8 +697,6 @@ leaving a version that reads as a major release.
 - Corrected the borderless-window icon default in both `README.md` and `docs/API.md`: a
   borderless window shows its icon by default, which both documents had stated backwards.
 - Refreshed the token-dictionary listing in `README.md`, which named 7 of the 11 dictionaries.
-
-For details, see [`docs/RELEASE_NOTES_0.3.5-preview.1.md`](docs/RELEASE_NOTES_0.3.5-preview.1.md).
 
 All notable changes follow Keep a Changelog. The project intends to use Semantic Versioning after the preview cycle.
 

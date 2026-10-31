@@ -1,15 +1,22 @@
 # Md3.Avalonia 0.5.0-preview.1 release notes
 
-发布日期：2026-10-18
+发布日期：2026-10-19
+
+> `0.5.0-preview.1` 已于 2026-10-19 发布到 [NuGet.org](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.1)；18 个包均使用此版本。
 
 版本号从 `0.4.1-preview.1` 进到 `0.5.0-preview.1`。这一版没有破坏性改动，但公开 API 面增加了不少：
-可发布包从六个变成十七个，`Md3.Avalonia.Extra` 多了三个自研控件，所以走次版本而不是补丁版本。
+包数从六个增至十八个——包括 11 个第三方主题包和独立的 Notifications 包；`Md3.Avalonia.Extra` 另新增三个自研控件，因此采用次版本而不是补丁版本。
 
 > 仓库中没有 `0.4.1-preview.1` 的 tag 或 release；`docs/RELEASE_NOTES_0.4.1-preview.1.md` 保留为
 > 那一轮工作的记录。本版条目原先记在 CHANGELOG 的 `0.4.1-preview.1` 小节下，已归入
 > `## [0.5.0-preview.1]`。
 
 ## 新增
+
+### 通知服务与面包屑路径转换
+
+- 新增独立的 `Md3.Avalonia.Notifications` 包，为 Windows、macOS、Linux 和 Android 提供标题/正文通知 API。Windows AppUserModelID 注册和 Android 13+ 通知权限仍由宿主负责；跨平台投递行为仍需对应系统/设备上的人工验收。
+- 新增 `MdBreadcrumbPathConverter`，可将斜杠分隔的路由路径转换为 `MdBreadcrumb` 路径项；可导航祖先项使用主题主文字色，当前项与分隔符保持中性。
 
 ### 十一个第三方控件主题包
 
@@ -62,8 +69,15 @@
 
 > `MdSideSheet`（贴边收起的边缘面板）曾在本轮一并实现，后按需求撤下，代码库中已无残留。
 
+## 变更
+
+- 核心、Extra、Icons、Icons.Lite 与 DataGrid 五个包包含 `net8.0` 和 `net10.0` 资产；Notifications 还提供这两个目标及 Windows 专用 TFM。包括 RichEditor 在内的 12 个集成与主题包以 `net10.0` 为目标。发行版本使用 Avalonia `12.1.2`，Gallery 仍仅以 .NET 10 构建。
+- Extra 控件资源统一通过 `ExtraTheme` 暴露；移除旧 `EcosystemTheme` 名称，不提供兼容 shim。
+
 ## 修复
 
+- `MaterialRichEditorTheme` 的默认正文颜色改为使用实时 M3 `OnSurface` 令牌，以改善深色主题下未设置样式的文本可读性。
+- `MdBeforeAfter` 在拖动期间延后键盘焦点并抑制祖先 `BringIntoViewOnFocusChange`；Headless 回归测试覆盖首次从左边缘和上边缘拖动的过程，但这不等同于桌面端人工验收，首次拖动/定位/滚动问题仍需桌面复测。
 - **Markdown 代码块偶发无法成形。** `CCode` 的 `MonospaceFontFamily` 默认取
   `FontFamilyCollector.TryGetMonospace()` 按**枚举顺序**挑出的第一个系统字体族，该字体带
   `fonts:SystemFonts` 键且无回退，导致 CI 间歇性抛 `Could not create glyphTypeface`。改为设置
@@ -92,8 +106,8 @@
 - `check-api-doc-coverage.py`：types=346，documented=346，missing=0
 - `check-gallery-localization.py --strict`：1031 keys，0 重复，未翻译正文 0
 - `lint-design-tokens.py`：errors=0
-- 六个（现为十七个）`src/` 包声明 `IsAotCompatible`，并以 IL3xxx 分析器构建；本轮未新增反射
-- CI、AOT probe、Build NuGet Packages、Build Multi-Platform Gallery 四个 workflow 全绿
+- 全部 18 个 `src/` 包项目声明 `IsAotCompatible`，并以 IL3xxx 分析器构建；本轮未新增反射。
+- `v0.5.0-preview.1` 发布工作流全部通过：18 个 NuGet 包成功推送到 NuGet.org，并生成 Linux、macOS、Windows 桌面 Gallery 与 Android Gallery 产物。
 
 ## 升级
 

@@ -1,11 +1,11 @@
-# Flutter parity status
+# Flutter behavior boundaries
+
+[English](FLUTTER_PARITY_STATUS.md) | [简体中文](FLUTTER_PARITY_STATUS.zh-CN.md)
 
 Last reviewed: 2026-10-22  
 Comparison target: Flutter stable public API documentation (see `spec-snapshot/manifest.json`).
 
-Md3.Avalonia is Avalonia-native. A similar type name does **not** imply complete Flutter API,
-rendering, route, platform-adaptation, accessibility, or state-machine parity. This status table is
-normative for documentation and release notes.
+Md3.Avalonia uses Avalonia controls, properties, and lifecycles. Similar type names do not imply identical Flutter APIs, rendering, routing, platform adaptation, or accessibility. `Md3.Avalonia.Extra` is an optional extension package, not part of the official Material component catalog.
 
 | API family | Status | Supported behavior | Known boundary |
 |---|---|---|---|
@@ -27,9 +27,5 @@ normative for documentation and release notes.
 | `MdCommitGraph` | No Flutter counterpart | Lane-based commit history with branch/merge connectors, head marker, per-lane Material colors, `HeadId` and read-only `LaneCount` | No first-party Flutter commit graph; layout is a custom GitHub-style lane algorithm, items are plain `MdCommitNode` models supplied by the host |
 | `MdCarousel` | Mapped to `PageView` | Weighted, hero, center-aligned and uncontained carousel variants with controller and autoplay | Not certified for Flutter `PageView` physics/scroll-position parity |
 
-## Release policy
 
-- `Implemented subset` may be documented only with its explicit supported behavior and boundary.
-- `Partial` and `API shell` must not be counted as completed Flutter parity.
-- `Experimental` APIs must not be included in compliance totals.
-- Behavioral parity claims require tests against a named Flutter stable version and source commit.
+Types marked `[MdExperimental]` are not evidence of completed Flutter parity. The project does not publish an overall parity percentage; every compatibility claim must be limited to the APIs, tested cases, and boundaries listed here.

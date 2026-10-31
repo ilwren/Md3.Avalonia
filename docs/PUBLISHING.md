@@ -72,6 +72,10 @@ The workflow rejects runs from branches other than `main`, malformed versions, a
 
 Use a new version for every publication. NuGet.org does not allow replacing a published package version; `--skip-duplicate` lets a retry continue after a partially successful upload, but it does not make it safe to rebuild different contents under an already published version.
 
+## NuGet source repository metadata
+
+All package projects inherit `RepositoryUrl` and `RepositoryType` from the root `Directory.Build.props`. This emits a `<repository type="git" url="https://github.com/ilwren/Md3.Avalonia" />` element in each `.nuspec`, which NuGet.org displays as the source repository link. The metadata applies to newly packed and published versions; an existing NuGet version cannot be rewritten.
+
 ## If the push fails
 
 The publish step reports which half of the exchange broke:
