@@ -354,7 +354,7 @@ public sealed class MdFileSystemPicker : TemplatedControl
         if (_itemsHost is not null)
         {
             _itemsHost.SelectionChanged += OnSelectionChanged;
-            _itemsHost.AddHandler(Gestures.DoubleTappedEvent, OnItemDoubleTapped,
+            _itemsHost.AddHandler(InputElement.DoubleTappedEvent, OnItemDoubleTapped,
                 RoutingStrategies.Bubble, handledEventsToo: true);
             _itemsHost.AddHandler(Button.ClickEvent, OnEntryOpenClicked);
         }
@@ -766,7 +766,7 @@ public sealed class MdFileSystemPicker : TemplatedControl
         if (_itemsHost is not null)
         {
             _itemsHost.SelectionChanged -= OnSelectionChanged;
-            _itemsHost.RemoveHandler(Gestures.DoubleTappedEvent, OnItemDoubleTapped);
+            _itemsHost.RemoveHandler(InputElement.DoubleTappedEvent, OnItemDoubleTapped);
             _itemsHost.RemoveHandler(Button.ClickEvent, OnEntryOpenClicked);
         }
         if (_upButton is not null) _upButton.Click -= OnUpClick;
