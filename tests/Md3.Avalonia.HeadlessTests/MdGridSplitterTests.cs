@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Shapes;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -36,7 +37,7 @@ public sealed class MdGridSplitterTests
         {
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Equal(12, splitter.Bounds.Width, 1);
+            Assert.Equal(16, splitter.Bounds.Width, 1);
             Assert.Equal("调整列宽", AutomationProperties.GetName(splitter));
             var columnVisual = splitter.GetVisualDescendants().OfType<Grid>()
                 .Single(control => control.Name == "PART_ColumnVisual");
@@ -44,8 +45,12 @@ public sealed class MdGridSplitterTests
                 .Single(control => control.Name == "PART_RowVisual");
             Assert.True(columnVisual.IsVisible);
             Assert.False(rowVisual.IsVisible);
-            Assert.True(splitter.GetVisualDescendants().OfType<Border>()
-                .Single(control => control.Name == "PART_ColumnHandle").IsVisible);
+            var handle = splitter.GetVisualDescendants().OfType<Border>()
+                .Single(control => control.Name == "PART_ColumnHandle");
+            Assert.True(handle.IsVisible);
+            Assert.Equal(6, handle.Width);
+            Assert.Equal(56, handle.Height);
+            Assert.Equal(3, handle.GetVisualDescendants().OfType<Ellipse>().Count());
         }
         finally
         {
@@ -76,6 +81,32 @@ public sealed class MdGridSplitterTests
 
             Assert.Equal(1, resetCount);
             Assert.Equal(grid.ColumnDefinitions[0].ActualWidth, grid.ColumnDefinitions[2].ActualWidth, 1);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Home_Key_Requests_The_Hosts_Default_Pane_Sizes()
+    {
+        var splitter = new MdGridSplitter
+        {
+            [Grid.ColumnProperty] = 1,
+            ResizeDirection = GridResizeDirection.Columns
+        };
+        var requested = 0;
+        splitter.ResetRequested += (_, _) => requested++;
+        var window = new Window { Width = 612, Height = 240, Content = ColumnGrid(splitter, "2*,Auto,*") };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(splitter.Focus());
+            window.KeyPress(Key.Home, RawInputModifiers.None, PhysicalKey.Home, null);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(1, requested);
         }
         finally
         {
@@ -155,7 +186,7 @@ public sealed class MdGridSplitterTests
 
             splitter.RaiseEvent(new VectorEventArgs { RoutedEvent = Thumb.DragCompletedEvent });
             Dispatcher.UIThread.RunJobs();
-            Assert.Equal(12, splitter.Bounds.Width, 1);
+            Assert.Equal(16, splitter.Bounds.Width, 1);
             Assert.False(splitter.GetVisualDescendants().OfType<Border>()
                 .Single(control => control.Name == "PART_ColumnHandle").IsVisible);
         }
@@ -205,11 +236,11 @@ public sealed class MdGridSplitterTests
         var rowDemo = page.FindControl<Grid>("RowDemo")!;
         var rowSplitter = page.FindControl<MdGridSplitter>("RowSplitter")!;
 
-        Assert.Equal(columnDemo.ColumnDefinitions[0].Width, columnDemo.ColumnDefinitions[2].Width);
-        Assert.Equal(96, columnDemo.ColumnDefinitions[0].MinWidth);
+        Assert.NotEqual(columnDemo.ColumnDefinitions[0].Width, columnDemo.ColumnDefinitions[2].Width);
+        Assert.Equal(120, columnDemo.ColumnDefinitions[0].MinWidth);
         Assert.Equal(16, columnDemo.ColumnDefinitions[1].Width.Value);
         Assert.Equal(GridUnitType.Pixel, columnDemo.ColumnDefinitions[1].Width.GridUnitType);
-        Assert.Equal(96, columnDemo.ColumnDefinitions[2].MinWidth);
+        Assert.Equal(120, columnDemo.ColumnDefinitions[2].MinWidth);
         Assert.Equal(rowDemo.RowDefinitions[0].Height, rowDemo.RowDefinitions[2].Height);
         Assert.Equal(80, rowDemo.RowDefinitions[0].MinHeight);
         Assert.Equal(80, rowDemo.RowDefinitions[2].MinHeight);

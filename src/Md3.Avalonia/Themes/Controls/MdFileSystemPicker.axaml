@@ -11,6 +11,38 @@
   <StreamGeometry x:Key="Md.FileSystemPicker.CheckGeometry">M5 12.5L10 17.5L19 7.5</StreamGeometry>
   <StreamGeometry x:Key="Md.FileSystemPicker.ChevronGeometry">M8.5 5L15.5 12L8.5 19</StreamGeometry>
 
+  <!-- A breadcrumb is a contiguous navigation trail, not a row of 48-DIP MdButton containers.
+       This scoped button keeps the full 40-DIP path bar hit area without injecting horizontal
+       minimum widths between Powerline segments. -->
+  <ControlTheme x:Key="MdFileSystemBreadcrumbButtonTheme" TargetType="Button">
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="MinHeight" Value="40" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Button">
+        <Grid MinHeight="{TemplateBinding MinHeight}" Background="Transparent">
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+          <Border x:Name="PART_StateLayer" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
+                  IsHitTestVisible="False" Opacity="0" />
+          <Border x:Name="PART_FocusIndicator" Margin="2"
+                  BorderBrush="{DynamicResource Md.Sys.Color.Primary.Brush}" BorderThickness="2"
+                  CornerRadius="6" IsHitTestVisible="False" Opacity="0" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:pressed /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.10" /></Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusIndicator"><Setter Property="Opacity" Value="1" /></Style>
+    <Style Selector="^.current"><Setter Property="Cursor" Value="Arrow" /></Style>
+    <Style Selector="^.current /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0" /></Style>
+  </ControlTheme>
+
   <ControlTheme x:Key="MdFileSystemPickerItemTheme" TargetType="ListBoxItem">
     <Setter Property="MinHeight" Value="{DynamicResource Md.Comp.FileSystemPicker.Item.MinHeight}" />
     <Setter Property="Padding" Value="{DynamicResource Md.Comp.FileSystemPicker.Item.Padding}" />
@@ -148,46 +180,57 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                       <DataTemplate x:DataType="md:MdFileSystemPathSegment">
-                        <md:MdButton x:Name="PART_PathSegmentButton"
-                                     Classes="breadcrumb-segment"
-                                     Classes.current="{Binding IsCurrent}"
-                                     MinWidth="0" Padding="0" Size="ExtraSmall" Variant="Text"
-                                     Tag="{Binding}">
+                        <Button x:Name="PART_PathSegmentButton"
+                                Theme="{StaticResource MdFileSystemBreadcrumbButtonTheme}"
+                                Classes="breadcrumb-segment"
+                                Classes.first="{Binding IsFirst}"
+                                Classes.current="{Binding IsCurrent}"
+                                Tag="{Binding}">
                           <Grid>
                             <StackPanel Classes="standard-segment" Orientation="Horizontal" VerticalAlignment="Center">
-                              <TextBlock Margin="10,0" VerticalAlignment="Center" Text="{Binding Label}" />
+                              <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Label}"
+                                         Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" />
                               <TextBlock Margin="0,0,2,0" VerticalAlignment="Center" Text="›"
                                          IsVisible="{Binding IsCurrent, Converter={x:Static BoolConverters.Not}}"
                                          Foreground="{DynamicResource Md.Sys.Color.Outline.Brush}" />
                             </StackPanel>
-                            <Grid Classes="powerline-segment" Height="40" IsVisible="False"
-                                  ColumnDefinitions="Auto,8" Margin="0,0,1,0">
-                              <Grid Grid.Column="0">
-                                <Border Padding="13,0,9,0"
-                                        Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
-                                        CornerRadius="8,0,0,8"
-                                        IsVisible="{Binding IsCurrent, Converter={x:Static BoolConverters.Not}}">
-                                  <TextBlock VerticalAlignment="Center" Text="{Binding Label}"
-                                             Foreground="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
-                                </Border>
-                                <Border Padding="13,0,9,0"
-                                        Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
-                                        CornerRadius="8,0,0,8" IsVisible="{Binding IsCurrent}">
-                                  <TextBlock VerticalAlignment="Center" Text="{Binding Label}"
-                                             Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" />
-                                </Border>
-                              </Grid>
-                              <Grid Grid.Column="1" Width="8" Height="40">
-                                <Path Data="M0,0 L8,20 L0,40 Z" Stretch="Fill"
-                                      Fill="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
-                                      IsVisible="{Binding IsCurrent, Converter={x:Static BoolConverters.Not}}" />
-                                <Path Data="M0,0 L8,20 L0,40 Z" Stretch="Fill"
-                                      Fill="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
-                                      IsVisible="{Binding IsCurrent}" />
-                              </Grid>
+
+                            <!-- Complementary 14-DIP notch/body/point pieces match MdBreadcrumb's
+                                 Powerline geometry. The button containers overlap by the notch
+                                 depth, so no default button minimum width can open a seam. -->
+                            <Grid Classes="powerline-segment" Height="32" IsVisible="False"
+                                  ColumnDefinitions="14,Auto,14">
+                              <Path Grid.Column="0" Stretch="Fill" Stroke="{x:Null}"
+                                    Data="M 0,0 L 1,0 L 1,1 L 0,1 L 1,0.5 Z"
+                                    Fill="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                                    IsVisible="{Binding IsFirst, Converter={x:Static BoolConverters.Not}}" />
+                              <Path Grid.Column="0" Stretch="Fill" Stroke="{x:Null}"
+                                    Data="M 0,0 L 1,0 L 1,1 L 0,1 Z"
+                                    Fill="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                                    IsVisible="{Binding IsFirst}" />
+                              <Border Grid.Column="1" Padding="4,5,8,5"
+                                      Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                                      IsVisible="{Binding IsCurrent, Converter={x:Static BoolConverters.Not}}">
+                                <TextBlock VerticalAlignment="Center" Text="{Binding Label}"
+                                           Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+                              </Border>
+                              <Border Grid.Column="1" Padding="4,5,8,5"
+                                      Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
+                                      IsVisible="{Binding IsCurrent}">
+                                <TextBlock VerticalAlignment="Center" Text="{Binding Label}"
+                                           Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" FontWeight="SemiBold" />
+                              </Border>
+                              <Path Grid.Column="2" Stretch="Fill" Stroke="{x:Null}"
+                                    Data="M 0,0 L 1,0.5 L 0,1 Z"
+                                    Fill="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                                    IsVisible="{Binding IsCurrent, Converter={x:Static BoolConverters.Not}}" />
+                              <Path Grid.Column="2" Stretch="Fill" Stroke="{x:Null}"
+                                    Data="M 0,0 L 1,0.5 L 0,1 Z"
+                                    Fill="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
+                                    IsVisible="{Binding IsCurrent}" />
                             </Grid>
                           </Grid>
-                        </md:MdButton>
+                        </Button>
                       </DataTemplate>
                     </ItemsControl.ItemTemplate>
                   </ItemsControl>
@@ -392,6 +435,8 @@
       </ControlTemplate>
     </Setter>
 
+    <Style Selector="^:powerline-breadcrumb /template/ Button.breadcrumb-segment"><Setter Property="Margin" Value="-14,0,0,0" /></Style>
+    <Style Selector="^:powerline-breadcrumb /template/ Button.breadcrumb-segment.first"><Setter Property="Margin" Value="0" /></Style>
     <Style Selector="^:editing-path /template/ ScrollViewer#PART_BreadcrumbScroller"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:editing-path /template/ md|MdTextBox#PART_PathBox"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:folder-mode /template/ TextBlock#PART_FileModeLabel"><Setter Property="IsVisible" Value="False" /></Style>

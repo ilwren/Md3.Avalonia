@@ -81,7 +81,8 @@ The responsive redesign was subsequently hardened in four areas:
 
 - every glyph is drawn in a fixed 24×24 transparent `Canvas` and scaled by a centered `Viewbox`, so asymmetric path bounds cannot move the visual viewport off-center;
 - single selection uses Avalonia's native `SelectionMode.Single | SelectionMode.Toggle`, matching multiple mode's ability to clear an accidental selection;
-- `BreadcrumbStyle` exposes `Standard` and connected `Powerline` presentations without changing path semantics;
+- `BreadcrumbStyle` exposes `Standard` and connected `Powerline` presentations without changing path semantics. The Powerline treatment now uses the same complementary 14-DIP notch/body/point geometry and overlap as the original `MdBreadcrumb`, with a scoped zero-minimum-width button theme so generic button targets cannot create gaps between segments;
+- folder activation resolves the entry from the actual double-tap source before consulting selection. This is required because the intentional Toggle selection mode can deselect the row on the second click;
 - visible labels, state messages, entry type/date/number formatting, tooltips and automation names follow inherited `MdLocalization.Culture` (English/Chinese). Public text properties such as `Title`, `PathLabel`, action labels and state labels remain locally overridable and are not overwritten by later culture changes.
 
 These are additive clean-room decisions built from the same Avalonia selection/localization primitives; no reference package source or icon asset was copied.

@@ -1,7 +1,9 @@
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -58,6 +60,43 @@ public sealed class MdFileSystemPickerTests
     }
 
     [AvaloniaFact]
+    public async Task Double_Clicking_A_Folder_Opens_The_Clicked_Row_Even_When_Toggle_Selection_Deselects_It()
+    {
+        var root = CreateFixture();
+        var picker = new MdFileSystemPicker { Width = 720, Height = 500 };
+        var window = new Window { Width = 800, Height = 580, Content = picker };
+        window.Show();
+        try
+        {
+            Assert.True(await picker.NavigateAsync(root));
+            Dispatcher.UIThread.RunJobs();
+            var folder = Assert.Single(picker.Entries, entry => entry.IsDirectory && entry.Name == "folder");
+            var row = picker.GetVisualDescendants().OfType<ListBoxItem>()
+                .Single(item => ReferenceEquals(item.DataContext, folder));
+            var point = row.TranslatePoint(new Point(row.Bounds.Width / 2, row.Bounds.Height / 2), window)!.Value;
+
+            window.MouseMove(point, RawInputModifiers.None);
+            window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
+            window.MouseUp(point, MouseButton.Left, RawInputModifiers.None);
+            window.MouseDown(point, MouseButton.Left, RawInputModifiers.None);
+            window.MouseUp(point, MouseButton.Left, RawInputModifiers.None);
+
+            var expected = Path.GetFullPath(folder.FullPath);
+            for (var attempt = 0; attempt < 50 && picker.CurrentDirectory != expected; attempt++)
+            {
+                await Task.Delay(10);
+                Dispatcher.UIThread.RunJobs();
+            }
+            Assert.Equal(expected, picker.CurrentDirectory);
+        }
+        finally
+        {
+            window.Close();
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [AvaloniaFact]
     public async Task Folder_Mode_Can_Confirm_Current_Directory_And_Reports_Navigation_Errors()
     {
         var root = CreateFixture();
@@ -105,6 +144,8 @@ public sealed class MdFileSystemPickerTests
             Assert.NotEmpty(picker.PathSegments);
             Assert.Equal(Path.GetFullPath(nested), picker.PathSegments[^1].FullPath);
             Assert.Equal("nested", picker.PathSegments[^1].Label);
+            Assert.True(picker.PathSegments[0].IsFirst);
+            Assert.All(picker.PathSegments.Skip(1), segment => Assert.False(segment.IsFirst));
             Assert.True(picker.PathSegments[^1].IsCurrent);
             Assert.All(picker.PathSegments.Take(picker.PathSegments.Count - 1), segment => Assert.False(segment.IsCurrent));
             Assert.All(picker.PathSegments, segment => Assert.True(Path.IsPathFullyQualified(segment.FullPath)));
@@ -129,6 +170,13 @@ public sealed class MdFileSystemPickerTests
             Assert.True(
                 powerline.IsVisible,
                 $"powerline visual should be visible; property={picker.IsPowerlineBreadcrumb}, local={powerline.GetValue(Visual.IsVisibleProperty)}");
+            var breadcrumbButtons = picker.GetVisualDescendants().OfType<Button>()
+                .Where(button => button.Classes.Contains("breadcrumb-segment"))
+                .ToArray();
+            Assert.Equal(picker.PathSegments.Count, breadcrumbButtons.Length);
+            Assert.Equal(default(Thickness), breadcrumbButtons[0].Margin);
+            Assert.All(breadcrumbButtons.Skip(1), button => Assert.Equal(-14, button.Margin.Left));
+            Assert.All(breadcrumbButtons, button => Assert.Equal(0, button.MinWidth));
 
             MdLocalization.SetCulture(picker, CultureInfo.GetCultureInfo("zh-CN"));
             Dispatcher.UIThread.RunJobs();

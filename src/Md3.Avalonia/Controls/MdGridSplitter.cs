@@ -80,6 +80,12 @@ public class MdGridSplitter : GridSplitter
         set => SetValue(ResetOnDoubleTappedProperty, value);
     }
 
+    /// <summary>
+    /// Raised when double-tap or the Home key requests the host's preferred pane sizes. When no
+    /// handler is attached, the control falls back to <see cref="ResetToEqual"/>.
+    /// </summary>
+    public event EventHandler? ResetRequested;
+
     /// <summary>Raised after <see cref="ResetToEqual"/> successfully equalizes a compatible pair.</summary>
     public event EventHandler? SplitReset;
 
@@ -140,10 +146,27 @@ public class MdGridSplitter : GridSplitter
         return result;
     }
 
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        if (e.Key == Key.Home && RequestReset())
+        {
+            e.Handled = true;
+            return;
+        }
+        base.OnKeyDown(e);
+    }
+
     private void OnDoubleTapped(object? sender, TappedEventArgs e)
     {
-        if (!ResetOnDoubleTapped || !ResetToEqual()) return;
+        if (!ResetOnDoubleTapped || !RequestReset()) return;
         e.Handled = true;
+    }
+
+    private bool RequestReset()
+    {
+        if (ResetRequested is null) return ResetToEqual();
+        ResetRequested.Invoke(this, EventArgs.Empty);
+        return true;
     }
 
     private GridResizeDirection GetEffectiveResizeDirection()
@@ -298,6 +321,11 @@ public class MdGridSplitter : GridSplitter
         {
             if (divider is not null)
                 divider.Transitions = MdMotionTransitions.Collect(
+                    MdMotionTransitions.CreateDouble(
+                        this,
+                        OpacityProperty,
+                        MdMotionKind.Effects,
+                        MdMotionSpeed.Fast),
                     MdMotionTransitions.CreateBrush(
                         this,
                         Border.BackgroundProperty,

@@ -354,7 +354,8 @@ public sealed class MdFileSystemPicker : TemplatedControl
         if (_itemsHost is not null)
         {
             _itemsHost.SelectionChanged += OnSelectionChanged;
-            _itemsHost.DoubleTapped += OnItemDoubleTapped;
+            _itemsHost.AddHandler(Gestures.DoubleTappedEvent, OnItemDoubleTapped,
+                RoutingStrategies.Bubble, handledEventsToo: true);
             _itemsHost.AddHandler(Button.ClickEvent, OnEntryOpenClicked);
         }
         if (_upButton is not null) _upButton.Click += OnUpClick;
@@ -616,6 +617,13 @@ public sealed class MdFileSystemPicker : TemplatedControl
         foreach (var grid in this.GetVisualDescendants().OfType<Grid>())
             if (grid.Classes.Contains("powerline-segment"))
                 grid.IsVisible = IsPowerlineBreadcrumb;
+        foreach (var button in this.GetVisualDescendants().OfType<Button>())
+        {
+            if (!button.Classes.Contains("breadcrumb-segment")) continue;
+            button.Margin = IsPowerlineBreadcrumb && !button.Classes.Contains("first")
+                ? new Thickness(-14, 0, 0, 0)
+                : default;
+        }
     }
 
     private void UpdatePseudoClasses()
@@ -661,7 +669,12 @@ public sealed class MdFileSystemPicker : TemplatedControl
 
     private void ActivateSelectedEntry()
     {
-        if (_itemsHost?.SelectedItem is not MdFileSystemEntry entry) return;
+        if (_itemsHost?.SelectedItem is MdFileSystemEntry entry)
+            ActivateEntry(entry);
+    }
+
+    private void ActivateEntry(MdFileSystemEntry entry)
+    {
         if (entry.IsDirectory)
             _ = NavigateAsync(entry.FullPath);
         else if (Mode == MdFileSystemPickerMode.File)
@@ -672,7 +685,20 @@ public sealed class MdFileSystemPicker : TemplatedControl
 
     private void OnItemDoubleTapped(object? sender, TappedEventArgs e)
     {
-        ActivateSelectedEntry();
+        // Toggle selection intentionally deselects on the second click. Resolve the entry from the
+        // actual double-tap source before falling back to SelectedItem, otherwise a folder appears
+        // selectable but cannot be opened by the standard desktop gesture.
+        var source = e.Source as Control;
+        var entry = source?.DataContext as MdFileSystemEntry ??
+                    source?.GetVisualAncestors().OfType<Control>()
+                        .Select(control => control.DataContext)
+                        .OfType<MdFileSystemEntry>()
+                        .FirstOrDefault();
+        if (entry is null && _itemsHost?.SelectedItem is MdFileSystemEntry selected)
+            entry = selected;
+        if (entry is null) return;
+
+        ActivateEntry(entry);
         e.Handled = true;
     }
 
@@ -740,7 +766,7 @@ public sealed class MdFileSystemPicker : TemplatedControl
         if (_itemsHost is not null)
         {
             _itemsHost.SelectionChanged -= OnSelectionChanged;
-            _itemsHost.DoubleTapped -= OnItemDoubleTapped;
+            _itemsHost.RemoveHandler(Gestures.DoubleTappedEvent, OnItemDoubleTapped);
             _itemsHost.RemoveHandler(Button.ClickEvent, OnEntryOpenClicked);
         }
         if (_upButton is not null) _upButton.Click -= OnUpClick;
@@ -880,6 +906,7 @@ public sealed class MdFileSystemPicker : TemplatedControl
             .Select((value, index) => new MdFileSystemPathSegment(
                 value.Label,
                 value.FullPath,
+                index == 0,
                 index == values.Count - 1))
             .ToArray();
     }

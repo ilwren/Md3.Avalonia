@@ -31,8 +31,15 @@ localized automation text, double-tap reset and a public `ResetToEqual()` comman
 
 The splitter has two deliberately different geometries:
 
-- a 12 dp interaction track that is easy to acquire with mouse, pen or touch without a ripple; and
-- a 2 dp visible divider with an optional rounded 32 dp grip.
+- a 16 dp interaction lane that is easy to acquire with mouse, pen or touch without a ripple; and
+- a 2 dp visible divider with an optional rounded 56 dp three-dot capsule.
+
+The follow-up also inspected and packaged the proven
+[`MaterialGridSplitter`](https://github.com/ilwren/MdExplorer/blob/arena/c665818d-mdexplorer/src/MdExplorer.UI/Controls/MaterialGridSplitter.cs)
+prototype and its `AppStyles.axaml` theme from MdExplorer. Its 16 dp lane, long three-dot capsule,
+hover/pressed growth, Home-key reset request, and host-owned default pane restoration replace the
+first Gallery treatment. Md3.Avalonia retains its more general row/column orientation, motion scheme,
+preview and `ResetToEqual()` APIs around those validated interaction and visual decisions.
 
 The visual divider uses `OutlineVariant` at rest, `OnSurfaceVariant` on hover/focus, and `Primary`
 while dragging. The grip follows the same state colors. Horizontal and vertical rendering is selected
