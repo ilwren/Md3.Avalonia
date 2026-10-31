@@ -4,15 +4,15 @@
 
 Md3.Avalonia is split into 18 packages so an app can take the core controls it needs and add optional fonts, widgets, or third-party themes independently. All packages from a release use the same version.
 
-> **Current preview:** `0.5.0-preview.2`. All 18 packages use this version. See [`Md3.Avalonia` on NuGet.org](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.2).
+> **Current source baseline:** `0.5.6-preview.1` (publication pending). All 18 planned packages use this version.
 
 ## Install
 
 Start with the core package. Add exactly one icon package only if the app uses the bundled Material Symbols catalog.
 
 ```bash
-dotnet add package Md3.Avalonia --version 0.5.0-preview.2
-dotnet add package Md3.Avalonia.Icons --version 0.5.0-preview.2
+dotnet add package Md3.Avalonia --version 0.5.6-preview.1
+dotnet add package Md3.Avalonia.Icons --version 0.5.6-preview.1
 ```
 
 Add optional controls or a vendor theme only when the app uses them. Keep every Md3.Avalonia package on the same version. To test source changes directly, build a local feed from a repository checkout:
@@ -42,15 +42,15 @@ The core package is the base for Avalonia controls and most opt-in theme package
 | `Md3.Avalonia.Icons` | `net8.0`, `net10.0` | Full Material Symbols Rounded font and catalog. |
 | `Md3.Avalonia.Icons.Lite` | `net8.0`, `net10.0` | Smaller Material Symbols font subset and catalog. Use instead of `Icons` when the full set is unnecessary. |
 | `Md3.Avalonia.DataGrid` | `net8.0`, `net10.0` | Material theme for Avalonia `DataGrid`; register `MaterialDataGridTheme`. |
-| `Md3.Avalonia.RichEditor` | `net8.0`, `net10.0` | Material theme for the maintained AvaloniaRichEditor fork; register `MaterialRichEditorTheme`. |
 
-## Third-party theme packages
+## Integration and theme packages
 
 These packages target `net10.0` in the current source. Each is opt-in and is the only Md3.Avalonia package that brings its corresponding upstream component dependency; the core package does not acquire those dependencies.
 
 | Package | Theme entry point | Integrates with |
 |---|---|---|
 | `Md3.Avalonia.AvaloniaEdit` | `MaterialAvaloniaEditTheme` | AvaloniaEdit |
+| `Md3.Avalonia.RichEditor` | `MaterialRichEditorTheme` | Maintained AvaloniaRichEditor fork |
 | `Md3.Avalonia.AvaloniaHex` | `MaterialAvaloniaHexTheme` | AvaloniaHex |
 | `Md3.Avalonia.Dock` | `MaterialDockTheme` | Dock |
 | `Md3.Avalonia.Tabalonia` | `MaterialTabaloniaTheme` | Tabalonia |

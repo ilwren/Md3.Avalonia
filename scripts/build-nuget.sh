@@ -8,12 +8,13 @@ Md3.Avalonia.Icons.Lite, Md3.Avalonia.Extra, Md3.Avalonia.DataGrid,
 Md3.Avalonia.RichEditor, Md3.Avalonia.AvaloniaEdit, Md3.Avalonia.AvaloniaHex,
 Md3.Avalonia.Dock, Md3.Avalonia.Tabalonia, Md3.Avalonia.Markdown,
 Md3.Avalonia.LiveCharts2, Md3.Avalonia.ScottPlot,
-Md3.Avalonia.PropertyGrid, Md3.Avalonia.NodifyM, Md3.Avalonia.Mapsui, Md3.Avalonia.InkCanvas and Md3.Avalonia.Notifications.
+Md3.Avalonia.PropertyGrid, Md3.Avalonia.NodifyM, Md3.Avalonia.Mapsui, Md3.Avalonia.InkCanvas,
+and Md3.Avalonia.Notifications.
 
 Usage:
   scripts/build-nuget.sh [--output /absolute/or/relative/path]
                          [--configuration Release]
-                         [--version 0.5.0-preview.2]
+                         [--version 0.5.6-preview.1]
                          [--no-restore]
                          [--keep-intermediate]
 
@@ -64,7 +65,7 @@ done
 if [[ "$OUTPUT" != /* ]]; then OUTPUT="$ROOT/$OUTPUT"; fi
 
 if [[ -n "$PACKAGE_VERSION" ]] && [[ ! "$PACKAGE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]; then
-  echo "error: invalid package version '$PACKAGE_VERSION' (expected SemVer such as 0.5.0 or 0.5.0-preview.2)" >&2
+  echo "error: invalid package version '$PACKAGE_VERSION' (expected SemVer such as 0.5.6 or 0.5.6-preview.1)" >&2
   exit 2
 fi
 VERSION_ARGS=()

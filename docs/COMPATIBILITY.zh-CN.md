@@ -10,7 +10,7 @@ _lang: zh-CN
 
 | 范围 | 基线 | 状态 |
 |---|---|---|
-| .NET NuGet 资产 | 六个核心与通用包支持 `net8.0;net10.0`；11 个可选第三方主题包支持 `net10.0`。 | 通知包的平台专用资产见下文；桌面 Gallery 与测试以 .NET 10 为目标框架。 |
+| .NET NuGet 资产 | 五个核心与通用包支持 `net8.0;net10.0`；12 个可选集成与主题包支持 `net10.0`。 | 通知包的平台专用资产见下文；桌面 Gallery 与测试以 .NET 10 为目标框架。 |
 | Avalonia | `12.1.2` | Avalonia 控件包的构建与 headless 测试基线。最低版本由第三方集成包而非核心库决定。 |
 | Windows | Avalonia 12 支持的 x64/ARM64 主机 | 库级兼容；设备与辅助技术验收仍需人工完成。 |
 | macOS | Avalonia 12 支持的 x64/Apple Silicon 主机 | 库级兼容；VoiceOver 验收仍需人工完成。 |
@@ -22,7 +22,7 @@ _lang: zh-CN
 
 ## 版本策略
 
-当前包版本为 [`0.5.0-preview.2`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.2)（共 18 个包）。更早的预览说明仅记录历史基线。
+当前源码基线版本为 `0.5.6-preview.1`（尚未发布，共 18 个计划发布包）。更早的预览说明仅记录历史基线。
 预览包可能调整 API；调整时应同时更新变更记录与迁移说明。
 稳定版遵循 Semantic Versioning。
 更新 Avalonia 次版本前，会对支持的 .NET 目标框架进行 Release 构建、headless 测试、包校验与平台矩阵验证。
@@ -30,7 +30,7 @@ _lang: zh-CN
 
 ## 原生通知包
 
-`Md3.Avalonia.Notifications` 是独立包，不依赖 Avalonia。macOS/Linux 使用 `net8.0` 与 `net10.0`；Windows 使用 `net8.0-windows10.0.19041.0` 与 `net10.0-windows10.0.19041.0`；打包脚本传入 `-p:IncludeAndroidTarget=true` 时，为 Android 加入 `net10.0-android`。Android 最低 API 级别为 23；由于 `net8.0-android` 已停止支持，因此不提供该目标。Windows 使用 WinRT toast API，macOS 使用 AppKit 中已弃用的 `NSUserNotificationCenter`，Linux 调用原生 `libnotify`，Android 使用 `NotificationManager`；实现不会启动外部辅助进程。Linux 需要 `libnotify` 与 D-Bus 通知服务。注册与权限要求见[中文包 README](https://github.com/ilwren/Md3.Avalonia/blob/arena/7fa0e0b4-md3-avalonia/src/Md3.Avalonia.Notifications/README.zh-CN.md)。各操作系统上的显示与权限行为仍需人工验证。
+`Md3.Avalonia.Notifications` 是独立包，不依赖 Avalonia。macOS/Linux 使用 `net8.0` 与 `net10.0`；Windows 使用 `net8.0-windows10.0.19041.0` 与 `net10.0-windows10.0.19041.0`；打包脚本传入 `-p:IncludeAndroidTarget=true` 时，为 Android 加入 `net10.0-android`。Android 最低 API 级别为 23；由于 `net8.0-android` 已停止支持，因此不提供该目标。Windows 使用 WinRT toast API，macOS 使用 AppKit 中已弃用的 `NSUserNotificationCenter`，Linux 调用原生 `libnotify`，Android 使用 `NotificationManager`；实现不会启动外部辅助进程。Linux 需要 `libnotify` 与 D-Bus 通知服务。注册与权限要求见[中文包 README](https://github.com/ilwren/Md3.Avalonia/blob/main/src/Md3.Avalonia.Notifications/README.zh-CN.md)。各操作系统上的显示与权限行为仍需人工验证。
 
 ## Android 范围
 

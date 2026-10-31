@@ -1,0 +1,92 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <x:Double x:Key="Md.Comp.CommitGraph.Lane.Width">20</x:Double>
+  <x:Double x:Key="Md.Comp.CommitGraph.Node.Size">10</x:Double>
+
+  <!-- Lane palette: M3 hues first, containers and neutrals for deeper histories. Both theme
+       layers reference the same tokens - DynamicResource keeps every lane brush in step with
+       the active theme at runtime. -->
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <SolidColorBrush x:Key="Md.CommitGraph.Lane.Brush.1" Color="{DynamicResource Md.Sys.Color.Primary}" />
+      <SolidColorBrush x:Key="Md.CommitGraph.Lane.Brush.2" Color="{DynamicResource Md.Sys.Color.Tertiary}" />
+      <SolidColorBrush x:Key="Md.CommitGraph.Lane.Brush.3" Color="{DynamicResource Md.Sys.Color.Secondary}" />
+      <SolidColorBrush x:Key="Md.CommitGraph.Lane.Brush.4" Color="{DynamicResource Md.Sys.Color.Error}" />
+      <SolidColorBrush x:Key="Md.CommitGraph.Lane.Brush.5" Color="{DynamicResource Md.Sys.Color.PrimaryContainer}" />
+      <SolidColorBrush x:Key="Md.CommitGraph.Lane.Brush.6" Color="{DynamicResource Md.Sys.Color.TertiaryContainer}" />
+      <SolidColorBrush x:Key="Md.CommitGraph.Lane.Brush.7" Color="{DynamicResource Md.Sys.Color.SecondaryContainer}" />
+      <SolidColorBrush x:Key="Md.CommitGraph.Lane.Brush.8" Color="{DynamicResource Md.Sys.Color.Outline}" />
+    </ResourceDictionary>
+    <ResourceDictionary x:Key="Dark">
+      <SolidColorBrush x:Key="Md.CommitGraph.Lane.Brush.1" Color="{DynamicResource Md.Sys.Color.Primary}" />
+      <SolidColorBrush x:Key="Md.CommitGraph.Lane.Brush.2" Color="{DynamicResource Md.Sys.Color.Tertiary}" />
+      <SolidColorBrush x:Key="Md.CommitGraph.Lane.Brush.3" Color="{DynamicResource Md.Sys.Color.Secondary}" />
+      <SolidColorBrush x:Key="Md.CommitGraph.Lane.Brush.4" Color="{DynamicResource Md.Sys.Color.Error}" />
+      <SolidColorBrush x:Key="Md.CommitGraph.Lane.Brush.5" Color="{DynamicResource Md.Sys.Color.PrimaryContainer}" />
+      <SolidColorBrush x:Key="Md.CommitGraph.Lane.Brush.6" Color="{DynamicResource Md.Sys.Color.TertiaryContainer}" />
+      <SolidColorBrush x:Key="Md.CommitGraph.Lane.Brush.7" Color="{DynamicResource Md.Sys.Color.SecondaryContainer}" />
+      <SolidColorBrush x:Key="Md.CommitGraph.Lane.Brush.8" Color="{DynamicResource Md.Sys.Color.Outline}" />
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+
+  <md:MdCommitGraphDateTextConverter x:Key="MdCommitGraphDateConverter" />
+
+  <ControlTheme x:Key="{x:Type md:MdCommitGraph}" TargetType="md:MdCommitGraph">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="LaneWidth" Value="{DynamicResource Md.Comp.CommitGraph.Lane.Width}" />
+    <Setter Property="NodeSize" Value="{DynamicResource Md.Comp.CommitGraph.Node.Size}" />
+    <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel /></ItemsPanelTemplate></Setter>
+    <!-- No inner scroller: a host scroll view owns scrolling so lanes stay one continuous column. -->
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdCommitGraph">
+        <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
+      </ControlTemplate>
+    </Setter>
+    <Setter Property="ItemTemplate">
+      <DataTemplate x:DataType="md:MdCommitNode">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+          <!-- Clip the message block at its column so a long author/date/tag line is cut off
+               at the gutter instead of running over the short id in the next column. -->
+          <StackPanel Spacing="2" ClipToBounds="True">
+            <TextBlock Text="{Binding Message}"
+                       FontSize="13"
+                       FontWeight="Medium"
+                       TextTrimming="CharacterEllipsis"
+                       Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+              <TextBlock Text="{Binding Author}"
+                         FontSize="12"
+                         Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              <TextBlock Text="·"
+                         FontSize="12"
+                         Foreground="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+              <TextBlock FontSize="12"
+                         Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}">
+                <TextBlock.Text>
+                  <Binding Path="Date" Converter="{StaticResource MdCommitGraphDateConverter}" />
+                </TextBlock.Text>
+              </TextBlock>
+              <Border IsVisible="{Binding Tag, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                      Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                      CornerRadius="4"
+                      Padding="6,1"
+                      Margin="4,0,0,0"
+                      VerticalAlignment="Center">
+                <TextBlock Text="{Binding Tag}"
+                           FontSize="11"
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+              </Border>
+            </StackPanel>
+          </StackPanel>
+          <TextBlock Grid.Column="1"
+                     VerticalAlignment="Center"
+                     FontSize="12"
+                     FontFamily="Cascadia Mono,Consolas,Menlo,DejaVu Sans Mono,Liberation Mono,Noto Sans Mono,monospace"
+                     Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
+                     Text="{Binding ShortId}" />
+        </Grid>
+      </DataTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

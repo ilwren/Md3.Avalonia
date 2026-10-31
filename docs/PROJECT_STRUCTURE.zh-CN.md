@@ -78,4 +78,4 @@ dotnet build gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.c
 dotnet test tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj -c Release
 ```
 
-构建完整 solution 与发布包时可能还需安装 Android workload；详见仓库 [中文 README](https://github.com/ilwren/Md3.Avalonia/blob/arena/7fa0e0b4-md3-avalonia/README.zh-CN.md#构建与测试) 和[兼容性指南](COMPATIBILITY.zh-CN.md)。
+构建完整 solution 与发布包时可能还需安装 Android workload；详见仓库 [中文 README](https://github.com/ilwren/Md3.Avalonia/blob/main/README.zh-CN.md#构建与测试) 和[兼容性指南](COMPATIBILITY.zh-CN.md)。

@@ -8,8 +8,9 @@ https://github.com/user-attachments/assets/53c05bc6-f1b5-4076-8b62-c4a7a2b819bf
 
 [![CI](https://github.com/ilwren/Md3.Avalonia/actions/workflows/ci.yml/badge.svg)](https://github.com/ilwren/Md3.Avalonia/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Project visitors](https://api.visitorbadge.io/api/visitors?path=ilwren%2FMd3.Avalonia&label=Visitors&countColor=%236750A4)](https://visitorbadge.io/status?path=ilwren%2FMd3.Avalonia)
 
-- 353 public API types for buttons, inputs, navigation, dialogs, charts, and motion; indexed in the API reference and checked by a script gate.
+- 375 public API types for buttons, inputs, navigation, dialogs, charts, and motion; indexed in the API reference and checked by a script gate.
 
 - HCT dynamic color: any seed color, 6 schemes, 3 contrast levels, and 49 color roles.
 
@@ -23,7 +24,7 @@ https://github.com/user-attachments/assets/53c05bc6-f1b5-4076-8b62-c4a7a2b819bf
 
 - Desktop and Android targets; every package declares `IsTrimmable` and `IsAotCompatible`.
 
-> **Current preview: [`0.5.0-preview.2`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.2).** The install examples below use this version. Preview APIs may still receive compatibility changes. See [Known limitations](#known-limitations) for manual screen-reader and Android-device validation status.
+> **Current source baseline: `0.5.6-preview.1` (publication pending).** The install examples below use the version that will be published from this source baseline. Preview APIs may still receive compatibility changes. See [Known limitations](#known-limitations) for manual screen-reader and Android-device validation status.
 >
 
 ## Contents
@@ -45,7 +46,7 @@ https://github.com/user-attachments/assets/53c05bc6-f1b5-4076-8b62-c4a7a2b819bf
 | Item | Requirement |
 |---|---|
 | Avalonia | `12.1.2` (minimum version is determined by the dependency floor of third-party integrations; see [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md)) |
-| Library target frameworks | Core family: `net8.0;net10.0`; third-party theme packages: `net10.0` (see [NuGet packages](#nuget-packages)) |
+| Library target frameworks | Five core/general packages: `net8.0;net10.0`; twelve integration/theme packages: `net10.0`; Notifications adds platform-specific targets (see [NuGet packages](#nuget-packages)) |
 | Gallery and tests | .NET 10 |
 | Android | Minimum API 23; host target `net10.0-android` |
 | Packaging scripts | .NET 10 SDK, Java 17, and `dotnet workload install android` |
@@ -55,13 +56,13 @@ https://github.com/user-attachments/assets/53c05bc6-f1b5-4076-8b62-c4a7a2b819bf
 Install the core package
 
 ```bash
-dotnet add package Md3.Avalonia --version 0.5.0-preview.2
+dotnet add package Md3.Avalonia --version 0.5.6-preview.1
 ```
 
 Add optional packages as needed; all packages use the same version
 
 ```bash
-dotnet add package Md3.Avalonia.Icons --version 0.5.0-preview.2
+dotnet add package Md3.Avalonia.Icons --version 0.5.6-preview.1
 ```
 
 ## Quick start
@@ -168,17 +169,17 @@ The verifier checks checksums, variable-font tables, and glyph counts for the fu
 
 ## Controls overview
 
-The online [DocFX API reference](https://ilwren.github.io/Md3.Avalonia/) is generated from the C# XML comments in all 18 packages. [`docs/API.md`](docs/API.md) describes package coverage and documentation sources. `scripts/check-api-doc-coverage.py` scans all 353 public types; the table lists representative types in each group.
+The online [DocFX API reference](https://ilwren.github.io/Md3.Avalonia/) is generated from the C# XML comments in all 18 packages. [`docs/API.md`](docs/API.md) describes package coverage and documentation sources. `scripts/check-api-doc-coverage.py` scans all 375 public types; the table lists representative types in each group.
 
 | Group | Representative types |
 |---|---|
 | Buttons | `MdButton`, `MdToggleButton`, `MdIconButton`, `MdToggleIconButton`, `MdSplitButton`, `MdStandardButtonGroup`, `MdConnectedButtonGroup`, `MdFloatingActionButton`, `MdExtendedFloatingActionButton`, `MdFabMenu` |
-| Inputs | `MdTextBox`, `MdCheckBox`, `MdRadioButton`, `MdComboBox`, `MdAutoCompleteBox`, `MdSlider`, `MdSwitch`, `MdDatePicker`, `MdTimePicker`, `MdPinInput`, `MdTagInput`, `MdForm` |
-| Navigation | `MdNavigationDrawer`, `MdNavigationBar`, `MdTabs`, `MdToolbar`, `MdTopAppBar`, `MdBottomAppBar`, `MdSearchBar`, `MdSearchView`, `MdCommandPalette`, `MdBreadcrumb` |
-| Containers and overlays | `MdCard`, `MdDialog`, `MdDialogHost`, `MdMenu`, `MdPopover`, `MdTooltip`, `MdSnackbar`, `MdBanner`, `MdSheetHost`, `MdExpansionPanelList`, `MdFloatingWindow`, `MdBorderlessWindow` |
-| Data display | `MdList`, `MdDataTable`, `MdDataGrid`, `MdCarousel`, `MdCalendar`, `MdTreeView`, `MdAvatar`, `MdBadge`, `MdChip`, `MdTimeline`, `MdWaveform`, `MdChart` |
+| Inputs | `MdTextBox`, `MdCheckBox`, `MdRadioButton`, `MdComboBox`, `MdAutoCompleteBox`, `MdSlider`, `MdSwitch`, `MdDatePicker`, `MdTimePicker`, `MdPinInput`, `MdTagInput`, `MdMaskedTextBox`, `MdFileSystemPicker`, `MdForm` |
+| Navigation | `MdNavigationDrawer`, `MdNavigationBar`, `MdTabs`, `MdToolbar`, `MdTopAppBar`, `MdBottomAppBar`, `MdSearchBar`, `MdSearchView`, `MdCommandPalette`, `MdBreadcrumb`, `MdPagination` |
+| Containers and overlays | `MdCard`, `MdDialog`, `MdDialogHost`, `MdMenu`, `MdPopover`, `MdTooltip`, `MdSnackbar`, `MdBanner`, `MdBannerHost`, `MdSheetHost`, `MdExpansionPanelList`, `MdFloatingWindow`, `MdBorderlessWindow` |
+| Data display | `MdList`, `MdDataTable`, `MdDataGrid`, `MdCarousel`, `MdCalendar`, `MdTreeView`, `MdAvatar`, `MdBadge`, `MdChip`, `MdTimeline`, `MdCommitGraph`, `MdContributionGrid`, `MdWaveform`, `MdChart` |
 | Feedback and progress | `MdCircularProgressIndicator`, `MdLinearProgressIndicator`, `MdLoadingIndicator`, `MdSkeleton`, `MdRefreshIndicator`, `MdSpinKit`, `MdStateLayer`, `MdFocusRing` |
-| Layout and motion | `MdSurface`, `MdAdaptiveLayout`, `MdScrollViewer`, `MdWaterfall`, `MdMasonryPanel`, `MdStaggeredPanel`, `MdAnimationSequence`, `MdAnimatedText`, `MdRevealHost`, `MdMorphPanel`, `MdHero` |
+| Layout and motion | `MdSurface`, `MdAdaptiveLayout`, `MdScrollViewer`, `MdWaterfall`, `MdMasonryPanel`, `MdStaggeredPanel`, `MdGridSplitter`, `MdAnimationSequence`, `MdAnimatedText`, `MdRevealHost`, `MdMorphPanel`, `MdHero` |
 
 All Button, Icon Button, and FAB templates use `MdRipplePresenter`: ripples originate at the press point, clip to the full container shape, and support Expressive, Standard, Reduced, and None motion schemes. The Elevated `MdButton` variant is retained for compatibility but is deprecated in M3; prefer another variant for new interfaces.
 
@@ -260,6 +261,7 @@ Clean build artifacts immediately after every build, test, or pack operation. Do
 | [`docs/COMPATIBILITY.md`](docs/COMPATIBILITY.md) | Target frameworks, platforms, and dependency compatibility policy |
 | [`docs/RELEASE_NOTES_0.5.0-preview.1.md`](docs/RELEASE_NOTES_0.5.0-preview.1.md) | Changes in the published release |
 | [`docs/RELEASE_NOTES_0.5.0-preview.2.md`](docs/RELEASE_NOTES_0.5.0-preview.2.md) | Changes in preview 0.5.0-preview.2 |
+| [`docs/RELEASE_NOTES_0.5.6-preview.1.md`](docs/RELEASE_NOTES_0.5.6-preview.1.md) | Current source-baseline changes |
 | [`docs/RELEASE_VALIDATION.md`](docs/RELEASE_VALIDATION.md) | Manual validation checklist and sign-off status |
 | [`docs/PUBLISHING.md`](docs/PUBLISHING.md) | Release process and NuGet Trusted Publishing setup |
 | [`docs/SPEC_VERIFICATION.md`](docs/SPEC_VERIFICATION.md) | Layered spec verification and known gaps |

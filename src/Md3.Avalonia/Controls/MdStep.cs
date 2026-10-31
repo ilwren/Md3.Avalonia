@@ -11,7 +11,8 @@ using Md3.Avalonia.Motion;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A header, optional subtitle and body participating in an <see cref="MdStepper"/>.</summary>
-[PseudoClasses(":active", ":inactive", ":content-present", ":complete", ":editing", ":error", ":disabled", ":reduced-motion", ":no-motion")]
+[PseudoClasses(":active", ":inactive", ":content-present", ":complete", ":editing", ":error", ":disabled",
+    ":reduced-motion", ":no-motion", ":step-first", ":step-last", ":horizontal")]
 public sealed class MdStep : HeaderedContentControl
 {
     public static readonly StyledProperty<object?> SubtitleProperty =
@@ -66,10 +67,15 @@ public sealed class MdStep : HeaderedContentControl
         UpdateMotion();
     }
 
-    internal void SetStepState(int number, bool active)
+    // Avalonia 12 only lets a control set the pseudo classes it declares itself, so the
+    // stepper funnels the position flags through here instead of touching the step's classes.
+    internal void SetStepState(int number, bool active, bool first, bool last, bool horizontal)
     {
         SetAndRaise(StepNumberProperty, ref _stepNumber, number);
         SetAndRaise(IsActiveProperty, ref _isActive, active);
+        PseudoClasses.Set(":step-first", first);
+        PseudoClasses.Set(":step-last", last);
+        PseudoClasses.Set(":horizontal", horizontal);
         UpdatePseudoClasses();
         _presence.Update(active, MdMotion.GetExitDuration(this));
         if (_contentPresenter is not null) _contentPresenter.IsHitTestVisible = active;

@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             xmlns:motion="using:Md3.Avalonia.Motion"
+             x:Class="Md3.Avalonia.Gallery.Pages.ContributionGridGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Contribution grid" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="A GitHub-style activity heatmap with adjustable cells. This sample uses larger touch-friendly cells; increase CellSize and CellSpacing for mobile, or use the compact density below. Click a single day to read its commits." />
+      </StackPanel>
+
+      <md:MdCard Padding="16" IsInteractive="False">
+        <md:MdScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+          <md:MdContributionGrid x:Name="DemoGrid" CellSize="20" CellSpacing="4"
+                                 DayClicked="DemoGridDayClicked" />
+        </md:MdScrollViewer>
+      </md:MdCard>
+
+      <Grid ColumnDefinitions="*,320" ColumnSpacing="20">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="Stats" />
+          <md:MdCard Padding="16" IsInteractive="False">
+            <StackPanel x:Name="StatsContent" Spacing="8" />
+          </md:MdCard>
+        </StackPanel>
+
+        <StackPanel x:Name="ContributionSelectionPane" Grid.Column="1" Spacing="10">
+          <TextBlock Classes="h2" Text="Selection" />
+          <md:MdCard Padding="16" IsInteractive="False">
+            <StackPanel x:Name="SelectionContent" Spacing="8" />
+          </md:MdCard>
+          <md:MdButton x:Name="RegenerateButton" Content="Regenerate" HorizontalAlignment="Left" Click="RegenerateButtonClicked"
+                       motion:MdMotion.Scheme="None" />
+        </StackPanel>
+      </Grid>
+
+      <StackPanel Spacing="10" MaxWidth="760">
+        <TextBlock Classes="h2" Text="Compact" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="Smaller cells and tighter spacing fit a whole year in a sidebar." />
+        <md:MdCard Padding="16" IsInteractive="False">
+          <md:MdScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+            <md:MdContributionGrid x:Name="CompactGrid" CellSize="9" CellSpacing="2" />
+          </md:MdScrollViewer>
+        </md:MdCard>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample CSharpCode="var grid = new MdContributionGrid&#10;{&#10;    CellSize = isTouch ? 20 : 12,&#10;    CellSpacing = isTouch ? 4 : 3,&#10;    Days = days.Select(d =&gt; new MdContributionDay { Date = d, Value = counts[d] }).ToList(),&#10;};&#10;grid.DayClicked += (_, day) =&gt; Status.Text = $&quot;{day.Value} on {day.Date:yyyy-MM-dd}&quot;;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

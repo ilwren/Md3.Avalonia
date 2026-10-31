@@ -1,5 +1,6 @@
 using System;
 using Avalonia;
+using Md3.Avalonia.Gallery;
 
 namespace Md3.Avalonia.Gallery.Desktop;
 

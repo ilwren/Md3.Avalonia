@@ -3,18 +3,30 @@
              xmlns:md="using:Md3.Avalonia.Controls"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.DismissibleGalleryPage">
-  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowMouseDrag="False">
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Dismissible" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Swipe a row either way to dismiss it, with a different background behind each direction. Restore puts it back." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Drag either way to preview the action. A short drag springs back; crossing the threshold dismisses the row, and Restore puts it back." />
       </StackPanel>
 
       <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
-        <md:MdDismissible x:Name="DismissibleDemo" Height="72" Dismissed="DismissibleDismissed">
-          <md:MdDismissible.BackgroundContent><Border Width="180" Padding="20" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"><TextBlock VerticalAlignment="Center" Text="Archive" /></Border></md:MdDismissible.BackgroundContent>
-          <md:MdDismissible.SecondaryBackgroundContent><Border Width="180" Padding="20" Background="{DynamicResource Md.Sys.Color.Error.Brush}"><TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Text="Delete" /></Border></md:MdDismissible.SecondaryBackgroundContent>
-          <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"><TextBlock VerticalAlignment="Center" Text="Swipe this notification in either direction" /></Border>
+        <md:MdDismissible x:Name="DismissibleDemo" Dismissed="DismissibleDismissed">
+          <md:MdDismissible.BackgroundContent>
+            <Border MinHeight="72" Padding="20" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}">
+              <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Text="Archive"
+                         Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" FontWeight="SemiBold" />
+            </Border>
+          </md:MdDismissible.BackgroundContent>
+          <md:MdDismissible.SecondaryBackgroundContent>
+            <Border MinHeight="72" Padding="20" Background="{DynamicResource Md.Sys.Color.Error.Brush}">
+              <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Text="Delete"
+                         Foreground="{DynamicResource Md.Sys.Color.OnError.Brush}" FontWeight="SemiBold" />
+            </Border>
+          </md:MdDismissible.SecondaryBackgroundContent>
+          <Border MinHeight="72" Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}">
+            <TextBlock VerticalAlignment="Center" Text="Swipe this notification in either direction" />
+          </Border>
         </md:MdDismissible>
         <md:MdButton Width="110" HorizontalAlignment="Left" Content="Restore" Variant="Text" Click="RestoreDismissible" />
         <TextBlock x:Name="DismissibleStatus" Classes="body" Text="Swipe the row, or press Restore." />

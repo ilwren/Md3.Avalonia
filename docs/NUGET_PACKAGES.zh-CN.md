@@ -8,15 +8,15 @@ _lang: zh-CN
 
 Md3.Avalonia 拆分为 18 个 NuGet 包，应用可按需引用核心控件，并独立添加图标字体、扩展控件或第三方主题。每次发布的所有包使用相同版本号。
 
-> **当前预览版本：** `0.5.0-preview.2`。本预览版的 18 个包均使用此版本号。可查看 [NuGet.org 上的 `Md3.Avalonia` 核心包](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.2)。
+> **当前源码基线：** `0.5.6-preview.1`（尚未发布）。计划发布的 18 个包均使用此版本号。
 
 ## 安装
 
 先安装核心包。只有在应用需要随包提供的 Material Symbols 图标目录时，才额外安装一个图标包。
 
 ```bash
-dotnet add package Md3.Avalonia --version 0.5.0-preview.2
-dotnet add package Md3.Avalonia.Icons --version 0.5.0-preview.2
+dotnet add package Md3.Avalonia --version 0.5.6-preview.1
+dotnet add package Md3.Avalonia.Icons --version 0.5.6-preview.1
 ```
 
 仅在应用实际使用对应功能时添加扩展控件或第三方主题包。所有 Md3.Avalonia 包应保持相同版本。如需使用仓库源码进行本地测试，可从仓库构建本地 NuGet 源：
@@ -29,7 +29,7 @@ bash scripts/build-nuget.sh --output "$HOME/.cache/md3-nuget"
 dotnet add package Md3.Avalonia --source "$HOME/.cache/md3-nuget"
 ```
 
-发布脚本会构建全部 18 个包，并校验 `.nupkg` 与 `.snupkg` 产物；需要 .NET 10 SDK、Java 17 和 .NET Android workload。详情见[仓库构建指南](https://github.com/ilwren/Md3.Avalonia/blob/arena/7fa0e0b4-md3-avalonia/README.zh-CN.md#构建与测试)。
+发布脚本会构建全部 18 个包，并校验 `.nupkg` 与 `.snupkg` 产物；需要 .NET 10 SDK、Java 17 和 .NET Android workload。详情见[仓库构建指南](https://github.com/ilwren/Md3.Avalonia/blob/main/README.zh-CN.md#构建与测试)。
 
 ## 包关系
 
@@ -46,15 +46,15 @@ dotnet add package Md3.Avalonia --source "$HOME/.cache/md3-nuget"
 | `Md3.Avalonia.Icons` | `net8.0`, `net10.0` | 完整 Material Symbols Rounded 字体与图标目录。 |
 | `Md3.Avalonia.Icons.Lite` | `net8.0`, `net10.0` | 精简版 Material Symbols 字体与图标目录；不需要完整目录时替代 `Icons` 使用。 |
 | `Md3.Avalonia.DataGrid` | `net8.0`, `net10.0` | Avalonia `DataGrid` 的 Material 主题；注册 `MaterialDataGridTheme`。 |
-| `Md3.Avalonia.RichEditor` | `net8.0`, `net10.0` | 维护版 AvaloniaRichEditor 的 Material 主题；注册 `MaterialRichEditorTheme`。 |
 
-## 第三方主题包
+## 集成与主题包
 
 这些包在当前源码中以 `net10.0` 为目标框架。每个包均需显式添加；对应上游组件的依赖只由该主题适配包引入，核心包不会因此增加依赖。
 
 | 包 | 主题入口 | 适配组件 |
 |---|---|---|
 | `Md3.Avalonia.AvaloniaEdit` | `MaterialAvaloniaEditTheme` | AvaloniaEdit |
+| `Md3.Avalonia.RichEditor` | `MaterialRichEditorTheme` | AvaloniaRichEditor 维护版 |
 | `Md3.Avalonia.AvaloniaHex` | `MaterialAvaloniaHexTheme` | AvaloniaHex |
 | `Md3.Avalonia.Dock` | `MaterialDockTheme` | Dock |
 | `Md3.Avalonia.Tabalonia` | `MaterialTabaloniaTheme` | Tabalonia |

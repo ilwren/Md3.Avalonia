@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -26,11 +26,9 @@
             Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
             BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,1,0">
       <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
-        <Border Width="56" Height="56" HorizontalAlignment="Center" CornerRadius="18"
-                Background="{DynamicResource Md.Sys.Color.Primary.Brush}">
-          <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" FontWeight="Medium"
-                     Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" Text="M3" />
-        </Border>
+        <Image Width="56" Height="56" HorizontalAlignment="Center" Stretch="Uniform"
+               Source="avares://Md3.Avalonia.Gallery/Assets/logo-128.png"
+               AutomationProperties.Name="Md3.Avalonia logo" />
         <md:MdIconButton Grid.Row="1" Icon="{x:Static md:MdSymbols.Search}" Click="FocusGallerySearch"
                          HorizontalAlignment="Center" ToolTip.Tip="Search" />
         <StackPanel x:Name="TopNavigation" Grid.Row="2" Spacing="4" VerticalAlignment="Top">
@@ -61,11 +59,9 @@
         <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="12">
           <md:MdIconButton x:Name="NavigationMenuButton" Grid.Column="0" Icon="{x:Static md:MdSymbols.Menu}"
                            Click="ToggleNavigation" ToolTip.Tip="Open navigation" />
-          <Border x:Name="CompactBrandMark" Grid.Column="1" Width="44" Height="44" CornerRadius="14"
-                  Background="{DynamicResource Md.Sys.Color.Primary.Brush}">
-            <TextBlock Text="M3" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18"
-                       FontWeight="Medium" Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" />
-          </Border>
+          <Image x:Name="CompactBrandMark" Grid.Column="1" Width="44" Height="44" Stretch="Uniform"
+                 Source="avares://Md3.Avalonia.Gallery/Assets/logo-128.png"
+                 AutomationProperties.Name="Md3.Avalonia logo" />
           <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="1">
             <TextBlock x:Name="BrandTitle" FontSize="18" FontWeight="Medium" Text="Material Design 3" />
             <TextBlock FontSize="11" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Avalonia component gallery" />
@@ -142,6 +138,8 @@
             <md:MdButton x:Name="ColorPickerNav" Content="Color picker" Variant="Text" HorizontalContentAlignment="Left" Click="ShowColorPicker" />
             <md:MdButton x:Name="ComboBoxNav" Content="Combo box" Variant="Text" HorizontalContentAlignment="Left" Click="ShowComboBoxes" />
             <md:MdButton x:Name="CommandPaletteNav" Content="Command palette" Variant="Text" HorizontalContentAlignment="Left" Click="ShowCommandPalette" />
+            <md:MdButton x:Name="CommitGraphNav" Content="Commit graph" Variant="Text" HorizontalContentAlignment="Left" Click="ShowCommitGraph" />
+            <md:MdButton x:Name="ContributionGridNav" Content="Contribution grid" Variant="Text" HorizontalContentAlignment="Left" Click="ShowContributionGrid" />
             <md:MdButton x:Name="DataGridNav" Content="Data grids" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDataGrid" />
             <md:MdButton x:Name="DataTableNav" Content="Data table" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDataTable" />
             <md:MdButton x:Name="PickerNav" Content="Date &amp; time pickers" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPickers" />
@@ -153,13 +151,16 @@
             <md:MdButton x:Name="DraggableSheetNav" Content="Draggable sheet" Variant="Text" HorizontalContentAlignment="Left" Click="ShowDraggableSheet" />
             <md:MdButton x:Name="ExpansionPanelNav" Content="Expansion panels" Variant="Text" HorizontalContentAlignment="Left" Click="ShowExpansionPanels" />
             <md:MdButton x:Name="FabNav" Content="FABs" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFabs" />
+            <md:MdButton x:Name="FileSystemPickerNav" Content="File-system picker" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFileSystemPicker" />
             <md:MdButton x:Name="FormValidationNav" Content="Form validation" Variant="Text" HorizontalContentAlignment="Left" Click="ShowFormValidation" />
+            <md:MdButton x:Name="GridSplitterNav" Content="Grid splitter" Variant="Text" HorizontalContentAlignment="Left" Click="ShowGridSplitter" />
             <md:MdButton x:Name="GridTileNav" Content="Grid tiles" Variant="Text" HorizontalContentAlignment="Left" Click="ShowGridTiles" />
             <md:MdButton x:Name="HoverCardNav" Content="Hover cards" Variant="Text" HorizontalContentAlignment="Left" Click="ShowHoverCard" />
             <md:MdButton x:Name="IconButtonNav" Content="Icon buttons" Variant="Text" HorizontalContentAlignment="Left" Click="ShowIconButtons" />
             <md:MdButton x:Name="KeyboardAvoidNav" Content="Keyboard avoidance" Variant="Text" HorizontalContentAlignment="Left" Click="ShowKeyboardAvoid" />
             <md:MdButton x:Name="ListNav" Content="Lists" Variant="Text" HorizontalContentAlignment="Left" Click="ShowLists" />
             <md:MdButton x:Name="LoadingNav" Content="Loading" Variant="Text" HorizontalContentAlignment="Left" Click="ShowLoading" />
+            <md:MdButton x:Name="MaskedTextBoxNav" Content="Masked text field" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMaskedTextBox" />
             <md:MdButton x:Name="MasonryNav" Content="Masonry panel" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMasonry" />
             <md:MdButton x:Name="MenuNav" Content="Menus" Variant="Text" HorizontalContentAlignment="Left" Click="ShowMenus" />
             <md:MdButton x:Name="NavigationBarNav" Content="Navigation bar" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNavigationBar" />
@@ -168,6 +169,7 @@
             <md:MdButton x:Name="NumericNav" Content="Numeric input" Variant="Text" HorizontalContentAlignment="Left" Click="ShowNumeric" />
             <md:MdButton x:Name="PagedItemsNav" Content="Paged items" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPagedItems" />
             <md:MdButton x:Name="PaginatedTableNav" Content="Paginated table" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPaginatedTable" />
+            <md:MdButton x:Name="PaginationNav" Content="Pagination" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPagination" />
             <md:MdButton x:Name="PickerRestoreNav" Content="Picker restoration" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPickerRestore" />
             <md:MdButton x:Name="PinInputNav" Content="PIN input" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPinInput" />
             <md:MdButton x:Name="PopoverNav" Content="Popover" Variant="Text" HorizontalContentAlignment="Left" Click="ShowPopover" />

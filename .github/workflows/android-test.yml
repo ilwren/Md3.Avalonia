@@ -12,7 +12,9 @@ on:
 jobs:
   maestro-android-test:
     name: Run Android UI Regressions on Emulator
-    runs-on: macos-14 # macOS runners have hardware acceleration for Android Emulator
+    # macOS hosted runners provide hardware acceleration for the Android Emulator. macOS 14
+    # retires on 2026-11-02, so keep this probe on the supported macOS 15 image.
+    runs-on: macos-15
     timeout-minutes: 30
 
     steps:

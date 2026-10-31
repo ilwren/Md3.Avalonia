@@ -1,4 +1,4 @@
-# Build the release NuGet packages for all seven Md3.Avalonia packages.
+# Build the release NuGet packages for all Md3.Avalonia packages.
 # Requires Java 17 and the .NET Android workload: dotnet workload install android.
 [CmdletBinding()]
 param(
@@ -52,7 +52,7 @@ if ($Version -and $Local) {
     throw "-Version and -Local cannot be combined."
 }
 if ($Version -and $Version -notmatch '^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$') {
-    throw "Invalid package version '$Version'. Use SemVer such as 0.5.0 or 0.5.0-preview.2."
+    throw "Invalid package version '$Version'. Use SemVer such as 0.5.6 or 0.5.6-preview.1."
 }
 
 $versionArgs = @()
@@ -98,7 +98,7 @@ foreach ($proj in $projects) {
 Write-Host ""
 Write-Host "Built packages:" -ForegroundColor Green
 Get-ChildItem $outputDir -Filter *.nupkg | Sort-Object LastWriteTime -Descending |
-    Select-Object -First 18 | ForEach-Object { Write-Host "  $($_.FullName)" -ForegroundColor Green }
+    Select-Object -First 19 | ForEach-Object { Write-Host "  $($_.FullName)" -ForegroundColor Green }
 if (-not $Local -and -not $Version) {
     Write-Host ""
     Write-Host "WARNING: the version is unchanged. NuGet will keep restoring the previously cached" -ForegroundColor Yellow

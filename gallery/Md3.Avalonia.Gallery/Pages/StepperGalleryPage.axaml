@@ -26,8 +26,26 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Horizontal" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="The header row walks through the steps with connectors; the active step's body moves below the row." />
+        <md:MdStepper x:Name="HorizontalStepper" Orientation="Horizontal" ActiveStepChanged="HorizontalStepperChanged" MaxWidth="760" HorizontalAlignment="Stretch">
+          <md:MdStep Header="Account" Subtitle="Sign in details" State="Complete">
+            <md:MdTextBox Label="E-mail" PlaceholderText="you@example.com" Width="320" HorizontalAlignment="Left" />
+          </md:MdStep>
+          <md:MdStep Header="Workspace" Subtitle="Pick the project" State="Editing">
+            <md:MdComboBox x:Name="WorkspaceBox" Label="Project" SelectedIndex="0" Width="320" HorizontalAlignment="Left" />
+          </md:MdStep>
+          <md:MdStep Header="Confirm" Subtitle="Review and start">
+            <TextBlock Text="Press Continue to finish the flow." />
+          </md:MdStep>
+        </md:MdStepper>
+        <TextBlock x:Name="HorizontalStatus" Classes="body" Text="Step 1 is active." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
-        <gallery:CodeExample XamlCode="&lt;md:MdStepper ActiveStepChanged=&quot;OnStepChanged&quot; ContinueRequested=&quot;OnContinue&quot;&gt;&#10;  &lt;md:MdStep Header=&quot;Choose a plan&quot; Subtitle=&quot;Select the tier&quot; State=&quot;Complete&quot;&gt;&#10;    &lt;md:MdComboBox Label=&quot;Plan&quot; /&gt;&#10;  &lt;/md:MdStep&gt;&#10;&lt;/md:MdStepper&gt;" />
+        <gallery:CodeExample XamlCode="&lt;md:MdStepper Orientation=&quot;Horizontal&quot; ActiveStepChanged=&quot;OnStepChanged&quot;&gt;&#10;  &lt;md:MdStep Header=&quot;Choose a plan&quot; Subtitle=&quot;Select the tier&quot; State=&quot;Complete&quot;&gt;&#10;    &lt;md:MdComboBox Label=&quot;Plan&quot; /&gt;&#10;  &lt;/md:MdStep&gt;&#10;&lt;/md:MdStepper&gt;" />
       </StackPanel>
     </StackPanel>
   </md:MdScrollViewer>

@@ -1,0 +1,146 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:md="using:Md3.Avalonia.Controls">
+  <ControlTheme x:Key="{x:Type md:MdGridSplitter}" TargetType="md:MdGridSplitter">
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="MinWidth" Value="{DynamicResource Md.Comp.GridSplitter.Track.Thickness}" />
+    <Setter Property="MinHeight" Value="{DynamicResource Md.Comp.GridSplitter.Track.Thickness}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="ResizeBehavior" Value="PreviousAndNext" />
+    <Setter Property="PreviewContent">
+      <Template>
+        <Border Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                CornerRadius="{DynamicResource Md.Comp.GridSplitter.Divider.Shape}"
+                Opacity="{DynamicResource Md.Comp.GridSplitter.Preview.Opacity}" />
+      </Template>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="md:MdGridSplitter">
+        <!-- MdExplorer-proven composition: the whole 16-DIP lane receives input, while a quiet
+             track and a three-dot capsule make the drag affordance unmistakable. -->
+        <Border x:Name="PART_InteractionTrack" Background="{TemplateBinding Background}">
+          <Grid>
+            <Grid x:Name="PART_ColumnVisual" IsVisible="False" IsHitTestVisible="False">
+              <Border x:Name="PART_ColumnDivider"
+                      Width="{DynamicResource Md.Comp.GridSplitter.Divider.Thickness}"
+                      HorizontalAlignment="Center" VerticalAlignment="Stretch"
+                      Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                      CornerRadius="{DynamicResource Md.Comp.GridSplitter.Divider.Shape}"
+                      Opacity="{DynamicResource Md.Comp.GridSplitter.Divider.RestingOpacity}" />
+              <Border x:Name="PART_ColumnStateLayer"
+                      Width="{DynamicResource Md.Comp.GridSplitter.StateLayer.Thickness}"
+                      HorizontalAlignment="Center" VerticalAlignment="Stretch"
+                      Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                      CornerRadius="{DynamicResource Md.Comp.GridSplitter.Divider.Shape}"
+                      Opacity="0" />
+              <Border x:Name="PART_ColumnHandle"
+                      Width="{DynamicResource Md.Comp.GridSplitter.Handle.Thickness}"
+                      Height="{DynamicResource Md.Comp.GridSplitter.Handle.Length}"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                      BoxShadow="{DynamicResource Md.Sys.Elevation.Level1}"
+                      CornerRadius="{DynamicResource Md.Comp.GridSplitter.Handle.Shape}"
+                      IsVisible="{TemplateBinding ShowHandle}">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Spacing="{DynamicResource Md.Comp.GridSplitter.Handle.DotSpacing}">
+                  <Ellipse Classes="splitter-dot" Width="{DynamicResource Md.Comp.GridSplitter.Handle.DotSize}" Height="{DynamicResource Md.Comp.GridSplitter.Handle.DotSize}" Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                  <Ellipse Classes="splitter-dot" Width="{DynamicResource Md.Comp.GridSplitter.Handle.DotSize}" Height="{DynamicResource Md.Comp.GridSplitter.Handle.DotSize}" Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                  <Ellipse Classes="splitter-dot" Width="{DynamicResource Md.Comp.GridSplitter.Handle.DotSize}" Height="{DynamicResource Md.Comp.GridSplitter.Handle.DotSize}" Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+              </Border>
+            </Grid>
+
+            <Grid x:Name="PART_RowVisual" IsVisible="False" IsHitTestVisible="False">
+              <Border x:Name="PART_RowDivider"
+                      Height="{DynamicResource Md.Comp.GridSplitter.Divider.Thickness}"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                      Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                      CornerRadius="{DynamicResource Md.Comp.GridSplitter.Divider.Shape}"
+                      Opacity="{DynamicResource Md.Comp.GridSplitter.Divider.RestingOpacity}" />
+              <Border x:Name="PART_RowStateLayer"
+                      Height="{DynamicResource Md.Comp.GridSplitter.StateLayer.Thickness}"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                      Background="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                      CornerRadius="{DynamicResource Md.Comp.GridSplitter.Divider.Shape}"
+                      Opacity="0" />
+              <Border x:Name="PART_RowHandle"
+                      Width="{DynamicResource Md.Comp.GridSplitter.Handle.Length}"
+                      Height="{DynamicResource Md.Comp.GridSplitter.Handle.Thickness}"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+                      BoxShadow="{DynamicResource Md.Sys.Elevation.Level1}"
+                      CornerRadius="{DynamicResource Md.Comp.GridSplitter.Handle.Shape}"
+                      IsVisible="{TemplateBinding ShowHandle}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Spacing="{DynamicResource Md.Comp.GridSplitter.Handle.DotSpacing}">
+                  <Ellipse Classes="splitter-dot" Width="{DynamicResource Md.Comp.GridSplitter.Handle.DotSize}" Height="{DynamicResource Md.Comp.GridSplitter.Handle.DotSize}" Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                  <Ellipse Classes="splitter-dot" Width="{DynamicResource Md.Comp.GridSplitter.Handle.DotSize}" Height="{DynamicResource Md.Comp.GridSplitter.Handle.DotSize}" Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                  <Ellipse Classes="splitter-dot" Width="{DynamicResource Md.Comp.GridSplitter.Handle.DotSize}" Height="{DynamicResource Md.Comp.GridSplitter.Handle.DotSize}" Fill="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+                </StackPanel>
+              </Border>
+            </Grid>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:columns /template/ Grid#PART_ColumnVisual"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:rows /template/ Grid#PART_RowVisual"><Setter Property="IsVisible" Value="True" /></Style>
+
+    <Style Selector="^:pointerover /template/ Border#PART_ColumnDivider"><Setter Property="Opacity" Value="{DynamicResource Md.Comp.GridSplitter.Divider.HoverOpacity}" /></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_RowDivider"><Setter Property="Opacity" Value="{DynamicResource Md.Comp.GridSplitter.Divider.HoverOpacity}" /></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_ColumnStateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Comp.GridSplitter.StateLayer.HoverOpacity}" /></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_RowStateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Comp.GridSplitter.StateLayer.HoverOpacity}" /></Style>
+    <Style Selector="^:pointerover /template/ Border#PART_ColumnHandle">
+      <Setter Property="Width" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveThickness}" />
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveLength}" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_RowHandle">
+      <Setter Property="Width" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveLength}" />
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveThickness}" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Ellipse.splitter-dot"><Setter Property="Fill" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" /></Style>
+
+    <Style Selector="^:focus-visible /template/ Border#PART_ColumnHandle">
+      <Setter Property="Width" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveThickness}" />
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveLength}" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_RowHandle">
+      <Setter Property="Width" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveLength}" />
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveThickness}" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Ellipse.splitter-dot"><Setter Property="Fill" Value="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" /></Style>
+
+    <Style Selector="^:dragging /template/ Border#PART_ColumnDivider"><Setter Property="Opacity" Value="0" /></Style>
+    <Style Selector="^:dragging /template/ Border#PART_RowDivider"><Setter Property="Opacity" Value="0" /></Style>
+    <Style Selector="^:dragging /template/ Border#PART_ColumnStateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Comp.GridSplitter.StateLayer.DraggedOpacity}" /></Style>
+    <Style Selector="^:dragging /template/ Border#PART_RowStateLayer"><Setter Property="Opacity" Value="{DynamicResource Md.Comp.GridSplitter.StateLayer.DraggedOpacity}" /></Style>
+    <Style Selector="^:dragging /template/ Border#PART_ColumnHandle">
+      <Setter Property="Width" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveThickness}" />
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.GridSplitter.Handle.DraggedLength}" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:dragging /template/ Border#PART_RowHandle">
+      <Setter Property="Width" Value="{DynamicResource Md.Comp.GridSplitter.Handle.DraggedLength}" />
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.GridSplitter.Handle.ActiveThickness}" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    </Style>
+    <Style Selector="^:dragging /template/ Ellipse.splitter-dot"><Setter Property="Fill" Value="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" /></Style>
+
+    <!-- Reduced motion keeps state colour but removes the handle's spatial morph. -->
+    <Style Selector="^:reduced-motion:pointerover /template/ Border#PART_ColumnHandle, ^:reduced-motion:focus-visible /template/ Border#PART_ColumnHandle, ^:reduced-motion:dragging /template/ Border#PART_ColumnHandle">
+      <Setter Property="Width" Value="{DynamicResource Md.Comp.GridSplitter.Handle.Thickness}" />
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.GridSplitter.Handle.Length}" />
+    </Style>
+    <Style Selector="^:reduced-motion:pointerover /template/ Border#PART_RowHandle, ^:reduced-motion:focus-visible /template/ Border#PART_RowHandle, ^:reduced-motion:dragging /template/ Border#PART_RowHandle">
+      <Setter Property="Width" Value="{DynamicResource Md.Comp.GridSplitter.Handle.Length}" />
+      <Setter Property="Height" Value="{DynamicResource Md.Comp.GridSplitter.Handle.Thickness}" />
+    </Style>
+    <Style Selector="^:disabled /template/ Border#PART_InteractionTrack"><Setter Property="Opacity" Value="{DynamicResource Md.Comp.GridSplitter.Disabled.Opacity}" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

@@ -707,6 +707,47 @@ public sealed class MdDesktopPopupAndComparisonTests
     }
 
     [AvaloniaFact]
+    public void Cascader_First_Open_Without_A_Selection_Never_Covers_The_Field()
+    {
+        // The reported regression: with the field still showing its placeholder, opening the
+        // dropdown left part of the menu over the field until something inside the menu was
+        // clicked. The entrance transform used to translate the surface 8px up while it
+        // scaled in; the open state must now rest exactly on the anchor's bottom edge, and a
+        // pure scale from the top-left anchor keeps it there for the whole animation.
+        var window = new MainWindow { Width = 1400, Height = 900 };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            window.GetVisualDescendants().OfType<MdButton>()
+                .Single(button => button.Name == "CascaderNav")
+                .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+
+            var cascader = window.GetVisualDescendants().OfType<MdCascader>().First();
+            Assert.Empty(cascader.SelectedPath);
+            cascader.IsDropDownOpen = true;
+            Dispatcher.UIThread.RunJobs();
+
+            var popup = Descendant<Popup>(cascader, "PART_Popup");
+            var surface = Assert.IsAssignableFrom<Border>(popup.Child);
+            var anchor = Descendant<Button>(cascader, "PART_Anchor");
+            var surfaceTopLeft = surface.TranslatePoint(default, window)!.Value;
+            var surfaceRect = new Rect(surfaceTopLeft, surface.Bounds.Size);
+            var anchorTopLeft = anchor.TranslatePoint(default, window)!.Value;
+            var anchorRect = new Rect(anchorTopLeft, anchor.Bounds.Size);
+
+            Assert.True(surfaceRect.Top >= anchorRect.Bottom - 0.5,
+                $"the open menu covers the field by {anchorRect.Bottom - surfaceRect.Top:0.##} dip " +
+                $"(surface top {surfaceRect.Top:0.##}, anchor bottom {anchorRect.Bottom:0.##}); " +
+                $"surface={surfaceRect}, anchor={anchorRect}");
+            Assert.True(Math.Abs(surfaceRect.Left - anchorRect.Left) <= 1,
+                $"the menu is shifted {surfaceRect.Left - anchorRect.Left:0.##} dip from the field's left edge");
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
     public void Cascader_First_Open_Is_Aligned_And_Clicking_A_Path_Updates_The_Visible_Field()
     {
         // Exercise the actual Gallery tree and pointer selection, not just MdCascader.Select:

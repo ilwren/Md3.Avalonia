@@ -1,19 +1,22 @@
 # Changelog
 
-## [0.5.0-preview.2]
+## [Unreleased]
 
-### Documentation
+### Added
 
-- Updated English and Chinese package/install guidance and Gallery examples to use `0.5.0-preview.2`.
-- Corrected package-release metadata and documentation covering package counts, release dates, target frameworks, compatibility, and release validation.
+- Added `MdGridSplitter`, retaining Avalonia's row/column resize, preview, keyboard, constraint and Escape behavior while adding a Material 3 interaction track, orientation-aware divider/grip states, localized automation and optional double-tap/programmatic pane equalization. Its state layer, color and grip geometry now transition through `MdMotion`, while live mode keeps pane geometry directly synchronized with every drag delta.
 
-### Packaging
+### Changed
 
-- Added shared NuGet repository metadata pointing all packages to the GitHub source repository.
+- Advanced the unified package version from `0.5.0-preview.1` to `0.5.6-preview.1`: one patch increment for each of the six new standalone controls (`MdCommitGraph`, `MdContributionGrid`, `MdPagination`, `MdMaskedTextBox`, `MdFileSystemPicker`, and `MdGridSplitter`).
+- `MdTextBox` and `MdSearchBar` now explicitly keep Avalonia's logical `TextBox.CaretIndex` synchronized with the visual `TextPresenter` after pointer placement, reverse-selection replacement, and committed input, preventing the next character from being inserted away from the rendered caret. `MdTextBox` also keeps its interactive input row in stable layout coordinates instead of render-translating it with floating-label motion, and uses the scoped `MdScrollViewer` for a real horizontal viewport in Material-only hosts, so Avalonia 12.1.2 glyph hit-testing receives the exact point shown under the mouse across labels, affixes, scrolling, and multiline text.
+- `MdFileSystemPicker` now localizes visible text and culture-sensitive entry details, preserves host text overrides, supports `Standard`/`Powerline` breadcrumbs, centers every glyph in a fixed transparent viewport, and lets single selection toggle off like multiple selection.
 
-## [0.5.0-preview.1] - 2026-10-19
+### Removed
 
-> Published on [NuGet.org](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.1) and [GitHub Releases](https://github.com/ilwren/Md3.Avalonia/releases/tag/v0.5.0-preview.1) on 2026-10-19; all 18 packages use this version.
+- Removed the unreleased `MdVideoPlayer`, playback-request API, optional `Md3.Avalonia.LibVLC` adapter, Gallery sample, generated media asset, scripts, tests, and associated documentation.
+
+## [0.5.0-preview.1] - 2026-10-18
 
 ### Added
 
@@ -253,7 +256,7 @@
 
 ### Changed
 
-- The core, Extra, Icons, Icons.Lite, DataGrid, RichEditor, and Notifications packages include `net8.0` and `net10.0` assets; Notifications also has Windows-specific TFMs. The 11 third-party theme packages remain `net10.0`-only. The release uses Avalonia `12.1.2`; Gallery remains .NET 10-only.
+- The core, Extra, Icons, Icons.Lite, and DataGrid packages include `net8.0` and `net10.0` assets; Notifications also provides those targets plus Windows-specific TFMs. The 12 integration and theme packages, including RichEditor, remain `net10.0`-only. The release uses Avalonia `12.1.2`; Gallery remains .NET 10-only.
 - Consolidated Extra control resources under `ExtraTheme` and removed the obsolete `EcosystemTheme` name without a compatibility shim.
 
 ### Fixed

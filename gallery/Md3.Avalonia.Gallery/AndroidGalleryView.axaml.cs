@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
@@ -29,6 +29,7 @@ public partial class AndroidGalleryView : UserControl
 
     internal int NavigationPageCount => _galleryIndex.Count;
     internal string? CurrentPageTitle => _currentPageTitle;
+    internal MdDialogHost DialogHost => MobileDialogHost;
 
     public AndroidGalleryView()
     {
@@ -78,10 +79,12 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Cards", () => new CardGalleryPage());
         AddPage("Chips", () => new ChipGalleryPage());
         AddPage("Date and time pickers", () => new PickerGalleryPage());
+        AddPage("File-system picker", () => new FileSystemPickerGalleryPage());
         AddPage("Picker restoration", () => new PickerRestorationGalleryPage());
         AddPage("Color picker", () => new ColorPickerGalleryPage());
         AddPage("Data table", () => new DataTableGalleryPage());
         AddPage("Paginated table", () => new PaginatedDataTableGalleryPage());
+        AddPage("Pagination", () => new PaginationGalleryPage());
         AddPage("Dialogs", () => new DialogGalleryPage());
         AddPage("Simple dialog", () => new SimpleDialogGalleryPage());
         AddPage("About and licenses", () => new AboutDialogGalleryPage());
@@ -134,6 +137,8 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Signature pad", () => new SignaturePadGalleryPage());
         AddPage("Chat view", () => new ChatViewGalleryPage());
         AddPage("Command palette", () => new CommandPaletteGalleryPage());
+        AddPage("Commit graph", () => new CommitGraphGalleryPage());
+        AddPage("Contribution grid", () => new ContributionGridGalleryPage());
         AddPage("Data grids", () => new DataGridGalleryPage());
         AddPage("Docking", () => new DockGalleryPage());
         AddPage("Draggable tabs", () => new DraggableTabsGalleryPage());
@@ -146,6 +151,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Hex editor", () => new HexEditorGalleryPage());
         AddPage("Density", () => new DensityGalleryPage());
         AddPage("Hover cards", () => new HoverCardGalleryPage());
+        AddPage("Masked text field", () => new MaskedTextBoxGalleryPage());
         AddPage("Masonry panel", () => new MasonryPanelGalleryPage());
         AddPage("Paged items", () => new PagedItemsGalleryPage());
         AddPage("PIN input", () => new PinInputGalleryPage());
@@ -343,7 +349,7 @@ public partial class AndroidGalleryView : UserControl
                 Spacing = 10,
                 Children =
                 {
-                    new TextBlock { Text = "Md3.Avalonia v0.5.0-preview.2", FontSize = 18, FontWeight = global::Avalonia.Media.FontWeight.SemiBold },
+                    new TextBlock { Text = "Md3.Avalonia v0.5.6-preview.1", FontSize = 18, FontWeight = global::Avalonia.Media.FontWeight.SemiBold },
                     new TextBlock { Text = "Material Design 3 and Flutter ecosystem components for Avalonia UI.", TextWrapping = global::Avalonia.Media.TextWrapping.Wrap },
                     new MdLinearProgressIndicator { Value = 100 }
                 }

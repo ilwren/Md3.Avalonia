@@ -6,7 +6,7 @@
 
 | Area | Baseline | Status |
 |---|---|---|
-| .NET NuGet assets | `net8.0;net10.0` for six core/general-purpose packages; `net10.0` for eleven opt-in third-party theme packages. | Platform-specific notification assets are listed below. The desktop Gallery and tests target .NET 10. |
+| .NET NuGet assets | `net8.0;net10.0` for five core/general-purpose packages; `net10.0` for twelve opt-in integration and theme packages. | Platform-specific notification assets are listed below. The desktop Gallery and tests target .NET 10. |
 | Avalonia | `12.1.2` | Build and headless-test baseline for Avalonia control packages. The minimum is set by third-party integration packages, not by the core library. |
 | Windows | Avalonia 12-supported x64/ARM64 hosts | Library-compatible; device and assistive-technology sign-off remains external. |
 | macOS | Avalonia 12-supported x64/Apple Silicon hosts | Library-compatible; VoiceOver sign-off remains external. |
@@ -18,7 +18,7 @@ The core runtime package references only `Avalonia` and `MaterialColorUtilities`
 
 ## Versioning
 
-- Current package version: [`0.5.0-preview.2`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.2) (18 packages). Earlier preview notes describe historical baselines.
+- Current source package baseline: `0.5.6-preview.1` (publication pending); earlier release notes and validation evidence remain historical records.
 - Preview packages may adjust API after a changelog entry and migration note.
 - Stable releases follow Semantic Versioning.
 - Avalonia minor-version upgrades are validated by Release builds for the supported .NET package TFMs, headless tests, package validation, and the platform matrix before the baseline changes.

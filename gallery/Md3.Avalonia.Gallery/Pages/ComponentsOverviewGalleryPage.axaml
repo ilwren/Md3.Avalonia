@@ -9,7 +9,7 @@
         <TextBlock Classes="body" TextWrapping="Wrap"
                    Text="Components are interactive building blocks for creating a user interface. They can be organized into categories based on their purpose: action, containment, communications, navigation, selection, and text input." />
         <TextBlock Classes="body" TextWrapping="Wrap" Opacity="0.72"
-                   Text="108 indexed pages. Every entry below opens its own page; MdGalleryIndexTests fails the build if any of them stops resolving." />
+                   Text="110 indexed pages. Every entry below opens its own page; MdGalleryIndexTests fails the build if any of them stops resolving." />
       </StackPanel>
 
       <WrapPanel Orientation="Horizontal">
@@ -19,6 +19,8 @@
             <TextBlock Classes="body" FontSize="14" TextWrapping="Wrap" Text="Controls that start or expose an action." />
             <md:MdButton Content="Buttons" Tag="Buttons" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Command palette" Tag="Command palette" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Commit graph" Tag="Commit graph" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Contribution grid" Tag="Contribution grid" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Dismissible" Tag="Dismissible" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="FABs" Tag="FABs" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Icon buttons" Tag="Icon buttons" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
@@ -61,9 +63,11 @@
             <md:MdButton Content="Docking" Tag="Docking" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Draggable tabs" Tag="Draggable tabs" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Expansion panels" Tag="Expansion panels" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Grid splitter" Tag="Grid splitter" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Grid tiles" Tag="Grid tiles" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Lists" Tag="Lists" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Markdown" Tag="Markdown" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Masked text field" Tag="Masked text field" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Masonry panel" Tag="Masonry panel" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Scrolling surface" Tag="Scrolling surface" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Settings cards" Tag="Settings cards" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
@@ -86,6 +90,7 @@
             <md:MdButton Content="Map" Tag="Map" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Paged items" Tag="Paged items" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Paginated table" Tag="Paginated table" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="Pagination" Tag="Pagination" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Pull to refresh" Tag="Pull to refresh" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="ScottPlot charts" Tag="ScottPlot charts" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Signature pad" Tag="Signature pad" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
@@ -150,6 +155,7 @@
             <md:MdButton Content="Color picker" Tag="Color picker" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Date and time pickers" Tag="Date and time pickers" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Date range picker" Tag="Date range picker" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
+            <md:MdButton Content="File-system picker" Tag="File-system picker" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Picker restoration" Tag="Picker restoration" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Radio buttons" Tag="Radio buttons" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
             <md:MdButton Content="Range slider" Tag="Range slider" Variant="Text" HorizontalContentAlignment="Left" Click="OpenComponent" />
