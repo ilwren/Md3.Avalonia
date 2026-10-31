@@ -144,7 +144,10 @@ public sealed class MdGalleryTests
         {
             var userPage = Assert.IsAssignableFrom<UserControl>(page);
             var pageContent = userPage.Content;
-            while (pageContent is MdDialogHost dialogHost) pageContent = dialogHost.Content; // pages may nest hosts at the root
+            // Pages may put a surface host at the root. Walk through it to find the documented
+            // scrolling body without coupling the render smoke test to one host type.
+            while (pageContent is MdDialogHost or MdBannerHost)
+                pageContent = ((ContentControl)pageContent).Content;
             var pageScroller = pageContent as MdScrollViewer ??
                                (pageContent as Grid)?.Children.OfType<MdScrollViewer>().FirstOrDefault();
             Assert.NotNull(pageScroller);
