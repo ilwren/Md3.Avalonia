@@ -32,11 +32,18 @@ public sealed class MdSpatialSpringRunner : IDisposable
     public bool IsRunning => _timer.IsEnabled;
 
     /// <summary>Changes the destination without discarding momentum from an in-flight spring.</summary>
-    public void Retarget(double target, MdMotionSpeed speed = MdMotionSpeed.Default)
+    public void Retarget(double target, MdMotionSpeed speed = MdMotionSpeed.Default) =>
+        Retarget(target, speed, initialVelocity: null);
+
+    /// <summary>
+    /// Changes the destination and adopts release velocity from a direct-manipulation gesture.
+    /// </summary>
+    public void Retarget(double target, MdMotionSpeed speed, double? initialVelocity)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         Target = target;
         _speed = speed;
+        if (initialVelocity is { } velocity && double.IsFinite(velocity)) Velocity = velocity;
         var spec = MdMotion.Resolve(_owner, MdMotionKind.Spatial, speed);
         if (!spec.IsEnabled)
         {

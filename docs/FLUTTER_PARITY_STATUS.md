@@ -11,7 +11,7 @@ normative for documentation and release notes.
 |---|---|---|---|
 | `MdHero` | Implemented subset | Snapshot overlay, source/destination interpolation, cancellation, Reduced Motion fallback | Not certified for multi-window, every clip/elevation case, or Flutter pixel parity |
 | `MdReorderableList` | Implemented subset | Pointer reorder, auto-scroll, keyboard alternative, Reduced Motion | No claim of every Flutter delegate/drag decorator API |
-| `MdDismissible` | Implemented subset | Gesture threshold, confirmation, velocity and collapse lifecycle | Keyboard action and announcement coverage remains partial |
+| `MdDismissible` | Implemented subset | Axis-aware pointer drag, velocity-preserving spring settle, logical-direction backgrounds, confirmation and collapse lifecycle | Keyboard action and announcement coverage remains partial |
 | `MdFocusTraversalGroup` | Implemented subset | Visual-order, TabIndex and geometric reading-order traversal; cycle and skip modes | It maps to Avalonia focus primitives rather than accepting Flutter `FocusTraversalPolicy` objects |
 | `MdKeyboardAvoidingHost` | Implemented subset | Subscribes to Avalonia `TopLevel.InputPane`, applies occluded height and scrolls focused content | Floating keyboards that report no occlusion intentionally produce zero avoidance |
 | `MdSimpleDialog` | Partial | Scrim, Escape, focus containment/restoration, selectable list and cancel action | It must be placed in a full-size overlay host; it is not a Navigator route or a clone of `showDialog<T>` |

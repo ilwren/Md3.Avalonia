@@ -414,7 +414,7 @@ internal static class GalleryLocalization
         ["Standard and modal drawers expose top-level destinations on larger or temporarily constrained layouts."]="标准抽屉与模态抽屉在更大或临时受限的布局中展示顶级目标。",
         ["Standard, filled, tonal, and outlined variants across five expressive sizes."]="标准、填充、色调与描边变体，覆盖五种表现尺寸。",
         ["Subtle shadow separates this card from its background."]="轻微投影使卡片与背景分离。",
-        ["Swipe a row either way to dismiss it, with a different background behind each direction. Restore puts it back."]="向任意方向滑动即可移除该行，每个方向背后是不同的背景。恢复按钮可将其放回。",
+        ["Drag either way to preview the action. A short drag springs back; crossing the threshold dismisses the row, and Restore puts it back."]="向任意方向拖动可预览操作。短距离拖动会平滑回弹；越过阈值会移除该行，点击“恢复”可将其放回。",
         ["Swipe the row, or press Restore."]="滑动该行，或点击恢复。",
         ["Switches immediately toggle a single setting on or off."]="开关用于即时开启或关闭单个设置项。",
         ["Tables, grids, paging, and charts."]="表格、数据网格、分页与图表。",

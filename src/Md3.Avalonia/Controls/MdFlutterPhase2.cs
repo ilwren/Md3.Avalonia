@@ -585,17 +585,25 @@ public sealed class MdDismissible : ContentControl
         AvaloniaProperty.RegisterDirect<MdDismissible, bool>(nameof(IsConfirmationPending), control => control.IsConfirmationPending);
     public static readonly StyledProperty<double> VisualHeightProperty = AvaloniaProperty.Register<MdDismissible, double>(nameof(VisualHeight), double.NaN);
 
+    private const double DragSlop = 4;
+    private const double FlingVelocity = 650;
+    private const double MinimumFlingProgress = 0.12;
+
     private Point _start;
+    private bool _trackingPointer;
     private bool _dragging;
+    private double _dragStartOffset;
     private double _dragOffset;
     private Border? _root;
     private Border? _foreground;
     private TranslateTransform? _foregroundTransform;
+    private readonly MdSpatialSpringRunner _offsetRunner;
     private readonly DispatcherTimer _collapseDelay = new();
     private readonly DispatcherTimer _collapseCompletion = new();
     private double _lastPointerX;
     private ulong _lastPointerTimestamp;
     private double _horizontalVelocity;
+    private MdDismissDirection? _settleDirection;
     private bool _isConfirmationPending;
     private CancellationTokenSource? _confirmationCancellation;
     private int _confirmationVersion;
@@ -608,6 +616,11 @@ public sealed class MdDismissible : ContentControl
 
     public MdDismissible()
     {
+        _offsetRunner = new MdSpatialSpringRunner(this, value =>
+        {
+            if (_foregroundTransform is not null) _foregroundTransform.X = value;
+            UpdateDirectionPseudoClasses(value);
+        });
         _collapseDelay.Tick += (_, _) => BeginHeightCollapse();
         _collapseCompletion.Tick += (_, _) =>
         {
@@ -664,19 +677,19 @@ public sealed class MdDismissible : ContentControl
             if (!await confirmation(direction, confirmationCancellation.Token) ||
                 version != _confirmationVersion || confirmationCancellation.IsCancellationRequested)
             {
-                SetDragOffset(0);
+                SettleOffset(0);
                 return false;
             }
             return CompleteDismiss(direction);
         }
         catch (OperationCanceledException) when (confirmationCancellation.IsCancellationRequested)
         {
-            SetDragOffset(0);
+            SettleOffset(0);
             return false;
         }
         catch (Exception error)
         {
-            SetDragOffset(0);
+            SettleOffset(0);
             DismissConfirmationFailed?.Invoke(this, error);
             return false;
         }
@@ -700,11 +713,12 @@ public sealed class MdDismissible : ContentControl
         return !args.Cancel;
     }
 
-    private bool CompleteDismiss(MdDismissDirection direction)
+    private bool CompleteDismiss(MdDismissDirection direction, double releaseVelocity = 0)
     {
         if (DismissCommand?.CanExecute(direction) == true) DismissCommand.Execute(direction);
+        var target = DirectionSign(direction) * Math.Max(1, Bounds.Width);
+        SettleOffset(target, releaseVelocity);
         SetCurrentValue(IsDismissedProperty, true);
-        SetDragOffset(direction == MdDismissDirection.EndToStart ? -Math.Max(1, Bounds.Width) : Math.Max(1, Bounds.Width));
         Dismissed?.Invoke(this, EventArgs.Empty);
         return true;
     }
@@ -716,8 +730,9 @@ public sealed class MdDismissible : ContentControl
         _collapseCompletion.Stop();
         SetPresence(true);
         SetCurrentValue(VisualHeightProperty, double.NaN);
+        var wasDismissed = IsDismissed;
         SetCurrentValue(IsDismissedProperty, false);
-        SetDragOffset(0);
+        if (!wasDismissed) SettleOffset(0);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -726,6 +741,8 @@ public sealed class MdDismissible : ContentControl
         _root = e.NameScope.Find<Border>("PART_Root");
         _foreground = e.NameScope.Find<Border>("PART_Foreground");
         _foregroundTransform = _foreground?.RenderTransform as TranslateTransform;
+        if (_foregroundTransform is not null) _foregroundTransform.Transitions = null;
+        _offsetRunner.SnapTo(DragOffset);
         UpdateMotion();
     }
 
@@ -737,45 +754,112 @@ public sealed class MdDismissible : ContentControl
         _lastPointerX = _start.X;
         _lastPointerTimestamp = e.Timestamp;
         _horizontalVelocity = 0;
-        _dragging = true;
-        if (_foregroundTransform is not null) _foregroundTransform.Transitions = null;
-        PseudoClasses.Set(":dragging", true);
+        _trackingPointer = true;
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
-        if (!_dragging) return;
+        if (!_trackingPointer) return;
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            _trackingPointer = false;
+            if (_dragging)
+            {
+                _dragging = false;
+                PseudoClasses.Set(":dragging", false);
+                SettleOffset(0);
+                if (ReferenceEquals(e.Pointer.Captured, this)) e.Pointer.Capture(null);
+            }
+            return;
+        }
         var position = e.GetPosition(this);
-        var delta = position.X - _start.X;
-        if (delta == 0 || !IsOffsetAllowed(delta)) return;
+        var horizontalDelta = position.X - _start.X;
+        var verticalDelta = position.Y - _start.Y;
+        if (!_dragging)
+        {
+            if (Math.Abs(horizontalDelta) < DragSlop && Math.Abs(verticalDelta) < DragSlop) return;
+            if (Math.Abs(verticalDelta) > Math.Abs(horizontalDelta))
+            {
+                _trackingPointer = false;
+                return;
+            }
+
+            _dragging = true;
+            _dragStartOffset = _offsetRunner.Position;
+            _offsetRunner.Stop();
+            PseudoClasses.Set(":dragging", true);
+            e.Pointer.Capture(this);
+        }
+
+        var candidate = _dragStartOffset + horizontalDelta;
+        if (!IsOffsetAllowed(candidate)) candidate = 0;
         var elapsed = e.Timestamp > _lastPointerTimestamp ? e.Timestamp - _lastPointerTimestamp : 1;
-        _horizontalVelocity = (position.X - _lastPointerX) / elapsed;
+        var instantaneousVelocity = (position.X - _lastPointerX) * 1000 / elapsed;
+        _horizontalVelocity = _horizontalVelocity == 0
+            ? instantaneousVelocity
+            : _horizontalVelocity * 0.65 + instantaneousVelocity * 0.35;
         _lastPointerX = position.X;
         _lastPointerTimestamp = e.Timestamp;
-        e.Pointer.Capture(this);
-        SetDragOffset(delta);
+        ApplyDirectOffset(candidate);
         e.Handled = true;
     }
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
+        if (!_trackingPointer) return;
+        _trackingPointer = false;
         if (!_dragging) return;
+
         _dragging = false;
         PseudoClasses.Set(":dragging", false);
-        UpdateMotion();
-        var threshold = Math.Clamp(DismissThreshold, 0.05, 1) * Math.Max(1, Bounds.Width);
-        var fling = Math.Abs(_horizontalVelocity) >= 0.6 && Math.Sign(_horizontalVelocity) == Math.Sign(DragOffset);
-        if (Math.Abs(DragOffset) >= threshold || fling)
-            Dismiss(DragOffset < 0 ? MdDismissDirection.EndToStart : MdDismissDirection.StartToEnd);
-        else SetDragOffset(0);
-        e.Pointer.Capture(null);
+        var idleMilliseconds = e.Timestamp > _lastPointerTimestamp ? e.Timestamp - _lastPointerTimestamp : 0;
+        if (idleMilliseconds > 100) _horizontalVelocity = 0;
+        var width = Math.Max(1, Bounds.Width);
+        var releaseVelocity = Math.Clamp(_horizontalVelocity, -width * 8, width * 8);
+        var threshold = Math.Clamp(DismissThreshold, 0.05, 1) * width;
+        var fling = Math.Abs(DragOffset) >= width * MinimumFlingProgress &&
+                    Math.Abs(releaseVelocity) >= FlingVelocity &&
+                    Math.Sign(releaseVelocity) == Math.Sign(DragOffset);
+        var direction = DirectionFromOffset(DragOffset);
+        if (direction is not null && (Math.Abs(DragOffset) >= threshold || fling))
+        {
+            if (ConfirmDismissAsync is null)
+            {
+                if (!RequestDismiss(direction.Value) ||
+                    !CompleteDismiss(direction.Value, releaseVelocity))
+                    SettleOffset(0, releaseVelocity);
+            }
+            else
+            {
+                _ = DismissAsync(direction.Value);
+            }
+        }
+        else
+        {
+            SettleOffset(0, releaseVelocity);
+        }
+        if (ReferenceEquals(e.Pointer.Captured, this)) e.Pointer.Capture(null);
+        e.Handled = true;
+    }
+
+    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+    {
+        var wasDragging = _dragging;
+        _trackingPointer = false;
+        _dragging = false;
+        PseudoClasses.Set(":dragging", false);
+        if (wasDragging && !IsDismissed) SettleOffset(0);
+        base.OnPointerCaptureLost(e);
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         CancelConfirmation();
+        _trackingPointer = false;
+        _dragging = false;
+        _offsetRunner.Stop();
         _collapseDelay.Stop();
         _collapseCompletion.Stop();
         base.OnDetachedFromVisualTree(e);
@@ -790,11 +874,12 @@ public sealed class MdDismissible : ContentControl
             _collapseCompletion.Stop();
             SetPresence(true);
             SetCurrentValue(VisualHeightProperty, double.NaN);
+            SettleOffset(0);
             return;
         }
 
         SetPresence(true);
-        var exit = MdMotion.GetExitDuration(this, MdMotionSpeed.Fast, MdMotionSpeed.Fast);
+        var exit = MdMotion.GetExitDuration(this, MdMotionSpeed.Default, MdMotionSpeed.Fast);
         if (exit <= TimeSpan.Zero)
         {
             BeginHeightCollapse();
@@ -842,13 +927,9 @@ public sealed class MdDismissible : ContentControl
                 : MdMotionTransitions.Collect(
                     MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects, MdMotionSpeed.Fast));
         }
-        if (_foregroundTransform is not null)
-        {
-            _foregroundTransform.Transitions = _dragging
-                ? null
-                : MdMotionTransitions.Collect(
-                    MdMotionTransitions.CreateDouble(this, TranslateTransform.XProperty, MdMotionKind.Spatial, MdMotionSpeed.Fast));
-        }
+        if (_foregroundTransform is not null) _foregroundTransform.Transitions = null;
+        if (_offsetRunner.IsRunning)
+            _offsetRunner.Retarget(_offsetRunner.Target, MdMotionSpeed.Default);
         if (_root is not null)
         {
             _root.Transitions = MdMotionTransitions.Collect(
@@ -857,14 +938,61 @@ public sealed class MdDismissible : ContentControl
         if (IsDismissed) OnDismissedChanged();
     }
 
-    private bool IsDirectionAllowed(MdDismissDirection direction) => Direction == MdDismissDirection.Horizontal || Direction == direction;
-    private bool IsOffsetAllowed(double value) => Direction == MdDismissDirection.Horizontal || Direction == MdDismissDirection.StartToEnd && value > 0 || Direction == MdDismissDirection.EndToStart && value < 0;
+    private bool IsDirectionAllowed(MdDismissDirection direction) =>
+        Direction == MdDismissDirection.Horizontal || Direction == direction;
 
-    private void SetDragOffset(double value)
+    private bool IsOffsetAllowed(double value) =>
+        value == 0 || DirectionFromOffset(value) is { } direction && IsDirectionAllowed(direction);
+
+    private MdDismissDirection? DirectionFromOffset(double value)
     {
+        if (Math.Abs(value) < 0.001) return null;
+        return Math.Sign(value) == DirectionSign(MdDismissDirection.StartToEnd)
+            ? MdDismissDirection.StartToEnd
+            : MdDismissDirection.EndToStart;
+    }
+
+    private int DirectionSign(MdDismissDirection direction)
+    {
+        var startToEnd = FlowDirection == FlowDirection.RightToLeft ? -1 : 1;
+        return direction == MdDismissDirection.EndToStart ? -startToEnd : startToEnd;
+    }
+
+    private void ApplyDirectOffset(double value)
+    {
+        _settleDirection = null;
+        SetDragOffset(value);
+        _offsetRunner.SnapTo(value);
+    }
+
+    private void SettleOffset(double value, double initialVelocity = 0)
+    {
+        SetDragOffset(value);
+        // A programmatic dismissal starts from rest, so expose its action background before the
+        // first animation frame. During a return-to-zero settle the currently revealed action must
+        // remain visible until the foreground has physically covered it again.
+        _settleDirection = Math.Abs(value) >= 0.001
+            ? DirectionFromOffset(value)
+            : DirectionFromOffset(_offsetRunner.Position);
+        UpdateDirectionPseudoClasses(value);
+        _offsetRunner.Retarget(value, MdMotionSpeed.Default, initialVelocity);
+    }
+
+    private void SetDragOffset(double value) =>
         SetAndRaise(DragOffsetProperty, ref _dragOffset, value);
-        PseudoClasses.Set(":start", value > 0);
-        PseudoClasses.Set(":end", value < 0);
+
+    private void UpdateDirectionPseudoClasses(double visualOffset)
+    {
+        var reachedRest = !_dragging && Math.Abs(_offsetRunner.Target) < 0.001 &&
+                          !_offsetRunner.IsRunning && Math.Abs(visualOffset) < 0.001;
+        var direction = reachedRest
+            ? null
+            : _dragging
+                ? DirectionFromOffset(visualOffset)
+                : _settleDirection ?? DirectionFromOffset(_offsetRunner.Target);
+        if (reachedRest) _settleDirection = null;
+        PseudoClasses.Set(":start", direction == MdDismissDirection.StartToEnd);
+        PseudoClasses.Set(":end", direction == MdDismissDirection.EndToStart);
     }
 
     private void CancelConfirmation()

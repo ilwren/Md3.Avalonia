@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media.Imaging;
@@ -185,6 +186,32 @@ public sealed class MdGalleryTests
         finally
         {
             gallery.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Dismissible_Gallery_Does_Not_Fix_The_Row_Height_Or_Compete_For_Mouse_Dragging()
+    {
+        var page = new DismissibleGalleryPage();
+        var host = new Window { Width = 960, Height = 640, Content = page };
+        host.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var dismissible = page.FindControl<MdDismissible>("DismissibleDemo")!;
+            var scroller = Assert.IsType<MdScrollViewer>(page.Content);
+            var foreground = dismissible.GetVisualDescendants().OfType<Border>()
+                .Single(border => border.Name == "PART_Foreground");
+            var foregroundContent = Assert.IsType<ContentPresenter>(foreground.Child);
+            var row = Assert.IsType<Border>(foregroundContent.Content);
+
+            Assert.True(double.IsNaN(dismissible.Height));
+            Assert.Equal(72, row.MinHeight);
+            Assert.False(scroller.AllowMouseDrag);
+        }
+        finally
+        {
+            host.Close();
         }
     }
 
