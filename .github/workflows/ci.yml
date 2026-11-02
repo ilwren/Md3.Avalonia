@@ -313,6 +313,15 @@ jobs:
         continue-on-error: true
         run: scripts/probe-tests.sh MdFloatingWindowTests floating-window.trx
 
+      # The picker tests are the only ones in the suite that click a day through the popup, and a
+      # picker with nothing selected re-anchors on today when it opens: the calendar on screen, the
+      # month transition that decides which grid is live and whether a click commits all depend on
+      # the date the job runs on. That is what broke this run on the first day of a month, so its
+      # five tests get a probe of their own rather than only a line in the combined suite.
+      - name: Probe the desktop picker and carousel tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdDesktopPickerAndCarouselTests pickers.trx
+
       # Bounded, because an unbounded stall costs the job's whole timeout and takes the run's
       # annotations with it. The suite measured about four and a half minutes before main's tests
       # were merged in and then ran past ten, so fifteen is the wall now: high enough that ordinary
