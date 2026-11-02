@@ -67,7 +67,7 @@
           </Border>
       </StackPanel>
 
-      <gallery:ApiNotes Control="MdDialogHost, IMdDialogService"
+      <gallery:ApiNotes Control="MdDialogHost"
                       Members="Dialog, DialogTemplate, IsOpen, DismissOnScrimClick, ShowAsync(object), Show, ReplaceAsync, Replace, Close(result)">
         <gallery:ApiNotes.Notes>
           <TextBlock Classes="body" TextWrapping="Wrap" Text="Hand the service to view models rather than the host. Escape and an optional scrim click dismiss the active dialog, and only one is active at a time: Dialog stores its current view model and Avalonia selects the matching template. A request made while another dialog is open queues behind it; ReplaceAsync and Replace swap the current dialog instead, for a wizard stepping a page." />

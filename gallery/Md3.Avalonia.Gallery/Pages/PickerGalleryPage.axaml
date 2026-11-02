@@ -55,7 +55,7 @@
       </Border>
 
       <StackPanel Spacing="10">
-        <gallery:ApiNotes Control="MdDatePicker, MdTimePicker"
+        <gallery:ApiNotes Control="MdDatePicker / MdTimePicker"
                         Members="SelectedDate, DisplayDate, MinimumDate, MaximumDate, DateFormat, Mode, SelectedTime, Hour, Minute, MinuteStep, Is24Hour">
           <gallery:ApiNotes.Notes>
             <TextBlock Classes="body" TextWrapping="Wrap" Text="DisplayDate is the month the grid opens on, independent of SelectedDate; MinimumDate and MaximumDate clamp it. Mode picks docked, modal, dial or input, MinuteStep and Is24Hour shape the time pickers, and DateFormat overrides the field's text." />

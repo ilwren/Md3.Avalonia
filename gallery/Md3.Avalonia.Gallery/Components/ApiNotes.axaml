@@ -31,13 +31,15 @@
           BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
           BorderThickness="1">
     <StackPanel Spacing="10">
-      <StackPanel Orientation="Horizontal" Spacing="10">
-        <TextBlock Classes="api-title" Text="API surface" />
-        <Border Classes="api-member" VerticalAlignment="Center" Margin="0">
-          <!-- An API name is not prose: the localization walker skips verbatim elements. -->
-          <TextBlock x:Name="TypeLabel" Classes="verbatim" />
+      <WrapPanel Orientation="Horizontal">
+        <TextBlock Classes="api-title" Text="API surface" Margin="0,0,10,0" />
+        <Border Classes="api-member" VerticalAlignment="Center" Margin="0,0,0,6" MaxWidth="300">
+          <!-- An API name is not prose: the localization walker skips verbatim elements. A long
+               qualified name wraps here rather than widening the card past a 480 dip phone, which
+               is what the gallery's own reflow test measures. -->
+          <TextBlock x:Name="TypeLabel" Classes="verbatim" TextWrapping="Wrap" />
         </Border>
-      </StackPanel>
+      </WrapPanel>
       <WrapPanel x:Name="MemberHost" Orientation="Horizontal" />
       <ContentPresenter x:Name="NotesHost" />
     </StackPanel>
