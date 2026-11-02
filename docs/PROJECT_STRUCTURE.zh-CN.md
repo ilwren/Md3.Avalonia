@@ -1,5 +1,11 @@
 ---
 _lang: zh-CN
+description: "Md3.Avalonia 的仓库结构：源码项目、测试、Gallery 页面、主题令牌与文档构建。"
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/PROJECT_STRUCTURE.zh-CN.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/PROJECT_STRUCTURE.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/PROJECT_STRUCTURE.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/PROJECT_STRUCTURE.html"
+comments: true
 ---
 
 # 项目结构

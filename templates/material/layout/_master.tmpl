@@ -1,0 +1,222 @@
+{{!Md3.Avalonia: repository-owned copy of docfx 2.81.0 templates/modern/layout/_master.tmpl.}}
+{{!Everything outside the blocks marked MD3 is unchanged from that file. Re-diff and re-apply those}}
+{{!blocks when the pinned docfx version in .github/workflows/docs.yml moves; templates/material/README.md}}
+{{!lists what each block adds.}}
+{{!Licensed to the .NET Foundation under one or more agreements. The .NET Foundation licenses this file to you under the MIT license.}}
+{{!include(/^public/.*/)}}
+{{!include(favicon.ico)}}
+{{!include(logo.svg)}}
+<!DOCTYPE html>
+<html {{#_lang}}lang="{{_lang}}"{{/_lang}}>
+  <head>
+    <meta charset="utf-8">
+    {{#redirect_url}}
+      <meta http-equiv="refresh" content="0;URL='{{redirect_url}}'">
+    {{/redirect_url}}
+    {{^redirect_url}}
+      <title>{{#title}}{{title}}{{/title}}{{^title}}{{>partials/title}}{{/title}} {{#_appTitle}}| {{_appTitle}} {{/_appTitle}}</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="{{#title}}{{title}}{{/title}}{{^title}}{{>partials/title}}{{/title}} {{#_appTitle}}| {{_appTitle}} {{/_appTitle}}">
+      {{#_description}}<meta name="description" content="{{_description}}">{{/_description}}
+      {{#description}}<meta name="description" content="{{description}}">{{/description}}
+      {{!MD3: search and social metadata, driven by page front matter and docfx.json global metadata.}}
+      {{#canonical}}<link rel="canonical" href="{{canonical}}">{{/canonical}}
+      {{#hreflang_en}}<link rel="alternate" hreflang="en" href="{{hreflang_en}}">{{/hreflang_en}}
+      {{#hreflang_zh}}<link rel="alternate" hreflang="zh-Hans" href="{{hreflang_zh}}">{{/hreflang_zh}}
+      {{#hreflang_x_default}}<link rel="alternate" hreflang="x-default" href="{{hreflang_x_default}}">{{/hreflang_x_default}}
+      {{#_ogImage}}
+      <meta property="og:type" content="{{#_ogType}}{{_ogType}}{{/_ogType}}{{^_ogType}}website{{/_ogType}}">
+      <meta property="og:site_name" content="{{_appTitle}}">
+      <meta property="og:image" content="{{_ogImage}}">
+      <meta property="og:locale" content="{{#_lang}}{{_lang}}{{/_lang}}{{^_lang}}en{{/_lang}}">
+      <meta name="twitter:card" content="summary">
+      <meta name="twitter:image" content="{{_ogImage}}">
+      {{#title}}<meta property="og:title" content="{{title}} | {{_appTitle}}">{{/title}}
+      {{#description}}<meta property="og:description" content="{{description}}">{{/description}}
+      {{#canonical}}<meta property="og:url" content="{{canonical}}">{{/canonical}}
+      {{/_ogImage}}
+      <link rel="icon" href="{{_rel}}{{{_appFaviconPath}}}{{^_appFaviconPath}}favicon.ico{{/_appFaviconPath}}">
+      <link rel="stylesheet" href="{{_rel}}public/docfx.min.css">
+      <link rel="stylesheet" href="{{_rel}}public/main.css">
+      <meta name="docfx:navrel" content="{{_navRel}}">
+      <meta name="docfx:tocrel" content="{{_tocRel}}">
+      {{#_noindex}}<meta name="searchOption" content="noindex">{{/_noindex}}
+      {{#_enableSearch}}<meta name="docfx:rel" content="{{_rel}}">{{/_enableSearch}}
+      {{#_disableNewTab}}<meta name="docfx:disablenewtab" content="true">{{/_disableNewTab}}
+      {{#_disableTocFilter}}<meta name="docfx:disabletocfilter" content="true">{{/_disableTocFilter}}
+      {{#docurl}}<meta name="docfx:docurl" content="{{docurl}}">{{/docurl}}
+      <meta name="loc:inThisArticle" content="{{__global.inThisArticle}}">
+      <meta name="loc:searchResultsCount" content="{{__global.searchResultsCount}}">
+      <meta name="loc:searchNoResults" content="{{__global.searchNoResults}}">
+      <meta name="loc:tocFilter" content="{{__global.tocFilter}}">
+      <meta name="loc:nextArticle" content="{{__global.nextArticle}}">
+      <meta name="loc:prevArticle" content="{{__global.prevArticle}}">
+      <meta name="loc:themeLight" content="{{__global.themeLight}}">
+      <meta name="loc:themeDark" content="{{__global.themeDark}}">
+      <meta name="loc:themeAuto" content="{{__global.themeAuto}}">
+      <meta name="loc:changeTheme" content="{{__global.changeTheme}}">
+      <meta name="loc:copy" content="{{__global.copy}}">
+      <meta name="loc:downloadPdf" content="{{__global.downloadPdf}}">
+
+      <script type="module" src="./{{_rel}}public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+      {{#_googleAnalyticsTagId}}
+      <script async src="https://www.googletagmanager.com/gtag/js?id={{_googleAnalyticsTagId}}"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', '{{_googleAnalyticsTagId}}');
+      </script>
+      {{/_googleAnalyticsTagId}}
+    {{/redirect_url}}
+  </head>
+
+  {{^redirect_url}}
+  <body class="tex2jax_ignore" data-layout="{{_layout}}{{layout}}" data-yaml-mime="{{yamlmime}}">
+    <header class="bg-body border-bottom">
+      {{^_disableNavbar}}
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="{{_appLogoUrl}}{{^_appLogoUrl}}{{_rel}}index.html{{/_appLogoUrl}}">
+            <img id="logo" class="svg" src="{{_rel}}{{{_appLogoPath}}}{{^_appLogoPath}}logo.svg{{/_appLogoPath}}" alt="{{_appName}}" >
+            {{_appName}}
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              {{#_enableSearch}}
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled placeholder="{{__global.search}}" autocomplete="off" aria-label="Search">
+              </form>
+              {{/_enableSearch}}
+            </div>
+          </div>
+        </div>
+      </nav>
+      {{/_disableNavbar}}
+    </header>
+
+    <main class="container-xxl">
+      {{^_disableToc}}
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+      {{/_disableToc}}
+
+      <div class="content">
+        <div class="actionbar">
+          {{^_disableToc}}
+          <button class="btn btn-lg border-0 d-md-none"
+              type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas"
+              aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+          {{/_disableToc}}
+
+          {{^_disableBreadcrumb}}
+          <nav id="breadcrumb"></nav>
+          {{/_disableBreadcrumb}}
+        </div>
+
+        <article data-uid="{{uid}}">
+          {{!body}}
+        </article>
+
+        {{!MD3: comment thread, rendered only when giscus is configured.}}{{!MD3: It needs both _giscusRepo in docfx.json globalMetadata (which carries the repository and category ids) and `comments: true` in the page front matter, so API pages, which are generated from metadata, stay out of the issue tracker.}}
+        {{#_giscusRepo}}{{#comments}}
+        <section class="md3-page-comments d-print-none" aria-label="Comments">
+          <script src="https://giscus.app/client.js"
+                  data-repo="{{_giscusRepo}}"
+                  data-repo-id="{{_giscusRepoId}}"
+                  data-category="{{_giscusCategory}}"
+                  data-category-id="{{_giscusCategoryId}}"
+                  data-mapping="pathname"
+                  data-strict="1"
+                  data-reactions-enabled="1"
+                  data-emit-metadata="0"
+                  data-input-position="top"
+                  data-theme="preferred_color_scheme"
+                  data-lang="{{#_giscusLang}}{{_giscusLang}}{{/_giscusLang}}{{^_giscusLang}}en{{/_giscusLang}}"
+                  data-loading="lazy"
+                  crossorigin="anonymous"
+                  async>
+          </script>
+        </section>
+        {{/comments}}{{/_giscusRepo}}
+
+        {{^_disableContribution}}
+        <div class="contribution d-print-none">
+          {{#sourceurl}}
+          <a href="{{sourceurl}}" class="edit-link">{{__global.improveThisDoc}}</a>
+          {{/sourceurl}}
+          {{^sourceurl}}{{#docurl}}
+          <a href="{{docurl}}" class="edit-link">{{__global.improveThisDoc}}</a>
+          {{/docurl}}{{/sourceurl}}
+        </div>
+        {{/_disableContribution}}
+
+        {{^_disableNextArticle}}
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+        {{/_disableNextArticle}}
+
+      </div>
+
+      {{^_disableAffix}}
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+      {{/_disableAffix}}
+    </main>
+
+    {{#_enableSearch}}
+    <div class="container-xxl search-results" id="search-results"></div>
+    {{/_enableSearch}}
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          {{{_appFooter}}}{{^_appFooter}}<span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>{{/_appFooter}}
+          {{!MD3: real anchors, so the site has a crawlable link graph without running public/docfx.min.js.}}{{!MD3: The docfx sidebar, breadcrumb and next-article blocks are all rendered client side.}}
+          <nav class="md3-footer-nav" aria-label="Site">
+            <a href="{{_rel}}index.html">Home · 首页</a>
+            <a href="{{_rel}}docs/GETTING_STARTED.html">Quick start · 快速上手</a>
+            <a href="{{_rel}}docs/USAGE_EXAMPLES.html">Usage examples · 使用示例</a>
+            <a href="{{_rel}}api/">API reference</a>
+            <a href="{{_rel}}docs/NUGET_PACKAGES.html">NuGet packages · NuGet 包</a>
+            <a href="{{_rel}}index.zh-CN.html" hreflang="zh-Hans">简体中文</a>
+            <a href="https://github.com/ilwren/Md3.Avalonia">GitHub</a>
+          </nav>
+          {{!MD3: page view counter, enabled by setting _busuanzi in docfx.json globalMetadata.}}{{!MD3: The label is swapped by language in public/main.css, because front matter already sets _lang on <html>.}}
+          {{#_busuanzi}}
+          <span class="md3-page-views" id="busuanzi_container_page_pv">
+            <span class="md3-page-views-label"></span>
+            <span id="busuanzi_value_page_pv">0</span>
+            <span class="md3-page-views-sep">·</span>
+            <span class="md3-page-views-label md3-site-views-label"></span>
+            <span id="busuanzi_value_site_pv">0</span>
+          </span>
+          <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+          {{/_busuanzi}}
+        </div>
+      </div>
+    </footer>
+  </body>
+  {{/redirect_url}}
+</html>

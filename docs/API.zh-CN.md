@@ -1,5 +1,11 @@
 ---
 _lang: zh-CN
+description: "Md3.Avalonia API 参考的组织方式，以及控件、主题与服务的入口。"
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/API.zh-CN.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/API.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/API.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/API.html"
+comments: true
 ---
 
 # API 参考

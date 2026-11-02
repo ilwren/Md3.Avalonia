@@ -1,3 +1,12 @@
+---
+description: "Where Md3.Avalonia matches Flutter's Material widgets, where it deliberately diverges, and why."
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/FLUTTER_PARITY_STATUS.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/FLUTTER_PARITY_STATUS.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/FLUTTER_PARITY_STATUS.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/FLUTTER_PARITY_STATUS.html"
+comments: true
+---
+
 # Flutter behavior boundaries
 
 [English](FLUTTER_PARITY_STATUS.md) | [简体中文](FLUTTER_PARITY_STATUS.zh-CN.md)

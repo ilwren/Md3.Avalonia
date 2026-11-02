@@ -828,6 +828,52 @@ body > footer a {
   color: var(--md3-primary);
 }
 
+/* Footer site links, page-view counter and comment thread.
+   The footer anchors are the only server-rendered navigation on the site: the
+   docfx sidebar, breadcrumb and next-article blocks are built by docfx.min.js,
+   so a crawler that does not run scripts sees this list instead. */
+.md3-footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin-top: 0.35rem;
+  font-size: 0.875rem;
+}
+
+.md3-page-views {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.8125rem;
+  color: var(--md3-on-surface-variant);
+}
+
+/* Front matter already sets _lang on <html>, so the counter needs no per-page string. */
+.md3-page-views-label::after {
+  content: 'Page views';
+}
+
+.md3-site-views-label::after {
+  content: 'Site views';
+}
+
+html[lang^='zh'] .md3-page-views-label::after {
+  content: '本页阅读';
+}
+
+html[lang^='zh'] .md3-site-views-label::after {
+  content: '全站访问';
+}
+
+.md3-page-views-sep {
+  padding: 0 0.35rem;
+}
+
+.md3-page-comments {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--md3-outline-variant);
+}
+
 #search-results .sr-item {
   margin-bottom: 1rem;
   padding: 1rem 1.2rem;

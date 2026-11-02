@@ -1,5 +1,11 @@
 ---
 _lang: zh-CN
+description: "在 Avalonia 应用中接入 Md3.Avalonia：包引用、主题配置，以及第一个 Material Design 3 界面。"
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/GETTING_STARTED.zh-CN.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/GETTING_STARTED.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/GETTING_STARTED.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/GETTING_STARTED.html"
+comments: true
 ---
 
 # 快速上手

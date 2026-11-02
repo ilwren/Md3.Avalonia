@@ -1,3 +1,12 @@
+---
+description: "Copy-ready XAML patterns for Md3.Avalonia: navigation, dialogs, forms, data display and motion."
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/USAGE_EXAMPLES.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/USAGE_EXAMPLES.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/USAGE_EXAMPLES.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/USAGE_EXAMPLES.html"
+comments: true
+---
+
 # Usage examples
 
 [English](USAGE_EXAMPLES.md) | [简体中文](USAGE_EXAMPLES.zh-CN.md)

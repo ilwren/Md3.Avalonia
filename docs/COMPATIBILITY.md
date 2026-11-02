@@ -1,3 +1,12 @@
+---
+description: "Avalonia versions, target frameworks and platforms Md3.Avalonia supports, plus its breaking-change policy."
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/COMPATIBILITY.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/COMPATIBILITY.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/COMPATIBILITY.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/COMPATIBILITY.html"
+comments: true
+---
+
 # Compatibility and support policy
 
 [English](COMPATIBILITY.md) | [简体中文](COMPATIBILITY.zh-CN.md)

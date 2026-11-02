@@ -1,5 +1,11 @@
 ---
 _lang: zh-CN
+description: "Md3.Avalonia 的全部 NuGet 包、它们在核心库之上提供的能力，以及何时引用。"
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/NUGET_PACKAGES.zh-CN.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/NUGET_PACKAGES.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/NUGET_PACKAGES.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/NUGET_PACKAGES.html"
+comments: true
 ---
 
 # NuGet 包

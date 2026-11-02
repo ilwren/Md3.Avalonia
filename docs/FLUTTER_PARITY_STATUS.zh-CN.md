@@ -1,5 +1,11 @@
 ---
 _lang: zh-CN
+description: "Md3.Avalonia 与 Flutter Material 组件在哪些方面一致、哪些方面有意不同，以及原因。"
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/FLUTTER_PARITY_STATUS.zh-CN.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/FLUTTER_PARITY_STATUS.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/FLUTTER_PARITY_STATUS.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/FLUTTER_PARITY_STATUS.html"
+comments: true
 ---
 
 # Flutter 行为边界

@@ -1,3 +1,12 @@
+---
+description: "Every Md3.Avalonia NuGet package, what it adds on top of the core library, and when to reference it."
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/NUGET_PACKAGES.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/NUGET_PACKAGES.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/NUGET_PACKAGES.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/NUGET_PACKAGES.html"
+comments: true
+---
+
 # NuGet packages
 
 [English](NUGET_PACKAGES.md) | [简体中文](NUGET_PACKAGES.zh-CN.md)

@@ -1,3 +1,12 @@
+---
+description: "Add Md3.Avalonia to an Avalonia app: package references, theme setup and a first Material Design 3 screen."
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/GETTING_STARTED.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/GETTING_STARTED.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/GETTING_STARTED.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/GETTING_STARTED.html"
+comments: true
+---
+
 # Quick start
 
 [English](GETTING_STARTED.md) | [简体中文](GETTING_STARTED.zh-CN.md)

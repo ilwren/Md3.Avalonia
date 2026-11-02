@@ -1,3 +1,12 @@
+---
+description: "How the Md3.Avalonia API reference is organised, and where to start for controls, theming and services."
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/API.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/API.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/API.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/API.html"
+comments: true
+---
+
 # Md3.Avalonia public API overview
 
 [English](API.md) | [简体中文](API.zh-CN.md)
