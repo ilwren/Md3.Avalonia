@@ -36,6 +36,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdFocusTraversalGroup, MdShortcutScope, MdHero"
+                        Members="Policy, Cycle, SkipTraversal, IsTransitionEnabled, IsTransitioning, Progress, RequestTransitionTo()">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="MdFocusTraversalGroup applies the Flutter traversal policies - Policy and Cycle - to its subtree, and SkipTraversal keeps one element out of the order. MdShortcutScope binds a gesture only while the focused group stays inside it (Register, Unregister, ClearShortcuts), and MdHero flies an element between two positions: RequestTransitionTo starts the flight, IsTransitioning and Progress report it." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdFocusTraversalGroup Cycle=&quot;True&quot;&gt;&#10;  &lt;md:MdShortcutScope x:Name=&quot;ShortcutScope&quot;&gt;&#10;    &lt;md:MdHero x:Name=&quot;HeroSource&quot; Tag=&quot;avatar&quot;&gt;...&lt;/md:MdHero&gt;&#10;  &lt;/md:MdShortcutScope&gt;&#10;&lt;/md:MdFocusTraversalGroup&gt;"
                             CSharpCode="ShortcutScope.Register(new KeyGesture(Key.S, KeyModifiers.Control | KeyModifiers.Shift),&#10;                       new RelayCommand(RunAction));&#10;await HeroSource.TransitionToAsync(HeroDestination);" />

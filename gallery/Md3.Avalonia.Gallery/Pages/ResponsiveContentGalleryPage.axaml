@@ -20,6 +20,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdAdaptiveLayout"
+                        Members="Mode, Breakpoint, CompactContent, MediumContent, ExpandedContent, LargeContent, ExtraLargeContent, MediumBreakpoint, ExpandedBreakpoint, LargeBreakpoint, ExtraLargeBreakpoint">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="It measures itself, not the window: Mode picks compact, medium or expanded from the control's own width and Breakpoint reports the result, so a pane inside a split view adapts to the pane rather than to the screen. The four breakpoint properties move the thresholds, and each *Content slot takes any object - a template, a view or a plain string." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdAdaptiveLayout MediumBreakpoint=&quot;560&quot; ExpandedBreakpoint=&quot;760&quot;&gt;&#10;  &lt;md:MdAdaptiveLayout.CompactContent&gt;...&lt;/md:MdAdaptiveLayout.CompactContent&gt;&#10;  &lt;md:MdAdaptiveLayout.MediumContent&gt;...&lt;/md:MdAdaptiveLayout.MediumContent&gt;&#10;  &lt;md:MdAdaptiveLayout.ExpandedContent&gt;...&lt;/md:MdAdaptiveLayout.ExpandedContent&gt;&#10;&lt;/md:MdAdaptiveLayout&gt;" />
       </StackPanel>

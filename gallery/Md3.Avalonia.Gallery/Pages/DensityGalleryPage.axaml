@@ -35,6 +35,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdDensity"
+                        Members="Mode, GetMode(), SetMode()">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Mode is an inheriting attached property, so it is set once on a subtree and everything inside reads it - there is no per-control variant to remember. Comfortable is the default and Compact tightens paddings, min-heights and gaps; because it inherits, a nested scope can opt back out for a single card." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;Border infra:MdDensity.Mode=&quot;Compact&quot;&gt;&#10;  &lt;StackPanel&gt;...&lt;/StackPanel&gt;&#10;&lt;/Border&gt;" />
       </StackPanel>

@@ -20,6 +20,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdChatView"
+                        Members="MessagesSource, ComposerText, SuggestionsSource, SendCommand, AttachmentCommand, QuoteMessageCommand, RetryMessageCommand, DeleteMessagesCommand, IsBusy, AllowMultipleSelection, SelectionCount, QuotedMessage">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="The provider behind it is yours: MessagesSource is the list of bubbles, SuggestionsSource fills the composer, and SendCommand, AttachmentCommand, QuoteMessageCommand, RetryMessageCommand and DeleteMessagesCommand are the hooks it calls. Selection and quoting are explicit API too - ToggleMessageSelection, QuoteSelected, ClearSelection, CancelQuote and DeleteSelected - so a failed bubble's Retry is the same path as a fresh send, driven by IsBusy rather than by a local spinner." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdChatView MessagesSource=&quot;{Binding Messages}&quot; SendCommand=&quot;{Binding SendCommand}&quot; /&gt;" />
       </StackPanel>

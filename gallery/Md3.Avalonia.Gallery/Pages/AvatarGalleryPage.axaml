@@ -23,6 +23,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdAvatar"
+                        Members="Image, Initials, Size, Overlap">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Image and Initials are the two things it can show - the image wins once it loads, the initials stand in until it does. Size sets the container and its type together, and Overlap pulls a row of avatars into one surface so a group reads as a group." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdAvatar Initials=&quot;AL&quot; Background=&quot;{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}&quot; /&gt;" />
       </StackPanel>

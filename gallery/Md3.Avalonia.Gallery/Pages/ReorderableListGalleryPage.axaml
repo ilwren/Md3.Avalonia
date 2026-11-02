@@ -21,6 +21,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdReorderableList"
+                        Members="IsReorderEnabled, BuildDefaultDragHandles, ReorderCommand, MoveItem(), MoveSelectedUp(), MoveSelectedDown(), ReorderStarted, ReorderRequested, ReorderCompleted">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="It is a ListBox, so ItemsSource, selection and keyboard navigation come from Avalonia; the reorder surface adds IsReorderEnabled, BuildDefaultDragHandles and ReorderCommand, plus MoveItem and MoveSelectedUp/Down for the direct API. ReorderStarted, ReorderRequested and ReorderCompleted report where an item came from and where it went." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdReorderableList SelectionMode=&quot;Single&quot; ReorderCompleted=&quot;OnReorderCompleted&quot;&gt;&#10;  &lt;TextBlock Text=&quot;Design tokens&quot; /&gt;&#10;  &lt;TextBlock Text=&quot;Component themes&quot; /&gt;&#10;&lt;/md:MdReorderableList&gt;" />
       </StackPanel>

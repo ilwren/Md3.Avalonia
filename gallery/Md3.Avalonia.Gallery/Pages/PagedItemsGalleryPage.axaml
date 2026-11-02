@@ -34,6 +34,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdPagedItemsView"
+                        Members="PageSize, AutoLoad, PageRequestCommand, ItemTemplate, EmptyContent, ErrorContent, Items, State, Error, PageRequested, Refreshed">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="The provider is async by contract: PageRequestCommand is asked for a page and State says whether the view is loading, empty, errored or full, so the wait is observable instead of hidden in one dispatcher pass. PageSize and AutoLoad decide when the next request fires, and EmptyContent and ErrorContent are the two states a host usually forgets." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample CSharpCode="pages.PageProvider = async request =&gt;&#10;{&#10;    var items = await service.LoadPageAsync(request.PageKey, request.PageSize, request.CancellationToken);&#10;    return new MdPageResult&lt;object?&gt;(items, nextPageKey, isLastPage);&#10;};&#10;await pages.LoadNextPageAsync();" />
       </StackPanel>

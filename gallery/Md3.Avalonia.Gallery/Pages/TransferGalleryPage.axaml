@@ -18,6 +18,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdTransfer"
+                        Members="ItemsSource, SelectedItems, SourceFilter, TargetFilter, IsDragEnabled, LayoutMode, AvailableItems, TargetItems, IsCompact, StatusText">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="ItemsSource is the whole collection and SelectedItems (two-way) is what has crossed to the other side. SourceFilter and TargetFilter narrow each list independently, LayoutMode chooses side by side or stacked, IsCompact drops the lesser labels, and IsDragEnabled is the drag route that complements the arrow actions." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdTransfer ItemsSource=&quot;{Binding All}&quot; SelectedItems=&quot;{Binding Chosen}&quot; /&gt;" />
       </StackPanel>
