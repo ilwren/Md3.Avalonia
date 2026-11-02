@@ -1,4 +1,4 @@
-# Md3.Avalonia
+﻿# Md3.Avalonia
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
@@ -18,7 +18,7 @@
 
 - 桌面与 Android 双端，全部包声明 `IsTrimmable` 与 `IsAotCompatible`。
 
-> **当前源码基线：`0.5.6-preview.1`（尚未发布）。** 以下安装示例使用该源码基线计划发布的版本。预览期 API 仍可能做兼容性调整。屏幕阅读器与 Android 真机等人工验收状态见 [已知边界](#已知边界)。
+> **当前源码基线：`0.5.6-preview.1`。** 以下安装示例使用该源码基线计划发布的版本。预览期 API 仍可能做兼容性调整。屏幕阅读器与 Android 真机等人工验收状态见 [已知边界](#已知边界)。
 
 ## 目录
 

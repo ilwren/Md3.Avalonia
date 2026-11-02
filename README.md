@@ -1,4 +1,4 @@
-# Md3.Avalonia
+﻿# Md3.Avalonia
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
@@ -24,7 +24,7 @@ https://github.com/user-attachments/assets/53c05bc6-f1b5-4076-8b62-c4a7a2b819bf
 
 - Desktop and Android targets; every package declares `IsTrimmable` and `IsAotCompatible`.
 
-> **Current source baseline: `0.5.6-preview.1` (publication pending).** The install examples below use the version that will be published from this source baseline. Preview APIs may still receive compatibility changes. See [Known limitations](#known-limitations) for manual screen-reader and Android-device validation status.
+> **Current source baseline: `0.5.6-preview.1` .** The install examples below use the version that will be published from this source baseline. Preview APIs may still receive compatibility changes. See [Known limitations](#known-limitations) for manual screen-reader and Android-device validation status.
 >
 
 ## Contents
