@@ -96,6 +96,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdPagination"
+                        Members="NumberOfPages, SelectedPageIndex, DisplayMode, Orientation">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="MdPagination is Avalonia's PipsPager with the Material pager around it: NumberOfPages and SelectedPageIndex are the model, DisplayMode switches between numbered buttons and dots, and Orientation lets the dots stack for a vertical pager." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdPagination x:Name=&quot;Pager&quot; NumberOfPages=&quot;12&quot;&#10;                SelectedPageIndex=&quot;0&quot; MaxVisiblePips=&quot;5&quot;&#10;                DisplayMode=&quot;Numbers&quot;&#10;                SelectedIndexChanged=&quot;OnPageChanged&quot; /&gt;" />
       </StackPanel>

@@ -15,7 +15,12 @@
       <StackPanel Spacing="12"><TextBlock Classes="h2" Text="Configurations"/><md:MdSnackbar Content="Connection restored" Duration="0:0:0" IsOpen="True"/><md:MdSnackbar Content="Message deleted" ActionContent="Undo" ActionInvoked="UndoArchive" Duration="0:0:0" IsOpen="True"/></StackPanel>
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="MVVM service usage"/>
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Create one MdSnackbarService at the composition root, assign it to the visual MdSnackbarHost, and inject the same instance as IMdSnackbarService into view models. Creating an unattached MdSnackbar control cannot render."/>
+        <gallery:ApiNotes Control="MdSnackbar, MdSnackbarService"
+                        Members="IsOpen, Content, ActionContent, ActionCommand, Duration, IsDismissible, Show(), Dismiss(), ActionInvoked, Dismissed, IMdSnackbarService">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Duration times the message out; a zero duration waits for the action or the close affordance instead. Create one MdSnackbarService at the composition root, assign it to the visual MdSnackbarHost and inject the same instance as IMdSnackbarService into view models - an unattached MdSnackbar control cannot render." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <gallery:CodeExample
           XamlCode="&lt;md:MdSnackbarHost Service=&quot;{StaticResource SnackbarService}&quot;&gt;&#10;  &lt;views:CurrentPage /&gt;&#10;&lt;/md:MdSnackbarHost&gt;"
           CSharpCode="public MainViewModel(IMdSnackbarService snackbars) =&gt; _snackbars = snackbars;&#10;&#10;await _snackbars.ShowAsync(new MdSnackbarMessage(&quot;Draft archived&quot;)&#10;{&#10;    ActionContent = &quot;Undo&quot;,&#10;    ActionCommand = UndoCommand,&#10;    IsDismissible = true&#10;});"/>

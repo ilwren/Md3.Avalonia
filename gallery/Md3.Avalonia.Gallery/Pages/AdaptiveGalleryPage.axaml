@@ -84,6 +84,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdNavigationSuite, MdScaffold"
+                        Members="Mode, RailBreakpoint, DrawerBreakpoint, EffectiveMode, NavigationBar, NavigationRail, NavigationDrawer, TopBar, BottomBar, FloatingActionButton, Snackbar">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Mode=Auto swaps bar, rail and drawer at RailBreakpoint and DrawerBreakpoint; a fixed Mode pins one of them and EffectiveMode reports what the window actually got. MdScaffold places the bars, the FAB and the snackbar host in one grid, so a page does not restack them per breakpoint." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdNavigationSuite Mode=&quot;Auto&quot;&gt;&#10;  &lt;md:MdNavigationSuite.NavigationBar&gt;...&lt;/md:MdNavigationSuite.NavigationBar&gt;&#10;  &lt;md:MdNavigationSuite.NavigationRail&gt;...&lt;/md:MdNavigationSuite.NavigationRail&gt;&#10;  &lt;md:MdNavigationSuite.NavigationDrawer&gt;...&lt;/md:MdNavigationSuite.NavigationDrawer&gt;&#10;  &lt;views:Page /&gt;&#10;&lt;/md:MdNavigationSuite&gt;" CSharpCode="var scaffold = new MdScaffold&#10;{&#10;    TopBar = appBar,&#10;    Navigation = navigationSuite,&#10;    Content = page,&#10;    FloatingActionButton = composeFab&#10;};" />
       </StackPanel>

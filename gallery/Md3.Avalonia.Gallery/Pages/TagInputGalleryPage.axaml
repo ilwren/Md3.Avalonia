@@ -23,6 +23,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdTagInput"
+                        Members="Text, TagsSource, SuggestionsSource, Separators, MaximumTags, MaximumSuggestions, AllowDuplicates, CommitOnLostFocus, Comparison, TagValidator, TagAdded, TagRemoved, ClearTags()">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="TagsSource is the list the control adds to and Text is the editor in front of it. Separators decides what commits a tag, TagValidator can reject one before it lands, and TagAdded and TagRemoved report every change so a view model can persist it." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdTagInput TagsSource=&quot;{Binding Tags}&quot; SuggestionsSource=&quot;{Binding Suggestions}&quot;&#10;                TagAddedCommand=&quot;{Binding TagAddedCommand}&quot; /&gt;"
                             CSharpCode="tags.AddTag(&quot;Localization&quot;);&#10;tags.TagValidator = tag =&gt; tag.Length &lt; 3 ? &quot;Use at least 3 characters&quot; : null;" />

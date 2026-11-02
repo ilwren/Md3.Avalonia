@@ -52,6 +52,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdKeyboardAvoidingHost"
+                        Members="KeyboardHeight, AutomaticallyMonitorKeyboard, AutoScrollToFocused, ExtraBottomOffset, IsKeyboardActive">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="The host pads its viewport by KeyboardHeight and scrolls the focused text control into what is left. AutomaticallyMonitorKeyboard reads the platform's inset where there is one; setting KeyboardHeight by hand is what the simulator on this page does, and AutoScrollToFocused is the behaviour that follows focus." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdKeyboardAvoidingHost AutoScrollToFocused=&quot;True&quot; ExtraBottomOffset=&quot;16&quot;&gt;&#10;  &lt;md:MdScrollViewer&gt;&#10;    &lt;StackPanel&gt;...&lt;/StackPanel&gt;&#10;  &lt;/md:MdScrollViewer&gt;&#10;&lt;/md:MdKeyboardAvoidingHost&gt;"
                             CSharpCode="DemoKeyboardHost.KeyboardHeight = 150;   // normally driven by the platform inset" />

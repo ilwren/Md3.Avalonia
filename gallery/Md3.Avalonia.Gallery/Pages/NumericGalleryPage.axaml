@@ -53,6 +53,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdNumericBox"
+                        Members="Variant, Label, SupportingText, IsError, Value, Minimum, Maximum, Increment, ShowButtonSpinner">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="MdNumericBox is Avalonia's NumericUpDown inside a Material field: Value stays decimal and two-way, Minimum and Maximum clamp it, Increment steps the spinner, and ShowButtonSpinner=false keeps the parsing and clamping while the stepper goes away. Variant picks the field shape and IsError paints the supporting text as an error." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdNumericBox Label=&quot;Quantity&quot;&#10;                 Value=&quot;{Binding Quantity}&quot;&#10;                 Minimum=&quot;0&quot; Maximum=&quot;100&quot; Increment=&quot;1&quot; /&gt;&#10;&#10;&lt;md:MdNumericBox Label=&quot;Typed only&quot; ShowButtonSpinner=&quot;False&quot; /&gt;"
                              CSharpCode="var amount = new MdNumericBox&#10;{&#10;    Label = &quot;Amount&quot;,&#10;    Minimum = 0,&#10;    Maximum = 100,&#10;    Increment = 1&#10;};&#10;amount.ValueChanged += (_, e) =&gt; viewModel.Amount = e.NewValue;" />

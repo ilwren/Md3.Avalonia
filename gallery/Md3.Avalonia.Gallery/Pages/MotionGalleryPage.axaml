@@ -103,6 +103,12 @@
 
       <!-- Usage Example -->
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdContainerTransform, MdAnimatedVisibility"
+                        Members="IsExpanded, ClosedContent, OpenContent, ClosedCornerRadius, OpenCornerRadius, Duration, IsContentVisible, Transition">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="MdContainerTransform morphs between the two contents it is given, interpolating the corner radius from ClosedCornerRadius to OpenCornerRadius so the trigger and the expanded surface read as one container. MdAnimatedVisibility is the same motion for an expand or collapse, and Transition picks the scheme - shared axis, fade through or the spring variants." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;!-- M3 Container Transform --&gt;&#10;&lt;extra:MdContainerTransform IsExpanded=&quot;{Binding IsDetailOpen}&quot;&gt;&#10;    &lt;extra:MdContainerTransform.ClosedContent&gt;...&lt;/extra:MdContainerTransform.ClosedContent&gt;&#10;    &lt;extra:MdContainerTransform.OpenContent&gt;...&lt;/extra:MdContainerTransform.OpenContent&gt;&#10;&lt;/extra:MdContainerTransform&gt;&#10;&#10;&lt;!-- M3 Shared Axis Navigation --&gt;&#10;&lt;extra:MdSharedAxis Axis=&quot;X&quot; Forward=&quot;True&quot;&gt;&#10;    &lt;ContentControl Content=&quot;{Binding ActivePage}&quot; /&gt;&#10;&lt;/extra:MdSharedAxis&gt;"
                              CSharpCode="containerTransform.Toggle();&#10;sharedAxis.Axis = MdSharedAxisKind.X;&#10;animatedVis.IsContentVisible = !animatedVis.IsContentVisible;" />

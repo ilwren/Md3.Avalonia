@@ -55,7 +55,13 @@
         </StackPanel>
 
         <StackPanel Spacing="10">
-          <TextBlock Classes="h2" Text="Usage" />
+          <gallery:ApiNotes Control="MdBanner"
+                        Members="IsOpen, LeadingContent, Actions, ForceActionsBelow, IsDismissible, Show(), Dismiss(), Dismissed, IMdBannerService">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="A banner is persistent: IsOpen or Show() puts it on screen and only Dismiss() or one of its actions takes it away. Actions holds up to two buttons, ForceActionsBelow stacks them under the text on a narrow window, and a view model reaches the banner through IMdBannerService when it must not own the control." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
+        <TextBlock Classes="h2" Text="Usage" />
           <gallery:CodeExample XamlCode="&lt;md:MdBannerHost Service=&quot;{Binding BannerService}&quot;&gt;&#10;  &lt;md:MdBannerHost.DataTemplates&gt;&#10;    &lt;DataTemplate DataType=&quot;{x:Type vm:SyncBannerModel}&quot;&gt;&#10;      &lt;md:MdBanner IsDismissible=&quot;True&quot;&gt;&#10;        &lt;TextBlock Text=&quot;{Binding Message}&quot; /&gt;&#10;      &lt;/md:MdBanner&gt;&#10;    &lt;/DataTemplate&gt;&#10;  &lt;/md:MdBannerHost.DataTemplates&gt;&#10;  &lt;views:PageContent /&gt;&#10;&lt;/md:MdBannerHost&gt;"
                                CSharpCode="public sealed class PageViewModel(IMdBannerService banners)&#10;{&#10;    public async Task SyncAsync()&#10;    {&#10;        var result = await banners.ShowAsync&lt;string&gt;(&#10;            new SyncBannerModel(&quot;Could not synchronize.&quot;));&#10;    }&#10;}" />
         </StackPanel>
