@@ -46,6 +46,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MaterialRichEditorTheme, MdRichEditor"
+                        Members="Styles include, Adapter, ToolbarCommands, ToolbarItems, Execute(MdRichEditorCommand), EditorStateChanged">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="MaterialRichEditorTheme is a Styles collection, so it is included after MaterialTheme. MdRichEditor is the engine-free surface: Adapter is the only thing that touches the document, Execute() routes a command through it, and ToolbarItems is the descriptor list a toolbar binds to." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample CSharpCode="var editor = new MdRichEditor { Adapter = myEditorAdapter };   // IMdRichEditorAdapter" />
       </StackPanel>

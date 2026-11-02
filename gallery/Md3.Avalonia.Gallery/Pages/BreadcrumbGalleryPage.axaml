@@ -56,6 +56,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdBreadcrumb, MdBreadcrumbItem, MdBreadcrumbPathConverter"
+                        Members="ItemsSource, Variant, Separator, SeparatorTemplate, MaxDisplayedItems, ItemInvokedCommand">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Variant=Powerline draws the interlocking chevrons and MaxDisplayedItems collapses a deep path behind an overflow segment. MdBreadcrumbPathConverter turns the shared route into items; ItemInvokedCommand reports the segment a user chose, and the trailing item is the current location." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <TextBlock Classes="body" TextWrapping="Wrap" Text="ExtraTheme registers MdBreadcrumbPathConverter as a resource named MdBreadcrumbPathConverter. Add ExtraTheme after MaterialTheme, then reference this resource from the ItemsSource binding." />
         <gallery:CodeExample XamlCode="&lt;extra:MdBreadcrumb&#10;    Variant=&quot;Powerline&quot;&#10;    ItemsSource=&quot;{Binding CurrentPath, Converter={StaticResource MdBreadcrumbPathConverter}}&quot;&#10;    ItemInvokedCommand=&quot;{Binding NavigateToBreadcrumbCommand}&quot;&#10;    Separator=&quot;›&quot; /&gt;"
