@@ -225,7 +225,7 @@
             <TextBlock x:Name="OnThisPageTitle" FontSize="14" FontWeight="Medium" Text="On this page" />
             <StackPanel x:Name="TableOfContentsItems" Spacing="4" />
             <Border Margin="0,12,0,0" Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
-            <TextBlock TextWrapping="Wrap" Classes="body" Text="Headings are generated from the active page. Activate one to move it into view." />
+            <TextBlock TextWrapping="Wrap" Classes="body" Text="Activate a heading to scroll it into view." />
           </StackPanel>
         </md:MdScrollViewer>
       </Border>

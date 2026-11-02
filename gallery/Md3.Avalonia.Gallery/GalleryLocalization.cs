@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
 using Avalonia.VisualTree;
@@ -14,11 +15,12 @@ internal static class GalleryLocalization
     private static readonly ConditionalWeakTable<object, Original> Originals = new();
     private static readonly ConditionalWeakTable<object, Original> LabelOriginals = new();
     private static readonly ConditionalWeakTable<object, Original> PlaceholderOriginals = new();
+    private static readonly ConditionalWeakTable<object, Original> SupportingOriginals = new();
+    private static readonly ConditionalWeakTable<object, Original> ErrorOriginals = new();
     private static readonly IReadOnlyDictionary<string, string> Zh = new Dictionary<string, string>(StringComparer.Ordinal)
     {
         ["Get started"]="开始使用", ["Develop"]="开发", ["Foundations"]="基础", ["Styles"]="样式", ["Components"]="组件",
-        ["Avalonia component gallery"]="Avalonia 组件库", ["Headings are generated from the active page. Activate one to move it into view."]="目录根据当前页面的标题生成；激活一项即可将对应内容滚动到视图中。",
-        ["Search components"]="搜索组件", ["Language"]="语言", ["Theme"]="主题", ["Light"]="浅色", ["Dark"]="深色", ["System"]="跟随系统",
+        ["Avalonia component gallery"]="Avalonia 组件库", ["Search components"]="搜索组件", ["Language"]="语言", ["Theme"]="主题", ["Light"]="浅色", ["Dark"]="深色", ["System"]="跟随系统",
         ["COMPONENTS"]="组件", ["FOUNDATIONS"]="基础", ["Components overview"]="组件概览", ["COMMUNICATIONS"]="通讯", ["SAMPLES & APPS"]="示例应用", ["LIBRARY EXTENSIONS"]="库扩展", ["ALL COMPONENTS"]="全部组件", ["On this page"]="本页内容", ["Overview"]="概览", ["Examples"]="示例", ["Usage"]="用法", ["API"]="API",
         ["Android settings"]="Android 设置", ["Clock app"]="时钟应用", ["Tasks & todo"]="任务待办", ["Settings cards"]="设置卡片", ["Breadcrumbs"]="面包屑导航",
         ["Components are interactive building blocks for creating a user interface. They can be organized into categories based on their purpose: action, containment, communications, navigation, selection, and text input."]="组件是构建用户界面的交互式基础单元。它们可以按用途组织为操作、容器、通讯、导航、选择和文本输入等类别。",
@@ -211,21 +213,11 @@ internal static class GalleryLocalization
         ["Material tokens drive this pane: the strip sits on Surface, the selected tab is a Primary container with OnPrimary ink, and hover is the 0.08 onSurface state layer."]="本窗格由 Material tokens 驱动：标签条位于 surface 上，选中标签是 primary 容器配 onPrimary 文字，悬停则是 0.08 的 onSurface 状态层。",
         ["Added from the strip's own add button."]="由标签条自带的添加按钮添加。",
         ["Markdown"]="Markdown 文档",
-        ["Markdown.Avalonia documents wearing the opt-in Md3.Avalonia.Markdown style collection: headings, prose, links, lists, quotes, code blocks, tables, notes and rules are all drawn from the Material type scale and colour roles, and light/dark follow the core MaterialTheme variant."]="Markdown.Avalonia 文档配上 opt-in 的 Md3.Avalonia.Markdown 样式集合：标题、正文、链接、列表、引用、代码块、表格、提示与分隔线全部取自 Material 的字阶与颜色角色，明暗跟随核心 MaterialTheme 变体。",
         ["Rendered document"]="渲染结果",
-        ["The collection is built inside this page and assigned to this one viewer, so nothing outside it changes - a viewer whose MarkdownStyle is left alone keeps Markdown.Avalonia's own look."]="该集合在本页内构造并只赋给这一个查看器，因此外部不受影响——未设置 MarkdownStyle 的查看器仍保持 Markdown.Avalonia 自带外观。",
-        ["Select text in the document to see the Material selection tint; it is Md.Sys.Color.PrimarySelection.Brush, the same wash the editor, hex viewer and text field themes use, and without it the viewer falls back to a cyan selection."]="在文档中选中文字可以看到 Material 的选区色：它就是 Md.Sys.Color.PrimarySelection.Brush，与编辑器、十六进制查看器和输入框主题所用的一致；没有它时查看器会退回青色选区。",
-        ["This is the one Material theme that is not registered in Application.Styles: MarkdownScrollViewer chooses the style collection it renders with itself and inserts it into its own Styles, and Markdown.Avalonia keeps its five built-in collections closed to third parties, so the collection is assigned to the viewer's MarkdownStyle property instead - one instance per viewer."]="这是唯一不注册到 Application.Styles 的 Material 主题：MarkdownScrollViewer 自己挑选渲染用的样式集合并把它插进自己的 Styles，而 Markdown.Avalonia 的五个内置集合对第三方是封闭的，所以这里的做法是把它赋给查看器的 MarkdownStyle 属性——每个查看器一个实例。",
         ["Mapping"]="映射",
         ["LiveCharts2 charts"]="LiveCharts2 图表",
         ["ScottPlot charts"]="ScottPlot 图表",
         ["ScottPlot charts wearing the opt-in Md3.Avalonia.ScottPlot theme: the plot is a Material surface, axes and grids take the theme's inks and type scale, the legend is a surface container, and the series walk the same eight Material roles the LiveCharts2 theme uses."]="ScottPlot 图表配上 opt-in 的 Md3.Avalonia.ScottPlot 主题：绘图区是一块 Material 表面，坐标轴与网格采用主题的墨色与字阶，图例是一个表面容器，系列走的是与 LiveCharts2 主题相同的八个 Material 角色。",
-        ["Both controls below are stock ScottPlot AvaPlot views. The page calls the theme once per control and the theme keeps them in step with the application's light/dark switch - ScottPlot writes colours into a plot when they are set, so a themed plot does not re-resolve them the way an Avalonia style would."]="下面两个控件都是原样的 ScottPlot AvaPlot 视图。页面为每个控件调用一次主题，主题随后让它们跟随应用明暗切换——ScottPlot 只在设置时把颜色写进绘图对象，因此已主题化的图表不会像 Avalonia 样式那样自行重新解析颜色。",
-        ["The signal curves, the bars, the grid, the axis inks and the legend are all drawn from Md.Sys.* tokens; the bars take the palette's first role and each curve the next one, wrapping like ScottPlot's own palettes."]="信号曲线、柱条、网格、坐标轴墨色与图例全部取自 Md.Sys.* 令牌；柱条取调色板的第一个角色，每条曲线依次取下一个，循环方式与 ScottPlot 自带调色板一致。",
-        ["Eight Material roles carry the series palette, in the same order the LiveCharts2 theme walks them: the first four give a palette of four hues the way ScottPlot's own palettes do, and the remaining four are further tones of the same accent hues, so a chart with more than four series still reads as Material instead of inventing colours."]="系列调色板由八个 Material 角色组成，顺序与 LiveCharts2 主题一致：前四个与 ScottPlot 自带调色板一样提供四种色相，后四个是同色相的更多色调，因此超过四个系列时仍然像 Material，而不会出现随意编造的颜色。",
-        ["ScottPlot has no per-control styles either: a plot carries its own colours, so there is nothing to register in Application.Styles and nothing that could leak into a chart this package was not asked to style. Follow() themes a control for the variant it actually has and keeps it in step; an application that draws plots off screen can apply the rules to a Plot directly."]="ScottPlot 同样没有针对单个控件的样式：绘图对象自己保存颜色，因此 `Application.Styles` 里没有任何东西可注册，也不会有样式泄漏到本包未被要求处理的图表上。`Follow()` 按控件当前的实际变体应用主题并让二者保持同步；离屏绘制图表的应用可以直接把规则应用到 `Plot` 上。",
-        ["Figure and data background are the same Material surface, so a chart inside a card blends with the card. Axes, their names and the title carry the OnSurfaceVariant ink, which colors the frame, the tick marks, the tick labels and the axis names in one call. The grid is a single OutlineVariant line at major ticks and minor lines are switched off, and the legend is a SurfaceContainerHigh panel with the same soft OutlineVariant outline a Material card uses, so it reads as a container floating over the data rather than the default white box. Type runs on the same roles the LiveCharts2 theme uses: TitleMedium for the chart title, LabelLarge for axis names and legend entries, LabelMedium for tick labels, all in the family the Md.Sys.Typeface.Plain token names. Series take the eight-role palette through the plot's own plottable adder."]="图形背景与数据区背景是同一块 Material 表面，因此卡片里的图表与卡片融为一体。坐标轴、轴名与标题使用 OnSurfaceVariant 墨色，一次调用即覆盖边框、刻度线、刻度标签与轴名。网格只在主刻度上画一条 OutlineVariant 线，次网格关闭；图例是 SurfaceContainerHigh 面板并带 Material 卡片那种柔和的 OutlineVariant 描边，读起来像浮在数据之上的容器，而不是默认的白色方块。字体沿用 LiveCharts2 主题的角色：图表标题 TitleMedium、轴名与图例 LabelLarge、刻度标签 LabelMedium，字体族取自 Md.Sys.Typeface.Plain 令牌。系列通过绘图对象自身的 plottable adder 采用八角色调色板。",
-        ["This is the second Material theme in the repository that is not an Avalonia style collection at all - there is no Styles or ControlTheme in the package, only a plot-level entry point. ScottPlot keeps the axis frames, tick generation, layout and interaction exactly as it ships; the theme writes colours, sizes and the palette, and a plot that is left alone keeps ScottPlot's own defaults. The theme reads Md.Sys.Color.* for the variant it is asked for, so light/dark follow the application; an application that does not register MaterialTheme gets the M3 baseline values the package carries instead. MdChart in the core package stays provider neutral and keeps drawing through whichever chart engine an application picks."]="这是仓库里第二个完全不是 Avalonia 样式集合的 Material 主题——包里没有 Styles 也没有 ControlTheme，只有绘图对象级的入口。ScottPlot 的坐标轴边框、刻度生成、布局与交互保持原样；主题只写颜色、字号与调色板，未被处理的绘图对象仍是 ScottPlot 自己的默认外观。主题按被要求的变体读取 Md.Sys.Color.*，因此明暗跟随应用；未注册 MaterialTheme 的应用则使用包内自带的 M3 基线取值。核心包中的 MdChart 保持与绘图引擎无关，继续用应用选定的图表引擎绘制。",
         ["Property grid"]="属性网格",
         ["A property grid wearing the opt-in Md3.Avalonia.PropertyGrid theme. The grid sets no colours of its own: it lays out templates and hosts plain Avalonia controls, so this theme hands each of those controls a Material control theme - fields, checkboxes, combo boxes, spinners, sliders, date and time pickers, expanders, menus and tooltips - without replacing any native control theme elsewhere in the application."]="属性网格配上 opt-in 的 Md3.Avalonia.PropertyGrid 主题。网格自身不设置任何颜色：它只负责布局模板并承载原生 Avalonia 控件，因此本主题为这些控件逐个提供 Material 控件主题——字段、复选框、组合框、微调器、滑块、日期与时间选择器、展开器、菜单与工具提示——同时不会替换应用其他位置的任何原生控件主题。",
         ["Themed grid"]="已主题化的网格",
@@ -259,8 +251,6 @@ internal static class GalleryLocalization
         ["LiveCharts has no per-control styles: every chart resolves its look from the one theme held by LiveCharts.DefaultSettings, so the theme is configured once, at startup, before the first chart view exists. Adding it on top of LiveCharts' own default theme keeps its tooltip and legend factories and its animations."]="LiveCharts 没有针对单个控件的样式：每张图的外观都来自 LiveCharts.DefaultSettings 里那唯一一个主题，因此在启动时、在第一个图表控件出现之前配置一次即可。把它叠加在 LiveCharts 自带默认主题之上，可以保留其工具提示与图例工厂以及动画。",
         ["Axes take the LabelMedium size and the OnSurfaceVariant ink, grid lines are OutlineVariant and the horizontal-only rule LiveCharts draws stays as it is. A line series is a 3 DIP stroke with 8 DIP markers ringed in the series colour over the surface, and upstream's area fill is cleared so a line chart reads as a line chart. Columns grow with a 4 DIP rounded end and sit 6 DIP apart, which is the one place the geometry moves away from upstream; a stacked bar keeps square corners so the segments read as one bar. A pie or donut is separated by the surface showing through, a gauge is a SurfaceContainerHighest track with a Primary indicator, and candlesticks take the third accent for rising and the error role for falling instead of upstream's green and red. Tooltips and legends are the inverse-surface card with the OnSurfaceVariant ink at LabelLarge, and a chart's canvas is cleared to the card's surface so a chart inside a card blends with it."]="坐标轴使用 LabelMedium 字号与 OnSurfaceVariant 墨色，网格线是 OutlineVariant，LiveCharts 只画水平线这一点保持不变。折线系列是 3 DIP 描边、8 DIP 数据点，点外圈是系列色、内里是表面色；上游的面积填充被清空，让折线图就是折线图。柱状以 4 DIP 圆角收尾、间距 6 DIP，这是唯一偏离上游几何的地方；堆叠柱保持直角，好让各段读起来是一根柱子。饼图或环形图靠表面色透出分隔，仪表是 SurfaceContainerHighest 轨道配 Primary 指示弧，K 线用第三个强调色表示上涨、用 error 表示下跌，取代上游的绿与红。工具提示与图例是反相表面卡片，墨色为 OnSurfaceVariant、字号 LabelLarge；图表画布清屏为卡片表面色，因此卡片里的图表与卡片融为一体。",
         ["This is the one Material theme that is not an Avalonia style collection at all - LiveCharts' only seam is its global settings, and this package contains no Styles or ControlTheme that could reach an Avalonia style tree. A chart view's own overrides (its ChartTheme, its tooltip and legend paints) still win over the theme, and a series that sets a paint itself keeps it. The theme reads Md.Sys.Color.* for the variant each chart draws in, so light/dark follow the application; an application that does not register MaterialTheme gets the M3 baseline values the package carries instead. MdChart in the core package stays provider neutral and keeps drawing through whichever chart engine an application picks."]="这是唯一完全不是 Avalonia 样式集合的 Material 主题——LiveCharts 唯一的口子就是它的全局设置，这个包里没有任何能进入 Avalonia 样式树的 Styles 或 ControlTheme。图表控件自身的覆盖（它的 ChartTheme、工具提示与图例画刷）依旧优先于主题，系列自己设置的画刷也会保留。主题按每张图绘制时所在的变体读取 Md.Sys.Color.*，因此明暗跟随应用；未注册 MaterialTheme 的应用则使用包内自带的 M3 基线取值。核心包中的 MdChart 保持与绘图引擎无关，继续用应用选定的图表引擎绘制。",
-        ["Every selector of the pinned package's own FluentTheme collection is re-tokenized with the same shape: prose is OnSurfaceVariant on Surface, headings and code are OnSurface, links are Primary and switch to Tertiary on hover, the blockquote bar is Primary, table and divider rules are OutlineVariant, code blocks sit on SurfaceContainerLow, and notes, table headers and inline code use SurfaceContainerHighest. Sizes come from Md.Sys.TypeScale - HeadlineLarge for h1 down to TitleSmall for h6, BodyLarge for prose, BodyMedium for code and table cells, LabelLarge for table headers - and headings follow the M3 role weights instead of Fluent's Light: Regular down to TitleLarge, Medium for TitleMedium, TitleSmall and table headers. Layout follows upstream except where Material has a shape of its own: the code block is a SurfaceContainerLow card with an 8 DIP radius and 12/10 DIP padding instead of two hairlines, table cells get 10/6 DIP padding instead of 2, and the Error marker on an unhandled ::: container is a 3 DIP frame."]="固定版本自带 FluentTheme 集合的每一条选择器都按同样的形状重写成 token：正文是 Surface 上的 OnSurfaceVariant，标题与代码是 OnSurface，链接是 Primary、悬停切换为 Tertiary，引用条是 Primary，表格线与分隔线是 OutlineVariant，代码块位于 SurfaceContainerLow，提示、表头与行内代码使用 SurfaceContainerHighest。字号取自 Md.Sys.TypeScale——h1 用 HeadlineLarge 一路到 h6 的 TitleSmall、正文 BodyLarge、代码与表格单元 BodyMedium、表头 LabelLarge——标题按 M3 各角色的字重而非 Fluent 的 Light：到 TitleLarge 为止是 Regular，TitleMedium、TitleSmall 与表头是 Medium。布局基本沿用上游，只在 Material 自有形状处改动：代码块是 SurfaceContainerLow 卡片、8 圆角与 12/10 内边距（取代上下两条细线），表格单元格内边距 10/6（上游为 2），未处理 ::: 容器的 Error 标记是 3 宽的边框。",
-
         // Defect #29 sweep (2026-10-13): every prose TextBlock - the h1, h2, h3 and body classes -
         // now has an entry. scripts/check-gallery-localization.py measures this and fails on a
         // duplicate key, which would silently kill whichever of two translations came first.
@@ -325,7 +315,6 @@ internal static class GalleryLocalization
         ["Children enter one after another on a fixed item delay. PlayAsync replays the whole sequence and completes when it finishes."]="子元素按固定间隔依次入场。PlayAsync 会重播整段序列，并在结束时完成。",
         ["Chips produced from typed text. Enter or comma commits, Backspace removes the last chip from an empty editor, and a validator can reject a tag before it is added."]="由输入文本生成的标签块。Enter 或逗号提交；编辑器为空时 Backspace 删除最后一个标签块；校验器可在标签加入前拒绝它。",
         ["Click a settings card to trigger its preference action."]="点击设置卡片即可触发其偏好操作。",
-        ["Click an empty label to inspect the stable 150 ms animation, or right-click any editable field for the localized Material editing menu."]="点击空标签可查看稳定的 150 毫秒动画，或右键任意可编辑字段以打开本地化的 Material 编辑菜单。",
         ["Click any breadcrumb segment to navigate to it."]="点击任意面包屑分段即可跳转到该层级。",
         ["Click any segment to select it."]="点击任意分段即可选中。",
         ["Click the card below to see the Material 3 Container Transform morphing transition between card trigger and expanded surface."]="点击下方卡片，查看 Material 3 容器变换在卡片触发器与展开表面之间的变形过渡。",
@@ -339,14 +328,12 @@ internal static class GalleryLocalization
         ["Container transform (Open Container)"]="容器变换（打开容器）",
         ["Continuous vertical indexes with expressive segmented styling, flexible slots, and native selection."]="连续的纵向索引，具备表现力的分段样式、灵活插槽与原生选择能力。",
         ["Create one MdSnackbarService at the composition root, assign it to the visual MdSnackbarHost, and inject the same instance as IMdSnackbarService into view models. Creating an unattached MdSnackbar control cannot render."]="在组合根处创建一个 MdSnackbarService，将其赋给可视的 MdSnackbarHost，并把同一实例以 IMdSnackbarService 注入视图模型。创建未挂载的 MdSnackbar 控件无法渲染。",
-        ["Default, toggle, split, standard group and connected group configurations."]="默认、切换、拆分、标准分组与连体分组等配置。",
         ["Density is an attached property, so a compact scope applies to one subtree and leaves the rest of the page at the default spacing."]="密度是附加属性，因此紧凑作用域只影响一个子树，页面其余部分保持默认间距。",
         ["Dialogs interrupt a flow with an important prompt. MdDialogHost can select predeclared AXAML templates by model type and supports awaitable direct usage."]="对话框会以重要提示打断当前流程。MdDialogHost 可按模型类型选择预先声明的 AXAML 模板，也支持可等待的直接调用。",
         ["Displays large, medium, and 40–56dp small keyline items. Tapping invokes content without changing its size; sizes advance only with scrolling or controller navigation."]="展示大、中以及 40–56dp 的小关键线项。点击只触发内容而不改变尺寸；尺寸仅在滚动或控制器导航时推进。",
         ["Docked and floating toolbars keep frequently used actions close to page content."]="停靠与浮动工具栏让常用操作贴近页面内容。",
         ["Drag the divider, or focus the comparison and use the arrow keys — Shift for a coarser step."]="拖动分隔条，或聚焦对比区域后使用方向键 — 按住 Shift 可加大步进。",
         ["Each swatch keeps a 48-DIP target and opens the same picker on an elevated Material surface."]="每个色块保持 48 DIP 目标尺寸，并在带投影的 Material 表面上打开同一个取色器。",
-        ["Elevated, filled, and outlined cards group related content and actions with a 12-DIP shape."]="投影、填充与描边卡片以 12 DIP 圆角将相关内容与操作归组。",
         ["Escape and optional scrim click dismiss the active dialog. Only one modal dialog is active; Dialog stores its current view model and Avalonia selects the matching template. ShowAsync returns the value supplied to Close(result)."]="Escape 与可选的遮罩点击会关闭当前对话框。同一时刻只有一个模态对话框处于活动状态；Dialog 保存当前视图模型，由 Avalonia 选择匹配的模板。ShowAsync 返回传给 Close(result) 的值。",
         ["Expansion panels edit lightweight settings in place. AllowMultiple decides whether opening one closes the others."]="展开面板就地编辑轻量设置。AllowMultiple 决定打开一个时是否关闭其他面板。",
         ["Extended client-area chrome keeps the platform resize frame, shadow and corner treatment while Material owns the caption content. This is a true chromeless client window: Material owns the surface, title bar, caption buttons and resize affordances without a second native title-bar line."]="扩展客户区窗口保留平台的调整边框、阴影与圆角处理，标题内容则由 Material 负责。这是真正的无原生边框客户窗口：Material 掌管表面、标题栏、标题按钮与调整大小的交互区，不再出现第二条原生标题栏。",
@@ -374,7 +361,6 @@ internal static class GalleryLocalization
         ["Material color roles, type scale, shape and motion are exposed as dynamic resources rather than global native-control overrides."]="Material 颜色角色、字号层级、形状与动效以动态资源形式暴露，而不是全局改写原生控件样式。",
         ["MdAdaptiveLayout picks compact, medium, or expanded content from its own measured width, not from the window. Resize the gallery to cross the breakpoints below."]="MdAdaptiveLayout 依据自身测量宽度而不是窗口宽度选择紧凑、中等或展开内容。调整示例窗口即可跨越下面的断点。",
         ["MdBeforeAfter wipes one layer over another along a draggable divider. Both layers take any content, so the same control compares two photos, two renders, or two laid-out panels."]="MdBeforeAfter 沿可拖动分隔条在一层内容上擦出另一层。两层都可承载任意内容，因此同一控件可对比两张照片、两次渲染结果或两个布局面板。",
-        ["MdComboBox implements Material's exposed dropdown menu while retaining Avalonia selection and keyboard behavior."]="MdComboBox 实现 Material 的外露下拉菜单，同时保留 Avalonia 的选择与键盘行为。",
         ["MdDataGrid · Material table"]="MdDataGrid · Material 表格",
         ["MdForm validates its fields together and reports one result. Autovalidate decides whether errors appear as the user types or only on submit."]="MdForm 会一起校验其字段并给出单一结果。Autovalidate 决定错误是在输入过程中出现，还是仅在提交时出现。",
         ["MdRichEditor command surface"]="MdRichEditor 命令面板",
@@ -389,7 +375,6 @@ internal static class GalleryLocalization
         ["Official Material Design 3 motion system: Container Transform (morph), Shared Axis, Fade Through, Animated Visibility, expressive spring schemes, and pointer ripples."]="官方 Material Design 3 动效系统：容器变换（变形）、共享轴、淡入淡出、动画可见性、表现力弹簧方案与指针涟漪。",
         ["One group, two modes. Single selection behaves like a radio set; AllowMultiple turns the same group into independent toggles."]="一个分组，两种模式。单选行为类似单选组；AllowMultiple 会把同一分组变成相互独立的开关。",
         ["One task rendered under two platform policies. The switches choose between following the host platform and forcing Cupertino metrics."]="同一任务在两种平台策略下渲染。开关用于在跟随宿主平台与强制 Cupertino 度量之间切换。",
-        ["Open a menu by clicking the field or pressing Alt+Down. Arrow keys change the active option; Enter commits selection and Escape dismisses the popup."]="点击输入框或按 Alt+Down 打开菜单。方向键切换当前选项；Enter 确认选择，Escape 关闭弹出层。",
         ["Open the palette and run a command, or filter by keyword."]="打开面板执行命令，或按关键词过滤。",
         ["Open the popover, then scroll to verify it dismisses."]="打开弹出框，然后滚动以验证它会自动关闭。",
         ["Plain tooltips label controls; rich tooltips provide persistent contextual details and actions."]="普通工具提示用于标注控件；富工具提示提供持续的上下文详情与操作。",
@@ -492,16 +477,51 @@ internal static class GalleryLocalization
         ["Onboarding"]="入门引导", ["Dots page 1 of 4"]="圆点第 1 页，共 4 页",
         ["Horizontal"]="水平",
         ["The header row walks through the steps with connectors; the active step's body moves below the row."]="标题行以连接线依次经过各步骤；当前步骤的内容在行下方移动。",
+        // Gallery refactor: API notes and the prose they replaced.
+        ["Filled and outlined Material text fields with floating labels, supporting and error text, affixes and the localized editing menu."]="填充与描边两种 Material 文本字段，包含浮动标签、辅助与错误文本、前置/后置内容以及本地化的编辑菜单。",
+        ["MdTextBox is a TextBox, so Text, SelectionStart, CaretIndex and the text-input events are Avalonia's own. The Material additions are the floating label, the variant and the supporting/error rows; right-click any editable field to see the editing menu."]="MdTextBox 就是 TextBox，Text、SelectionStart、CaretIndex 与文本输入事件均为 Avalonia 原生。Material 增加的是浮动标签、变体以及辅助/错误行；右键任意可编辑字段即可看到编辑菜单。",
+        ["Elevated, filled and outlined cards group related content and actions."]="高架、填充与描边卡片用于对相关内容与操作进行分组。",
+        ["Variant selects the surface role and whether elevation or an outline marks the boundary; padding and corner radius come from the shape tokens, so a card follows the theme's light and dark variants without local brushes."]="Variant 决定表面角色以及用高程还是描边标示边界；内边距与圆角取自形状 token，因此卡片无需局部画刷即可跟随明暗变体。",
+        ["API surface"]="API 说明",
+        ["Default, toggle, split and grouped button configurations."]="默认、切换、拆分与成组按钮的配置。",
+        ["Variant picks the colour role set, Size scales the container and its type, and Shape is the corner family. Toggle, split and grouped buttons are separate types that read the same tokens."]="Variant 决定配色角色组，Size 控制容器尺寸与字号，Shape 决定圆角族。切换、拆分与成组按钮是各自独立的类型，但读取同一套 token。",
+        ["Material's exposed dropdown menu on top of Avalonia's own ComboBox selection and keyboard handling."]="在 Avalonia 原生 ComboBox 的选择与键盘行为之上实现 Material 的展开式下拉菜单。",
+        ["Items are ordinary ComboBoxItems, so ItemsSource, SelectedItem and SelectedIndex bind exactly as they do on Avalonia's ComboBox. Alt+Down opens the menu, arrows move the active option, Enter commits and Escape dismisses it."]="选项就是普通的 ComboBoxItem，ItemsSource、SelectedItem 与 SelectedIndex 的绑定方式与 Avalonia 的 ComboBox 完全一致。Alt+↓ 打开菜单，方向键移动活动选项，Enter 确认，Escape 关闭。",
+        ["Markdown.Avalonia documents rendered with the opt-in Md3.Avalonia.Markdown style collection."]="使用 opt-in 的 Md3.Avalonia.Markdown 样式集合渲染的 Markdown.Avalonia 文档。",
+        ["The collection is built on this page and assigned to this one viewer, so a viewer that is left alone keeps Markdown.Avalonia's own look."]="样式集合在本页构建并只赋给这一个 viewer；未设置的 viewer 仍保持 Markdown.Avalonia 原本的外观。",
+        ["Markdown.Avalonia keeps its style collections closed, so this one is assigned to the viewer's MarkdownStyle property instead of being registered in Application.Styles."]="Markdown.Avalonia 的样式集合是封闭的，因此这里把它赋给 viewer 的 MarkdownStyle 属性，而不是注册到 Application.Styles。",
+        ["Every selector of the pinned FluentTheme collection is re-tokenized: prose is OnSurfaceVariant on Surface, headings and code OnSurface, links Primary, rules OutlineVariant, and code blocks a SurfaceContainerLow card. Sizes come from Md.Sys.TypeScale."]="固定版本 FluentTheme 集合中的每个选择器都重新绑定到 token：正文为 Surface 上的 OnSurfaceVariant，标题与代码为 OnSurface，链接为 Primary，分隔线为 OutlineVariant，代码块为 SurfaceContainerLow 卡片；字号取自 Md.Sys.TypeScale。",
+        ["The collection maps Markdown.Avalonia's selectors onto Md.Sys tokens, so the tokens still come from MaterialTheme and follow its light/dark variant. A viewer is themed by assigning one instance to its MarkdownStyle."]="该集合把 Markdown.Avalonia 的选择器映射到 Md.Sys token，token 本身仍由 MaterialTheme 提供并跟随其明暗变体。把集合实例赋给 viewer 的 MarkdownStyle 即可完成主题化。",
+        ["Both plots below are stock AvaPlots themed once per control; ScottPlot bakes colours into a plot when they are set, so the theme re-applies them when the application switches variant."]="下方两个图表都是原生 AvaPlot，每个控件应用一次主题；ScottPlot 在设置颜色时即写入绘图对象，因此在应用切换明暗时由主题重新应用。",
+        ["Eight Material roles carry the series palette in the order the LiveCharts2 theme walks them: four hues, then further tones of the same accents."]="八个 Material 角色按 LiveCharts2 主题的顺序构成序列调色板：四种色相，再是同批强调色的更多层次。",
+        ["A plot carries its own colours, so nothing is registered in Application.Styles: Follow() themes a control for the variant it has and keeps it in step, and Apply() themes a Plot that never reaches the screen."]="绘图对象自带颜色，因此无需在 Application.Styles 中注册：Follow() 按控件当前变体应用主题并保持同步，Apply() 可为不显示的 Plot 应用主题。",
+        ["Figure and data background are the same Material surface, axes and titles use OnSurfaceVariant, the grid is one OutlineVariant rule at major ticks, and the legend is a card-shaped SurfaceContainerHigh panel. Type runs TitleMedium, LabelLarge and LabelMedium in Md.Sys.Typeface.Plain."]="图与数据背景同为 Material 表面，坐标轴与标题使用 OnSurfaceVariant，网格只在主刻度画一条 OutlineVariant 线，图例是卡片形态的 SurfaceContainerHigh 面板；字体按 Md.Sys.Typeface.Plain 使用 TitleMedium、LabelLarge 与 LabelMedium。",
+        ["The package registers nothing in Application.Styles: it writes colours, type and the eight-role palette into a plot and leaves ScottPlot's layout, ticks and interaction untouched. A plot that is never themed keeps ScottPlot's own defaults."]="该包不在 Application.Styles 中注册任何内容：它把颜色、字体与八角色调色板写入绘图对象，ScottPlot 的布局、刻度与交互保持不变；未应用主题的绘图对象保留 ScottPlot 默认外观。",
+        ["Activate a heading to scroll it into view."]="激活某个标题即可将其滚动到视图中。",
     };
 
     public static void Apply(Control root, CultureInfo culture)
     {
+        // Elements whose text is an API name, a value or a language endonym rather than prose.
+        // A control opts out with Classes="verbatim"; the page styles leave it alone in both
+        // languages, exactly like the checker's VERBATIM list does for the static side.
         var elements = new object[] { root }
             .Concat(root.GetLogicalDescendants().Cast<object>())
-            .Concat(root.GetVisualDescendants().Cast<object>())
+            // Visual descendants are still needed for content a template realises later - item
+            // templates, dialog bodies, popup children - but a template *part* is not authored
+            // text. Parts are generated by the control's ControlTemplate and their Text/Content
+            // is template-bound to a property on the templated parent, and a local value written
+            // here outranks that binding: Avalonia gives LocalValue a higher priority than
+            // Template. Rewriting them therefore froze the part at whatever it showed the first
+            // time this ran. That is why the language selector kept reading "English" after
+            // switching to 简体中文, and why the theme selector kept the label it opened with.
+            .Concat(root.GetVisualDescendants()
+                .Where(visual => visual.TemplatedParent is null)
+                .Cast<object>())
             .Distinct();
         foreach (var element in elements)
         {
+            if (element is StyledElement styled && styled.Classes.Contains("verbatim")) continue;
             if (element is TextBlock text && text.Text is { } value)
             {
                 var original = Originals.GetValue(text, _ => new Original(value)).Value;
@@ -522,10 +542,26 @@ internal static class GalleryLocalization
                 var original = LabelOriginals.GetValue(field, _ => new Original(fieldLabel)).Value;
                 field.Label = Translate(original, culture);
             }
-            if (element is MdComboBox combo && combo.Label is string comboLabel)
+            if (element is MdComboBox combo)
             {
-                var original = LabelOriginals.GetValue(combo, _ => new Original(comboLabel)).Value;
-                combo.Label = Translate(original, culture);
+                if (combo.Label is string comboLabel)
+                {
+                    var original = LabelOriginals.GetValue(combo, _ => new Original(comboLabel)).Value;
+                    combo.Label = Translate(original, culture);
+                }
+                // Supporting and error text are plain strings on the control, so the TextBlock
+                // walk above never sees them; without this they stayed English on every page
+                // that writes them as an attribute (the combo box page does, three times).
+                if (combo.SupportingText is string comboSupporting)
+                {
+                    var original = SupportingOriginals.GetValue(combo, _ => new Original(comboSupporting)).Value;
+                    combo.SupportingText = Translate(original, culture);
+                }
+                if (combo.ErrorText is string comboError)
+                {
+                    var original = ErrorOriginals.GetValue(combo, _ => new Original(comboError)).Value;
+                    combo.ErrorText = Translate(original, culture);
+                }
             }
             if (element is MdCascader cascader)
             {

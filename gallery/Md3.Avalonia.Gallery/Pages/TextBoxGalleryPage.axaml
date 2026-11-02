@@ -12,8 +12,14 @@
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Text fields" />
         <TextBlock Classes="body" TextWrapping="Wrap"
-                   Text="Click an empty label to inspect the stable 150 ms animation, or right-click any editable field for the localized Material editing menu." />
+                   Text="Filled and outlined Material text fields with floating labels, supporting and error text, affixes and the localized editing menu." />
       </StackPanel>
+
+      <gallery:ApiNotes Control="MdTextBox" Members="Variant, Label, PlaceholderText, Text, LeadingIcon, TrailingIcon, SupportingText, IsError, ErrorText">
+        <gallery:ApiNotes.Notes>
+          <TextBlock Classes="body" TextWrapping="Wrap" Text="MdTextBox is a TextBox, so Text, SelectionStart, CaretIndex and the text-input events are Avalonia's own. The Material additions are the floating label, the variant and the supporting/error rows; right-click any editable field to see the editing menu." />
+        </gallery:ApiNotes.Notes>
+      </gallery:ApiNotes>
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Variants" />
