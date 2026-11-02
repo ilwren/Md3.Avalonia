@@ -41,6 +41,15 @@ adds is the rest of what crawlers and social previews read:
 canonical link, alternates, description or footer navigation disappear from the
 generated HTML — or if a Mustache tag survives into `<head>` unresolved.
 
+Search Console and Bing Webmaster Tools both offer an HTML-tag verification method, which is
+the only one available here: a `github.io` project site has no DNS record and cannot serve a
+verification file at the host root. Paste the token from either service into `docfx.json`:
+
+```json
+"_googleSiteVerification": "the content value Google gives you",
+"_bingSiteVerification": "the msvalidate.01 content value",
+```
+
 `robots.txt` is deliberately absent. The site is a GitHub project page, and a
 `robots.txt` only takes effect at the host root (`https://ilwren.github.io/robots.txt`),
 which this repository does not own. Nothing blocks crawling, so the sitemap is the

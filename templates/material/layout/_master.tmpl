@@ -24,6 +24,9 @@
       {{#hreflang_en}}<link rel="alternate" hreflang="en" href="{{hreflang_en}}">{{/hreflang_en}}
       {{#hreflang_zh}}<link rel="alternate" hreflang="zh-Hans" href="{{hreflang_zh}}">{{/hreflang_zh}}
       {{#hreflang_x_default}}<link rel="alternate" hreflang="x-default" href="{{hreflang_x_default}}">{{/hreflang_x_default}}
+      {{!MD3: search-console ownership meta tags; a github.io project site has no DNS record to verify.}}
+      {{#_googleSiteVerification}}<meta name="google-site-verification" content="{{_googleSiteVerification}}">{{/_googleSiteVerification}}
+      {{#_bingSiteVerification}}<meta name="msvalidate.01" content="{{_bingSiteVerification}}">{{/_bingSiteVerification}}
       {{#_ogImage}}
       <meta property="og:type" content="{{#_ogType}}{{_ogType}}{{/_ogType}}{{^_ogType}}website{{/_ogType}}">
       <meta property="og:site_name" content="{{_appTitle}}">
