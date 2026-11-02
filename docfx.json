@@ -88,6 +88,7 @@
       "_enableSearch": true,
       "_lang": "en",
       "_ogImage": "https://ilwren.github.io/Md3.Avalonia/logo.png",
+      "_busuanzi": true,
       "_appFooter": "<span>AI-generated or AI-assisted documentation may be inaccurate; verify before use / 文档可能由 AI 生成或辅助编写，使用前请核实。 <a href=\"https://ilwren.github.io/Md3.Avalonia/docs/AI_DISCLOSURE.html\">Full notice · 完整说明</a>. Built with <a href=\"https://dotnet.github.io/docfx\">DocFX</a>.</span>"
     },
     "postProcessors": ["ExtractSearchIndex"],
