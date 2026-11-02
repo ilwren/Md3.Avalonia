@@ -20,6 +20,9 @@
     <Setter Property="Padding" Value="0" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
+    <!-- Navigable ancestors carry the accent, the current location does not: the same mapping
+         MdBreadcrumb's item themes use, so a trail reads identically on both controls. -->
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Template">
@@ -39,8 +42,27 @@
     <Style Selector="^:pointerover /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.08" /></Style>
     <Style Selector="^:pressed /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0.10" /></Style>
     <Style Selector="^:focus-visible /template/ Border#PART_FocusIndicator"><Setter Property="Opacity" Value="1" /></Style>
-    <Style Selector="^.current"><Setter Property="Cursor" Value="Arrow" /></Style>
+    <Style Selector="^:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    </Style>
+    <Style Selector="^.current">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
     <Style Selector="^.current /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0" /></Style>
+    <!-- Powerline: the segment paints its own chevron out of the button's Background, so the
+         rectangular state layer would wash over the shape. Hover moves the fill instead, which is
+         what MdBreadcrumb's powerline item theme does. Every segment keeps the same container
+         role - the current one is marked by its ink and weight, not by a filled pill - so the
+         strip reads as one continuous ribbon. -->
+    <Style Selector="^.powerline">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+    </Style>
+    <Style Selector="^.powerline /template/ Border#PART_StateLayer"><Setter Property="Opacity" Value="0" /></Style>
+    <Style Selector="^.powerline:pointerover">
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" />
+    </Style>
   </ControlTheme>
 
   <ControlTheme x:Key="MdFileSystemPickerItemTheme" TargetType="ListBoxItem">
@@ -189,45 +211,37 @@
                           <Grid>
                             <StackPanel Classes="standard-segment" Orientation="Horizontal" VerticalAlignment="Center">
                               <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Label}"
-                                         Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+                                         FontSize="{DynamicResource Md.Sys.TypeScale.LabelLarge.Size}"
+                                         Foreground="{Binding $parent[Button].Foreground}" />
                               <TextBlock Margin="0,0,2,0" VerticalAlignment="Center" Text="›"
                                          IsVisible="{Binding IsCurrent, Converter={x:Static BoolConverters.Not}}"
                                          Foreground="{DynamicResource Md.Sys.Color.Outline.Brush}" />
                             </StackPanel>
 
                             <!-- Complementary 14-DIP notch/body/point pieces match MdBreadcrumb's
-                                 Powerline geometry. The button containers overlap by the notch
-                                 depth, so no default button minimum width can open a seam. -->
+                                 powerline geometry, and their fill, ink and type follow its powerline
+                                 item theme: MdBreadcrumbPowerlineItemTheme in ExtraControls.axaml.
+                                 The button containers overlap by the notch depth, so no default
+                                 button minimum width can open a seam. -->
                             <Grid Classes="powerline-segment" Height="32" IsVisible="False"
                                   ColumnDefinitions="14,Auto,14">
                               <Path Grid.Column="0" Stretch="Fill" Stroke="{x:Null}"
                                     Data="M 0,0 L 1,0 L 1,1 L 0,1 L 1,0.5 Z"
-                                    Fill="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                                    Fill="{Binding $parent[Button].Background}"
                                     IsVisible="{Binding IsFirst, Converter={x:Static BoolConverters.Not}}" />
                               <Path Grid.Column="0" Stretch="Fill" Stroke="{x:Null}"
                                     Data="M 0,0 L 1,0 L 1,1 L 0,1 Z"
-                                    Fill="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
+                                    Fill="{Binding $parent[Button].Background}"
                                     IsVisible="{Binding IsFirst}" />
                               <Border Grid.Column="1" Padding="4,5,8,5"
-                                      Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
-                                      IsVisible="{Binding IsCurrent, Converter={x:Static BoolConverters.Not}}">
+                                      Background="{Binding $parent[Button].Background}">
                                 <TextBlock VerticalAlignment="Center" Text="{Binding Label}"
-                                           Foreground="{DynamicResource Md.Sys.Color.Primary.Brush}" />
-                              </Border>
-                              <Border Grid.Column="1" Padding="4,5,8,5"
-                                      Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
-                                      IsVisible="{Binding IsCurrent}">
-                                <TextBlock VerticalAlignment="Center" Text="{Binding Label}"
-                                           Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" FontWeight="SemiBold" />
+                                           FontSize="{DynamicResource Md.Sys.TypeScale.LabelLarge.Size}"
+                                           Foreground="{Binding $parent[Button].Foreground}" />
                               </Border>
                               <Path Grid.Column="2" Stretch="Fill" Stroke="{x:Null}"
                                     Data="M 0,0 L 1,0.5 L 0,1 Z"
-                                    Fill="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
-                                    IsVisible="{Binding IsCurrent, Converter={x:Static BoolConverters.Not}}" />
-                              <Path Grid.Column="2" Stretch="Fill" Stroke="{x:Null}"
-                                    Data="M 0,0 L 1,0.5 L 0,1 Z"
-                                    Fill="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"
-                                    IsVisible="{Binding IsCurrent}" />
+                                    Fill="{Binding $parent[Button].Background}" />
                             </Grid>
                           </Grid>
                         </Button>

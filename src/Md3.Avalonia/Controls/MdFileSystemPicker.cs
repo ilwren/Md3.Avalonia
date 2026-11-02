@@ -623,6 +623,9 @@ public sealed class MdFileSystemPicker : TemplatedControl
             button.Margin = IsPowerlineBreadcrumb && !button.Classes.Contains("first")
                 ? new Thickness(-14, 0, 0, 0)
                 : default;
+            // The segment template paints its chevron out of the button's own Background, so the
+            // class is what moves it from a transparent hit area to a filled ribbon segment.
+            button.Classes.Set("powerline", IsPowerlineBreadcrumb);
         }
     }
 
