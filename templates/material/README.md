@@ -95,9 +95,33 @@ browser, where rate limits are per IP.
 
 ### Page-view counter
 
-Set `"_busuanzi": true` in `build.globalMetadata` to show page views and site views
-in the footer. The label text lives in `public/main.css` and switches on
-`html[lang^='zh']`, so no page needs its own string. The counter is a third-party
-script (busuanzi); for analytics rather than a public number, prefer the DocFX
-built-in `_googleAnalyticsTagId`, which the template already supports, or a
-self-hosted GoatCounter/Umami deployment.
+`public/views.js` renders the footer counter, and `_viewsProvider` in
+`build.globalMetadata` selects the service. Switching counters is a one-key change;
+the template itself does not move.
+
+| `_viewsProvider` | What it needs | What it shows |
+| --- | --- | --- |
+| `abacus` (current) | nothing — `_viewsNamespace` names the counter group, counters are created on first hit | page views, counted once per tab session |
+| `goatcounter` | a site code in `_goatcounterCode`, plus **Allow adding visitor counts on your website** in the GoatCounter settings (otherwise the JSON endpoint answers 403 without CORS) | page views and `TOTAL.json` site views, plus the full analytics dashboard |
+| `endpoint` | a URL in `_viewsEndpoint` answering `{"count": n}` or `{"value": n}` for `?page=<path>` — e.g. a Cloudflare Worker in front of Umami, or any hosted counter with a JSON API | page views, and site views when the payload has `site`/`total` |
+| `none`, or no key | — | nothing is rendered and no third-party request is made |
+
+Current configuration:
+
+```json
+"_viewsProvider": "abacus",
+"_viewsNamespace": "ilwren.github.io"
+```
+
+```json
+"_viewsProvider": "goatcounter",
+"_goatcounterCode": "your-site-code"
+```
+
+The counter keys on the page's **canonical URL**, not on `location`, so `/` and
+`/index.html` share one number and the `hreflang` pair never splits a count. Every
+provider fails quietly: a blocked or unreachable counter leaves the footer without a
+number rather than showing a wrong one.
+
+Unrelated but useful: DocFX already supports `_googleAnalyticsTagId` for GA4 if you
+want real analytics alongside (or instead of) a public number.

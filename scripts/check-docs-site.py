@@ -96,6 +96,18 @@ for relative in ("index.html", page):
             "an unconfigured widget requests an empty repository and fails in the console"
         )
 
+# --- the footer counter is configured, and its script ships --------------------
+
+views_js = read("public/views.js")
+if views_js and "abacus.jasoncameron.dev" not in views_js:
+    fail("public/views.js: the abacus provider is missing from the shipped script")
+
+expect("index.html", 'data-md3-views', "page-view counter container")
+expect("index.html", 'data-provider="abacus"', "configured page-view provider")
+expect("index.html", 'public/views.js', "page-view script")
+if "busuanzi" in read("index.html").lower():
+    fail("index.html: still requests the retired busuanzi counter")
+
 # --- the API reference is generated, so only its presence is checked ----------
 
 api_pages = list((SITE / "api").glob("*.html")) if (SITE / "api").is_dir() else []

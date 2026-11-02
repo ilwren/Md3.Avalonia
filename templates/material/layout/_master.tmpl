@@ -206,17 +206,27 @@
             <a href="{{_rel}}index.zh-CN.html" hreflang="zh-Hans">简体中文</a>
             <a href="https://github.com/ilwren/Md3.Avalonia">GitHub</a>
           </nav>
-          {{!MD3: page view counter, enabled by setting _busuanzi in docfx.json globalMetadata.}}{{!MD3: The label is swapped by language in public/main.css, because front matter already sets _lang on <html>.}}
-          {{#_busuanzi}}
-          <span class="md3-page-views" id="busuanzi_container_page_pv">
-            <span class="md3-page-views-label"></span>
-            <span id="busuanzi_value_page_pv">0</span>
-            <span class="md3-page-views-sep">·</span>
-            <span class="md3-page-views-label md3-site-views-label"></span>
-            <span id="busuanzi_value_site_pv">0</span>
-          </span>
-          <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-          {{/_busuanzi}}
+          {{!MD3: page-view counter. The provider is chosen by _viewsProvider in docfx.json globalMetadata;}}
+          {{!MD3: public/views.js reads the data attributes below, so switching services needs no HTML edit.}}
+          {{!MD3: Nothing renders when the provider is unknown, so a typo leaves the footer clean.}}
+          {{#_viewsProvider}}
+          <div class="md3-page-views" data-md3-views
+               data-provider="{{_viewsProvider}}"
+               data-namespace="{{_viewsNamespace}}"
+               data-goatcounter="{{_goatcounterCode}}"
+               data-endpoint="{{_viewsEndpoint}}">
+            <span class="md3-page-views-item" data-md3-views-page hidden>
+              <span class="md3-page-views-label"></span>
+              <span data-md3-views-page-value>0</span>
+            </span>
+            <span class="md3-page-views-sep" data-md3-views-sep hidden>·</span>
+            <span class="md3-page-views-item" data-md3-views-site hidden>
+              <span class="md3-page-views-label md3-site-views-label"></span>
+              <span data-md3-views-site-value>0</span>
+            </span>
+          </div>
+          <script src="{{_rel}}public/views.js" defer></script>
+          {{/_viewsProvider}}
         </div>
       </div>
     </footer>

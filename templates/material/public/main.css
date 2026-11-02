@@ -847,6 +847,16 @@ body > footer a {
   color: var(--md3-on-surface-variant);
 }
 
+.md3-page-views-item {
+  display: inline-flex;
+  gap: 0.3rem;
+  align-items: baseline;
+}
+
+.md3-page-views [hidden] {
+  display: none !important;
+}
+
 /* Front matter already sets _lang on <html>, so the counter needs no per-page string. */
 .md3-page-views-label::after {
   content: 'Page views';
