@@ -12,7 +12,13 @@
         <md:MdSwitch Content="Show status icons" ShowIcons="True" IsChecked="True"/><md:MdDivider/>
         <md:MdSwitch Content="Disabled setting" IsEnabled="False"/>
       </StackPanel>
-      <Border MaxWidth="520" HorizontalAlignment="Stretch" Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20"><TextBlock Classes="body" TextWrapping="Wrap" Text="MdSwitch derives from ToggleButton, so IsChecked, Command, keyboard input, focus and automation remain available for MVVM and direct control usage."/></Border>
+      <Border MaxWidth="520" HorizontalAlignment="Stretch" Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="20"></Border>
+        <gallery:ApiNotes Control="MdSwitch"
+                        Members="ShowIcons, IsChecked, Command">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="MdSwitch is a ToggleButton, so IsChecked, Command, keyboard input, focus and automation all come from Avalonia; the control adds only ShowIcons, which decides whether the On and Off glyphs sit inside the track. Everything visual comes from the switch theme, which is why six states need no sixth property." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
       <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdSwitch Content=&quot;Wi-Fi&quot;&#10;             IsChecked=&quot;{Binding IsWifiEnabled}&quot;&#10;             Command=&quot;{Binding ToggleWifiCommand}&quot; /&gt;" CSharpCode="var toggle = new MdSwitch { Content = &quot;Wi-Fi&quot;, IsChecked = true };&#10;toggle.IsCheckedChanged += (_, _) =&gt; Save(toggle.IsChecked);"/></StackPanel>
     </StackPanel>
   </md:MdScrollViewer>

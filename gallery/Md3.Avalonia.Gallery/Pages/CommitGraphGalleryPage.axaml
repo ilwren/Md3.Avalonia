@@ -35,6 +35,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdCommitGraph"
+                        Members="HeadId, SelectedId, LaneWidth, MaxLanes, NodeSize, LaneCount">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="HeadId marks the checked-out commit and SelectedId is the two-way selection the page round-trips. LaneWidth, MaxLanes and NodeSize are the geometry knobs, LaneCount reports what was resolved from the data, and the first-parent lane stays visually dominant so a dense history still reads as one line of narrative." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample CSharpCode="var graph = new MdCommitGraph&#10;{&#10;    HeadId = &quot;h5&quot;,&#10;    ItemsSource = commits,&#10;};&#10;graph.CommitClicked += (_, node) =&gt; Details.Show(node);" />
       </StackPanel>

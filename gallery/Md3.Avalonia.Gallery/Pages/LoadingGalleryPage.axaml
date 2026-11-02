@@ -24,10 +24,15 @@
       </StackPanel>
 
       <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="IsActive pauses rendering work. The inherited MdMotion scheme reduces or disables decorative movement."/>
       </Border>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdLoadingIndicator"
+                        Members="IsActive, Size, IndicatorBrush, IsContained, ContainerBrush">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="IsActive is the property that earns its keep: while it is false the shape is not animated at all, so a parked indicator costs no frames. Size and IndicatorBrush shape the glyph, IsContained with ContainerBrush wraps it in the M3 container bubble, and the inherited MdMotion scheme decides how much of the morph survives a reduce-motion request." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdLoadingIndicator Size=&quot;48&quot; IsActive=&quot;{Binding IsLoading}&quot; /&gt;" CSharpCode="var loading = new MdLoadingIndicator { Size = 48, IsActive = true };&#10;loading.IsActive = viewModel.IsLoading;" />
       </StackPanel>

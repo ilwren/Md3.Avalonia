@@ -9,7 +9,6 @@
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Cascader" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="A cascading picker for a hierarchy. The selection is reported as the full path from root to leaf, not just the leaf." />
       </StackPanel>
 
       <StackPanel Spacing="12">
@@ -18,6 +17,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdCascader"
+                        Members="ItemsSource, SelectedPath, DisplayText, PathSeparator, Columns, IsDropDownOpen, Label, PlaceholderText">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="SelectedPath is what makes it more than a combo box: the value is the root-to-leaf chain, not just the leaf. Columns says how many levels open at once, PathSeparator joins the segments of DisplayText, and IsDropDownOpen with Label and PlaceholderText is the usual open/labeled/empty trio." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdCascader ItemsSource=&quot;{Binding Tree}&quot; SelectionChanged=&quot;OnPathChanged&quot; /&gt;" />
       </StackPanel>

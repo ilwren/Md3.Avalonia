@@ -31,10 +31,15 @@
       </StackPanel>
 
       <Border Padding="22" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Small badges are 6 DIP. Large badges are 16 DIP high, use the Error/OnError roles, and expand horizontally for multiple characters." />
       </Border>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdBadgedBox, MdBadge"
+                        Members="Badge, BadgeVariant, Variant">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="MdBadgedBox wraps its content and positions the badge over it, so the count never enters your layout. BadgeVariant picks small - a 6 DIP dot for presence - or large, a 16 DIP pill on the Error/OnError roles that grows for multiple characters. MdBadge alone is the same surface anchored wherever you place it." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdBadgedBox Badge=&quot;3&quot; BadgeVariant=&quot;Label&quot;&gt;&#10;  &lt;md:MdIconButton Icon=&quot;{x:Static md:MdSymbols.Notifications}&quot; /&gt;&#10;&lt;/md:MdBadgedBox&gt;" CSharpCode="var badge = new MdBadgedBox&#10;{&#10;    Badge = &quot;3&quot;,&#10;    BadgeVariant = MdBadgeVariant.Label,&#10;    Content = new MdIconButton { Icon = MdSymbols.Notifications }&#10;};" />
       </StackPanel>

@@ -33,6 +33,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdDismissible"
+                        Members="Direction, DismissThreshold, BackgroundContent, SecondaryBackgroundContent, IsDismissed, DismissCommand, ConfirmDismissAsync, IsConfirmationPending">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Direction restricts the swipe to one axis or both and DismissThreshold sets how far it travels before it commits. BackgroundContent is the reveal - SecondaryBackgroundContent is the opposite side's - and ConfirmDismissAsync is where a destructive action asks first, with IsConfirmationPending reporting that the row is waiting for that answer." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdDismissible Dismissed=&quot;OnDismissed&quot;&gt;&#10;  &lt;md:MdDismissible.BackgroundContent&gt;&#10;    &lt;Border Background=&quot;{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}&quot; /&gt;&#10;  &lt;/md:MdDismissible.BackgroundContent&gt;&#10;  &lt;md:MdDismissible.SecondaryBackgroundContent&gt;&#10;    &lt;Border Background=&quot;{DynamicResource Md.Sys.Color.Error.Brush}&quot; /&gt;&#10;  &lt;/md:MdDismissible.SecondaryBackgroundContent&gt;&#10;  &lt;Border&gt;&lt;TextBlock Text=&quot;Swipe me in either direction&quot; /&gt;&lt;/Border&gt;&#10;&lt;/md:MdDismissible&gt;" />
       </StackPanel>

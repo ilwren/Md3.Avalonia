@@ -24,6 +24,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdGridTile, MdGridTileBar"
+                        Members="Header, Footer, IsActivated, IsFavorite, Leading, Title, Subtitle, Trailing, IsInteractive, Command">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Header and Footer are the two slots. MdGridTileBar in the footer carries Leading, Title, Subtitle and Trailing, and its own Command with IsInteractive makes the trailing favourite a real target inside a tile that is itself one - two hit surfaces, one card." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdGridTile Click=&quot;OnOpen&quot;&gt;&#10;  &lt;Border Background=&quot;{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}&quot; /&gt;&#10;  &lt;md:MdGridTile.Footer&gt;&#10;    &lt;md:MdGridTileBar Title=&quot;Aurora dashboard&quot; Subtitle=&quot;Last edited 2 minutes ago&quot;&#10;                      IsInteractive=&quot;True&quot; Invoked=&quot;OnFooterInvoked&quot; /&gt;&#10;  &lt;/md:MdGridTile.Footer&gt;&#10;&lt;/md:MdGridTile&gt;" />
       </StackPanel>

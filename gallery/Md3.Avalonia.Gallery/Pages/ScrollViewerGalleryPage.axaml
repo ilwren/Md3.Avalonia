@@ -24,6 +24,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdScrollViewer"
+                        Members="IsDragScrollingEnabled, AllowMouseDrag, DragThreshold, Friction">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="It is a plain Avalonia ScrollViewer under the Material bar and overscroll, so nothing about scrolling changes - only how it looks. The four extra properties are the touch ones: IsDragScrollingEnabled turns drag-to-scroll on, AllowMouseDrag extends it to the mouse, DragThreshold decides when a drag becomes a scroll, and Friction is the deceleration after release." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdScrollViewer VerticalScrollBarVisibility=&quot;Auto&quot; HorizontalScrollBarVisibility=&quot;Disabled&quot;&gt;&#10;  &lt;StackPanel&gt;...&lt;/StackPanel&gt;&#10;&lt;/md:MdScrollViewer&gt;"
                             CSharpCode="var scroll = new MdScrollViewer { Content = longContent };" />
