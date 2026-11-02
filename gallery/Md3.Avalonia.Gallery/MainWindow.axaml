@@ -68,8 +68,11 @@
           </StackPanel>
           <StackPanel x:Name="HeaderActions" Grid.Column="3" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
             <md:MdSearchBar x:Name="GallerySearch" Width="260" PlaceholderText="Search components" TextChanged="GallerySearchTextChanged" SearchSubmitted="GallerySearchSubmitted" />
-            <md:MdComboBox x:Name="LanguageSelector" Width="116" Label="Language" Variant="Outlined" SelectionChanged="LanguageSelectionChanged" />
-            <md:MdComboBox x:Name="ThemeSelector" Width="116" Label="Theme" Variant="Outlined" SelectionChanged="ThemeSelectionChanged" />
+            <!-- Both boxes are the combo box theme's minimum width: a language endonym and the theme
+                 names ("Material dark") both fit, and the pair stays aligned when the label switches
+                 between "Language" and "语言". -->
+            <md:MdComboBox x:Name="LanguageSelector" Width="160" Label="Language" Variant="Outlined" SelectionChanged="LanguageSelectionChanged" />
+            <md:MdComboBox x:Name="ThemeSelector" Width="160" Label="Theme" Variant="Outlined" SelectionChanged="ThemeSelectionChanged" />
           </StackPanel>
         </Grid>
       </Border>
