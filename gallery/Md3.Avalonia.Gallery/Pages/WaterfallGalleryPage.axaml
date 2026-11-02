@@ -46,6 +46,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdWaterfall"
+                        Members="Columns, MinColumnWidth, ColumnSpacing, ItemSpacing, AnimateLayout">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Columns = 0 derives the count from the width and MinColumnWidth; a value above 0 pins the count and ignores MinColumnWidth. ColumnSpacing and ItemSpacing are independent, and AnimateLayout moves children into their columns instead of jumping them." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdWaterfall MinColumnWidth=&quot;220&quot; ItemsSource=&quot;{Binding Cards}&quot; /&gt;&#10;&#10;&lt;!-- or the panel on its own --&gt;&#10;&lt;eco:MdWaterfallPanel Columns=&quot;3&quot; ItemSpacing=&quot;8&quot;&gt;&#10;  &lt;md:MdCard Height=&quot;120&quot; /&gt;&#10;&lt;/eco:MdWaterfallPanel&gt;"
                              CSharpCode="// Columns = 0 (the default) derives the count from MinColumnWidth.&#10;// Set Columns to pin it and MinColumnWidth is ignored.&#10;feed.MinColumnWidth = 220;&#10;feed.ItemsSource = cards;" />

@@ -91,6 +91,12 @@
       </StackPanel>
 
       <StackPanel Spacing="12">
+        <gallery:ApiNotes Control="MaterialDockTheme"
+                        Members="Styles include, DockApplicationAccentBrush*, DockBorderSubtleBrush, DockBorderStrongBrush, DockChromeButton*">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="The theme answers the brush and metric keys Dock's own templates read - accents, borders, chrome buttons, tab strips and drop targets - from Md.Sys tokens, so Dock keeps its templates, part names and layouts and only the values change. Registering it in a page's styles rather than the application's is what keeps it next to the demo." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <TextBlock Classes="body" TextWrapping="Wrap" Text="Add the theme after MaterialTheme and keep using Dock as usual - the package carries Dock.Avalonia and Dock.Avalonia.Themes.Fluent, and DockFluentTheme must not be included as well. This demo registers it in the page's own styles rather than in the application's." />
         <gallery:CodeExample XamlCode="&lt;themes:MaterialTheme /&gt;&#10;&lt;themes:MaterialDockTheme /&gt;   &lt;!-- opt-in package, after MaterialTheme --&gt;"

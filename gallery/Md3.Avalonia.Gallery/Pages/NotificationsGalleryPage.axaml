@@ -31,11 +31,17 @@
         <StackPanel Spacing="8">
           <TextBlock Classes="h3" Text="Platform setup" />
           <TextBlock Classes="body" TextWrapping="Wrap"
-                     Text="Linux needs libnotify and a running desktop notification service. Android 13+ needs POST_NOTIFICATIONS permission. The Windows Gallery registers its current-user Start-menu shortcut and AppUserModelID at launch; allow notifications for the app in Windows Settings. Other Windows desktop hosts must register their own AppUserModelID shortcut. macOS delivery follows system notification settings." />
+                     Text="Linux needs libnotify and a running notification service; Android 13+ needs the POST_NOTIFICATIONS permission; macOS follows system settings. The Windows Gallery registers its Start-menu shortcut and AppUserModelID at launch - other Windows hosts must register their own, and the app has to be allowed to notify in Settings." />
         </StackPanel>
       </Border>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdSystemNotificationService"
+                        Members="CreateDefault(MdSystemNotificationOptions), ShowAsync(MdSystemNotification), ShowAsync(string, string), IMdSystemNotificationService">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="CreateDefault() picks the backend for the platform it runs on; the interface is what a view model takes, so tests can supply their own. ShowAsync() throws MdSystemNotificationPermissionException when the user has not allowed notifications - surface that where the call was made. Delivery options live on MdSystemNotificationOptions." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample CSharpCode="var notifications = MdSystemNotificationService.CreateDefault(new MdSystemNotificationOptions&#10;{&#10;    ApplicationName = &quot;Material Design 3 Gallery&quot;,&#10;    // On Windows, match the AppUserModelID on your registered Start-menu shortcut.&#10;    WindowsAppUserModelId = &quot;Contoso.Builder&quot;&#10;});&#10;await notifications.ShowAsync(title, message);" />
       </StackPanel>

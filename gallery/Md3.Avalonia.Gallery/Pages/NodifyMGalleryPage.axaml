@@ -86,7 +86,7 @@
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Node editor" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="A node editor wearing the opt-in Md3.Avalonia.NodifyM theme. The canvas is a Material surface ruled with outlineVariant grid lines, nodes are surface containers with a secondary container header, input pins are secondary containers and output pins primary containers, so the two ends of a wire are distinguishable without reading a label - and the alignment guides and the selection frame use the same primary." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A node editor wearing the opt-in Md3.Avalonia.NodifyM theme. The canvas is a Material surface ruled with OutlineVariant grid lines; nodes are surface containers with a SecondaryContainer header, input pins SecondaryContainer and output pins PrimaryContainer, so the two ends of a wire are distinguishable without a label. Alignment guides and the selection frame use the same Primary." />
       </StackPanel>
 
       <StackPanel Spacing="12">
@@ -124,13 +124,16 @@
             </StackPanel>
           </Border>
         </Grid>
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Every colour in that editor comes from Md.Sys.* tokens: nothing on the controls was set, and the page's own templates read the same brush keys the package overrides rather than picking colours of their own." />
       </StackPanel>
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="How it stays local" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="The theme is a Styles collection that style-includes NodifyM's eleven per-control style sheets and answers the brush keys those templates read from an accent dictionary of ours, so the pinned package keeps owning its templates, its part names and its converters, and only the values change. Every one of those keys is mapped onto Md.Sys.Color.*, which is why light and dark follow the core theme variant and the dictionary carries no variants of its own." />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="NodifyM's controls are all its own types - Node, Connector, Connection and friends - so there is no native Avalonia control here for the theme to be careful about, and registering it application-wide changes nothing else in the app. The values upstream sets as literals - a node's white ink, the Azure behind its items, a group's four inline colours and the grid rule's grey - are set again by the theme; the node's 3 DIP corner radius, baked into its template, stays upstream's." />
+        <gallery:ApiNotes Control="MaterialNodifyMTheme"
+                        Members="Styles include, Node.BackgroundBrush, Connector.BackgroundBrush, Connection.StrokeBrush, GridLinesColorBrush, Md.Sys.Color.*">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="A Styles collection that style-includes NodifyM's eleven per-control style sheets and answers the brush keys those templates read from an accent dictionary, so the pinned package keeps owning its templates, part names and converters and only the values change. Every key is mapped onto Md.Sys.Color.*, which is why light and dark follow the core variant. NodifyM's controls are all its own types, so registering the theme application-wide changes nothing else; the literals upstream bakes in - a node's white ink, the Azure behind its items, a group's four colours, the grid's grey - are set again by the theme." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
       </StackPanel>
 
       <StackPanel Spacing="10">

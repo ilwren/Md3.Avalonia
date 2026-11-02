@@ -20,7 +20,7 @@
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h3" Text="Themed hex view" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="The editor brings its own Material chrome — surfaceContainerLow surface, outlineVariant outline, ExtraSmall corner and MdScrollViewer scrollbars — so it can be dropped straight into a page. Offsets and column headers are onSurfaceVariant, bytes are onSurface, the header strip sits on surfaceContainerHigh and the current line on surfaceContainerHighest." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The editor brings its own Material chrome - a SurfaceContainerLow surface, OutlineVariant outline, ExtraSmall corner and MdScrollViewer scrollbars - so it can be dropped straight into a page. Offsets and column headers are OnSurfaceVariant, bytes OnSurface, the header strip SurfaceContainerHigh and the current line SurfaceContainerHighest." />
         <hex:HexEditor x:Name="Editor" Height="260" FontFamily="Cascadia Mono,JetBrains Mono,Consolas,monospace">
           <hex:HexEditor.Columns>
             <rendering:OffsetColumn />
@@ -34,6 +34,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MaterialAvaloniaHexTheme"
+                        Members="Styles include, HexForegroundBase, OffsetForeground, HeaderBackground, HeaderForeground, CurrentLineBackground, PrimaryCaretBackground">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="The theme fills the resource keys AvaloniaHex publishes - foregrounds, the header, current line, caret and selection brushes - from Md.Sys tokens, and the editor's templates keep their part names, so nothing else about the control changes. The keys are scoped to the editor's own subtree, which is why a Light and a Dark set can sit side by side." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;themes:MaterialTheme /&gt;&#10;&lt;themes:MaterialAvaloniaHexTheme /&gt;   &lt;!-- opt-in package, after MaterialTheme --&gt;"
                             CSharpCode="var editor = new HexEditor();&#10;editor.Columns.Add(new OffsetColumn());&#10;editor.Columns.Add(new HexColumn());&#10;editor.Columns.Add(new AsciiColumn());&#10;&#10;editor.Document = new MemoryBinaryDocument(File.ReadAllBytes(path));" />
