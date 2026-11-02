@@ -36,10 +36,15 @@
             <md:MdButton Content="Rich tooltip" Variant="Outlined" />
           </md:MdTooltipHost>
         </WrapPanel>
-        <TextBlock Classes="body" Text="Hover the rich trigger, then move onto its action without leaving the tooltip. Escape or an outside press dismisses it." />
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdTooltipHost, MdTooltip"
+                        Members="Tooltip, IsOpen, Placement, ShowDelay, HideDelay, OpenOnClick, LongPressDelay, Variant, Title, ActionContent">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="MdTooltipHost owns the timing: ShowDelay and HideDelay for the pointer, LongPressDelay and TouchSlop for touch, OpenOnClick for a click target, and Placement for the side. MdTooltip is the surface - Variant picks plain or rich, and a rich one carries a Title and one ActionContent, which is what lets the pointer move onto the action without dismissing it." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdTooltipHost Placement=&quot;Bottom&quot;&gt;&#10;  &lt;md:MdTooltipHost.Tooltip&gt;&#10;    &lt;md:MdTooltip Content=&quot;Share this item&quot; /&gt;&#10;  &lt;/md:MdTooltipHost.Tooltip&gt;&#10;  &lt;md:MdIconButton Icon=&quot;...&quot; /&gt;&#10;&lt;/md:MdTooltipHost&gt;" CSharpCode="var host = new MdTooltipHost&#10;{&#10;    Content = shareButton,&#10;    Tooltip = new MdTooltip { Content = &quot;Share this item&quot; }&#10;};&#10;host.Show();&#10;host.Dismiss();" />
       </StackPanel>

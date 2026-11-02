@@ -45,11 +45,15 @@
               Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
         <StackPanel Spacing="8">
           <TextBlock Classes="h2" Text="Interaction" />
-          <TextBlock Classes="body" TextWrapping="Wrap"
-                     Text="The 18-DIP checkbox stays inside a 40-DIP state layer and a 48-DIP hit target. Tab reveals the keyboard focus indicator; click cycles native Avalonia CheckBox state." />
         </StackPanel>
       </Border>
     </Grid>
+    <gallery:ApiNotes Control="MdCheckBox"
+                    Members="Content, IsChecked, IsThreeState, IsError">
+      <gallery:ApiNotes.Notes>
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="MdCheckBox is Avalonia's CheckBox, so IsChecked, IsThreeState and the two- and three-state click cycle are native, and Content can be anything a ContentControl takes. IsError paints the box in the error role for a form that has not been submitted yet. The 18-DIP box sits inside a 40-DIP state layer and a 48-DIP hit target, and Tab reveals the focus indicator." />
+      </gallery:ApiNotes.Notes>
+    </gallery:ApiNotes>
     <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdCheckBox Content=&quot;Receive updates&quot;&#10;               IsChecked=&quot;{Binding ReceiveUpdates}&quot; /&gt;" CSharpCode="var updates = new MdCheckBox { Content = &quot;Receive updates&quot;, IsChecked = true };" /></StackPanel>
     </StackPanel>
   </md:MdScrollViewer>

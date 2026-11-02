@@ -27,8 +27,6 @@
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Horizontal" />
-        <TextBlock Classes="body" TextWrapping="Wrap"
-                   Text="The header row walks through the steps with connectors; the active step's body moves below the row." />
         <md:MdStepper x:Name="HorizontalStepper" Orientation="Horizontal" ActiveStepChanged="HorizontalStepperChanged" MaxWidth="760" HorizontalAlignment="Stretch">
           <md:MdStep Header="Account" Subtitle="Sign in details" State="Complete">
             <md:MdTextBox Label="E-mail" PlaceholderText="you@example.com" Width="320" HorizontalAlignment="Left" />
@@ -44,6 +42,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdStepper, MdStep"
+                        Members="ActiveStep, Orientation, IsLinear, ContinueCommand, CancelCommand, ActiveStepContent, Title, Subtitle, IsActive, State, StepNumber">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Each MdStep declares its own Title, Subtitle and State; the stepper reports which one is active through ActiveStep and draws its body as ActiveStepContent. IsLinear keeps the user on the current step until ContinueCommand runs, CancelCommand backs out of the flow, and Orientation switches the header row between horizontal and vertical." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdStepper Orientation=&quot;Horizontal&quot; ActiveStepChanged=&quot;OnStepChanged&quot;&gt;&#10;  &lt;md:MdStep Header=&quot;Choose a plan&quot; Subtitle=&quot;Select the tier&quot; State=&quot;Complete&quot;&gt;&#10;    &lt;md:MdComboBox Label=&quot;Plan&quot; /&gt;&#10;  &lt;/md:MdStep&gt;&#10;&lt;/md:MdStepper&gt;" />
       </StackPanel>
