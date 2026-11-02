@@ -135,6 +135,15 @@
     <Style Selector="^.accent">
       <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
     </Style>
+    <!-- The current location keeps the ribbon and is marked by ink and weight, the same way the
+         standard item theme marks it. This rule was missing: the last crumb fell back to
+         OnSurfaceVariant and read as the quietest segment of the trail rather than the one you are
+         standing on. MdFileSystemPicker's powerline strip mirrors this treatment. -->
+    <Style Selector="^.current">
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
     <!-- The first crumb has nothing to interlock with, so it keeps a flat left edge and sits
          flush with the control's own padding instead of being pulled back under a predecessor. -->
     <Style Selector="^:nth-child(1)">

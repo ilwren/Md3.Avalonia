@@ -45,7 +45,7 @@
 
       <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="12">
         <TextBlock Classes="h2" Text="Powerline variant" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Set Variant to Powerline for interlocking chevron segments. Each point slots into the next segment's notch, creating one continuous ribbon. This example uses MdBreadcrumbPathConverter too: selecting an ancestor updates the shared route, while ancestor and current-location colours stay on Material 3 roles." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Set Variant to Powerline for interlocking chevron segments. Each point slots into the next segment's notch, creating one continuous ribbon: navigable ancestors take the Primary ink, the current location stays OnSurface at semi-bold. This example uses MdBreadcrumbPathConverter too, so selecting an ancestor updates the shared route." />
         <Border Padding="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" CornerRadius="16">
           <extra:MdBreadcrumb x:Name="PowerlineBreadcrumb" Variant="Powerline"
                               ItemsSource="{Binding CurrentPath, RelativeSource={RelativeSource AncestorType=pages:BreadcrumbGalleryPage}, Converter={StaticResource MdBreadcrumbPathConverter}}"
