@@ -1,8 +1,14 @@
-﻿# Md3.Avalonia
+# Md3.Avalonia
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
 面向 Avalonia 12 的 Material Design 3 控件库与组件 Gallery。
+
+[![CI](https://github.com/ilwren/Md3.Avalonia/actions/workflows/ci.yml/badge.svg)](https://github.com/ilwren/Md3.Avalonia/actions/workflows/ci.yml)
+[![NuGet](https://img.shields.io/nuget/vpre/Md3.Avalonia.svg?label=NuGet&logo=nuget&logoColor=white)](https://www.nuget.org/packages/Md3.Avalonia)
+[![NuGet downloads](https://img.shields.io/nuget/dt/Md3.Avalonia.svg?label=downloads&logo=nuget&logoColor=white)](https://www.nuget.org/packages/Md3.Avalonia)
+[![NuGet packages](https://img.shields.io/badge/NuGet-18%20packages-004880.svg?logo=nuget&logoColor=white)](https://www.nuget.org/profiles/ilwren)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
 - 375 个公共 API 类型，覆盖按钮、输入、导航、对话框、图表与动效，全部收录在 API 参考中并由脚本门禁校验。
 
@@ -96,7 +102,7 @@ dotnet add package Md3.Avalonia.Icons --version 0.5.6-preview.1
 
 ## NuGet 包
 
-十八个包版本统一，均可独立安装；不使用就不会被引入。
+十八个包版本统一，均可独立安装；不使用就不会被引入。各包已发布的版本（含当前预览版）见 [NuGet 主页](https://www.nuget.org/profiles/ilwren)。
 
 | 包 | 能力 | 主题注册 | 目标框架 |
 |---|---|---|---|
