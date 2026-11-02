@@ -322,26 +322,67 @@
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type eco:MdSlidableItem}" TargetType="eco:MdSlidableItem">
-    <Setter Property="ClipToBounds" Value="True" /><Setter Property="Focusable" Value="True" />
+    <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="Focusable" Value="True" />
     <Setter Property="Template">
       <ControlTemplate>
-        <!-- One rounded clip for the whole row. The action layers behind the foreground used to
-             be square while PART_Foreground was rounded, and a Grid's ClipToBounds is
-             rectangular, so the archive and delete colours showed through at all four corners. -->
-        <Border CornerRadius="12" ClipToBounds="True">
-        <Grid>
-          <Border HorizontalAlignment="Left" Width="{TemplateBinding ActionExtent}" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"><ContentPresenter x:Name="PART_StartActions" Content="{TemplateBinding StartActions}" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="{TemplateBinding RevealProgress}" RenderTransform="scale(0.8)" RenderTransformOrigin="50%,50%" /></Border>
-          <Border HorizontalAlignment="Right" Width="{TemplateBinding ActionExtent}" Background="{DynamicResource Md.Sys.Color.ErrorContainer.Brush}"><ContentPresenter x:Name="PART_EndActions" Content="{TemplateBinding EndActions}" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="{TemplateBinding RevealProgress}" RenderTransform="scale(0.8)" RenderTransformOrigin="50%,50%" /></Border>
-          <Border x:Name="PART_Foreground" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="12">
-            <Border.RenderTransform><TranslateTransform X="{TemplateBinding Offset}" /></Border.RenderTransform>
-            <ContentPresenter Content="{TemplateBinding Content}" Padding="{TemplateBinding Padding}" />
-          </Border>
-        </Grid>
+        <Border CornerRadius="16" ClipToBounds="True" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}">
+          <Grid>
+            <Border x:Name="PART_StartPane" HorizontalAlignment="Left" Width="{TemplateBinding ActionExtent}"
+                    IsVisible="False" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}">
+              <Grid>
+                <ContentPresenter x:Name="PART_StartActions" Content="{TemplateBinding StartActions}"
+                                  HorizontalAlignment="Center" VerticalAlignment="Stretch"
+                                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                  Foreground="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}"
+                                  Opacity="{TemplateBinding ActionOpacity}" RenderTransformOrigin="50%,50%">
+                  <ContentPresenter.RenderTransform>
+                    <TransformGroup>
+                      <ScaleTransform ScaleX="{TemplateBinding ActionScale}" ScaleY="{TemplateBinding ActionScale}" />
+                      <TranslateTransform X="{TemplateBinding StartActionOffset}" />
+                    </TransformGroup>
+                  </ContentPresenter.RenderTransform>
+                </ContentPresenter>
+                <Border x:Name="PART_StartActionState" IsHitTestVisible="False"
+                        Background="{DynamicResource Md.Sys.Color.OnPrimaryContainer.Brush}" Opacity="0" />
+              </Grid>
+            </Border>
+            <Border x:Name="PART_EndPane" HorizontalAlignment="Right" Width="{TemplateBinding ActionExtent}"
+                    IsVisible="False" Background="{DynamicResource Md.Sys.Color.ErrorContainer.Brush}">
+              <Grid>
+                <ContentPresenter x:Name="PART_EndActions" Content="{TemplateBinding EndActions}"
+                                  HorizontalAlignment="Center" VerticalAlignment="Stretch"
+                                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                  Foreground="{DynamicResource Md.Sys.Color.OnErrorContainer.Brush}"
+                                  Opacity="{TemplateBinding ActionOpacity}" RenderTransformOrigin="50%,50%">
+                  <ContentPresenter.RenderTransform>
+                    <TransformGroup>
+                      <ScaleTransform ScaleX="{TemplateBinding ActionScale}" ScaleY="{TemplateBinding ActionScale}" />
+                      <TranslateTransform X="{TemplateBinding EndActionOffset}" />
+                    </TransformGroup>
+                  </ContentPresenter.RenderTransform>
+                </ContentPresenter>
+                <Border x:Name="PART_EndActionState" IsHitTestVisible="False"
+                        Background="{DynamicResource Md.Sys.Color.OnErrorContainer.Brush}" Opacity="0" />
+              </Grid>
+            </Border>
+            <Border x:Name="PART_Foreground" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" CornerRadius="16"
+                    BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
+              <Border.RenderTransform><TranslateTransform X="{TemplateBinding VisualOffset}" /></Border.RenderTransform>
+              <ContentPresenter Content="{TemplateBinding Content}" Padding="{TemplateBinding Padding}" />
+            </Border>
+          </Grid>
         </Border>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^:start-open /template/ ContentPresenter#PART_StartActions"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
-    <Style Selector="^:end-open /template/ ContentPresenter#PART_EndActions"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+    <Style Selector="^:has-start-actions /template/ Border#PART_StartPane"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:has-end-actions /template/ Border#PART_EndPane"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:rtl /template/ Border#PART_StartPane"><Setter Property="HorizontalAlignment" Value="Right" /></Style>
+    <Style Selector="^:rtl /template/ Border#PART_EndPane"><Setter Property="HorizontalAlignment" Value="Left" /></Style>
+    <Style Selector="^:start-action-over /template/ Border#PART_StartActionState"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:end-action-over /template/ Border#PART_EndActionState"><Setter Property="Opacity" Value="0.08" /></Style>
+    <Style Selector="^:start-action-pressed /template/ Border#PART_StartActionState"><Setter Property="Opacity" Value="0.12" /></Style>
+    <Style Selector="^:end-action-pressed /template/ Border#PART_EndActionState"><Setter Property="Opacity" Value="0.12" /></Style>
     <Style Selector="^:reduced-motion /template/ ContentPresenter#PART_StartActions"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
     <Style Selector="^:reduced-motion /template/ ContentPresenter#PART_EndActions"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
   </ControlTheme>
@@ -612,6 +653,11 @@
                 <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
               </Style>
             </Popup.Styles>
+            <!-- A pure scale from the top-left anchor: the old entrance also translated the
+                 surface up while it scaled in, so on the first open with nothing selected the
+                 menu visibly overlapped the field until the menu was clicked. Shrinking towards
+                 the top-left anchor keeps the surface's top edge on the anchor's bottom edge
+                 for the whole animation. -->
             <Border Name="PART_Surface"
                     Margin="12,14,12,16"
                     MinWidth="{Binding Bounds.Width, ElementName=PART_Anchor}"
@@ -623,7 +669,7 @@
                     BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}"
                     ClipToBounds="True"
                     Opacity="0"
-                    RenderTransform="scale(0.8) translate(0px,-8px)"
+                    RenderTransform="scale(0.88)"
                     RenderTransformOrigin="0%,0%">
               <ItemsControl Name="PART_Columns" Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding Columns}">
                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
@@ -693,10 +739,12 @@
       <Setter Property="IsNotched" Value="True" />
     </Style>
     <Style Selector="^:present /template/ Border#PART_Surface"><Setter Property="IsVisible" Value="True" /></Style>
-    <Style Selector="^:open /template/ Border#PART_Surface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
+    <!-- Keep the open state a one-operation transform too so the entrance interpolates a
+         scale into a scale instead of a scale-plus-translate into a scale. -->
+    <Style Selector="^:open /template/ Border#PART_Surface"><Setter Property="Opacity" Value="1" /><Setter Property="RenderTransform" Value="scale(1)" /></Style>
     <Style Selector="^:open /template/ Path#PART_Arrow"><Setter Property="RenderTransform" Value="rotate(180deg)" /></Style>
-    <Style Selector="^:reduced-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
-    <Style Selector="^:no-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1) translate(0px,0px)" /></Style>
+    <Style Selector="^:reduced-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
+    <Style Selector="^:no-motion /template/ Border#PART_Surface"><Setter Property="RenderTransform" Value="scale(1)" /></Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type eco:MdTransfer}" TargetType="eco:MdTransfer">
@@ -745,27 +793,49 @@
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdTimelineItemPresenter">
         <Grid>
-          <Grid x:Name="PART_Vertical" MinHeight="72" ColumnDefinitions="28,*" RowDefinitions="*,14,*" Margin="0,2">
-            <Border x:Name="PART_VBefore" Grid.Row="0" Width="2" HorizontalAlignment="Center" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
-            <Border x:Name="PART_VAfter" Grid.Row="2" Width="2" HorizontalAlignment="Center" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
-            <Border x:Name="PART_Indicator" Grid.Row="1" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center"
-                    Background="{DynamicResource Md.Sys.Color.Outline.Brush}" BorderBrush="{DynamicResource Md.Sys.Color.Surface.Brush}" BorderThickness="2" CornerRadius="7" ZIndex="1" />
-            <StackPanel Grid.Column="1" Grid.RowSpan="3" Margin="8,5,0,8" Spacing="2">
-              <ContentPresenter Content="{Binding Item.Icon, RelativeSource={RelativeSource TemplatedParent}}" IsVisible="False" />
-              <TextBlock Text="{Binding Item.Title, RelativeSource={RelativeSource TemplatedParent}}" FontWeight="SemiBold" />
-              <TextBlock Text="{Binding Item.Description, RelativeSource={RelativeSource TemplatedParent}}" TextWrapping="Wrap" Opacity=".72" />
-              <TextBlock Text="{Binding Item.Time, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:g}'}" FontSize="11" Opacity=".6" />
+          <Grid x:Name="PART_Vertical" ColumnDefinitions="32,*" MinHeight="88">
+            <Grid Grid.Column="0" RowDefinitions="*,32,*">
+              <Border x:Name="PART_VBefore" Grid.Row="0" Width="2" HorizontalAlignment="Center" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+              <Grid Grid.Row="1" Width="32" Height="32">
+                <md:MdCircularProgressIndicator x:Name="PART_VProgress" Size="30" StrokeThickness="2"
+                                                IsIndeterminate="False" IsHitTestVisible="False" IsVisible="False"
+                                                IndicatorBrush="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                                                TrackBrush="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
+                <Border x:Name="PART_VMarker" Width="14" Height="14" CornerRadius="7" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Background="{DynamicResource Md.Sys.Color.Outline.Brush}" BorderBrush="{DynamicResource Md.Sys.Color.Surface.Brush}" BorderThickness="2">
+                  <ContentPresenter x:Name="PART_VIcon" Content="{Binding Item.Icon, RelativeSource={RelativeSource TemplatedParent}}" IsVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" />
+                </Border>
+              </Grid>
+              <Border x:Name="PART_VAfter" Grid.Row="2" Width="2" HorizontalAlignment="Center" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+            </Grid>
+            <StackPanel Grid.Column="1" Margin="12,4,0,16" Spacing="4">
+              <Grid ColumnDefinitions="*,Auto">
+                <ContentPresenter Content="{Binding Item.Title, RelativeSource={RelativeSource TemplatedParent}}" FontWeight="SemiBold" />
+                <TextBlock Grid.Column="1" Margin="12,0,0,0" Opacity="0.68" Text="{Binding Item.Time, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:g}'}" />
+              </Grid>
+              <ContentPresenter Content="{Binding Item.Description, RelativeSource={RelativeSource TemplatedParent}}" Opacity="0.76" />
             </StackPanel>
           </Grid>
-          <Grid x:Name="PART_Horizontal" MinWidth="176" RowDefinitions="28,*" ColumnDefinitions="*,14,*" Margin="4" IsVisible="False">
-            <Border x:Name="PART_HBefore" Grid.Column="0" Height="2" VerticalAlignment="Center" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
-            <Border x:Name="PART_HAfter" Grid.Column="2" Height="2" VerticalAlignment="Center" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
-            <Border x:Name="PART_HIndicator" Grid.Column="1" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center"
-                    Background="{DynamicResource Md.Sys.Color.Outline.Brush}" BorderBrush="{DynamicResource Md.Sys.Color.Surface.Brush}" BorderThickness="2" CornerRadius="7" ZIndex="1" />
-            <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Margin="8,6" Spacing="2">
-              <TextBlock HorizontalAlignment="Center" Text="{Binding Item.Title, RelativeSource={RelativeSource TemplatedParent}}" FontWeight="SemiBold" />
-              <TextBlock HorizontalAlignment="Center" Text="{Binding Item.Description, RelativeSource={RelativeSource TemplatedParent}}" TextWrapping="Wrap" Opacity=".72" />
-              <TextBlock HorizontalAlignment="Center" Text="{Binding Item.Time, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:g}'}" FontSize="11" Opacity=".6" />
+
+          <Grid x:Name="PART_Horizontal" RowDefinitions="32,Auto" MinWidth="196" IsVisible="False">
+            <Grid Grid.Row="0" ColumnDefinitions="*,32,*">
+              <Border x:Name="PART_HBefore" Grid.Column="0" Height="2" VerticalAlignment="Center" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+              <Grid Grid.Column="1" Width="32" Height="32">
+                <md:MdCircularProgressIndicator x:Name="PART_HProgress" Size="30" StrokeThickness="2"
+                                                IsIndeterminate="False" IsHitTestVisible="False" IsVisible="False"
+                                                IndicatorBrush="{DynamicResource Md.Sys.Color.Primary.Brush}"
+                                                TrackBrush="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
+                <Border x:Name="PART_HMarker" Width="14" Height="14" CornerRadius="7" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Background="{DynamicResource Md.Sys.Color.Outline.Brush}" BorderBrush="{DynamicResource Md.Sys.Color.Surface.Brush}" BorderThickness="2">
+                  <ContentPresenter x:Name="PART_HIcon" Content="{Binding Item.Icon, RelativeSource={RelativeSource TemplatedParent}}" IsVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" />
+                </Border>
+              </Grid>
+              <Border x:Name="PART_HAfter" Grid.Column="2" Height="2" VerticalAlignment="Center" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+            </Grid>
+            <StackPanel Grid.Row="1" Margin="12,4,12,12" Spacing="4" HorizontalAlignment="Center" MaxWidth="184">
+              <ContentPresenter Content="{Binding Item.Title, RelativeSource={RelativeSource TemplatedParent}}" FontWeight="SemiBold" HorizontalAlignment="Center" />
+              <TextBlock Opacity="0.68" Text="{Binding Item.Time, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:g}'}" HorizontalAlignment="Center" />
+              <ContentPresenter Content="{Binding Item.Description, RelativeSource={RelativeSource TemplatedParent}}" Opacity="0.76" HorizontalAlignment="Center" />
             </StackPanel>
           </Grid>
         </Grid>
@@ -774,20 +844,34 @@
     <Style Selector="^:horizontal /template/ Grid#PART_Vertical"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:horizontal /template/ Grid#PART_Horizontal"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:first /template/ Border#PART_VBefore"><Setter Property="IsVisible" Value="False" /></Style>
-    <Style Selector="^:first /template/ Border#PART_HBefore"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:last /template/ Border#PART_VAfter"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:first /template/ Border#PART_HBefore"><Setter Property="IsVisible" Value="False" /></Style>
     <Style Selector="^:last /template/ Border#PART_HAfter"><Setter Property="IsVisible" Value="False" /></Style>
-    <Style Selector="^:active /template/ Border#PART_Indicator"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
-    <Style Selector="^:active /template/ Border#PART_HIndicator"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
-    <Style Selector="^:completed /template/ Border#PART_Indicator"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Tertiary.Brush}" /></Style>
-    <Style Selector="^:completed /template/ Border#PART_HIndicator"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Tertiary.Brush}" /></Style>
-    <Style Selector="^:error /template/ Border#PART_Indicator"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" /></Style>
-    <Style Selector="^:error /template/ Border#PART_HIndicator"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" /></Style>
+    <Style Selector="^:active /template/ Border#PART_VMarker"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Style Selector="^:completed /template/ Border#PART_VMarker"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Tertiary.Brush}" /></Style>
+    <Style Selector="^:error /template/ Border#PART_VMarker"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" /></Style>
+    <Style Selector="^:active /template/ Border#PART_HMarker"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Style Selector="^:completed /template/ Border#PART_HMarker"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Tertiary.Brush}" /></Style>
+    <Style Selector="^:error /template/ Border#PART_HMarker"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" /></Style>
+    <Style Selector="^:completed /template/ Border#PART_VBefore"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Tertiary.Brush}" /></Style>
+    <Style Selector="^:completed /template/ Border#PART_VAfter"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Tertiary.Brush}" /></Style>
+    <Style Selector="^:completed /template/ Border#PART_HBefore"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Tertiary.Brush}" /></Style>
+    <Style Selector="^:completed /template/ Border#PART_HAfter"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Tertiary.Brush}" /></Style>
+    <Style Selector="^:active /template/ Border#PART_VBefore"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Style Selector="^:active /template/ Border#PART_HBefore"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" /></Style>
+    <Style Selector="^:error /template/ Border#PART_VBefore"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" /></Style>
+    <Style Selector="^:error /template/ Border#PART_HBefore"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Error.Brush}" /></Style>
+    <Style Selector="^:vertical:progress-ring /template/ md|MdCircularProgressIndicator#PART_VProgress"><Setter Property="IsVisible" Value="True" /><Setter Property="IsIndeterminate" Value="True" /></Style>
+    <Style Selector="^:horizontal:progress-ring /template/ md|MdCircularProgressIndicator#PART_HProgress"><Setter Property="IsVisible" Value="True" /><Setter Property="IsIndeterminate" Value="True" /></Style>
+    <Style Selector="^:has-icon /template/ Border#PART_VMarker"><Setter Property="Width" Value="24" /><Setter Property="Height" Value="24" /><Setter Property="CornerRadius" Value="12" /></Style>
+    <Style Selector="^:has-icon /template/ Border#PART_HMarker"><Setter Property="Width" Value="24" /><Setter Property="Height" Value="24" /><Setter Property="CornerRadius" Value="12" /></Style>
+    <Style Selector="^:has-icon /template/ ContentPresenter#PART_VIcon"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:has-icon /template/ ContentPresenter#PART_HIcon"><Setter Property="IsVisible" Value="True" /></Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type eco:MdTimeline}" TargetType="eco:MdTimeline">
     <Setter Property="Template"><ControlTemplate TargetType="eco:MdTimeline"><ItemsPresenter x:Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" /></ControlTemplate></Setter>
-    <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel /></ItemsPanelTemplate></Setter>
+    <Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Vertical" /></ItemsPanelTemplate></Setter>
     <Setter Property="ItemTemplate"><DataTemplate x:DataType="eco:MdTimelineItem"><eco:MdTimelineItemPresenter Item="{Binding}" /></DataTemplate></Setter>
     <Style Selector="^:horizontal"><Setter Property="ItemsPanel"><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></Setter></Style>
   </ControlTheme>

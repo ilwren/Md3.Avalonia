@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
@@ -34,6 +34,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        Icon = App.LoadGalleryIcon();
         AutomationProperties.SetLandmarkType(NavigationPane, AutomationLandmarkType.Navigation);
         AutomationProperties.SetLandmarkType(PageScroll, AutomationLandmarkType.Main);
         AutomationProperties.SetLandmarkType(TableOfContentsPane, AutomationLandmarkType.Complementary);
@@ -43,7 +44,7 @@ public partial class MainWindow : Window
         [
             ComponentsOverviewNav, AndroidSettingsNav, ClockNav, TasksNav,
             ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, BreadcrumbNav, TextFieldNav,
-            CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, ColorPickerNav,
+            CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, FileSystemPickerNav, ColorPickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
             NavigationDrawerNav, AdaptiveNav, NotificationsNav, SearchNav, SettingsCardNav, SheetNav, SliderNav,
             SnackbarNav, SwitchNav, TabNav, ToolbarNav, TooltipNav, BorderlessWindowNav,
@@ -60,7 +61,8 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             SignaturePadNav,
             NumericNav, ThemeResourcesNav, SymbolsNav, MotionNav,
             BannerNav, DataTableNav, PaginatedTableNav, DismissibleNav, ExpansionPanelNav,
-            GridTileNav, RefreshNav, ReorderableListNav, StepperNav,
+            GridSplitterNav, GridTileNav, RefreshNav, ReorderableListNav, StepperNav,
+            CommitGraphNav, ContributionGridNav, MaskedTextBoxNav, PaginationNav,
             FormValidationNav, SimpleDialogNav, AboutDialogNav, PickerRestoreNav,
             DraggableSheetNav, KeyboardAvoidNav, AdaptiveControlsNav, FocusHeroNav,
             AutoCompleteNav, DateRangePickerNav, RangeSliderNav, ResponsiveContentNav,
@@ -86,6 +88,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             Entry("Cards", "card elevated filled outlined", CardNav, () => new CardGalleryPage()),
             Entry("Chips", "chip assist filter input suggestion", ChipNav, () => new ChipGalleryPage()),
             Entry("Date and time pickers", "calendar clock picker localized minute", PickerNav, () => new PickerGalleryPage()),
+            Entry("File-system picker", "file folder path browser filesystem android storage", FileSystemPickerNav, () => new FileSystemPickerGalleryPage()),
             Entry("Color picker", "color picker palette hsv hex rgb alpha flutter swatch", ColorPickerNav, () => new ColorPickerGalleryPage()),
             Entry("Dialogs", "dialog modal alert", DialogNav, () => new DialogGalleryPage()),
             Entry("Divider", "separator inset", DividerNav, () => new DividerGalleryPage()),
@@ -123,9 +126,12 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             Entry("Chart", "chart line bar series axis plot data visualisation visualization", ChartNav, () => new ChartGalleryPage()),
             Entry("Chat view", "chat message bubble conversation quote retry attachment composer", ChatNav, () => new ChatViewGalleryPage()),
             Entry("Command palette", "command palette search keyword action launcher", CommandPaletteNav, () => new CommandPaletteGalleryPage()),
+            Entry("Commit graph", "commit graph git history branch merge lane", CommitGraphNav, () => new CommitGraphGalleryPage()),
+            Entry("Contribution grid", "contribution grid github heatmap activity days week calendar", ContributionGridNav, () => new ContributionGridGalleryPage()),
             Entry("Data grids", "data grid table row column sort filter spreadsheet datagrid theme", DataGridNav, () => new DataGridGalleryPage()),
             Entry("Density", "density compact comfortable spacing scope attached property", DensityNav, () => new DensityGalleryPage()),
             Entry("Hover cards", "hover card delay focus preview overlay", HoverCardNav, () => new HoverCardGalleryPage()),
+            Entry("Masked text field", "masked text field input mask pin phone phone number format", MaskedTextBoxNav, () => new MaskedTextBoxGalleryPage()),
             Entry("Masonry panel", "masonry quilted staggered tile dashboard reflow", MasonryNav, () => new MasonryPanelGalleryPage()),
             Entry("Paged items", "paging pagination infinite scroll load more async page", PagedItemsNav, () => new PagedItemsGalleryPage()),
             Entry("PIN input", "pin otp code verification digit mask one time password", PinInputNav, () => new PinInputGalleryPage()),
@@ -163,8 +169,10 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             Entry("Banner", "banner message action persistent dismiss", BannerNav, () => new BannerGalleryPage()),
             Entry("Data table", "data table sort column header rows", DataTableNav, () => new DataTableGalleryPage()),
             Entry("Paginated table", "paginated data table rows per page pagination", PaginatedTableNav, () => new PaginatedDataTableGalleryPage()),
+            Entry("Pagination", "pagination pager page numbers dots carousel prev next", PaginationNav, () => new PaginationGalleryPage()),
             Entry("Dismissible", "dismissible swipe to dismiss restore slidable", DismissibleNav, () => new DismissibleGalleryPage()),
             Entry("Expansion panels", "expansion panel accordion expand collapse", ExpansionPanelNav, () => new ExpansionPanelGalleryPage()),
+            Entry("Grid splitter", "grid splitter divider resize pane row column preview equalize", GridSplitterNav, () => new GridSplitterGalleryPage()),
             Entry("Grid tiles", "grid tile bar media footer favorite", GridTileNav, () => new GridTileGalleryPage()),
             Entry("Pull to refresh", "refresh indicator pull to refresh swipe reload", RefreshNav, () => new RefreshIndicatorGalleryPage()),
             Entry("Reorderable list", "reorderable list drag reorder move up down", ReorderableListNav, () => new ReorderableListGalleryPage()),
@@ -207,6 +215,8 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
     /// </summary>
     public IReadOnlyList<string> IndexedPageTitles => _galleryIndex.Select(entry => entry.Title).ToArray();
 
+    internal Control? CurrentPage => PageHost.Content as Control;
+
     internal bool NavigateToIndexedPage(string title)
     {
         var entry = _galleryIndex.FirstOrDefault(candidate => string.Equals(candidate.Title, title, StringComparison.Ordinal));
@@ -239,6 +249,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
     private void ShowCards(object? s, RoutedEventArgs e) => Navigate(new CardGalleryPage(), CardNav);
     private void ShowChips(object? s, RoutedEventArgs e) => Navigate(new ChipGalleryPage(), ChipNav);
     private void ShowPickers(object? s, RoutedEventArgs e) => Navigate(new PickerGalleryPage(), PickerNav);
+    private void ShowFileSystemPicker(object? s, RoutedEventArgs e) => Navigate(new FileSystemPickerGalleryPage(), FileSystemPickerNav);
     private void ShowColorPicker(object? s, RoutedEventArgs e) => Navigate(new ColorPickerGalleryPage(), ColorPickerNav);
     private void ShowDialogs(object? s, RoutedEventArgs e) => Navigate(new DialogGalleryPage(), DialogNav);
     private void ShowDivider(object? s, RoutedEventArgs e) => Navigate(new DividerGalleryPage(), DividerNav);
@@ -324,9 +335,14 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
     private void ShowDismissible(object? s, RoutedEventArgs e) => Navigate(new DismissibleGalleryPage(), DismissibleNav);
     private void ShowExpansionPanels(object? s, RoutedEventArgs e) => Navigate(new ExpansionPanelGalleryPage(), ExpansionPanelNav);
     private void ShowGridTiles(object? s, RoutedEventArgs e) => Navigate(new GridTileGalleryPage(), GridTileNav);
+    private void ShowGridSplitter(object? s, RoutedEventArgs e) => Navigate(new GridSplitterGalleryPage(), GridSplitterNav);
     private void ShowRefresh(object? s, RoutedEventArgs e) => Navigate(new RefreshIndicatorGalleryPage(), RefreshNav);
     private void ShowReorderableList(object? s, RoutedEventArgs e) => Navigate(new ReorderableListGalleryPage(), ReorderableListNav);
     private void ShowStepper(object? s, RoutedEventArgs e) => Navigate(new StepperGalleryPage(), StepperNav);
+    private void ShowCommitGraph(object? s, RoutedEventArgs e) => Navigate(new CommitGraphGalleryPage(), CommitGraphNav);
+    private void ShowContributionGrid(object? s, RoutedEventArgs e) => Navigate(new ContributionGridGalleryPage(), ContributionGridNav);
+    private void ShowMaskedTextBox(object? s, RoutedEventArgs e) => Navigate(new MaskedTextBoxGalleryPage(), MaskedTextBoxNav);
+    private void ShowPagination(object? s, RoutedEventArgs e) => Navigate(new PaginationGalleryPage(), PaginationNav);
     private void ShowFormValidation(object? s, RoutedEventArgs e) => Navigate(new FormValidationGalleryPage(), FormValidationNav);
     private void ShowSimpleDialog(object? s, RoutedEventArgs e) => Navigate(new SimpleDialogGalleryPage(), SimpleDialogNav);
     private void ShowAboutDialog(object? s, RoutedEventArgs e) => Navigate(new AboutDialogGalleryPage(), AboutDialogNav);

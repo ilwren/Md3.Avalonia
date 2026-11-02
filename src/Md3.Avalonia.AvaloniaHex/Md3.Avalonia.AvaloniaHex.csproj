@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <!-- Same reasoning as the other themed packages: a RootNamespace that names the themed
@@ -7,7 +7,7 @@
     <AssemblyName>Md3.Avalonia.AvaloniaHex</AssemblyName>
     <Description>Material Design 3 theme for the AvaloniaHex hex editor control. Opt-in package: it carries the AvaloniaHex dependency so the core Material packages do not have to.</Description>
     <PackageId>Md3.Avalonia.AvaloniaHex</PackageId>
-    <Version>0.5.0-preview.2</Version>
+    <Version>0.5.6-preview.1</Version>
     <Authors>Md3.Avalonia contributors</Authors>
     <PackageTags>avalonia;avaloniahex;hex-editor;binary;editor;controls;theme;material-design-3</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>

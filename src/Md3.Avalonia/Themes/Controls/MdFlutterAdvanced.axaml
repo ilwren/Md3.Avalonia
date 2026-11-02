@@ -210,13 +210,15 @@
         <Border x:Name="PART_Root" Height="{TemplateBinding VisualHeight}" CornerRadius="14"
                 ClipToBounds="True" IsVisible="False">
           <Grid>
-            <ContentPresenter x:Name="PART_StartBackground" HorizontalAlignment="Left" VerticalAlignment="Stretch"
-                              Content="{TemplateBinding BackgroundContent}" />
-            <ContentPresenter x:Name="PART_EndBackground" HorizontalAlignment="Right" VerticalAlignment="Stretch"
-                              Content="{TemplateBinding SecondaryBackgroundContent}" />
+            <ContentPresenter x:Name="PART_StartBackground" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                              HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                              Content="{TemplateBinding BackgroundContent}" IsVisible="False" />
+            <ContentPresenter x:Name="PART_EndBackground" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                              HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                              Content="{TemplateBinding SecondaryBackgroundContent}" IsVisible="False" />
             <Border x:Name="PART_Foreground" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
                     CornerRadius="14" Opacity="1">
-              <Border.RenderTransform><TranslateTransform X="{TemplateBinding DragOffset}" /></Border.RenderTransform>
+              <Border.RenderTransform><TranslateTransform X="0" /></Border.RenderTransform>
               <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
             </Border>
           </Grid>
@@ -225,9 +227,8 @@
     </Setter>
     <Style Selector="^:present /template/ Border#PART_Root"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:confirming /template/ Border#PART_Foreground"><Setter Property="Opacity" Value="0.72" /></Style>
-    <Style Selector="^:dismissed /template/ Border#PART_Foreground"><Setter Property="Opacity" Value="0" /></Style>
-    <Style Selector="^:start /template/ ContentPresenter#PART_EndBackground"><Setter Property="IsVisible" Value="False" /></Style>
-    <Style Selector="^:end /template/ ContentPresenter#PART_StartBackground"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:start /template/ ContentPresenter#PART_StartBackground"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:end /template/ ContentPresenter#PART_EndBackground"><Setter Property="IsVisible" Value="True" /></Style>
   </ControlTheme>
 
   <!-- Flutter Material phase 3: form and dialog helpers -->

@@ -129,4 +129,72 @@ public sealed class MdVisualExtrasTests
         item.Close();
         Assert.False(item.IsOpen);
     }
+
+    [AvaloniaFact]
+    public void SlidableItem_Keeps_Logical_Sides_In_Rtl_And_Auto_Closes_Its_Group()
+    {
+        var group = $"test-{Guid.NewGuid():N}";
+        var first = new MdSlidableItem { ActionExtent = 100, GroupName = group };
+        var rtl = new MdSlidableItem
+        {
+            ActionExtent = 120,
+            GroupName = group,
+            FlowDirection = FlowDirection.RightToLeft,
+            ActionPaneMotion = MdSlidableActionPaneMotion.Scroll
+        };
+
+        first.OpenEnd();
+        Assert.True(first.IsOpen);
+        rtl.OpenStart();
+
+        Assert.False(first.IsOpen);
+        Assert.Equal(120, rtl.Offset);
+        Assert.Equal(-120, rtl.VisualOffset);
+        Assert.True(rtl.IsStartOpen);
+        Assert.Equal(1, rtl.RevealProgress);
+        Assert.Equal(0, rtl.StartActionOffset);
+        rtl.Close();
+        Assert.Equal(120, rtl.StartActionOffset);
+    }
+
+    [AvaloniaFact]
+    public void SlidableItem_Settles_Against_The_Pane_Extent_And_Rejects_Vertical_Drags()
+    {
+        var item = new MdSlidableItem
+        {
+            Width = 520,
+            Height = 72,
+            ActionExtent = 144,
+            StartActions = "Archive",
+            EndActions = "Delete",
+            Content = "Message"
+        };
+        var window = new Window { Width = 620, Height = 180, Content = item };
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var start = item.TranslatePoint(new Point(240, 36), window)!.Value;
+
+            // 80 px is over half of the 144 px pane, but far below half the 520 px row.
+            window.MouseMove(start, RawInputModifiers.None);
+            window.MouseDown(start, MouseButton.Left, RawInputModifiers.None);
+            window.MouseMove(start.WithX(start.X + 80), RawInputModifiers.LeftMouseButton);
+            window.MouseMove(start.WithX(start.X + 80), RawInputModifiers.LeftMouseButton);
+            window.MouseUp(start.WithX(start.X + 80), MouseButton.Left, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(item.IsStartOpen);
+            Assert.Equal(144, item.Offset);
+
+            item.Close();
+            window.MouseMove(start, RawInputModifiers.None);
+            window.MouseDown(start, MouseButton.Left, RawInputModifiers.None);
+            window.MouseMove(new Point(start.X + 8, start.Y + 40), RawInputModifiers.LeftMouseButton);
+            window.MouseUp(new Point(start.X + 8, start.Y + 40), MouseButton.Left, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(0, item.Offset);
+            Assert.DoesNotContain(":dragging", item.Classes);
+        }
+        finally { window.Close(); }
+    }
 }

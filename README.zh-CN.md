@@ -4,7 +4,7 @@
 
 面向 Avalonia 12 的 Material Design 3 控件库与组件 Gallery。
 
-- 353 个公共 API 类型，覆盖按钮、输入、导航、对话框、图表与动效，全部收录在 API 参考中并由脚本门禁校验。
+- 375 个公共 API 类型，覆盖按钮、输入、导航、对话框、图表与动效，全部收录在 API 参考中并由脚本门禁校验。
 
 - HCT 动态配色：任意 seed color，6 种 scheme、3 档对比度、49 个色彩角色。
 
@@ -18,7 +18,7 @@
 
 - 桌面与 Android 双端，全部包声明 `IsTrimmable` 与 `IsAotCompatible`。
 
-> **当前预览版：[`0.5.0-preview.2`](https://www.nuget.org/packages/Md3.Avalonia/0.5.0-preview.2)。** 以下安装示例均使用此版本。预览期 API 仍可能做兼容性调整。屏幕阅读器与 Android 真机等人工验收状态见 [已知边界](#已知边界)。
+> **当前源码基线：`0.5.6-preview.1`（尚未发布）。** 以下安装示例使用该源码基线计划发布的版本。预览期 API 仍可能做兼容性调整。屏幕阅读器与 Android 真机等人工验收状态见 [已知边界](#已知边界)。
 
 ## 目录
 
@@ -39,7 +39,7 @@
 | 项 | 要求 |
 |---|---|
 | Avalonia | `12.1.2`（最低版本由第三方集成包的依赖下限决定，见 [`docs/COMPATIBILITY.zh-CN.md`](docs/COMPATIBILITY.zh-CN.md)） |
-| 库目标框架 | 核心族 `net8.0;net10.0`；第三方主题包 `net10.0`（见 [NuGet 包](#nuget-包)） |
+| 库目标框架 | 五个核心/通用包为 `net8.0;net10.0`；12 个集成/主题包为 `net10.0`；Notifications 另含平台专用目标（见 [NuGet 包](#nuget-包)） |
 | Gallery 与测试 | .NET 10 |
 | Android | 最低 API 23，宿主 `net10.0-android` |
 | 打包脚本 | .NET 10 SDK、Java 17、`dotnet workload install android` |
@@ -49,13 +49,13 @@
 安装核心包：
 
 ```bash
-dotnet add package Md3.Avalonia --version 0.5.0-preview.2
+dotnet add package Md3.Avalonia --version 0.5.6-preview.1
 ```
 
 按需添加可选包，全部包版本一致：
 
 ```bash
-dotnet add package Md3.Avalonia.Icons --version 0.5.0-preview.2
+dotnet add package Md3.Avalonia.Icons --version 0.5.6-preview.1
 ```
 
 ## 快速开始
@@ -162,17 +162,17 @@ python3 scripts/verify-fonts.py
 
 ## 控件总览
 
-在线 [DocFX API 参考](https://ilwren.github.io/Md3.Avalonia/)从 18 个包的 C# XML 注释生成页面；[`docs/API.zh-CN.md`](docs/API.zh-CN.md)说明覆盖的包与文档来源。353 个公共类型由 `scripts/check-api-doc-coverage.py` 扫描，下表只列出各分组的主要类型。
+在线 [DocFX API 参考](https://ilwren.github.io/Md3.Avalonia/)从 18 个包的 C# XML 注释生成页面；[`docs/API.zh-CN.md`](docs/API.zh-CN.md)说明覆盖的包与文档来源。375 个公共类型由 `scripts/check-api-doc-coverage.py` 扫描，下表只列出各分组的主要类型。
 
 | 分组 | 主要类型 |
 |---|---|
 | 按钮 | `MdButton`、`MdToggleButton`、`MdIconButton`、`MdToggleIconButton`、`MdSplitButton`、`MdStandardButtonGroup`、`MdConnectedButtonGroup`、`MdFloatingActionButton`、`MdExtendedFloatingActionButton`、`MdFabMenu` |
-| 输入 | `MdTextBox`、`MdCheckBox`、`MdRadioButton`、`MdComboBox`、`MdAutoCompleteBox`、`MdSlider`、`MdSwitch`、`MdDatePicker`、`MdTimePicker`、`MdPinInput`、`MdTagInput`、`MdForm` |
-| 导航 | `MdNavigationDrawer`、`MdNavigationBar`、`MdTabs`、`MdToolbar`、`MdTopAppBar`、`MdBottomAppBar`、`MdSearchBar`、`MdSearchView`、`MdCommandPalette`、`MdBreadcrumb` |
-| 容器与浮层 | `MdCard`、`MdDialog`、`MdDialogHost`、`MdMenu`、`MdPopover`、`MdTooltip`、`MdSnackbar`、`MdBanner`、`MdSheetHost`、`MdExpansionPanelList`、`MdFloatingWindow`、`MdBorderlessWindow` |
-| 数据展示 | `MdList`、`MdDataTable`、`MdDataGrid`、`MdCarousel`、`MdCalendar`、`MdTreeView`、`MdAvatar`、`MdBadge`、`MdChip`、`MdTimeline`、`MdWaveform`、`MdChart` |
+| 输入 | `MdTextBox`、`MdCheckBox`、`MdRadioButton`、`MdComboBox`、`MdAutoCompleteBox`、`MdSlider`、`MdSwitch`、`MdDatePicker`、`MdTimePicker`、`MdPinInput`、`MdTagInput`、`MdMaskedTextBox`、`MdFileSystemPicker`、`MdForm` |
+| 导航 | `MdNavigationDrawer`、`MdNavigationBar`、`MdTabs`、`MdToolbar`、`MdTopAppBar`、`MdBottomAppBar`、`MdSearchBar`、`MdSearchView`、`MdCommandPalette`、`MdBreadcrumb`、`MdPagination` |
+| 容器与浮层 | `MdCard`、`MdDialog`、`MdDialogHost`、`MdMenu`、`MdPopover`、`MdTooltip`、`MdSnackbar`、`MdBanner`、`MdBannerHost`、`MdSheetHost`、`MdExpansionPanelList`、`MdFloatingWindow`、`MdBorderlessWindow` |
+| 数据展示 | `MdList`、`MdDataTable`、`MdDataGrid`、`MdCarousel`、`MdCalendar`、`MdTreeView`、`MdAvatar`、`MdBadge`、`MdChip`、`MdTimeline`、`MdCommitGraph`、`MdContributionGrid`、`MdWaveform`、`MdChart` |
 | 反馈与进度 | `MdCircularProgressIndicator`、`MdLinearProgressIndicator`、`MdLoadingIndicator`、`MdSkeleton`、`MdRefreshIndicator`、`MdSpinKit`、`MdStateLayer`、`MdFocusRing` |
-| 布局与动效 | `MdSurface`、`MdAdaptiveLayout`、`MdScrollViewer`、`MdWaterfall`、`MdMasonryPanel`、`MdStaggeredPanel`、`MdAnimationSequence`、`MdAnimatedText`、`MdRevealHost`、`MdMorphPanel`、`MdHero` |
+| 布局与动效 | `MdSurface`、`MdAdaptiveLayout`、`MdScrollViewer`、`MdWaterfall`、`MdMasonryPanel`、`MdStaggeredPanel`、`MdGridSplitter`、`MdAnimationSequence`、`MdAnimatedText`、`MdRevealHost`、`MdMorphPanel`、`MdHero` |
 
 全部按钮、Icon Button 与 FAB 模板都接入 `MdRipplePresenter`：按下位置产生涟漪，裁切到完整 container shape，并支持 Expressive / Standard / Reduced / None 四种 motion scheme。`MdButton` 的 Elevated 配置为 M3 已标记 deprecated 的兼容项，新界面应优先选用其他配置。
 
@@ -254,6 +254,7 @@ bash scripts/publish-gallery-aot.sh --rid linux-x64 --smoke   # 也可指定 win
 | [`docs/COMPATIBILITY.zh-CN.md`](docs/COMPATIBILITY.zh-CN.md) | 目标框架、平台与依赖兼容策略 |
 | [`docs/RELEASE_NOTES_0.5.0-preview.1.md`](docs/RELEASE_NOTES_0.5.0-preview.1.md) | 已发布版本的变更说明 |
 | [`docs/RELEASE_NOTES_0.5.0-preview.2.md`](docs/RELEASE_NOTES_0.5.0-preview.2.md) | 0.5.0-preview.2 变更说明 |
+| [`docs/RELEASE_NOTES_0.5.6-preview.1.md`](docs/RELEASE_NOTES_0.5.6-preview.1.md) | 当前源码基线变更说明 |
 | [`docs/RELEASE_VALIDATION.md`](docs/RELEASE_VALIDATION.md) | 人工验收清单与签署状态 |
 | [`docs/PUBLISHING.md`](docs/PUBLISHING.md) | 发布流程与 NuGet Trusted Publishing 配置 |
 | [`docs/SPEC_VERIFICATION.md`](docs/SPEC_VERIFICATION.md) | 规范一致性分层校验与已知差距 |

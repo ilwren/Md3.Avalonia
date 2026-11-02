@@ -6,7 +6,7 @@ _lang: zh-CN
 
 [English](USAGE_EXAMPLES.md) | [简体中文](USAGE_EXAMPLES.zh-CN.md)
 
-以下示例展示如何将控件和主题包组合到真实页面中。截图来自项目 Gallery；瀑布流示意图为本指南专门绘制。完整可运行示例可查看 [Gallery 源码](https://github.com/ilwren/Md3.Avalonia/tree/arena/7fa0e0b4-md3-avalonia/gallery/Md3.Avalonia.Gallery/Pages)。
+以下示例展示如何将控件和主题包组合到真实页面中。截图来自项目 Gallery；瀑布流示意图为本指南专门绘制。完整可运行示例可查看 [Gallery 源码](https://github.com/ilwren/Md3.Avalonia/tree/main/gallery/Md3.Avalonia.Gallery/Pages)。
 
 ## 1. 简单表单
 

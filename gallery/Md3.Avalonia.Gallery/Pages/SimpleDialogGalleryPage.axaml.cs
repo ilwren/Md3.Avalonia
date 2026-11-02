@@ -8,9 +8,9 @@ public partial class SimpleDialogGalleryPage : UserControl
 {
     private static string L(string english, string chinese) => GalleryLocalization.Choose(english, chinese);
 
-    // Prefer the shell's host so the dialog covers the whole window; fall back to the page's own
-    // when this page is previewed on its own.
-    private MdDialogHost ActiveDialogHost => TopLevel.GetTopLevel(this) is MainWindow main ? main.DialogHost : LocalDialogHost;
+    // Prefer either shell's viewport-level host so the scrim covers the desktop window or the
+    // complete Android single view; fall back only when the page is previewed by itself.
+    private MdDialogHost ActiveDialogHost => GalleryDialogHosts.Find(this) ?? LocalDialogHost;
 
     public SimpleDialogGalleryPage() => InitializeComponent();
 

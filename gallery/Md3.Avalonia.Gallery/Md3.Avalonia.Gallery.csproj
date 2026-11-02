@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net10.0</TargetFrameworks>
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net10.0;net10.0-windows10.0.19041.0</TargetFrameworks>
@@ -34,6 +34,6 @@
     <ProjectReference Include="../../src/Md3.Avalonia.Mapsui/Md3.Avalonia.Mapsui.csproj" />
     <ProjectReference Include="../../src/Md3.Avalonia.InkCanvas/Md3.Avalonia.InkCanvas.csproj" />
     <AvaloniaResource Include="Assets/Media/**" />
-    <AvaloniaResource Include="Assets/tray-icon.png" />
+    <AvaloniaResource Include="Assets/logo-128.png" />
   </ItemGroup>
 </Project>

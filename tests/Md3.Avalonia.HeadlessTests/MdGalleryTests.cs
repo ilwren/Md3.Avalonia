@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media.Imaging;
@@ -18,6 +19,15 @@ namespace Md3.Avalonia.HeadlessTests;
 
 public sealed class MdGalleryTests
 {
+    [Fact]
+    public void Motion_Track_Translation_Uses_The_Measured_Visible_Width()
+    {
+        Assert.Equal(92, MotionGalleryPage.CalculateTrackTranslation(1, 120, 28));
+        Assert.Equal(92, MotionGalleryPage.CalculateTrackTranslation(1.06, 120, 28));
+        Assert.Equal(0, MotionGalleryPage.CalculateTrackTranslation(-0.06, 120, 28));
+        Assert.Equal(0, MotionGalleryPage.CalculateTrackTranslation(1, 20, 28));
+    }
+
     [AvaloniaFact]
     public void Gallery_Shell_And_All_Documentation_Pages_Render()
     {
@@ -40,6 +50,7 @@ public sealed class MdGalleryTests
             new CardGalleryPage(),
             new ChipGalleryPage(),
             new PickerGalleryPage(),
+            new FileSystemPickerGalleryPage(),
             new DialogGalleryPage(),
             new DividerGalleryPage(),
             new ListGalleryPage(),
@@ -122,14 +133,21 @@ public sealed class MdGalleryTests
             new TreeViewGalleryPage(),
             new TagInputGalleryPage(),
             new AvatarGalleryPage(),
-            new RatingGalleryPage()
+            new RatingGalleryPage(),
+            new CommitGraphGalleryPage(),
+            new ContributionGridGalleryPage(),
+            new MaskedTextBoxGalleryPage(),
+            new PaginationGalleryPage()
         ];
 
         foreach (var page in pages)
         {
             var userPage = Assert.IsAssignableFrom<UserControl>(page);
             var pageContent = userPage.Content;
-            while (pageContent is MdDialogHost dialogHost) pageContent = dialogHost.Content; // pages may nest hosts at the root
+            // Pages may put a surface host at the root. Walk through it to find the documented
+            // scrolling body without coupling the render smoke test to one host type.
+            while (pageContent is MdDialogHost or MdBannerHost)
+                pageContent = ((ContentControl)pageContent).Content;
             var pageScroller = pageContent as MdScrollViewer ??
                                (pageContent as Grid)?.Children.OfType<MdScrollViewer>().FirstOrDefault();
             Assert.NotNull(pageScroller);
@@ -180,6 +198,70 @@ public sealed class MdGalleryTests
         finally
         {
             gallery.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Dismissible_Gallery_Does_Not_Fix_The_Row_Height_Or_Compete_For_Mouse_Dragging()
+    {
+        var page = new DismissibleGalleryPage();
+        var host = new Window { Width = 960, Height = 640, Content = page };
+        host.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var dismissible = page.FindControl<MdDismissible>("DismissibleDemo")!;
+            var scroller = Assert.IsType<MdScrollViewer>(page.Content);
+            var foreground = dismissible.GetVisualDescendants().OfType<Border>()
+                .Single(border => border.Name == "PART_Foreground");
+            var foregroundContent = Assert.IsType<ContentPresenter>(foreground.Child);
+            var row = Assert.IsType<Border>(foregroundContent.Content);
+
+            Assert.True(double.IsNaN(dismissible.Height));
+            Assert.Equal(72, row.MinHeight);
+            Assert.False(scroller.AllowMouseDrag);
+        }
+        finally
+        {
+            host.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Git_Graph_Galleries_Keep_Details_Separate_And_Do_Not_Ripple_Whole_Cards()
+    {
+        var samples = new (UserControl Page, string SelectionPaneName)[]
+        {
+            (new CommitGraphGalleryPage(), "CommitSelectionPane"),
+            (new ContributionGridGalleryPage(), "ContributionSelectionPane"),
+        };
+
+        foreach (var (page, selectionPaneName) in samples)
+        {
+            var host = new Window { Width = 960, Height = 760, Content = page };
+            host.Show();
+            try
+            {
+                Dispatcher.UIThread.RunJobs();
+
+                var selectionPane = page.GetVisualDescendants().OfType<StackPanel>()
+                    .Single(panel => panel.Name == selectionPaneName);
+                Assert.Equal(1, Grid.GetColumn(selectionPane));
+
+                var cards = page.GetVisualDescendants().OfType<MdCard>().ToArray();
+                Assert.NotEmpty(cards);
+                Assert.All(cards, card => Assert.False(card.IsInteractive,
+                    "presentational graph cards must not show a whole-card state layer or ripple"));
+
+                var touchGrid = page.GetVisualDescendants().OfType<MdContributionGrid>()
+                    .SingleOrDefault(grid => grid.Name == "DemoGrid");
+                if (touchGrid is not null)
+                {
+                    Assert.Equal(20, touchGrid.CellSize);
+                    Assert.Equal(4, touchGrid.CellSpacing);
+                }
+            }
+            finally { host.Close(); }
         }
     }
 

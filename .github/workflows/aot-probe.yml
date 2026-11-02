@@ -24,10 +24,11 @@ jobs:
       - name: Install the native toolchain ILC links against
         run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev xvfb libx11-6 libice6 libsm6 libfontconfig1
       # The script is the single source of truth for the AOT publish: it asserts the output is a
-      # native executable with no managed app assembly beside it, then smoke-runs it under xvfb.
+      # native executable with no managed app assembly beside it, then opens the file-system picker
+      # in that native process and verifies its template, filtering, selection and confirmation.
       - name: Publish, verify and smoke the native AOT gallery
         run: |
-          bash scripts/publish-gallery-aot.sh --rid linux-x64 --output /tmp/aot-out --smoke 2>&1 | tee /tmp/aot.log
+          bash scripts/publish-gallery-aot.sh --rid linux-x64 --output /tmp/aot-out --smoke-scenario file-system-picker 2>&1 | tee /tmp/aot.log
           {
             echo "### AOT publish output"
             ls -la /tmp/aot-out | head -20 | sed 's/^/    /'

@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -8,6 +10,7 @@ using Md3.Avalonia.Themes;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using Md3.Avalonia.Gallery.Pages;
 
 namespace Md3.Avalonia.Gallery;
 
@@ -26,7 +29,9 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow();
+            var window = new MainWindow();
+            desktop.MainWindow = window;
+            ConfigureNativeAotSmoke(desktop, window);
             InstallTrayIcon(desktop);
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleView)
@@ -38,6 +43,53 @@ public partial class App : Application
     }
 
     /// <summary>
+    /// Runs a scenario inside the published native executable when requested by the AOT probe.
+    /// Success is communicated out-of-process through a marker because merely keeping the Gallery
+    /// window alive would not prove that the requested page, template and interaction path ran.
+    /// </summary>
+    private static void ConfigureNativeAotSmoke(
+        IClassicDesktopStyleApplicationLifetime desktop,
+        MainWindow window)
+    {
+        const string scenarioName = "file-system-picker";
+        var scenario = Environment.GetEnvironmentVariable("MD3_GALLERY_AOT_SMOKE_SCENARIO");
+        if (string.IsNullOrEmpty(scenario)) return;
+
+        var markerPath = Environment.GetEnvironmentVariable("MD3_GALLERY_AOT_SMOKE_MARKER");
+        if (!string.Equals(scenario, scenarioName, StringComparison.Ordinal) || string.IsNullOrWhiteSpace(markerPath))
+            throw new InvalidOperationException("The native-AOT smoke scenario or marker path is invalid.");
+
+        window.Opened += async (_, _) =>
+        {
+            try
+            {
+                if (!window.NavigateToIndexedPage("File-system picker") ||
+                    window.CurrentPage is not FileSystemPickerGalleryPage page)
+                {
+                    throw new InvalidOperationException("The native-AOT Gallery could not open the file-system picker page.");
+                }
+
+                await page.RunNativeAotSmokeAsync();
+                File.WriteAllText(markerPath, $"{scenarioName}: passed{Environment.NewLine}");
+                Trace.TraceInformation("Native-AOT smoke scenario passed: {0}", scenarioName);
+            }
+            catch (Exception exception)
+            {
+                Trace.TraceError("Native-AOT smoke scenario failed: {0}", exception);
+                try
+                {
+                    File.WriteAllText(markerPath + ".failed", exception.ToString());
+                }
+                catch
+                {
+                    // The process exit still makes the probe fail if the diagnostic cannot be written.
+                }
+                desktop.Shutdown();
+            }
+        };
+    }
+
+    /// <summary>
     /// Desktop-only shell feature: a tray icon whose menu shows the window, switches the theme
     /// and owns shutdown. Closing the window hides it instead of quitting while the tray is
     /// present; the Android single-view lifetime never reaches this code.
@@ -46,7 +98,7 @@ public partial class App : Application
     {
         var trayIcon = new TrayIcon
         {
-            Icon = LoadTrayIcon(),
+            Icon = LoadGalleryIcon(),
             ToolTipText = "Md3.Avalonia Gallery",
             Menu = BuildTrayMenu(desktop),
             IsVisible = true,
@@ -64,12 +116,13 @@ public partial class App : Application
         }
     }
 
-    private static WindowIcon? LoadTrayIcon()
+    internal static WindowIcon? LoadGalleryIcon()
     {
-        // A missing or unreadable icon must not take the shell down; the menu still works.
+        // The visible Gallery mark, title-bar icon and tray all use the repository's canonical
+        // logo. A missing or unreadable asset must not take the shell down; the menu still works.
         try
         {
-            using var stream = AssetLoader.Open(new Uri("avares://Md3.Avalonia.Gallery/Assets/tray-icon.png"));
+            using var stream = AssetLoader.Open(new Uri("avares://Md3.Avalonia.Gallery/Assets/logo-128.png"));
             return new WindowIcon(new Bitmap(stream));
         }
         catch

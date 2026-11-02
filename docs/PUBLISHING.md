@@ -65,9 +65,8 @@ Examples:
 
 | Channel | Base version | Preview sequence | Package / Gallery version | Git tag |
 | --- | --- | ---: | --- | --- |
-| Preview | `0.5.0` | `1` | `0.5.0-preview.1` | `v0.5.0-preview.1` |
-| Preview | `0.5.0` | `2` | `0.5.0-preview.2` | `v0.5.0-preview.2` |
-| Stable | `0.5.0` | ignored | `0.5.0` | `v0.5.0` |
+| Preview | `0.5.6` | `1` | `0.5.6-preview.1` | `v0.5.6-preview.1` |
+| Stable | `0.5.6` | ignored | `0.5.6` | `v0.5.6` |
 
 The workflow rejects runs from branches other than `main`, malformed versions, and tags that already exist. A preview is marked as a GitHub prerelease. Android's display version is set to the same version as NuGet and desktop Gallery; its integer Android version code is increased per workflow run.
 
@@ -94,4 +93,4 @@ A key that expired mid-run — possible only if a push is stalled for more than 
 
 The workflow supplies an MSBuild version override to the package and Gallery builds and does not edit or commit project files. The checked-in `.csproj` versions therefore remain unchanged by a release. After publishing, bump the project versions and Android `ApplicationDisplayVersion` in a normal reviewed change so local builds and subsequent branch artifacts reflect the new development baseline.
 
-`build-nuget.sh` accepts `--version 0.5.0-preview.2`; `build-nuget.ps1` accepts `-Version 0.5.0-preview.2`. Without either option, both scripts continue to use the version declared in the project files. The ordinary Gallery and NuGet build workflows remain available for branches and pull requests but no longer run on tags or releases; this workflow owns release creation and upload to avoid duplicate publication.
+`build-nuget.sh` accepts `--version 0.5.6-preview.1`; `build-nuget.ps1` accepts `-Version 0.5.6-preview.1`. Without either option, both scripts continue to use the version declared in the project files. The ordinary Gallery and NuGet build workflows remain available for branches and pull requests but no longer run on tags or releases; this workflow owns release creation and upload to avoid duplicate publication.

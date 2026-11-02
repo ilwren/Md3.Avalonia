@@ -6,10 +6,10 @@
 
 ## 安装
 
-当前预览版本为 [`0.5.0-preview.2`](https://www.nuget.org/packages/Md3.Avalonia.Notifications/0.5.0-preview.2)。
+当前源码基线版本为 `0.5.6-preview.1`（尚未发布）。
 
 ```bash
-dotnet add package Md3.Avalonia.Notifications --version 0.5.0-preview.2
+dotnet add package Md3.Avalonia.Notifications --version 0.5.6-preview.1
 ```
 
 ## 显示通知

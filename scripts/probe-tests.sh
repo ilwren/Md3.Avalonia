@@ -11,16 +11,69 @@ set -uo pipefail
 
 filter="${1:?a filter fragment is required}"
 trx="${2:?a .trx file name is required}"
+label="${3:-$filter}"
 project="tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj"
+
+# A filter containing '|' or '!' is a full vstest expression; anything else is a name fragment.
+if [[ "$filter" == *'|'* || "$filter" == *'!'* ]]; then
+  expression="$filter"
+else
+  expression="FullyQualifiedName~$filter"
+fi
 
 timeout --signal=KILL 300 dotnet test "$project" \
   -c Release --no-build --no-restore \
-  --filter "FullyQualifiedName~$filter" \
+  --filter "$expression" \
   --logger "trx;LogFileName=$trx" \
-  --logger "console;verbosity=normal"
+  --logger "console;verbosity=normal" > /tmp/probe-console.txt 2>&1
 status=$?
 
-python3 - "$filter" "$trx" "$status" <<'PY'
+# A non-zero exit with no failed tests means the host itself died; the console is the only trace
+# that is not lost. .NET prints "Unhandled exception. <Type>:" (or "Fatal error. <Type>") on the
+# thread that kills the process, followed by the stack - ship that block, not the xunit frames
+# around the pipeline message.
+if [ "$status" -ne 0 ]; then
+  python3 - /tmp/probe-console.txt "$label" <<'PY'
+import re
+import sys
+
+path, label = sys.argv[1:3]
+try:
+    text = open(path, errors="replace").read()
+except OSError:
+    text = ""
+
+match = re.search(r"(Unhandled exception\. [^\n]+|Fatal error\. [^\n]+)", text)
+if match:
+    start = match.start()
+    chunk = text[start:start + 4000]
+    lines = [l.strip() for l in chunk.splitlines() if l.strip()]
+    header = lines[0][:160]
+    frames = [l[:140] for l in lines[1:] if l.startswith("at ") or l.startswith("   at ")][:4]
+    print("::error::%s crash: %s // %s" % (label, header, " | ".join(frames)[:330]))
+    raise SystemExit
+
+# No managed marker: a native abort. The aborting library prints its reason right before the
+# run summary - ship everything after the last PASS/FAIL test line and before "Results File".
+lines = [l for l in text.splitlines() if l.strip()]
+cut = 0
+for i, l in enumerate(lines):
+    if re.search(r"(Passed!|Failed!|Aborted)", l) and ("error" not in l.lower()):
+        cut = i
+summary = next((i for i, l in enumerate(lines) if "Results File" in l), len(lines))
+region = [l.strip() for l in lines[max(cut, 0):summary]
+          if l.strip() and not re.match(r"^\[\w+\.net", l.strip())]
+# Stack frames carry the source line; keep every "at " frame even when the region is long,
+# and cap the rest so the annotation still fits.
+frames = [l[:200] for l in region if l.startswith("at ") or l.startswith("   at ")][:8]
+others = [l[:160] for l in region
+          if not (l.startswith("at ") or l.startswith("   at ")) and "at Md3" not in l][:12]
+blob = " | ".join(others + frames)[:2400]
+print("::error::%s native-abort region: %s" % (label, blob or "(nothing between last test line and summary)"))
+PY
+fi
+
+python3 - "$label" "$trx" "$status" <<'PY'
 import glob
 import sys
 import xml.etree.ElementTree as ET
@@ -34,17 +87,32 @@ results = [
 ]
 
 failed = []
+detailed = []
 for result in results:
     if result.get("outcome") != "Failed":
         continue
     message = result.find(".//ns:Message", ns)
-    first = message.text.strip().splitlines()[0] if message is not None and message.text else ""
+    text = message.text.strip() if message is not None and message.text else ""
+    stack = result.find(".//ns:StackTrace", ns)
+    stack_text = (stack.text or "").strip() if stack is not None else ""
+    # xunit v3 keeps the inner-exception stack (the real source line) outside the message.
+    full = text + ("\n----\n" + stack_text if stack_text and stack_text not in text else "")
+    first = (text or stack_text).splitlines()[0] if (text or stack_text) else ""
     failed.append(f"{result.get('testName')}: {first}")
+    if len(detailed) < 3 and full:
+        detailed.append(f"{result.get('testName')}: {full[:1600]}")
 
 # Annotations are the only part of a run that survives a cancelled job, and GitHub caps them, so
-# this is one line however many tests went wrong.
-print("::notice::%s alone: exit=%s, %d run, %d failed -> %s"
-      % (name, status, len(results), len(failed), "; ".join(failed) or "none"))
+# this is one line however many tests went wrong. The trx lists results in completion order, so
+# the last entry names how far a dead process got.
+last = results[-1].get("testName", "?").rsplit(".", 1)[-1] if results else "none"
+print("::notice::%s alone: exit=%s, %d run, %d failed, last=%s -> %s"
+      % (name, status, len(results), len(failed), last, "; ".join(failed) or "none"))
+
+# The first line loses the stack trace; the full message keeps the exact source line of an
+# unhandled exception, which is what a truncated console log never survives.
+for entry in detailed:
+    print("::error::%s detail: %s" % (name, entry.replace("\n", " | ")))
 PY
 
 exit "$status"

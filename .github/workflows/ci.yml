@@ -247,6 +247,29 @@ jobs:
         continue-on-error: true
         run: scripts/probe-tests.sh MdGallery gallery.trx
 
+      # These four classes are new and are the only ones in the suite that own custom Render
+      # passes, custom templates or pointer-press guards, so each runs alone: a class that dies
+      # in its own process dies differently (and readably) than it would beside its neighbours.
+      - name: Probe the commit graph tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdCommitGraphTests commit-graph.trx
+
+      - name: Probe the pagination tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdPaginationTests pagination.trx
+
+      - name: Probe the stepper tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdStepperTests stepper.trx
+
+      - name: Probe the masked text field tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdMaskedTextBoxTests mask.trx
+
+      - name: Probe the text box selection tests alone
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdTextBoxSelectionTests selection.trx
+
       # The map theme is the newest package and the only one that reaches a third-party Skia text
       # stack, so its eight tests are run on their own as well: the notice is what says they ran and
       # how many, which the main suite's summary cannot be read back for.

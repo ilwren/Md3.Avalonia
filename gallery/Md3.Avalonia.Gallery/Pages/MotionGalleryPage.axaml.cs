@@ -29,8 +29,10 @@ public partial class MotionGalleryPage : UserControl
     private void PlayMotion(object? sender, RoutedEventArgs e)
     {
         _timer.Stop();
-        _from = _atEnd ? 260 : 0;
-        _to = _atEnd ? 0 : 260;
+        // Animate normalized progress instead of a fixed 260-DIP offset. Each track converts that
+        // progress to its own measured travel, which keeps the circles inside narrow Android views.
+        _from = _atEnd ? 1 : 0;
+        _to = _atEnd ? 0 : 1;
         _atEnd = !_atEnd;
         _startedAt = Stopwatch.GetTimestamp();
         _timer.Start();
@@ -80,8 +82,27 @@ public partial class MotionGalleryPage : UserControl
             MotionSpeedText.Text = $"{slider.Value:0.00}×";
     }
 
+    private void MotionTracksSizeChanged(object? sender, SizeChangedEventArgs e)
+    {
+        // Rotation and split-screen resizing can shrink a track after an animation completed.
+        // Recompute the endpoint from the new arranged width instead of retaining a stale offset.
+        if (_timer.IsEnabled) return;
+        var progress = _atEnd ? 1d : 0d;
+        SetPosition(ExpressiveDot, progress);
+        SetPosition(StandardDot, progress);
+        SetPosition(ReducedDot, progress);
+    }
+
     private double Interpolate(double progress) => _from + (_to - _from) * progress;
 
-    private static void SetPosition(Control control, double x) =>
-        control.RenderTransform = new TranslateTransform(x, 0);
+    private static void SetPosition(Control control, double progress)
+    {
+        var trackWidth = (control.Parent as Control)?.Bounds.Width ?? 0;
+        control.RenderTransform = new TranslateTransform(
+            CalculateTrackTranslation(progress, trackWidth, control.Bounds.Width), 0);
+    }
+
+    /// <summary>Maps spring progress to a translation that cannot leave the measured track.</summary>
+    internal static double CalculateTrackTranslation(double progress, double trackWidth, double dotWidth) =>
+        Math.Clamp(progress, 0, 1) * Math.Max(0, trackWidth - dotWidth);
 }

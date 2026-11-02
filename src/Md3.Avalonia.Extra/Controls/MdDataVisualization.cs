@@ -23,7 +23,25 @@ using Md3.Avalonia.Localization;
 namespace Md3.Avalonia.Extra.Controls;
 
 public enum MdTimelineItemState { Neutral, Active, Completed, Error }
-public sealed record MdTimelineItem(object? Title, object? Description = null, DateTimeOffset? Time = null, MdTimelineItemState State = MdTimelineItemState.Neutral, object? Icon = null);
+
+/// <summary>Controls the optional visual treatment surrounding a timeline marker.</summary>
+public enum MdTimelineIndicatorEffect
+{
+    /// <summary>Uses a progress ring while the item is active and no effect otherwise.</summary>
+    Auto,
+    /// <summary>Always renders the plain marker.</summary>
+    None,
+    /// <summary>Always renders an indeterminate progress ring around the marker.</summary>
+    ProgressRing
+}
+
+public sealed record MdTimelineItem(
+    object? Title,
+    object? Description = null,
+    DateTimeOffset? Time = null,
+    MdTimelineItemState State = MdTimelineItemState.Neutral,
+    object? Icon = null,
+    MdTimelineIndicatorEffect IndicatorEffect = MdTimelineIndicatorEffect.Auto);
 
 /// <summary>Accessible vertical/horizontal timeline; semantics remain ordered as supplied.</summary>
 [PseudoClasses(":vertical", ":horizontal")]
@@ -47,16 +65,19 @@ public sealed class MdTimeline : ItemsControl
 }
 
 /// <summary>Theme-facing timeline item that projects state, position, and orientation into stable pseudo classes.</summary>
-[PseudoClasses(":vertical", ":horizontal", ":first", ":last", ":neutral", ":active", ":completed", ":error")]
+[PseudoClasses(":vertical", ":horizontal", ":first", ":last", ":neutral", ":active", ":completed", ":error", ":progress-ring", ":has-icon")]
 public sealed class MdTimelineItemPresenter : ContentControl
 {
     public static readonly StyledProperty<MdTimelineItem?> ItemProperty =
         AvaloniaProperty.Register<MdTimelineItemPresenter, MdTimelineItem?>(nameof(Item));
     public static readonly DirectProperty<MdTimelineItemPresenter, MdTimelineItemState> EffectiveStateProperty =
         AvaloniaProperty.RegisterDirect<MdTimelineItemPresenter, MdTimelineItemState>(nameof(EffectiveState), control => control.EffectiveState);
+    public static readonly DirectProperty<MdTimelineItemPresenter, bool> HasProgressRingProperty =
+        AvaloniaProperty.RegisterDirect<MdTimelineItemPresenter, bool>(nameof(HasProgressRing), control => control.HasProgressRing);
 
     private MdTimeline? _owner;
     private MdTimelineItemState _effectiveState;
+    private bool _hasProgressRing;
 
     static MdTimelineItemPresenter() =>
         ItemProperty.Changed.AddClassHandler<MdTimelineItemPresenter>((control, _) => control.UpdateState());
@@ -66,6 +87,11 @@ public sealed class MdTimelineItemPresenter : ContentControl
     {
         get => _effectiveState;
         private set => SetAndRaise(EffectiveStateProperty, ref _effectiveState, value);
+    }
+    public bool HasProgressRing
+    {
+        get => _hasProgressRing;
+        private set => SetAndRaise(HasProgressRingProperty, ref _hasProgressRing, value);
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -116,11 +142,16 @@ public sealed class MdTimelineItemPresenter : ContentControl
             state = MdTimelineItemState.Active;
         EffectiveState = state;
 
+        var effect = Item?.IndicatorEffect ?? MdTimelineIndicatorEffect.Auto;
+        HasProgressRing = effect == MdTimelineIndicatorEffect.ProgressRing ||
+                          effect == MdTimelineIndicatorEffect.Auto && state == MdTimelineItemState.Active;
         var horizontal = _owner?.Orientation == Orientation.Horizontal;
         PseudoClasses.Set(":horizontal", horizontal);
         PseudoClasses.Set(":vertical", !horizontal);
         PseudoClasses.Set(":first", index <= 0);
         PseudoClasses.Set(":last", index >= 0 && index == values.Length - 1);
+        PseudoClasses.Set(":progress-ring", HasProgressRing);
+        PseudoClasses.Set(":has-icon", Item?.Icon is not null);
         foreach (var value in Enum.GetValues<MdTimelineItemState>())
             PseudoClasses.Set($":{value.ToString().ToLowerInvariant()}", value == state);
         AutomationProperties.SetName(this, Item?.Title?.ToString());

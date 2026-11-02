@@ -2,7 +2,7 @@
 
 [English](USAGE_EXAMPLES.md) | [简体中文](USAGE_EXAMPLES.zh-CN.md)
 
-These short examples show how the package guides fit into real screens. The screenshots are captured from the project gallery; the waterfall diagram is a purpose-made layout illustration. For a complete runnable demo, open the [Gallery source](https://github.com/ilwren/Md3.Avalonia/tree/arena/7fa0e0b4-md3-avalonia/gallery/Md3.Avalonia.Gallery/Pages).
+These short examples show how the package guides fit into real screens. The screenshots are captured from the project gallery; the waterfall diagram is a purpose-made layout illustration. For a complete runnable demo, open the [Gallery source](https://github.com/ilwren/Md3.Avalonia/tree/main/gallery/Md3.Avalonia.Gallery/Pages).
 
 ## 1. A small form
 

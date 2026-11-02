@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -133,6 +134,95 @@ public sealed class MdTextBoxTests
             Assert.Equal("Hello", textBox.Text);
             // Focus uses a non-measuring overlay, so the base outline remains one DIP.
             Assert.Equal(new Thickness(1), textBox.BorderThickness);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Replacing_A_Reverse_Selection_Keeps_Visual_And_Logical_Carets_In_Sync()
+    {
+        var textBox = new MdTextBox
+        {
+            Label = "Value",
+            Text = "ab",
+            Variant = MdTextBoxVariant.Outlined
+        };
+        var window = ShowWindow(textBox);
+        try
+        {
+            textBox.Focus();
+            textBox.CaretIndex = textBox.Text!.Length;
+            Dispatcher.UIThread.RunJobs();
+
+            window.KeyPress(Key.Left, RawInputModifiers.None, PhysicalKey.ArrowLeft, null);
+            window.KeyPress(Key.Left, RawInputModifiers.Shift, PhysicalKey.ArrowLeft, null);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(1, textBox.SelectionStart);
+            Assert.Equal(0, textBox.SelectionEnd);
+
+            window.KeyTextInput("c");
+            Dispatcher.UIThread.RunJobs();
+
+            var presenter = textBox.GetVisualDescendants().OfType<TextPresenter>()
+                .Single(control => control.Name == "PART_TextPresenter");
+            Assert.Equal("cb", textBox.Text);
+            Assert.Equal(1, textBox.CaretIndex);
+            Assert.Equal(textBox.CaretIndex, presenter.CaretIndex);
+            Assert.Equal(textBox.CaretIndex, textBox.SelectionStart);
+            Assert.Equal(textBox.CaretIndex, textBox.SelectionEnd);
+
+            // The next character is the user-visible failure mode: it must be inserted beside the
+            // rendered caret, not at a stale pre-selection index.
+            window.KeyTextInput("d");
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal("cdb", textBox.Text);
+            Assert.Equal(2, textBox.CaretIndex);
+            Assert.Equal(textBox.CaretIndex, presenter.CaretIndex);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Committed_Input_Uses_The_Visible_Caret_When_A_Selection_Path_Left_State_Diverged()
+    {
+        var textBox = new MdTextBox
+        {
+            Label = "Value",
+            Text = "abcd"
+        };
+        var window = ShowWindow(textBox);
+        try
+        {
+            textBox.Focus();
+            textBox.CaretIndex = 1;
+            Dispatcher.UIThread.RunJobs();
+
+            var presenter = textBox.GetVisualDescendants().OfType<TextPresenter>()
+                .Single(control => control.Name == "PART_TextPresenter");
+            presenter.MoveCaretToTextPosition(textBox.Text!.Length);
+
+            // Reproduce the actual failure state: TextPresenter draws the caret at the end while
+            // TextBox still plans to insert at index 1.
+            Assert.Equal(1, textBox.CaretIndex);
+            Assert.Equal(textBox.Text.Length, presenter.CaretIndex);
+            Assert.Equal(textBox.SelectionStart, textBox.SelectionEnd);
+
+            window.KeyTextInput("!");
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal("abcd!", textBox.Text);
+            Assert.Equal(5, textBox.CaretIndex);
+            Assert.Equal(textBox.CaretIndex, presenter.CaretIndex);
+            Assert.Equal(textBox.CaretIndex, textBox.SelectionStart);
+            Assert.Equal(textBox.CaretIndex, textBox.SelectionEnd);
         }
         finally
         {

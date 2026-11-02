@@ -1,0 +1,23 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The MdExplorer prototype validated a 16-DIP input lane around a quiet 2-DIP track and
+       a much more legible 56-DIP capsule. Pane geometry remains owned by Avalonia GridSplitter. -->
+  <x:Double x:Key="Md.Comp.GridSplitter.Track.Thickness">16</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.Divider.Thickness">2</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.Divider.RestingOpacity">0.55</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.Divider.HoverOpacity">0.90</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.Handle.Thickness">6</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.Handle.Length">56</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.Handle.ActiveThickness">7</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.Handle.ActiveLength">76</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.Handle.DraggedLength">88</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.Handle.DotSize">2</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.Handle.DotSpacing">5</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.StateLayer.Thickness">3</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.StateLayer.HoverOpacity">0.08</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.StateLayer.DraggedOpacity">1</x:Double>
+  <CornerRadius x:Key="Md.Comp.GridSplitter.Divider.Shape">1</CornerRadius>
+  <CornerRadius x:Key="Md.Comp.GridSplitter.Handle.Shape">3</CornerRadius>
+  <x:Double x:Key="Md.Comp.GridSplitter.Disabled.Opacity">0.38</x:Double>
+  <x:Double x:Key="Md.Comp.GridSplitter.Preview.Opacity">0.32</x:Double>
+</ResourceDictionary>

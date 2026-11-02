@@ -46,6 +46,21 @@ public sealed class MdMotionLifecycleTests
         Assert.Equal(1, reducedEasing.Ease(1));
     }
 
+    [Fact]
+    public void Spatial_Spring_Can_Continue_A_Direct_Manipulation_Release_Velocity()
+    {
+        var owner = new Border();
+        MdMotion.SetScheme(owner, MdMotionScheme.Standard);
+        using var runner = new MdSpatialSpringRunner(owner, _ => { });
+
+        runner.Retarget(240, MdMotionSpeed.Default, initialVelocity: 720);
+
+        Assert.Equal(240, runner.Target);
+        Assert.Equal(720, runner.Velocity);
+        runner.Advance(TimeSpan.FromMilliseconds(16));
+        Assert.True(runner.Position > 0);
+    }
+
     [AvaloniaFact]
     public void Theme_Manager_Propagates_Motion_Scheme_From_Each_TopLevel()
     {
@@ -666,7 +681,14 @@ public sealed class MdMotionLifecycleTests
     [AvaloniaFact]
     public void Dismissible_And_Slidable_Use_Release_Settle_And_Reduced_Semantics()
     {
-        var dismissible = new MdDismissible { Width = 360, Height = 72, Content = "Dismiss" };
+        var dismissible = new MdDismissible
+        {
+            Width = 360,
+            Height = 72,
+            Content = "Dismiss",
+            BackgroundContent = "Archive",
+            SecondaryBackgroundContent = "Delete"
+        };
         var slidable = new MdSlidableItem
         {
             Width = 360,
@@ -683,9 +705,20 @@ public sealed class MdMotionLifecycleTests
         var dismissForeground = dismissible.GetVisualDescendants().OfType<Border>()
             .Single(control => control.Name == "PART_Foreground");
         var dismissTransform = Assert.IsType<TranslateTransform>(dismissForeground.RenderTransform);
+        var startBackground = Part<ContentPresenter>(dismissible, "PART_StartBackground");
+        var endBackground = Part<ContentPresenter>(dismissible, "PART_EndBackground");
+        var offsetRunner = PrivateField<MdSpatialSpringRunner>(dismissible, "_offsetRunner");
         Assert.True(dismissible.Dismiss());
         Assert.True(dismissRoot.IsVisible);
-        Assert.Single(dismissTransform.Transitions!);
+        Assert.Null(dismissTransform.Transitions);
+        Assert.True(offsetRunner.IsRunning);
+        Assert.Equal(360, offsetRunner.Target);
+        offsetRunner.Advance(TimeSpan.FromMilliseconds(16));
+        Assert.True(dismissTransform.X > 0);
+        Assert.Equal(1, dismissForeground.Opacity);
+        Assert.True(startBackground.IsVisible);
+        Assert.False(endBackground.IsVisible);
+        Assert.Equal("Dismiss", Assert.IsType<ContentPresenter>(dismissForeground.Child).Content);
         Assert.Single(dismissRoot.Transitions!);
         MdMotion.SetScheme(dismissible, MdMotionScheme.None);
         Dispatcher.UIThread.RunJobs();
@@ -705,6 +738,50 @@ public sealed class MdMotionLifecycleTests
         Assert.Single(startAction.Transitions!);
         MdMotion.SetScheme(slidable, MdMotionScheme.None);
         Assert.Null(startAction.Transitions);
+    }
+
+    [AvaloniaFact]
+    public void Dismissible_End_To_Start_Keeps_Action_Text_And_Foreground_Content_During_Settle()
+    {
+        var content = new TextBlock { Text = "Notification" };
+        var dismissible = new MdDismissible
+        {
+            Width = 360,
+            Content = content,
+            BackgroundContent = new TextBlock { Text = "Archive" },
+            SecondaryBackgroundContent = new TextBlock { Text = "Delete" }
+        };
+        using var scope = Show(dismissible, 480, 180);
+
+        var root = Part<Border>(dismissible, "PART_Root");
+        var foreground = Part<Border>(dismissible, "PART_Foreground");
+        var transform = Assert.IsType<TranslateTransform>(foreground.RenderTransform);
+        var startBackground = Part<ContentPresenter>(dismissible, "PART_StartBackground");
+        var endBackground = Part<ContentPresenter>(dismissible, "PART_EndBackground");
+        var runner = PrivateField<MdSpatialSpringRunner>(dismissible, "_offsetRunner");
+
+        Assert.True(dismissible.Dismiss(MdDismissDirection.EndToStart));
+        Assert.True(root.IsVisible); // Kept until travel and height-collapse motion finish.
+        Assert.Equal(-360, dismissible.DragOffset);
+        Assert.Equal(-360, runner.Target);
+        Assert.False(startBackground.IsVisible);
+        Assert.True(endBackground.IsVisible);
+        Assert.Equal("Delete", Assert.IsType<TextBlock>(endBackground.Content).Text);
+        Assert.Same(content, Assert.IsType<ContentPresenter>(foreground.Child).Content);
+        Assert.Equal(1, foreground.Opacity); // Translation, rather than an early fade, carries the text out.
+
+        runner.Advance(TimeSpan.FromMilliseconds(16));
+        Assert.True(transform.X < 0);
+
+        dismissible.Restore();
+        Assert.True(endBackground.IsVisible); // Do not clear the label while the foreground returns.
+        for (var frame = 0; frame < 120 && runner.IsRunning; frame++)
+            runner.Advance(TimeSpan.FromMilliseconds(16));
+        Assert.False(runner.IsRunning);
+        Assert.Equal(0, transform.X, 6);
+        Assert.False(startBackground.IsVisible);
+        Assert.False(endBackground.IsVisible);
+        Assert.Same(content, Assert.IsType<ContentPresenter>(foreground.Child).Content);
     }
 
     [AvaloniaFact]

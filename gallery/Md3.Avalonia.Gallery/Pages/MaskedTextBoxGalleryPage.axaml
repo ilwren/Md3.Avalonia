@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
+             x:Class="Md3.Avalonia.Gallery.Pages.MaskedTextBoxGalleryPage">
+  <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Spacing="28" Margin="0,0,12,24">
+      <StackPanel Spacing="8">
+        <TextBlock Classes="h1" Text="Masked text field" />
+        <TextBlock Classes="body" TextWrapping="Wrap"
+                   Text="A text field that constrains input to a mask: required digits, optional slots and literal characters." />
+      </StackPanel>
+
+      <StackPanel Spacing="10" MaxWidth="760" HorizontalAlignment="Stretch">
+        <TextBlock Classes="h2" Text="Filled" />
+        <md:MdMaskedTextBox x:Name="PhoneBox" Width="320" HorizontalAlignment="Left"
+                            Mask="(000) 000-0000" Label="Phone number"
+                            SupportingText="The mask fills literals as you type." />
+        <md:MdMaskedTextBox Width="320" HorizontalAlignment="Left"
+                            Mask="##/##/####" Label="Date of birth" Variant="Outlined"
+                            PromptChar="_" />
+      </StackPanel>
+
+      <StackPanel Spacing="10" MaxWidth="760" HorizontalAlignment="Stretch">
+        <TextBlock Classes="h2" Text="PIN code" />
+        <StackPanel Spacing="6">
+          <md:MdMaskedTextBox x:Name="PinBox" Width="320" HorizontalAlignment="Left"
+                              Mask="#####" Label="PIN" HidePromptOnLeave="True"
+                              PromptChar="•" TextChanged="PinTextChanged" />
+          <TextBlock x:Name="PinStatus" Classes="body" Text="Waiting for input." />
+        </StackPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="10" MaxWidth="760" HorizontalAlignment="Stretch">
+        <TextBlock Classes="h2" Text="Error state" />
+        <md:MdMaskedTextBox Width="320" HorizontalAlignment="Left"
+                            Mask="###-###" Label="Access code" IsError="True"
+                            ErrorText="This code has expired." />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Usage" />
+        <gallery:CodeExample XamlCode="&lt;md:MdMaskedTextBox Mask=&quot;(000) 000-0000&quot; Label=&quot;Phone number&quot; /&gt;&#10;&lt;md:MdMaskedTextBox Mask=&quot;####&quot; Label=&quot;PIN&quot; PromptChar=&quot;•&quot;&#10;                HidePromptOnLeave=&quot;True&quot; /&gt;" />
+      </StackPanel>
+    </StackPanel>
+  </md:MdScrollViewer>
+</UserControl>

@@ -9,7 +9,7 @@ public partial class AboutDialogGalleryPage : UserControl
     private readonly MdLicenseEntry[] _licenses;
     private static string L(string english, string chinese) => GalleryLocalization.Choose(english, chinese);
 
-    private MdDialogHost ActiveDialogHost => TopLevel.GetTopLevel(this) is MainWindow main ? main.DialogHost : LocalDialogHost;
+    private MdDialogHost ActiveDialogHost => GalleryDialogHosts.Find(this) ?? LocalDialogHost;
 
     public AboutDialogGalleryPage()
     {
@@ -52,11 +52,28 @@ public partial class AboutDialogGalleryPage : UserControl
 
     private void ShowLicenseList(object? sender, RoutedEventArgs e)
     {
-        var page = new MdLicensePage { Licenses = _licenses, FilterLabel = L("Filter packages", "筛选包"), Width = 760, Height = 440 };
+        var host = ActiveDialogHost;
+        var viewportWidth = host.Bounds.Width > 0
+            ? host.Bounds.Width
+            : TopLevel.GetTopLevel(this)?.ClientSize.Width ?? Bounds.Width;
+        // The two-pane desktop surface needs 820 DIP plus the host's outer margin. Narrow
+        // viewports use an actual full-screen dialog instead of retaining that desktop minimum.
+        var useFullScreen = viewportWidth <= 0 || viewportWidth < 900;
+        var page = new MdLicensePage
+        {
+            Licenses = _licenses,
+            FilterLabel = L("Filter packages", "筛选包")
+        };
+        if (!useFullScreen)
+        {
+            page.Width = 760;
+            page.Height = 440;
+        }
+
         var back = new MdButton { Content = L("Back to about", "返回关于"), Variant = MdButtonVariant.Text, Size = MdButtonSize.ExtraSmall };
         back.Click += BackToAboutDialog;
         var close = new MdButton { Content = L("Close", "关闭"), Variant = MdButtonVariant.Text, Size = MdButtonSize.ExtraSmall };
-        close.Click += (_, _) => ActiveDialogHost.Close();
+        close.Click += (_, _) => host.Close();
         var actions = new StackPanel { Orientation = global::Avalonia.Layout.Orientation.Horizontal, Spacing = 8 };
         actions.Children.Add(back);
         actions.Children.Add(close);
@@ -65,10 +82,15 @@ public partial class AboutDialogGalleryPage : UserControl
             Headline = L("Open source licenses", "开源许可证"),
             Content = page,
             Actions = actions,
-            MinWidth = 820,
-            MaxWidth = 900
+            Variant = useFullScreen ? MdDialogVariant.FullScreen : MdDialogVariant.Basic
         };
-        _ = ActiveDialogHost.ReplaceAsync(dialog);
+        if (!useFullScreen)
+        {
+            dialog.MinWidth = 820;
+            dialog.MaxWidth = 900;
+        }
+
+        _ = host.ReplaceAsync(dialog);
         LicenseStatus.Text = L("License dialog opened; select a package or return to About.", "许可证对话框已打开；请选择包或返回“关于”。");
     }
 }

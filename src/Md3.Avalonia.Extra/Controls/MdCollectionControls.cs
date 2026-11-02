@@ -14,39 +14,87 @@ using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Extra.Controls;
 
-/// <summary>A start/end swipe-action container with RTL-aware thresholds and keyboard alternatives.</summary>
-[PseudoClasses(":dragging", ":start-open", ":end-open", ":reduced-motion", ":no-motion")]
+/// <summary>Motion applied to the action pane while a slidable item is revealed.</summary>
+public enum MdSlidableActionPaneMotion
+{
+    /// <summary>Actions stay fixed behind the moving foreground.</summary>
+    Behind,
+    /// <summary>Actions grow into place from the outside edge.</summary>
+    Stretch,
+    /// <summary>Actions travel with the foreground from outside the row.</summary>
+    Scroll,
+    /// <summary>Actions enter part-way from the outside edge, like a drawer.</summary>
+    Drawer
+}
+
+/// <summary>A start/end swipe-action container with RTL-aware panes, velocity settling, and keyboard alternatives.</summary>
+[PseudoClasses(":dragging", ":start-open", ":end-open", ":rtl", ":has-start-actions", ":has-end-actions",
+    ":start-action-over", ":end-action-over", ":start-action-pressed", ":end-action-pressed", ":reduced-motion", ":no-motion")]
 public sealed class MdSlidableItem : ContentControl
 {
     public static readonly StyledProperty<object?> StartActionsProperty = AvaloniaProperty.Register<MdSlidableItem, object?>(nameof(StartActions));
     public static readonly StyledProperty<object?> EndActionsProperty = AvaloniaProperty.Register<MdSlidableItem, object?>(nameof(EndActions));
-    public static readonly StyledProperty<double> OpenThresholdProperty = AvaloniaProperty.Register<MdSlidableItem, double>(nameof(OpenThreshold), 0.28);
+    public static readonly StyledProperty<double> OpenThresholdProperty = AvaloniaProperty.Register<MdSlidableItem, double>(nameof(OpenThreshold), 0.5);
     public static readonly StyledProperty<double> ActionExtentProperty = AvaloniaProperty.Register<MdSlidableItem, double>(nameof(ActionExtent), 144);
     public static readonly StyledProperty<double> DismissThresholdProperty = AvaloniaProperty.Register<MdSlidableItem, double>(nameof(DismissThreshold), 1.25);
     public static readonly StyledProperty<bool> CloseOnActionProperty = AvaloniaProperty.Register<MdSlidableItem, bool>(nameof(CloseOnAction), true);
+    public static readonly StyledProperty<bool> IsSwipeEnabledProperty = AvaloniaProperty.Register<MdSlidableItem, bool>(nameof(IsSwipeEnabled), true);
     public static readonly StyledProperty<bool> IsOpenProperty = AvaloniaProperty.Register<MdSlidableItem, bool>(nameof(IsOpen), false, defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
+    public static readonly StyledProperty<string?> GroupNameProperty = AvaloniaProperty.Register<MdSlidableItem, string?>(nameof(GroupName));
+    public static readonly StyledProperty<MdSlidableActionPaneMotion> ActionPaneMotionProperty =
+        AvaloniaProperty.Register<MdSlidableItem, MdSlidableActionPaneMotion>(nameof(ActionPaneMotion), MdSlidableActionPaneMotion.Behind);
     public static readonly StyledProperty<ICommand?> StartActionCommandProperty = AvaloniaProperty.Register<MdSlidableItem, ICommand?>(nameof(StartActionCommand));
     public static readonly StyledProperty<ICommand?> EndActionCommandProperty = AvaloniaProperty.Register<MdSlidableItem, ICommand?>(nameof(EndActionCommand));
     public static readonly DirectProperty<MdSlidableItem, double> OffsetProperty = AvaloniaProperty.RegisterDirect<MdSlidableItem, double>(nameof(Offset), item => item.Offset);
+    public static readonly DirectProperty<MdSlidableItem, double> VisualOffsetProperty = AvaloniaProperty.RegisterDirect<MdSlidableItem, double>(nameof(VisualOffset), item => item.VisualOffset);
     public static readonly DirectProperty<MdSlidableItem, double> RevealProgressProperty = AvaloniaProperty.RegisterDirect<MdSlidableItem, double>(nameof(RevealProgress), item => item.RevealProgress);
+    public static readonly DirectProperty<MdSlidableItem, double> ActionOpacityProperty = AvaloniaProperty.RegisterDirect<MdSlidableItem, double>(nameof(ActionOpacity), item => item.ActionOpacity);
+    public static readonly DirectProperty<MdSlidableItem, double> ActionScaleProperty = AvaloniaProperty.RegisterDirect<MdSlidableItem, double>(nameof(ActionScale), item => item.ActionScale);
+    public static readonly DirectProperty<MdSlidableItem, double> StartActionOffsetProperty = AvaloniaProperty.RegisterDirect<MdSlidableItem, double>(nameof(StartActionOffset), item => item.StartActionOffset);
+    public static readonly DirectProperty<MdSlidableItem, double> EndActionOffsetProperty = AvaloniaProperty.RegisterDirect<MdSlidableItem, double>(nameof(EndActionOffset), item => item.EndActionOffset);
+
+    private static readonly Dictionary<string, WeakReference<MdSlidableItem>> OpenGroups = new(StringComparer.Ordinal);
 
     private Point _start;
     private double _startOffset;
     private double _offset;
+    private double _visualOffset;
     private double _revealProgress;
+    private double _actionOpacity = 1;
+    private double _actionScale = 1;
+    private double _startActionOffset;
+    private double _endActionOffset;
+    private bool _tracking;
     private bool _dragging;
     private Border? _foreground;
     private TranslateTransform? _foregroundTransform;
     private Control? _startActionPresenter;
     private Control? _endActionPresenter;
+    private TranslateTransform? _startActionTransform;
+    private TranslateTransform? _endActionTransform;
+    private ScaleTransform? _startActionScale;
+    private ScaleTransform? _endActionScale;
     private double _lastPointerX;
     private ulong _lastPointerTimestamp;
     private double _horizontalVelocity;
     private bool _updatingOpenState;
+    private ActionSide _pressedAction;
+    private ActionSide _hoveredAction;
+
+    private enum ActionSide { None, Start, End }
 
     static MdSlidableItem()
     {
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdSlidableItem>((item, _) => item.UpdateMotion());
+        FlowDirectionProperty.Changed.AddClassHandler<MdSlidableItem>((item, _) => item.UpdateVisualState());
+        ActionPaneMotionProperty.Changed.AddClassHandler<MdSlidableItem>((item, _) => item.UpdateVisualState());
+        ActionExtentProperty.Changed.AddClassHandler<MdSlidableItem>((item, _) =>
+        {
+            if (item.Offset != 0) item.SetOffset(Math.Sign(item.Offset) * Math.Max(0, item.ActionExtent));
+            else item.UpdateVisualState();
+        });
+        StartActionsProperty.Changed.AddClassHandler<MdSlidableItem>((item, _) => item.UpdateAvailability());
+        EndActionsProperty.Changed.AddClassHandler<MdSlidableItem>((item, _) => item.UpdateAvailability());
         IsOpenProperty.Changed.AddClassHandler<MdSlidableItem>((item, change) =>
         {
             if (item._updatingOpenState) return;
@@ -55,33 +103,95 @@ public sealed class MdSlidableItem : ContentControl
         });
     }
 
+    public MdSlidableItem()
+    {
+        UpdateAvailability();
+        UpdateVisualState();
+    }
+
     public object? StartActions { get => GetValue(StartActionsProperty); set => SetValue(StartActionsProperty, value); }
     public object? EndActions { get => GetValue(EndActionsProperty); set => SetValue(EndActionsProperty, value); }
+    /// <summary>Fraction of the action-pane extent required to settle open.</summary>
     public double OpenThreshold { get => GetValue(OpenThresholdProperty); set => SetValue(OpenThresholdProperty, value); }
     public double ActionExtent { get => GetValue(ActionExtentProperty); set => SetValue(ActionExtentProperty, value); }
     public double DismissThreshold { get => GetValue(DismissThresholdProperty); set => SetValue(DismissThresholdProperty, value); }
     public bool CloseOnAction { get => GetValue(CloseOnActionProperty); set => SetValue(CloseOnActionProperty, value); }
+    public bool IsSwipeEnabled { get => GetValue(IsSwipeEnabledProperty); set => SetValue(IsSwipeEnabledProperty, value); }
     public bool IsOpen { get => GetValue(IsOpenProperty); set => SetValue(IsOpenProperty, value); }
+    /// <summary>Optional group whose previously open item closes when this item opens.</summary>
+    public string? GroupName { get => GetValue(GroupNameProperty); set => SetValue(GroupNameProperty, value); }
+    public MdSlidableActionPaneMotion ActionPaneMotion { get => GetValue(ActionPaneMotionProperty); set => SetValue(ActionPaneMotionProperty, value); }
     public ICommand? StartActionCommand { get => GetValue(StartActionCommandProperty); set => SetValue(StartActionCommandProperty, value); }
     public ICommand? EndActionCommand { get => GetValue(EndActionCommandProperty); set => SetValue(EndActionCommandProperty, value); }
+    /// <summary>Logical offset: positive reveals start and negative reveals end, independent of RTL.</summary>
     public double Offset => _offset;
+    /// <summary>Physical foreground translation used by the template.</summary>
+    public double VisualOffset => _visualOffset;
     public double RevealProgress => _revealProgress;
+    public double ActionOpacity => _actionOpacity;
+    public double ActionScale => _actionScale;
+    public double StartActionOffset => _startActionOffset;
+    public double EndActionOffset => _endActionOffset;
     public bool IsStartOpen => Offset > 0;
     public bool IsEndOpen => Offset < 0;
 
     public event EventHandler? Opened;
     public event EventHandler? Closed;
-    public void OpenStart() { UpdateMotion(); SetOffset(Math.Max(0, ActionExtent)); SetOpenState(true); }
-    public void OpenEnd() { UpdateMotion(); SetOffset(-Math.Max(0, ActionExtent)); SetOpenState(true); }
-    public void Close() { UpdateMotion(); SetOffset(0); SetOpenState(false); Closed?.Invoke(this, EventArgs.Empty); }
+
+    public void OpenStart() => Open(1);
+    public void OpenEnd() => Open(-1);
+
+    public void Close()
+    {
+        var wasOpen = Offset != 0 || IsOpen;
+        UpdateMotion();
+        SetOffset(0);
+        SetOpenState(false);
+        SetHoveredAction(ActionSide.None);
+        SetActionInteraction(ActionSide.None, pressed: true);
+        if (!string.IsNullOrWhiteSpace(GroupName) && OpenGroups.TryGetValue(GroupName, out var registered) &&
+            registered.TryGetTarget(out var current) && ReferenceEquals(current, this))
+            OpenGroups.Remove(GroupName);
+        if (wasOpen) Closed?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void InvokeStart()
+    {
+        if (StartActionCommand?.CanExecute(DataContext) == true) StartActionCommand.Execute(DataContext);
+        if (CloseOnAction) Close(); else OpenStart();
+    }
+
+    public void InvokeEnd()
+    {
+        if (EndActionCommand?.CanExecute(DataContext) == true) EndActionCommand.Execute(DataContext);
+        if (CloseOnAction) Close(); else OpenEnd();
+    }
+
+    private void Open(int side)
+    {
+        var wasOpenOnSide = IsOpen && Math.Sign(Offset) == side;
+        CloseGroupPeer();
+        UpdateMotion();
+        SetOffset(side * Math.Max(0, ActionExtent));
+        SetOpenState(true);
+        if (!wasOpenOnSide) Opened?.Invoke(this, EventArgs.Empty);
+    }
+
     private void SetOpenState(bool value)
     {
         _updatingOpenState = true;
         try { SetCurrentValue(IsOpenProperty, value); }
         finally { _updatingOpenState = false; }
     }
-    public void InvokeStart() { if (StartActionCommand?.CanExecute(DataContext) == true) StartActionCommand.Execute(DataContext); if (CloseOnAction) Close(); }
-    public void InvokeEnd() { if (EndActionCommand?.CanExecute(DataContext) == true) EndActionCommand.Execute(DataContext); if (CloseOnAction) Close(); }
+
+    private void CloseGroupPeer()
+    {
+        if (string.IsNullOrWhiteSpace(GroupName)) return;
+        if (OpenGroups.TryGetValue(GroupName, out var reference) &&
+            reference.TryGetTarget(out var peer) && !ReferenceEquals(peer, this))
+            peer.Close();
+        OpenGroups[GroupName] = new WeakReference<MdSlidableItem>(this);
+    }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
@@ -90,35 +200,79 @@ public sealed class MdSlidableItem : ContentControl
         _foregroundTransform = _foreground?.RenderTransform as TranslateTransform;
         _startActionPresenter = e.NameScope.Find<Control>("PART_StartActions");
         _endActionPresenter = e.NameScope.Find<Control>("PART_EndActions");
+        (_startActionScale, _startActionTransform) = FindActionTransforms(_startActionPresenter);
+        (_endActionScale, _endActionTransform) = FindActionTransforms(_endActionPresenter);
+        UpdateVisualState();
         UpdateMotion();
+    }
+
+    private static (ScaleTransform? Scale, TranslateTransform? Translate) FindActionTransforms(Control? presenter)
+    {
+        if (presenter?.RenderTransform is not TransformGroup group) return (null, null);
+        return (group.Children.OfType<ScaleTransform>().FirstOrDefault(),
+            group.Children.OfType<TranslateTransform>().FirstOrDefault());
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
-        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
-        _start = e.GetPosition(this); _startOffset = Offset; _dragging = true;
-        _lastPointerX = _start.X; _lastPointerTimestamp = e.Timestamp; _horizontalVelocity = 0;
-        if (_foregroundTransform is not null) _foregroundTransform.Transitions = null;
-        if (_startActionPresenter is not null) _startActionPresenter.Transitions = null;
-        if (_endActionPresenter is not null) _endActionPresenter.Transitions = null;
-        PseudoClasses.Set(":dragging", true);
+        if (!IsSwipeEnabled || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
+        _start = e.GetPosition(this);
+        _startOffset = Offset;
+        _tracking = true;
+        _dragging = false;
+        _pressedAction = GetActionSide(_start);
+        SetActionInteraction(_pressedAction, pressed: true);
+        _lastPointerX = _start.X;
+        _lastPointerTimestamp = e.Timestamp;
+        _horizontalVelocity = 0;
     }
+
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
-        if (!_dragging) return;
         var position = e.GetPosition(this);
-        var delta = position.X - _start.X;
+        if (!_tracking)
+        {
+            SetHoveredAction(GetActionSide(position));
+            return;
+        }
+
+        var physicalX = position.X - _start.X;
+        var physicalY = position.Y - _start.Y;
+        if (!_dragging)
+        {
+            if (Math.Abs(physicalX) < 6 && Math.Abs(physicalY) < 6) return;
+            if (Math.Abs(physicalY) > Math.Abs(physicalX))
+            {
+                CancelTracking();
+                return;
+            }
+
+            _dragging = true;
+            _pressedAction = ActionSide.None;
+            SetActionInteraction(ActionSide.None, pressed: true);
+            PseudoClasses.Set(":dragging", true);
+            if (_foregroundTransform is not null) _foregroundTransform.Transitions = null;
+            if (_startActionPresenter is not null) _startActionPresenter.Transitions = null;
+            if (_endActionPresenter is not null) _endActionPresenter.Transitions = null;
+            foreach (var transform in new Transform?[] { _startActionTransform, _endActionTransform, _startActionScale, _endActionScale })
+                if (transform is not null) transform.Transitions = null;
+            e.Pointer.Capture(this);
+        }
+
+        var logicalDelta = IsRightToLeft ? -physicalX : physicalX;
         var movement = position.X - _lastPointerX;
-        if (FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft) { delta = -delta; movement = -movement; }
-        if (Math.Abs(delta) < 4) return;
+        if (IsRightToLeft) movement = -movement;
         var elapsed = e.Timestamp > _lastPointerTimestamp ? e.Timestamp - _lastPointerTimestamp : 1;
-        _horizontalVelocity = movement / (double)elapsed;
-        _lastPointerX = position.X; _lastPointerTimestamp = e.Timestamp;
-        e.Pointer.Capture(this);
+        _horizontalVelocity = movement / elapsed;
+        _lastPointerX = position.X;
+        _lastPointerTimestamp = e.Timestamp;
+
         var maxExtent = Math.Max(0, ActionExtent);
-        var targetOffset = _startOffset + delta;
+        var targetOffset = _startOffset + logicalDelta;
+        if (targetOffset > 0 && StartActions is null) targetOffset = 0;
+        if (targetOffset < 0 && EndActions is null) targetOffset = 0;
         if (targetOffset > maxExtent)
             targetOffset = maxExtent + (targetOffset - maxExtent) * 0.35;
         else if (targetOffset < -maxExtent)
@@ -126,27 +280,69 @@ public sealed class MdSlidableItem : ContentControl
         SetOffset(targetOffset);
         e.Handled = true;
     }
+
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
-        if (!_dragging) return;
-        FinishDrag();
-        e.Pointer.Capture(null); e.Handled = true;
+        if (!_tracking) return;
+        if (_dragging)
+        {
+            FinishDrag();
+            e.Pointer.Capture(null);
+            e.Handled = true;
+            return;
+        }
+
+        var action = _pressedAction;
+        CancelTracking();
+        if (action == ActionSide.Start && StartActionCommand is not null)
+        {
+            InvokeStart();
+            e.Handled = true;
+        }
+        else if (action == ActionSide.End && EndActionCommand is not null)
+        {
+            InvokeEnd();
+            e.Handled = true;
+        }
+        else if (action == ActionSide.None && Offset != 0)
+        {
+            Close();
+            e.Handled = true;
+        }
     }
 
     protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
     {
         base.OnPointerCaptureLost(e);
         if (_dragging) FinishDrag();
+        else CancelTracking();
     }
+
+    protected override void OnPointerExited(PointerEventArgs e)
+    {
+        base.OnPointerExited(e);
+        if (!_tracking) SetHoveredAction(ActionSide.None);
+    }
+
+    private void CancelTracking()
+    {
+        _tracking = false;
+        _dragging = false;
+        _pressedAction = ActionSide.None;
+        SetActionInteraction(ActionSide.None, pressed: true);
+    }
+
     private void FinishDrag()
     {
+        _tracking = false;
         _dragging = false;
+        _pressedAction = ActionSide.None;
+        SetActionInteraction(ActionSide.None, pressed: true);
         PseudoClasses.Set(":dragging", false);
         UpdateMotion();
         var maxExtent = Math.Max(0, ActionExtent);
-        var threshold = Math.Max(1, Bounds.Width) * Math.Clamp(OpenThreshold, 0.05, 0.9);
-        var fling = Math.Abs(_horizontalVelocity) >= 0.5 && Math.Sign(_horizontalVelocity) == Math.Sign(Offset);
+        var threshold = maxExtent * Math.Clamp(OpenThreshold, 0.05, 0.95);
 
         if (Offset >= maxExtent * Math.Max(1, DismissThreshold) && StartActionCommand is not null)
         {
@@ -159,26 +355,99 @@ public sealed class MdSlidableItem : ContentControl
             return;
         }
 
-        if (Offset >= threshold || (fling && Offset > 0)) OpenStart();
-        else if (Offset <= -threshold || (fling && Offset < 0)) OpenEnd();
+        if (Math.Abs(_horizontalVelocity) >= 0.5 && Offset != 0)
+        {
+            if (Math.Sign(_horizontalVelocity) != Math.Sign(Offset)) Close();
+            else if (Offset > 0) OpenStart();
+            else OpenEnd();
+        }
+        else if (Offset >= threshold) OpenStart();
+        else if (Offset <= -threshold) OpenEnd();
         else Close();
-        if (Offset != 0) Opened?.Invoke(this, EventArgs.Empty);
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
-        if (e.KeyModifiers.HasFlag(KeyModifiers.Control) && e.Key == Key.Left) { OpenStart(); e.Handled = true; }
-        else if (e.KeyModifiers.HasFlag(KeyModifiers.Control) && e.Key == Key.Right) { OpenEnd(); e.Handled = true; }
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Control) && e.Key == Key.Left)
+        {
+            if (IsRightToLeft) OpenEnd(); else OpenStart();
+            e.Handled = true;
+        }
+        else if (e.KeyModifiers.HasFlag(KeyModifiers.Control) && e.Key == Key.Right)
+        {
+            if (IsRightToLeft) OpenStart(); else OpenEnd();
+            e.Handled = true;
+        }
         else if (e.Key == Key.Escape && Offset != 0) { Close(); e.Handled = true; }
         else base.OnKeyDown(e);
     }
+
+    private bool IsRightToLeft => FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft;
+
+    private ActionSide GetActionSide(Point position)
+    {
+        if (Offset == 0) return ActionSide.None;
+        var extent = Math.Min(Math.Abs(VisualOffset), Bounds.Width);
+        var inExposedPane = VisualOffset > 0 ? position.X <= extent : position.X >= Bounds.Width - extent;
+        if (!inExposedPane) return ActionSide.None;
+        return Offset > 0 ? ActionSide.Start : ActionSide.End;
+    }
+
+    private void SetHoveredAction(ActionSide side)
+    {
+        if (_hoveredAction == side) return;
+        _hoveredAction = side;
+        PseudoClasses.Set(":start-action-over", side == ActionSide.Start);
+        PseudoClasses.Set(":end-action-over", side == ActionSide.End);
+    }
+
+    private void SetActionInteraction(ActionSide side, bool pressed)
+    {
+        if (pressed)
+        {
+            PseudoClasses.Set(":start-action-pressed", side == ActionSide.Start);
+            PseudoClasses.Set(":end-action-pressed", side == ActionSide.End);
+        }
+    }
+
     private void SetOffset(double value)
     {
         SetAndRaise(OffsetProperty, ref _offset, value);
-        var progress = Math.Clamp(Math.Abs(value) / Math.Max(1, ActionExtent), 0, 1);
-        SetAndRaise(RevealProgressProperty, ref _revealProgress, progress);
+        UpdateVisualState();
         PseudoClasses.Set(":start-open", value > 0.5);
         PseudoClasses.Set(":end-open", value < -0.5);
+    }
+
+    private void UpdateVisualState()
+    {
+        var progress = Math.Clamp(Math.Abs(Offset) / Math.Max(1, ActionExtent), 0, 1);
+        SetAndRaise(RevealProgressProperty, ref _revealProgress, progress);
+        var physical = IsRightToLeft ? -Offset : Offset;
+        SetAndRaise(VisualOffsetProperty, ref _visualOffset, physical);
+
+        var travel = ActionPaneMotion switch
+        {
+            MdSlidableActionPaneMotion.Behind => 0,
+            MdSlidableActionPaneMotion.Stretch => ActionExtent * (1 - progress) * 0.5,
+            MdSlidableActionPaneMotion.Scroll => ActionExtent * (1 - progress),
+            MdSlidableActionPaneMotion.Drawer => ActionExtent * (1 - progress) * 0.55,
+            _ => 0
+        };
+        var scale = ActionPaneMotion == MdSlidableActionPaneMotion.Stretch ? 0.72 + 0.28 * progress :
+                    ActionPaneMotion == MdSlidableActionPaneMotion.Drawer ? 0.9 + 0.1 * progress : 1;
+        var opacity = ActionPaneMotion == MdSlidableActionPaneMotion.Behind ? 1 : 0.6 + 0.4 * progress;
+        var physicalStartDirection = IsRightToLeft ? 1 : -1;
+        SetAndRaise(ActionScaleProperty, ref _actionScale, scale);
+        SetAndRaise(ActionOpacityProperty, ref _actionOpacity, opacity);
+        SetAndRaise(StartActionOffsetProperty, ref _startActionOffset, physicalStartDirection * travel);
+        SetAndRaise(EndActionOffsetProperty, ref _endActionOffset, -physicalStartDirection * travel);
+        PseudoClasses.Set(":rtl", IsRightToLeft);
+    }
+
+    private void UpdateAvailability()
+    {
+        PseudoClasses.Set(":has-start-actions", StartActions is not null);
+        PseudoClasses.Set(":has-end-actions", EndActions is not null);
     }
 
     private void UpdateMotion()
@@ -203,6 +472,19 @@ public sealed class MdSlidableItem : ContentControl
                         MdMotionTransitions.CreateDouble(this, OpacityProperty, MdMotionKind.Effects, MdMotionSpeed.Fast),
                         MdMotionTransitions.CreateTransform(this, RenderTransformProperty, MdMotionSpeed.Fast));
             }
+        }
+        foreach (var transform in new[] { _startActionTransform, _endActionTransform })
+        {
+            if (transform is not null)
+                transform.Transitions = _dragging ? null : MdMotionTransitions.Collect(
+                    MdMotionTransitions.CreateDouble(this, TranslateTransform.XProperty, MdMotionKind.Spatial, MdMotionSpeed.Fast));
+        }
+        foreach (var scale in new[] { _startActionScale, _endActionScale })
+        {
+            if (scale is not null)
+                scale.Transitions = _dragging ? null : MdMotionTransitions.Collect(
+                    MdMotionTransitions.CreateDouble(this, ScaleTransform.ScaleXProperty, MdMotionKind.Spatial, MdMotionSpeed.Fast),
+                    MdMotionTransitions.CreateDouble(this, ScaleTransform.ScaleYProperty, MdMotionKind.Spatial, MdMotionSpeed.Fast));
         }
     }
 }

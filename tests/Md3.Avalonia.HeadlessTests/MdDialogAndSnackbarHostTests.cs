@@ -117,6 +117,77 @@ public sealed class MdDialogAndSnackbarHostTests
     }
 
     [AvaloniaFact]
+    public void Gallery_Simple_Dialog_Scrim_Covers_The_Whole_Android_Shell()
+    {
+        var shell = new AndroidGalleryView();
+        var window = new Window { Width = 360, Height = 640, Content = shell };
+        MdMotion.SetScheme(shell, MdMotionScheme.None);
+        window.Show();
+        try
+        {
+            Assert.True(shell.NavigateToPage("Simple dialog"));
+            Dispatcher.UIThread.RunJobs();
+            var open = shell.GetVisualDescendants().OfType<MdButton>()
+                .Single(button => Equals(button.Content?.ToString(), "Choose account"));
+            open.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+
+            var host = shell.DialogHost;
+            Assert.True(host.IsOpen);
+            Assert.IsType<MdSimpleDialog>(host.Dialog);
+            Assert.Equal(shell.Bounds.Width, host.Bounds.Width, 1);
+            Assert.Equal(shell.Bounds.Height, host.Bounds.Height, 1);
+            var origin = host.TranslatePoint(default, shell);
+            Assert.NotNull(origin);
+            Assert.Equal(0, origin!.Value.X, 1);
+            Assert.Equal(0, origin.Value.Y, 1);
+
+            var overlay = host.GetVisualDescendants().OfType<Grid>()
+                .Single(grid => grid.Name == "PART_Overlay" &&
+                                grid.Children.Any(child => child.Name == "PART_DialogPresenter"));
+            var scrim = overlay.Children.OfType<Border>().Single(border => border.Name == "PART_Scrim");
+            Assert.Equal(shell.Bounds.Width, scrim.Bounds.Width, 1);
+            Assert.Equal(shell.Bounds.Height, scrim.Bounds.Height, 1);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Gallery_License_Dialog_Uses_A_Compact_Full_Screen_Android_Layout()
+    {
+        var shell = new AndroidGalleryView();
+        var window = new Window { Width = 360, Height = 640, Content = shell };
+        MdMotion.SetScheme(shell, MdMotionScheme.None);
+        window.Show();
+        try
+        {
+            Assert.True(shell.NavigateToPage("About and licenses"));
+            Dispatcher.UIThread.RunJobs();
+            shell.GetVisualDescendants().OfType<MdButton>()
+                .Single(button => Equals(button.Content?.ToString(), "About this app"))
+                .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+            shell.DialogHost.GetVisualDescendants().OfType<MdButton>()
+                .Single(button => Equals(button.Content?.ToString(), "View licenses"))
+                .RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+
+            var dialog = Assert.IsType<MdDialog>(shell.DialogHost.Dialog);
+            var page = Assert.IsType<MdLicensePage>(dialog.Content);
+            Assert.Equal(MdDialogVariant.FullScreen, dialog.Variant);
+            Assert.InRange(dialog.Bounds.Width, 1, shell.DialogHost.Bounds.Width);
+            Assert.InRange(dialog.Bounds.Height, 1, shell.DialogHost.Bounds.Height);
+            Assert.InRange(page.Bounds.Width, 1, dialog.Bounds.Width);
+            Assert.InRange(page.Bounds.Height, 1, dialog.Bounds.Height);
+
+            var compact = page.GetVisualDescendants().OfType<Grid>()
+                .Single(grid => grid.Name == "PART_CompactLayout");
+            Assert.True(compact.IsVisible);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
     public void DialogHost_SimpleDialog_Uses_One_Full_Screen_Scrim_And_Synchronizes_Close()
     {
         var dialog = new MdSimpleDialog

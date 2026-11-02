@@ -71,7 +71,7 @@
 
 ## 变更
 
-- 七个包（核心、Extra、Icons、Icons.Lite、DataGrid、RichEditor 与 Notifications）包含 `net8.0` 和 `net10.0` 资产；Notifications 还包含 Windows 专用 TFM。11 个第三方主题包以 `net10.0` 为目标。发行版本使用 Avalonia `12.1.2`，Gallery 仍仅以 .NET 10 构建。
+- 核心、Extra、Icons、Icons.Lite 与 DataGrid 五个包包含 `net8.0` 和 `net10.0` 资产；Notifications 还提供这两个目标及 Windows 专用 TFM。包括 RichEditor 在内的 12 个集成与主题包以 `net10.0` 为目标。发行版本使用 Avalonia `12.1.2`，Gallery 仍仅以 .NET 10 构建。
 - Extra 控件资源统一通过 `ExtraTheme` 暴露；移除旧 `EcosystemTheme` 名称，不提供兼容 shim。
 
 ## 修复

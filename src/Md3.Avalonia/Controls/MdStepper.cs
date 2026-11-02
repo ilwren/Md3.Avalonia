@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
@@ -11,6 +12,15 @@ using Avalonia.Threading;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A Flutter-style Material stepper with linear/non-linear navigation and command hooks.</summary>
+/// <remarks>
+/// <para>
+/// The default <see cref="Orientation"/> is vertical: every step renders its header and, when active,
+/// its body below the header. With <see cref="Orientation"/> set to <c>Orientation.Horizontal</c>
+/// the steps lay out as a header row (indicator above label, horizontal connectors between steps) and
+/// the active step's content moves into a shared body below the row, mirroring Flutter's
+/// <c>StepperType.horizontal</c>.
+/// </para>
+/// </remarks>
 [PseudoClasses(":vertical", ":horizontal", ":first-step", ":last-step")]
 public sealed class MdStepper : ItemsControl
 {
@@ -29,9 +39,16 @@ public sealed class MdStepper : ItemsControl
         AvaloniaProperty.Register<MdStepper, ICommand?>(nameof(ContinueCommand));
     public static readonly StyledProperty<ICommand?> CancelCommandProperty =
         AvaloniaProperty.Register<MdStepper, ICommand?>(nameof(CancelCommand));
+    public static readonly DirectProperty<MdStepper, object?> ActiveStepContentProperty =
+        AvaloniaProperty.RegisterDirect<MdStepper, object?>(nameof(ActiveStepContent), stepper => stepper.ActiveStepContent);
+    public static readonly DirectProperty<MdStepper, IDataTemplate?> ActiveStepContentTemplateProperty =
+        AvaloniaProperty.RegisterDirect<MdStepper, IDataTemplate?>(
+            nameof(ActiveStepContentTemplate), stepper => stepper.ActiveStepContentTemplate);
 
     private Button? _continueButton;
     private Button? _cancelButton;
+    private object? _activeStepContent;
+    private IDataTemplate? _activeStepContentTemplate;
 
     static MdStepper()
     {
@@ -41,7 +58,13 @@ public sealed class MdStepper : ItemsControl
             stepper.UpdateSteps();
             stepper.ActiveStepChanged?.Invoke(stepper, stepper.ActiveStep);
         });
-        OrientationProperty.Changed.AddClassHandler<MdStepper>((stepper, _) => stepper.UpdatePseudoClasses());
+        // A direction change re-styles every step (the horizontal header template is swapped in
+        // through each step's own pseudo class), so the steps must be refreshed as well.
+        OrientationProperty.Changed.AddClassHandler<MdStepper>((stepper, _) =>
+        {
+            stepper.UpdatePseudoClasses();
+            stepper.UpdateSteps();
+        });
     }
 
     public MdStepper()
@@ -57,6 +80,14 @@ public sealed class MdStepper : ItemsControl
     public object? CancelContent { get => GetValue(CancelContentProperty); set => SetValue(CancelContentProperty, value); }
     public ICommand? ContinueCommand { get => GetValue(ContinueCommandProperty); set => SetValue(ContinueCommandProperty, value); }
     public ICommand? CancelCommand { get => GetValue(CancelCommandProperty); set => SetValue(CancelCommandProperty, value); }
+
+    /// <summary>Gets the content of the active step, used by the horizontal layout's shared body.</summary>
+    // The getter must read the field, not GetValue: a getter-only DirectProperty whose CLR
+    // getter calls GetValue recurses through the property registry until the stack overflows.
+    public object? ActiveStepContent => _activeStepContent;
+
+    /// <summary>Gets the content template of the active step, used by the horizontal layout's shared body.</summary>
+    public IDataTemplate? ActiveStepContentTemplate => _activeStepContentTemplate;
 
     public event EventHandler<int>? ContinueRequested;
     public event EventHandler<int>? CancelRequested;
@@ -112,7 +143,23 @@ public sealed class MdStepper : ItemsControl
             .Distinct()
             .ToArray();
         for (var index = 0; index < steps.Length; index++)
-            steps[index].SetStepState(index + 1, index == ActiveStep);
+        {
+            // Per-step position drives the connector visibility (the last step never draws a
+            // trailing connector) and, together with the direction, the header template.
+            steps[index].SetStepState(
+                index + 1,
+                index == ActiveStep,
+                index == 0,
+                index == steps.Length - 1,
+                Orientation == Orientation.Horizontal);
+        }
+
+        // The horizontal layout renders the active step's content in a shared body below the
+        // header row, so the template needs the active item's content as a property.
+        var active = steps.Length > 0 ? steps[Math.Clamp(ActiveStep, 0, steps.Length - 1)] : null;
+        SetAndRaise(ActiveStepContentProperty, ref _activeStepContent, active?.Content);
+        SetAndRaise(ActiveStepContentTemplateProperty, ref _activeStepContentTemplate, active?.ContentTemplate);
+
         UpdatePseudoClasses();
     }
 

@@ -7,6 +7,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Layout;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -134,6 +135,40 @@ public sealed class MdParityHardeningTests
         Assert.Equal(MdTimelineItemState.Error, presenters[2].EffectiveState);
         Assert.False(presenters[0].GetVisualDescendants().OfType<Border>().Single(border => border.Name == "PART_VBefore").IsVisible);
         Assert.False(presenters[2].GetVisualDescendants().OfType<Border>().Single(border => border.Name == "PART_VAfter").IsVisible);
+        Assert.NotNull(host.Window.CaptureRenderedFrame());
+    }
+
+    [AvaloniaFact]
+    public void Timeline_Horizontal_Axis_And_Active_Progress_Ring_Are_Real_Template_States()
+    {
+        var timeline = new MdTimeline
+        {
+            Orientation = Orientation.Horizontal,
+            ItemsSource = new[]
+            {
+                new MdTimelineItem("Done", State: MdTimelineItemState.Completed),
+                new MdTimelineItem("Running", State: MdTimelineItemState.Active),
+                new MdTimelineItem("Opt out", State: MdTimelineItemState.Active,
+                    IndicatorEffect: MdTimelineIndicatorEffect.None)
+            }
+        };
+        using var host = Show(timeline, 760, 220);
+        Dispatcher.UIThread.RunJobs();
+        var presenters = timeline.GetVisualDescendants().OfType<MdTimelineItemPresenter>().ToArray();
+
+        Assert.Equal(3, presenters.Length);
+        Assert.All(presenters, presenter => Assert.Contains(":horizontal", presenter.Classes));
+        Assert.True(presenters[1].HasProgressRing);
+        Assert.False(presenters[2].HasProgressRing);
+        var ring = presenters[1].GetVisualDescendants().OfType<MdCircularProgressIndicator>()
+            .Single(indicator => indicator.Name == "PART_HProgress");
+        Assert.True(ring.IsVisible);
+        Assert.True(ring.IsIndeterminate);
+        Assert.False(presenters[0].GetVisualDescendants().OfType<Border>()
+            .Single(border => border.Name == "PART_HBefore").IsVisible);
+        Assert.False(presenters[2].GetVisualDescendants().OfType<Border>()
+            .Single(border => border.Name == "PART_HAfter").IsVisible);
+        Assert.True(presenters[0].Bounds.Width >= 196);
         Assert.NotNull(host.Window.CaptureRenderedFrame());
     }
 
