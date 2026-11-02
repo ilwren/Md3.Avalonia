@@ -33,6 +33,12 @@
                              NavigationFailed="NavigationFailed" />
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdFileSystemPicker"
+                        Members="Mode, BreadcrumbStyle, InitialDirectory, CurrentDirectory, FilePatterns, PathSegments, SelectedPaths, NavigateAsync(), SelectionConfirmed, NavigationFailed">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="NavigateAsync() walks real directories through System.IO - no StorageProvider and no native dialog - and PathSegments is the breadcrumb it draws. Mode=Folder lists directories only, FilePatterns filters files in File mode, and SelectionConfirmed reports the absolute paths the user chose." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdFileSystemPicker Mode=&quot;File&quot;&#10;                           BreadcrumbStyle=&quot;Powerline&quot;&#10;                           Title=&quot;Choose an asset&quot;&#10;                           InitialDirectory=&quot;{Binding WorkspacePath}&quot;&#10;                           FilePatterns=&quot;{Binding AllowedPatterns}&quot;&#10;                           SelectionConfirmed=&quot;FilesConfirmed&quot; /&gt;"
                              CSharpCode="// Paths are normalized absolute file-system paths.&#10;picker.FilePatterns = new[] { &quot;*.json&quot;, &quot;*.txt&quot; };&#10;await picker.NavigateAsync(startPath);&#10;picker.SelectionConfirmed += (_, e) =&gt; Open(e.Paths[0]);" />

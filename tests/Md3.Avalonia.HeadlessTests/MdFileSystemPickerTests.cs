@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
@@ -226,8 +227,8 @@ public sealed class MdFileSystemPickerTests
         var breadcrumb = new MdBreadcrumb
         {
             Variant = MdBreadcrumbVariant.Powerline,
-            ItemsSource = new MdBreadcrumbPathConverter().Convert(
-                "Home/Settings/Security", typeof(IEnumerable<MdBreadcrumbItem>), null, CultureInfo.InvariantCulture)
+            ItemsSource = (IEnumerable<MdBreadcrumbItem>)new MdBreadcrumbPathConverter().Convert(
+                "Home/Settings/Security", typeof(IEnumerable<MdBreadcrumbItem>), null, CultureInfo.InvariantCulture)!
         };
         var reference = new Window { Width = 520, Height = 120, Content = breadcrumb };
         window.Show();

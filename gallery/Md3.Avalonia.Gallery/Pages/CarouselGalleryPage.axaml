@@ -145,6 +145,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdCarousel"
+                        Members="Variant, ItemWidth, ItemHeight, ItemSpacing, SmallItemWidth, IsAutoPlay, AutoPlayInterval, IsInfiniteLoop, PauseOnPointerOver, Controller">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Variant picks MultiBrowse, Hero or Uncontained, and the item metrics plus SmallItemWidth are what each variant scales. IsAutoPlay with AutoPlayInterval advances the strip, PauseOnPointerOver holds it while the pointer rests, and Controller drives it from code." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdCarousel ItemsSource=&quot;{Binding Destinations}&quot;&#10;               SelectedItem=&quot;{Binding SelectedDestination}&quot;&#10;               Variant=&quot;MultiBrowse&quot;&gt;&#10;  &lt;md:MdCarousel.ItemTemplate&gt;...&lt;/md:MdCarousel.ItemTemplate&gt;&#10;&lt;/md:MdCarousel&gt;" CSharpCode="var carousel = new MdCarousel&#10;{&#10;    ItemsSource = viewModel.Destinations,&#10;    SelectedItem = viewModel.SelectedDestination,&#10;    Variant = MdCarouselVariant.MultiBrowse&#10;};" />
       </StackPanel>
