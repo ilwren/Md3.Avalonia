@@ -2,6 +2,7 @@ using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -245,7 +246,11 @@ public sealed class MdInventoryTests
                 // keeps one control's template failure from being reported against its neighbours.
                 using var sample = MdVisualTreeQuery.Show(control, 420, 420);
 
-                if (control.Template is null || control.GetVisualRoot() is not Visual)
+                // A template that failed to load leaves Template null, and a control that never
+                // attached has no visual descendants at all; both mean "nothing to assert", which
+                // would otherwise be mistaken for a part that is simply missing.
+                if (control is not TemplatedControl { Template: not null } ||
+                    control.GetVisualDescendants().FirstOrDefault() is null)
                 {
                     failures.Add($"{name}: no template was applied (Template is null or the control never attached)");
                     continue;

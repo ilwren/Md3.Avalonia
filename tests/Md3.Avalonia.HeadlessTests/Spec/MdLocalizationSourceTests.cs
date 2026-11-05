@@ -77,7 +77,17 @@ public sealed class MdLocalizationSourceTests
     [Fact]
     public void Every_Culture_Can_Render_Every_English_Key_With_The_Same_Placeholders()
     {
-        var tables = Tables(File.ReadAllText(LocalizationFile())).ToDictionary(pair => pair.Culture, pair => pair.Table);
+        // Grouped rather than keyed: a source file may open a second table for the same culture
+        // (no shipped file does, but the parser is not the place to assume it), and collapsing
+        // those here is what keeps the comparison a comparison of cultures.
+        var tables = Tables(File.ReadAllText(LocalizationFile()))
+            .GroupBy(pair => pair.Culture, StringComparer.Ordinal)
+            .ToDictionary(
+                group => group.Key,
+                group => group.SelectMany(pair => pair.Table)
+                    .ToDictionary(entry => entry.Key, entry => entry.Value, StringComparer.Ordinal),
+                StringComparer.Ordinal);
+
         Assert.Contains("en", tables.Keys);
 
         var english = tables["en"];
@@ -156,7 +166,11 @@ public sealed class MdLocalizationSourceTests
         }
 
         var source = Tables(File.ReadAllText(LocalizationFile()))
-            .ToDictionary(pair => pair.Culture, pair => pair.Table);
+            .ToDictionary(
+                group => group.Key,
+                group => group.SelectMany(pair => pair.Table)
+                    .ToDictionary(entry => entry.Key, entry => entry.Value, StringComparer.Ordinal),
+                StringComparer.Ordinal);
 
         Assert.Equal(source.Count, actual.Count);
         foreach (var (culture, table) in source)
