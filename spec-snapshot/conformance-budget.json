@@ -111,9 +111,9 @@
     },
     "dual_declaration_mismatches": {
       "direction": "lower",
-      "budget": null,
+      "budget": 8,
       "source": "headless",
-      "why": "XAML token versus MdThemeManager assignment, compared at ShapeScale.Standard. Tracked without a ceiling until the first run measures it: a threshold invented before the measurement would be a guess, and guessing is what this repository's manifest explicitly refuses to do."
+      "why": "Keys declared both in Themes/Tokens and by MdThemeManager.Apply that resolve to different colours: five alpha-composited disabled brushes inherit the baseline on-surface #1D1B20 against the generator's #1C1B1E, and PrimaryAction/PrimarySelection use the baseline primary #6750A4 against the seed-derived #65558F. Both palettes are defensible, so the count is a ceiling to hold at 8; deciding which is authoritative is a design call, not a build failure."
     },
     "unresolved_declared_tokens": {
       "direction": "lower",
