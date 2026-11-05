@@ -7,6 +7,9 @@
 TestResults/
 __pycache__/
 artifacts/
+# Generated verification evidence, written by scripts/run-spec-verification.py and consumed by the
+# Android workflow from the run that just produced it. Committing it would pin yesterday's result.
+docs/reports/
 /_site/
 /api/
 *.dll

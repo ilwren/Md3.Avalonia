@@ -22,7 +22,18 @@ namespace Md3.Avalonia.HeadlessTests.Spec;
 /// between Skia's platform back ends and would otherwise produce false failures.
 /// </param>
 /// <param name="Build">Scene factory.</param>
-internal sealed record MdGoldenScene(string Name, int Width, int Height, bool TextFree, Func<Control> Build);
+/// <param name="Dark">
+/// Render the scene in the dark variant. Colour roles are what a theme regression actually breaks,
+/// and the eight roles in <c>Md.Sys.Color.*</c> that exist in one variant only are invisible to a
+/// light-only baseline.
+/// </param>
+internal sealed record MdGoldenScene(
+    string Name,
+    int Width,
+    int Height,
+    bool TextFree,
+    Func<Control> Build,
+    bool Dark = false);
 
 /// <summary>
 /// Layer L3 — visual golden images.
@@ -63,10 +74,14 @@ public sealed class MdVisualGoldenTests
 
         var baselineDirectory = MdSpecPaths.BaselineDirectory;
         var candidateDirectory = Path.Combine(MdSpecPaths.EnsureArtifactDirectory(), "baselines-new");
+        // The variant is restored after every scene, so a dark scene in the middle of the list
+        // cannot tint the light scenes that follow it.
+        var armed = 0;
 
         foreach (var scene in BuildScenes())
         {
             var rendered = Render(scene);
+            Application.Current!.RequestedThemeVariant = ThemeVariant.Light;
             if (rendered is null)
             {
                 report.Gap(scene.Name, "the headless platform returned no rendered frame for this scene");
@@ -101,6 +116,7 @@ public sealed class MdVisualGoldenTests
             try
             {
                 baseline = MdPng.Decode(File.ReadAllBytes(baselinePath));
+                armed++;
             }
             catch (Exception ex) when (ex is InvalidDataException or NotSupportedException)
             {
@@ -151,13 +167,21 @@ public sealed class MdVisualGoldenTests
             }
         }
 
+        // The number that matters for this layer is not "how many pixels moved" but "how many
+        // goldens are armed at all": at zero, L3 is the only layer here that gates nothing, and a
+        // report that lists three passing scenes would read as if it did.
+        var scenes = BuildScenes();
+        report.Metric("golden_scenes", scenes.Count);
+        report.Metric("armed_goldens", armed);
+        report.Metric("unarmed_goldens", scenes.Count - armed);
+
         report.Complete();
     }
 
     private static byte[]? Render(MdGoldenScene scene)
     {
         var application = Application.Current!;
-        application.RequestedThemeVariant = ThemeVariant.Light;
+        application.RequestedThemeVariant = scene.Dark ? ThemeVariant.Dark : ThemeVariant.Light;
 
         var window = new Window
         {
@@ -198,7 +222,14 @@ public sealed class MdVisualGoldenTests
         new MdGoldenScene("state-layers", 420, 120, TextFree: true, BuildStateLayers),
 
         // One text-bearing scene covering the controls whose templates change most often.
-        new MdGoldenScene("component-sampler", 520, 220, TextFree: false, BuildComponentSampler)
+        new MdGoldenScene("component-sampler", 520, 220, TextFree: false, BuildComponentSampler),
+
+        // The same three scenes in the dark variant. A colour role that exists in only one variant,
+        // or a surface role that was never re-coloured, is invisible to a light-only baseline - and
+        // that is the class of defect ThemeDictionaries is most likely to introduce.
+        new MdGoldenScene("shape-scale-dark", 420, 120, TextFree: true, BuildShapeScale, Dark: true),
+        new MdGoldenScene("state-layers-dark", 420, 120, TextFree: true, BuildStateLayers, Dark: true),
+        new MdGoldenScene("component-sampler-dark", 520, 220, TextFree: false, BuildComponentSampler, Dark: true)
     ];
 
     private static Control BuildShapeScale()
@@ -300,6 +331,13 @@ public sealed class MdVisualGoldenTests
         });
     }
 
+    /// <summary>
+    /// Frames a scene on the current variant's surface.
+    /// </summary>
+    /// <remarks>
+    /// The variant is read back from the application rather than hard-coded to Light: a dark scene
+    /// framed in a light Surface would test the frame, not the roles the scene is there to check.
+    /// </remarks>
     private static Control Frame(Control child) => new Border
     {
         Background = Brush("Md.Sys.Color.Surface"),
@@ -307,8 +345,11 @@ public sealed class MdVisualGoldenTests
         Child = child
     };
 
+    private static ThemeVariant Variant =>
+        Application.Current!.RequestedThemeVariant ?? ThemeVariant.Light;
+
     private static object? Resource(string key) =>
-        Application.Current!.TryGetResource(key, ThemeVariant.Light, out var value) ? value : null;
+        Application.Current!.TryGetResource(key, Variant, out var value) ? value : null;
 
     private static IBrush? Brush(string key) => Resource(key) switch
     {

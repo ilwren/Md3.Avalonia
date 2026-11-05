@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "_readme": [
+    "Quantified backlog for the two harness layers that already exist (L0 static lint, L1-L5 headless).",
+    "",
+    "conformance-policy.json answers 'may this build pass?'. This file answers 'is the library",
+    "getting closer to the specification?'. A policy only fails on a high-confidence divergence;",
+    "it says nothing about 279 geometry literals or a 24% oracle coverage, and both of those are",
+    "the actual distance between this library and its stated goal.",
+    "",
+    "Every entry is a measurement, not an opinion: scripts/check-conformance-ratchet.py recomputes",
+    "the value from the tree (or reads it from the headless run's artifacts/spec/*.json) and fails",
+    "when it moved the wrong way. Moving a budget is therefore a reviewable act that has to be in",
+    "the diff, and tightening it is the expected direction of travel.",
+    "",
+    "direction: 'lower'  - the number is a gap and must shrink (budget is a ceiling).",
+    "           'higher' - the number is coverage and must grow   (budget is a floor).",
+    "A null budget means 'tracked, no ceiling yet'. The value is measured and printed, and it is never treated as passing or failing; it becomes a gate once a run has produced the number. This is deliberate: an invented threshold would be the same defect the manifest forbids for token values.",
+    "L4_inventory measures the structural entries from source inside the headless run (a control theme is AXAML, so no window is needed), which is why they are 'headless' sources even though they assert nothing about rendering."
+  ],
+  "ratchet": {
+    "errors": {
+      "direction": "lower",
+      "budget": 0,
+      "source": "lint",
+      "why": "L0 already has a clean baseline for literal colours, unresolved keys and broken includes; any error is a new regression."
+    },
+    "bare_hex": {
+      "direction": "lower",
+      "budget": 0,
+      "source": "lint",
+      "why": "No shipped theme may carry a literal colour; that is what makes dynamic colour retargetable."
+    },
+    "unresolved_keys": {
+      "direction": "lower",
+      "budget": 0,
+      "source": "lint",
+      "why": "A {DynamicResource Md.*} that resolves to nothing fails silently at runtime."
+    },
+    "dangling_cs_keys": {
+      "direction": "lower",
+      "budget": 0,
+      "source": "lint",
+      "why": "A Md.* key a control looks up from C# that no dictionary declares. TryGetResource returns null instead of throwing, so this is the one class of token bug that produces an unstyled control with no error at all."
+    },
+    "broken_includes": {
+      "direction": "lower",
+      "budget": 0,
+      "source": "lint",
+      "why": "A ResourceInclude that points at a missing file breaks the theme merge for every consumer."
+    },
+    "high_confidence_gaps": {
+      "direction": "lower",
+      "budget": 0,
+      "source": "lint",
+      "why": "The policy is in enforce mode with zero non-waived high-confidence gaps; the ratchet keeps it there."
+    },
+    "orphan_tokens": {
+      "direction": "lower",
+      "budget": 84,
+      "source": "lint",
+      "why": "A declared Md.* token nothing references is either dead weight or, worse, a value the theme stopped honouring. Burn down to 0."
+    },
+    "hardcoded_geometry": {
+      "direction": "lower",
+      "budget": 279,
+      "source": "lint",
+      "why": "279 themable geometry literals inside Themes/Controls/*.axaml. Each one is a visual value the oracle cannot audit and a consumer cannot retarget. This is the single largest measurable gap between the library and its token-first design requirement."
+    },
+    "hardcoded_ui_text": {
+      "direction": "lower",
+      "budget": 11,
+      "source": "lint",
+      "why": "Authored English inside a shipped template ignores MdLocalization entirely; the string renders for every culture. Burn down to 0."
+    },
+    "dual_declaration_keys": {
+      "direction": "lower",
+      "budget": 27,
+      "source": "lint",
+      "why": "27 keys exist both as a XAML token and as a runtime assignment in MdThemeManager. Two sources of truth drift silently; the L1 dual-declaration check now compares them, and the count is the size of the surface at risk."
+    },
+    "oracle_coverage_ratio": {
+      "direction": "higher",
+      "budget": 0.2462,
+      "source": "lint",
+      "why": "144 oracle entries against 585 declared keys. Every point of coverage is a value that can fail a build instead of a value that is merely asserted by a hand-written unit test."
+    },
+    "oracle_families": {
+      "direction": "higher",
+      "budget": 19,
+      "source": "lint",
+      "why": "Component families with at least one oracle value: 19 of the 113 themed controls' natural families. The M3 component catalogue this library implements is much wider than buttons, cards and text fields."
+    },
+    "measured_controls": {
+      "direction": "higher",
+      "budget": 8,
+      "source": "headless",
+      "why": "Controls whose rendered geometry L2 actually measures. The matrix today covers Button, IconButton, FAB, CheckBox, RadioButton, Switch, TextBox and Chip; every other themed control renders without a geometry assertion."
+    },
+    "measured_cases": {
+      "direction": "higher",
+      "budget": 37,
+      "source": "headless",
+      "why": "Rendered geometry cases in the L2 matrix. The case count matters separately from the control count because one control can be swept across a size scale without the sweep covering the shapes a consumer actually sets."
+    },
+    "armed_goldens": {
+      "direction": "higher",
+      "budget": 0,
+      "source": "headless",
+      "why": "Committed L3 baselines under tests/Md3.Avalonia.HeadlessTests/Spec/baselines/. At zero, the only layer that can catch an unpredicted visual regression gates nothing at all."
+    },
+    "dual_declaration_mismatches": {
+      "direction": "lower",
+      "budget": null,
+      "source": "headless",
+      "why": "XAML token versus MdThemeManager assignment, compared at ShapeScale.Standard. Tracked without a ceiling until the first run measures it: a threshold invented before the measurement would be a guess, and guessing is what this repository's manifest explicitly refuses to do."
+    },
+    "unresolved_declared_tokens": {
+      "direction": "lower",
+      "budget": null,
+      "source": "headless",
+      "why": "Every Md.* key declared by a shipped dictionary that the merged theme does not resolve. A key stranded in the wrong ThemeDictionaries entry renders with a fallback and never fails anything."
+    },
+    "unmeasured_themed_controls": {
+      "direction": "lower",
+      "budget": null,
+      "source": "headless",
+      "why": "Themed Md* controls with no L2 geometry case. The list, not just the count, is published in artifacts/spec/L4-inventory.json so the backlog can be worked through."
+    },
+    "unstyled_control_classes": {
+      "direction": "lower",
+      "budget": null,
+      "source": "headless",
+      "why": "Md* classes with no {x:Type} control theme entry anywhere. Some are parts and helpers; the ones that are not render as an empty ContentControl with no Material surface."
+    },
+    "contrast_failures": {
+      "direction": "lower",
+      "budget": null,
+      "source": "headless",
+      "why": "Failing foreground/background pairs across 6 scheme variants x 2 modes x 3 contrast levels, using MdThemeManager.Diagnose. The existing tests check one configuration; this counts the whole matrix."
+    },
+    "duplicate_localization_keys": {
+      "direction": "lower",
+      "budget": null,
+      "source": "headless",
+      "why": "Keys defined twice inside MdLocalization's tables, which is how a translation silently wins over another one."
+    },
+    "localization_table_mismatches": {
+      "direction": "lower",
+      "budget": null,
+      "source": "headless",
+      "why": "Keys present in one language table and not the other, or whose {0} placeholders disagree between languages."
+    },
+    "undeclared_template_parts": {
+      "direction": "lower",
+      "budget": null,
+      "source": "headless",
+      "why": "PART_* names that exist only inside a ControlTheme. The template works, but nothing outside the AXAML knows the name, so a rename is caught by no test, no analyzer and no documentation. Adding [TemplatePart] is mechanical; that is why this is a budget rather than a discussion."
+    },
+    "templates_without_part_contract": {
+      "direction": "lower",
+      "budget": null,
+      "source": "headless",
+      "why": "Themed controls whose template names at least one part but whose type declares no [TemplatePart] at all, so every name in that template is unowned."
+    },
+    "templates_with_a_part_contract": {
+      "direction": "higher",
+      "budget": 12,
+      "source": "headless",
+      "why": "Control themes whose every named part is also declared through [TemplatePart]. Raising it is the whole point of the L4 template-coverage report; a drop means a theme gained a part nobody declared."
+    },
+    "variant_asymmetric_tokens": {
+      "direction": "lower",
+      "budget": 0,
+      "source": "headless",
+      "why": "A token declared in a themed dictionary's Light block but not its Dark block resolves in one variant only; the control that binds it renders with a property default in the other. Zero today and gated, because the fix is always to declare the missing counterpart."
+    },
+    "tokens_outside_the_core_theme": {
+      "direction": "lower",
+      "budget": null,
+      "source": "headless",
+      "why": "Md.* keys declared by a sibling theme package that ships its own Styles collection. Not a defect - each is asserted by its own package's test class - but the count is the honest scope limit of the every-key-resolves gate."
+    }
+  }
+}

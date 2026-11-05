@@ -40,6 +40,7 @@ Two rules keep the oracle honest:
 | **L2** geometry & targets | `Spec/MdGeometryConformanceTests.cs` | headless session | Arranged bounds and corner radii of template parts match the oracle, and every interactive control offers a 48×48dp hit-testable target. |
 | **L3** visual goldens | `Spec/MdVisualGoldenTests.cs` | headless session | Pixels did not change unintentionally — the only layer that catches regressions nobody predicted. |
 | **L5** motion | `Spec/MdMotionConformanceTests.cs` | partly none, partly headless | Spring physics match an independent integration; published durations really are the settling points they claim to be; the runtime integrator and the closed form agree. |
+| **L4** inventory | `Spec/MdInventoryTests.cs`, `Spec/MdTemplateSourceTests.cs`, `Spec/MdLocalizationSourceTests.cs` | headless + source scan | How much of the library is measured at all: declared tokens against the merged dictionary, themed types against the geometry matrix, template parts against `[TemplatePart]`, colour roles against WCAG in every generator configuration. Reports the backlog; two of its checks are invariants and gate the build. |
 
 ### Why L0 and L1 both exist
 
@@ -60,6 +61,87 @@ screenshot.
 `Md.Comp.Chip.*` tokens, so it is a **gap at L1** (the token is missing) and a **pass at L2** (the
 rendered geometry is right). A token that exists but is never bound in a template is the mirror
 image. Neither layer alone tells you whether a user sees the correct chip.
+
+### What L4 is for
+
+L1–L3 and L5 all answer "is this value right". None of them answers "how much of this library is
+answered at all", and that is the question a preview release needs: **157 types carry a
+`ControlTheme` while L2 lays out eight of them**, and **144 oracle entries point at 585 declared
+tokens**. Both of those numbers were invisible before L4 existed; neither is a defect.
+
+L4 therefore measures the library against itself and reports, it does not adjudicate:
+
+- declared tokens that the merged theme does not resolve (a key stranded in the wrong
+  `ThemeDictionaries` entry renders with a fallback and fails nothing);
+- themed controls with no rendered-geometry case;
+- `Md*` classes with no theme at all;
+- `PART_*` names a template uses that the owning type never declares;
+- dual-declared tokens — 27 keys exist both as a static XAML value and as an assignment in
+  `MdThemeManager.Apply`, so L1 only ever sees the first and a dynamic-theme app only the second;
+- WCAG AA failures across 6 scheme variants × 2 modes × 3 contrast levels, where the existing suite
+  checks one configuration;
+- localization keys that one culture cannot render, or whose `{0}` placeholders disagree.
+
+Five of these do gate a run, because they are invariants rather than smells:
+
+1. **a template must realise the parts it names** (`Control_Templates_Expose_The_Parts_They_Name`);
+2. **a declared token must resolve through the real merge**, in both variants
+   (`Every_Declared_Token_Resolves_In_Both_Theme_Variants`);
+3. **a `[TemplatePart]` attribute must have a matching `x:Name` in its template**
+   (`Declared_Template_Parts_Exist_In_Their_Template`);
+4. **a themed dictionary must declare the same keys in Light and Dark**
+   (`Both_Theme_Variants_Declare_The_Same_Keys`);
+5. **no culture table may define a key twice, and every culture must carry the English key set with
+   the same placeholders** (`MdLocalizationSourceTests`).
+
+The last one exists because a duplicate key in a dictionary literal is invisible at run time: the
+later entry wins, so the object that comes back matches the source exactly. Only the text can show it.
+
+Which keys does the resolution gate actually cover? `MaterialTheme.axaml` merges 66 dictionaries and
+`DeclaredTokenKeys()` resolves its list from that include list rather than by globbing `src`, so a
+dictionary that exists but is nobody's `ResourceInclude` is not counted as verified. 52 `Md.*` keys
+in sibling packages (PropertyGrid, AvaloniaEdit, DataGrid, Dock) ship in their own `Styles`
+collection, which an application opts into with `Styles.Add`; they are reported as
+`tokens_outside_the_core_theme` instead of being asserted against the wrong application.
+
+The rest become numbers in `artifacts/spec/L4-*.json`, and the JSON twin of each report carries the
+member list behind every inventory count, not just the count.
+
+---
+
+### The budget: what "still missing" means, numerically
+
+`spec-snapshot/conformance-policy.json` answers *may this build pass*. It cannot answer *is the
+library getting closer to the specification*, because it only knows how to fail on a high-confidence
+divergence. `spec-snapshot/conformance-budget.json` is the second question, and
+`scripts/check-conformance-ratchet.py` enforces it in two passes:
+
+- **static-checks** runs it with `--allow-not-measured`: the L0 metrics only, no SDK needed;
+- **build-and-test** runs it with `--strict` after the suite: a pinned metric this run could not
+  measure is a failure, because an unverified budget entry is an unverified claim.
+
+Each entry carries `direction` (`lower` = a gap with a ceiling, `higher` = coverage with a floor)
+and `budget`. Moving a budget is therefore a visible diff, and only one direction is ever expected:
+
+| metric | meaning | today |
+| --- | --- | ---: |
+| `hardcoded_geometry` | themable literals inside `Themes/Controls/*.axaml` | 279 |
+| `hardcoded_ui_text` | English authored in a shipped template, bypassing `MdLocalization` | 11 |
+| `orphan_tokens` | declared tokens nothing references | 84 |
+| `dual_declaration_keys` | keys declared in both XAML and `MdThemeManager` | 27 |
+| `oracle_coverage_ratio` | oracle entries ÷ declared keys | 0.2462 |
+| `oracle_families` | component families with at least one oracle value | 19 |
+| `measured_controls` / `measured_cases` | controls and cases the L2 matrix lays out | 8 / 37 |
+| `armed_goldens` | committed L3 baselines | 0 |
+| `undeclared_template_parts` | `PART_*` names with no `[TemplatePart]` | 470 |
+| `templates_without_part_contract` | themed controls whose template has no contract at all | 97 |
+| `templates_with_a_part_contract` | themes whose every named part is declared | 12 |
+| `variant_asymmetric_tokens` | tokens declared in one theme variant only | 0 |
+| `tokens_outside_the_core_theme` | `Md.*` keys in sibling theme packages | 52 |
+
+A `null` budget means **tracked, not gated yet**: the number is measured and printed, and it becomes
+a gate once a run has produced it. Inventing a threshold before the measurement would be exactly the
+defect `manifest.json` forbids for token values.
 
 ### What L5 deliberately does not do
 

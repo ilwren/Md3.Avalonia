@@ -78,7 +78,7 @@ public sealed class MdGeometryConformanceTests
             host.Children.Add(item.Control);
         }
 
-        using (MdVisualTreeQuery.Show(host, 1000, 900))
+        using (MdVisualTreeQuery.Show(host, 1000, 900, ThemeVariant.Light))
         {
             foreach (var item in cases)
             {
@@ -87,6 +87,12 @@ public sealed class MdGeometryConformanceTests
 
             ReportIconButtonWidthOrdering(cases, report);
         }
+
+        // Machine-readable coverage. "How many controls does L2 actually measure" is the number the
+        // budget ratchet moves; the case count alone hides that the matrix is 37 cases over 10
+        // controls while 157 types carry a ControlTheme.
+        report.Metric("measured_controls", cases.Select(item => item.Control.GetType().Name).Distinct().Count());
+        report.Metric("measured_cases", cases.Count);
 
         report.Complete();
     }

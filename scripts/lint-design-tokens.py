@@ -13,6 +13,14 @@ R4 broken-include    ResourceInclude Source="avares://..." that does not resolve
 R5 hardcoded-geometry  Numeric literals for themable geometry inside Themes/Controls/*.axaml.
 R6 oracle-schema     spec-snapshot/*.json parse + required fields.
 R7 token-value       Statically parsed token values vs. the spec-snapshot oracle.
+R8 hardcoded-ui-text English literal text inside a shipped control template, which bypasses
+                     MdLocalization and cannot follow the inherited culture.
+R9 dual-declaration  A Md.* key that is both a XAML token and a runtime assignment in C#
+                     (MdThemeManager). Two sources of truth drift silently, so the pairs are
+                     reported as an inventory.
+R10 dangling-cs-key  A Md.* key a control looks up at runtime that no theme dictionary declares.
+                     The lookup returns null instead of throwing, so a typo is invisible until
+                     something renders unstyled.
 
 Severity model
 --------------
@@ -79,6 +87,33 @@ RE_GEOMETRY = re.compile(
     r'=\s*"([0-9][0-9,. ]*)"'
 )
 
+# --- R8 ---------------------------------------------------------------------
+# An English literal with at least three letters and a space-or-word shape. Glyph strings,
+# font family names, resource keys and single symbols are not authored prose.
+RE_UI_TEXT = re.compile(r'(?<![\w:.])Text="([^"{}]+)"')
+RE_WORD = re.compile(r"[A-Za-z]{3,}")
+
+# --- R9 ---------------------------------------------------------------------
+RE_CS_TOKEN_WRITE = re.compile(
+    r'Resources\[\s*"\s*(Md\.[A-Za-z0-9.]+)\s*"\s*\]\s*='
+)
+# A write through a constant indirection: Resources[SchemeResourceKey] = ... . The constant's
+# value is resolved from the const declaration below, so the write still counts as a declaration.
+RE_CS_TOKEN_WRITE_INDIRECT = re.compile(r"Resources\[\s*([A-Za-z_][A-Za-z0-9_]*)\s*\]\s*=")
+RE_CS_CONST = re.compile(r'const\s+string\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*"(Md\.[A-Za-z0-9.]+)"')
+
+# --- R10 --------------------------------------------------------------------
+# Tokens that are filled in by an optional package or only exist after a runtime theme update.
+# Anything else a control looks up at runtime has to exist in a shipped dictionary, otherwise the
+# lookup returns null and the control silently renders unstyled.
+OPTIONAL_TOKENS = {
+    "Md.Sys.Typeface.Symbols.Rounded":
+        "filled in by the optional Md3.Avalonia.Icons / .Icons.Lite package; core must not depend on it",
+    "Md.Sys.Motion.Scheme":
+        "written by MdThemeManager.Apply (through MdMotion.SchemeResourceKey) when a dynamic theme is applied",
+}
+RE_CS_TOKEN_REF = re.compile(r'"(Md\.[A-Za-z0-9.]+)"')
+
 
 @dataclass
 class Finding:
@@ -90,11 +125,30 @@ class Finding:
 
 
 @dataclass
+class RatchetCounter:
+    """A metric that must not get worse. ``direction`` is ``lower`` for gaps to burn down."""
+
+    name: str
+    measured: int
+    budget: int
+    direction: str  # "lower" | "higher"
+    detail: str = ""
+
+    @property
+    def ok(self) -> bool:
+        return self.measured <= self.budget if self.direction == "lower" else self.measured >= self.budget
+
+
+@dataclass
 class Lint:
     findings: list[Finding] = field(default_factory=list)
+    metrics: dict[str, int] = field(default_factory=dict)
 
     def add(self, rule: str, severity: str, path: str, line: int, message: str) -> None:
         self.findings.append(Finding(rule, severity, path, line, message))
+
+    def count(self, rule: str) -> int:
+        return sum(1 for f in self.findings if f.rule == rule)
 
     @property
     def errors(self) -> list[Finding]:
@@ -165,13 +219,56 @@ def collect_declarations(lint: Lint) -> tuple[set[str], dict[str, tuple[str, str
     for path in (REPO / "src").rglob("*.cs"):
         if "/obj/" in path.as_posix() or "/bin/" in path.as_posix():
             continue
-        declared.update(RE_CS_KEY.findall(path.read_text(encoding="utf-8", errors="replace")))
+        text = path.read_text(encoding="utf-8", errors="replace")
+        declared.update(RE_CS_KEY.findall(text))
+
+        # A runtime write through a const (Resources[SchemeResourceKey] = ...) declares its key
+        # too; without this the R9 dual-declaration inventory silently under-counts.
+        constants = dict(RE_CS_CONST.findall(text))
+        for name in RE_CS_TOKEN_WRITE_INDIRECT.findall(text):
+            if name in constants:
+                declared.add(constants[name])
 
     for path in sorted(TOKEN_DIR.glob("*.axaml")):
         for lineno, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
             for kind, key, raw in RE_RESOURCE_VALUE.findall(line):
                 values[key] = (kind, raw, lineno)
     return declared, values
+
+
+def collect_cs_token_values(lint: Lint) -> dict[str, dict[str, object]]:
+    """Statically parsed ``Resources["Md.X"] = <literal>`` assignments in C#.
+
+    Only literal right-hand sides are recorded. Anything computed from a variable, a multiplier or
+    a helper call is left out on purpose: a guessed static value would make R7 report a divergence
+    that does not exist, and the headless dual-declaration layer is the layer that can evaluate
+    those expressions for real.
+    """
+    values: dict[str, dict[str, object]] = {}
+    literal_double = re.compile(r"^([-+]?[0-9]*\.?[0-9]+)d?$")
+    literal_scaled = re.compile(r"^([-+]?[0-9]*\.?[0-9]+)d?\s*\*\s*([A-Za-z0-9_.]+)")
+    literal_corner = re.compile(r"new\s+CornerRadius\(\s*([-+]?[0-9]*\.?[0-9]+)d?\s*\)")
+    for path in sorted((REPO / "src").rglob("*.cs")):
+        if "/obj/" in path.as_posix() or "/bin/" in path.as_posix():
+            continue
+        for lineno, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+            for key in RE_CS_TOKEN_WRITE.findall(line):
+                if key in values:
+                    continue
+                rhs = line.split("]", 1)[1].lstrip(" =") if "]" in line else ""
+                rhs = rhs.rstrip(";").strip()
+                m = literal_double.match(rhs)
+                if m:
+                    values[key] = {"type": "x:Double", "raw": m.group(1), "line": lineno, "file": rel(path)}
+                    continue
+                m = literal_scaled.match(rhs)
+                if m and m.group(2).strip() in ("1", "1.0"):
+                    values[key] = {"type": "x:Double", "raw": m.group(1), "line": lineno, "file": rel(path)}
+                    continue
+                m = literal_corner.search(rhs)
+                if m:
+                    values[key] = {"type": "CornerRadius", "raw": m.group(1), "line": lineno, "file": rel(path)}
+    return values
 
 
 def rule_bare_hex(lint: Lint) -> None:
@@ -216,6 +313,29 @@ def rule_orphans(lint: Lint, values: dict[str, tuple[str, str, int]], usage: dic
                 "R3 orphan-token", "warning", "src/Md3.Avalonia/Themes/Tokens", lineno,
                 f"token '{key}' ({kind}) is declared but never referenced",
             )
+
+
+def rule_dangling_cs_key(lint: Lint, declared: set[str]) -> None:
+    """R10 — a Md.* key looked up from C# that no shipped dictionary declares.
+
+    ``TryGetResource``/``Resources[...]`` return null for an unknown key rather than throwing, so a
+    renamed or mistyped token produces a control that renders with a fallback and no error. This
+    rule is the cheap static half of that check; the headless L1 layer is the half that resolves
+    through the real merged dictionary.
+    """
+    for path in sorted((REPO / "src").rglob("*.cs")):
+        if "/obj/" in path.as_posix() or "/bin/" in path.as_posix():
+            continue
+        r = rel(path)
+        for lineno, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+            for key in RE_CS_TOKEN_REF.findall(line):
+                if key in declared or key in OPTIONAL_TOKENS:
+                    continue
+                lint.add(
+                    "R10 dangling-cs-key", "error", r, lineno,
+                    f"'{key}' is looked up at runtime but no theme dictionary declares it; the "
+                    f"lookup returns null and the control renders unstyled",
+                )
 
 
 def rule_includes(lint: Lint) -> None:
@@ -265,11 +385,69 @@ def load_json(path: Path, lint: Lint) -> dict | None:
         return None
 
 
+def rule_hardcoded_ui_text(lint: Lint) -> None:
+    """R8 — English prose baked into a shipped template.
+
+    A control template that says ``Text="Rows per page"`` renders that sentence for every culture
+    and no consumer can retarget it, because the string is authored in the theme rather than
+    resolved through ``MdLocalization``. The rule is deliberately conservative: it only reports a
+    value that contains a run of three or more ASCII letters and at least one space, so glyphs,
+    single words used as labels and ``{DynamicResource ...}`` references stay out of the report.
+    """
+    for path in iter_theme_files():
+        r = rel(path)
+        if "Themes/Tokens/" in r:
+            continue
+        for lineno, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+            for raw in RE_UI_TEXT.findall(line):
+                text = raw.strip()
+                if " " not in text or not RE_WORD.search(text):
+                    continue
+                lint.add(
+                    "R8 hardcoded-ui-text", "warning", r, lineno,
+                    f'Text="{text}" is authored English inside a shipped theme; route it through '
+                    f"MdLocalization so it follows the inherited culture",
+                )
+
+
+def rule_dual_declaration(lint: Lint) -> None:
+    """R9 — one token key declared twice, in XAML and in C#.
+
+    ``Themes/Tokens/*.axaml`` ships a value and ``MdThemeManager.Apply`` assigns the same key at
+    runtime. The static theme is what L1 validates; the C# assignment is what a dynamic-scheme
+    application actually sees. Nothing in the build keeps the two in sync, so the inventory is
+    reported (and the C#-side comparison is asserted by the headless L1 extension).
+    """
+    xaml_keys: set[str] = set()
+    for path in sorted(TOKEN_DIR.glob("*.axaml")):
+        xaml_keys.update(RE_KEY.findall(path.read_text(encoding="utf-8", errors="replace")))
+
+    cs_keys: dict[str, tuple[str, int]] = {}
+    for path in (REPO / "src").rglob("*.cs"):
+        if "/obj/" in path.as_posix() or "/bin/" in path.as_posix():
+            continue
+        for lineno, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+            for key in RE_CS_TOKEN_WRITE.findall(line):
+                cs_keys.setdefault(key, (rel(path), lineno))
+
+    dual = sorted(set(cs_keys) & xaml_keys)
+    for key in dual:
+        path, lineno = cs_keys[key]
+        lint.add(
+            "R9 dual-declaration", "warning", path, lineno,
+            f"token '{key}' is declared in Themes/Tokens and re-assigned at runtime; the two "
+            f"values are compared by the L1 dual-declaration check",
+        )
+    lint.metrics["dual_declaration_keys"] = len(dual)
+    lint.metrics["runtime_written_keys"] = len(cs_keys)
+
+
 def rule_token_values(
     lint: Lint,
     oracle: dict,
     policy: dict,
     values: dict[str, tuple[str, str, int]],
+    values_cs: dict[str, dict[str, object]] | None = None,
 ) -> list[dict]:
     mode = policy.get("mode", "bootstrap")
     tol = oracle.get("tolerances", {})
@@ -293,7 +471,8 @@ def rule_token_values(
         required = entry.get("required", True)
         expected = entry["value"]
 
-        if key not in values:
+        from_cs = key in (values_cs or {})
+        if key not in values and not from_cs:
             if not required:
                 continue
             gaps.append(
@@ -303,7 +482,10 @@ def rule_token_values(
             )
             continue
 
-        declared_kind, raw, lineno = values[key]
+        if from_cs:
+            declared_kind, raw, lineno = str(values_cs[key]["type"]), str(values_cs[key]["raw"]), int(values_cs[key]["line"])
+        else:
+            declared_kind, raw, lineno = values[key]
         actual: object | None
         detail = ""
         if kind == "double":
@@ -320,7 +502,8 @@ def rule_token_values(
             continue
 
         if not ok:
-            detail = f"declared at Themes/Tokens line {lineno} as <{declared_kind}>{raw}</{declared_kind}>"
+            where = "the runtime assignment" if from_cs else f"Themes/Tokens line {lineno}"
+            detail = f"declared at {where} as <{declared_kind}>{raw}</{declared_kind}>"
             gaps.append(
                 {"key": key, "kind": "mismatch", "confidence": confidence,
                  "expected": expected, "actual": actual, "detail": detail}
@@ -415,17 +598,72 @@ def main() -> int:
         mode = "bootstrap"
 
     declared, values = collect_declarations(lint)
+    values_cs = collect_cs_token_values(lint)
     rule_bare_hex(lint)
     usage = rule_references(lint, declared)
     rule_orphans(lint, values, usage)
     rule_includes(lint)
     rule_hardcoded_geometry(lint)
-    gaps = rule_token_values(lint, oracle, policy, values) if oracle else []
+    rule_hardcoded_ui_text(lint)
+    rule_dual_declaration(lint)
+    rule_dangling_cs_key(lint, declared)
+    gaps = rule_token_values(lint, oracle, policy, values, values_cs) if oracle else []
+
+    lint.metrics.update(
+        {
+            "declared_keys": len(declared),
+            "token_values": len(values),
+            "referenced_keys": sum(1 for k, n in usage.items() if n > 0),
+            "orphan_tokens": lint.count("R3 orphan-token"),
+            "dual_declaration_keys": lint.metrics.get("dual_declaration_keys", 0),
+            "hardcoded_geometry": lint.count("R5 hardcoded-geometry"),
+            "hardcoded_ui_text": lint.count("R8 hardcoded-ui-text"),
+            "bare_hex": lint.count("R1 bare-hex"),
+            "unresolved_keys": lint.count("R2 unresolved-key"),
+            "broken_includes": lint.count("R4 broken-include"),
+            "dangling_cs_keys": lint.count("R10 dangling-cs-key"),
+            "oracle_tokens": len(oracle.get("tokens", [])) if oracle else 0,
+            "oracle_high": sum(1 for t in (oracle or {}).get("tokens", []) if t.get("confidence") == "high"),
+            "oracle_families": len({t["key"].split(".")[2] for t in (oracle or {}).get("tokens", []) if t["key"].startswith("Md.Comp.")}),
+            "high_confidence_gaps": sum(1 for g in gaps if g["confidence"] == "high" and "waived" not in g),
+            "medium_confidence_gaps": sum(1 for g in gaps if g["confidence"] == "medium"),
+            "waived_gaps": sum(1 for g in gaps if "waived" in g),
+        }
+    )
+    lint.metrics["oracle_coverage_ratio"] = (
+        round(lint.metrics["oracle_tokens"] / lint.metrics["declared_keys"], 4)
+        if lint.metrics["declared_keys"]
+        else 0.0
+    )
 
     report = Path(args.report)
     if not report.is_absolute():
         report = REPO / report
     write_report(report, lint, gaps, mode)
+
+    # Machine-readable twin of the markdown report. The ratchet check reads this file, so a
+    # number that moves is a number a script can act on rather than a table someone skims.
+    payload = {
+        "schema_version": 1,
+        "generated_at": __import__("datetime").datetime.now(
+            __import__("datetime").timezone.utc).isoformat(),
+        "mode": mode,
+        "errors": len(lint.errors),
+        "warnings": len(lint.warnings),
+        "metrics": dict(sorted(lint.metrics.items())),
+        "findings": [
+            {"rule": f.rule, "severity": f.severity, "path": f.path, "line": f.line, "message": f.message}
+            for f in lint.findings
+        ],
+        "oracle_gaps": [
+            {k: v for k, v in g.items() if k in ("key", "kind", "confidence", "expected", "actual", "waived", "severity")}
+            for g in gaps
+        ],
+    }
+    report.with_suffix(".json").write_text(
+        __import__("json").dumps(payload, indent=2, ensure_ascii=False, default=str) + "\n",
+        encoding="utf-8",
+    )
 
     if args.github:
         for f in lint.findings:

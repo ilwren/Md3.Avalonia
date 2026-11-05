@@ -36,6 +36,15 @@ TITLES = {
     "L3-visual": "L3 visual goldens",
     "L5-motion-physics": "L5 spring physics",
     "L5-motion-runtime": "L5 runtime motion",
+    "L4-inventory": "L4 structural inventory",
+    "L4-dual-declaration": "L4 dual-declared tokens",
+    "L4-template-parts": "L4 declared template parts",
+    "L4-template-coverage": "L4 template coverage",
+    "L4-localization-source": "L4 localization source",
+    "L4-localization-tables": "L4 localization tables",
+    "L4-template-realisation": "L4 template realisation",
+    "L4-token-variants": "L4 theme variant symmetry",
+    "conformance-ratchet": "Conformance budget (quantified backlog)",
 }
 
 COUNT = re.compile(r"^- (?P<label>[a-z][a-z\- ]*?): \*\*(?P<value>\d+)\*\*", re.MULTILINE)
