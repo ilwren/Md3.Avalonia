@@ -109,8 +109,8 @@ public sealed class MdInventoryTests
         application.RequestedThemeVariant = ThemeVariant.Light;
 
         var declared = DeclaredTokenKeys();
-        var controls = PublicControlTypes();
-        var themed = ThemedTypeNames();
+        var controls = MdSpecSurface.PublicControlTypes();
+        var themed = MdSpecSurface.ThemedTypeNames();
 
         report.Metric("declared_tokens", declared.Count);
         report.Metric("public_controls", controls.Count);
@@ -412,7 +412,7 @@ public sealed class MdInventoryTests
         var asymmetries = new List<string>();
         var dictionaries = 0;
 
-        foreach (var file in CoreThemeFiles())
+        foreach (var file in MdSpecSurface.CoreThemeFiles())
         {
             var text = File.ReadAllText(file);
             var start = text.IndexOf("<ResourceDictionary.ThemeDictionaries>", StringComparison.Ordinal);
@@ -544,8 +544,7 @@ public sealed class MdInventoryTests
     private static HashSet<string> DeclaredTokenKeys()
     {
         var keys = new HashSet<string>(StringComparer.Ordinal);
-        var root = MdSpecPaths.RequireRoot();
-        foreach (var file in CoreThemeFiles())
+        foreach (var file in MdSpecSurface.CoreThemeFiles())
         {
             foreach (System.Text.RegularExpressions.Match match in
                      System.Text.RegularExpressions.Regex.Matches(
@@ -557,13 +556,8 @@ public sealed class MdInventoryTests
 
         // The generator writes its keys at runtime (Resources["Md.X"] = ...), so they are
         // declarations too - but only the ones it actually writes, not every Md.* literal in C#.
-        foreach (var file in Directory.EnumerateFiles(Path.Combine(root, "src"), "*.cs", SearchOption.AllDirectories))
+        foreach (var file in MdSpecSurface.SourceFiles("*.cs"))
         {
-            if (PathContainsBuildOutput(file))
-            {
-                continue;
-            }
-
             foreach (var line in File.ReadLines(file))
             {
                 foreach (System.Text.RegularExpressions.Match match in
@@ -579,34 +573,6 @@ public sealed class MdInventoryTests
     }
 
     /// <summary>
-    /// The AXAML files <c>MaterialTheme</c> merges, resolved from its own include list.
-    /// </summary>
-    /// <remarks>
-    /// Read from the include list rather than by globbing the directory, so a file that exists but
-    /// nobody merged - the exact shape of "declared and never loaded" - cannot pass this check by
-    /// being counted.
-    /// </remarks>
-    private static IReadOnlyList<string> CoreThemeFiles()
-    {
-        var root = MdSpecPaths.RequireRoot();
-        var theme = Path.Combine(root, "src", "Md3.Avalonia", "Themes", "MaterialTheme.axaml");
-        var files = new List<string>();
-        foreach (System.Text.RegularExpressions.Match match in
-                 System.Text.RegularExpressions.Regex.Matches(
-                     File.ReadAllText(theme), "avares://Md3\\.Avalonia/(?<path>Themes/[^\"]+\\.axaml)"))
-        {
-            var path = Path.Combine(root, "src", "Md3.Avalonia", match.Groups["path"].Value);
-            if (File.Exists(path))
-            {
-                files.Add(path);
-            }
-        }
-
-        Assert.True(files.Count > 20, $"only {files.Count} dictionaries were resolved from MaterialTheme.axaml; the include scan is not working");
-        return files;
-    }
-
-    /// <summary>
     /// <c>Md.*</c> keys declared outside the core theme and therefore outside this application.
     /// </summary>
     /// <remarks>
@@ -619,12 +585,12 @@ public sealed class MdInventoryTests
     private static List<string> KeysOutsideTheCoreTheme()
     {
         var root = MdSpecPaths.RequireRoot();
-        var core = CoreThemeFiles().ToHashSet(StringComparer.Ordinal);
+        var core = MdSpecSurface.CoreThemeFiles().ToHashSet(StringComparer.Ordinal);
         var outside = new List<string>();
 
-        foreach (var file in Directory.EnumerateFiles(Path.Combine(root, "src"), "*.axaml", SearchOption.AllDirectories))
+        foreach (var file in MdSpecSurface.SourceFiles("*.axaml"))
         {
-            if (PathContainsBuildOutput(file) || core.Contains(file))
+            if (core.Contains(file))
             {
                 continue;
             }
@@ -642,60 +608,6 @@ public sealed class MdInventoryTests
         }
 
         return outside;
-    }
-
-    private static bool PathContainsBuildOutput(string path) =>
-        path.Contains("/obj/", StringComparison.Ordinal) || path.Contains("/bin/", StringComparison.Ordinal);
-
-    /// <summary>Public, non-abstract <c>Md*</c> types from the library's own assemblies.</summary>
-    private static IReadOnlyList<Type> PublicControlTypes()
-    {
-        // The test project references every theme package, so a repository-wide scan would also
-        // count a third-party type that happens to start with Md. The set is pinned to the three
-        // assemblies that actually ship controls.
-        var assemblies = new[]
-        {
-            typeof(MdButton).Assembly,          // Md3.Avalonia
-            typeof(MdRating).Assembly,          // Md3.Avalonia.Extra
-            typeof(MdSignaturePad).Assembly     // Md3.Avalonia.InkCanvas (namespace Md3.Avalonia.Controls)
-        };
-
-        return assemblies
-            .Distinct()
-            .SelectMany(assembly => assembly.GetExportedTypes())
-            .Where(type => type is { IsClass: true, IsAbstract: false } && type.Name.StartsWith("Md", StringComparison.Ordinal))
-            .Distinct()
-            .OrderBy(type => type.Name, StringComparer.Ordinal)
-            .ToList();
-    }
-
-    /// <summary>Type names that carry a <c>{x:Type}</c> control theme (or a keyed one) in any theme file.</summary>
-    private static HashSet<string> ThemedTypeNames()
-    {
-        var names = new HashSet<string>(StringComparer.Ordinal);
-        var root = MdSpecPaths.RequireRoot();
-        foreach (var file in Directory.EnumerateFiles(Path.Combine(root, "src"), "*.axaml", SearchOption.AllDirectories))
-        {
-            if (PathContainsBuildOutput(file))
-            {
-                continue;
-            }
-
-            var text = File.ReadAllText(file);
-            foreach (System.Text.RegularExpressions.Match match in
-                     System.Text.RegularExpressions.Regex.Matches(text, "x:Key=\"\\{x:Type [\\w:]*?(\\w+)\\}\""))
-            {
-                names.Add(match.Groups[1].Value);
-            }
-
-            foreach (System.Text.RegularExpressions.Match match in
-                     System.Text.RegularExpressions.Regex.Matches(text, "ControlTheme[^>]*TargetType=\"[\\w:]*?(\\w+)\""))
-            {
-                names.Add(match.Groups[1].Value);
-            }
-        }
-
-        return names;
     }
 
     private static double? ResolveDouble(Application application, string key) =>

@@ -293,6 +293,21 @@
         "MdInventoryTests.Both_Theme_Variants_Declare_The_Same_Keys"
       ],
       "verification_status": "not_run"
+    },
+    {
+      "id": "CONTROL-CONSTRUCTION-001",
+      "component": "All themed controls",
+      "variant": "Every type",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://m3.material.io/components",
+      "assertion": "Every themed Md* control with a public parameterless constructor can be created, have its ControlTheme applied and lay out a realised visual tree in both the light theme the suite runs in, so a template that throws or a part that is never received fails with the control's own name.",
+      "automated_evidence": [
+        "MdControlConstructionTests.Every_Themed_Control_Can_Be_Built_Themed_And_Laid_Out"
+      ],
+      "verification_status": "not_run"
     }
   ]
 }

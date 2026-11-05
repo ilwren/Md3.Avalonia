@@ -180,6 +180,24 @@
       "budget": 52,
       "source": "headless",
       "why": "Md.* keys declared by a sibling theme package that ships its own Styles collection. Not a defect - each is asserted by its own package's test class - but the count is the honest scope limit of the every-key-resolves gate."
+    },
+    "constructible_themed_controls": {
+      "direction": "higher",
+      "budget": null,
+      "source": "headless",
+      "why": "Themed controls that can be created, themed and laid out through a public parameterless constructor - the population a generic matrix could ever cover. A floor: the number dropping means a control gained a required constructor argument."
+    },
+    "constructed_themed_controls": {
+      "direction": "higher",
+      "budget": null,
+      "source": "headless",
+      "why": "Of those, the ones that actually produced a realised visual tree. A control that is constructible but realises nothing renders as an empty box, so this is the number that says how much of the themed surface is genuinely exercised."
+    },
+    "themed_controls_needing_arguments": {
+      "direction": "lower",
+      "budget": null,
+      "source": "headless",
+      "why": "Themed controls with no public parameterless constructor. They sit outside every coverage number this harness reports; the list is the scope limit, not a to-do list."
     }
   }
 }

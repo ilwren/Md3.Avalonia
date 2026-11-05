@@ -33,6 +33,7 @@ TITLES = {
     "token-lint": "L0 static token lint",
     "L1-tokens": "L1 token conformance",
     "L2-geometry": "L2 rendered geometry",
+    "L2b-construction": "L2b themed-control construction",
     "L3-visual": "L3 visual goldens",
     "L5-motion-physics": "L5 spring physics",
     "L5-motion-runtime": "L5 runtime motion",
