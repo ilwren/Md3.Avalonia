@@ -116,7 +116,11 @@ def headless_metrics() -> dict[str, float]:
         if path.name == "conformance-ratchet.json":
             continue
         try:
-            payload = json.loads(path.read_text(encoding="utf-8"))
+            # utf-8-sig rather than utf-8: the reports were written with a BOM until MdSpecReport
+            # switched to a BOM-less encoder, and a run that mixes the two must not silently drop
+            # the whole metrics block. A silently skipped file is the one failure mode a budget
+            # cannot afford.
+            payload = json.loads(path.read_text(encoding="utf-8-sig"))
         except (OSError, json.JSONDecodeError):
             continue
         blocks = [payload.get("metrics")]

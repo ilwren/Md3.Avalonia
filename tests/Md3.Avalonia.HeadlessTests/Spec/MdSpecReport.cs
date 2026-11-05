@@ -144,7 +144,7 @@ internal sealed class MdSpecReport
             : new List<MdSpecFinding>();
 
         var path = Path.Combine(MdSpecPaths.EnsureArtifactDirectory(), _reportName + ".md");
-        File.WriteAllText(path, Render(), Encoding.UTF8);
+        File.WriteAllText(path, Render(), NoBom);
         WriteMetrics(Path.ChangeExtension(path, ".json"), blocking.Count);
 
         // A conformance layer that checked nothing would otherwise be an unconditional pass, which
@@ -202,8 +202,19 @@ internal sealed class MdSpecReport
                 WriteIndented = true,
                 PropertyNamingPolicy = null
             }) + Environment.NewLine,
-            Encoding.UTF8);
+            NoBom);
     }
+
+    /// <summary>
+    /// UTF-8 without a byte-order mark.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="Encoding.UTF8"/> emits a BOM, which every .NET reader strips and every other
+    /// reader has to be told about. <c>scripts/check-conformance-ratchet.py</c> is the other reader,
+    /// and <c>json.loads</c> refuses a document that starts with one - so the metrics twin of every
+    /// report was unreadable to the budget while looking perfectly well formed in an editor.
+    /// </remarks>
+    private static readonly UTF8Encoding NoBom = new(encoderShouldEmitUTF8Identifier: false);
 
     private int Count(Func<MdSpecFinding, bool> predicate) => _findings.Count(predicate);
 
