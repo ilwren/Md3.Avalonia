@@ -77,17 +77,7 @@ public sealed class MdLocalizationSourceTests
     [Fact]
     public void Every_Culture_Can_Render_Every_English_Key_With_The_Same_Placeholders()
     {
-        // Grouped rather than keyed: a source file may open a second table for the same culture
-        // (no shipped file does, but the parser is not the place to assume it), and collapsing
-        // those here is what keeps the comparison a comparison of cultures.
-        var tables = Tables(File.ReadAllText(LocalizationFile()))
-            .GroupBy(pair => pair.Culture, StringComparer.Ordinal)
-            .ToDictionary(
-                group => group.Key,
-                group => group.SelectMany(pair => pair.Table)
-                    .ToDictionary(entry => entry.Key, entry => entry.Value, StringComparer.Ordinal),
-                StringComparer.Ordinal);
-
+        var tables = SourceTables();
         Assert.Contains("en", tables.Keys);
 
         var english = tables["en"];
@@ -165,12 +155,7 @@ public sealed class MdLocalizationSourceTests
             actual[culture] = table;
         }
 
-        var source = Tables(File.ReadAllText(LocalizationFile()))
-            .ToDictionary(
-                group => group.Key,
-                group => group.SelectMany(pair => pair.Table)
-                    .ToDictionary(entry => entry.Key, entry => entry.Value, StringComparer.Ordinal),
-                StringComparer.Ordinal);
+        var source = SourceTables();
 
         Assert.Equal(source.Count, actual.Count);
         foreach (var (culture, table) in source)
@@ -195,6 +180,24 @@ public sealed class MdLocalizationSourceTests
             .Where(path => !path.Contains("/obj/", StringComparison.Ordinal)
                            && !path.Contains("/bin/", StringComparison.Ordinal))
             .OrderBy(path => path, StringComparer.Ordinal);
+
+    /// <summary>
+    /// The culture tables of the localization source, keyed by culture.
+    /// </summary>
+    /// <remarks>
+    /// Grouped rather than keyed directly: a file could open a second table for the same culture,
+    /// and collapsing those here keeps every later comparison a comparison of cultures rather than
+    /// of individual initialisers.
+    /// </remarks>
+    private static Dictionary<string, Dictionary<string, string>> SourceTables() =>
+        Tables(File.ReadAllText(LocalizationFile()))
+            .GroupBy(pair => pair.Culture, StringComparer.Ordinal)
+            .ToDictionary(
+                group => group.Key,
+                group => group
+                    .SelectMany(pair => pair.Table)
+                    .ToDictionary(entry => entry.Key, entry => entry.Value, StringComparer.Ordinal),
+                StringComparer.Ordinal);
 
     private static IEnumerable<(string Culture, List<KeyValuePair<string, string>> Table)> Tables(string text)
     {
