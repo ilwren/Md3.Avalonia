@@ -138,9 +138,18 @@ and `budget`. Moving a budget is therefore a visible diff, and only one directio
 | `templates_with_a_part_contract` | themes whose every named part is declared | 12 |
 | `variant_asymmetric_tokens` | tokens declared in one theme variant only | 0 |
 | `tokens_outside_the_core_theme` | `Md.*` keys in sibling theme packages | 52 |
+| `unmeasured_themed_controls` | themed controls with no L2 geometry case | 150 |
+| `unstyled_control_classes` | `Md*` classes with no control theme (mostly parts) | 85 |
+| `unresolved_declared_tokens` | declared keys the merged theme cannot resolve | 0 |
+| `contrast_failures` | WCAG AA failures across every generator configuration | 0 |
 
-A `null` budget means **tracked, not gated yet**: the number is measured and printed, and it becomes
-a gate once a run has produced it. Inventing a threshold before the measurement would be exactly the
+`contrast_failures` is the one entry above with no ceiling even though it measures zero: contrast
+remediation is out of scope for this round, so the number is recorded and nothing gates on it.
+
+A `null` budget means **tracked, not gated yet**: the number is measured and printed, and it gets a
+ceiling once a run has established it. That is why most of the table was `null` in the first commit
+and pinned in the second: the numbers come from a headless run, and inventing a threshold before one
+has happened is exactly the defect `manifest.json` forbids for token values. Inventing a threshold before the measurement would be exactly the
 defect `manifest.json` forbids for token values.
 
 ### What L5 deliberately does not do

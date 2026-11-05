@@ -117,51 +117,51 @@
     },
     "unresolved_declared_tokens": {
       "direction": "lower",
-      "budget": null,
+      "budget": 0,
       "source": "headless",
-      "why": "Every Md.* key declared by a shipped dictionary that the merged theme does not resolve. A key stranded in the wrong ThemeDictionaries entry renders with a fallback and never fails anything."
+      "why": "Declared by a shipped dictionary but not resolved through the merged theme. Zero today, and the every-key-resolves invariant already fails the build on it; the budget entry keeps the number in the same table a reader of the backlog looks at."
     },
     "unmeasured_themed_controls": {
       "direction": "lower",
-      "budget": null,
+      "budget": 150,
       "source": "headless",
-      "why": "Themed Md* controls with no L2 geometry case. The list, not just the count, is published in artifacts/spec/L4-inventory.json so the backlog can be worked through."
+      "why": "Themed Md* controls with no L2 geometry case. A ceiling, not a target: adding a geometry case lowers the number and the budget moves down with it; a new themed control must not raise it without a review."
     },
     "unstyled_control_classes": {
       "direction": "lower",
-      "budget": null,
+      "budget": 85,
       "source": "headless",
-      "why": "Md* classes with no {x:Type} control theme entry anywhere. Some are parts and helpers; the ones that are not render as an empty ContentControl with no Material surface."
+      "why": "Md* classes with no {x:Type} control theme. Most are parts, presenters and service types that legitimately have no template; the ceiling exists so a control that loses its theme is caught rather than absorbed."
     },
     "contrast_failures": {
       "direction": "lower",
       "budget": null,
       "source": "headless",
-      "why": "Failing foreground/background pairs across 6 scheme variants x 2 modes x 3 contrast levels, using MdThemeManager.Diagnose. The existing tests check one configuration; this counts the whole matrix."
+      "why": "Failing foreground/background pairs across 6 scheme variants x 2 modes x 3 contrast levels, using MdThemeManager.Diagnose. Measured 0 today. Left without a ceiling on purpose: contrast remediation is out of scope for this round, so this records the number and nothing gates on it until that decision is taken."
     },
     "duplicate_localization_keys": {
       "direction": "lower",
-      "budget": null,
+      "budget": 0,
       "source": "headless",
-      "why": "Keys defined twice inside MdLocalization's tables, which is how a translation silently wins over another one."
+      "why": "A key written twice inside one culture table. The later entry silently wins, so the dictionary that comes back matches the source exactly and no runtime check can see it - only the text can. Zero, and gated twice: the test asserts it and the budget holds it."
     },
     "localization_table_mismatches": {
       "direction": "lower",
-      "budget": null,
+      "budget": 0,
       "source": "headless",
-      "why": "Keys present in one language table and not the other, or whose {0} placeholders disagree between languages."
+      "why": "A culture missing an English key, defining one English does not, or using different {0} placeholders. A missing key falls back to English; a missing placeholder throws FormatException the moment a control speaks."
     },
     "undeclared_template_parts": {
       "direction": "lower",
-      "budget": null,
+      "budget": 470,
       "source": "headless",
-      "why": "PART_* names that exist only inside a ControlTheme. The template works, but nothing outside the AXAML knows the name, so a rename is caught by no test, no analyzer and no documentation. Adding [TemplatePart] is mechanical; that is why this is a budget rather than a discussion."
+      "why": "PART_* names that exist only inside a ControlTheme. Ceiling: adding [TemplatePart] to a type lowers it, and a new template may not raise it."
     },
     "templates_without_part_contract": {
       "direction": "lower",
-      "budget": null,
+      "budget": 97,
       "source": "headless",
-      "why": "Themed controls whose template names at least one part but whose type declares no [TemplatePart] at all, so every name in that template is unowned."
+      "why": "Themed controls whose template names parts but whose type declares no [TemplatePart] at all."
     },
     "templates_with_a_part_contract": {
       "direction": "higher",
@@ -177,7 +177,7 @@
     },
     "tokens_outside_the_core_theme": {
       "direction": "lower",
-      "budget": null,
+      "budget": 52,
       "source": "headless",
       "why": "Md.* keys declared by a sibling theme package that ships its own Styles collection. Not a defect - each is asserted by its own package's test class - but the count is the honest scope limit of the every-key-resolves gate."
     }

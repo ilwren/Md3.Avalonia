@@ -68,7 +68,7 @@ public sealed class MdLocalizationSourceTests
 
         var report = new MdSpecReport("L4-localization-source", Layer, "L4 — localization source",
             MdSpecPolicy.Load());
-        report.Metric("localization_duplicate_keys", duplicates.Count);
+        report.Metric("duplicate_localization_keys", duplicates.Count);
         report.Metric("localization_entries", entries);
         report.Pass($"localization source ({files} file(s), {entries} entries, no duplicate key)");
         report.Complete();
