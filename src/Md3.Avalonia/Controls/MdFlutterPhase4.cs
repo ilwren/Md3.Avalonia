@@ -32,6 +32,15 @@ public sealed class MdDraggableScrollableSheet : ContentControl
     public static readonly DirectProperty<MdDraggableScrollableSheet, double> SheetHeightProperty = AvaloniaProperty.RegisterDirect<MdDraggableScrollableSheet, double>(nameof(SheetHeight), sheet => sheet.SheetHeight);
     public static readonly DirectProperty<MdDraggableScrollableSheet, bool> IsAnimatingProperty = AvaloniaProperty.RegisterDirect<MdDraggableScrollableSheet, bool>(nameof(IsAnimating), sheet => sheet.IsAnimating);
 
+    /// <summary>Backing styled property for <see cref="ShouldCloseOnMinExtent"/>.</summary>
+    public static readonly StyledProperty<bool> ShouldCloseOnMinExtentProperty = AvaloniaProperty.Register<MdDraggableScrollableSheet, bool>(nameof(ShouldCloseOnMinExtent), true);
+
+    /// <summary>Backing styled property for <see cref="SnapAnimationDuration"/>.</summary>
+    public static readonly StyledProperty<TimeSpan?> SnapAnimationDurationProperty = AvaloniaProperty.Register<MdDraggableScrollableSheet, TimeSpan?>(nameof(SnapAnimationDuration));
+
+    /// <summary>Backing styled property for <see cref="Controller"/>.</summary>
+    public static readonly StyledProperty<MdDraggableScrollableController?> ControllerProperty = AvaloniaProperty.Register<MdDraggableScrollableSheet, MdDraggableScrollableController?>(nameof(Controller));
+
     private Control? _dragHandle;
     private Border? _surface;
     private bool _dragging;
@@ -52,6 +61,12 @@ public sealed class MdDraggableScrollableSheet : ContentControl
         MaximumExtentProperty.Changed.AddClassHandler<MdDraggableScrollableSheet>((sheet, _) => sheet.CoerceExtents());
         ExtentProperty.Changed.AddClassHandler<MdDraggableScrollableSheet>((sheet, _) => sheet.OnExtentChanged());
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdDraggableScrollableSheet>((sheet, _) => sheet.OnMotionSchemeChanged());
+        SnapAnimationDurationProperty.Changed.AddClassHandler<MdDraggableScrollableSheet>((sheet, _) => sheet.UpdateMotion());
+        ControllerProperty.Changed.AddClassHandler<MdDraggableScrollableSheet>((sheet, change) =>
+        {
+            (change.OldValue as MdDraggableScrollableController)?.Detach(sheet);
+            (change.NewValue as MdDraggableScrollableController)?.Attach(sheet);
+        });
     }
 
     public MdDraggableScrollableSheet()
@@ -68,6 +83,27 @@ public sealed class MdDraggableScrollableSheet : ContentControl
     public IReadOnlyList<double> SnapSizes { get => GetValue(SnapSizesProperty); set => SetValue(SnapSizesProperty, value); }
     public bool Expand { get => GetValue(ExpandProperty); set => SetValue(ExpandProperty, value); }
     public object? Header { get => GetValue(HeaderProperty); set => SetValue(HeaderProperty, value); }
+
+    /// <summary>
+    /// When <c>true</c> (the default), a drag that settles at <see cref="MinimumExtent"/> raises
+    /// <see cref="MinExtentReached"/> so the host can close the sheet, mirroring Flutter's
+    /// <c>DraggableScrollableSheet.shouldCloseOnMinExtent</c>.
+    /// </summary>
+    public bool ShouldCloseOnMinExtent { get => GetValue(ShouldCloseOnMinExtentProperty); set => SetValue(ShouldCloseOnMinExtentProperty, value); }
+
+    /// <summary>
+    /// Duration for snap/settle animations. <c>null</c> (the default) keeps the motion system's
+    /// spatial duration, including reduced-motion handling; <see cref="TimeSpan.Zero"/> snaps
+    /// without animating.
+    /// </summary>
+    public TimeSpan? SnapAnimationDuration { get => GetValue(SnapAnimationDurationProperty); set => SetValue(SnapAnimationDurationProperty, value); }
+
+    /// <summary>
+    /// Optional imperative handle mirroring Flutter's <c>DraggableScrollableController</c>. The
+    /// controller attaches to this sheet while it is set.
+    /// </summary>
+    public MdDraggableScrollableController? Controller { get => GetValue(ControllerProperty); set => SetValue(ControllerProperty, value); }
+
     public double SheetHeight => _sheetHeight;
     public new bool IsAnimating
     {
@@ -83,21 +119,29 @@ public sealed class MdDraggableScrollableSheet : ContentControl
     public event EventHandler<double>? ExtentChanged;
     public event EventHandler? AnimationCompleted;
 
+    /// <summary>
+    /// Raised when a drag settles at <see cref="MinimumExtent"/> while
+    /// <see cref="ShouldCloseOnMinExtent"/> is <c>true</c>.
+    /// </summary>
+    public event EventHandler? MinExtentReached;
+
     public void AnimateTo(double extent) => _ = AnimateToAsync(extent);
 
-    public async ValueTask AnimateToAsync(double extent, CancellationToken cancellationToken = default)
+    /// <summary>Animates to <paramref name="extent"/>, overriding <see cref="SnapAnimationDuration"/> when given.</summary>
+    public async ValueTask AnimateToAsync(double extent, TimeSpan? duration = null, CancellationToken cancellationToken = default)
     {
         CancelAnimation();
         var operation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         _animationCancellation = operation;
         var spec = MdMotion.Resolve(this, MdMotionKind.Spatial, MdMotionSpeed.Default);
         UpdateMotion();
-        IsAnimating = spec.IsEnabled;
+        var travel = ResolveSnapDuration(duration, spec);
+        IsAnimating = spec.IsEnabled && travel > TimeSpan.Zero;
         SetExtent(extent);
         try
         {
-            if (spec.IsEnabled && spec.Duration > TimeSpan.Zero)
-                await Task.Delay(spec.Duration, operation.Token);
+            if (IsAnimating)
+                await Task.Delay(travel, operation.Token);
             operation.Token.ThrowIfCancellationRequested();
             AnimationCompleted?.Invoke(this, EventArgs.Empty);
         }
@@ -230,6 +274,7 @@ public sealed class MdDraggableScrollableSheet : ContentControl
         _dragging = false;
         PseudoClasses.Set(":dragging", false);
         UpdateMotion();
+        var settled = Extent;
         if (Snap && SnapSizes.Count > 0)
         {
             var clamped = SnapSizes.Select(value => Math.Clamp(value, MinimumExtent, MaximumExtent)).Distinct().OrderBy(v => v).ToList();
@@ -238,22 +283,25 @@ public sealed class MdDraggableScrollableSheet : ContentControl
                 // Upward flick (negative velocity): snap to next higher snap size
                 if (_verticalVelocity < -0.35)
                 {
-                    var target = clamped.FirstOrDefault(v => v > Extent + 0.02, clamped.Last());
-                    SetExtent(target);
+                    settled = clamped.FirstOrDefault(v => v > Extent + 0.02, clamped.Last());
                 }
                 // Downward flick (positive velocity): snap to next lower snap size
                 else if (_verticalVelocity > 0.35)
                 {
-                    var target = clamped.LastOrDefault(v => v < Extent - 0.02, clamped.First());
-                    SetExtent(target);
+                    settled = clamped.LastOrDefault(v => v < Extent - 0.02, clamped.First());
                 }
                 else
                 {
-                    var nearest = clamped.OrderBy(value => Math.Abs(value - Extent)).First();
-                    SetExtent(nearest);
+                    settled = clamped.OrderBy(value => Math.Abs(value - Extent)).First();
                 }
+                SetExtent(settled);
             }
         }
+
+        // A drag that settles at the minimum extent may be a dismissal in progress; hand the
+        // decision to the host instead of closing on our own.
+        if (ShouldCloseOnMinExtent && Math.Abs(settled - Math.Clamp(MinimumExtent, 0, 1)) < 0.001)
+            MinExtentReached?.Invoke(this, EventArgs.Empty);
     }
 
     private void OnMotionSchemeChanged()
@@ -270,8 +318,32 @@ public sealed class MdDraggableScrollableSheet : ContentControl
         if (_surface is not null)
             _surface.Transitions = _dragging
                 ? null
-                : MdMotionTransitions.Collect(
-                    MdMotionTransitions.CreateDouble(this, HeightProperty, MdMotionKind.Spatial, MdMotionSpeed.Default));
+                : CreateHeightTransitions();
+    }
+
+    private Avalonia.Animation.Transitions? CreateHeightTransitions()
+    {
+        if (SnapAnimationDuration is { } custom)
+        {
+            // An explicit snap duration keeps the motion scheme's easing and enabled state but
+            // replaces its timing, matching Flutter's snapAnimationDuration.
+            var spec = MdMotion.Resolve(this, MdMotionKind.Spatial, MdMotionSpeed.Default);
+            return MdMotionTransitions.Collect(new DoubleTransition
+            {
+                Property = HeightProperty,
+                Duration = spec.IsEnabled ? custom : TimeSpan.Zero,
+                Easing = spec.CreateEasing()
+            });
+        }
+        return MdMotionTransitions.Collect(
+            MdMotionTransitions.CreateDouble(this, HeightProperty, MdMotionKind.Spatial, MdMotionSpeed.Default));
+    }
+
+    private TimeSpan ResolveSnapDuration(TimeSpan? overrideDuration, MdMotionSpec spec)
+    {
+        if (overrideDuration is { } explicitDuration) return explicitDuration < TimeSpan.Zero ? TimeSpan.Zero : explicitDuration;
+        if (SnapAnimationDuration is { } custom) return custom < TimeSpan.Zero ? TimeSpan.Zero : custom;
+        return spec.IsEnabled ? spec.Duration : TimeSpan.Zero;
     }
 
     private void CancelAnimation()
@@ -308,6 +380,41 @@ public sealed class MdDraggableScrollableSheet : ContentControl
     {
         var height = Math.Max(0, available * Extent);
         SetAndRaise(SheetHeightProperty, ref _sheetHeight, height);
+    }
+}
+
+/// <summary>
+/// Imperative handle for a <see cref="MdDraggableScrollableSheet"/>, mirroring Flutter's
+/// <c>DraggableScrollableController</c>. Set it as the sheet's <see cref="MdDraggableScrollableSheet.Controller"/>;
+/// methods act only while a sheet is attached.
+/// </summary>
+public sealed class MdDraggableScrollableController
+{
+    private MdDraggableScrollableSheet? _sheet;
+
+    public bool IsAttached => _sheet is not null;
+
+    /// <summary>The attached sheet's current extent, or <c>0</c> when detached.</summary>
+    public double CurrentExtent => _sheet?.Extent ?? 0d;
+
+    /// <summary>Animates the attached sheet like <see cref="MdDraggableScrollableSheet.AnimateTo"/>.</summary>
+    public void AnimateTo(double extent) => _sheet?.AnimateTo(extent);
+
+    /// <summary>Animates the attached sheet with an explicit duration.</summary>
+    public ValueTask AnimateToAsync(double extent, TimeSpan? duration = null, CancellationToken cancellationToken = default)
+        => _sheet?.AnimateToAsync(extent, duration, cancellationToken) ?? ValueTask.CompletedTask;
+
+    /// <summary>Moves the attached sheet without animation.</summary>
+    public void JumpTo(double extent) => _sheet?.JumpTo(extent);
+
+    /// <summary>Returns the attached sheet to its initial extent.</summary>
+    public void Reset() => _sheet?.Reset();
+
+    internal void Attach(MdDraggableScrollableSheet sheet) => _sheet = sheet;
+
+    internal void Detach(MdDraggableScrollableSheet sheet)
+    {
+        if (ReferenceEquals(_sheet, sheet)) _sheet = null;
     }
 }
 
@@ -352,6 +459,93 @@ public sealed class MdAdaptiveProgressIndicator : TemplatedControl
 }
 
 /// <summary>
+/// Computes the bounds a hero flight occupies at a given <c>progress</c> in the 0..1 range.
+/// </summary>
+/// <remarks>
+/// The Flutter equivalent is <c>Hero.createRectTween</c>; <see cref="MdRectTweens"/> holds the
+/// built-in linear and Material-style arc factories.
+/// </remarks>
+public delegate Rect MdRectTween(Rect from, Rect to, double progress);
+
+/// <summary>Built-in <see cref="MdRectTween"/> shapes for <see cref="MdHero.RectTween"/>.</summary>
+public static class MdRectTweens
+{
+    /// <summary>Interpolates position and size linearly.</summary>
+    public static MdRectTween Linear { get; } = (from, to, progress) =>
+    {
+        var t = Math.Clamp(progress, 0, 1);
+        return new Rect(
+            from.X + (to.X - from.X) * t,
+            from.Y + (to.Y - from.Y) * t,
+            from.Width + (to.Width - from.Width) * t,
+            from.Height + (to.Height - from.Height) * t);
+    };
+
+    /// <summary>
+    /// Material-style arc flight: the size interpolates linearly while the center rides a quadratic
+    /// Bezier through the corner of the bounding box of the two centers, so diagonal flights lift
+    /// off the straight line the way Material hero arcs do.
+    /// </summary>
+    public static MdRectTween Arc { get; } = (from, to, progress) =>
+    {
+        var t = Math.Clamp(progress, 0, 1);
+        var start = new Point(from.X + from.Width / 2, from.Y + from.Height / 2);
+        var end = new Point(to.X + to.Width / 2, to.Y + to.Height / 2);
+        // The control point is the corner (end.X, start.Y) for horizontal-dominant flights and
+        // (start.X, end.Y) otherwise; the curve bulges off the diagonal toward that corner.
+        var control = Math.Abs(end.X - start.X) >= Math.Abs(end.Y - start.Y)
+            ? new Point(end.X, start.Y)
+            : new Point(start.X, end.Y);
+        var inverse = 1 - t;
+        var center = new Point(
+            inverse * inverse * start.X + 2 * inverse * t * control.X + t * t * end.X,
+            inverse * inverse * start.Y + 2 * inverse * t * control.Y + t * t * end.Y);
+        var size = new Size(
+            from.Width + (to.Width - from.Width) * t,
+            from.Height + (to.Height - from.Height) * t);
+        return new Rect(center.X - size.Width / 2, center.Y - size.Height / 2, size.Width, size.Height);
+    };
+}
+
+/// <summary>
+/// State handed to <see cref="MdHero.FlightShuttleBuilder"/> for a flight between two heroes.
+/// </summary>
+public sealed class MdHeroFlightShuttleContext : AvaloniaObject
+{
+    public static readonly StyledProperty<double> ProgressProperty =
+        AvaloniaProperty.Register<MdHeroFlightShuttleContext, double>(nameof(Progress));
+
+    private readonly MdRectTween _rectTween;
+
+    internal MdHeroFlightShuttleContext(
+        MdHero source, MdHero destination,
+        Rect sourceBounds, Rect destinationBounds,
+        MdRectTween rectTween)
+    {
+        Source = source;
+        Destination = destination;
+        SourceBounds = sourceBounds;
+        DestinationBounds = destinationBounds;
+        _rectTween = rectTween;
+    }
+
+    public MdHero Source { get; }
+    public MdHero Destination { get; }
+
+    /// <summary>Departure bounds in overlay coordinates.</summary>
+    public Rect SourceBounds { get; }
+
+    /// <summary>Arrival bounds in overlay coordinates.</summary>
+    public Rect DestinationBounds { get; }
+
+    /// <summary>Flight progress in the 0..1 range, driven by the hero during the flight.</summary>
+    public double Progress { get => GetValue(ProgressProperty); set => SetValue(ProgressProperty, value); }
+
+    /// <summary>The bounds the shuttle should occupy right now.</summary>
+    public Rect CurrentBounds => _rectTween(SourceBounds, DestinationBounds, Progress);
+}
+
+/// <summary>
 /// Shared-element transition that snapshots the source and destination into the top-level overlay,
 /// interpolates their bounds with Material spatial motion, and falls back to a short cross-fade for
 /// reduced motion. Flights sharing a tag cancel and replace one another deterministically.
@@ -360,6 +554,10 @@ public sealed class MdAdaptiveProgressIndicator : TemplatedControl
 public sealed class MdHero : ContentControl
 {
     public static readonly StyledProperty<bool> IsTransitionEnabledProperty = AvaloniaProperty.Register<MdHero, bool>(nameof(IsTransitionEnabled), true);
+    public static readonly StyledProperty<MdRectTween?> RectTweenProperty = AvaloniaProperty.Register<MdHero, MdRectTween?>(nameof(RectTween));
+    public static readonly StyledProperty<Func<MdHeroFlightShuttleContext, Control?>?> FlightShuttleBuilderProperty = AvaloniaProperty.Register<MdHero, Func<MdHeroFlightShuttleContext, Control?>?>(nameof(FlightShuttleBuilder));
+    public static readonly StyledProperty<Func<MdHero, Control?>?> PlaceholderBuilderProperty = AvaloniaProperty.Register<MdHero, Func<MdHero, Control?>?>(nameof(PlaceholderBuilder));
+    public static readonly StyledProperty<bool> TransitionOnUserGesturesProperty = AvaloniaProperty.Register<MdHero, bool>(nameof(TransitionOnUserGestures));
     public static readonly DirectProperty<MdHero, bool> IsTransitioningProperty = AvaloniaProperty.RegisterDirect<MdHero, bool>(nameof(IsTransitioning), hero => hero.IsTransitioning);
     private static readonly Dictionary<object, MdHeroFlightRegistration> ActiveFlights = [];
     private MdHeroFlightRegistration? _flight;
@@ -369,6 +567,44 @@ public sealed class MdHero : ContentControl
         MdMotion.SchemeProperty.Changed.AddClassHandler<MdHero>((hero, _) => hero._flight?.Cancellation.Cancel());
 
     public bool IsTransitionEnabled { get => GetValue(IsTransitionEnabledProperty); set => SetValue(IsTransitionEnabledProperty, value); }
+
+    /// <summary>
+    /// Interpolator for the flight bounds; <c>null</c> selects <see cref="MdRectTweens.Linear"/>.
+    /// </summary>
+    public MdRectTween? RectTween { get => GetValue(RectTweenProperty); set => SetValue(RectTweenProperty, value); }
+
+    /// <summary>
+    /// Builds the visual shown during the flight instead of the default bitmap cross-fade. The
+    /// builder is consulted on the source hero first; the returned control is reparented into the
+    /// overlay for the flight and positioned at
+    /// <see cref="MdHeroFlightShuttleContext.CurrentBounds"/> each frame.
+    /// </summary>
+    public Func<MdHeroFlightShuttleContext, Control?>? FlightShuttleBuilder
+    {
+        get => GetValue(FlightShuttleBuilderProperty);
+        set => SetValue(FlightShuttleBuilderProperty, value);
+    }
+
+    /// <summary>
+    /// Builds the stand-in shown at this hero's bounds while it flies. When unset (or returning
+    /// <c>null</c>) the hero simply hides itself for the duration of the flight.
+    /// </summary>
+    public Func<MdHero, Control?>? PlaceholderBuilder
+    {
+        get => GetValue(PlaceholderBuilderProperty);
+        set => SetValue(PlaceholderBuilderProperty, value);
+    }
+
+    /// <summary>
+    /// Whether this hero may fly when a transition is gesture-driven (a back swipe, a drag
+    /// dismissal). Both heroes must opt in; programmatic transitions are unaffected.
+    /// </summary>
+    public bool TransitionOnUserGestures
+    {
+        get => GetValue(TransitionOnUserGesturesProperty);
+        set => SetValue(TransitionOnUserGesturesProperty, value);
+    }
+
     public bool IsTransitioning
     {
         get => _isTransitioning;
@@ -383,17 +619,24 @@ public sealed class MdHero : ContentControl
     public event EventHandler<MdHeroTransitionEventArgs>? TransitionRequested;
     public event EventHandler? TransitionCompleted;
 
-    public void RequestTransitionTo(MdHero destination) => _ = TransitionToAsync(destination);
+    public void RequestTransitionTo(MdHero destination, bool isUserGesture = false) =>
+        _ = TransitionToAsync(destination, isUserGesture);
 
-    public async ValueTask<bool> TransitionToAsync(MdHero destination, CancellationToken cancellationToken = default)
+    public ValueTask<bool> TransitionToAsync(MdHero destination, CancellationToken cancellationToken = default) =>
+        TransitionToAsync(destination, isUserGesture: false, cancellationToken);
+
+    public async ValueTask<bool> TransitionToAsync(
+        MdHero destination, bool isUserGesture, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(destination);
         if (!IsTransitionEnabled || !destination.IsTransitionEnabled || Tag is null || !Equals(Tag, destination.Tag)) return false;
+        // Gesture-driven flights need both heroes to opt in; asking for one is not enough.
+        if (isUserGesture && !(TransitionOnUserGestures && destination.TransitionOnUserGestures)) return false;
         var tag = Tag;
         if (!this.IsAttachedToVisualTree() || !destination.IsAttachedToVisualTree())
         {
             TransitionRequested?.Invoke(this, new MdHeroTransitionEventArgs(
-                this, destination, new Rect(default(Point), Bounds.Size), new Rect(default(Point), destination.Bounds.Size)));
+                this, destination, new Rect(default(Point), Bounds.Size), new Rect(default(Point), destination.Bounds.Size), isUserGesture));
             return false;
         }
 
@@ -413,7 +656,7 @@ public sealed class MdHero : ContentControl
         if (overlay is null || !ReferenceEquals(overlay, OverlayLayer.GetOverlayLayer(destination)))
         {
             TransitionRequested?.Invoke(this, new MdHeroTransitionEventArgs(
-                this, destination, new Rect(default(Point), Bounds.Size), new Rect(default(Point), destination.Bounds.Size)));
+                this, destination, new Rect(default(Point), Bounds.Size), new Rect(default(Point), destination.Bounds.Size), isUserGesture));
             return false;
         }
         var sourceOrigin = this.TranslatePoint(default, overlay);
@@ -423,7 +666,7 @@ public sealed class MdHero : ContentControl
 
         var sourceRect = new Rect(sourceOrigin.Value, Bounds.Size);
         var destinationRect = new Rect(destinationOrigin.Value, destination.Bounds.Size);
-        TransitionRequested?.Invoke(this, new MdHeroTransitionEventArgs(this, destination, sourceRect, destinationRect));
+        TransitionRequested?.Invoke(this, new MdHeroTransitionEventArgs(this, destination, sourceRect, destinationRect, isUserGesture));
         var scheme = MdMotion.GetScheme(this);
         if (scheme == MdMotionScheme.None)
         {
@@ -431,16 +674,29 @@ public sealed class MdHero : ContentControl
             return true;
         }
 
-        var sourceBitmap = Capture(this);
-        RenderTargetBitmap destinationBitmap;
-        try
+        // A shuttle builder replaces the default bitmap cross-fade entirely, so the captures are
+        // only taken when the default presentation is actually needed.
+        var shuttleBuilder = FlightShuttleBuilder ?? destination.FlightShuttleBuilder;
+        var shuttleContext = shuttleBuilder is null
+            ? null
+            : new MdHeroFlightShuttleContext(this, destination, sourceRect, destinationRect,
+                RectTween ?? destination.RectTween ?? MdRectTweens.Linear);
+        var shuttle = shuttleBuilder?.Invoke(shuttleContext!);
+        RenderTargetBitmap? sourceBitmap = null;
+        RenderTargetBitmap? destinationBitmap = null;
+        if (shuttle is null)
         {
-            destinationBitmap = Capture(destination);
-        }
-        catch
-        {
-            sourceBitmap.Dispose();
-            throw;
+            shuttleContext = null;
+            sourceBitmap = MdVisualSnapshot.Capture(this);
+            try
+            {
+                destinationBitmap = MdVisualSnapshot.Capture(destination);
+            }
+            catch
+            {
+                sourceBitmap.Dispose();
+                throw;
+            }
         }
 
         var operation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -451,7 +707,10 @@ public sealed class MdHero : ContentControl
         var spatial = MdMotion.Resolve(this, MdMotionKind.Spatial, MdMotionSpeed.Default);
         var effects = MdMotion.Resolve(this, MdMotionKind.Effects, MdMotionSpeed.Fast);
         var duration = spatial.IsEnabled ? spatial.Duration : effects.Duration;
-        var flight = new MdHeroFlightPresenter(sourceBitmap, destinationBitmap, sourceRect, destinationRect, spatial.IsEnabled)
+        var flight = new MdHeroFlightPresenter(
+            sourceBitmap, destinationBitmap, sourceRect, destinationRect,
+            RectTween ?? destination.RectTween ?? MdRectTweens.Linear,
+            spatial.IsEnabled, shuttle, shuttleContext)
         {
             Width = Math.Max(1, overlay.Bounds.Width),
             Height = Math.Max(1, overlay.Bounds.Height),
@@ -463,9 +722,22 @@ public sealed class MdHero : ContentControl
             spatial.IsEnabled ? MdMotionKind.Spatial : MdMotionKind.Effects,
             spatial.IsEnabled ? MdMotionSpeed.Default : MdMotionSpeed.Fast);
         flight.Transitions = MdMotionTransitions.Collect(transition);
+        var placeholders = new List<Control>();
+        foreach (var hero in new[] { this, destination })
+        {
+            if (hero.PlaceholderBuilder?.Invoke(hero) is not { } placeholder) continue;
+            var bounds = ReferenceEquals(hero, this) ? sourceRect : destinationRect;
+            placeholder.Width = Math.Max(1, bounds.Width);
+            placeholder.Height = Math.Max(1, bounds.Height);
+            Canvas.SetLeft(placeholder, bounds.X);
+            Canvas.SetTop(placeholder, bounds.Y);
+            overlay.Children.Add(placeholder);
+            placeholders.Add(placeholder);
+        }
         var sourceOpacity = Opacity;
         var destinationOpacity = destination.Opacity;
         overlay.Children.Add(flight);
+        if (shuttle is not null) overlay.Children.Add(shuttle);
         SetCurrentValue(OpacityProperty, 0);
         destination.SetCurrentValue(OpacityProperty, 0);
         IsTransitioning = true;
@@ -485,8 +757,10 @@ public sealed class MdHero : ContentControl
         finally
         {
             overlay.Children.Remove(flight);
-            sourceBitmap.Dispose();
-            destinationBitmap.Dispose();
+            if (shuttle is not null) overlay.Children.Remove(shuttle);
+            foreach (var placeholder in placeholders) overlay.Children.Remove(placeholder);
+            sourceBitmap?.Dispose();
+            destinationBitmap?.Dispose();
             SetCurrentValue(OpacityProperty, sourceOpacity);
             destination.SetCurrentValue(OpacityProperty, destinationOpacity);
             IsTransitioning = false;
@@ -506,16 +780,6 @@ public sealed class MdHero : ContentControl
         base.OnDetachedFromVisualTree(e);
     }
 
-    private static RenderTargetBitmap Capture(Control control)
-    {
-        var scale = TopLevel.GetTopLevel(control)?.RenderScaling ?? 1;
-        var size = new PixelSize(Math.Max(1, (int)Math.Ceiling(control.Bounds.Width * scale)),
-            Math.Max(1, (int)Math.Ceiling(control.Bounds.Height * scale)));
-        var bitmap = new RenderTargetBitmap(size, new Vector(96 * scale, 96 * scale));
-        bitmap.Render(control);
-        return bitmap;
-    }
-
     private sealed class MdHeroFlightRegistration(CancellationTokenSource cancellation)
     {
         public CancellationTokenSource Cancellation { get; } = cancellation;
@@ -526,50 +790,91 @@ public sealed class MdHero : ContentControl
     private sealed class MdHeroFlightPresenter : Control
     {
         public static readonly StyledProperty<double> ProgressProperty = AvaloniaProperty.Register<MdHeroFlightPresenter, double>(nameof(Progress));
-        private readonly IImage _source;
-        private readonly IImage _destination;
+        private readonly IImage? _source;
+        private readonly IImage? _destination;
         private readonly Rect _sourceRect;
         private readonly Rect _destinationRect;
         private readonly bool _isSpatial;
+        private readonly MdRectTween _rectTween;
+        private readonly Control? _shuttle;
+        private readonly MdHeroFlightShuttleContext? _shuttleContext;
 
         static MdHeroFlightPresenter() => AffectsRender<MdHeroFlightPresenter>(ProgressProperty);
 
-        public MdHeroFlightPresenter(IImage source, IImage destination, Rect sourceRect, Rect destinationRect, bool isSpatial)
+        public MdHeroFlightPresenter(
+            IImage? source,
+            IImage? destination,
+            Rect sourceRect,
+            Rect destinationRect,
+            MdRectTween rectTween,
+            bool isSpatial,
+            Control? shuttle = null,
+            MdHeroFlightShuttleContext? shuttleContext = null)
         {
             _source = source;
             _destination = destination;
             _sourceRect = sourceRect;
             _destinationRect = destinationRect;
+            _rectTween = rectTween;
             _isSpatial = isSpatial;
+            _shuttle = shuttle;
+            _shuttleContext = shuttleContext;
+            UpdateShuttle();
         }
 
         public double Progress { get => GetValue(ProgressProperty); set => SetValue(ProgressProperty, value); }
 
+        protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+        {
+            base.OnPropertyChanged(change);
+            if (change.Property == ProgressProperty) UpdateShuttle();
+        }
+
+        private void UpdateShuttle()
+        {
+            var progress = Math.Clamp(Progress, 0, 1);
+            if (_shuttleContext is not null) _shuttleContext.Progress = progress;
+            if (_shuttle is null) return;
+            var rect = CurrentBounds(progress);
+            _shuttle.Width = Math.Max(1, rect.Width);
+            _shuttle.Height = Math.Max(1, rect.Height);
+            Canvas.SetLeft(_shuttle, rect.X);
+            Canvas.SetTop(_shuttle, rect.Y);
+        }
+
         public override void Render(DrawingContext context)
         {
             base.Render(context);
+            // A shuttle replaces the bitmap cross-fade entirely.
+            if (_source is null || _destination is null) return;
             var progress = Math.Clamp(Progress, 0, 1);
-            var rect = _isSpatial ? Lerp(_sourceRect, _destinationRect, progress) : _destinationRect;
+            var rect = CurrentBounds(progress);
             using (context.PushOpacity(1 - progress))
                 context.DrawImage(_source, new Rect(_source.Size), rect);
             using (context.PushOpacity(progress))
                 context.DrawImage(_destination, new Rect(_destination.Size), rect);
         }
 
-        private static Rect Lerp(Rect from, Rect to, double progress) => new(
-            from.X + (to.X - from.X) * progress,
-            from.Y + (to.Y - from.Y) * progress,
-            from.Width + (to.Width - from.Width) * progress,
-            from.Height + (to.Height - from.Height) * progress);
+        private Rect CurrentBounds(double progress) => _isSpatial
+            ? _rectTween(_sourceRect, _destinationRect, progress)
+            : _destinationRect;
     }
 }
 
-public sealed class MdHeroTransitionEventArgs(MdHero source, MdHero destination, Rect sourceBounds, Rect destinationBounds) : EventArgs
+public sealed class MdHeroTransitionEventArgs(
+    MdHero source,
+    MdHero destination,
+    Rect sourceBounds,
+    Rect destinationBounds,
+    bool isUserGesture = false) : EventArgs
 {
     public MdHero Source { get; } = source;
     public MdHero Destination { get; } = destination;
     public Rect SourceBounds { get; } = sourceBounds;
     public Rect DestinationBounds { get; } = destinationBounds;
+
+    /// <summary>True when the surrounding transition is gesture-driven (back swipe, drag).</summary>
+    public bool IsUserGesture { get; } = isUserGesture;
 }
 
 public enum MdFocusTraversalPolicy { VisualOrder, TabIndex, ReadingOrder }

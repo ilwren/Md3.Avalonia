@@ -7,9 +7,35 @@ using Avalonia.Controls.Templates;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
+using Avalonia.Media;
 using Avalonia.Threading;
 
 namespace Md3.Avalonia.Controls;
+
+/// <summary>Details handed to <see cref="MdStepper.ControlsBuilder"/> for the active step.</summary>
+public sealed class MdStepControlsContext(MdStepper stepper, int stepIndex, int stepCount)
+{
+    public MdStepper Stepper { get; } = stepper;
+    public int StepIndex { get; } = stepIndex;
+    public int StepCount { get; } = stepCount;
+    public bool CanContinue => StepIndex < StepCount - 1;
+    public bool CanCancel => StepIndex > 0;
+
+    /// <summary>Advances like the default continue button would.</summary>
+    public void Continue() => Stepper.Next();
+
+    /// <summary>Goes back like the default cancel button would.</summary>
+    public void Cancel() => Stepper.Previous();
+}
+
+/// <summary>Details handed to <see cref="MdStepper.StepIconBuilder"/> for one step.</summary>
+public sealed class MdStepIconContext(MdStep step, int stepIndex)
+{
+    public MdStep Step { get; } = step;
+    public int StepIndex { get; } = stepIndex;
+    public MdStepState State => Step.State;
+    public bool IsActive => Step.IsActive;
+}
 
 /// <summary>A Flutter-style Material stepper with linear/non-linear navigation and command hooks.</summary>
 /// <remarks>
@@ -39,6 +65,14 @@ public sealed class MdStepper : ItemsControl
         AvaloniaProperty.Register<MdStepper, ICommand?>(nameof(ContinueCommand));
     public static readonly StyledProperty<ICommand?> CancelCommandProperty =
         AvaloniaProperty.Register<MdStepper, ICommand?>(nameof(CancelCommand));
+    public static readonly StyledProperty<IBrush?> ConnectorBrushProperty =
+        AvaloniaProperty.Register<MdStepper, IBrush?>(nameof(ConnectorBrush));
+    public static readonly StyledProperty<double> ConnectorThicknessProperty =
+        AvaloniaProperty.Register<MdStepper, double>(nameof(ConnectorThickness), 2d);
+    public static readonly StyledProperty<Func<MdStepControlsContext, Control?>?> ControlsBuilderProperty =
+        AvaloniaProperty.Register<MdStepper, Func<MdStepControlsContext, Control?>?>(nameof(ControlsBuilder));
+    public static readonly StyledProperty<Func<MdStepIconContext, Control?>?> StepIconBuilderProperty =
+        AvaloniaProperty.Register<MdStepper, Func<MdStepIconContext, Control?>?>(nameof(StepIconBuilder));
     public static readonly DirectProperty<MdStepper, object?> ActiveStepContentProperty =
         AvaloniaProperty.RegisterDirect<MdStepper, object?>(nameof(ActiveStepContent), stepper => stepper.ActiveStepContent);
     public static readonly DirectProperty<MdStepper, IDataTemplate?> ActiveStepContentTemplateProperty =
@@ -49,12 +83,15 @@ public sealed class MdStepper : ItemsControl
     private Button? _cancelButton;
     private object? _activeStepContent;
     private IDataTemplate? _activeStepContentTemplate;
+    private Control? _customControls;
+    private object? _buildersSignature;
 
     static MdStepper()
     {
         ActiveStepProperty.Changed.AddClassHandler<MdStepper>((stepper, change) =>
         {
             stepper.CoerceActiveStep();
+            stepper.InvalidateBuilders();
             stepper.UpdateSteps();
             stepper.ActiveStepChanged?.Invoke(stepper, stepper.ActiveStep);
         });
@@ -65,6 +102,10 @@ public sealed class MdStepper : ItemsControl
             stepper.UpdatePseudoClasses();
             stepper.UpdateSteps();
         });
+        ConnectorBrushProperty.Changed.AddClassHandler<MdStepper>((stepper, _) => stepper.UpdateSteps());
+        ConnectorThicknessProperty.Changed.AddClassHandler<MdStepper>((stepper, _) => stepper.UpdateSteps());
+        ControlsBuilderProperty.Changed.AddClassHandler<MdStepper>((stepper, _) => stepper.InvalidateBuilders());
+        StepIconBuilderProperty.Changed.AddClassHandler<MdStepper>((stepper, _) => stepper.InvalidateBuilders());
     }
 
     public MdStepper()
@@ -80,6 +121,37 @@ public sealed class MdStepper : ItemsControl
     public object? CancelContent { get => GetValue(CancelContentProperty); set => SetValue(CancelContentProperty, value); }
     public ICommand? ContinueCommand { get => GetValue(ContinueCommandProperty); set => SetValue(ContinueCommandProperty, value); }
     public ICommand? CancelCommand { get => GetValue(CancelCommandProperty); set => SetValue(CancelCommandProperty, value); }
+
+    /// <summary>
+    /// Brush for the step connectors; <c>null</c> falls back to the theme's outline-variant
+    /// resource. Active-step styling still wins where the theme applies it.
+    /// </summary>
+    public IBrush? ConnectorBrush { get => GetValue(ConnectorBrushProperty); set => SetValue(ConnectorBrushProperty, value); }
+
+    /// <summary>Connector thickness in DIP; the theme default is 2.</summary>
+    public double ConnectorThickness { get => GetValue(ConnectorThicknessProperty); set => SetValue(ConnectorThicknessProperty, value); }
+
+    /// <summary>
+    /// Builds the active step's control row instead of the default continue/cancel buttons. The
+    /// returned control is re-hosted whenever the active step changes; return <c>null</c> to fall
+    /// back to the default buttons. Mirrors Flutter's <c>Stepper.controlsBuilder</c>.
+    /// </summary>
+    public Func<MdStepControlsContext, Control?>? ControlsBuilder
+    {
+        get => GetValue(ControlsBuilderProperty);
+        set => SetValue(ControlsBuilderProperty, value);
+    }
+
+    /// <summary>
+    /// Builds a replacement for a step's indicator content (number, check, error mark). Rebuilt
+    /// when the active step or the builder changes; the context carries the step state at build
+    /// time. Mirrors Flutter's <c>Stepper.stepIconBuilder</c>.
+    /// </summary>
+    public Func<MdStepIconContext, Control?>? StepIconBuilder
+    {
+        get => GetValue(StepIconBuilderProperty);
+        set => SetValue(StepIconBuilderProperty, value);
+    }
 
     /// <summary>Gets the content of the active step, used by the horizontal layout's shared body.</summary>
     // The getter must read the field, not GetValue: a getter-only DirectProperty whose CLR
@@ -136,12 +208,14 @@ public sealed class MdStepper : ItemsControl
         if (coerced != ActiveStep) SetCurrentValue(ActiveStepProperty, coerced);
     }
 
+    private MdStep[] GatherSteps() => Items.OfType<MdStep>()
+        .Concat(this.GetLogicalDescendants().OfType<MdStep>())
+        .Distinct()
+        .ToArray();
+
     private void UpdateSteps()
     {
-        var steps = Items.OfType<MdStep>()
-            .Concat(this.GetLogicalDescendants().OfType<MdStep>())
-            .Distinct()
-            .ToArray();
+        var steps = GatherSteps();
         for (var index = 0; index < steps.Length; index++)
         {
             // Per-step position drives the connector visibility (the last step never draws a
@@ -152,6 +226,7 @@ public sealed class MdStepper : ItemsControl
                 index == 0,
                 index == steps.Length - 1,
                 Orientation == Orientation.Horizontal);
+            steps[index].SetConnector(ConnectorBrush, ConnectorThickness);
         }
 
         // The horizontal layout renders the active step's content in a shared body below the
@@ -160,7 +235,45 @@ public sealed class MdStepper : ItemsControl
         SetAndRaise(ActiveStepContentProperty, ref _activeStepContent, active?.Content);
         SetAndRaise(ActiveStepContentTemplateProperty, ref _activeStepContentTemplate, active?.ContentTemplate);
 
+        UpdateBuilders(steps);
         UpdatePseudoClasses();
+    }
+
+    /// <summary>
+    /// Marks the builder outputs stale so the next <see cref="UpdateSteps"/> rebuilds them. The
+    /// builders create live controls, so they run only when their inputs change - navigation or
+    /// an explicit invalidation - and not on every layout pass.
+    /// </summary>
+    private void InvalidateBuilders()
+    {
+        _buildersSignature = null;
+        UpdateSteps();
+    }
+
+    private void UpdateBuilders(MdStep[] steps)
+    {
+        var signature = (ControlsBuilder, StepIconBuilder, ActiveStep, Orientation, steps.Length);
+        if (Equals(signature, _buildersSignature)) return;
+        _buildersSignature = signature;
+
+        UpdateCustomControls();
+        for (var index = 0; index < steps.Length; index++)
+        {
+            steps[index].SetCustomIcon(StepIconBuilder is null
+                ? null
+                : StepIconBuilder(new MdStepIconContext(steps[index], index)));
+        }
+    }
+
+    private void UpdateCustomControls()
+    {
+        var host = (_continueButton?.Parent ?? _cancelButton?.Parent) as Panel;
+        if (_customControls is not null && host is not null) host.Children.Remove(_customControls);
+        _customControls = ControlsBuilder?.Invoke(new MdStepControlsContext(this, ActiveStep, StepCount));
+        if (host is not null && _customControls is not null) host.Children.Add(_customControls);
+        var useCustom = _customControls is not null;
+        if (_continueButton is not null) _continueButton.IsVisible = !useCustom;
+        if (_cancelButton is not null) _cancelButton.IsVisible = !useCustom;
     }
 
     private void UpdatePseudoClasses()

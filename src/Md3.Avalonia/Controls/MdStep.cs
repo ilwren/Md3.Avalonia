@@ -5,6 +5,7 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
+using Avalonia.Media;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
 
@@ -30,6 +31,11 @@ public sealed class MdStep : HeaderedContentControl
     private Control? _stepNumberPresenter;
     private Control? _completeIcon;
     private Control? _errorIcon;
+    private Border? _connector;
+    private Border? _hConnector;
+    private Control? _customIcon;
+    private IBrush? _connectorBrush;
+    private double _connectorThickness = 2d;
     private readonly MdPresenceController _presence;
     private bool _isActive;
     private int _stepNumber = 1;
@@ -62,8 +68,12 @@ public sealed class MdStep : HeaderedContentControl
         _stepNumberPresenter = e.NameScope.Find<Control>("PART_StepNumber");
         _completeIcon = e.NameScope.Find<Control>("PART_CompleteIcon");
         _errorIcon = e.NameScope.Find<Control>("PART_ErrorIcon");
+        _connector = e.NameScope.Find<Border>("PART_Connector");
+        _hConnector = e.NameScope.Find<Border>("PART_HConnector");
         if (_headerButton is not null) _headerButton.Click += OnHeaderClick;
         _presence.Initialize(IsActive);
+        ApplyConnector();
+        ApplyCustomIcon();
         UpdateMotion();
     }
 
@@ -79,6 +89,52 @@ public sealed class MdStep : HeaderedContentControl
         UpdatePseudoClasses();
         _presence.Update(active, MdMotion.GetExitDuration(this));
         if (_contentPresenter is not null) _contentPresenter.IsHitTestVisible = active;
+    }
+
+    /// <summary>
+    /// Applies the stepper-level connector brush and thickness to whichever connector template is
+    /// active; a <c>null</c> brush hands the value back to the theme.
+    /// </summary>
+    internal void SetConnector(IBrush? brush, double thickness)
+    {
+        if (Equals(_connectorBrush, brush) && _connectorThickness.Equals(thickness)) return;
+        _connectorBrush = brush;
+        _connectorThickness = thickness;
+        ApplyConnector();
+    }
+
+    private void ApplyConnector()
+    {
+        foreach (var connector in new[] { _connector, _hConnector })
+        {
+            if (connector is null) continue;
+            if (_connectorBrush is not null) connector.Background = _connectorBrush;
+            else connector.ClearValue(Visual.BackgroundProperty);
+        }
+        if (_connector is not null) _connector.Width = _connectorThickness;
+        if (_hConnector is not null) _hConnector.Height = _connectorThickness;
+    }
+
+    /// <summary>
+    /// Installs a custom indicator built by <see cref="MdStepper.StepIconBuilder"/>. While one is
+    /// present the stock number/check/error visuals are hidden but not removed.
+    /// </summary>
+    internal void SetCustomIcon(Control? icon)
+    {
+        if (ReferenceEquals(_customIcon, icon)) return;
+        if (_customIcon is not null && _indicator?.Child is Panel oldHost) oldHost.Children.Remove(_customIcon);
+        _customIcon = icon;
+        ApplyCustomIcon();
+    }
+
+    private void ApplyCustomIcon()
+    {
+        var useCustom = _customIcon is not null;
+        if (_stepNumberPresenter is not null) _stepNumberPresenter.IsVisible = !useCustom;
+        if (_completeIcon is not null) _completeIcon.IsVisible = !useCustom;
+        if (_errorIcon is not null) _errorIcon.IsVisible = !useCustom;
+        if (useCustom && _customIcon is not null && _indicator?.Child is Panel host && !host.Children.Contains(_customIcon))
+            host.Children.Add(_customIcon);
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)

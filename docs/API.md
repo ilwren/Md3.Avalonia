@@ -1305,7 +1305,7 @@ Every public enum and its members are listed below. To print the current member 
 | `MdDataTableSortDirection` | `None` · `Ascending` · `Descending` |
 | `MdDatePickerMode` | `Docked` · `Modal` |
 | `MdDialogVariant` | `Basic` · `FullScreen` |
-| `MdDismissDirection` | `Horizontal` · `StartToEnd` · `EndToStart` |
+| `MdDismissDirection` | `Horizontal` · `StartToEnd` · `EndToStart` · `Vertical` · `Up` · `Down` |
 | `MdExtendedFabSize` | `Small` · `Medium` · `Large` |
 | `MdFabAlignment` | `End` · `Start` · `Right` · `Left` |
 | `MdFabColor` | `PrimaryContainer` · `SecondaryContainer` · `TertiaryContainer` · `Primary` · `Secondary` · `Tertiary` |

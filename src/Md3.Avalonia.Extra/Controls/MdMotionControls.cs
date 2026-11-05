@@ -6,6 +6,7 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Media.Transformation;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -416,15 +417,26 @@ public class MdContainerTransform : TemplatedControl
     public static readonly StyledProperty<TimeSpan> DurationProperty =
         AvaloniaProperty.Register<MdContainerTransform, TimeSpan>(nameof(Duration), TimeSpan.FromMilliseconds(350));
 
+    /// <summary>Backing styled property for <see cref="ClosedElevation"/>.</summary>
+    public static readonly StyledProperty<double> ClosedElevationProperty =
+        AvaloniaProperty.Register<MdContainerTransform, double>(nameof(ClosedElevation), 1d);
+
+    /// <summary>Backing styled property for <see cref="OpenElevation"/>.</summary>
+    public static readonly StyledProperty<double> OpenElevationProperty =
+        AvaloniaProperty.Register<MdContainerTransform, double>(nameof(OpenElevation));
+
     private Border? _container;
     private MdMorphPanel? _morph;
     private ContentPresenter? _closed;
     private ContentPresenter? _open;
+    private EventHandler<AvaloniaPropertyChangedEventArgs>? _morphChangedHandler;
 
     static MdContainerTransform()
     {
         IsExpandedProperty.Changed.AddClassHandler<MdContainerTransform>((ct, _) => ct.UpdateState(animate: true));
         DurationProperty.Changed.AddClassHandler<MdContainerTransform>((ct, _) => ct.UpdateState(animate: false));
+        ClosedElevationProperty.Changed.AddClassHandler<MdContainerTransform>((ct, _) => ct.UpdateElevation());
+        OpenElevationProperty.Changed.AddClassHandler<MdContainerTransform>((ct, _) => ct.UpdateElevation());
     }
 
     public MdContainerTransform() => UpdateState(animate: false);
@@ -437,15 +449,36 @@ public class MdContainerTransform : TemplatedControl
     public IBrush? ContainerBackground { get => GetValue(ContainerBackgroundProperty); set => SetValue(ContainerBackgroundProperty, value); }
     public TimeSpan Duration { get => GetValue(DurationProperty); set => SetValue(DurationProperty, value); }
 
+    /// <summary>
+    /// Container elevation while collapsed. The morph interpolates between this value and
+    /// <see cref="OpenElevation"/>, mapping the intermediate elevation to an M3-style shadow.
+    /// </summary>
+    public double ClosedElevation { get => GetValue(ClosedElevationProperty); set => SetValue(ClosedElevationProperty, value); }
+
+    /// <summary>Container elevation while expanded; <c>0</c> removes the shadow entirely.</summary>
+    public double OpenElevation { get => GetValue(OpenElevationProperty); set => SetValue(OpenElevationProperty, value); }
+
     public void Toggle() => IsExpanded = !IsExpanded;
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
+        if (_morph is not null && _morphChangedHandler is not null)
+            _morph.PropertyChanged -= _morphChangedHandler;
         _container = e.NameScope.Find<Border>("PART_Container");
         _morph = e.NameScope.Find<MdMorphPanel>("PART_Morph");
         _closed = e.NameScope.Find<ContentPresenter>("PART_ClosedContent");
         _open = e.NameScope.Find<ContentPresenter>("PART_OpenContent");
+        if (_morph is not null)
+        {
+            // The morph's progress animates through transitions; following every value change
+            // lets the elevation shadow interpolate with the rest of the container.
+            _morphChangedHandler = (_, change) =>
+            {
+                if (change.Property == MdMorphPanel.ProgressProperty) UpdateElevation();
+            };
+            _morph.PropertyChanged += _morphChangedHandler;
+        }
         UpdateState(animate: false);
     }
 
@@ -457,21 +490,32 @@ public class MdContainerTransform : TemplatedControl
 
         var spec = MdMotion.Resolve(this, MdMotionKind.Spatial, MdMotionSpeed.Default);
         var total = animate && spec.IsEnabled && Duration > TimeSpan.Zero ? Duration : TimeSpan.Zero;
-        var (exit, enter) = MdContentPhaser.SplitPhases(total);
 
-        _container.Transitions = total > TimeSpan.Zero
+        // Interruptible redirect: a state flip mid-flight keeps the current progress and scales
+        // the duration by the remaining travel, so the reversed motion continues at roughly the
+        // velocity it already had instead of restarting a full-length animation.
+        var target = IsExpanded ? 1d : 0d;
+        var remaining = Math.Abs(target - Math.Clamp(_morph.Progress, 0, 1));
+        var travel = total <= TimeSpan.Zero || remaining <= 0.001
+            ? TimeSpan.Zero
+            : remaining >= 0.999
+                ? total
+                : TimeSpan.FromMilliseconds(total.TotalMilliseconds * remaining);
+        var (exit, enter) = MdContentPhaser.SplitPhases(travel);
+
+        _container.Transitions = travel > TimeSpan.Zero
             ? MdMotionTransitions.Collect(new CornerRadiusTransition
             {
                 Property = Border.CornerRadiusProperty,
-                Duration = total,
+                Duration = travel,
                 Easing = spec.CreateEasing()
             })
             : null;
-        _morph.Transitions = total > TimeSpan.Zero
+        _morph.Transitions = travel > TimeSpan.Zero
             ? MdMotionTransitions.Collect(new DoubleTransition
             {
                 Property = MdMorphPanel.ProgressProperty,
-                Duration = total,
+                Duration = travel,
                 Easing = spec.CreateEasing()
             })
             : null;
@@ -481,7 +525,38 @@ public class MdContainerTransform : TemplatedControl
         MdContentPhaser.ApplyCrossFade(incoming, outgoing, exit, enter, spec);
 
         _container.CornerRadius = IsExpanded ? OpenCornerRadius : ClosedCornerRadius;
-        _morph.Progress = IsExpanded ? 1d : 0d;
+        _morph.Progress = target;
+        UpdateElevation();
+    }
+
+    /// <summary>
+    /// Maps the morph progress to an elevation between <see cref="ClosedElevation"/> and
+    /// <see cref="OpenElevation"/> and re-derives the container's shadow from it.
+    /// </summary>
+    private void UpdateElevation()
+    {
+        if (_container is null) return;
+        var progress = _morph is null ? (IsExpanded ? 1d : 0d) : Math.Clamp(_morph.Progress, 0, 1);
+        var elevation = ClosedElevation + (OpenElevation - ClosedElevation) * progress;
+        _container.BoxShadows = ElevationShadow(elevation);
+    }
+
+    /// <summary>
+    /// Approximate M3 elevation shadow: shadow length and blur grow with the elevation value and
+    /// the ambient tint is a soft black. Zero elevation removes the shadow entirely.
+    /// </summary>
+    private static BoxShadows ElevationShadow(double elevation)
+    {
+        if (elevation <= 0.01) return new BoxShadows();
+        var value = Math.Clamp(elevation, 0, 24);
+        var alpha = (byte)Math.Clamp(20 + value * 3, 0, 90);
+        return new BoxShadows(new BoxShadow
+        {
+            OffsetY = value * 0.5,
+            Blur = value * 2 + 2,
+            Spread = 0,
+            Color = Color.FromArgb(alpha, 0, 0, 0)
+        });
     }
 }
 
@@ -628,7 +703,16 @@ internal sealed class MdContentPhaser
             _outgoing.IsVisible = present;
             if (!present)
             {
-                _outgoing.Content = null;
+                // A snapshot taken for a Control exit owns its bitmap; free it with the phase.
+                if (_outgoing.Content is Image { Source: RenderTargetBitmap snapshot })
+                {
+                    _outgoing.Content = null;
+                    snapshot.Dispose();
+                }
+                else
+                {
+                    _outgoing.Content = null;
+                }
                 _outgoing.UpdateChild();
             }
         });
@@ -749,21 +833,43 @@ internal sealed class MdContentPhaser
     /// Shows the previous value in the retained presenter for its exit phase.
     /// </summary>
     /// <remarks>
-    /// Only values the outgoing presenter can realise independently are retained. A Control is
-    /// already mounted in the primary presenter and a visual may have exactly one parent, so
-    /// moving it would mean reparenting a live element mid-transition. The incoming phase still
-    /// runs for Control content; what is skipped is the overlap, not the animation.
+    /// Only values the outgoing presenter can realise independently are retained. A live Control
+    /// already belongs to the primary presenter and a visual may have exactly one parent, so the
+    /// exit shows a frozen <see cref="MdVisualSnapshot"/> of it instead: the image can be retained,
+    /// faded and transformed while the live element moves on to its new content. When no snapshot
+    /// can be taken the incoming phase still runs on its own; what is skipped is the overlap, not
+    /// the animation.
     /// </remarks>
     private void PhaseOutgoing(object? oldContent, TimeSpan exit, MdMotionSpec spec)
     {
-        if (_outgoing is null || oldContent is null || oldContent is Control || exit <= TimeSpan.Zero)
+        if (_outgoing is null || oldContent is null || exit <= TimeSpan.Zero)
         {
             _presence.Update(false, TimeSpan.Zero);
             return;
         }
 
-        _outgoing.ContentTemplate = _owner.ContentTemplate;
-        _outgoing.Content = oldContent;
+        if (oldContent is Control control)
+        {
+            if (MdVisualSnapshot.TryCapture(control) is not { } snapshot)
+            {
+                _presence.Update(false, TimeSpan.Zero);
+                return;
+            }
+            _outgoing.ContentTemplate = null;
+            _outgoing.Content = new Image
+            {
+                Source = snapshot,
+                Width = Math.Max(1, control.Bounds.Width),
+                Height = Math.Max(1, control.Bounds.Height),
+                Stretch = Stretch.Fill,
+                IsHitTestVisible = false
+            };
+        }
+        else
+        {
+            _outgoing.ContentTemplate = _owner.ContentTemplate;
+            _outgoing.Content = oldContent;
+        }
         _outgoing.UpdateChild();
         _outgoing.IsVisible = true;
         _outgoing.IsHitTestVisible = false;

@@ -8,6 +8,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -566,16 +567,42 @@ public sealed class MdGridTileBar : ContentControl
     }
 }
 
-public enum MdDismissDirection { Horizontal, StartToEnd, EndToStart }
+/// <summary>
+/// Allowed displacement for an <see cref="MdDismissible"/>. <see cref="Horizontal"/> and
+/// <see cref="Vertical"/> permit both directions on their axis; the concrete members permit one.
+/// </summary>
+public enum MdDismissDirection
+{
+    /// <summary>Either horizontal direction.</summary>
+    Horizontal,
+
+    /// <summary>Logical start toward logical end (mirrored in RTL).</summary>
+    StartToEnd,
+
+    /// <summary>Logical end toward logical start (mirrored in RTL).</summary>
+    EndToStart,
+
+    /// <summary>Either vertical direction.</summary>
+    Vertical,
+
+    /// <summary>Dragged toward the top edge.</summary>
+    Up,
+
+    /// <summary>Dragged toward the bottom edge.</summary>
+    Down
+}
 
 /// <summary>A swipe-dismiss surface with command, event, confirmation, and direct-operation paths.</summary>
-[PseudoClasses(":dragging", ":confirming", ":dismissed", ":collapsing", ":present", ":start", ":end", ":reduced-motion", ":no-motion")]
+[PseudoClasses(":dragging", ":confirming", ":dismissed", ":collapsing", ":present", ":start", ":end", ":up", ":down", ":reduced-motion", ":no-motion")]
 public sealed class MdDismissible : ContentControl
 {
     public static readonly StyledProperty<object?> BackgroundContentProperty = AvaloniaProperty.Register<MdDismissible, object?>(nameof(BackgroundContent));
     public static readonly StyledProperty<object?> SecondaryBackgroundContentProperty = AvaloniaProperty.Register<MdDismissible, object?>(nameof(SecondaryBackgroundContent));
     public static readonly StyledProperty<MdDismissDirection> DirectionProperty = AvaloniaProperty.Register<MdDismissible, MdDismissDirection>(nameof(Direction));
     public static readonly StyledProperty<double> DismissThresholdProperty = AvaloniaProperty.Register<MdDismissible, double>(nameof(DismissThreshold), 0.4);
+    public static readonly StyledProperty<IReadOnlyDictionary<MdDismissDirection, double>?> DismissThresholdsProperty = AvaloniaProperty.Register<MdDismissible, IReadOnlyDictionary<MdDismissDirection, double>?>(nameof(DismissThresholds));
+    public static readonly StyledProperty<TimeSpan?> ResizeDurationProperty = AvaloniaProperty.Register<MdDismissible, TimeSpan?>(nameof(ResizeDuration));
+    public static readonly StyledProperty<double> CrossAxisEndOffsetProperty = AvaloniaProperty.Register<MdDismissible, double>(nameof(CrossAxisEndOffset));
     public static readonly StyledProperty<bool> IsDismissedProperty = AvaloniaProperty.Register<MdDismissible, bool>(nameof(IsDismissed), defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
     public static readonly StyledProperty<ICommand?> DismissCommandProperty = AvaloniaProperty.Register<MdDismissible, ICommand?>(nameof(DismissCommand));
     public static readonly StyledProperty<Func<MdDismissDirection, CancellationToken, Task<bool>>?> ConfirmDismissAsyncProperty =
@@ -597,12 +624,13 @@ public sealed class MdDismissible : ContentControl
     private Border? _root;
     private Border? _foreground;
     private TranslateTransform? _foregroundTransform;
+    private TranslateTransform? _crossTransform;
     private readonly MdSpatialSpringRunner _offsetRunner;
     private readonly DispatcherTimer _collapseDelay = new();
     private readonly DispatcherTimer _collapseCompletion = new();
-    private double _lastPointerX;
+    private double _lastPointerAxis;
     private ulong _lastPointerTimestamp;
-    private double _horizontalVelocity;
+    private double _axisVelocity;
     private MdDismissDirection? _settleDirection;
     private bool _isConfirmationPending;
     private CancellationTokenSource? _confirmationCancellation;
@@ -618,8 +646,13 @@ public sealed class MdDismissible : ContentControl
     {
         _offsetRunner = new MdSpatialSpringRunner(this, value =>
         {
-            if (_foregroundTransform is not null) _foregroundTransform.X = value;
+            if (_foregroundTransform is not null)
+            {
+                _foregroundTransform.X = DragAxis == Orientation.Horizontal ? value : 0;
+                _foregroundTransform.Y = DragAxis == Orientation.Vertical ? value : 0;
+            }
             UpdateDirectionPseudoClasses(value);
+            RaiseOffsetChanged(value);
         });
         _collapseDelay.Tick += (_, _) => BeginHeightCollapse();
         _collapseCompletion.Tick += (_, _) =>
@@ -635,12 +668,39 @@ public sealed class MdDismissible : ContentControl
     public object? SecondaryBackgroundContent { get => GetValue(SecondaryBackgroundContentProperty); set => SetValue(SecondaryBackgroundContentProperty, value); }
     public MdDismissDirection Direction { get => GetValue(DirectionProperty); set => SetValue(DirectionProperty, value); }
     public double DismissThreshold { get => GetValue(DismissThresholdProperty); set => SetValue(DismissThresholdProperty, value); }
+
+    /// <summary>
+    /// Per-direction dismissal thresholds as a fraction of the drag-axis extent (0..1). A
+    /// direction missing from the map falls back to <see cref="DismissThreshold"/>.
+    /// </summary>
+    public IReadOnlyDictionary<MdDismissDirection, double>? DismissThresholds
+    {
+        get => GetValue(DismissThresholdsProperty);
+        set => SetValue(DismissThresholdsProperty, value);
+    }
+
+    /// <summary>
+    /// Duration of the height collapse that removes the row from layout after a dismissal. When
+    /// unset the collapse follows the resolved motion token; motion schemes without spatial
+    /// animation collapse immediately regardless of this value.
+    /// </summary>
+    public TimeSpan? ResizeDuration { get => GetValue(ResizeDurationProperty); set => SetValue(ResizeDurationProperty, value); }
+
+    /// <summary>
+    /// Cross-axis displacement applied when the row settles out, as a fraction of the cross-axis
+    /// extent: a horizontal dismissal drifts vertically by this fraction and the other way round.
+    /// </summary>
+    public double CrossAxisEndOffset { get => GetValue(CrossAxisEndOffsetProperty); set => SetValue(CrossAxisEndOffsetProperty, value); }
+
     public bool IsDismissed { get => GetValue(IsDismissedProperty); set => SetValue(IsDismissedProperty, value); }
     public ICommand? DismissCommand { get => GetValue(DismissCommandProperty); set => SetValue(DismissCommandProperty, value); }
     public Func<MdDismissDirection, CancellationToken, Task<bool>>? ConfirmDismissAsync { get => GetValue(ConfirmDismissAsyncProperty); set => SetValue(ConfirmDismissAsyncProperty, value); }
     public double DragOffset => _dragOffset;
     public bool IsConfirmationPending { get => _isConfirmationPending; private set => SetAndRaise(IsConfirmationPendingProperty, ref _isConfirmationPending, value); }
     public double VisualHeight => GetValue(VisualHeightProperty);
+
+    /// <summary>Raised on every drag and settle frame with the live offset along the drag axis.</summary>
+    public event EventHandler<MdDismissOffsetEventArgs>? UpdateOffset;
 
     public event EventHandler<MdDismissRequestedEventArgs>? DismissRequested;
     public event EventHandler<Exception>? DismissConfirmationFailed;
@@ -716,8 +776,10 @@ public sealed class MdDismissible : ContentControl
     private bool CompleteDismiss(MdDismissDirection direction, double releaseVelocity = 0)
     {
         if (DismissCommand?.CanExecute(direction) == true) DismissCommand.Execute(direction);
-        var target = DirectionSign(direction) * Math.Max(1, Bounds.Width);
+        var (axis, sign) = ResolveDirection(direction);
+        var target = sign * Math.Max(1, axis == Orientation.Horizontal ? Bounds.Width : Bounds.Height);
         SettleOffset(target, releaseVelocity);
+        ApplyCrossAxisEndOffset();
         SetCurrentValue(IsDismissedProperty, true);
         Dismissed?.Invoke(this, EventArgs.Empty);
         return true;
@@ -730,6 +792,7 @@ public sealed class MdDismissible : ContentControl
         _collapseCompletion.Stop();
         SetPresence(true);
         SetCurrentValue(VisualHeightProperty, double.NaN);
+        ResetCrossAxisEndOffset();
         var wasDismissed = IsDismissed;
         SetCurrentValue(IsDismissedProperty, false);
         if (!wasDismissed) SettleOffset(0);
@@ -751,9 +814,9 @@ public sealed class MdDismissible : ContentControl
         base.OnPointerPressed(e);
         if (IsDismissed || IsConfirmationPending || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
         _start = e.GetPosition(this);
-        _lastPointerX = _start.X;
+        _lastPointerAxis = DragAxis == Orientation.Horizontal ? _start.X : _start.Y;
         _lastPointerTimestamp = e.Timestamp;
-        _horizontalVelocity = 0;
+        _axisVelocity = 0;
         _trackingPointer = true;
     }
 
@@ -776,10 +839,12 @@ public sealed class MdDismissible : ContentControl
         var position = e.GetPosition(this);
         var horizontalDelta = position.X - _start.X;
         var verticalDelta = position.Y - _start.Y;
+        var axisDelta = DragAxis == Orientation.Horizontal ? horizontalDelta : verticalDelta;
+        var crossDelta = DragAxis == Orientation.Horizontal ? verticalDelta : horizontalDelta;
         if (!_dragging)
         {
-            if (Math.Abs(horizontalDelta) < DragSlop && Math.Abs(verticalDelta) < DragSlop) return;
-            if (Math.Abs(verticalDelta) > Math.Abs(horizontalDelta))
+            if (Math.Abs(axisDelta) < DragSlop && Math.Abs(crossDelta) < DragSlop) return;
+            if (Math.Abs(crossDelta) > Math.Abs(axisDelta))
             {
                 _trackingPointer = false;
                 return;
@@ -792,14 +857,15 @@ public sealed class MdDismissible : ContentControl
             e.Pointer.Capture(this);
         }
 
-        var candidate = _dragStartOffset + horizontalDelta;
+        var candidate = _dragStartOffset + axisDelta;
         if (!IsOffsetAllowed(candidate)) candidate = 0;
         var elapsed = e.Timestamp > _lastPointerTimestamp ? e.Timestamp - _lastPointerTimestamp : 1;
-        var instantaneousVelocity = (position.X - _lastPointerX) * 1000 / elapsed;
-        _horizontalVelocity = _horizontalVelocity == 0
+        var axisPosition = DragAxis == Orientation.Horizontal ? position.X : position.Y;
+        var instantaneousVelocity = (axisPosition - _lastPointerAxis) * 1000 / elapsed;
+        _axisVelocity = _axisVelocity == 0
             ? instantaneousVelocity
-            : _horizontalVelocity * 0.65 + instantaneousVelocity * 0.35;
-        _lastPointerX = position.X;
+            : _axisVelocity * 0.65 + instantaneousVelocity * 0.35;
+        _lastPointerAxis = axisPosition;
         _lastPointerTimestamp = e.Timestamp;
         ApplyDirectOffset(candidate);
         e.Handled = true;
@@ -815,14 +881,14 @@ public sealed class MdDismissible : ContentControl
         _dragging = false;
         PseudoClasses.Set(":dragging", false);
         var idleMilliseconds = e.Timestamp > _lastPointerTimestamp ? e.Timestamp - _lastPointerTimestamp : 0;
-        if (idleMilliseconds > 100) _horizontalVelocity = 0;
-        var width = Math.Max(1, Bounds.Width);
-        var releaseVelocity = Math.Clamp(_horizontalVelocity, -width * 8, width * 8);
-        var threshold = Math.Clamp(DismissThreshold, 0.05, 1) * width;
-        var fling = Math.Abs(DragOffset) >= width * MinimumFlingProgress &&
+        if (idleMilliseconds > 100) _axisVelocity = 0;
+        var size = AxisSize;
+        var releaseVelocity = Math.Clamp(_axisVelocity, -size * 8, size * 8);
+        var direction = DirectionFromOffset(DragOffset);
+        var threshold = Math.Clamp(ThresholdFor(direction ?? PrimaryDirection), 0.05, 1) * size;
+        var fling = Math.Abs(DragOffset) >= size * MinimumFlingProgress &&
                     Math.Abs(releaseVelocity) >= FlingVelocity &&
                     Math.Sign(releaseVelocity) == Math.Sign(DragOffset);
-        var direction = DirectionFromOffset(DragOffset);
         if (direction is not null && (Math.Abs(DragOffset) >= threshold || fling))
         {
             if (ConfirmDismissAsync is null)
@@ -874,6 +940,7 @@ public sealed class MdDismissible : ContentControl
             _collapseCompletion.Stop();
             SetPresence(true);
             SetCurrentValue(VisualHeightProperty, double.NaN);
+            ResetCrossAxisEndOffset();
             SettleOffset(0);
             return;
         }
@@ -897,7 +964,10 @@ public sealed class MdDismissible : ContentControl
         var height = Math.Max(0, Bounds.Height);
         SetCurrentValue(VisualHeightProperty, height);
         var spec = MdMotion.Resolve(this, MdMotionKind.Spatial, MdMotionSpeed.Default);
-        if (!spec.IsEnabled)
+        // An explicit ResizeDuration sizes the collapse; Reduced/None schemes still collapse
+        // immediately because the height change is spatial motion.
+        var collapseDuration = ResizeDuration is { } resize && resize > TimeSpan.Zero ? resize : spec.Duration;
+        if (!spec.IsEnabled || collapseDuration <= TimeSpan.Zero)
         {
             SetCurrentValue(VisualHeightProperty, 0);
             SetPresence(false);
@@ -905,7 +975,7 @@ public sealed class MdDismissible : ContentControl
         }
         Dispatcher.UIThread.Post(() => SetCurrentValue(VisualHeightProperty, 0), DispatcherPriority.Render);
         _collapseCompletion.Stop();
-        _collapseCompletion.Interval = spec.Duration;
+        _collapseCompletion.Interval = collapseDuration;
         _collapseCompletion.Start();
     }
 
@@ -936,26 +1006,6 @@ public sealed class MdDismissible : ContentControl
                 MdMotionTransitions.CreateDouble(this, HeightProperty, MdMotionKind.Spatial));
         }
         if (IsDismissed) OnDismissedChanged();
-    }
-
-    private bool IsDirectionAllowed(MdDismissDirection direction) =>
-        Direction == MdDismissDirection.Horizontal || Direction == direction;
-
-    private bool IsOffsetAllowed(double value) =>
-        value == 0 || DirectionFromOffset(value) is { } direction && IsDirectionAllowed(direction);
-
-    private MdDismissDirection? DirectionFromOffset(double value)
-    {
-        if (Math.Abs(value) < 0.001) return null;
-        return Math.Sign(value) == DirectionSign(MdDismissDirection.StartToEnd)
-            ? MdDismissDirection.StartToEnd
-            : MdDismissDirection.EndToStart;
-    }
-
-    private int DirectionSign(MdDismissDirection direction)
-    {
-        var startToEnd = FlowDirection == FlowDirection.RightToLeft ? -1 : 1;
-        return direction == MdDismissDirection.EndToStart ? -startToEnd : startToEnd;
     }
 
     private void ApplyDirectOffset(double value)
@@ -993,7 +1043,84 @@ public sealed class MdDismissible : ContentControl
         if (reachedRest) _settleDirection = null;
         PseudoClasses.Set(":start", direction == MdDismissDirection.StartToEnd);
         PseudoClasses.Set(":end", direction == MdDismissDirection.EndToStart);
+        PseudoClasses.Set(":up", direction == MdDismissDirection.Up);
+        PseudoClasses.Set(":down", direction == MdDismissDirection.Down);
     }
+
+    private void RaiseOffsetChanged(double visualOffset)
+    {
+        if (UpdateOffset is null) return;
+        var size = AxisSize;
+        var direction = DirectionFromOffset(visualOffset) ?? PrimaryDirection;
+        UpdateOffset.Invoke(this, new MdDismissOffsetEventArgs(
+            direction, visualOffset, Math.Clamp(Math.Abs(visualOffset) / size, 0, 1)));
+    }
+
+    /// <summary>The physical axis the configured <see cref="Direction"/> drags along.</summary>
+    private Orientation DragAxis => Direction is MdDismissDirection.Vertical
+        or MdDismissDirection.Up or MdDismissDirection.Down
+        ? Orientation.Vertical
+        : Orientation.Horizontal;
+
+    /// <summary>The drag-axis extent used to normalize offsets and thresholds.</summary>
+    private double AxisSize => Math.Max(1, DragAxis == Orientation.Horizontal ? Bounds.Width : Bounds.Height);
+
+    private MdDismissDirection PrimaryDirection =>
+        DragAxis == Orientation.Vertical ? MdDismissDirection.Up : MdDismissDirection.StartToEnd;
+
+    private double ThresholdFor(MdDismissDirection direction) =>
+        DismissThresholds is { } overrides && overrides.TryGetValue(direction, out var threshold)
+            ? threshold
+            : DismissThreshold;
+
+    private void ApplyCrossAxisEndOffset()
+    {
+        if (Math.Abs(CrossAxisEndOffset) < 0.001 || _root is null) return;
+        _crossTransform ??= new TranslateTransform();
+        if (!ReferenceEquals(_root.RenderTransform, _crossTransform))
+            _root.RenderTransform = _crossTransform;
+        var crossSize = DragAxis == Orientation.Horizontal ? Bounds.Height : Bounds.Width;
+        var offset = CrossAxisEndOffset * crossSize;
+        if (DragAxis == Orientation.Horizontal) _crossTransform.Y = offset;
+        else _crossTransform.X = offset;
+    }
+
+    private void ResetCrossAxisEndOffset()
+    {
+        if (_crossTransform is null) return;
+        _crossTransform.X = 0;
+        _crossTransform.Y = 0;
+    }
+
+    private bool IsDirectionAllowed(MdDismissDirection direction) => Direction switch
+    {
+        MdDismissDirection.Horizontal => direction is MdDismissDirection.StartToEnd or MdDismissDirection.EndToStart,
+        MdDismissDirection.Vertical => direction is MdDismissDirection.Up or MdDismissDirection.Down,
+        _ => Direction == direction
+    };
+
+    private bool IsOffsetAllowed(double value) =>
+        value == 0 || DirectionFromOffset(value) is { } direction && IsDirectionAllowed(direction);
+
+    private MdDismissDirection? DirectionFromOffset(double value)
+    {
+        if (Math.Abs(value) < 0.001) return null;
+        if (DragAxis == Orientation.Vertical)
+            return value < 0 ? MdDismissDirection.Up : MdDismissDirection.Down;
+        var startToEnd = FlowDirection == FlowDirection.RightToLeft ? -1 : 1;
+        return Math.Sign(value) == startToEnd
+            ? MdDismissDirection.StartToEnd
+            : MdDismissDirection.EndToStart;
+    }
+
+    /// <summary>Resolves a logical direction to its drag axis and visual sign.</summary>
+    private (Orientation Axis, int Sign) ResolveDirection(MdDismissDirection direction) => direction switch
+    {
+        MdDismissDirection.StartToEnd => (Orientation.Horizontal, FlowDirection == FlowDirection.RightToLeft ? -1 : 1),
+        MdDismissDirection.EndToStart => (Orientation.Horizontal, FlowDirection == FlowDirection.RightToLeft ? 1 : -1),
+        MdDismissDirection.Up => (Orientation.Vertical, -1),
+        _ => (Orientation.Vertical, 1)
+    };
 
     private void CancelConfirmation()
     {
@@ -1012,4 +1139,17 @@ public sealed class MdDismissRequestedEventArgs(MdDismissDirection direction) : 
 {
     public MdDismissDirection Direction { get; } = direction;
     public bool Cancel { get; set; }
+}
+
+/// <summary>Live drag/settle state reported by <see cref="MdDismissible.UpdateOffset"/>.</summary>
+public sealed class MdDismissOffsetEventArgs(MdDismissDirection direction, double offset, double progress) : EventArgs
+{
+    /// <summary>The direction the content is currently displaced toward; at rest the primary direction.</summary>
+    public MdDismissDirection Direction { get; } = direction;
+
+    /// <summary>Visual offset along the drag axis in DIP; sign follows <see cref="Direction"/>.</summary>
+    public double Offset { get; } = offset;
+
+    /// <summary>Displacement as a fraction of the drag-axis extent, clamped to 0..1.</summary>
+    public double Progress { get; } = progress;
 }
