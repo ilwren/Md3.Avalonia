@@ -9,7 +9,6 @@
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Rating" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="A star rating with fractional precision. Each half-star is its own target, so the hit test follows the visual rather than the spacing." />
       </StackPanel>
 
       <StackPanel Spacing="12">
@@ -20,6 +19,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdRating"
+                        Members="Precision, ItemSize, Spacing, IsReadOnly, ActiveBrush, InactiveBrush">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Precision is the step a click can land on - 0.5 makes each half-star its own target, so the hit test follows the visual rather than the spacing. ItemSize and Spacing are independent, IsReadOnly turns the control into a read-out, and the two brushes are what the filled and empty stars use." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdRating Value=&quot;{Binding Score}&quot; Precision=&quot;0.5&quot; /&gt;" />
       </StackPanel>

@@ -1,3 +1,12 @@
+---
+description: "How AI tooling was used to build Md3.Avalonia, what that means for accuracy, and how to verify behaviour."
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/AI_DISCLOSURE.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/AI_DISCLOSURE.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/AI_DISCLOSURE.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/AI_DISCLOSURE.html"
+comments: true
+---
+
 # AI disclosure and disclaimer
 
 [English](AI_DISCLOSURE.md) | [简体中文](AI_DISCLOSURE.zh-CN.md)

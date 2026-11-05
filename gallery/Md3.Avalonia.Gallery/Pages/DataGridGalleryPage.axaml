@@ -27,6 +27,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdDataGrid"
+                        Members="DataSource, Columns, IsEditable, SortColumn, SortDirection, FilterText, IsHeaderSticky">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Columns are MdDataGridColumn entries with Header, PropertyName, Width and IsEditable; FilterText narrows every column, and SortColumn/SortDirection report the sort the user chose. For the full spreadsheet control - column reordering, frozen columns, grouping - use Avalonia's DataGrid with MaterialDataGridTheme, which only replaces the control themes underneath it." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;themes:MaterialTheme /&gt;&#10;&lt;themes:MaterialDataGridTheme /&gt;   &lt;!-- opt-in package, after MaterialTheme --&gt;"
                             CSharpCode="grid.Columns.Add(new MdDataGridColumn { Header = &quot;Name&quot;, PropertyName = nameof(Row.Name), IsEditable = true });&#10;grid.DataSource = rows;&#10;grid.SortBy(nameof(Row.Name), ListSortDirection.Ascending);" />

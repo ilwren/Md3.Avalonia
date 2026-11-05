@@ -9,7 +9,6 @@
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Command palette" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="A searchable list of application commands. Each item carries a title, a description and keywords, and runs an ICommand." />
       </StackPanel>
 
       <StackPanel Spacing="12">
@@ -24,6 +23,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdCommandPalette, MdCommandItem"
+                        Members="ItemsSource, Query, IsOpen, OpenGesture, SelectedIndex, FilteredItems, SearchPlaceholder, EmptyText">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Each MdCommandItem is a record: Title, Command and Parameter, plus an optional Description, Keywords and Gesture. Keywords is what makes the filter feel smarter than the titles, FilteredItems is the resulting set, and OpenGesture with IsOpen lets the host bind the usual shortcut instead of drawing its own key handling." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample CSharpCode="palette.ItemsSource = new[]&#10;{&#10;    new MdCommandItem(&quot;Toggle loading&quot;, new RelayCommand(Toggle),&#10;                      Description: &quot;Switch the placeholder state&quot;, Keywords: &quot;loading shimmer&quot;)&#10;};&#10;palette.Show();" />
       </StackPanel>

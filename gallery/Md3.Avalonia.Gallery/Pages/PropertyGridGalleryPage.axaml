@@ -15,12 +15,12 @@
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Property grid" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="A property grid wearing the opt-in Md3.Avalonia.PropertyGrid theme. The grid sets no colours of its own: it lays out templates and hosts plain Avalonia controls, so this theme hands each of those controls a Material control theme - fields, checkboxes, combo boxes, spinners, sliders, date and time pickers, expanders, menus and tooltips - without replacing any native control theme elsewhere in the application." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="A property grid wearing the opt-in Md3.Avalonia.PropertyGrid theme. The grid sets no colours of its own, so the theme hands each native control it hosts a Material control theme - fields, checkboxes, combo boxes, date and time pickers, expanders, menus and tooltips - without replacing any native control theme elsewhere in the application." />
       </StackPanel>
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h3" Text="Themed grid" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Filter with the field at the top, narrow the list to a category with the chips below it, and open the options menu from the button beside the field. Categories are Material expanders, the name/value divider is an outlineVariant rule that turns primary while it is dragged, and the property list scrolls on the core Material scrollbar." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Filter with the field at the top, narrow to a category with the chips below it, and open the options menu from the button beside the field. Categories are Material expanders, the name/value divider is an OutlineVariant rule that turns Primary while it is dragged, and the list scrolls on the core Material scrollbar." />
         <Border CornerRadius="12" Padding="4"
                 Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
                 BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
@@ -31,13 +31,17 @@
                              AllCategoriesExpanded="True" />
           </Border>
         </Border>
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Every cell editor in that grid is a plain Avalonia control the grid built itself: string cells are Material filled fields, numeric cells are filled fields with Material spinners, booleans are Material checkboxes, enums are Material combo boxes, collections are Material list editors, and the date and time cells open the control's own wheel flyout inside a Material surface card." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Every cell editor is a plain Avalonia control the grid built itself: string and numeric cells are Material filled fields, booleans Material checkboxes, enums Material combo boxes, collections Material list editors, and the date and time cells open the control's own wheel flyout inside a Material surface card." />
       </StackPanel>
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="How it stays local" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="The theme reaches the cells the same way it reaches the chrome: one style per native type, each selector requiring a PropertyGrid ancestor, each handing that type one of the Md.Comp.PropertyGrid.* control themes. That is what keeps the package opt-in - a TextBox anywhere else in the application still has no control theme of its own, exactly as before this package was added, and the grid needs no FluentTheme." />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Two hairlines stay upstream's: the 0.5 DIP Gray border the grid's own templates draw around the list, radio-button and toggle-group editors, and the same border its expandable-object factory sets from C#. Both are local values, so no style can reach them, and this package does not fork the grid's eleven embedded control styles just to repaint them. Colour cells keep Avalonia's own ColorPicker, whose style sheets the grid already loads for its own subtree." />
+        <gallery:ApiNotes Control="MaterialPropertyGridTheme"
+                        Members="Styles include, Md.Comp.PropertyGrid.*, Md.Sys.Color.*, Md.Sys.TypeScale">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="The theme reaches the cells the way it reaches the chrome: one style per native type, each selector requiring a PropertyGrid ancestor, each handing that type one of the Md.Comp.PropertyGrid.* control themes. That is what keeps the package opt-in - a TextBox anywhere else still has no control theme of its own, and the grid needs no FluentTheme. Two hairlines stay upstream's (the 0.5 DIP Gray border its templates draw, and the one its expandable-object factory sets from C#): both are local values no style can reach, and colour cells keep Avalonia's own ColorPicker." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
       </StackPanel>
 
       <StackPanel Spacing="10">

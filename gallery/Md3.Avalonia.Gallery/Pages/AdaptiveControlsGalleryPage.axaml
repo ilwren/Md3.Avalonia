@@ -39,6 +39,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdAdaptiveProgressIndicator, MdAdaptiveSwitch"
+                        Members="Platform, Minimum, Maximum, Value, IsIndeterminate, Size">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Platform is the whole point: following the host picks Material or Cupertino from the platform it runs on, and forcing either one is what the switches on this page do. MdAdaptiveProgressIndicator keeps Minimum, Maximum, Value and IsIndeterminate, and Size is its diameter - the metrics around them change with the policy, not the API." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdAdaptiveSwitch Content=&quot;Follow the current platform&quot; IsChecked=&quot;True&quot; /&gt;&#10;&lt;md:MdAdaptiveSwitch Platform=&quot;Cupertino&quot; Content=&quot;Preview iOS control metrics&quot; /&gt;&#10;&lt;md:MdAdaptiveProgressIndicator Platform=&quot;Material&quot; Value=&quot;0&quot; Size=&quot;36&quot; /&gt;" />
       </StackPanel>

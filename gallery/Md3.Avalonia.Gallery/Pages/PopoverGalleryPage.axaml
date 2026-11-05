@@ -9,7 +9,6 @@
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Popover" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="A popover is a transient anchored surface. It closes on an outside click, Escape, a page scroll, or when another popup opens." />
       </StackPanel>
 
       <StackPanel Spacing="12">
@@ -20,6 +19,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdPopover"
+                        Members="Anchor, PopoverContent, Placement, IsOpen, DismissOnOutsideClick, DismissOnScroll, RestoreFocusOnClose">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Anchor and PopoverContent set what it hangs off and what it shows; Placement picks the side and flips when there is no room. The dismiss rules are on by default - an outside click, Escape, a scroll with DismissOnScroll, or another popup opening - and RestoreFocusOnClose returns focus to the anchor so a keyboard user is not dropped at the top of the page." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdPopover Anchor=&quot;Options&quot; PopoverContent=&quot;{Binding Details}&quot; Opened=&quot;OnOpened&quot; Closed=&quot;OnClosed&quot; /&gt;" />
       </StackPanel>

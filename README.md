@@ -1,4 +1,4 @@
-﻿# Md3.Avalonia
+# Md3.Avalonia
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
@@ -7,8 +7,11 @@ A Material Design 3 control library and component gallery for Avalonia 12.
 https://github.com/user-attachments/assets/53c05bc6-f1b5-4076-8b62-c4a7a2b819bf
 
 [![CI](https://github.com/ilwren/Md3.Avalonia/actions/workflows/ci.yml/badge.svg)](https://github.com/ilwren/Md3.Avalonia/actions/workflows/ci.yml)
+[![NuGet](https://img.shields.io/nuget/vpre/Md3.Avalonia.svg?label=NuGet&logo=nuget&logoColor=white)](https://www.nuget.org/packages/Md3.Avalonia)
+[![NuGet downloads](https://img.shields.io/nuget/dt/Md3.Avalonia.svg?label=downloads&logo=nuget&logoColor=white)](https://www.nuget.org/packages/Md3.Avalonia)
+[![NuGet packages](https://img.shields.io/badge/NuGet-18%20packages-004880.svg?logo=nuget&logoColor=white)](https://www.nuget.org/profiles/ilwren)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Project visitors](https://api.visitorbadge.io/api/visitors?path=ilwren%2FMd3.Avalonia&label=Visitors&countColor=%236750A4)](https://visitorbadge.io/status?path=ilwren%2FMd3.Avalonia)
+[![Project visitors](https://api.visitorbadge.io/api/visitors?path=ilwren%2FMd3.Avalonia&label=Visitors&countColor=%236750A4&style=flat)](https://visitorbadge.io/status?path=ilwren%2FMd3.Avalonia)
 
 - 375 public API types for buttons, inputs, navigation, dialogs, charts, and motion; indexed in the API reference and checked by a script gate.
 
@@ -103,7 +106,7 @@ All bindable APIs are Avalonia properties and work directly with CommunityToolki
 
 ## NuGet packages
 
-All 18 packages share one version and can be installed independently; unused packages are not pulled in.
+All 18 packages share one version and can be installed independently; unused packages are not pulled in. The version published for each one, including the current preview, is listed on the [NuGet profile](https://www.nuget.org/profiles/ilwren).
 
 | Package | Capability | Theme registration | Target frameworks |
 |---|---|---|---|

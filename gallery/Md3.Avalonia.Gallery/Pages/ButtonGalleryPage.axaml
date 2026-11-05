@@ -7,8 +7,14 @@
     <StackPanel Spacing="26" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Buttons" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Default, toggle, split, standard group and connected group configurations." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Default, toggle, split and grouped button configurations." />
       </StackPanel>
+
+      <gallery:ApiNotes Control="MdButton" Members="Variant, Size, Shape, LeadingIcon, TrailingIcon, Command, Click">
+        <gallery:ApiNotes.Notes>
+          <TextBlock Classes="body" TextWrapping="Wrap" Text="Variant picks the colour role set, Size scales the container and its type, and Shape is the corner family. Toggle, split and grouped buttons are separate types that read the same tokens." />
+        </gallery:ApiNotes.Notes>
+      </gallery:ApiNotes>
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Default button color styles" />

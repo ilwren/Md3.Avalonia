@@ -25,6 +25,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdTreeView"
+                        Members="Roots, SelectedNode, VisibleRows, Indentation, ShowGuides, NodeInvokedCommand, ExpansionChangedCommand, Expand(), Collapse(), Toggle(), ExpandAll(), CollapseAll(), SelectById()">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Roots is the hierarchy and VisibleRows is the flattened list the control actually draws, so a row knows its depth without a nested ItemsControl. Expansion is explicit - Expand, Collapse, Toggle, ExpandAll and CollapseAll mutate the model and ExpansionChangedCommand reports it - and SelectById() moves selection from code." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdTreeView Roots=&quot;{Binding ProjectNodes}&quot; SelectedNode=&quot;{Binding SelectedNode}&quot; /&gt;"
                             CSharpCode="tree.ExpandAll();&#10;tree.SelectById(&quot;android&quot;);" />

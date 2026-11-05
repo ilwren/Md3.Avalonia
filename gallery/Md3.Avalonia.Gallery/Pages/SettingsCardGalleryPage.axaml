@@ -65,6 +65,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdSettingsCard, MdSettingsGroup, MdSettingsExpander"
+                        Members="Header, Description, Icon, IconBackground, IconForeground, Trailing, IsClickable, Variant, Command, Click, IsExpanded">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Header and Description are the two lines; Icon with IconBackground and IconForeground is the leading badge, and Trailing takes a switch, a chevron or any control. IsClickable with Command and Click makes the whole card the target, Variant picks flat, outlined or tonal, and MdSettingsGroup plus MdSettingsExpander are the containers that keep a list of cards straight." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdSettingsGroup Header=&quot;NETWORK&quot;&gt;&#10;  &lt;md:MdSettingsCard Header=&quot;Wi-Fi&quot;&#10;                     Description=&quot;Connected to Studio_5GHz&quot;&#10;                     Icon=&quot;{x:Static md:MdSymbols.Wifi}&quot;&#10;                     Click=&quot;OnWifiClicked&quot; /&gt;&#10;  &lt;md:MdSettingsCard Header=&quot;Airplane mode&quot;&#10;                     Icon=&quot;{x:Static md:MdSymbols.AirplanemodeActive}&quot;&gt;&#10;    &lt;md:MdSettingsCard.Trailing&gt;&#10;      &lt;md:MdSwitch IsChecked=&quot;{Binding IsAirplaneMode}&quot; /&gt;&#10;    &lt;/md:MdSettingsCard.Trailing&gt;&#10;  &lt;/md:MdSettingsCard&gt;&#10;&lt;/md:MdSettingsGroup&gt;"
                              CSharpCode="var card = new MdSettingsCard&#10;{&#10;    Header = &quot;Dark theme&quot;,&#10;    Description = &quot;Save battery and reduce eye strain&quot;,&#10;    Icon = MdSymbols.DarkMode,&#10;    Trailing = new MdSwitch { IsChecked = true }&#10;};" />

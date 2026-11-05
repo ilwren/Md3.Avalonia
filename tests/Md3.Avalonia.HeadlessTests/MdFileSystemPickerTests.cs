@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
@@ -5,9 +6,11 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
+using Md3.Avalonia.Extra.Controls;
 using Md3.Avalonia.Localization;
 using Xunit;
 
@@ -208,6 +211,66 @@ public sealed class MdFileSystemPickerTests
             window.Close();
             Directory.Delete(root, recursive: true);
         }
+    }
+
+    [AvaloniaFact]
+    public async Task Powerline_Breadcrumb_Uses_The_Same_Roles_As_MdBreadcrumb()
+    {
+        // The picker re-draws the powerline strip in its own template rather than hosting an
+        // MdBreadcrumb, so nothing but this test stops the two from drifting apart. The reference is
+        // the breadcrumb page's own powerline strip: navigable ancestors in the accent ink, the
+        // current location in OnSurface at semi-bold, and one SurfaceContainerHighest ribbon behind
+        // both.
+        var root = CreateFixture();
+        var picker = new MdFileSystemPicker { Mode = MdFileSystemPickerMode.Folder, Width = 680, Height = 480 };
+        var window = new Window { Width = 760, Height = 560, Content = picker };
+        var breadcrumb = new MdBreadcrumb
+        {
+            Variant = MdBreadcrumbVariant.Powerline,
+            ItemsSource = (IEnumerable<MdBreadcrumbItem>)new MdBreadcrumbPathConverter().Convert(
+                "Home/Settings/Security", typeof(IEnumerable<MdBreadcrumbItem>), null, CultureInfo.InvariantCulture)!
+        };
+        var reference = new Window { Width = 520, Height = 120, Content = breadcrumb };
+        window.Show();
+        reference.Show();
+        try
+        {
+            Assert.True(await picker.NavigateAsync(Path.Combine(root, "folder")));
+            picker.BreadcrumbStyle = MdFileSystemBreadcrumbStyle.Powerline;
+            Dispatcher.UIThread.RunJobs();
+
+            var segments = picker.GetVisualDescendants().OfType<Button>()
+                .Where(button => button.Classes.Contains("breadcrumb-segment"))
+                .ToArray();
+            var items = breadcrumb.GetVisualDescendants().OfType<ListBoxItem>().ToArray();
+            Assert.Equal(picker.PathSegments.Count, segments.Length);
+            Assert.Equal(3, items.Length);
+
+            var pickerAncestor = segments[0];
+            var pickerCurrent = segments[^1];
+            Assert.Contains("powerline", pickerCurrent.Classes);
+            Assert.Contains("current", pickerCurrent.Classes);
+            Assert.DoesNotContain("current", pickerAncestor.Classes);
+
+            Assert.Equal(Colour(items[0].Foreground), Colour(pickerAncestor.Foreground));
+            Assert.Equal(Colour(items[0].Background), Colour(pickerAncestor.Background));
+            Assert.Equal(Colour(items[^1].Foreground), Colour(pickerCurrent.Foreground));
+            Assert.Equal(Colour(items[^1].Background), Colour(pickerCurrent.Background));
+            Assert.Equal(items[^1].FontWeight, pickerCurrent.FontWeight);
+            Assert.Equal(
+                Colour(items[^1].Background),
+                Colour(picker.GetVisualDescendants().OfType<Grid>()
+                    .First(grid => grid.Classes.Contains("powerline-segment"))
+                    .GetVisualDescendants().OfType<Border>().First().Background));
+        }
+        finally
+        {
+            window.Close();
+            reference.Close();
+            Directory.Delete(root, recursive: true);
+        }
+
+        static Color? Colour(IBrush? brush) => brush is ISolidColorBrush solid ? solid.Color : null;
     }
 
     private static string CreateFixture()

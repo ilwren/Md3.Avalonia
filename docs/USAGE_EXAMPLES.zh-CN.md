@@ -1,5 +1,11 @@
 ---
 _lang: zh-CN
+description: "可直接复制的 Md3.Avalonia XAML 示例：导航、对话框、表单、数据展示与动效。"
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/USAGE_EXAMPLES.zh-CN.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/USAGE_EXAMPLES.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/USAGE_EXAMPLES.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/USAGE_EXAMPLES.html"
+comments: true
 ---
 
 # 使用示例

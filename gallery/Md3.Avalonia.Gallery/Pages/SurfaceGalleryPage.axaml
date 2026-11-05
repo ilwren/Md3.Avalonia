@@ -7,7 +7,6 @@
     <StackPanel Spacing="28" Margin="0,0,12,24">
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Surfaces and type scale" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="MdSurface paints a semantic container role with optional elevation; MdText picks a role from the M3 type scale. Both follow the active theme rather than hard-coded colours or font sizes." />
       </StackPanel>
 
       <StackPanel Spacing="12">
@@ -25,6 +24,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdSurface, MdText"
+                        Members="Variant, Elevation, StyleRole">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Variant picks the semantic container role and Elevation adds the shadow that role expects, both resolved from the active theme rather than from a colour. MdText.StyleRole does the same for type: it names a role in the M3 scale instead of a font size, so container and text stay in step when the typography is regenerated." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdSurface Variant=&quot;ContainerHigh&quot; Elevation=&quot;{DynamicResource Md.Sys.Elevation.Level2}&quot;&gt;&#10;  &lt;md:MdText StyleRole=&quot;TitleMedium&quot; Text=&quot;Heading&quot; /&gt;&#10;&lt;/md:MdSurface&gt;" />
       </StackPanel>

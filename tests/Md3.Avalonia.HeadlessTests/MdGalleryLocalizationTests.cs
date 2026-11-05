@@ -46,6 +46,25 @@ public sealed class MdGalleryLocalizationTests
     }
 
     [AvaloniaFact]
+    public void Apply_Leaves_API_Identifiers_Alone_Even_When_They_Match_A_Key()
+    {
+        // The API note on this page lists "Text" as a member, and "Text" is also the dictionary
+        // key for 文本. Rewriting the chip would rename the property the page is documenting, so
+        // identifiers are opted out with the verbatim class rather than trusted to miss the table.
+        var page = new TextBoxGalleryPage();
+
+        GalleryLocalization.Apply(page, Chinese);
+
+        var chips = page.GetLogicalDescendants().OfType<TextBlock>().Select(block => block.Text).ToArray();
+        Assert.Contains("Text", chips);
+        Assert.DoesNotContain("文本", chips);
+        Assert.Contains("API 说明", chips);
+
+        GalleryLocalization.Apply(page, English);
+        Assert.Contains("API surface", page.GetLogicalDescendants().OfType<TextBlock>().Select(block => block.Text));
+    }
+
+    [AvaloniaFact]
     public void Apply_Translates_Something_On_Every_Page_It_Is_Given_And_Restores_All_Of_Them()
     {
         // A sample rather than all 107 pages: MdGalleryAdaptiveTests already instantiates every

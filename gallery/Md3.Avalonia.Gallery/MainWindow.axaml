@@ -68,8 +68,11 @@
           </StackPanel>
           <StackPanel x:Name="HeaderActions" Grid.Column="3" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
             <md:MdSearchBar x:Name="GallerySearch" Width="260" PlaceholderText="Search components" TextChanged="GallerySearchTextChanged" SearchSubmitted="GallerySearchSubmitted" />
-            <md:MdComboBox x:Name="LanguageSelector" Width="116" Label="Language" Variant="Outlined" SelectionChanged="LanguageSelectionChanged" />
-            <md:MdComboBox x:Name="ThemeSelector" Width="116" Label="Theme" Variant="Outlined" SelectionChanged="ThemeSelectionChanged" />
+            <!-- Both boxes are the combo box theme's minimum width: a language endonym and the theme
+                 names ("Material dark") both fit, and the pair stays aligned when the label switches
+                 between "Language" and "语言". -->
+            <md:MdComboBox x:Name="LanguageSelector" Width="160" Label="Language" Variant="Outlined" SelectionChanged="LanguageSelectionChanged" />
+            <md:MdComboBox x:Name="ThemeSelector" Width="160" Label="Theme" Variant="Outlined" SelectionChanged="ThemeSelectionChanged" />
           </StackPanel>
         </Grid>
       </Border>
@@ -225,7 +228,7 @@
             <TextBlock x:Name="OnThisPageTitle" FontSize="14" FontWeight="Medium" Text="On this page" />
             <StackPanel x:Name="TableOfContentsItems" Spacing="4" />
             <Border Margin="0,12,0,0" Height="1" Background="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
-            <TextBlock TextWrapping="Wrap" Classes="body" Text="Headings are generated from the active page. Activate one to move it into view." />
+            <TextBlock TextWrapping="Wrap" Classes="body" Text="Activate a heading to scroll it into view." />
           </StackPanel>
         </md:MdScrollViewer>
       </Border>

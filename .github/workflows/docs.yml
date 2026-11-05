@@ -44,6 +44,9 @@ jobs:
       - name: Build documentation site
         run: docfx build docfx.json
 
+      - name: Verify sitemap and page metadata
+        run: python3 scripts/check-docs-site.py _site
+
       - name: Prepare static Pages output
         # upload-pages-artifact archives dotfiles, so the marker is included without extra inputs.
         run: touch _site/.nojekyll

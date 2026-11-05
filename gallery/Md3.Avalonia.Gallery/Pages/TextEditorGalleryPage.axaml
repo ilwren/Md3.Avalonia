@@ -20,7 +20,6 @@
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h3" Text="Themed editor" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="The theme re-templates TextEditor, TextArea, the search panel and the completion list, and styles the controls the editor creates for itself with keyed Md.Comp.AvaloniaEdit.* themes, so the rest of the application keeps its own control themes." />
         <Border CornerRadius="12" ClipToBounds="True" Padding="4"
                 Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
                 BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1">
@@ -33,6 +32,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MaterialAvaloniaEditTheme"
+                        Members="Styles include, Md.Comp.AvaloniaEdit.*, Md.Sys.Color.*, Md.Sys.TypeScale">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="The theme re-templates TextEditor, TextArea, the search panel and the completion list, and supplies the keyed Md.Comp.AvaloniaEdit.* themes for the controls the editor creates for itself - so no Fluent resources are needed and the rest of the application keeps its own control themes." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;themes:MaterialTheme /&gt;&#10;&lt;themes:MaterialAvaloniaEditTheme /&gt;   &lt;!-- opt-in package, after MaterialTheme --&gt;"
                             CSharpCode="var editor = new TextEditor { ShowLineNumbers = true };&#10;editor.Text = File.ReadAllText(path);&#10;&#10;editor.SearchPanel.Open();&#10;editor.SearchPanel.SearchPattern = &quot;Material&quot;;&#10;editor.SearchPanel.FindNext();" />

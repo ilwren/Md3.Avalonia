@@ -455,6 +455,43 @@ public sealed class MdReportedIssuesTests
     }
 
     [AvaloniaFact]
+    public void Language_Selector_Shows_The_Language_It_Selected()
+    {
+        var previousCulture = CultureInfo.CurrentCulture;
+        var previousUiCulture = CultureInfo.CurrentUICulture;
+        var window = new MainWindow();
+        window.Show();
+        try
+        {
+            Dispatcher.UIThread.RunJobs();
+            var selector = window.GetVisualDescendants().OfType<MdComboBox>()
+                .Single(control => control.Name == "LanguageSelector");
+            Assert.Equal("English", SelectionText(selector));
+
+            selector.SelectedIndex = 1;
+            Dispatcher.UIThread.RunJobs();
+            // The selector used to keep reading "English": GalleryLocalization.Apply rewrote the
+            // template's selection box, and a local value outranks the template binding that
+            // follows SelectedItem, so the box stopped following the selection for good.
+            Assert.Equal("简体中文", SelectionText(selector));
+
+            selector.SelectedIndex = 0;
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal("English", SelectionText(selector));
+        }
+        finally
+        {
+            window.Close();
+            CultureInfo.CurrentCulture = previousCulture;
+            CultureInfo.CurrentUICulture = previousUiCulture;
+        }
+    }
+
+    private static object? SelectionText(MdComboBox comboBox) =>
+        comboBox.GetVisualDescendants().OfType<ContentControl>()
+            .Single(control => control.Name == "PART_SelectionBox").Content;
+
+    [AvaloniaFact]
     public void Breadcrumb_Supports_Flutter_Style_Scroll_Overflow_Without_Persistent_Double_Selection()
     {
         var breadcrumb = new MdBreadcrumb

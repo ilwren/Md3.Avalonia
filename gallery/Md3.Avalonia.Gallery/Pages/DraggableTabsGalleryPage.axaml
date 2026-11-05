@@ -68,6 +68,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MaterialTabaloniaTheme"
+                        Members="Styles include, TabsControl, ItemsSource (IList), NewItemFactory">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="The theme replaces Tabalonia's CustomTheme and FluentTheme, so neither has to be included. ItemsSource must implement IList, NewItemFactory decides what the add button appends, and a pinned tab cannot be dragged or closed." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <TextBlock Classes="body" TextWrapping="Wrap" Text="Register the theme after MaterialTheme and keep using TabsControl as usual. It replaces Tabalonia's CustomTheme and FluentTheme and needs neither of them nor Avalonia's FluentTheme; ItemsSource must implement IList, and NewItemFactory decides what the add button appends." />
         <gallery:CodeExample XamlCode="&lt;themes:MaterialTheme /&gt;&#10;&lt;themes:MaterialTabaloniaTheme /&gt;   &lt;!-- opt-in package, after MaterialTheme --&gt;&#10;&#10;&lt;tab:TabsControl ItemsSource=&quot;{Binding Tabs}&quot;&#10;                NewItemFactory=&quot;{Binding CreateTab}&quot;&#10;                FixedHeaderCount=&quot;1&quot; /&gt;"

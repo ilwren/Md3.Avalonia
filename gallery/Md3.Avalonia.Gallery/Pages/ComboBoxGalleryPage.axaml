@@ -12,8 +12,14 @@
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Combo box" />
         <TextBlock Classes="body" TextWrapping="Wrap"
-                   Text="MdComboBox implements Material's exposed dropdown menu while retaining Avalonia selection and keyboard behavior." />
+                   Text="Material's exposed dropdown menu on top of Avalonia's own ComboBox selection and keyboard handling." />
       </StackPanel>
+
+      <gallery:ApiNotes Control="MdComboBox" Members="Variant, Label, PlaceholderText, SupportingText, IsError, ErrorText, IsEditable, ItemsSource, SelectedItem">
+        <gallery:ApiNotes.Notes>
+          <TextBlock Classes="body" TextWrapping="Wrap" Text="Items are ordinary ComboBoxItems, so ItemsSource, SelectedItem and SelectedIndex bind exactly as they do on Avalonia's ComboBox. Alt+Down opens the menu, arrows move the active option, Enter commits and Escape dismisses it." />
+        </gallery:ApiNotes.Notes>
+      </gallery:ApiNotes>
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Filled and outlined" />
@@ -69,11 +75,6 @@
         </WrapPanel>
       </StackPanel>
 
-      <Border Padding="20" CornerRadius="20"
-              Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
-        <TextBlock Classes="body" TextWrapping="Wrap"
-                   Text="Open a menu by clicking the field or pressing Alt+Down. Arrow keys change the active option; Enter commits selection and Escape dismisses the popup." />
-      </Border>
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />

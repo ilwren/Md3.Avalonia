@@ -1,3 +1,12 @@
+---
+description: "Repository layout for Md3.Avalonia: source projects, tests, gallery pages, theme tokens and the docs build."
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/PROJECT_STRUCTURE.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/PROJECT_STRUCTURE.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/PROJECT_STRUCTURE.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/PROJECT_STRUCTURE.html"
+comments: true
+---
+
 # Project structure
 
 [English](PROJECT_STRUCTURE.md) | [简体中文](PROJECT_STRUCTURE.zh-CN.md)

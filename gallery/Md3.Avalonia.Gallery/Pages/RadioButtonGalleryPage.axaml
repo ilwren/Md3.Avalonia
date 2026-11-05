@@ -31,8 +31,13 @@
       </WrapPanel>
     </StackPanel>
     <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
-      <TextBlock Classes="body" TextWrapping="Wrap" Text="The full 48-DIP target responds to mouse, touch, pen and keyboard input. Native Avalonia GroupName, command and automation semantics remain available." />
     </Border>
+    <gallery:ApiNotes Control="MdRadioButton"
+                    Members="Content, IsChecked, GroupName, IsError">
+      <gallery:ApiNotes.Notes>
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="MdRadioButton is Avalonia's RadioButton: GroupName, IsChecked, commands and the automation semantics are native, and Content takes anything. IsError paints the selected dot in the error role. The full 48-DIP target responds to mouse, touch, pen and keyboard input." />
+      </gallery:ApiNotes.Notes>
+    </gallery:ApiNotes>
     <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage"/><gallery:CodeExample XamlCode="&lt;md:MdRadioButton Content=&quot;Standard&quot; GroupName=&quot;Plan&quot;&#10;                  IsChecked=&quot;{Binding IsStandardPlan}&quot; /&gt;" CSharpCode="var standard = new MdRadioButton&#10;{&#10;    Content = &quot;Standard&quot;,&#10;    GroupName = &quot;Plan&quot;,&#10;    IsChecked = true&#10;};" /></StackPanel>
     </StackPanel>
   </md:MdScrollViewer>

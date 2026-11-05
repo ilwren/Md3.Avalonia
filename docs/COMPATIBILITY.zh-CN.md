@@ -1,5 +1,11 @@
 ---
 _lang: zh-CN
+description: "Md3.Avalonia 支持的 Avalonia 版本、目标框架与平台，以及破坏性变更策略。"
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/COMPATIBILITY.zh-CN.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/COMPATIBILITY.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/COMPATIBILITY.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/COMPATIBILITY.html"
+comments: true
 ---
 
 # 兼容性与支持策略

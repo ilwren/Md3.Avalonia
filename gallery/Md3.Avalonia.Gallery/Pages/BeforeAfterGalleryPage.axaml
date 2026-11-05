@@ -73,6 +73,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdBeforeAfter"
+                        Members="Before, After, Position, Orientation, DividerThickness, DividerBrush, IsInteractive">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Before and After take any content and the divider wipes one over the other: Position is two-way, Orientation chooses a horizontal or vertical wipe, and IsInteractive=false leaves a display-only cut for a page that is not asking for a comparison." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdBeforeAfter Position=&quot;{Binding Wipe, Mode=TwoWay}&quot;&#10;                   Orientation=&quot;Vertical&quot; DividerThickness=&quot;6&quot;&#10;                   DividerBrush=&quot;{DynamicResource Md.Sys.Color.Tertiary.Brush}&quot;&gt;&#10;  &lt;eco:MdBeforeAfter.Before&gt;&#10;    &lt;Image Source=&quot;{Binding Original}&quot; Stretch=&quot;UniformToFill&quot; /&gt;&#10;  &lt;/eco:MdBeforeAfter.Before&gt;&#10;  &lt;eco:MdBeforeAfter.After&gt;&#10;    &lt;Image Source=&quot;{Binding Processed}&quot; Stretch=&quot;UniformToFill&quot; /&gt;&#10;  &lt;/eco:MdBeforeAfter.After&gt;&#10;&lt;/eco:MdBeforeAfter&gt;" CSharpCode="var compare = new MdBeforeAfter&#10;{&#10;    Before = new Image { Source = original, Stretch = Stretch.UniformToFill },&#10;    After = new Image { Source = processed, Stretch = Stretch.UniformToFill },&#10;    Position = 0.5&#10;};&#10;compare.PositionChanged += (_, _) =&gt; Report(compare.Position);" />
       </StackPanel>

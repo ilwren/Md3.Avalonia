@@ -27,10 +27,15 @@
       </StackPanel>
 
       <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
-        <TextBlock Classes="body" Text="Active and stop indicators use Primary; the track uses SecondaryContainer. Value, Minimum, Maximum, and IsIndeterminate retain native ProgressBar semantics." TextWrapping="Wrap"/>
       </Border>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdLinearProgressIndicator, MdCircularProgressIndicator"
+                        Members="Value, Minimum, Maximum, IsIndeterminate, IndicatorBrush, TrackBrush, TrackThickness, Shape, WaveAmplitude, Size, StrokeThickness">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Both indicators keep native ProgressBar semantics: Value, Minimum, Maximum and IsIndeterminate mean what they always did. The material parts are the brushes and the shape: the active segment is Primary and the track SecondaryContainer, TrackThickness and Shape size the bar, WaveAmplitude and WaveLength shape the indeterminate wave, and the circular indicator takes Size and StrokeThickness instead." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdLinearProgressIndicator Value=&quot;{Binding Progress}&quot; Shape=&quot;Wavy&quot; /&gt;&#10;&lt;md:MdCircularProgressIndicator IsIndeterminate=&quot;True&quot; /&gt;" CSharpCode="var linear = new MdLinearProgressIndicator { Value = 64, Shape = MdProgressShape.Wavy };&#10;var circular = new MdCircularProgressIndicator { IsIndeterminate = true };" />
       </StackPanel>

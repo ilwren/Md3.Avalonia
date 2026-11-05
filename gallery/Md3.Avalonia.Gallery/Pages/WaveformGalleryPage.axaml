@@ -9,7 +9,7 @@
       <StackPanel Spacing="8">
         <TextBlock Classes="h1" Text="Waveform" />
         <TextBlock Classes="body" TextWrapping="Wrap" Text="A peak-driven waveform: the played part in Primary, the rest in SurfaceContainerHighest, the same split a Material 3 slider makes between its active and inactive track. The control draws peaks and does not decode audio, so the host keeps its own decoder, threading and buffer lifetime." />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="The peaks here are not invented. They are decoded from a real 20-second recording bundled with the gallery, read as plain PCM by a small WAV reader rather than drawn from a curve written to look like audio. Nothing reaches an audio device either: playback is a timer walking the playhead through the decoded samples, so it behaves the same on a machine with no output at all. The track is a 20-second excerpt of Okay from mdn/dom-examples, dedicated to the public domain under CC0 1.0." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The peaks are decoded from a real 20-second recording bundled with the gallery - an excerpt of Okay from mdn/dom-examples, dedicated to the public domain under CC0 1.0 - and playback is a timer walking the playhead, not an audio device, so the page behaves the same on a machine with no output." />
       </StackPanel>
 
       <StackPanel Spacing="12">
@@ -24,7 +24,7 @@
 
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="While it plays" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="IsPulsing makes the bars pulse in place, so the same peak buffer reads as a track that is playing rather than a picture of one. The pulse travels along the bars and is scaled by each bar's own peak, so a quiet passage stays quiet instead of thumping as loudly as the drop; AnimationAmplitude and AnimationSpeed shape it. It runs on the render loop rather than a timer, so a waveform that is hidden or switched off costs nothing, and it holds still under the Reduced and None motion schemes. The waveform above pulses while the demo track is playing, and its playhead carries a knob that grows while it is held, the way a Material slider's handle does." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="IsPulsing makes the bars pulse in place, so the same peak buffer reads as a track that is playing rather than a picture of one. The pulse travels along the bars, scaled by each bar's own peak, so a quiet passage stays quiet; AnimationAmplitude and AnimationSpeed shape it. It runs on the render loop, so a hidden waveform costs nothing and it holds still under the Reduced and None motion schemes." />
         <eco:MdWaveform x:Name="Live" Height="80" IsPulsing="True" IsInteractive="False" ShowPlayhead="False" HorizontalAlignment="Stretch" />
       </StackPanel>
 
@@ -43,6 +43,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdWaveform"
+                        Members="Peaks, PlayheadPosition, IsInteractive, IsPulsing, IsMirrored, ShowPlayhead, ShowPlayheadKnob, BarGap, AnimationAmplitude, AnimationSpeed, PeaksFromSamples()">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="The control never decodes audio: the host supplies normalised magnitudes, one per bar, and PeaksFromSamples() reduces a buffer the host already has. PlayheadPosition is two-way, so a view model drives the playhead during playback and receives seeks back." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdWaveform Peaks=&quot;{Binding Peaks}&quot;&#10;             PlayheadPosition=&quot;{Binding Position, Mode=TwoWay}&quot; /&gt;"
                              CSharpCode="// The control never decodes audio; the host supplies normalized magnitudes, one per bar.&#10;// PeaksFromSamples reduces a sample buffer the host already has.&#10;var peaks = MdWaveform.PeaksFromSamples(samples, barCount: 320);&#10;waveform.Peaks = peaks;" />

@@ -14,7 +14,7 @@
         <StackPanel Spacing="8">
           <TextBlock Classes="h3" Text="When a selection is committed" />
           <TextBlock Classes="body" TextWrapping="Wrap"
-                     Text="The docked date picker commits as you pick: its bound value changes the moment you choose a day. Everything that opens as a dialog — the modal date picker and both time pickers — is provisional: the value changes only when you confirm with OK, or Enter in input mode. Dismissing with Escape, the scrim, or Cancel restores the value the picker held when it opened. Each picker below prints its live bound value, so you can see which rule applied." />
+                     Text="The docked date picker commits as you pick. Anything that opens as a dialog - the modal date picker and both time pickers - is provisional: the value changes on OK, or Enter in input mode, and Escape, the scrim or Cancel restores what the picker held when it opened. Each picker prints its live bound value, so the difference is visible." />
         </StackPanel>
       </Border>
 
@@ -55,6 +55,12 @@
       </Border>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdDatePicker / MdTimePicker"
+                        Members="SelectedDate, DisplayDate, MinimumDate, MaximumDate, DateFormat, Mode, SelectedTime, Hour, Minute, MinuteStep, Is24Hour">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="DisplayDate is the month the grid opens on, independent of SelectedDate; MinimumDate and MaximumDate clamp it. Mode picks docked, modal, dial or input, MinuteStep and Is24Hour shape the time pickers, and DateFormat overrides the field's text." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;md:MdDatePicker SelectedDate=&quot;{Binding DueDate}&quot; Mode=&quot;Modal&quot; /&gt;&#10;&lt;md:MdTimePicker SelectedTime=&quot;{Binding StartTime}&quot;&#10;                 Mode=&quot;Input&quot; Is24Hour=&quot;True&quot; /&gt;" CSharpCode="var date = new MdDatePicker { Mode = MdDatePickerMode.Modal };&#10;var time = new MdTimePicker { Mode = MdTimePickerMode.Input, Is24Hour = true };&#10;&#10;// Modal pickers are provisional until confirmed; docked and dial pickers&#10;// write straight through, so this fires as the user picks.&#10;date.GetObservable(MdDatePicker.SelectedDateProperty).Subscribe(value =&gt; Report(value));" />
       </StackPanel>

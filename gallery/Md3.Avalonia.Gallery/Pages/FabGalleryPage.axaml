@@ -65,6 +65,12 @@
       </Border>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdFloatingActionButton, MdFabMenu"
+                        Members="Icon, Size, ColorStyle, Alignment, Elevation, IsOpen, IsInitiallyOpen, ExpansionDirection, OpenIcon, CloseIcon">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Size scales the FAB container and its icon together, ColorStyle picks the colour role set, and Elevation is the resting height the state layers ride on. MdFabMenu wraps two to six items: ExpansionDirection chooses up or down, IsInitiallyOpen applies once at attachment while IsOpen stays the live, bindable state." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage"/>
         <gallery:CodeExample XamlCode="&lt;!-- Material default: actions expand above the trailing anchor --&gt;&#10;&lt;md:MdFabMenu Alignment=&quot;Right&quot; ExpansionDirection=&quot;Up&quot; IsInitiallyOpen=&quot;True&quot;&gt;&#10;    &lt;md:MdFabMenuItem Content=&quot;Photo&quot; Icon=&quot;{x:Static md:MdSymbols.Photo}&quot; /&gt;&#10;    &lt;md:MdFabMenuItem Content=&quot;Document&quot; Icon=&quot;{x:Static md:MdSymbols.Description}&quot; /&gt;&#10;&lt;/md:MdFabMenu&gt;&#10;&#10;&lt;!-- Explicit extension for an anchor near the top edge --&gt;&#10;&lt;md:MdFabMenu Alignment=&quot;Left&quot; ExpansionDirection=&quot;Down&quot;&gt;&#10;    &lt;md:MdFabMenuItem Content=&quot;Voice&quot; Icon=&quot;{x:Static md:MdSymbols.Mic}&quot; /&gt;&#10;&lt;/md:MdFabMenu&gt;" CSharpCode="var menu = new MdFabMenu&#10;{&#10;    Alignment = MdFabAlignment.Right,&#10;    ExpansionDirection = MdFabMenuExpansionDirection.Up,&#10;    IsInitiallyOpen = true&#10;};" />
       </StackPanel>

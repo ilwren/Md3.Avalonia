@@ -27,6 +27,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdHoverCard"
+                        Members="Anchor, PopoverContent, IsOpen, Placement, OpenDelay, CloseDelay, DismissOnOutsideClick, DismissOnScroll, RestoreFocusOnClose">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Anchor is the element it attaches to and PopoverContent is what it shows. OpenDelay is what makes it deliberate rather than a tooltip, and CloseDelay is the grace period that lets the pointer travel from the anchor into the card. DismissOnOutsideClick, DismissOnScroll and RestoreFocusOnClose are the dismissal rules." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdHoverCard Anchor=&quot;Profile&quot; PopoverContent=&quot;{Binding Summary}&quot; Opened=&quot;OnOpened&quot; Closed=&quot;OnClosed&quot; /&gt;" />
       </StackPanel>

@@ -1,5 +1,11 @@
 ---
 _lang: zh-CN
+description: "MdDialogService 契约：注册对话框视图、await 返回值，以及用 MdDialogHost 承载对话框。"
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/DIALOG_SERVICE.zh-CN.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/DIALOG_SERVICE.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/DIALOG_SERVICE.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/DIALOG_SERVICE.html"
+comments: true
 ---
 
 # 从 ViewModel 弹出对话框：`IMdDialogService`

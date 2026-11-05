@@ -27,6 +27,28 @@ public sealed class MdDesktopPickerAndCarouselTests
         return child is null ? [] : child.GetSelfAndVisualDescendants().OfType<Control>();
     }
 
+    // The popup can hold two realised day grids. While a month transition animates, the outgoing
+    // month is still on screen above the active one, and its buttons are deliberately inert: the
+    // grid is not hit-testable and the picker's Click handler is attached to PART_DaysHost only.
+    // Walking the whole popup therefore finds the *old* month's buttons first, and a RaiseClick on
+    // one of those goes nowhere - which reads as "the picker never commits a day". Every day query
+    // starts from the active grid instead.
+    private static IEnumerable<Button> ActiveDayButtons(Control control)
+    {
+        var host = PopupContent(control).OfType<MdCalendarGrid>()
+            .FirstOrDefault(grid => grid.Name == "PART_DaysHost");
+        Assert.True(host is not null, "the popup realized no active day grid");
+        return host!.GetVisualDescendants().OfType<Button>().ToArray();
+    }
+
+    private static Button DayButton(Control control, MdCalendarDay day)
+    {
+        var button = ActiveDayButtons(control)
+            .FirstOrDefault(candidate => ReferenceEquals(candidate.DataContext, day));
+        Assert.True(button is not null, $"the active grid realized no button for {day.Date:d}");
+        return button!;
+    }
+
     // ---------------------------------------------------------------- date picker
 
     [AvaloniaFact]
@@ -46,17 +68,24 @@ public sealed class MdDesktopPickerAndCarouselTests
             Dispatcher.UIThread.RunJobs();
 
             // The popup content has to actually exist before anything inside it can be clicked.
-            var buttons = PopupContent(picker).OfType<Button>().ToArray();
+            var buttons = ActiveDayButtons(picker).ToArray();
             Assert.True(buttons.Length > 0, "the popup realized no content at all");
 
-            var day = buttons.FirstOrDefault(b => b.DataContext?.GetType().Name.Contains("Day", StringComparison.Ordinal) == true)
-                      ?? buttons.FirstOrDefault(b => b.Content is string s && s == "15");
-            Assert.True(day is not null, "no calendar day button in the realized popup content");
-
-            // Modal keeps the pick provisional until Confirm, so the day click alone must not commit.
-            day!.Command?.Execute(day.CommandParameter);
-            RaiseClick(day);
+            // A modal picker with nothing selected re-anchors on today when it opens, so the month
+            // on screen is whatever "today" falls in and not the seeded DisplayDate. Reading the day
+            // to click from the picker's own calendar keeps this test independent of the date it
+            // runs on: it used to look for "the first day button" and, on the first day of the next
+            // month, found one in the inert outgoing grid instead and asserted a commit that could
+            // never happen.
+            var target = picker.CalendarDays
+                .First(day => day.IsCurrentMonth && day.IsEnabled && day.Date.Day == 15);
+            RaiseClick(DayButton(picker, target));
             Dispatcher.UIThread.RunJobs();
+
+            // Modal keeps the pick provisional until Confirm, so the day click alone must not close
+            // the popup and must not lose the day that was picked.
+            Assert.True(picker.IsOpen, "a modal day click closed the popup without a confirm");
+            Assert.Equal(target.Date.Date, picker.SelectedDate?.Date);
 
             var confirm = PopupContent(picker).OfType<Button>()
                 .FirstOrDefault(b => b.Name == "PART_ConfirmButton");
@@ -65,7 +94,7 @@ public sealed class MdDesktopPickerAndCarouselTests
             Dispatcher.UIThread.RunJobs();
 
             Assert.False(picker.IsOpen);
-            Assert.NotNull(picker.SelectedDate);
+            Assert.Equal(target.Date.Date, picker.SelectedDate?.Date);
         }
         finally { window.Close(); }
     }
@@ -127,15 +156,13 @@ public sealed class MdDesktopPickerAndCarouselTests
             picker.IsOpen = true;
             Dispatcher.UIThread.RunJobs();
 
-            var day = PopupContent(picker).OfType<Button>()
-                .Where(b => b.DataContext?.GetType().Name.Contains("Day", StringComparison.Ordinal) == true)
-                .FirstOrDefault(b => b.DataContext?.ToString() != picker.SelectedDate?.Day.ToString());
-            Assert.NotNull(day);
-
-            RaiseClick(day!);
+            var target = picker.CalendarDays
+                .First(day => day.IsCurrentMonth && day.IsEnabled && day.Date.Day == 15);
+            RaiseClick(DayButton(picker, target));
             Dispatcher.UIThread.RunJobs();
 
             Assert.False(picker.IsOpen, "a docked picker commits as you pick and closes itself");
+            Assert.Equal(target.Date.Date, picker.SelectedDate?.Date);
             Assert.NotEqual(new DateTimeOffset(new DateTime(2026, 9, 22)), picker.SelectedDate);
             Assert.NotEqual(seeded, picker.DisplayText);
 

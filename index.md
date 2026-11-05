@@ -1,3 +1,13 @@
+---
+title: "Md3.Avalonia - Material Design 3 controls for Avalonia UI"
+description: "Material Design 3 controls for Avalonia: 18 NuGet packages covering navigation, dialogs, data display, charts, maps and editors, with a live gallery."
+canonical: "https://ilwren.github.io/Md3.Avalonia/"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/index.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/"
+comments: true
+---
+
 <p class="md3-page-note md3-language-switch"><strong>Language:</strong> <a href="index.html">English</a> | <a href="index.zh-CN.html" lang="zh-Hans">简体中文</a></p>
 
 <section class="md3-hero" aria-label="Md3.Avalonia">

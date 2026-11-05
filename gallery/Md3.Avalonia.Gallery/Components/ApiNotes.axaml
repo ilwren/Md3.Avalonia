@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Md3.Avalonia.Gallery.Components.ApiNotes">
+  <UserControl.Styles>
+    <!-- Local to this component: the shell styles h1/h2/body only, and an API card is a quiet
+         aside rather than a page section, so it owns its own type scale. -->
+    <Style Selector="TextBlock.api-title">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontWeight" Value="Medium" />
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.api-member">
+      <Setter Property="Margin" Value="0,0,6,6" />
+      <Setter Property="Padding" Value="9,4" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+    </Style>
+    <Style Selector="Border.api-member TextBlock">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="FontFamily" Value="Cascadia Mono,Consolas,Menlo,DejaVu Sans Mono,Liberation Mono,Noto Sans Mono,monospace" />
+      <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <!-- One card per page: the control type under test, the members a reader has to know about,
+       and the page's own sentence about how they fit together. Keeping it a component means the
+       eleven pages that use it cannot drift into eleven different API sections. -->
+  <Border Padding="20" CornerRadius="20"
+          Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
+          BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
+          BorderThickness="1">
+    <StackPanel Spacing="10">
+      <WrapPanel Orientation="Horizontal">
+        <TextBlock Classes="api-title" Text="API surface" Margin="0,0,10,0" />
+        <Border Classes="api-member" VerticalAlignment="Center" Margin="0,0,0,6" MaxWidth="300">
+          <!-- An API name is not prose: the localization walker skips verbatim elements. A long
+               qualified name wraps here rather than widening the card past a 480 dip phone, which
+               is what the gallery's own reflow test measures. -->
+          <TextBlock x:Name="TypeLabel" Classes="verbatim" TextWrapping="Wrap" />
+        </Border>
+      </WrapPanel>
+      <WrapPanel x:Name="MemberHost" Orientation="Horizontal" />
+      <ContentPresenter x:Name="NotesHost" />
+    </StackPanel>
+  </Border>
+</UserControl>

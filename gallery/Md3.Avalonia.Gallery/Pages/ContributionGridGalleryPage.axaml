@@ -49,6 +49,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdContributionGrid"
+                        Members="Days, CellSize, CellSpacing, SelectedDate, LessLabel, MoreLabel, DayClicked">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Days is the data. CellSize and CellSpacing are the two knobs that take it from a compact year-in-a-sidebar to touch-friendly cells, and the grid re-measures from them. SelectedDate is two-way, DayClicked reports the cell a user hit, and LessLabel and MoreLabel caption the legend." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample CSharpCode="var grid = new MdContributionGrid&#10;{&#10;    CellSize = isTouch ? 20 : 12,&#10;    CellSpacing = isTouch ? 4 : 3,&#10;    Days = days.Select(d =&gt; new MdContributionDay { Date = d, Value = counts[d] }).ToList(),&#10;};&#10;grid.DayClicked += (_, day) =&gt; Status.Text = $&quot;{day.Value} on {day.Date:yyyy-MM-dd}&quot;;" />
       </StackPanel>

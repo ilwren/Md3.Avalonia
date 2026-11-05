@@ -24,6 +24,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdMasonryPanel"
+                        Members="Strategy, ColumnCount, ColumnSpacing, RowSpacing">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Strategy is the balancing rule - the shortest column takes the next tile, so the source order is preserved left to right while the heights stay even. ColumnCount pins the number of columns (0 derives it from the width), the two spacing properties are independent, and each child keeps its natural height, so the panel reflows cards instead of cropping them." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdMasonryPanel ColumnCount=&quot;3&quot; Strategy=&quot;Quilted&quot; ColumnSpacing=&quot;12&quot; RowSpacing=&quot;12&quot;&gt;&#10;  &lt;md:MdCard Height=&quot;120&quot;&gt;...&lt;/md:MdCard&gt;&#10;&lt;/eco:MdMasonryPanel&gt;" />
       </StackPanel>

@@ -1,3 +1,12 @@
+---
+description: "The MdDialogService contract: registering dialog views, awaiting results and hosting dialogs in MdDialogHost."
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/DIALOG_SERVICE.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/DIALOG_SERVICE.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/DIALOG_SERVICE.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/DIALOG_SERVICE.html"
+comments: true
+---
+
 # Showing dialogs from a ViewModel: `IMdDialogService`
 
 [English](DIALOG_SERVICE.md) | [简体中文](DIALOG_SERVICE.zh-CN.md)

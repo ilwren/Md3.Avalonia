@@ -13,7 +13,6 @@
       </StackPanel>
 
       <StackPanel Spacing="12">
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Click the segmented field, type or paste six digits, then use the direct APIs to exercise masking, errors and completion." />
         <eco:MdPinInput x:Name="PinInput" Length="6" Completed="PinCompleted" HorizontalAlignment="Left" />
         <WrapPanel Orientation="Horizontal">
           <md:MdButton Content="Set demo code" Variant="Tonal" Click="SetPinDemo" Margin="0,0,8,8" />
@@ -25,6 +24,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdPinInput"
+                        Members="Code, Length, AcceptsOnlyDigits, IsObscured, MaskCharacter, IsError, ErrorText, CellSize, CellSpacing, CompletedCommand, Cells">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Typing, pasting and the Code property all drive the same state: Length decides how many cells there are, AcceptsOnlyDigits filters what lands in them, and IsObscured with MaskCharacter hides the values. IsError with ErrorText is the wrong-code presentation and CompletedCommand fires once the last cell is filled." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdPinInput Length=&quot;6&quot; Code=&quot;{Binding VerificationCode}&quot; CompletedCommand=&quot;{Binding VerifyCommand}&quot; /&gt;"
                             CSharpCode="pin.SetCode(&quot;273841&quot;);&#10;pin.Clear();" />

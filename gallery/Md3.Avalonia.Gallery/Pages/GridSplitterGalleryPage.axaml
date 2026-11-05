@@ -88,6 +88,12 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdGridSplitter"
+                        Members="ResizeDirection, ShowHandle, ResetOnDoubleTapped, ResetToEqual(), SplitReset">
+          <gallery:ApiNotes.Notes>
+            <TextBlock Classes="body" TextWrapping="Wrap" Text="Minimum widths stay enforced by Avalonia; the control supplies the interaction track, the grip and the state layers. ShowHandle hides the grip while keeping the same hit area, focus ring and resize cursor, ResetOnDoubleTapped equalizes the two panes on a double tap, and ResetToEqual() does the same from code." />
+          </gallery:ApiNotes.Notes>
+        </gallery:ApiNotes>
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;Grid ColumnDefinitions=&quot;*,Auto,2*&quot;&gt;&#10;  &lt;Border Grid.Column=&quot;0&quot; /&gt;&#10;  &lt;md:MdGridSplitter Grid.Column=&quot;1&quot;&#10;                     ResizeDirection=&quot;Columns&quot;&#10;                     ResizeBehavior=&quot;PreviousAndNext&quot;&#10;                     ShowsPreview=&quot;False&quot; /&gt;&#10;  &lt;Border Grid.Column=&quot;2&quot; /&gt;&#10;&lt;/Grid&gt;"
                              CSharpCode="// Double-tap or Home can restore a host-specific default:&#10;splitter.ResetRequested += (_, _) =&gt;&#10;    navigationColumn.Width = new GridLength(288);&#10;&#10;// With no ResetRequested handler, the built-in fallback is:&#10;splitter.ResetToEqual();" />

@@ -1,5 +1,11 @@
 ---
 _lang: zh-CN
+description: "AI 工具在 Md3.Avalonia 中的使用方式、对准确性的影响，以及如何验证实际行为。"
+canonical: "https://ilwren.github.io/Md3.Avalonia/docs/AI_DISCLOSURE.zh-CN.html"
+hreflang_en: "https://ilwren.github.io/Md3.Avalonia/docs/AI_DISCLOSURE.html"
+hreflang_zh: "https://ilwren.github.io/Md3.Avalonia/docs/AI_DISCLOSURE.zh-CN.html"
+hreflang_x_default: "https://ilwren.github.io/Md3.Avalonia/docs/AI_DISCLOSURE.html"
+comments: true
 ---
 
 # AI 内容说明与免责声明
