@@ -183,37 +183,37 @@
     },
     "constructible_themed_controls": {
       "direction": "higher",
-      "budget": null,
+      "budget": 115,
       "source": "headless",
       "why": "Themed controls that can be created, themed and laid out through a public parameterless constructor - the population a generic matrix could ever cover. A floor: the number dropping means a control gained a required constructor argument."
     },
     "constructed_themed_controls": {
       "direction": "higher",
-      "budget": null,
+      "budget": 114,
       "source": "headless",
       "why": "Of those, the ones that actually produced a realised visual tree. A control that is constructible but realises nothing renders as an empty box, so this is the number that says how much of the themed surface is genuinely exercised."
     },
     "rendered_themed_controls": {
       "direction": "higher",
-      "budget": null,
+      "budget": 110,
       "source": "headless",
       "why": "Themed controls that produced a visual tree, a rendered template, or draw themselves. The floor for how much of the control surface a bare window actually exercises."
     },
     "themed_controls_with_a_named_theme_only": {
       "direction": "lower",
-      "budget": null,
+      "budget": 1,
       "source": "headless",
       "why": "Controls whose only ControlTheme is keyed by name, so it is applied by a host template rather than to a bare instance. Their appearance is only reachable through that host, which is a scope limit of every generic matrix."
     },
     "themed_controls_drawing_their_own_text": {
       "direction": "lower",
-      "budget": null,
+      "budget": 3,
       "source": "headless",
       "why": "TextBlock/ContentPresenter subclasses that draw through Text or Content. An empty instance renders nothing and nothing is wrong, so they are counted separately from controls that failed to render."
     },
     "themed_controls_with_property_only_themes": {
       "direction": "lower",
-      "budget": null,
+      "budget": 1,
       "source": "headless",
       "why": "Controls whose implicit theme sets properties but no template and whose instance has no content. Legitimate for hit targets and spacing elements; worth watching because a control that lost its template looks exactly the same."
     }

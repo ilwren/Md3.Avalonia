@@ -142,9 +142,27 @@ and `budget`. Moving a budget is therefore a visible diff, and only one directio
 | `unstyled_control_classes` | `Md*` classes with no control theme (mostly parts) | 85 |
 | `unresolved_declared_tokens` | declared keys the merged theme cannot resolve | 0 |
 | `contrast_failures` | WCAG AA failures across every generator configuration | 0 |
+| `constructible_themed_controls` | themed controls with an implicit theme | 115 |
+| `constructed_themed_controls` | of those, the ones that built and laid out | 114 |
+| `rendered_themed_controls` | of those, the ones that produced a visual tree | 110 |
 
 `contrast_failures` is the one entry above with no ceiling even though it measures zero: contrast
 remediation is out of scope for this round, so the number is recorded and nothing gates on it.
+
+### L2b: the coverage numbers, filled in
+
+L2 measures eight controls against the oracle. L2b asks the question underneath it, for every themed
+control at once, and the first run answers it: **114 of 115 themed controls with an implicit theme
+construct, theme and lay out, and 110 of them produce a visual tree.** The gap between those two
+numbers is named rather than averaged away — three are `TextBlock`/`ContentPresenter` subclasses that
+draw through `Text`/`Content`, one (`MdSliderThumb`) is only ever themed by the slider's own template,
+and one (`MdWindowResizeGrip`) has a property-only theme because it is a hit target, not a surface.
+
+That layer gates two things, both statements of fact: construction must not throw, and an
+`{x:Type}` theme that sets `Property="Template"` must actually deliver a template to a bare instance.
+It deliberately does not gate "did it render something", because a control that legitimately draws
+nothing and a control that lost its template are indistinguishable from the outside — so the second
+would have needed an exception list, and an exception list is how a check stops meaning anything.
 
 A `null` budget means **tracked, not gated yet**: the number is measured and printed, and it gets a
 ceiling once a run has established it. That is why most of the table was `null` in the first commit
