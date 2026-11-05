@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
 using Avalonia.VisualTree;
 using Xunit;
 
@@ -17,19 +18,28 @@ namespace Md3.Avalonia.HeadlessTests.Spec;
 /// nothing in the suite said whether they could even be constructed.
 /// </para>
 /// <para>
-/// This layer asks the question that has to be answered first, for every themed control at once:
-/// create it through its public parameterless constructor, put it in a window, let the theme apply,
-/// lay it out, and check that something was actually realised. A control whose template throws, or
-/// whose <c>OnApplyTemplate</c> dereferences a part it did not get, or that binds a
-/// <c>DynamicResource</c> that does not exist - all of those fail here with the control's name
-/// attached, instead of surfacing as an unrelated crash in a gallery page months later.
+/// This layer asks the question that has to be answered first: create the control through a public
+/// constructor, put it in a window, let its theme apply, lay it out, and check that it is actually
+/// in a state where it could render. Three outcomes are possible, and they are not the same thing:
 /// </para>
+/// <list type="bullet">
+///   <item><b>rendered</b> — a template was applied and it realised visual children (or, for a
+///     control that draws itself, it derives from <see cref="Control"/> and overrides
+///     <c>Render</c>). This is the healthy case.</item>
+///   <item><b>hidden by design</b> — the control is present and themed but <c>IsVisible</c> is
+///     false, because its theme defers presentation to a host: a snackbar is invisible until the
+///     host marks it present, a resize grip until the window reports custom chrome. Nothing was
+///     realised because nothing was meant to be.</item>
+///   <item><b>stuck</b> — a template was applied and the control is visible, yet it produced no
+///     visual children and draws nothing of its own. That is a control that renders as an empty
+///     box, and it fails the build.</item>
+/// </list>
 /// <para>
 /// It does not assert geometry and does not compare anything to the oracle: "lays out at the right
-/// height" is L2's question and "lays out at all" is this one. What it produces is the coverage
-/// number the budget tracks (<c>constructible_themed_controls</c>), plus a named inventory entry
-/// for anything it cannot reach - usually a constructor that needs arguments, which is a design
-/// fact rather than a defect, but which does put that control outside every number here.
+/// height" is L2's question, "lays out at all" is this one. What it produces is the number the
+/// budget tracks (<c>constructed_themed_controls</c>) plus named inventories for the two other
+/// outcomes, because a control that is legitimately hidden and a control that is silently empty look
+/// identical in a property dump.
 /// </para>
 /// </remarks>
 public sealed class MdControlConstructionTests
@@ -48,12 +58,22 @@ public sealed class MdControlConstructionTests
         var themed = MdSpecSurface.ThemedTypeNames();
         var candidates = MdSpecSurface.PublicControlTypes()
             .Where(type => themed.Contains(type.Name))
+            // A Window cannot be a child of another window: the headless platform assigns it a
+            // TopLevelHost of its own, and adding it to a ContentPresenter throws. Windows are
+            // covered by the desktop adapter tests, so they are reported rather than laid out here.
+            .Where(type => !typeof(TopLevel).IsAssignableFrom(type))
+            .ToList();
+
+        var topLevels = MdSpecSurface.PublicControlTypes()
+            .Where(type => themed.Contains(type.Name) && typeof(TopLevel).IsAssignableFrom(type))
+            .Select(type => type.Name)
             .ToList();
 
         Assert.True(candidates.Count > 100,
             $"only {candidates.Count} themed controls were found; the surface scan is not working");
 
-        var constructed = 0;
+        var rendered = 0;
+        var hidden = new List<string>();
         var unreachable = new List<string>();
         var stuck = new List<string>();
 
@@ -61,36 +81,43 @@ public sealed class MdControlConstructionTests
         {
             if (!MdSpecSurface.HasParameterlessConstructor(type))
             {
-                unreachable.Add(
-                    $"{type.Name}: {string.Join(", ", type.GetConstructors().Select(ctor => ctor.GetParameters().Length + " arg(s)"))}");
+                unreachable.Add($"{type.Name}: {DescribeConstructors(type)}");
                 continue;
             }
 
             // One window per control, not one window for all of them: a single bad control in a
             // shared tree throws during the layout pass of its neighbours and takes the batch with
-            // it, and the resulting message names the wrong control.
+            // it, and the resulting message then names the wrong control.
             try
             {
                 var control = (Control)Activator.CreateInstance(type)!;
                 using (MdVisualTreeQuery.Show(control, 360, 260))
                 {
-                    // A TemplatedControl with a null Template after being attached and laid out
-                    // never had its ControlTheme applied, which is a shipped control that renders
-                    // as nothing rather than a subtle geometry error.
+                    var hasChildren = control.GetVisualChildren().FirstOrDefault() is not null;
+                    var drawsItself = OverridesRender(type);
+
+                    if (hasChildren || drawsItself)
+                    {
+                        rendered++;
+                        report.Pass(type.Name);
+                        continue;
+                    }
+
+                    // Nothing was realised. Whether that is a defect depends entirely on whether the
+                    // control was supposed to be on screen at all.
+                    if (!control.IsEffectivelyVisible)
+                    {
+                        hidden.Add($"{type.Name}: IsVisible is false in its theme until a host presents it");
+                        continue;
+                    }
+
                     if (control is TemplatedControl { Template: null })
                     {
-                        stuck.Add($"{type.Name}: attached but no ControlTemplate was applied");
+                        stuck.Add($"{type.Name}: attached, visible, but no ControlTemplate was applied");
                         continue;
                     }
 
-                    if (control.GetVisualChildren().FirstOrDefault() is null)
-                    {
-                        stuck.Add($"{type.Name}: applied a template but realised no visual children");
-                        continue;
-                    }
-
-                    constructed++;
-                    report.Pass(type.Name);
+                    stuck.Add($"{type.Name}: visible, themed, but realises no children and does not draw itself");
                 }
             }
             catch (Exception ex)
@@ -103,7 +130,7 @@ public sealed class MdControlConstructionTests
             $"{stuck.Count} themed control(s) could not be built, themed and laid out:" +
             $"{Environment.NewLine}  " + string.Join(Environment.NewLine + "  ", stuck));
 
-        report.Metric("constructed_themed_controls", constructed);
+        report.Metric("constructed_themed_controls", rendered);
         report.Metric("constructible_themed_controls", candidates.Count);
 
         report.Inventory(
@@ -112,12 +139,60 @@ public sealed class MdControlConstructionTests
             "A themed control with no public parameterless constructor, so no generic matrix can lay "
             + "it out. Usually a dialog or an overlay that needs its owner - a design fact, not a "
             + "defect - but it does put that control outside every coverage number this harness "
-            + "reports, which is worth knowing before reading those numbers as complete.");
+            + "reports, which matters before reading those numbers as complete.");
+
+        report.Inventory(
+            "themed_controls_hidden_by_design",
+            hidden,
+            "A themed control that is present and laid out but invisible until its host presents it. "
+            + "The template is not missing and nothing is broken; the control is simply not on screen "
+            + "in a bare window, so no generic matrix can measure it either.");
+
+        report.Inventory(
+            "top_level_themed_controls",
+            topLevels,
+            "A Window or other TopLevel with a control theme. It cannot be a child of another window, "
+            + "so this layer reports it instead of laying it out; the desktop adapter tests cover the "
+            + "chrome these themes drive.");
 
         report.Note("construction",
-            $"{constructed} of {candidates.Count} themed controls were constructed, themed and laid "
-            + "out with a realised visual tree.");
+            $"{rendered} of {candidates.Count} themed controls rendered under a bare window; "
+            + $"{hidden.Count} are invisible by design and {unreachable.Count} need constructor "
+            + $"arguments. {topLevels.Count} TopLevel theme(s) are out of scope for a generic matrix.");
 
         report.Complete();
+    }
+
+    /// <summary>How a control with no parameterless constructor can be reached, in one line.</summary>
+    private static string DescribeConstructors(Type type) =>
+        string.Join(
+            " or ",
+            type.GetConstructors()
+                .OrderBy(ctor => ctor.GetParameters().Length)
+                .Select(ctor => $"({string.Join(", ", ctor.GetParameters().Select(p => p.ParameterType.Name))})"));
+
+    /// <summary>
+    /// True when the type draws itself in <c>Render</c> instead of through a template.
+    /// </summary>
+    /// <remarks>
+    /// A self-drawing control legitimately has no visual children, so counting "no children" as a
+    /// failure would flag every one of them. Only an override declared on the type itself counts: a
+    /// control that merely inherits its parent's drawing code is covered by that parent's own case,
+    /// and treating it as self-drawing here would hide a genuinely empty template.
+    /// </remarks>
+    private static bool OverridesRender(Type type)
+    {
+        var method = type.GetMethod(
+            "Render",
+            System.Reflection.BindingFlags.Instance
+            | System.Reflection.BindingFlags.Public
+            | System.Reflection.BindingFlags.NonPublic,
+            binder: null,
+            types: [typeof(DrawingContext)],
+            modifiers: null);
+
+        return method is not null
+               && method.DeclaringType == type
+               && method.GetBaseDefinition().DeclaringType != type;
     }
 }

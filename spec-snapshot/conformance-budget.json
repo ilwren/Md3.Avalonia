@@ -193,11 +193,17 @@
       "source": "headless",
       "why": "Of those, the ones that actually produced a realised visual tree. A control that is constructible but realises nothing renders as an empty box, so this is the number that says how much of the themed surface is genuinely exercised."
     },
-    "themed_controls_needing_arguments": {
+    "themed_controls_hidden_by_design": {
       "direction": "lower",
       "budget": null,
       "source": "headless",
-      "why": "Themed controls with no public parameterless constructor. They sit outside every coverage number this harness reports; the list is the scope limit, not a to-do list."
+      "why": "Themed controls that are present and themed but invisible until a host presents them, so no bare window can render them. A scope limit rather than a defect: the number is here so a reader can tell how much of the control surface a generic matrix can never reach."
+    },
+    "top_level_themed_controls": {
+      "direction": "lower",
+      "budget": null,
+      "source": "headless",
+      "why": "Windows and other TopLevels with a control theme. They cannot be a child of another window, so the construction layer reports them and the desktop adapter tests cover them instead."
     }
   }
 }
