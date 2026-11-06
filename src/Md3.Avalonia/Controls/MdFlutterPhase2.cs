@@ -12,6 +12,7 @@ using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Controls;
@@ -32,8 +33,12 @@ public sealed class MdPaginatedDataTable : TemplatedControl
     public static readonly DirectProperty<MdPaginatedDataTable, IReadOnlyList<object?>> PageItemsProperty = AvaloniaProperty.RegisterDirect<MdPaginatedDataTable, IReadOnlyList<object?>>(nameof(PageItems), control => control.PageItems);
     public static readonly DirectProperty<MdPaginatedDataTable, string> PageLabelProperty = AvaloniaProperty.RegisterDirect<MdPaginatedDataTable, string>(nameof(PageLabel), control => control.PageLabel);
 
+    /// <summary>The label in front of the rows-per-page selector, localized rather than authored in XAML.</summary>
+    public static readonly DirectProperty<MdPaginatedDataTable, string> RowsPerPageLabelProperty = AvaloniaProperty.RegisterDirect<MdPaginatedDataTable, string>(nameof(RowsPerPageLabel), control => control.RowsPerPageLabel);
+
     private IReadOnlyList<object?> _pageItems = Array.Empty<object?>();
     private string _pageLabel = "0 of 0";
+    private string _rowsPerPageLabel = string.Empty;
     private Button? _previousButton;
     private Button? _nextButton;
 
@@ -46,7 +51,22 @@ public sealed class MdPaginatedDataTable : TemplatedControl
         IsLoadingProperty.Changed.AddClassHandler<MdPaginatedDataTable>((control, _) => control.UpdatePseudoClasses());
     }
 
-    public MdPaginatedDataTable() => RebuildPage();
+    public MdPaginatedDataTable()
+    {
+        UpdateLocalizedText();
+        RebuildPage();
+    }
+
+    /// <summary>
+    /// Re-reads the localized labels. Called from the constructor and whenever the inherited
+    /// culture changes, so switching language updates the table's own chrome and not just the
+    /// text the application supplies.
+    /// </summary>
+    private void UpdateLocalizedText()
+    {
+        var culture = MdLocalization.ResolveCulture(this);
+        SetAndRaise(RowsPerPageLabelProperty, ref _rowsPerPageLabel, MdLocalization.GetString("RowsPerPage", culture));
+    }
 
     public object? Header { get => GetValue(HeaderProperty); set => SetValue(HeaderProperty, value); }
     public IEnumerable? ItemsSource { get => GetValue(ItemsSourceProperty); set => SetValue(ItemsSourceProperty, value); }
@@ -59,6 +79,9 @@ public sealed class MdPaginatedDataTable : TemplatedControl
     public ICommand? PageChangedCommand { get => GetValue(PageChangedCommandProperty); set => SetValue(PageChangedCommandProperty, value); }
     public IReadOnlyList<object?> PageItems => _pageItems;
     public string PageLabel => _pageLabel;
+
+    /// <summary>Label shown before the rows-per-page selector.</summary>
+    public string RowsPerPageLabel => _rowsPerPageLabel;
     public int FirstRowIndex => PageIndex * Math.Max(1, RowsPerPage);
 
     public event EventHandler<MdPageChangedEventArgs>? PageChanged;

@@ -85,6 +85,34 @@ public class MdColorPicker : TemplatedControl
     public static readonly DirectProperty<MdColorPicker, string?> CopyStatusMessageProperty =
         AvaloniaProperty.RegisterDirect<MdColorPicker, string?>(nameof(CopyStatusMessage), picker => picker.CopyStatusMessage);
 
+    // The picker's own chrome: section headings, their one-line explanations, and the four channel
+    // labels. Authored in the theme until now, which meant every one of them stayed English under
+    // any inherited culture and no consumer could retarget them.
+    public static readonly DirectProperty<MdColorPicker, string> SourceColorsTextProperty =
+        AvaloniaProperty.RegisterDirect<MdColorPicker, string>(nameof(SourceColorsText), picker => picker.SourceColorsText);
+    public static readonly DirectProperty<MdColorPicker, string> SourceColorsHintProperty =
+        AvaloniaProperty.RegisterDirect<MdColorPicker, string>(nameof(SourceColorsHint), picker => picker.SourceColorsHint);
+    public static readonly DirectProperty<MdColorPicker, string> TonalPaletteTextProperty =
+        AvaloniaProperty.RegisterDirect<MdColorPicker, string>(nameof(TonalPaletteText), picker => picker.TonalPaletteText);
+    public static readonly DirectProperty<MdColorPicker, string> TonalPaletteHintProperty =
+        AvaloniaProperty.RegisterDirect<MdColorPicker, string>(nameof(TonalPaletteHint), picker => picker.TonalPaletteHint);
+    public static readonly DirectProperty<MdColorPicker, string> AdjustColorTextProperty =
+        AvaloniaProperty.RegisterDirect<MdColorPicker, string>(nameof(AdjustColorText), picker => picker.AdjustColorText);
+    public static readonly DirectProperty<MdColorPicker, string> AdjustColorHintProperty =
+        AvaloniaProperty.RegisterDirect<MdColorPicker, string>(nameof(AdjustColorHint), picker => picker.AdjustColorHint);
+    public static readonly DirectProperty<MdColorPicker, string> HueTextProperty =
+        AvaloniaProperty.RegisterDirect<MdColorPicker, string>(nameof(HueText), picker => picker.HueText);
+    public static readonly DirectProperty<MdColorPicker, string> SaturationTextProperty =
+        AvaloniaProperty.RegisterDirect<MdColorPicker, string>(nameof(SaturationText), picker => picker.SaturationText);
+    public static readonly DirectProperty<MdColorPicker, string> ValueTextProperty =
+        AvaloniaProperty.RegisterDirect<MdColorPicker, string>(nameof(ValueText), picker => picker.ValueText);
+    public static readonly DirectProperty<MdColorPicker, string> OpacityTextProperty =
+        AvaloniaProperty.RegisterDirect<MdColorPicker, string>(nameof(OpacityText), picker => picker.OpacityText);
+    public static readonly DirectProperty<MdColorPicker, string> RecentColorsTextProperty =
+        AvaloniaProperty.RegisterDirect<MdColorPicker, string>(nameof(RecentColorsText), picker => picker.RecentColorsText);
+    public static readonly DirectProperty<MdColorPicker, string> RecentColorsHintProperty =
+        AvaloniaProperty.RegisterDirect<MdColorPicker, string>(nameof(RecentColorsHint), picker => picker.RecentColorsHint);
+
     private static readonly Color[] DefaultMaterialPrimaryColors =
     [
         Color.Parse("#F44336"), // Red
@@ -137,6 +165,9 @@ public class MdColorPicker : TemplatedControl
         SaturationProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.OnHsvChanged());
         ColorValueProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.OnHsvChanged());
         AlphaProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.OnHsvChanged());
+        // The picker's own chrome is localized, so it has to follow the inherited culture the same
+        // way the controls it hosts do.
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.UpdateLocalizedChrome());
         PickerModeProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.OnPanelConfigurationChanged());
         IsModeSelectorVisibleProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.OnPanelConfigurationChanged());
         IsMaterialPalettePanelVisibleProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.OnPanelConfigurationChanged());
@@ -144,8 +175,22 @@ public class MdColorPicker : TemplatedControl
         IsRecentColorsPanelVisibleProperty.Changed.AddClassHandler<MdColorPicker>((picker, _) => picker.OnPanelConfigurationChanged());
     }
 
+    private string _sourceColorsText = string.Empty;
+    private string _sourceColorsHint = string.Empty;
+    private string _tonalPaletteText = string.Empty;
+    private string _tonalPaletteHint = string.Empty;
+    private string _adjustColorText = string.Empty;
+    private string _adjustColorHint = string.Empty;
+    private string _hueText = string.Empty;
+    private string _saturationText = string.Empty;
+    private string _valueText = string.Empty;
+    private string _opacityText = string.Empty;
+    private string _recentColorsText = string.Empty;
+    private string _recentColorsHint = string.Empty;
+
     public MdColorPicker()
     {
+        UpdateLocalizedChrome();
         SelectColorCommand = new DelegateCommand(parameter =>
         {
             if (parameter is Color color) SelectColor(color);
@@ -270,6 +315,45 @@ public class MdColorPicker : TemplatedControl
     }
 
     /// <summary>Non-error status for the asynchronous copy action.</summary>
+    public string SourceColorsText => _sourceColorsText;
+    public string SourceColorsHint => _sourceColorsHint;
+    public string TonalPaletteText => _tonalPaletteText;
+    public string TonalPaletteHint => _tonalPaletteHint;
+    public string AdjustColorText => _adjustColorText;
+    public string AdjustColorHint => _adjustColorHint;
+    public string HueText => _hueText;
+    public string SaturationText => _saturationText;
+    public string ValueText => _valueText;
+    public string OpacityText => _opacityText;
+    public string RecentColorsText => _recentColorsText;
+    public string RecentColorsHint => _recentColorsHint;
+
+    /// <summary>
+    /// Re-reads every localized label the picker's own chrome shows and re-raises it, so the
+    /// template binds to the current culture.
+    /// </summary>
+    /// <remarks>
+    /// Twelve explicit calls rather than a loop over a table: <c>SetAndRaise</c> needs a
+    /// <c>ref</c> to the backing field, which no table can hold, and casting a
+    /// <see cref="DirectPropertyBase{T}"/> back to its generic form would trade this verbosity for a
+    /// runtime cast that the compiler cannot check.
+    /// </remarks>
+    private void UpdateLocalizedChrome()
+    {
+        SetAndRaise(SourceColorsTextProperty, ref _sourceColorsText, MdLocalization.GetString("ColorSourceColors", this));
+        SetAndRaise(SourceColorsHintProperty, ref _sourceColorsHint, MdLocalization.GetString("ColorSourceColorsHint", this));
+        SetAndRaise(TonalPaletteTextProperty, ref _tonalPaletteText, MdLocalization.GetString("ColorTonalPalette", this));
+        SetAndRaise(TonalPaletteHintProperty, ref _tonalPaletteHint, MdLocalization.GetString("ColorTonalPaletteHint", this));
+        SetAndRaise(AdjustColorTextProperty, ref _adjustColorText, MdLocalization.GetString("ColorAdjust", this));
+        SetAndRaise(AdjustColorHintProperty, ref _adjustColorHint, MdLocalization.GetString("ColorAdjustHint", this));
+        SetAndRaise(HueTextProperty, ref _hueText, MdLocalization.GetString("ColorHue", this));
+        SetAndRaise(SaturationTextProperty, ref _saturationText, MdLocalization.GetString("ColorSaturation", this));
+        SetAndRaise(ValueTextProperty, ref _valueText, MdLocalization.GetString("ColorValue", this));
+        SetAndRaise(OpacityTextProperty, ref _opacityText, MdLocalization.GetString("ColorOpacity", this));
+        SetAndRaise(RecentColorsTextProperty, ref _recentColorsText, MdLocalization.GetString("ColorRecent", this));
+        SetAndRaise(RecentColorsHintProperty, ref _recentColorsHint, MdLocalization.GetString("ColorRecentHint", this));
+    }
+
     public string? CopyStatusMessage
     {
         get => _copyStatusMessage;

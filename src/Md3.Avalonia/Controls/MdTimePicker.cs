@@ -68,6 +68,13 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         AvaloniaProperty.RegisterDirect<MdTimePicker, string>(nameof(ConfirmText), picker => picker.ConfirmText);
     public static readonly DirectProperty<MdTimePicker, string> HeaderTextProperty =
         AvaloniaProperty.RegisterDirect<MdTimePicker, string>(nameof(HeaderText), picker => picker.HeaderText);
+
+    /// <summary>
+    /// The one-line instruction shown under the dial. Localized like the rest of the picker's text,
+    /// so it follows the inherited culture instead of being written in the template.
+    /// </summary>
+    public static readonly DirectProperty<MdTimePicker, string> DialHintTextProperty =
+        AvaloniaProperty.RegisterDirect<MdTimePicker, string>(nameof(DialHintText), picker => picker.DialHintText);
     public static readonly DirectProperty<MdTimePicker, bool> IsPopupOpenProperty =
         AvaloniaProperty.RegisterDirect<MdTimePicker, bool>(nameof(IsPopupOpen), picker => picker.IsPopupOpen);
 
@@ -79,6 +86,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private string _cancelText = "Cancel";
     private string _confirmText = "OK";
     private string _headerText = "Choose time";
+    private string _dialHintText = string.Empty;
     private string _defaultLabelText = "Time";
     private TimeSpan? _valueAtOpen;
     private bool _commitOnClose;
@@ -222,6 +230,9 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     public string CancelText => _cancelText;
     public string ConfirmText => _confirmText;
     public string HeaderText => _headerText;
+
+    /// <summary>Instruction shown under the dial; localized, so it is never authored in XAML.</summary>
+    public string DialHintText => _dialHintText;
     public bool IsPopupOpen
     {
         get => _isPopupOpen;
@@ -607,6 +618,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         SetAndRaise(CancelTextProperty, ref _cancelText, MdLocalization.GetString("Cancel", culture));
         SetAndRaise(ConfirmTextProperty, ref _confirmText, MdLocalization.GetString("OK", culture));
         SetAndRaise(HeaderTextProperty, ref _headerText, MdLocalization.GetString("ChooseTime", culture));
+        SetAndRaise(DialHintTextProperty, ref _dialHintText, MdLocalization.GetString("TimeDialHint", culture));
     }
 
     private void RefreshTextAndState()

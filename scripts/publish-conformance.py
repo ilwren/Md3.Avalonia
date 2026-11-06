@@ -45,6 +45,7 @@ TITLES = {
     "L4-localization-tables": "L4 localization tables",
     "L4-template-realisation": "L4 template realisation",
     "L4-token-variants": "L4 theme variant symmetry",
+    "L4-themed-text": "L4 themed text follows the culture",
     "conformance-ratchet": "Conformance budget (quantified backlog)",
 }
 

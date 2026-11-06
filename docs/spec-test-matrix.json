@@ -308,6 +308,21 @@
         "MdControlConstructionTests.Every_Themed_Control_Can_Be_Built_Themed_And_Laid_Out"
       ],
       "verification_status": "not_run"
+    },
+    {
+      "id": "LOCALIZATION-THEMED-TEXT-001",
+      "component": "MdTimePicker, MdPaginatedDataTable, MdColorPicker",
+      "variant": "en, zh-Hans",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://m3.material.io/foundations/content-design/global-writing",
+      "assertion": "Chrome a shipped theme draws - the dial hint, the rows-per-page label and the colour picker's section headings and channel labels - is provided by localized properties and changes when the inherited MdLocalization.Culture changes, instead of being authored in the ControlTemplate.",
+      "automated_evidence": [
+        "MdThemedTextTests.Localized_Chrome_Follows_The_Inherited_Culture"
+      ],
+      "verification_status": "not_run"
     }
   ]
 }

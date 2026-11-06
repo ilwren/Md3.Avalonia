@@ -1231,6 +1231,8 @@ public sealed class MdChatMessagePresenter : ContentControl
         AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(SenderInitials), control => control.SenderInitials);
     public static readonly DirectProperty<MdChatMessagePresenter, string?> TextContentProperty =
         AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string?>(nameof(TextContent), control => control.TextContent);
+    public static readonly DirectProperty<MdChatMessagePresenter, string> ReplyingToTextProperty =
+        AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(ReplyingToText), control => control.ReplyingToText);
 
     static MdChatMessagePresenter()
     {
@@ -1239,11 +1241,18 @@ public sealed class MdChatMessagePresenter : ContentControl
         MdLocalization.CultureProperty.Changed.AddClassHandler<MdChatMessagePresenter>((presenter, _) => presenter.UpdateRole());
     }
 
-    public MdChatMessagePresenter() => UpdateRole();
+    public MdChatMessagePresenter()
+    {
+        _replyingToText = MdLocalization.GetString("ChatReplyingTo");
+        UpdateRole();
+    }
     public MdChatMessage? Message { get => GetValue(MessageProperty); set => SetValue(MessageProperty, value); }
     public bool IsSelected { get => GetValue(IsSelectedProperty); set => SetValue(IsSelectedProperty, value); }
 
     public string FormattedTime => Message?.Timestamp.LocalDateTime.ToString("t", CultureInfo.CurrentCulture) ?? string.Empty;
+
+    /// <summary>Label shown above the quoted message when the message is a reply.</summary>
+    public string ReplyingToText => _replyingToText;
     public string? TextContent => Message?.Content as string;
     public string AvatarGlyph => Message?.AvatarGlyph ?? (Message?.Role == MdChatMessageRole.Assistant ? "\uf06c" : "\ue7fd");
     public string SenderInitials
@@ -1259,6 +1268,8 @@ public sealed class MdChatMessagePresenter : ContentControl
         }
     }
 
+    private string _replyingToText = string.Empty;
+
     private void UpdateRole()
     {
         PseudoClasses.Set(":user", Message?.Role == MdChatMessageRole.User);
@@ -1272,6 +1283,10 @@ public sealed class MdChatMessagePresenter : ContentControl
         RaisePropertyChanged(AvatarGlyphProperty, string.Empty, AvatarGlyph);
         RaisePropertyChanged(SenderInitialsProperty, string.Empty, SenderInitials);
         RaisePropertyChanged(TextContentProperty, null, TextContent);
+        RaisePropertyChanged(
+            ReplyingToTextProperty,
+            _replyingToText,
+            _replyingToText = MdLocalization.GetString("ChatReplyingTo", this));
 
         var sender = Message?.Sender;
         if (string.IsNullOrWhiteSpace(sender)) sender = Message?.Role switch

@@ -69,9 +69,9 @@
     },
     "hardcoded_ui_text": {
       "direction": "lower",
-      "budget": 11,
+      "budget": 0,
       "source": "lint",
-      "why": "Authored English inside a shipped template ignores MdLocalization entirely; the string renders for every culture. Burn down to 0."
+      "why": "English authored in a shipped template, bypassing MdLocalization. Was 11 and is now 0: the dial hint, the rows-per-page label and the colour picker's twelve section headings and channel labels are localized properties the template binds to. Zero is the ceiling, because authoring a sentence in a theme is invisible to every consumer."
     },
     "dual_declaration_keys": {
       "direction": "lower",

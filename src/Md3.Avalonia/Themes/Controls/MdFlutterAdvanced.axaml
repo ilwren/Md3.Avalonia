@@ -71,7 +71,7 @@
                 <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                            Text="{TemplateBinding PageLabel}" />
                 <TextBlock Grid.Column="1" Margin="8,0" VerticalAlignment="Center" FontSize="12"
-                           Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Rows per page" />
+                           Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="{TemplateBinding RowsPerPageLabel}" />
                 <md:MdComboBox Grid.Column="2" MinWidth="84" MinHeight="48" ItemsSource="{TemplateBinding AvailableRowsPerPage}"
                                SelectedItem="{TemplateBinding RowsPerPage, Mode=TwoWay}" />
                 <md:MdIconButton x:Name="PART_PreviousPageButton" Grid.Column="3" Icon="{DynamicResource Md.Icon.ChevronLeft}"

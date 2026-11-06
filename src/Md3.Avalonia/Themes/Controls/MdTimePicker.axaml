@@ -121,7 +121,7 @@
                 <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                   <TextBlock Grid.Column="0" VerticalAlignment="Center"
                              Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
-                             Text="Drag the hand, use the wheel, or press arrow keys" TextWrapping="Wrap" />
+                             Text="{TemplateBinding DialHintText}" TextWrapping="Wrap" />
                   <md:MdButton x:Name="PART_CancelButton" Grid.Column="1" Content="{TemplateBinding CancelText}" Size="ExtraSmall" Variant="Text" />
                   <md:MdButton x:Name="PART_ConfirmButton" Grid.Column="2" Content="{TemplateBinding ConfirmText}" Size="ExtraSmall" Variant="Text" />
                 </Grid>
