@@ -63,14 +63,13 @@ public sealed record MdTreeRow(
     bool IsExpanded,
     double ExpansionAngle,
     bool ShowGuide);
-[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
-[TemplatePart("PART_Toggle", typeof(ToggleButton))]
-
 /// <summary>
 /// A Material hierarchical list with arbitrary depth, selection, keyboard traversal, RTL-aware
 /// indentation and direct expand/collapse APIs. It derives from ListBox to retain native selection
 /// and automation semantics without globally styling Avalonia's TreeView.
 /// </summary>
+[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
+[TemplatePart("PART_Toggle", typeof(ToggleButton))]
 public sealed class MdTreeView : ListBox
 {
     public static readonly StyledProperty<IEnumerable<MdTreeNode>?> RootsProperty =

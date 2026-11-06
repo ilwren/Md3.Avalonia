@@ -196,9 +196,9 @@ public class MdFormField : ContentControl
         PseudoClasses.Set(":has-supporting-text", SupportingText is not null);
     }
 }
-[TemplatePart("PART_Editor", typeof(MdComboBox))]
 
 /// <summary>A Material dropdown combined with <see cref="MdFormField"/> validation semantics.</summary>
+[TemplatePart("PART_Editor", typeof(MdComboBox))]
 public sealed class MdDropdownFormField : MdFormField
 {
     public static readonly StyledProperty<object?> LabelProperty = AvaloniaProperty.Register<MdDropdownFormField, object?>(nameof(Label));

@@ -196,7 +196,6 @@ public class MdWaterfallPanel : Panel
         return index;
     }
 }
-[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
 
 /// <summary>
 /// An items control whose panel is a <see cref="MdWaterfallPanel"/>, for a masonry feed bound to a
@@ -208,6 +207,7 @@ public class MdWaterfallPanel : Panel
 /// without reaching into an <c>ItemsPanelTemplate</c>. Replacing <c>ItemsPanel</c> with something
 /// else is supported and simply leaves these four properties unused.
 /// </remarks>
+[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
 public class MdWaterfall : ItemsControl
 {
     public static readonly StyledProperty<int> ColumnsProperty =

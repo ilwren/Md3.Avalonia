@@ -126,6 +126,7 @@ public class MdAvaloniaWindowPlatformAdapter(MdWindowPlatform platform) : IMdWin
     }
     public virtual bool TryShowSystemMenu(MdBorderlessWindow window, Point clientPoint) => false;
 }
+
 /// <summary>
 /// Windows custom-chrome bridge. Full decorations intentionally preserve WS_CAPTION,
 /// WS_MINIMIZEBOX and WS_MAXIMIZEBOX, allowing Avalonia's native WindowState path and DWM to

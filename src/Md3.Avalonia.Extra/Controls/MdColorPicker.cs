@@ -619,13 +619,13 @@ public class MdColorPicker : TemplatedControl
         public void Execute(object? parameter) => execute(parameter);
     }
 }
-[TemplatePart("PART_DropDownButton", typeof(Button))]
-[TemplatePart("PART_Picker", typeof(MdColorPicker))]
-[TemplatePart("PART_Popup", typeof(Popup))]
 
 /// <summary>
 /// A compact Material 3 button that displays the current color swatch and opens a popover color picker.
 /// </summary>
+[TemplatePart("PART_DropDownButton", typeof(Button))]
+[TemplatePart("PART_Picker", typeof(MdColorPicker))]
+[TemplatePart("PART_Popup", typeof(Popup))]
 public sealed class MdColorPickerButton : TemplatedControl
 {
     public static readonly StyledProperty<Color> SelectedColorProperty =
