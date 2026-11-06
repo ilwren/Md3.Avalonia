@@ -14,6 +14,7 @@ using Avalonia.Platform;
 using Avalonia.VisualTree;
 using Avalonia.Controls.Shapes;
 using Md3.Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 
 namespace Md3.Avalonia.Controls;
 
@@ -362,8 +363,8 @@ public class MdBorderlessWindow : MdWindow
 
 /// <summary>Hit-test-aware drag region and caption-button host for MdBorderlessWindow.</summary>
 [PseudoClasses(":active", ":inactive")]
-[TemplatePart("PART_MaximizeGlyph", typeof(Path))]
-[TemplatePart("PART_RestoreGlyph", typeof(Path))]
+[TemplatePart("PART_MaximizeGlyph", typeof(Avalonia.Controls.Shapes.Path))]
+[TemplatePart("PART_RestoreGlyph", typeof(Avalonia.Controls.Shapes.Path))]
 public sealed class MdWindowTitleBar : ContentControl
 {
     public static readonly StyledProperty<object?> LeadingContentProperty = AvaloniaProperty.Register<MdWindowTitleBar, object?>(nameof(LeadingContent));
