@@ -1385,7 +1385,7 @@ Every public enum and its members are listed below. To print the current member 
 
 `MdPageIndicator` is an independent page-position indicator for carousels and similar hosts.
 Set `PageCount` and the zero-based `PagePosition`; fractional positions move the marker between
-adjacent pages. `Effect` selects `Slide` or `Worm`, and `Orientation` supports horizontal or
+adjacent pages. `IndicatorEffect` selects `Slide` or `Worm`, and `Orientation` supports horizontal or
 vertical layouts. Horizontal layout respects RTL. `DotSize`, `DotSpacing`, `ActiveBrush` and
 `InactiveBrush` can be customized; theme defaults use Material color roles.
 

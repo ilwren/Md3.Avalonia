@@ -53,7 +53,7 @@
             <md:MdPagination x:Name="DotsPager" DisplayMode="Dots" NumberOfPages="3" SelectedPageIndex="0"
                              SelectedIndexChanged="DotsPagerChanged" HorizontalAlignment="Center"
                              motion:MdMotion.Scheme="None" />
-            <eco:MdPageIndicator x:Name="CarouselIndicator" PageCount="3" Effect="Worm"
+            <eco:MdPageIndicator x:Name="CarouselIndicator" PageCount="3" IndicatorEffect="Worm"
                                  PageRequested="CarouselIndicatorRequested" HorizontalAlignment="Center" />
             <TextBlock x:Name="DotsStatus" Classes="body" Text="Slide 1 of 3" />
           </StackPanel>

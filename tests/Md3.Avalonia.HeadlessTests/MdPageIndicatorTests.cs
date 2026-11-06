@@ -101,7 +101,7 @@ public sealed class MdPageIndicatorTests
     [AvaloniaFact]
     public void Fractional_Worm_And_Slide_Paint_Different_Markers()
     {
-        var indicator = new MdPageIndicator { PageCount = 3, PagePosition = 0.5, Effect = MdPageIndicatorEffect.Worm,
+        var indicator = new MdPageIndicator { PageCount = 3, PagePosition = 0.5, IndicatorEffect = MdPageIndicatorEffect.Worm,
             Width = 128, Height = 48, ActiveBrush = Brushes.Red, InactiveBrush = Brushes.Blue };
         var window = new Window { Width = 200, Height = 200, Content = indicator };
         window.Show();
@@ -113,7 +113,7 @@ public sealed class MdPageIndicatorTests
             var inactive = Pixel(window, indicator, new Point(96, 24));
             Assert.NotEqual(inactive, wormFirst);
             Assert.Equal(wormFirst, wormMiddle);
-            indicator.Effect = MdPageIndicatorEffect.Slide;
+            indicator.IndicatorEffect = MdPageIndicatorEffect.Slide;
             Dispatcher.UIThread.RunJobs();
             Assert.Equal(inactive, Pixel(window, indicator, new Point(32, 24)));
             Assert.NotEqual(inactive, Pixel(window, indicator, new Point(48, 24)));

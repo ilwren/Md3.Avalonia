@@ -35,8 +35,8 @@ public sealed class MdPageIndicator : Control
             coerce: static (owner, value) => double.IsFinite(value) ? Math.Clamp(value, 0, Math.Max(0, ((MdPageIndicator)owner).PageCount - 1)) : 0);
     public static readonly StyledProperty<Orientation> OrientationProperty =
         AvaloniaProperty.Register<MdPageIndicator, Orientation>(nameof(Orientation));
-    public static readonly StyledProperty<MdPageIndicatorEffect> EffectProperty =
-        AvaloniaProperty.Register<MdPageIndicator, MdPageIndicatorEffect>(nameof(Effect));
+    public static readonly StyledProperty<MdPageIndicatorEffect> IndicatorEffectProperty =
+        AvaloniaProperty.Register<MdPageIndicator, MdPageIndicatorEffect>(nameof(IndicatorEffect));
     public static readonly StyledProperty<bool> IsInteractiveProperty =
         AvaloniaProperty.Register<MdPageIndicator, bool>(nameof(IsInteractive), true);
     public static readonly StyledProperty<double> DotSizeProperty =
@@ -51,7 +51,7 @@ public sealed class MdPageIndicator : Control
     static MdPageIndicator()
     {
         AffectsMeasure<MdPageIndicator>(PageCountProperty, OrientationProperty, DotSizeProperty, DotSpacingProperty);
-        AffectsRender<MdPageIndicator>(PageCountProperty, PagePositionProperty, OrientationProperty, EffectProperty,
+        AffectsRender<MdPageIndicator>(PageCountProperty, PagePositionProperty, OrientationProperty, IndicatorEffectProperty,
             DotSizeProperty, DotSpacingProperty, ActiveBrushProperty, InactiveBrushProperty, FlowDirectionProperty);
         PageCountProperty.Changed.AddClassHandler<MdPageIndicator>((control, _) => control.CoerceValue(PagePositionProperty));
         IsInteractiveProperty.Changed.AddClassHandler<MdPageIndicator>((control, _) => control.PseudoClasses.Set(":non-interactive", !control.IsInteractive));
@@ -72,7 +72,7 @@ public sealed class MdPageIndicator : Control
     /// <summary>Direction in which the markers are laid out.</summary>
     public Orientation Orientation { get => GetValue(OrientationProperty); set => SetValue(OrientationProperty, value); }
     /// <summary>Marker shape between pages.</summary>
-    public MdPageIndicatorEffect Effect { get => GetValue(EffectProperty); set => SetValue(EffectProperty, value); }
+    public MdPageIndicatorEffect IndicatorEffect { get => GetValue(IndicatorEffectProperty); set => SetValue(IndicatorEffectProperty, value); }
     /// <summary>Enables pointer, keyboard and automation page requests.</summary>
     public bool IsInteractive { get => GetValue(IsInteractiveProperty); set => SetValue(IsInteractiveProperty, value); }
     /// <summary>Marker diameter in DIP, coerced to 2–40.</summary>
@@ -110,7 +110,7 @@ public sealed class MdPageIndicator : Control
             context.DrawEllipse(inactive, null, Centre(index, cell), radius, radius);
 
         var position = PagePosition;
-        if (Effect == MdPageIndicatorEffect.Slide || position == Math.Floor(position))
+        if (IndicatorEffect == MdPageIndicatorEffect.Slide || position == Math.Floor(position))
         {
             context.DrawEllipse(active, null, Centre(position, cell), radius, radius);
             return;
