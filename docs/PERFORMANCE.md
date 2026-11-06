@@ -99,7 +99,25 @@ dotnet-gcdump collect -p <pid> -o after.gcdump
 Day-to-day UI work: run the Gallery with `AttachDeveloperTools()` (Debug) and press F12 for
 layout/render timings and the visual tree.
 
-Android (Maestro scenario + `adb`):
+Android is collected automatically: after the Maestro scenario, the Android workflow runs
+`scripts/collect-android-perf.py`, which captures frame stats (`dumpsys gfxinfo` summary plus
+the raw `framestats` table), memory (`dumpsys meminfo`), cold start (the ActivityManager
+`Displayed` line for a force-stop + launcher relaunch) and APK size into
+`artifacts/android-test/android-perf.json`. The JSON, the raw dumps and a rendered
+`android-perf.md` table ship in the `android-ui-regression-evidence` artifact, and the headline
+numbers are mirrored as annotations and a step summary. Collection is advisory by design — any
+failure becomes a null with a warning, never a red step — and the numbers couple to the Maestro
+scenario on a swiftshader emulator, so compare runs against each other, not against a budget.
+
+Against a local device or emulator, run the collector directly (any single attached `adb`
+device; pass `--serial` when several are attached):
+
+```bash
+python3 scripts/collect-android-perf.py --package io.arena.md3avalonia.gallery \
+  --apk artifacts/android --output-dir /tmp/android-perf --summary --github
+```
+
+For ad-hoc inspection without the collector:
 
 ```bash
 adb shell dumpsys gfxinfo <package> framestats   # P90/P99 frame times, jank counts

@@ -93,7 +93,22 @@ dotnet-gcdump collect -p <pid> -o after.gcdump
 
 日常 UI 开发：Debug 下用 `AttachDeveloperTools()` 跑 Gallery，按 F12 看布局/渲染耗时和可视树。
 
-Android（Maestro 场景 + `adb`）：
+Android 侧是自动采集的：Maestro 场景跑完后，Android 工作流会跑
+`scripts/collect-android-perf.py`，抓取帧统计（`dumpsys gfxinfo` 摘要 + 原始 `framestats` 表）、
+内存（`dumpsys meminfo`）、冷启动（force-stop + 从 Launcher 重启后的 ActivityManager
+`Displayed` 行）和 APK 体积，写入 `artifacts/android-test/android-perf.json`。JSON、原始 dump
+和渲染好的 `android-perf.md` 表格都会进 `android-ui-regression-evidence` 产物，关键数字还会镜像
+到 annotations 和 step summary。采集是建议性质的——任何失败都变成带 warning 的 null，绝不会挂红
+步骤；数字与 swiftshader 模拟器上的 Maestro 场景强相关，所以只做横向对比，不设预算红线。
+
+连着本地真机/模拟器时可以直接跑采集器（默认用唯一在线的 `adb` 设备，多设备时传 `--serial`）：
+
+```bash
+python3 scripts/collect-android-perf.py --package io.arena.md3avalonia.gallery \
+  --apk artifacts/android --output-dir /tmp/android-perf --summary --github
+```
+
+不用采集器、临时看一眼：
 
 ```bash
 adb shell dumpsys gfxinfo <package> framestats   # P90/P99 帧时间、掉帧数

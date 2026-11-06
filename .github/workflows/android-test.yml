@@ -75,6 +75,16 @@ jobs:
             mkdir -p artifacts/android-test
             maestro test --format junit --output artifacts/android-test/maestro-results.xml tests/maestro/
 
+            # Performance evidence (frames, memory, cold start, APK size). Advisory only: the
+            # collector exits 0 with nulls on any failure, and the || true below covers even a
+            # crashed interpreter, so this never fails the step. Must run inside this block: the
+            # emulator only exists for the duration of this step.
+            python3 scripts/collect-android-perf.py \
+              --package io.arena.md3avalonia.gallery \
+              --apk artifacts/android \
+              --output-dir artifacts/android-test \
+              --summary --github || true
+
             # Merge real Headless and Android execution into the non-certifying evidence schema.
             python3 scripts/run-spec-verification.py \
               --android-junit artifacts/android-test/maestro-results.xml
@@ -90,5 +100,11 @@ jobs:
             artifacts/android-test/logcat.txt
             artifacts/android-test/maestro-results.xml
             artifacts/android-test/verification-results.json
+            artifacts/android-test/android-perf.json
+            artifacts/android-test/android-perf.md
+            artifacts/android-test/gfxinfo.txt
+            artifacts/android-test/framestats.txt
+            artifacts/android-test/meminfo.txt
+            artifacts/android-test/displayed.txt
             artifacts/verification/dotnet-test.log
           if-no-files-found: warn
