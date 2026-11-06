@@ -4,6 +4,12 @@
                     xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
                     xmlns:md="using:Md3.Avalonia.Controls">
 
+  <!-- Auto-sizing text is a plain-text control, scoped to Extra and the on-surface role. -->
+  <ControlTheme x:Key="{x:Type eco:MdAutoSizeText}" TargetType="eco:MdAutoSizeText">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="ClipToBounds" Value="True" />
+  </ControlTheme>
+
   <!-- Media timeline colors use Material roles; playback and buffering remain host-owned. -->
   <ControlTheme x:Key="{x:Type eco:MdMediaProgressBar}" TargetType="eco:MdMediaProgressBar">
     <Setter Property="Focusable" Value="True" />

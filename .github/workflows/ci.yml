@@ -241,6 +241,9 @@ jobs:
       - name: Probe media progress bar tests
         run: scripts/probe-tests.sh MdMediaProgressBarTests media-progress.trx
 
+      - name: Probe auto-size text tests
+        run: scripts/probe-tests.sh MdAutoSizeTextTests auto-size-text.trx
+
       # The markdown and hex editor tests fail on a font no runner has, and the gallery tests fail
       # the same way beside them - but the markdown class passes when it runs alone, so the font is
       # not the cause: something earlier in the suite leaves the process unable to shape text. The

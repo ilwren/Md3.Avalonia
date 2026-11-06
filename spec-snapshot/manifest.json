@@ -113,6 +113,14 @@
       "license": "MIT",
       "disposition": "Documentation-only behavioral reference for independently implemented MdPageIndicator; no Dart source or assets copied."
     },
+    "auto_size_text": {
+      "version": "3.0.0",
+      "repository": "https://github.com/simc/auto_size_text",
+      "commit": "2178f0821132636bc4f0dea1bc4d40a889d8249b",
+      "documentation": "https://github.com/simc/auto_size_text/blob/2178f0821132636bc4f0dea1bc4d40a889d8249b/README.md",
+      "license": "MIT",
+      "note": "Public documentation, metadata and license only; independent Avalonia implementation."
+    },
     "audio_video_progress_bar": {
       "version": "2.0.2",
       "repository": "https://github.com/suragch/audio_video_progress_bar",

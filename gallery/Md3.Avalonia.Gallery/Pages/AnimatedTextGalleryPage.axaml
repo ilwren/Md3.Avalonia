@@ -20,6 +20,16 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Auto-size text" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The text shrinks within a bounded area without changing the requested font size." />
+        <md:MdCard Padding="20" HorizontalAlignment="Left">
+          <Border Width="220" Height="64" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" ClipToBounds="True">
+            <eco:MdAutoSizeText Classes="verbatim" Text="MdAutoSizeText 123456789" FontSize="30" MinFontSize="10" MaxLines="1" />
+          </Border>
+        </md:MdCard>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdAnimatedText Text=&quot;{Binding Headline}&quot; Effect=&quot;Typewriter&quot; Duration=&quot;0:0:1.4&quot; /&gt;" />
       </StackPanel>

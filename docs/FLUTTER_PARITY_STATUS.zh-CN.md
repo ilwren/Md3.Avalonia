@@ -32,6 +32,7 @@ Md3.Avalonia 使用 Avalonia 控件、属性与生命周期。相似的类型名
 | `MdSharedAxis`, `MdFadeThrough`（Extra） | 实现子集 | 对模板、ViewModel 与 `Control` 内容执行带平移/缩放的分段入场与保留退出 | `Control` 退出时展示冻结的 `MdVisualSnapshot` 图像——不含实时绑定、命中测试或无障碍树；无法截取快照时跳过退出阶段，仅执行新内容入场 |
 | `MdStepper` | 实现子集 | 垂直与水平（`Orientation`）步骤流、每步 `State` 样式、索引导航和 `ActiveStepChanged`；`ControlsBuilder`、`StepIconBuilder`、`ConnectorBrush`/`ConnectorThickness` | 不承诺 Flutter `controlsStep`/`currentStep` 的动画时序一致；水平内容布局更简化；builder 在导航时重建，不会在每步状态变化时重跑 |
 | `MdDraggableScrollableSheet` | 实现子集 | 拖拽手柄改尺寸、吸附点与轻弹吸附、`ExtentChanged`/`AnimationCompleted`、`ShouldCloseOnMinExtent`/`MinExtentReached`、`SnapAnimationDuration`、`MdDraggableScrollableController` | 不承诺 Flutter 滚动物理或 `ScrollController` 注入一致性；最小尺寸收起请求以事件形式上报，由宿主决定是否关闭 |
+| `MdAutoSizeText`（Extra） | 实现子集 | 有界纯文本字号缩放、下限及步进、最大行数、换行、裁剪、RTL 和文本无障碍 | 参考公开文档独立实现；不含富文本、选择、分组、预设字号及替代内容 |
 | `MdMediaProgressBar`（Extra） | 实现子集 | 宿主提供的秒数、已播放/缓冲段、时间标签、指针/键盘/无障碍 seek 与 RTL | 参考公开文档独立实现；不含播放、解码、流媒体或自主计时器；宿主处理 seek 请求 |
 | `MdPageIndicator`（Extra） | 实现子集 | 宿主驱动的小数页位置、滑动/拉伸标记、水平/垂直与 RTL 布局、指针/键盘/无障碍请求 | 参考 smooth_page_indicator 公开文档独立实现；翻页和动效由宿主管理；不含控制器自动绑定、自运动、滚动圆点虚拟化及其他效果 |
 | `MdPagination` | 无 Flutter 对应控件 | 数字与圆点模式、上一页/下一页、`NumberOfPages` 与双向 `SelectedPageIndex` | Flutter 没有第一方 pagination 控件；本控件基于 Avalonia `PipsPager`，不是 Flutter 移植 |

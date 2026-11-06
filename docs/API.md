@@ -1381,6 +1381,30 @@ Every public enum and its members are listed below. To print the current member 
 | `MdTransferLayoutMode` | `Auto` · `Standard` · `Compact` |
 | `MdVisibilityTransition` | `Fade` · `ExpandVertical` · `ExpandHorizontal` · `Scale` · `SlideAndFade` |
 
+
+## Auto-size text (Extra)
+
+`MdAutoSizeText` displays plain `Text` and uses Avalonia text shaping to fit the available
+layout space. Set inherited `FontSize` to the requested maximum; it is never overwritten, so
+styles and bindings remain intact. `EffectiveFontSize` is read-only and reports the last layout
+choice. `MinFontSize` defaults to 12 DIP and `StepGranularity` to 1 DIP. `MaxLines` defaults
+to zero (unlimited); `TextWrapping`, `TextTrimming`, `TextAlignment`, `Padding`, font properties
+and `FlowDirection` apply to the plain-text layout. If no candidate fits, the minimum is used
+and the displayed text is trimmed or clipped. At least one bounded layout dimension is needed
+for automatic resizing. The requested and minimum size are constrained to 1–512 DIP, the step
+to 0.1–512 DIP, and the minimum never exceeds the requested size. Search uses stepped sizes
+from `FontSize` down to the minimum, including the exact minimum; it assumes fit is monotonic.
+
+This is not a `TextBlock`: rich inlines, selection, shared-size groups, preset size lists,
+replacement content, font features, letter spacing and exact Flutter parity are not supported.
+A text automation peer exposes the full `Text` (or the host's explicit automation name).
+
+```xml
+<eco:MdAutoSizeText Text="A long title" Width="180" Height="48"
+                    FontSize="32" MinFontSize="12" MaxLines="1"
+                    TextTrimming="CharacterEllipsis" />
+```
+
 ### Media progress bar (Extra)
 
 `MdMediaProgressBar` is a media timeline; it does not play or decode media. The inherited `Value`

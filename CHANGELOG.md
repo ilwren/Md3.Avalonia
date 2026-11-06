@@ -4,6 +4,8 @@
 
 ### Added
 
+- Added Extra `MdAutoSizeText` for bounded plain-text font fitting, with minimum size, step, line limit, native wrapping/trimming and text automation; it preserves the requested font-size binding.
+
 - Added Extra `MdMediaProgressBar`, a host-driven media timeline with buffered and played segments, configurable time labels, pointer/keyboard/automation seeking and RTL. Playback and decoding remain the host's responsibility.
 
 - Added the independently implemented Extra `MdPageIndicator`: host-driven fractional page position, slide/worm markers, horizontal/vertical and RTL layouts, and pointer, keyboard and automation page requests. Paging and animation remain host-owned.
