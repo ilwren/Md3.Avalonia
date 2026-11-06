@@ -1,4 +1,4 @@
-using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 
 namespace Md3.Avalonia.Motion;
 
