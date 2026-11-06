@@ -93,6 +93,32 @@ public sealed class MdMarqueeTests
     }
 
     [AvaloniaFact]
+    public void Actual_Render_Frames_Advance_And_Stop_The_Marquee()
+    {
+        var marquee = Create();
+        var window = Show(marquee);
+        try
+        {
+            marquee.Speed = 41;
+            marquee.Speed = 40;
+            for (var i = 0; i < 20 && marquee.ScrollOffset == 0; i++)
+            {
+                Thread.Sleep(25);
+                AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+                Dispatcher.UIThread.RunJobs();
+            }
+            Assert.True(marquee.ScrollOffset > 0, "Real render-frame callbacks never advanced the text.");
+            MdMotion.SetScheme(marquee, MdMotionScheme.None);
+            Assert.False(marquee.IsRunning);
+            Assert.Equal(0, marquee.ScrollOffset);
+            AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(0, marquee.ScrollOffset);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
     public void Overflow_And_Property_Changes_Control_Animation()
     {
         var marquee = Create();
