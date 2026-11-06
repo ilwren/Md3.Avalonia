@@ -207,7 +207,11 @@ public sealed class MdBaselineColorTests
         var differing = light.Where(pair => pair.Value != dark[pair.Key]).Select(pair => pair.Key).ToList();
         var fixedSet = FixedRoles.ToHashSet(StringComparer.Ordinal);
         Assert.Equal(light.Count - fixedSet.Count, differing.Count);
-        Assert.Empty(differing.Where(fixedSet.Contains));
+        foreach (var role in FixedRoles)
+        {
+            Assert.DoesNotContain(role, differing);
+        }
+
         Assert.Equal(FixedRoles.Length, FixedRoles.Distinct(StringComparer.Ordinal).Count());
         Assert.Equal(12, FixedRoles.Length);
         Assert.Equal(49, light.Count);
