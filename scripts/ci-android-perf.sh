@@ -89,9 +89,20 @@ fi
 
 # monkey is the only launcher that does not need the generated activity's JNI name.
 step adb shell monkey -p "$PACKAGE" -c android.intent.category.LAUNCHER 1
-# A cold .NET MAUI-style startup on a swiftshader emulator is slow; give it room before asking
-# for frame stats, then record what it is actually doing.
-sleep 30
+
+# A cold .NET startup on a swiftshader emulator is slow -- minutes, not seconds -- and asking for
+# frame stats before the first frame simply returns an empty dump. Warm the app up until gfxinfo
+# reports frames, then let the collector measure.
+warm=0
+while [ "$warm" -lt 180 ]; do
+  if adb shell dumpsys gfxinfo "$PACKAGE" 2>/dev/null | grep -q "Total frames rendered"; then
+    echo "first frame after ${warm}s" >>"$LOG"
+    break
+  fi
+  sleep 10
+  warm=$((warm + 10))
+done
+[ "$warm" -ge 180 ] && echo "::warning::android perf: no frame after 180s; the app may still be starting"
 
 # A dead process is the difference between "no data" and "the app crashed": say which.
 step adb shell pidof "$PACKAGE"
