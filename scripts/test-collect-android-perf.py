@@ -284,6 +284,9 @@ elif args[:3] == ["shell", "dumpsys", "gfxinfo"]:
     print((STATE / "gfxinfo.txt").read_text())
 elif args[:3] == ["shell", "dumpsys", "meminfo"]:
     print((STATE / "meminfo.txt").read_text())
+elif args[:1] == ["logcat"] and "-b" in args:
+    crash = STATE / "crash.txt"
+    print(crash.read_text() if crash.exists() else "", end="")
 elif args[:1] == ["logcat"]:
     logs.write_text(str(seen + 1))
     # The first dump carries the launch that already happened; after the collector forces
@@ -310,12 +313,13 @@ def write_fake_adb(bin_dir: Path, state_dir: Path) -> None:
     (state_dir / "meminfo.txt").write_text(MEMINFO, encoding="utf-8")
     (state_dir / "logcat-initial.txt").write_text(LOGACT_PRELAUNCH, encoding="utf-8")
     (state_dir / "logcat-cold.txt").write_text(LOGACT_COLD_START, encoding="utf-8")
+    (state_dir / "crash.txt").write_text("", encoding="utf-8")
 
 
 class EndToEndTests(unittest.TestCase):
     """Runs the collector as a command against a fake device."""
 
-    def run_collector(self, extra_args=(), with_adb=True, installed=PACKAGE):
+    def run_collector(self, extra_args=(), with_adb=True, installed=PACKAGE, crashed=False):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name)
@@ -328,6 +332,16 @@ class EndToEndTests(unittest.TestCase):
         env["PATH"] = (f"{bin_dir}{os.pathsep}{env.get('PATH', '')}" if with_adb else "/usr/bin:/bin")
         if with_adb:
             write_fake_adb(bin_dir, state_dir)
+            if crashed:
+                # The process died on launch: no frame summary, no process section, a crash log.
+                (state_dir / "gfxinfo.txt").write_text(
+                    "** Graphics info for pid 1 **\n\n", encoding="utf-8")
+                (state_dir / "meminfo.txt").write_text(
+                    "Applications Memory Usage (in Kilobytes):\n\nNo process found for: "
+                    + installed + "\n", encoding="utf-8")
+                (state_dir / "crash.txt").write_text(
+                    "FATAL EXCEPTION: main\nProcess: " + installed + ", PID: 1\n"
+                    "java.lang.RuntimeException: Unable to start activity\n", encoding="utf-8")
             env["FAKE_ADB_STATE"] = str(state_dir)
             env["FAKE_ADB_INSTALLED"] = installed
         summary = root / "summary.md"
@@ -362,7 +376,8 @@ class EndToEndTests(unittest.TestCase):
                      "android-perf.json", "android-perf.md"):
             self.assertTrue((out_dir / name).is_file(), f"{name} missing")
         self.assertEqual(report["raw"], {"gfxinfo": "gfxinfo.txt", "framestats": "framestats.txt",
-                                        "meminfo": "meminfo.txt", "displayed": "displayed.txt"})
+                                        "meminfo": "meminfo.txt", "displayed": "displayed.txt",
+                                        "crash": "crash.txt"})
         self.assertIn("Displayed io.arena.md3avalonia.gallery", (out_dir / "displayed.txt").read_text())
 
         # Annotations and step summary are what a reviewer actually reads.
@@ -394,6 +409,17 @@ class EndToEndTests(unittest.TestCase):
         self.assertIn("| Frames rendered | n/a |", markdown)
         self.assertNotIn("n/ams", markdown)
         self.assertIn("::warning::", proc.stdout)
+
+    def test_dead_app_reports_the_crash_reason(self):
+        # The app was installed and launched but died: every metric is empty, and the warning must
+        # point at the crash buffer instead of leaving a reader to guess "app may not have drawn".
+        proc, out_dir, report, _ = self.run_collector(crashed=True)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertIsNone(report["gfx"]["totalFrames"])
+        self.assertIsNone(report["mem"]["totalPssKb"])
+        self.assertTrue(any("crash buffer" in w for w in report["warnings"]), report["warnings"])
+        self.assertIn("FATAL EXCEPTION", (out_dir / "crash.txt").read_text())
+        self.assertEqual(report["raw"]["crash"], "crash.txt")
 
     def test_package_not_installed_is_advisory(self):
         proc, out_dir, report, _ = self.run_collector(installed="io.arena.md3avalonia.other")

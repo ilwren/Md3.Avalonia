@@ -183,12 +183,22 @@ def main() -> int:
             if not installed:
                 warnings.append(f"package {package} is not installed on the device; skipping device metrics")
             else:
+                # The crash buffer is small and decisive: when the app dies on launch, every
+                # other metric comes back empty and the reason is in here.
+                code, crash = run(adb + ["logcat", "-d", "-b", "crash"])
+                (out_dir / "crash.txt").write_text(crash, encoding="utf-8")
+                crash_lines = [line for line in crash.splitlines() if line.strip()]
+
                 code, gfxinfo = run(adb + ["shell", "dumpsys", "gfxinfo", package])
                 (out_dir / "gfxinfo.txt").write_text(gfxinfo, encoding="utf-8")
                 if code == 0 and "Total frames rendered" in gfxinfo:
                     gfx = parse_gfxinfo_summary(gfxinfo)
                 else:
-                    warnings.append("dumpsys gfxinfo produced no frame summary (app may not have drawn yet)")
+                    if crash_lines:
+                        warnings.append("the app was not drawing and its crash buffer is not empty "
+                                        "(see crash.txt): " + crash_lines[-1][:160])
+                    else:
+                        warnings.append("dumpsys gfxinfo produced no frame summary (app may not have drawn yet)")
 
                 code, framestats = run(adb + ["shell", "dumpsys", "gfxinfo", package, "framestats"])
                 (out_dir / "framestats.txt").write_text(framestats, encoding="utf-8")
@@ -262,6 +272,7 @@ def main() -> int:
             "framestats": "framestats.txt" if (out_dir / "framestats.txt").exists() else None,
             "meminfo": "meminfo.txt" if (out_dir / "meminfo.txt").exists() else None,
             "displayed": "displayed.txt" if (out_dir / "displayed.txt").exists() else None,
+            "crash": "crash.txt" if (out_dir / "crash.txt").exists() else None,
         },
         "warnings": warnings,
     }

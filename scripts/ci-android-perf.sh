@@ -89,7 +89,13 @@ fi
 
 # monkey is the only launcher that does not need the generated activity's JNI name.
 step adb shell monkey -p "$PACKAGE" -c android.intent.category.LAUNCHER 1
-sleep 15
+sleep 20
+
+# A dead process is the difference between "no data" and "the app crashed": say which.
+step adb shell pidof "$PACKAGE"
+step adb logcat -d -b crash
+crash=$(adb logcat -d -b crash 2>/dev/null | tail -12 | tr '\n' ' ')
+[ -n "$crash" ] && echo "::error::android perf: crash buffer: $crash"
 
 step python3 scripts/collect-android-perf.py \
   --package "$PACKAGE" \

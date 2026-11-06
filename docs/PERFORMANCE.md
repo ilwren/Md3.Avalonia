@@ -103,7 +103,9 @@ Android is collected automatically: after the Maestro scenario, the Android work
 `scripts/collect-android-perf.py`, which captures frame stats (`dumpsys gfxinfo` summary plus
 the raw `framestats` table), memory (`dumpsys meminfo`), cold start (the ActivityManager
 `Displayed` line for a force-stop + launcher relaunch) and APK size into
-`artifacts/android-test/android-perf.json`. The JSON, the raw dumps and a rendered
+`artifacts/android-test/android-perf.json`. A `crash.txt` dump rides along with it: when the app
+dies on launch every metric is empty, and the crash buffer is the only thing that explains why.
+The JSON, the raw dumps and a rendered
 `android-perf.md` table ship in the `android-ui-regression-evidence` artifact, and the headline
 numbers are mirrored as annotations and a step summary. Collection is advisory by design — any
 failure becomes a null with a warning, never a red step — and the numbers couple to the Maestro
