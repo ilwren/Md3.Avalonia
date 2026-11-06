@@ -1,0 +1,121 @@
+# TEMPORARY diagnostics: the emulator never boots on macos-15, and the emulator action's log is
+# unreachable from this sandbox (blob-storage download fails), so capture everything into an
+# uploaded artifact instead: accel check, installed images, a manual AVD boot with -verbose, and
+# — if it does boot — a real collector run. DELETE AFTER USE.
+name: Android Emulator Diagnostics (TEMPORARY)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/android-emulator-diag.yml'
+
+jobs:
+  diag:
+    name: Emulator boot diagnostics
+    runs-on: macos-15
+    timeout-minutes: 40
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Environment diagnostics
+        continue-on-error: true
+        run: |
+          mkdir -p artifacts/diag
+          LOG=artifacts/diag/environment.log
+          exec > >(tee -a "$LOG") 2>&1
+          echo "== uname ==            $(uname -a)"
+          echo "== cpu ==              $(sysctl -n machdep.cpu.brand_string 2>/dev/null || true)"
+          echo "== arch ==             $(uname -m)"
+          echo "== ANDROID_HOME ==     ${ANDROID_HOME:-unset}"
+          echo "== ANDROID_SDK_ROOT == ${ANDROID_SDK_ROOT:-unset}"
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}}"
+          echo "== sdk tree ==" && ls "$SDK" || true
+          echo "== emulator version ==" && "$SDK/emulator/emulator" -version || true
+          echo "== accel-check ==" && "$SDK/emulator/emulator" -accel-check || true
+          echo "== installed packages =="
+          "$SDK/cmdline-tools/latest/bin/sdkmanager" --list_installed 2>&1 | head -60 || true
+          echo "== avds =="
+          "$SDK/cmdline-tools/latest/bin/avdmanager" list avd 2>&1 | head -30 || true
+
+      - name: Setup .NET SDK & Workloads
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install Android Workload
+        run: dotnet workload install android
+
+      - name: Build Android Gallery APK
+        run: |
+          dotnet publish gallery/Md3.Avalonia.Gallery.Android/Md3.Avalonia.Gallery.Android.csproj \
+            -c Release \
+            -f net10.0-android \
+            -p:AndroidPackageFormat=apk \
+            -o artifacts/android/
+
+      - name: Boot emulator by hand, then collect
+        timeout-minutes: 22
+        run: |
+          mkdir -p artifacts/diag artifacts/android-test
+          LOG=artifacts/diag/boot.log
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}}"
+          export PATH="$SDK/platform-tools:$SDK/emulator:$SDK/cmdline-tools/latest/bin:$PATH"
+
+          {
+            echo "== sdkmanager install =="
+            yes | sdkmanager --licenses >/dev/null 2>&1 || true
+            sdkmanager "system-images;android-34;google_apis;arm64-v8a" "platforms;android-34" 2>&1 | tail -5
+            echo "== create avd =="
+            echo no | avdmanager create avd -n ci34 -k "system-images;android-34;google_apis;arm64-v8a" \
+              -d pixel_6 --force 2>&1 | tail -5
+          } | tee -a "$LOG"
+
+          echo "== launch ==" | tee -a "$LOG"
+          nohup emulator -avd ci34 -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim \
+            -no-snapshot -verbose > artifacts/diag/emulator.log 2>&1 &
+          emulator_pid=$!
+
+          booted=0
+          for i in $(seq 1 72); do
+            sleep 10
+            devices=$(adb devices 2>&1 | tee -a "$LOG" | tail -n +2 | tr -d '\r')
+            boot=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+            echo "t=$((i*10))s boot=${boot:-none} devices=$(echo "$devices" | tr '\n' ' ')" | tee -a "$LOG"
+            if [ "$boot" = "1" ]; then booted=1; break; fi
+            kill -0 "$emulator_pid" 2>/dev/null || { echo "emulator process exited" | tee -a "$LOG"; break; }
+          done
+
+          echo "booted=$booted" | tee -a "$LOG"
+          adb devices -l | tee -a "$LOG"
+          adb shell getprop ro.product.cpu.abi | tee -a "$LOG" || true
+
+          if [ "$booted" = "1" ]; then
+            adb install artifacts/android/*.apk 2>&1 | tee -a "$LOG"
+            adb shell monkey -p io.arena.md3avalonia.gallery -c android.intent.category.LAUNCHER 1 2>&1 | tail -3 | tee -a "$LOG"
+            sleep 20
+            python3 scripts/collect-android-perf.py \
+              --package io.arena.md3avalonia.gallery \
+              --apk artifacts/android \
+              --output-dir artifacts/android-test \
+              --summary --github 2>&1 | tee -a "$LOG"
+          fi
+
+          tail -60 artifacts/diag/emulator.log | tee -a "$LOG" || true
+
+      - name: Upload diagnostics and evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-emulator-diag
+          path: |
+            artifacts/diag/
+            artifacts/android-test/
+          if-no-files-found: warn
