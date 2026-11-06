@@ -238,7 +238,7 @@ public sealed class MdEmojiPicker : TemplatedControl
 
         if (_search is not null)
         {
-            _search.Watermark = MdLocalization.GetString("EmojiSearch", this);
+            _search.PlaceholderText = MdLocalization.GetString("EmojiSearch", this);
             AutomationProperties.SetName(_search, MdLocalization.GetString("EmojiSearch", this));
         }
         if (_categories is not null)
