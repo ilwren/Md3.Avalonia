@@ -140,9 +140,22 @@ public sealed class MdAutoSizeText : TemplatedControl
     protected override AutomationPeer OnCreateAutomationPeer() => new MdAutoSizeTextAutomationPeer(this);
 }
 
-internal sealed class MdAutoSizeTextAutomationPeer(MdAutoSizeText owner) : ControlAutomationPeer(owner)
+internal sealed class MdAutoSizeTextAutomationPeer : ControlAutomationPeer
 {
+    public MdAutoSizeTextAutomationPeer(MdAutoSizeText owner) : base(owner)
+    {
+        owner.PropertyChanged += (_, e) =>
+        {
+            if (e.Property == MdAutoSizeText.TextProperty && string.IsNullOrWhiteSpace(base.GetNameCore()))
+                RaisePropertyChangedEvent(AutomationElementIdentifiers.NameProperty, e.OldValue, e.NewValue);
+        };
+    }
+
     private MdAutoSizeText TextOwner => (MdAutoSizeText)Owner;
-    protected override string? GetNameCore() => base.GetNameCore() ?? TextOwner.Text;
+    protected override string? GetNameCore()
+    {
+        var name = base.GetNameCore();
+        return string.IsNullOrWhiteSpace(name) ? TextOwner.Text : name;
+    }
     protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Text;
 }

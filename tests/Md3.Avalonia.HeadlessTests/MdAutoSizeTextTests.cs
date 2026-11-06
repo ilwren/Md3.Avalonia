@@ -102,9 +102,16 @@ public sealed class MdAutoSizeTextTests
             var peer = ControlAutomationPeer.CreatePeerForElement(text);
             Assert.Equal(AutomationControlType.Text, peer.GetAutomationControlType());
             Assert.Equal("Accessible text", peer.GetName());
+            var changes = 0;
+            peer.PropertyChanged += (_, e) => { if (e.Property == AutomationElementIdentifiers.NameProperty) changes++; };
             text.Text = "Changed";
             Assert.Equal("Changed", peer.GetName());
+            Assert.Equal(1, changes);
             AutomationProperties.SetName(text, "Custom name");
+            Assert.Equal("Custom name", peer.GetName());
+            var before = changes;
+            text.Text = "Another change";
+            Assert.Equal(before, changes);
             Assert.Equal("Custom name", peer.GetName());
         }
         finally { window.Close(); }
