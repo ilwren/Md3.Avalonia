@@ -1,7 +1,13 @@
-# TEMPORARY diagnostics: the emulator never boots on macos-15, and the emulator action's log is
-# unreachable from this sandbox (blob-storage download fails), so capture everything into an
-# uploaded artifact instead: accel check, installed images, a manual AVD boot with -verbose, and
-# — if it does boot — a real collector run. DELETE AFTER USE.
+# TEMPORARY: emulator availability probe.
+#
+# Established so far, from annotations (job logs and artifacts are unreachable from the agent's
+# sandbox — blob storage is not allowed there):
+#   * macos-15 is an "Apple M1 (Virtual)" VM without nested virtualization, so the emulator dies
+#     with "HVF error: HV_UNSUPPORTED" before Android boots. No arch or option fixes that.
+#   * A hand-rolled AVD on ubuntu-latest never produced a bootable AVD.
+# This run asks the question the standard way: the emulator action on ubuntu-latest (KVM), with
+# the default graphics options and a long boot timeout. If Android boots, the collector runs for
+# real and its annotations become the end-to-end evidence. DELETE AFTER USE.
 name: Android Emulator Diagnostics (TEMPORARY)
 
 on:
@@ -10,11 +16,8 @@ on:
       - '.github/workflows/android-emulator-diag.yml'
 
 jobs:
-  diag:
-    name: Emulator boot diagnostics
-    # macOS arm64 runners are themselves VMs without nested virtualization
-    # (HVF error: HV_UNSUPPORTED), so the emulator cannot boot there at all. Linux runners expose
-    # KVM, which is what an accelerated x86_64 emulator needs.
+  probe:
+    name: Emulator probe on Linux
     runs-on: ubuntu-latest
     timeout-minutes: 40
 
@@ -27,48 +30,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-
-      - name: Environment diagnostics
-        continue-on-error: true
-        run: |
-          mkdir -p artifacts/diag
-          LOG=artifacts/diag/environment.log
-          exec > >(tee -a "$LOG") 2>&1
-          echo "== uname ==            $(uname -a)"
-          echo "== cpu ==              $(sysctl -n machdep.cpu.brand_string 2>/dev/null || true)"
-          echo "== arch ==             $(uname -m)"
-          echo "== ANDROID_HOME ==     ${ANDROID_HOME:-unset}"
-          echo "== ANDROID_SDK_ROOT == ${ANDROID_SDK_ROOT:-unset}"
-          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}}"
-          echo "== sdk tree ==" && ls "$SDK" || true
-          echo "== emulator version ==" && "$SDK/emulator/emulator" -version || true
-          echo "== accel-check ==" && "$SDK/emulator/emulator" -accel-check || true
-          echo "== installed packages =="
-          "$SDK/cmdline-tools/latest/bin/sdkmanager" --list_installed 2>&1 | head -60 || true
-          echo "== avds =="
-          "$SDK/cmdline-tools/latest/bin/avdmanager" list avd 2>&1 | head -30 || true
-
-      - name: Annotate environment diagnostics
-        if: always()
-        run: |
-          # Artifact and job-log downloads are blocked in the agent's sandbox; annotations are
-          # the only channel it can read, so mirror the interesting lines into them.
-          python3 - <<'EOF'
-          import pathlib
-          def emit(path, level, keep=None, limit=3500):
-              p = pathlib.Path(path)
-              if not p.is_file():
-                  print(f"::{level}::diag::{path} missing")
-                  return
-              lines = [l.strip() for l in p.read_text(errors="replace").splitlines() if l.strip()]
-              if keep:
-                  selected = [l for l in lines if any(k.lower() in l.lower() for k in keep)]
-                  lines = selected or lines
-              body = " | ".join(lines[-40:])[:limit]
-              print(f"::{level}::diag::{path}: {body}")
-          emit("artifacts/diag/environment.log", "notice",
-               keep=["uname", "arch", "cpu", "accel", "emulator version", "system-images", "avd"])
-          EOF
 
       - name: Setup .NET SDK & Workloads
         uses: actions/setup-dotnet@v4
@@ -86,99 +47,50 @@ jobs:
             -p:AndroidPackageFormat=apk \
             -o artifacts/android/
 
-      - name: Boot emulator by hand, then collect
-        timeout-minutes: 22
-        run: |
-          mkdir -p artifacts/diag artifacts/android-test
-          LOG=artifacts/diag/boot.log
-          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}}"
-          export PATH="$SDK/platform-tools:$SDK/emulator:$SDK/cmdline-tools/latest/bin:$PATH"
-
-          {
-            echo "== sdk =="
-            echo "SDK=$SDK"; echo "HOME=$HOME"; echo "ANDROID_AVD_HOME=${ANDROID_AVD_HOME:-unset}"
-            echo "== licenses =="
-            yes | sdkmanager --licenses 2>&1 | tail -2
-            echo "== install =="
-            sdkmanager "system-images;android-34;google_apis;x86_64" "platforms;android-34" 2>&1 | tail -8
-            echo "== avd create =="
-            echo no | avdmanager create avd -n ci34 -k "system-images;android-34;google_apis;x86_64" \
-              --device pixel_6 --force 2>&1
-            echo "avdmanager exit=$?"
-            echo "== list-avds =="
-            emulator -list-avds 2>&1
-            echo "== avd dir =="
-            ls -la "$HOME/.android/avd" 2>&1
-            echo "== kvm =="
-            ls -l /dev/kvm 2>&1
-            emulator -accel-check 2>&1
-          } 2>&1 | tee -a "$LOG"
-
-          echo "== launch ==" | tee -a "$LOG"
-          nohup emulator -avd ci34 -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim \
-            -no-snapshot -verbose > artifacts/diag/emulator.log 2>&1 &
-          emulator_pid=$!
-
-          booted=0
-          for i in $(seq 1 72); do
-            sleep 10
-            devices=$(adb devices 2>&1 | tee -a "$LOG" | tail -n +2 | tr -d '\r')
-            boot=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
-            echo "t=$((i*10))s boot=${boot:-none} devices=$(echo "$devices" | tr '\n' ' ')" | tee -a "$LOG"
-            if [ "$boot" = "1" ]; then booted=1; break; fi
-            kill -0 "$emulator_pid" 2>/dev/null || { echo "emulator process exited" | tee -a "$LOG"; break; }
-          done
-
-          echo "booted=$booted" | tee -a "$LOG"
-          adb devices -l | tee -a "$LOG"
-          adb shell getprop ro.product.cpu.abi | tee -a "$LOG" || true
-
-          if [ "$booted" = "1" ]; then
-            adb install artifacts/android/*.apk 2>&1 | tee -a "$LOG"
-            adb shell monkey -p io.arena.md3avalonia.gallery -c android.intent.category.LAUNCHER 1 2>&1 | tail -3 | tee -a "$LOG"
+      - name: Boot emulator with the standard action and collect
+        timeout-minutes: 25
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          emulator-boot-timeout: 900
+          disable-animations: true
+          script: |
+            adb devices -l
+            adb install artifacts/android/*.apk
+            adb shell monkey -p io.arena.md3avalonia.gallery -c android.intent.category.LAUNCHER 1
             sleep 20
+            mkdir -p artifacts/android-test
             python3 scripts/collect-android-perf.py \
               --package io.arena.md3avalonia.gallery \
               --apk artifacts/android \
               --output-dir artifacts/android-test \
-              --summary --github 2>&1 | tee -a "$LOG"
-          fi
+              --summary --github
 
-          tail -60 artifacts/diag/emulator.log | tee -a "$LOG" || true
-
-      - name: Annotate boot attempt
+      - name: Verify what the collector wrote
         if: always()
         run: |
           python3 - <<'EOF'
-          import pathlib
-          def emit(path, level, keep=None, limit=3500, tail=40):
-              p = pathlib.Path(path)
-              if not p.is_file():
-                  print(f"::{level}::diag::{path} missing")
-                  return
-              lines = [l.strip() for l in p.read_text(errors="replace").splitlines() if l.strip()]
-              if keep:
-                  selected = [l for l in lines if any(k.lower() in l.lower() for k in keep)]
-                  lines = selected or lines
-              body = " | ".join(lines[-tail:])[:limit]
-              print(f"::{level}::diag::{path}: {body}")
-          p = pathlib.Path("artifacts/diag/boot.log")
-          if p.is_file():
-              head = " | ".join(p.read_text(errors="replace").splitlines()[:25])[:3500]
-              print(f"::error::diag::boot.log head: {head}")
-          emit("artifacts/diag/boot.log", "error",
-               keep=["boot=", "booted", "devices", "error", "fail", "abi", "cancel"])
-          emit("artifacts/diag/emulator.log", "warning",
-               keep=["error", "accel", "hvf", "panic", "cannot", "failed", "no such"], tail=30)
-          emit("artifacts/diag/emulator.log", "notice", tail=15)
+          import json, pathlib
+          p = pathlib.Path("artifacts/android-test/android-perf.json")
+          if not p.is_file():
+              print("::error::diag::no android-perf.json: the emulator never booted")
+          else:
+              d = json.loads(p.read_text())
+              print("::notice::diag::json=" + json.dumps(
+                  {"device": d["device"], "apkBytes": d["apkBytes"],
+                   "gfx": d["gfx"], "mem": d["mem"], "startup": d["startup"],
+                   "warnings": d["warnings"]})[:3500])
+              for f in sorted(pathlib.Path("artifacts/android-test").iterdir()):
+                  print(f"::warning::diag::file {f.name} {f.stat().st_size}B")
           EOF
 
-      - name: Upload diagnostics and evidence
+      - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: android-emulator-diag
-          path: |
-            artifacts/diag/
-            artifacts/android-test/
+          name: android-emulator-probe
+          path: artifacts/android-test/
           if-no-files-found: warn
