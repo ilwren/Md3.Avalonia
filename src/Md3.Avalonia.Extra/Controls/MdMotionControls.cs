@@ -361,6 +361,8 @@ public class MdSharedAxis : ContentControl
 /// <see cref="Duration"/>; the incoming content then fades and scales in over the remaining 70%,
 /// which is Material's fade-through timing for unrelated content.
 /// </summary>
+[TemplatePart("PART_Content", typeof(ContentPresenter))]
+[TemplatePart("PART_OutgoingContent", typeof(ContentPresenter))]
 public class MdFadeThrough : ContentControl
 {
     public static readonly StyledProperty<TimeSpan> DurationProperty =

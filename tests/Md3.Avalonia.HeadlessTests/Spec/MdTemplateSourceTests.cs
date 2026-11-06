@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests.Spec;
@@ -37,10 +38,6 @@ namespace Md3.Avalonia.HeadlessTests.Spec;
 public sealed class MdTemplateSourceTests
 {
     private const string Layer = "L4_inventory";
-
-    private static readonly Regex ControlThemeStart = new(
-        "<ControlTheme\\b[^>]*TargetType=\"(?:md:|[A-Za-z0-9]+:)(?<type>[A-Za-z0-9_]+)\"",
-        RegexOptions.Compiled);
 
     private static readonly Regex PartName = new(
         "x:Name=\"(?<name>PART_[A-Za-z0-9_]+)\"",
@@ -180,6 +177,18 @@ public sealed class MdTemplateSourceTests
         return declared;
     }
 
+    /// <summary>
+    /// Every <c>PART_*</c> name each <c>ControlTheme</c> actually contains, keyed by target type.
+    /// </summary>
+    /// <remarks>
+    /// This walks the parsed document, not the text between two open tags. A regex window that runs
+    /// from one <c>&lt;ControlTheme&gt;</c> to the next swallows everything after a self-closing
+    /// theme - nested grids, sibling templates and the generated item themes in between - and
+    /// attributes the part names it finds there to the wrong control. The window was worth 39 false
+    /// entries: <c>MdDataTable</c> was credited with <c>PART_ContinueButton</c>, which belongs to
+    /// <c>MdStepper</c> twenty lines further down the same file. A control that declares a part on
+    /// the strength of that number would promise something its own template never delivers.
+    /// </remarks>
     private static Dictionary<string, HashSet<string>> ThemedParts()
     {
         var themed = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
@@ -187,23 +196,42 @@ public sealed class MdTemplateSourceTests
 
         foreach (var file in SourceFiles(root, "*.axaml"))
         {
-            var text = File.ReadAllText(file);
-            var matches = ControlThemeStart.Matches(text);
-            for (var index = 0; index < matches.Count; index++)
+            XDocument document;
+            try
             {
-                var type = matches[index].Groups["type"].Value;
-                var end = index + 1 < matches.Count ? matches[index + 1].Index : text.Length;
-                var block = text[matches[index].Index..end];
+                document = XDocument.Load(file);
+            }
+            catch (XmlException exception)
+            {
+                throw new InvalidOperationException($"{file} is not well-formed XML", exception);
+            }
 
+            foreach (var theme in document.Descendants()
+                         .Where(element => element.Name.LocalName == "ControlTheme"))
+            {
+                var type = theme.Attribute("TargetType")?.Value;
+                if (type is null)
+                {
+                    continue;
+                }
+
+                type = type[(type.LastIndexOf(':') + 1)..];
                 if (!themed.TryGetValue(type, out var parts))
                 {
                     parts = new HashSet<string>(StringComparer.Ordinal);
                     themed[type] = parts;
                 }
 
-                foreach (Match part in PartName.Matches(block))
+                foreach (var element in theme.Descendants())
                 {
-                    parts.Add(part.Groups["name"].Value);
+                    var name = element.Attributes()
+                        .FirstOrDefault(attribute => attribute.Name.LocalName == "Name"
+                                                     && attribute.Name.NamespaceName.Contains("xaml"))
+                        ?.Value;
+                    if (name is not null && name.StartsWith("PART_", StringComparison.Ordinal))
+                    {
+                        parts.Add(name);
+                    }
                 }
             }
         }
