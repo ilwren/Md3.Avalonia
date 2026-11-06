@@ -61,7 +61,13 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
-          arch: x86_64
+          # macos-15 is an Apple Silicon runner (arm64). An x86_64 system image cannot boot
+          # natively there -- the emulator has no x86 hardware acceleration to fall back on --
+          # which is why every run ended in "Timeout waiting for emulator to boot" without ever
+          # reaching Maestro or the collector.
+          arch: arm64-v8a
+          target: google_apis
+          emulator-boot-timeout: 600
           profile: pixel_6
           force-avd-creation: true
           disable-animations: true
