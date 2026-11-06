@@ -42,7 +42,8 @@ public enum MdThemeShapeScale
 /// <summary>Serializable Theme Lab state and runtime dynamic-theme configuration.</summary>
 public sealed record MdThemeOptions
 {
-    public string SeedColor { get; init; } = "#6750A4";
+    /// <summary>The source colour the scheme is generated from; defaults to the M3 baseline source.</summary>
+    public string SeedColor { get; init; } = MdBaselineScheme.SeedHex;
     public MdThemeSchemeVariant SchemeVariant { get; init; } = MdThemeSchemeVariant.TonalSpot;
     public MdThemeContrastLevel ContrastLevel { get; init; } = MdThemeContrastLevel.Standard;
     public MdThemeMode ThemeMode { get; init; } = MdThemeMode.System;

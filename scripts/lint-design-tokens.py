@@ -80,8 +80,9 @@ RE_REF = re.compile(r"\{\s*(?:StaticResource|DynamicResource)\s+(Md\.[A-Za-z0-9.
 RE_HEX = re.compile(r"#[0-9A-Fa-f]{3,8}\b")
 RE_INCLUDE = re.compile(r'ResourceInclude\s+Source="avares://([^/]+)/([^"]+)"')
 RE_RESOURCE_VALUE = re.compile(
-    r"<(x:Double|CornerRadius|Thickness|x:String|FontFamily)\s+x:Key=\"(Md\.[A-Za-z0-9.]+)\"\s*>([^<]*)</\1>"
+    r"<(x:Double|CornerRadius|Thickness|x:String|FontFamily|Color)\s+x:Key=\"(Md\.[A-Za-z0-9.]+)\"\s*>([^<]*)</\1>"
 )
+RE_THEME_VARIANT_OPEN = re.compile(r'<ResourceDictionary\s+x:Key="(Light|Dark)"')
 RE_GEOMETRY = re.compile(
     r'(?:Property="(' + "|".join(GEOMETRY_ATTRS) + r')"\s+Value|(' + "|".join(GEOMETRY_ATTRS) + r"))"
     r'=\s*"([0-9][0-9,. ]*)"'
@@ -195,6 +196,26 @@ def parse_quad(text: str) -> list[float] | None:
     return None
 
 
+def parse_color(value) -> tuple[int, int, int, int] | None:
+    """``#RGB``, ``#RRGGBB`` or an ``[r, g, b, a]`` oracle list, as one comparable tuple."""
+    if isinstance(value, (list, tuple)):
+        parts = [int(v) for v in value]
+        while len(parts) < 4:
+            parts.append(255)
+        return tuple(parts[:4])  # type: ignore[return-value]
+    text = str(value).strip().lstrip("#")
+    if len(text) == 3:
+        text = "".join(c * 2 for c in text)
+    if len(text) == 6:
+        text += "ff"
+    if len(text) != 8:
+        return None
+    try:
+        return (int(text[0:2], 16), int(text[2:4], 16), int(text[4:6], 16), int(text[6:8], 16))
+    except ValueError:
+        return None
+
+
 def parse_double(text: str) -> float | None:
     try:
         return float(text.strip())
@@ -208,7 +229,8 @@ def parse_double(text: str) -> float | None:
 def collect_declarations(lint: Lint) -> tuple[set[str], dict[str, tuple[str, str, int]]]:
     """Returns (all declared keys, token values declared in Themes/Tokens)."""
     declared: set[str] = set()
-    values: dict[str, tuple[str, str, int]] = {}  # key -> (type, raw, line) ; path folded into type report
+    # key -> variant -> (type, raw, line). The path is folded into the type report.
+    values: dict[str, dict[str, tuple[str, str, int]]] = {}
 
     for path in iter_all_axaml():
         text = path.read_text(encoding="utf-8", errors="replace")
@@ -230,9 +252,17 @@ def collect_declarations(lint: Lint) -> tuple[set[str], dict[str, tuple[str, str
                 declared.add(constants[name])
 
     for path in sorted(TOKEN_DIR.glob("*.axaml")):
+        # A token file may declare the same key once per theme variant, and often does: 49 of the
+        # colour roles carry a light value and a different dark one. Keying the map by token alone
+        # keeps whichever came last, which is why a dark #D0BCFF used to be compared against the
+        # light #6750A4 and reported as a mismatch. The variant is part of the identity.
+        variant = "Light"
         for lineno, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+            opened = RE_THEME_VARIANT_OPEN.search(line)
+            if opened:
+                variant = opened.group(1)
             for kind, key, raw in RE_RESOURCE_VALUE.findall(line):
-                values[key] = (kind, raw, lineno)
+                values.setdefault(key, {})[variant] = (kind, raw, lineno)
     return declared, values
 
 
@@ -305,10 +335,15 @@ def rule_references(lint: Lint, declared: set[str]) -> dict[str, int]:
     return usage
 
 
-def rule_orphans(lint: Lint, values: dict[str, tuple[str, str, int]], usage: dict[str, int]) -> None:
+def rule_orphans(
+    lint: Lint,
+    values: dict[str, dict[str, tuple[str, str, int]]],
+    usage: dict[str, int],
+) -> None:
     for key in sorted(values):
         if usage.get(key, 0) == 0:
-            kind, _, lineno = values[key]
+            # One finding per token, not per variant: the light declaration names it.
+            kind, _, lineno = values[key].get("Light") or next(iter(values[key].values()))
             lint.add(
                 "R3 orphan-token", "warning", "src/Md3.Avalonia/Themes/Tokens", lineno,
                 f"token '{key}' ({kind}) is declared but never referenced",
@@ -472,7 +507,14 @@ def rule_token_values(
         expected = entry["value"]
 
         from_cs = key in (values_cs or {})
-        if key not in values and not from_cs:
+        # An oracle entry may pin one variant ("m3-baseline-dark"); otherwise the light value is the
+        # one Material documents as the default scheme. Falling back to the other variant keeps a
+        # key that only exists in one dictionary from being called missing.
+        by_variant = values.get(key, {})
+        source = str(entry.get("source", ""))
+        wanted = "Dark" if source.endswith("dark") else "Light"
+        declaration = by_variant.get(wanted) or by_variant.get("Light") or by_variant.get("Dark")
+        if declaration is None and not from_cs:
             if not required:
                 continue
             gaps.append(
@@ -485,13 +527,20 @@ def rule_token_values(
         if from_cs:
             declared_kind, raw, lineno = str(values_cs[key]["type"]), str(values_cs[key]["raw"]), int(values_cs[key]["line"])
         else:
-            declared_kind, raw, lineno = values[key]
+            declared_kind, raw, lineno = declaration  # type: ignore[misc]
         actual: object | None
         detail = ""
         if kind == "double":
             actual = parse_double(raw)
             limit = tol_opacity if "Opacity" in key else (tol_font if "FontSize" in key or "Size" in key and "TypeScale" in key else tol_dip)
             ok = actual is not None and abs(actual - float(expected)) <= limit
+        elif kind == "color":
+            # Exactly, with no tolerance: these are authored values, not computed ones, and a
+            # difference is a wrong source or a transcription slip rather than rounding.
+            actual = parse_color(raw)
+            exp_color = parse_color(expected)
+            ok = actual is not None and exp_color is not None and actual == exp_color
+            expected = exp_color
         elif kind in ("corner", "thickness"):
             actual = parse_quad(raw)
             exp_quad = [float(expected)] * 4 if isinstance(expected, (int, float)) else [float(v) for v in expected]

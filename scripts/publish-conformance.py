@@ -46,6 +46,9 @@ TITLES = {
     "L4-template-realisation": "L4 template realisation",
     "L4-token-variants": "L4 theme variant symmetry",
     "L4-themed-text": "L4 themed text follows the culture",
+    "L1-baseline-colors": "L1 the static theme is the published M3 baseline",
+    "L1-baseline-generator": "L1 the generator reproduces the baseline",
+    "L1-baseline-structure": "L1 every baseline role has a brush",
     "conformance-ratchet": "Conformance budget (quantified backlog)",
 }
 

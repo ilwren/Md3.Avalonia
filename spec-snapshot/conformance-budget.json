@@ -81,9 +81,9 @@
     },
     "oracle_coverage_ratio": {
       "direction": "higher",
-      "budget": 0.2462,
+      "budget": 0.3299,
       "source": "lint",
-      "why": "144 oracle entries against 585 declared keys. Every point of coverage is a value that can fail a build instead of a value that is merely asserted by a hand-written unit test."
+      "why": "oracle entries / declared keys. Was 0.2462; the 49 published M3 baseline colour roles are now oracle entries with declared provenance, so every system colour role is measured rather than merely present."
     },
     "oracle_families": {
       "direction": "higher",
