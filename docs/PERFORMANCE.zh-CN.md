@@ -40,7 +40,8 @@ LeakTests 的配方——挂到 live 窗口上、操作、Detach + 布局、回�
 | 测试 | 卡住的东西 |
 |---|---|
 | `Detached_Material_Content_Is_Collected` | 从 live 窗口 detach 下来的内容必须可被回收 |
-| `Dialog_Open_Close_Cycle_Does_Not_Leak_Host` | 打开/关闭一轮后 detach 的 dialog host 必须可被回收，即使它的 service 还活着（service 对 host 只能持弱引用） |
+| `Attached_Dialog_Host_Detaches_Cleanly` | 挂上又摘下（从未打开过）的 dialog host 必须可被回收 |
+| `Dialog_Open_Close_Cycle_Does_Not_Leak_Host` | 打开/关闭一轮后 detach 的 dialog host 必须可被回收，即使它的 service 还活着（service 对 host 只能持弱引用；先用 host 外的焦点宿转移走模态焦点） |
 | `Snackbar_Show_Dismiss_Cycle_Does_Not_Leak_Host` | 同上，针对 snackbar host |
 
 本地只跑这些：

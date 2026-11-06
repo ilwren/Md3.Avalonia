@@ -44,7 +44,8 @@ because the shared headless platform keeps closed windows rooted.
 | Test | What it gates |
 |---|---|
 | `Detached_Material_Content_Is_Collected` | Content detached from a live window is collectable |
-| `Dialog_Open_Close_Cycle_Does_Not_Leak_Host` | The dialog host, detached after an open/close cycle, is collectable even while its service stays alive (services must hold hosts weakly) |
+| `Attached_Dialog_Host_Detaches_Cleanly` | An attached-then-detached dialog host (never opened) is collectable |
+| `Dialog_Open_Close_Cycle_Does_Not_Leak_Host` | The dialog host, detached after an open/close cycle, is collectable even while its service stays alive (services must hold hosts weakly; a focus sink outside the host releases modal focus first) |
 | `Snackbar_Show_Dismiss_Cycle_Does_Not_Leak_Host` | Same for the snackbar host |
 
 Run only these locally:

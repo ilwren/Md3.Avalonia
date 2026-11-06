@@ -48,6 +48,27 @@ public sealed class MdMemoryLeakTests
     }
 
     [AvaloniaFact]
+    public async Task Attached_Dialog_Host_Detaches_Cleanly()
+    {
+        if (!ReleaseOnlyGate()) return;
+
+        var service = new MdDialogService();
+        var window = new Window { Width = 640, Height = 480 };
+        window.Show();
+        try
+        {
+            var weak = AttachAndDetachDialogHost(window, service);
+            Assert.True(weak.IsAlive, "the host must be attached before collection.");
+            await CollectUntilCollectedAsync(weak);
+            Assert.False(weak.IsAlive, "the detached dialog host must be collectable.");
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public async Task Dialog_Open_Close_Cycle_Does_Not_Leak_Host()
     {
         if (!ReleaseOnlyGate()) return;
@@ -103,6 +124,22 @@ public sealed class MdMemoryLeakTests
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
+    private static WeakReference AttachAndDetachDialogHost(Window window, MdDialogService service)
+    {
+        var host = new MdDialogHost
+        {
+            Content = new TextBlock { Text = "Page" },
+            Service = service
+        };
+        window.Content = host;
+        Dispatcher.UIThread.RunJobs();
+        window.Content = null;
+        Dispatcher.UIThread.RunJobs();
+        ReplaceLastFrame(window);
+        return new WeakReference(host);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private static WeakReference AttachExerciseAndDetachDialog(Window window, MdDialogService service)
     {
         var host = new MdDialogHost
@@ -119,10 +156,13 @@ public sealed class MdMemoryLeakTests
         Dispatcher.UIThread.RunJobs();
         service.Close(true);
         Dispatcher.UIThread.RunJobs();
-        // The modal controller moved keyboard focus inside the dialog and nothing was focused
-        // before it, so focus would otherwise stay on a detached element and pin the host
-        // through the live window's focus manager. A live window always has focus somewhere.
-        window.Focus();
+        // Focus sink outside the host: the modal controller moved keyboard focus inside the
+        // dialog and nothing was focused before it, so focus would otherwise stay on a
+        // detached element and pin the host through the live window's focus manager.
+        var sink = new Button { Content = "sink" };
+        window.Content = sink;
+        Dispatcher.UIThread.RunJobs();
+        sink.Focus();
         Dispatcher.UIThread.RunJobs();
         window.Content = null;
         Dispatcher.UIThread.RunJobs();
