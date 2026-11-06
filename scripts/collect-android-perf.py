@@ -32,7 +32,7 @@ from pathlib import Path
 # Kept tight on purpose: this runs inside the emulator step's five-minute budget, so the
 # collector must never be the reason evidence goes missing.
 ADB_TIMEOUT = 45
-PROBE_BUDGET_SECONDS = 40
+PROBE_BUDGET_SECONDS = 60
 PROBE_POLL_SECONDS = 2
 
 
@@ -187,7 +187,10 @@ def main() -> int:
                 # other metric comes back empty and the reason is in here.
                 code, crash = run(adb + ["logcat", "-d", "-b", "crash"])
                 (out_dir / "crash.txt").write_text(crash, encoding="utf-8")
-                crash_lines = [line for line in crash.splitlines() if line.strip()]
+                # Only this package's crashes: an emulator's own processes (droid.bluetooth and
+                # friends) crash routinely and must not be blamed on the app under test.
+                crash_lines = [line for line in crash.splitlines()
+                               if line.strip() and package in line]
 
                 code, gfxinfo = run(adb + ["shell", "dumpsys", "gfxinfo", package])
                 (out_dir / "gfxinfo.txt").write_text(gfxinfo, encoding="utf-8")

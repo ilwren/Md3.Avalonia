@@ -18,6 +18,7 @@ produce evidence on every run. Run with `python3 scripts/test-collect-android-pe
 from __future__ import annotations
 
 import importlib.util
+import pathlib
 import json
 import os
 import stat
@@ -420,6 +421,22 @@ class EndToEndTests(unittest.TestCase):
         self.assertTrue(any("crash buffer" in w for w in report["warnings"]), report["warnings"])
         self.assertIn("FATAL EXCEPTION", (out_dir / "crash.txt").read_text())
         self.assertEqual(report["raw"]["crash"], "crash.txt")
+
+    def test_unrelated_crash_is_not_blamed_on_the_app(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        bin_dir, state_dir = pathlib.Path(tmp.name) / "bin", pathlib.Path(tmp.name) / "state"
+        bin_dir.mkdir()
+        state_dir.mkdir()
+        write_fake_adb(bin_dir, state_dir)
+        (state_dir / "crash.txt").write_text(
+            "F libc : Fatal signal 6 (SIGABRT) in tid 3912 (bt_stack_manage), pid 3660 "
+            "(droid.bluetooth)\n", encoding="utf-8")
+        proc, out_dir, report, _ = self.run_collector()
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertFalse(any("crash" in w for w in report["warnings"]), report["warnings"])
+        # ...and the unrelated crash is still preserved verbatim in the evidence.
+        self.assertIn("droid.bluetooth", (out_dir / "crash.txt").read_text())
 
     def test_package_not_installed_is_advisory(self):
         proc, out_dir, report, _ = self.run_collector(installed="io.arena.md3avalonia.other")

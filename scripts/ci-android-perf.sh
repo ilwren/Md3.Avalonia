@@ -89,10 +89,21 @@ fi
 
 # monkey is the only launcher that does not need the generated activity's JNI name.
 step adb shell monkey -p "$PACKAGE" -c android.intent.category.LAUNCHER 1
-sleep 20
+# A cold .NET MAUI-style startup on a swiftshader emulator is slow; give it room before asking
+# for frame stats, then record what it is actually doing.
+sleep 30
 
 # A dead process is the difference between "no data" and "the app crashed": say which.
 step adb shell pidof "$PACKAGE"
+pid=$(adb shell pidof "$PACKAGE" 2>/dev/null | tr -d '\r')
+step sh -c "adb shell dumpsys window 2>/dev/null | grep -i -m2 'mCurrentFocus\|mFocusedApp'"
+if [ -n "$pid" ]; then
+  # The app's own log often explains a UI that never draws (missing asset, XAML error, ...).
+  app_log=$(adb logcat -d --pid="$pid" 2>/dev/null | tail -25 | tr '\n' ' ')
+  echo "::notice::android perf: app log (pid $pid): $app_log" | cut -c1-3800
+else
+  echo "::warning::android perf: the app process is not running after launch"
+fi
 step adb logcat -d -b crash
 crash=$(adb logcat -d -b crash 2>/dev/null | tail -12 | tr '\n' ' ')
 [ -n "$crash" ] && echo "::error::android perf: crash buffer: $crash"
