@@ -15,7 +15,7 @@ namespace Md3.Avalonia.Controls;
 /// </summary>
 [PseudoClasses(":expanded")]
 [TemplatePart("PART_ContentArea", typeof(Border))]
-[TemplatePart("PART_ExpanderChevron", typeof(Path))]
+[TemplatePart("PART_ExpanderChevron", typeof(global::Avalonia.Controls.Shapes.Path))]
 [TemplatePart("PART_HeaderButton", typeof(ToggleButton))]
 public class MdSettingsExpander : ItemsControl
 {

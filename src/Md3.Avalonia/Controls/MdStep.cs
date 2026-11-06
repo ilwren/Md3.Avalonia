@@ -14,7 +14,7 @@ namespace Md3.Avalonia.Controls;
 /// <summary>A header, optional subtitle and body participating in an <see cref="MdStepper"/>.</summary>
 [PseudoClasses(":active", ":inactive", ":content-present", ":complete", ":editing", ":error", ":disabled",
     ":reduced-motion", ":no-motion", ":step-first", ":step-last", ":horizontal")]
-[TemplatePart("PART_CompleteIcon", typeof(Path))]
+[TemplatePart("PART_CompleteIcon", typeof(global::Avalonia.Controls.Shapes.Path))]
 [TemplatePart("PART_Connector", typeof(Border))]
 [TemplatePart("PART_ErrorIcon", typeof(TextBlock))]
 [TemplatePart("PART_HeaderButton", typeof(Button))]

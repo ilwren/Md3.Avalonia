@@ -20,8 +20,8 @@ public enum MdComparisonOrientation { Horizontal, Vertical }
 /// <summary>Reveals two pieces of content through a draggable before/after divider.</summary>
 [PseudoClasses(":dragging", ":horizontal", ":vertical", ":non-interactive")]
 [TemplatePart("PART_AfterClip", typeof(Border))]
-[TemplatePart("PART_ChevronLeft", typeof(Path))]
-[TemplatePart("PART_ChevronRight", typeof(Path))]
+[TemplatePart("PART_ChevronLeft", typeof(global::Avalonia.Controls.Shapes.Path))]
+[TemplatePart("PART_ChevronRight", typeof(global::Avalonia.Controls.Shapes.Path))]
 [TemplatePart("PART_Divider", typeof(Border))]
 [TemplatePart("PART_Thumb", typeof(Border))]
 [TemplatePart("PART_ThumbGlyphs", typeof(Grid))]

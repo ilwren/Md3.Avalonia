@@ -16,7 +16,7 @@ namespace Md3.Avalonia.Controls;
 /// <see cref="CheckBox"/> theme.
 /// </summary>
 [PseudoClasses(":md-error", ":reduced-motion", ":no-motion")]
-[TemplatePart("PART_CheckGlyph", typeof(Path))]
+[TemplatePart("PART_CheckGlyph", typeof(global::Avalonia.Controls.Shapes.Path))]
 [TemplatePart("PART_Container", typeof(Border))]
 [TemplatePart("PART_ContentPresenter", typeof(ContentPresenter))]
 [TemplatePart("PART_FocusIndicator", typeof(Border))]
