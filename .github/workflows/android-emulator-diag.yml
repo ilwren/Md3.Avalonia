@@ -95,18 +95,26 @@ jobs:
           export PATH="$SDK/platform-tools:$SDK/emulator:$SDK/cmdline-tools/latest/bin:$PATH"
 
           {
-            echo "== sdkmanager install =="
-            yes | sdkmanager --licenses >/dev/null 2>&1 || true
-            sdkmanager "system-images;android-34;google_apis;x86_64" "platforms;android-34" 2>&1 | tail -5
-            echo "== create avd =="
+            echo "== sdk =="
+            echo "SDK=$SDK"; echo "HOME=$HOME"; echo "ANDROID_AVD_HOME=${ANDROID_AVD_HOME:-unset}"
+            echo "== licenses =="
+            yes | sdkmanager --licenses 2>&1 | tail -2
+            echo "== install =="
+            sdkmanager "system-images;android-34;google_apis;x86_64" "platforms;android-34" 2>&1 | tail -8
+            echo "== avd create =="
             echo no | avdmanager create avd -n ci34 -k "system-images;android-34;google_apis;x86_64" \
-              -d pixel_6 --force 2>&1 | tail -5
-          } | tee -a "$LOG"
+              --device pixel_6 --force 2>&1
+            echo "avdmanager exit=$?"
+            echo "== list-avds =="
+            emulator -list-avds 2>&1
+            echo "== avd dir =="
+            ls -la "$HOME/.android/avd" 2>&1
+            echo "== kvm =="
+            ls -l /dev/kvm 2>&1
+            emulator -accel-check 2>&1
+          } 2>&1 | tee -a "$LOG"
 
           echo "== launch ==" | tee -a "$LOG"
-          echo "== kvm ==" | tee -a "$LOG"
-          ls -l /dev/kvm | tee -a "$LOG" || true
-          emulator -accel-check | tee -a "$LOG" || true
           nohup emulator -avd ci34 -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim \
             -no-snapshot -verbose > artifacts/diag/emulator.log 2>&1 &
           emulator_pid=$!
@@ -154,6 +162,10 @@ jobs:
                   lines = selected or lines
               body = " | ".join(lines[-tail:])[:limit]
               print(f"::{level}::diag::{path}: {body}")
+          p = pathlib.Path("artifacts/diag/boot.log")
+          if p.is_file():
+              head = " | ".join(p.read_text(errors="replace").splitlines()[:25])[:3500]
+              print(f"::error::diag::boot.log head: {head}")
           emit("artifacts/diag/boot.log", "error",
                keep=["boot=", "booted", "devices", "error", "fail", "abi", "cancel"])
           emit("artifacts/diag/emulator.log", "warning",
