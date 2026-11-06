@@ -45,6 +45,28 @@ jobs:
           echo "== avds =="
           "$SDK/cmdline-tools/latest/bin/avdmanager" list avd 2>&1 | head -30 || true
 
+      - name: Annotate environment diagnostics
+        if: always()
+        run: |
+          # Artifact and job-log downloads are blocked in the agent's sandbox; annotations are
+          # the only channel it can read, so mirror the interesting lines into them.
+          python3 - <<'EOF'
+          import pathlib
+          def emit(path, level, keep=None, limit=3500):
+              p = pathlib.Path(path)
+              if not p.is_file():
+                  print(f"::{level}::diag::{path} missing")
+                  return
+              lines = [l.strip() for l in p.read_text(errors="replace").splitlines() if l.strip()]
+              if keep:
+                  selected = [l for l in lines if any(k.lower() in l.lower() for k in keep)]
+                  lines = selected or lines
+              body = " | ".join(lines[-40:])[:limit]
+              print(f"::{level}::diag::{path}: {body}")
+          emit("artifacts/diag/environment.log", "notice",
+               keep=["uname", "arch", "cpu", "accel", "emulator version", "system-images", "avd"])
+          EOF
+
       - name: Setup .NET SDK & Workloads
         uses: actions/setup-dotnet@v4
         with:
@@ -109,6 +131,29 @@ jobs:
           fi
 
           tail -60 artifacts/diag/emulator.log | tee -a "$LOG" || true
+
+      - name: Annotate boot attempt
+        if: always()
+        run: |
+          python3 - <<'EOF'
+          import pathlib
+          def emit(path, level, keep=None, limit=3500, tail=40):
+              p = pathlib.Path(path)
+              if not p.is_file():
+                  print(f"::{level}::diag::{path} missing")
+                  return
+              lines = [l.strip() for l in p.read_text(errors="replace").splitlines() if l.strip()]
+              if keep:
+                  selected = [l for l in lines if any(k.lower() in l.lower() for k in keep)]
+                  lines = selected or lines
+              body = " | ".join(lines[-tail:])[:limit]
+              print(f"::{level}::diag::{path}: {body}")
+          emit("artifacts/diag/boot.log", "error",
+               keep=["boot=", "booted", "devices", "error", "fail", "abi", "cancel"])
+          emit("artifacts/diag/emulator.log", "warning",
+               keep=["error", "accel", "hvf", "panic", "cannot", "failed", "no such"], tail=30)
+          emit("artifacts/diag/emulator.log", "notice", tail=15)
+          EOF
 
       - name: Upload diagnostics and evidence
         if: always()
