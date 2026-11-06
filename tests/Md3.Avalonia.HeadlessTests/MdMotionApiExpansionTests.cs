@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -427,7 +429,7 @@ public sealed class MdMotionApiExpansionTests
         MdMotion.SetScheme(sheet, MdMotionScheme.Standard);
         sheet.SnapAnimationDuration = TimeSpan.FromMilliseconds(120);
         Dispatcher.UIThread.RunJobs();
-        var transition = Assert.IsType<Avalonia.Animation.DoubleTransition>(Assert.Single(surface.Transitions!));
+        var transition = Assert.IsType<DoubleTransition>(Assert.Single(surface.Transitions!));
         Assert.Equal(TimeSpan.FromMilliseconds(120), transition.Duration);
 
         // A drag settling at the minimum extent reports MinExtentReached while opted in.
@@ -463,17 +465,19 @@ public sealed class MdMotionApiExpansionTests
         var container = Part<Border>(transform, "PART_Container");
 
         // The shadow derives from the interpolated elevation.
-        var closedShadow = Assert.Single(container.BoxShadow);
+        Assert.Equal(1, container.BoxShadow.Count);
+        var closedShadow = container.BoxShadow[0];
         Assert.Equal(2 * 0.5, closedShadow.OffsetY, 6);
         Assert.Equal(2 * 2 + 2, closedShadow.Blur, 6);
         transform.Toggle();
         Dispatcher.UIThread.RunJobs();
-        var openShadow = Assert.Single(container.BoxShadow);
+        Assert.Equal(1, container.BoxShadow.Count);
+        var openShadow = container.BoxShadow[0];
         Assert.Equal(8 * 0.5, openShadow.OffsetY, 6);
         Assert.Equal(8 * 2 + 2, openShadow.Blur, 6);
 
         transform.OpenElevation = 0;
-        Assert.Empty(container.BoxShadow);
+        Assert.Equal(0, container.BoxShadow.Count);
 
         // A mid-flight redirect keeps the current progress and scales the travel by what is
         // left instead of restarting a full-length animation. The progress is parked while the
@@ -486,14 +490,14 @@ public sealed class MdMotionApiExpansionTests
         transform.OpenElevation = 8;
         transform.IsExpanded = true;
         var travel = TimeSpan.FromMilliseconds(300 * 0.6);
-        var morphTransition = Assert.IsType<Avalonia.Animation.DoubleTransition>(Assert.Single(morph.Transitions!));
+        var morphTransition = Assert.IsType<DoubleTransition>(Assert.Single(morph.Transitions!));
         Assert.Equal(travel, morphTransition.Duration);
 
         // The content cross-fade splits the redirected travel 30/70.
         var closed = Part<ContentPresenter>(transform, "PART_ClosedContent");
         var open = Part<ContentPresenter>(transform, "PART_OpenContent");
-        var exit = Assert.IsType<Avalonia.Animation.DoubleTransition>(Assert.Single(closed.Transitions!));
-        var enter = Assert.IsType<Avalonia.Animation.DoubleTransition>(Assert.Single(open.Transitions!));
+        var exit = Assert.IsType<DoubleTransition>(Assert.Single(closed.Transitions!));
+        var enter = Assert.IsType<DoubleTransition>(Assert.Single(open.Transitions!));
         Assert.Equal(TimeSpan.FromMilliseconds(300 * 0.6 * 0.3), exit.Duration);
         Assert.Equal(TimeSpan.FromMilliseconds(300 * 0.6 * 0.3), enter.Delay);
         Assert.Equal(TimeSpan.FromMilliseconds(300 * 0.6 * 0.7), enter.Duration);
