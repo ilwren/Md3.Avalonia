@@ -243,7 +243,11 @@ internal sealed class MdMediaProgressBarAutomationPeer(MdMediaProgressBar owner)
     public double LargeChange => Media.LargeChange;
     public double SmallChange => Media.SmallChange;
     public void SetValue(double value) { EnsureEnabled(); Media.RequestSeek(value); }
-    protected override string? GetNameCore() => AutomationProperties.GetName(Media) ?? MdLocalization.GetString("MediaProgress", Media);
+    protected override string? GetNameCore()
+    {
+        var name = base.GetNameCore();
+        return string.IsNullOrWhiteSpace(name) ? MdLocalization.GetString("MediaProgress", Media) : name;
+    }
     protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Slider;
     protected override bool IsControlElementCore() => true;
     protected override bool IsContentElementCore() => true;
