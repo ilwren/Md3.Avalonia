@@ -377,7 +377,10 @@ public sealed class MdFileSystemPicker : TemplatedControl
     {
         base.OnAttachedToVisualTree(e);
         _isAttached = true;
-        if (CurrentDirectory is null)
+        // A host may request a directory before the visual is attached (for example while a
+        // Gallery page is being inserted). Do not let the automatic initial navigation cancel
+        // that explicit, already-running request just because it has not committed its path yet.
+        if (CurrentDirectory is null && !IsLoading)
             _ = NavigateAsync(ResolveStartDirectory());
     }
 
