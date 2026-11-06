@@ -49,6 +49,12 @@ public sealed class MdPaginatedDataTable : TemplatedControl
         RowsPerPageProperty.Changed.AddClassHandler<MdPaginatedDataTable>((control, _) => control.OnRowsPerPageChanged());
         TotalItemCountProperty.Changed.AddClassHandler<MdPaginatedDataTable>((control, _) => control.RebuildPage());
         IsLoadingProperty.Changed.AddClassHandler<MdPaginatedDataTable>((control, _) => control.UpdatePseudoClasses());
+
+        // The rows-per-page label is localized, so it has to follow the inherited culture. Without
+        // this the label is resolved once in the constructor and then frozen for the lifetime of
+        // the control, which is exactly the defect it was pulled out of XAML to avoid.
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdPaginatedDataTable>(
+            (control, _) => control.UpdateLocalizedText());
     }
 
     public MdPaginatedDataTable()
