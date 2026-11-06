@@ -201,7 +201,7 @@ public sealed class MdTemplateSourceTests
             {
                 document = XDocument.Load(file);
             }
-            catch (XmlException exception)
+            catch (System.Xml.XmlException exception)
             {
                 throw new InvalidOperationException($"{file} is not well-formed XML", exception);
             }
