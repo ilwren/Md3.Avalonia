@@ -111,7 +111,9 @@ python3 scripts/collect-android-perf.py --package io.arena.md3avalonia.gallery \
 
 这些证据只有在托管 runner 真的启动了模拟器时才存在。当前的 macOS 镜像经常起不来：模拟器步骤会
 警告 "Timeout waiting for emulator to boot" 且不上传任何文件，而工作流因为该步骤是建议性质仍报
-success。看到没有 `android-perf.json` 时，请理解为"这次没有 runner"，而不是"没有数据"。
+success。看到没有 `android-perf.json` 时，请理解为"这次没有 runner"，而不是"没有数据"。如果文件存在但指标全是 `n/a`，先看
+`collector-run.log`、`crash.txt` 和 `::warning::` 注解：已经遇到过的原因是包管理器还没就绪、app
+启动即崩溃、以及模拟器自己的 `system_server` 在 swiftshader 下中途崩溃。
 
 采集器本身由 `scripts/test-collect-android-perf.py` 覆盖：把真实进程跑在一个假的 `adb` 上，用录制
 好的 `dumpsys` 输出喂给它，验证解析（含 Android 12 起 "Number Frame dead" 改名为

@@ -92,7 +92,10 @@ jobs:
             # and a Maestro flow that hangs must not cost the frame/memory evidence.
             bash scripts/ci-android-perf.sh io.arena.md3avalonia.gallery artifacts/android artifacts/android-test || true
 
-            curl -Ls "https://get.maestro.mobile.dev" | bash
+            # Bounded install: an unbounded download once ate the rest of the step, and the
+            # evidence above is more valuable than the flow results below.
+            timeout 300 bash -c 'curl -Ls "https://get.maestro.mobile.dev" | bash' \
+              || echo "::warning::maestro install failed or timed out; skipping UI flows"
             export PATH="$PATH:$HOME/.maestro/bin"
 
             # These are product UI regressions, not a Material/Flutter certification. Bounded by a

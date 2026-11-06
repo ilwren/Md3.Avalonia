@@ -122,7 +122,10 @@ python3 scripts/collect-android-perf.py --package io.arena.md3avalonia.gallery \
 That evidence exists only when the hosted runner boots an emulator. On the current macOS image
 it often does not: the emulator step warns "Timeout waiting for emulator to boot" and uploads no
 files, while the run still reports success because the step is advisory. Treat a missing
-`android-perf.json` as "no runner", not as "no data".
+`android-perf.json` as "no runner", not as "no data". When the file is there but every metric is
+`n/a`, read `collector-run.log`, `crash.txt` and the `::warning::` annotations first: the observed
+causes have been a package manager that was not up yet, the app dying on launch, and the
+emulator's own `system_server` crashing mid-run under swiftshader.
 
 The collector itself is covered by `scripts/test-collect-android-perf.py`, which runs it as a real
 process against a fake `adb` answering with recorded `dumpsys` output: parsers (including the
