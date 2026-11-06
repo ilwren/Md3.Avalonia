@@ -93,13 +93,13 @@
     },
     "measured_controls": {
       "direction": "higher",
-      "budget": 8,
+      "budget": 14,
       "source": "headless",
-      "why": "Controls whose rendered geometry L2 actually measures. The matrix today covers Button, IconButton, FAB, CheckBox, RadioButton, Switch, TextBox and Chip; every other themed control renders without a geometry assertion."
+      "why": "Controls whose rendered geometry L2 measures. Was 8 with 37 cases; the second batch added the card, the dot badge, the small top app bar, the menu container and the two navigation shells, all of which the oracle already pinned at high confidence and nothing rendered."
     },
     "measured_cases": {
       "direction": "higher",
-      "budget": 37,
+      "budget": 43,
       "source": "headless",
       "why": "Rendered geometry cases in the L2 matrix. The case count matters separately from the control count because one control can be swept across a size scale without the sweep covering the shapes a consumer actually sets."
     },

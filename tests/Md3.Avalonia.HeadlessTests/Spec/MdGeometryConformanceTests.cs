@@ -131,9 +131,18 @@ public sealed class MdGeometryConformanceTests
             $"wide={wide:0.##}");
     }
 
+    /// <summary>
+    /// The sentinel a case uses when the oracle value describes the control's own arranged box
+    /// rather than a template part. Written as a sentinel rather than a nullable field so a case
+    /// that forgets its parts still fails loudly instead of silently measuring the root.
+    /// </summary>
+    private const string SelfPart = "__self__";
+
     private static void Evaluate(MdGeometryCase item, MdSpecOracle oracle, MdSpecReport report)
     {
-        var container = MdVisualTreeQuery.FindPart<Control>(item.Control, item.ContainerParts);
+        var container = item.ContainerParts.Contains(SelfPart, StringComparer.Ordinal)
+            ? item.Control
+            : MdVisualTreeQuery.FindPart<Control>(item.Control, item.ContainerParts);
         if (container is null)
         {
             report.Gap(
@@ -427,6 +436,68 @@ public sealed class MdGeometryConformanceTests
                 CornerKey = "Md.Comp.Chip.Container.Shape"
             });
         }
+
+        // --- Second batch: families the oracle already pins but the matrix did not lay out. -------
+        // Each of these had a high-confidence value in spec-snapshot/tokens.json that nothing ever
+        // rendered, so the number was checked at L1 and unverified at L2 - the exact split the two
+        // layers exist to close.
+
+        // The card is the surface every other component is demonstrated on, and its corner is the
+        // one shape token a consumer is most likely to override.
+        cases.Add(new MdGeometryCase("MdCard/Container", new MdCard { Content = "Content" }, ["PART_Container"])
+        {
+            CornerKey = "Md.Comp.Card.Container.Shape",
+            RequiresTouchTarget = false
+        });
+
+        // A dot badge is the smallest thing the library renders: 6x6 with a full-radius corner.
+        cases.Add(new MdGeometryCase(
+            "MdBadge/Dot",
+            new MdBadge { Variant = MdBadgeVariant.Dot },
+            ["PART_Container"])
+        {
+            HeightKey = "Md.Comp.Badge.Small.Size",
+            WidthKey = "Md.Comp.Badge.Small.Size",
+            CornerKey = "Md.Comp.Badge.Small.Shape",
+            RequiresTouchTarget = false
+        });
+
+        // A small top app bar is a fixed 64dp band; the medium and large flexible variants are
+        // scroll-driven heights and are covered by their own tokens, not by a static layout.
+        cases.Add(new MdGeometryCase("MdTopAppBar/Small", new MdTopAppBar { Height = 64 }, ["PART_Layout"])
+        {
+            HeightKey = "Md.Comp.AppBar.Small.Height",
+            RequiresTouchTarget = false
+        });
+
+        // A menu's container corner is 4dp; the item inside it is a 48dp row.
+        cases.Add(new MdGeometryCase("MdMenu/Container", new MdMenu(), ["PART_Container"])
+        {
+            CornerKey = "Md.Comp.Menu.Container.Shape",
+            RequiresTouchTarget = false
+        });
+
+        // Navigation bars and rails publish their container box as a property on the shell itself,
+        // not on a part: the bar sets Height and the rail sets Width, so the case measures the
+        // control the way a consumer reads it. PART_Root belongs to the per-item template, which is
+        // a different question and is covered by the realisation check.
+        cases.Add(new MdGeometryCase(
+            "MdNavigationBar/Flexible",
+            new MdNavigationBar { Width = 360 },
+            ["__self__"])
+        {
+            HeightKey = "Md.Comp.NavigationBar.Flexible.Container.Height",
+            RequiresTouchTarget = false
+        });
+
+        cases.Add(new MdGeometryCase(
+            "MdNavigationRail",
+            new MdNavigationRail { Height = 480 },
+            ["__self__"])
+        {
+            WidthKey = "Md.Comp.NavigationRail.Container.Width",
+            RequiresTouchTarget = false
+        });
 
         return cases;
     }
