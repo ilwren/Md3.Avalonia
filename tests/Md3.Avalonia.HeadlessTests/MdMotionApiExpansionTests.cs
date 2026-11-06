@@ -356,23 +356,24 @@ public sealed class MdMotionApiExpansionTests
         Assert.Equal(4, connector.Width);
 
         // The controls builder replaces the default continue/cancel row for the active step.
-        var context = Assert.Single(contexts);
+        var context = contexts.Last();
         Assert.Equal(0, context.StepIndex);
         Assert.Equal(3, context.StepCount);
         Assert.True(context.CanContinue);
         Assert.False(context.CanCancel);
         Assert.False(Part<Button>(stepper, "PART_ContinueButton").IsVisible);
-        Assert.Same(customControls[0].Parent, Part<Button>(stepper, "PART_ContinueButton").Parent);
+        Assert.NotNull(customControls.Last().Parent);
+        Assert.Same(customControls.Last().Parent, Part<Button>(stepper, "PART_ContinueButton").Parent);
 
         // The icon builder swaps the indicator contents and hides the stock visuals.
-        Assert.Equal(3, iconCalls.Count);
         for (var index = 0; index < steps.Length; index++)
         {
-            Assert.Same(steps[index], iconCalls[index].Step);
-            Assert.Equal(index, iconCalls[index].Index);
+            var lastCall = iconCalls.FindLastIndex(call => call.Index == index);
+            Assert.True(lastCall >= 0);
+            Assert.Same(steps[index], iconCalls[lastCall].Step);
             var indicator = steps[index].GetVisualDescendants().OfType<Border>()
                 .Single(control => control.Name == "PART_Indicator");
-            Assert.Contains(customIcons[index], indicator.GetVisualDescendants());
+            Assert.Contains(customIcons[lastCall], indicator.GetVisualDescendants());
             var number = steps[index].GetVisualDescendants().OfType<Control>()
                 .Single(control => control.Name == "PART_StepNumber");
             Assert.False(number.IsVisible);
@@ -383,10 +384,11 @@ public sealed class MdMotionApiExpansionTests
         iconCalls.Clear();
         stepper.Next();
         Dispatcher.UIThread.RunJobs();
-        var next = Assert.Single(contexts);
+        var next = contexts.Last();
         Assert.Equal(1, next.StepIndex);
         Assert.True(next.CanCancel);
-        Assert.Equal(3, iconCalls.Count);
+        Assert.All(Enumerable.Range(0, steps.Length), index =>
+            Assert.Contains(iconCalls, call => call.Index == index && ReferenceEquals(call.Step, steps[index])));
 
         // The context methods drive the stepper like the stock buttons do.
         next.Continue();

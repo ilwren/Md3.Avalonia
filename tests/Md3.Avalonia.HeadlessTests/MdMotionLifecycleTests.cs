@@ -1617,8 +1617,7 @@ public sealed class MdMotionLifecycleTests
     [AvaloniaFact]
     public void Fade_Through_Still_Animates_Control_Content_Without_Reparenting_It()
     {
-        // A visual has exactly one parent, so a Control that is already mounted in the primary
-        // presenter cannot also be shown by the outgoing one. The entrance must still animate.
+        // The outgoing presenter must show a snapshot rather than reparenting the live control.
         var first = new TextBlock { Text = "first" };
         var fade = new MdFadeThrough { Content = first };
         using var scope = Show(fade);
@@ -1627,9 +1626,11 @@ public sealed class MdMotionLifecycleTests
         Dispatcher.UIThread.RunJobs();
 
         var outgoing = Part<ContentPresenter>(fade, "PART_OutgoingContent");
-        Assert.False(outgoing.IsVisible);
-        Assert.Null(outgoing.Content);
-        Assert.False(fade.IsTransitioning);
+        Assert.True(outgoing.IsVisible);
+        Assert.False(outgoing.IsHitTestVisible);
+        Assert.IsType<Image>(outgoing.Content);
+        Assert.DoesNotContain(first, outgoing.GetVisualDescendants());
+        Assert.True(fade.IsTransitioning);
 
         var primary = Part<ContentPresenter>(fade, "PART_Content");
         Assert.NotNull(primary.Transitions);

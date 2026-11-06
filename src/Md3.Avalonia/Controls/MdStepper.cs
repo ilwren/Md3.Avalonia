@@ -191,6 +191,11 @@ public sealed class MdStepper : ItemsControl
     {
         if (_continueButton is not null) _continueButton.Click -= OnContinue;
         if (_cancelButton is not null) _cancelButton.Click -= OnCancel;
+        if (_customControls?.Parent is Panel oldHost) oldHost.Children.Remove(_customControls);
+        _customControls = null;
+        // Builders can have run before a template host existed. Rebuild for the new host even
+        // when all of their logical inputs are unchanged.
+        _buildersSignature = null;
         base.OnApplyTemplate(e);
         _continueButton = e.NameScope.Find<Button>("PART_ContinueButton");
         _cancelButton = e.NameScope.Find<Button>("PART_CancelButton");
