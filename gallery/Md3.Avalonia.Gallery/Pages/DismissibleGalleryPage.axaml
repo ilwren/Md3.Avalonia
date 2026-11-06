@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.DismissibleGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowMouseDrag="False">
@@ -30,6 +31,15 @@
         </md:MdDismissible>
         <md:MdButton Width="110" HorizontalAlignment="Left" Content="Restore" Variant="Text" Click="RestoreDismissible" />
         <TextBlock x:Name="DismissibleStatus" Classes="body" Text="Swipe the row, or press Restore." />
+      </StackPanel>
+
+      <StackPanel Spacing="12" MaxWidth="440" HorizontalAlignment="Stretch">
+        <TextBlock Classes="h2" Text="Slide to confirm" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Drag the handle to the end, or focus it and press Enter or Space. Reset allows another confirmation." />
+        <eco:MdSlideToConfirm x:Name="SlideDemo" MaxWidth="360" HorizontalAlignment="Stretch" Confirmed="SlideConfirmed" />
+        <md:MdButton Width="110" HorizontalAlignment="Left" Content="Reset" Variant="Text" Click="ResetSlide" />
+        <TextBlock x:Name="SlideStatus" Classes="body" Text="Waiting for confirmation." />
+        <gallery:ApiNotes Control="MdSlideToConfirm" Members="Text, ConfirmedText, Threshold, IsConfirmed, Progress, Confirmed, Confirm(), Reset()" />
       </StackPanel>
 
       <StackPanel Spacing="10">

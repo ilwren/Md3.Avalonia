@@ -32,7 +32,7 @@ jobs:
           # Capture both sides of the pipe: tee must not hide a failed publish or smoke.
           set -uo pipefail
           set +e
-          bash scripts/publish-gallery-aot.sh --rid linux-x64 --output /tmp/aot-out --smoke-scenario file-system-picker,emoji-picker 2>&1 | tee /tmp/aot.log
+          bash scripts/publish-gallery-aot.sh --rid linux-x64 --output /tmp/aot-out --smoke-scenario file-system-picker,emoji-picker,slide-confirm 2>&1 | tee /tmp/aot.log
           statuses=("${PIPESTATUS[@]}")
           set -e
           if (( statuses[0] != 0 || statuses[1] != 0 )); then

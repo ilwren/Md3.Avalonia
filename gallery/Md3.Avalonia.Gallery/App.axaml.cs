@@ -56,7 +56,7 @@ public partial class App : Application
         if (string.IsNullOrEmpty(scenario)) return;
 
         var markerPath = Environment.GetEnvironmentVariable("MD3_GALLERY_AOT_SMOKE_MARKER");
-        if (scenario is not ("file-system-picker" or "emoji-picker") || string.IsNullOrWhiteSpace(markerPath))
+        if (scenario is not ("file-system-picker" or "emoji-picker" or "slide-confirm") || string.IsNullOrWhiteSpace(markerPath))
             throw new InvalidOperationException("The native-AOT smoke scenario or marker path is invalid.");
 
         window.Opened += async (_, _) =>
@@ -69,6 +69,16 @@ public partial class App : Application
                         window.CurrentPage is not FileSystemPickerGalleryPage pickerPage)
                         throw new InvalidOperationException("The native-AOT Gallery could not open the file-system picker page.");
                     await pickerPage.RunNativeAotSmokeAsync();
+                }
+                else if (scenario == "slide-confirm")
+                {
+                    if (!window.NavigateToIndexedPage("Dismissible") || window.CurrentPage is not DismissibleGalleryPage slidePage)
+                        throw new InvalidOperationException("The native-AOT Gallery could not open the slide confirmation page.");
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        window.UpdateLayout();
+                        slidePage.RunSlideNativeAotSmoke();
+                    }, DispatcherPriority.Loaded);
                 }
                 else
                 {

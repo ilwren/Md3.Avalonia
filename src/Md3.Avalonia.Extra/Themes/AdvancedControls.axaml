@@ -22,6 +22,17 @@
     </Setter>
   </ControlTheme>
 
+  <!-- Slide confirmation paints its own track and handle with scoped Material roles. -->
+  <ControlTheme x:Key="{x:Type eco:MdSlideToConfirm}" TargetType="eco:MdSlideToConfirm">
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
+    <Setter Property="TrackBrush" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
+    <Setter Property="ProgressBrush" Value="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
+    <Setter Property="ThumbBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="ThumbForeground" Value="{DynamicResource Md.Sys.Color.OnPrimary.Brush}" />
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
+  </ControlTheme>
+
   <!-- A standalone integer wheel, scoped to Material color roles. -->
   <ControlTheme x:Key="{x:Type eco:MdWheelPicker}" TargetType="eco:MdWheelPicker">
     <Setter Property="Focusable" Value="True" />

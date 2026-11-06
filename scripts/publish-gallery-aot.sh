@@ -10,7 +10,7 @@ Usage:
                                  [--output /absolute/or/relative/path]
                                  [--configuration Release]
                                  [--smoke]
-                                 [--smoke-scenario file-system-picker,emoji-picker]
+                                 [--smoke-scenario file-system-picker,emoji-picker,slide-confirm]
                                  [--keep-intermediate]
 
 The publish asserts what an AOT publish must produce: a native executable for the
@@ -19,7 +19,7 @@ nothing about native AOT - it fails at runtime on reflection that was trimmed aw
 so --smoke starts the binary under xvfb (Linux only, requires xvfb-run and the X
 libraries) and passes only if the window is still alive when the timeout fires.
 --smoke-scenario additionally requires each named scenario to execute in a separate
-native process and write its success marker; comma-separate names to run both. It implies --smoke.
+native process and write its success marker; comma-separate names to run several. It implies --smoke.
 
 Native linking needs the platform toolchain: clang + zlib on Linux, the MSVC or
 Xcode toolchain on Windows/macOS. A .NET 10 SDK is required.
@@ -82,7 +82,7 @@ if [[ -n "$SMOKE_SCENARIO" ]]; then
   fi
   IFS=',' read -r -a SMOKE_SCENARIOS <<< "$SMOKE_SCENARIO"
   for scenario in "${SMOKE_SCENARIOS[@]}"; do
-    if [[ "$scenario" != "file-system-picker" && "$scenario" != "emoji-picker" ]]; then
+    if [[ "$scenario" != "file-system-picker" && "$scenario" != "emoji-picker" && "$scenario" != "slide-confirm" ]]; then
       echo "error: unsupported --smoke-scenario '$scenario'" >&2
       exit 2
     fi

@@ -49,6 +49,9 @@ internal static class GalleryLocalization
         ["The Icons package includes the official font. Reinstall the package or run scripts/verify-fonts.py if this diagnostic appears; invalid glyphs remain hidden instead of using a look-alike fallback."]="Icons 包已包含官方字体；若出现此诊断，请重新安装包或运行 scripts/verify-fonts.py。无效字形会保持隐藏，不使用仿制回退符号。",
         ["Material controls use scoped themes and cross-platform Avalonia APIs."]="Material 控件使用局部主题与跨平台 Avalonia API。",
 
+        ["Slide to confirm"]="滑动确认", ["Drag the handle to the end, or focus it and press Enter or Space. Reset allows another confirmation."]="将手柄拖到末端，或聚焦后按回车键或空格键。重置后可再次确认。",
+        ["Waiting for confirmation."]="等待确认。",
+
         // Ecosystem Waves A–F
         ["Flutter ecosystem"]="Flutter 生态控件", ["Wave A · Overlay, commands and density"]="Wave A · 浮层、命令与密度",
         ["Open one transient surface, then scroll to verify it dismisses."]="打开一个临时浮层，然后滚动以验证其自动关闭。", ["Compact density is scoped to this information row only."]="紧凑密度仅应用于此信息行。",
