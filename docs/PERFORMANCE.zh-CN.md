@@ -32,8 +32,9 @@ Skia 渲染），再与一个故意放得很宽松的上限比较。CI 共享机
 | `Large_Virtualized_List_First_Layout_Stays_Within_Budget` | 1 万行 `MdList` 首次布局，**且**实际生成的容器 < 500 个 | < 10000ms |
 
 源码：`tests/Md3.Avalonia.HeadlessTests/MdMemoryLeakTests.cs`。写法沿用 Avalonia 官方
-LeakTests 的配方——挂到 live 窗口上、操作、Detach + 布局、回收、断言；且是 Release 专属门禁
-（Debug 下直接返回，CI 跑的是 Release）。从不断言窗口本身：连 Avalonia 自己的套件都只断言
+LeakTests 的配方——挂到 live 窗口上、操作、Detach + 布局、回收、断言；另加 detach 后强制刷一帧
+（headless 渲染器会钉住上一提交场景直到新帧替换），以及带墙钟延迟的有界回收重试来等渲染
+时钟。且是 Release 专属门禁（Debug 下直接返回，CI 跑的是 Release）。从不断言窗口本身：连 Avalonia 自己的套件都只断言
 内容控件，因为共享 headless 平台会钉住已关闭的窗口。
 
 | 测试 | 卡住的东西 |

@@ -34,7 +34,10 @@ wait on the UI thread or an accidental O(n²) in theme application.
 
 Source: `tests/Md3.Avalonia.HeadlessTests/MdMemoryLeakTests.cs`. These follow Avalonia's
 own LeakTests recipe — attach to a live window, exercise, detach with a layout pass, collect,
-assert — and are Release-only gates (they return immediately in Debug builds; CI runs Release).
+assert — plus a forced fresh frame after detach (the headless renderer holds the last committed
+scene until a new one replaces it) and bounded collect-retry with wall-clock delays for the
+render timer. They are Release-only gates (they return immediately in Debug builds; CI runs
+Release).
 The window itself is never asserted: even Avalonia's suite only asserts content controls,
 because the shared headless platform keeps closed windows rooted.
 
