@@ -124,7 +124,8 @@ public sealed class MdStepper : ItemsControl
 
     /// <summary>
     /// Brush for the step connectors; <c>null</c> falls back to the theme's outline-variant
-    /// resource. Active-step styling still wins where the theme applies it.
+    /// resource. While set it is a local value and therefore overrides the theme's active-step
+    /// highlight as well.
     /// </summary>
     public IBrush? ConnectorBrush { get => GetValue(ConnectorBrushProperty); set => SetValue(ConnectorBrushProperty, value); }
 

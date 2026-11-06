@@ -225,11 +225,16 @@ public sealed class MdMotionApiExpansionTests
         using var scope = Show(dismissible, 420, 180);
         var start = dismissible.TranslatePoint(new Point(180, 36), scope.Window)!.Value;
 
-        // 200 DIP over 360 clears the default 0.4 threshold.
+        // 200 DIP over 360 clears the default 0.4 threshold. Repeated stationary moves bleed
+        // the synthesized velocity away first, so the release is judged by the threshold alone
+        // instead of sneaking through the fling fast path.
+        var end = start + new Vector(200, 0);
         scope.Window.MouseMove(start, RawInputModifiers.None);
         scope.Window.MouseDown(start, MouseButton.Left, RawInputModifiers.None);
-        scope.Window.MouseMove(start + new Vector(200, 0), RawInputModifiers.LeftMouseButton);
-        scope.Window.MouseUp(start + new Vector(200, 0), MouseButton.Left, RawInputModifiers.None);
+        scope.Window.MouseMove(end, RawInputModifiers.LeftMouseButton);
+        for (var frame = 0; frame < 40; frame++)
+            scope.Window.MouseMove(end, RawInputModifiers.LeftMouseButton);
+        scope.Window.MouseUp(end, MouseButton.Left, RawInputModifiers.None);
         Assert.True(dismissible.IsDismissed);
 
         // The per-direction override raises the bar past the same drag.
@@ -241,8 +246,10 @@ public sealed class MdMotionApiExpansionTests
         Dispatcher.UIThread.RunJobs();
         scope.Window.MouseMove(start, RawInputModifiers.None);
         scope.Window.MouseDown(start, MouseButton.Left, RawInputModifiers.None);
-        scope.Window.MouseMove(start + new Vector(200, 0), RawInputModifiers.LeftMouseButton);
-        scope.Window.MouseUp(start + new Vector(200, 0), MouseButton.Left, RawInputModifiers.None);
+        scope.Window.MouseMove(end, RawInputModifiers.LeftMouseButton);
+        for (var frame = 0; frame < 40; frame++)
+            scope.Window.MouseMove(end, RawInputModifiers.LeftMouseButton);
+        scope.Window.MouseUp(end, MouseButton.Left, RawInputModifiers.None);
         Assert.False(dismissible.IsDismissed);
     }
 
