@@ -123,7 +123,7 @@
     },
     "unmeasured_themed_controls": {
       "direction": "lower",
-      "budget": 150,
+      "budget": 144,
       "source": "headless",
       "why": "Themed Md* controls with no L2 geometry case. A ceiling, not a target: adding a geometry case lowers the number and the budget moves down with it; a new themed control must not raise it without a review."
     },

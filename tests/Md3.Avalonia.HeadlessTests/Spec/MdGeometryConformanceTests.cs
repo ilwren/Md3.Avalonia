@@ -92,7 +92,17 @@ public sealed class MdGeometryConformanceTests
         // Machine-readable coverage. "How many controls does L2 actually measure" is the number the
         // budget ratchet moves; the case count alone hides that the matrix is 37 cases over 10
         // controls while 157 types carry a ControlTheme.
-        report.Metric("measured_controls", cases.Select(item => item.Control.GetType().Name).Distinct().Count());
+        var laidOut = cases.Select(item => item.Control.GetType().Name).Distinct()
+            .OrderBy(name => name, StringComparer.Ordinal)
+            .ToList();
+        var declared = MdSpecSurface.GeometryMeasuredTypes.OrderBy(name => name, StringComparer.Ordinal).ToList();
+
+        // Both directions matter. A registered control with no case would overstate coverage; a case
+        // whose control is not registered would be measured and then left out of the number the
+        // budget ratchet reads, which is how the two lists drifted apart before.
+        Assert.Equal(declared, laidOut);
+
+        report.Metric("measured_controls", laidOut.Count);
         report.Metric("measured_cases", cases.Count);
 
         report.Complete();

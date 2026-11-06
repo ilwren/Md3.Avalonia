@@ -48,11 +48,8 @@ public sealed class MdInventoryTests
     private const string Layer = "L4_inventory";
 
     /// <summary>Types the L2 matrix lays out, mirrored from MdGeometryConformanceTests.</summary>
-    private static readonly HashSet<string> GeometryMeasuredTypes = new(StringComparer.Ordinal)
-    {
-        "MdButton", "MdCheckBox", "MdChip", "MdFloatingActionButton",
-        "MdIconButton", "MdRadioButton", "MdSwitch", "MdTextBox"
-    };
+    private static readonly HashSet<string> GeometryMeasuredTypes =
+        new(MdSpecSurface.GeometryMeasuredTypes, StringComparer.Ordinal);
 
     /// <summary>
     /// Controls whose template is loaded and whose declared <c>PART_*</c> names are asserted.

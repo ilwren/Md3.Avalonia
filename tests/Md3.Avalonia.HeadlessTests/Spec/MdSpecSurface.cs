@@ -129,6 +129,24 @@ internal static class MdSpecSurface
             .OrderBy(path => path, StringComparer.Ordinal);
 
     /// <summary>
+    /// Controls whose rendered geometry L2 measures, i.e. the only ones for which "size and corner
+    /// radius match Material" has been shown rather than asserted.
+    /// </summary>
+    /// <remarks>
+    /// Kept here, once, because two tests need the same answer: L2 lays these controls out and
+    /// L4 subtracts them from the themed inventory to report how many are left uncovered. The list
+    /// used to be maintained only in L4, which meant adding a case to L2 changed nothing in the
+    /// coverage number - the two silently disagreed. L2 now asserts its cases match this set, so a
+    /// case and its registration have to land in the same commit.
+    /// </remarks>
+    public static readonly IReadOnlyList<string> GeometryMeasuredTypes =
+    [
+        "MdBadge", "MdButton", "MdCard", "MdCheckBox", "MdChip", "MdFloatingActionButton",
+        "MdIconButton", "MdMenu", "MdNavigationBar", "MdNavigationRail", "MdRadioButton",
+        "MdSwitch", "MdTextBox", "MdTopAppBar"
+    ];
+
+    /// <summary>
     /// True when the type can be created without arguments, which is the precondition for laying it
     /// out in a generic matrix.
     /// </summary>

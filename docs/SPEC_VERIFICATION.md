@@ -126,19 +126,19 @@ and `budget`. Moving a budget is therefore a visible diff, and only one directio
 | metric | meaning | today |
 | --- | --- | ---: |
 | `hardcoded_geometry` | themable literals inside `Themes/Controls/*.axaml` | 279 |
-| `hardcoded_ui_text` | English authored in a shipped template, bypassing `MdLocalization` | 11 |
+| `hardcoded_ui_text` | English authored in a shipped template, bypassing `MdLocalization` | 0 |
 | `orphan_tokens` | declared tokens nothing references | 84 |
 | `dual_declaration_keys` | keys declared in both XAML and `MdThemeManager` | 27 |
 | `oracle_coverage_ratio` | oracle entries ÷ declared keys | 0.2462 |
 | `oracle_families` | component families with at least one oracle value | 19 |
-| `measured_controls` / `measured_cases` | controls and cases the L2 matrix lays out | 8 / 37 |
+| `measured_controls` / `measured_cases` | controls and cases the L2 matrix lays out | 14 / 43 |
 | `armed_goldens` | committed L3 baselines | 0 |
 | `undeclared_template_parts` | `PART_*` names with no `[TemplatePart]` | 470 |
 | `templates_without_part_contract` | themed controls whose template has no contract at all | 97 |
 | `templates_with_a_part_contract` | themes whose every named part is declared | 12 |
 | `variant_asymmetric_tokens` | tokens declared in one theme variant only | 0 |
 | `tokens_outside_the_core_theme` | `Md.*` keys in sibling theme packages | 52 |
-| `unmeasured_themed_controls` | themed controls with no L2 geometry case | 150 |
+| `unmeasured_themed_controls` | themed controls with no L2 geometry case | 144 |
 | `unstyled_control_classes` | `Md*` classes with no control theme (mostly parts) | 85 |
 | `unresolved_declared_tokens` | declared keys the merged theme cannot resolve | 0 |
 | `contrast_failures` | WCAG AA failures across every generator configuration | 0 |
@@ -149,9 +149,22 @@ and `budget`. Moving a budget is therefore a visible diff, and only one directio
 `contrast_failures` is the one entry above with no ceiling even though it measures zero: contrast
 remediation is out of scope for this round, so the number is recorded and nothing gates on it.
 
+### L2c: the chrome a theme draws follows the culture
+
+`hardcoded_ui_text` reached 0 by moving eleven English strings out of the shipped templates and into
+localized properties. The lint can only see a literal, so the other half of the hole is closed by
+`MdThemedTextTests`: it switches the inherited `MdLocalization.Culture` between `en` and `zh-Hans` and
+asserts every one of those labels is non-empty and actually differs. A string moved into C# but never
+bound would pass the lint and still be frozen for every consumer.
+
+That test found a real defect on its first run — `MdPaginatedDataTable` resolved its new label in the
+constructor and never re-raised it on a culture change. The fix was a class handler, and the lesson is
+recorded in the test's own comments: a made-up sentinel, or a check that measures the panel instead of
+the control, is how a coverage number stops meaning anything.
+
 ### L2b: the coverage numbers, filled in
 
-L2 measures eight controls against the oracle. L2b asks the question underneath it, for every themed
+L2 measures fourteen controls against the oracle. L2b asks the question underneath it, for every themed
 control at once, and the first run answers it: **114 of 115 themed controls with an implicit theme
 construct, theme and lay out, and 110 of them produce a visual tree.** The gap between those two
 numbers is named rather than averaged away — three are `TextBlock`/`ContentPresenter` subclasses that
