@@ -4,6 +4,8 @@
 
 ### Added
 
+- Added Extra `MdMarquee` for horizontal single-line overflow scrolling with direction, speed, gap, round pauses, RTL, full-text automation and a static reduced-motion fallback.
+
 - Added Extra `MdExpandableText`: collapsed plain-text line or Unicode-text-element limits, a localized keyboard-accessible toggle and bindable expansion state.
 
 - Added Extra `MdAutoSizeText` for bounded plain-text font fitting, with minimum size, step, line limit, native wrapping/trimming and text automation; it preserves the requested font-size binding.

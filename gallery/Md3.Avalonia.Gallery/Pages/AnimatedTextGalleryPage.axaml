@@ -30,6 +30,18 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Scrolling text" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Overflowing text scrolls continuously; reduced motion shows a static, trimmed label." />
+        <md:MdCard Padding="20" HorizontalAlignment="Left">
+          <Border Width="260" Height="48" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}">
+            <eco:MdMarquee Padding="8,0" Speed="40" Gap="30" PauseAfterRound="0:0:1"
+                Text="A long announcement scrolls across this small space while the full text remains accessible." />
+          </Border>
+        </md:MdCard>
+        <gallery:CodeExample XamlCode="&lt;eco:MdMarquee Text=&quot;{Binding Announcement}&quot; Width=&quot;260&quot; Speed=&quot;40&quot; /&gt;" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Expandable text" />
         <TextBlock Classes="body" TextWrapping="Wrap" Text="Long text can be collapsed by line or character count, then expanded with a separate button." />
         <md:MdCard Padding="20" HorizontalAlignment="Left">

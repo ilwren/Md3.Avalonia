@@ -1383,6 +1383,33 @@ Every public enum and its members are listed below. To print the current member 
 
 
 
+
+## Scrolling text (Extra)
+
+`MdMarquee` renders single-line plain `Text`; line separators are replaced by spaces for display.
+When the laid-out text exceeds its bounded width, it repeats horizontally at constant `Speed`
+(default 40 DIP/s, coerced to 0–10000) with `Gap` between copies (default 24 DIP, coerced to
+0–10000). `Direction` is `Auto` (left for LTR, right for RTL), `Left` or `Right` in physical
+coordinates. `PauseAfterRound` holds the starting position after each cycle (default zero, capped
+at one hour). `IsAnimating` reports the active render loop, including the round pause.
+
+`IsActive=false`, zero speed, no overflow, invisibility, detachment, or the inherited `Reduced` or
+`None` motion scheme stops and resets scrolling; the static view uses `FallbackTrimming` (default
+`CharacterEllipsis`). On reactivation it starts at the logical text start. The control uses render
+frames rather than a perpetual dispatcher timer; long frame gaps are capped at 100 ms instead of
+jumping to a later round. An unbounded horizontal layout normally gives the text its natural width,
+so supply a bounded width for scrolling. It exposes one text automation peer with the full original
+text (or an explicit automation name), not duplicate names for the repeated visual copies.
+
+This is a horizontal, constant-speed plain-text subset: it does not provide vertical scrolling,
+finite repeat counts, start padding, acceleration/deceleration curves, selection, rich inlines or
+interactive text, and is not Flutter API or pixel compatible.
+
+```xml
+<eco:MdMarquee Text="{Binding Announcement}" Width="240" Speed="40"
+               Gap="24" PauseAfterRound="0:0:1" />
+```
+
 ## Expandable text (Extra)
 
 `MdExpandableText` shows plain `Text` with a separate Material text button when content exceeds

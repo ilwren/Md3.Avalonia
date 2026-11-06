@@ -366,6 +366,9 @@ internal static class GalleryLocalization
         ["Tabs organize peer content across screens and views while retaining native selection and keyboard navigation."]="标签用于在不同界面与视图之间组织同级内容，同时保留原生选择与键盘导航。",
         ["Tap any setting item or toggle a switch to interact."]="点击任意设置项或切换开关即可交互。",
         ["Temporary surfaces expose a concise list of choices with optional leading and trailing content."]="临时表面以简洁列表呈现选项，并可选带头部与尾部内容。",
+        ["Scrolling text"]="滚动文本",
+        ["Overflowing text scrolls continuously; reduced motion shows a static, trimmed label."]="超出区域的文本会连续滚动；减少动效时显示静止的省略文本。",
+        ["A long announcement scrolls across this small space while the full text remains accessible."]="较长的公告在狭小区域中滚动，而完整文本仍可供辅助技术读取。",
         ["Expandable text"]="可展开文本",
         ["Long text can be collapsed by line or character count, then expanded with a separate button."]="长文本可以按行数或字符数折叠，再用独立按钮展开。",
         ["Material components help organize information and actions. Expand this paragraph to read the rest of the example, and collapse it when you are done."]="Material 组件帮助组织信息和操作。展开此段落以阅读示例的其余内容，阅读完成后可以将其收起。",
@@ -580,6 +583,11 @@ internal static class GalleryLocalization
             {
                 var original = Originals.GetValue(content, _ => new Original(label)).Value;
                 content.Content = Translate(original, culture);
+            }
+            if (element is MdMarquee marquee && marquee.Text is { } marqueeText)
+            {
+                var original = Originals.GetValue(marquee, _ => new Original(marqueeText)).Value;
+                marquee.Text = Translate(original, culture);
             }
             if (element is MdExpandableText expandable && expandable.Text is { } expandableText)
             {

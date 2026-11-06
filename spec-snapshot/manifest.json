@@ -113,6 +113,14 @@
       "license": "MIT",
       "disposition": "Documentation-only behavioral reference for independently implemented MdPageIndicator; no Dart source or assets copied."
     },
+    "marquee": {
+      "version": "2.3.0",
+      "repository": "https://github.com/MarcelGarus/marquee",
+      "commit": "06a6cb1072f151a4053d17e8f613765b797daf69",
+      "documentation": "https://github.com/MarcelGarus/marquee/blob/06a6cb1072f151a4053d17e8f613765b797daf69/README.md",
+      "license": "MIT",
+      "note": "Public documentation, metadata and license only; independent Avalonia implementation."
+    },
     "readmore": {
       "version": "3.0.0",
       "repository": "https://github.com/jonataslaw/readmore",

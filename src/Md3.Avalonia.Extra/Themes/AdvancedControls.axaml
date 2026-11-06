@@ -4,6 +4,12 @@
                     xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
                     xmlns:md="using:Md3.Avalonia.Controls">
 
+  <!-- Marquee renders its own text; only its scoped foreground and clipping are themed. -->
+  <ControlTheme x:Key="{x:Type eco:MdMarquee}" TargetType="eco:MdMarquee">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="ClipToBounds" Value="True" />
+  </ControlTheme>
+
   <!-- The text and the separately focusable toggle share the parent's type and color roles. -->
   <ControlTheme x:Key="{x:Type eco:MdExpandableText}" TargetType="eco:MdExpandableText">
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
