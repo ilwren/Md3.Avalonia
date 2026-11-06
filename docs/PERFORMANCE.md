@@ -32,12 +32,16 @@ wait on the UI thread or an accidental O(n²) in theme application.
 | `Theme_Switch_Stays_Within_Budget` | `MdThemeManager.Apply` + resource propagation (restores the previous theme) | median < 3000ms |
 | `Large_Virtualized_List_First_Layout_Stays_Within_Budget` | 10k-row `MdList` first layout **and** realized containers < 500 | < 10000ms |
 
-Source: `tests/Md3.Avalonia.HeadlessTests/MdMemoryLeakTests.cs`.
+Source: `tests/Md3.Avalonia.HeadlessTests/MdMemoryLeakTests.cs`. These follow Avalonia's
+own LeakTests recipe — attach to a live window, exercise, detach with a layout pass, collect,
+assert — and are Release-only gates (they return immediately in Debug builds; CI runs Release).
+The window itself is never asserted: even Avalonia's suite only asserts content controls,
+because the shared headless platform keeps closed windows rooted.
 
 | Test | What it gates |
 |---|---|
-| `Closed_Window_Is_Collected` | A closed window is garbage-collectable |
-| `Dialog_Open_Close_Cycle_Does_Not_Leak_Host` | The dialog host survives an open/close cycle unpinned (services hold hosts weakly) |
+| `Detached_Material_Content_Is_Collected` | Content detached from a live window is collectable |
+| `Dialog_Open_Close_Cycle_Does_Not_Leak_Host` | The dialog host, detached after an open/close cycle, is collectable even while its service stays alive (services must hold hosts weakly) |
 | `Snackbar_Show_Dismiss_Cycle_Does_Not_Leak_Host` | Same for the snackbar host |
 
 Run only these locally:

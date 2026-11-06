@@ -31,12 +31,15 @@ Skia 渲染），再与一个故意放得很宽松的上限比较。CI 共享机
 | `Theme_Switch_Stays_Within_Budget` | `MdThemeManager.Apply` + 资源传播（测完恢复原主题） | 中位数 < 3000ms |
 | `Large_Virtualized_List_First_Layout_Stays_Within_Budget` | 1 万行 `MdList` 首次布局，**且**实际生成的容器 < 500 个 | < 10000ms |
 
-源码：`tests/Md3.Avalonia.HeadlessTests/MdMemoryLeakTests.cs`。
+源码：`tests/Md3.Avalonia.HeadlessTests/MdMemoryLeakTests.cs`。写法沿用 Avalonia 官方
+LeakTests 的配方——挂到 live 窗口上、操作、Detach + 布局、回收、断言；且是 Release 专属门禁
+（Debug 下直接返回，CI 跑的是 Release）。从不断言窗口本身：连 Avalonia 自己的套件都只断言
+内容控件，因为共享 headless 平台会钉住已关闭的窗口。
 
 | 测试 | 卡住的东西 |
 |---|---|
-| `Closed_Window_Is_Collected` | 关闭后的窗口必须可被 GC 回收 |
-| `Dialog_Open_Close_Cycle_Does_Not_Leak_Host` | 打开/关闭一轮后 dialog host 不得被钉住（service 对 host 只持弱引用） |
+| `Detached_Material_Content_Is_Collected` | 从 live 窗口 detach 下来的内容必须可被回收 |
+| `Dialog_Open_Close_Cycle_Does_Not_Leak_Host` | 打开/关闭一轮后 detach 的 dialog host 必须可被回收，即使它的 service 还活着（service 对 host 只能持弱引用） |
 | `Snackbar_Show_Dismiss_Cycle_Does_Not_Leak_Host` | 同上，针对 snackbar host |
 
 本地只跑这些：
