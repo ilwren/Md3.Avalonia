@@ -24,7 +24,7 @@ Md3.Avalonia uses Avalonia controls, properties, and lifecycles. Similar type na
 | `MdFocusTraversalGroup` | Implemented subset | Visual-order, TabIndex and geometric reading-order traversal; cycle and skip modes | It maps to Avalonia focus primitives rather than accepting Flutter `FocusTraversalPolicy` objects |
 | `MdKeyboardAvoidingHost` | Implemented subset | Subscribes to Avalonia `TopLevel.InputPane`, applies occluded height and scrolls focused content | Floating keyboards that report no occlusion intentionally produce zero avoidance |
 | `MdSimpleDialog` | Partial | Scrim, Escape, focus containment/restoration, selectable list and cancel action | It must be placed in a full-size overlay host; it is not a Navigator route or a clone of `showDialog<T>` |
-| `MdPaginatedDataTable` | API shell | Basic paging over list rows | No Flutter columns/cells/header-sort data model; do not describe it as DataTable parity |
+| `MdPaginatedDataTable` | Implemented subset | List-row paging, optional equal-width column headers, host-handled sort requests, header actions and first/last navigation | Rows and cell alignment remain host-supplied via `ItemTemplate`; no generated cells, row-selection API or automatic sorting; not Flutter DataTable parity |
 | `MdAdaptiveSwitch` | API shell | Material switch behavior with platform-size selection | Cupertino rendering and animation are not implemented |
 | `MdAdaptiveProgressIndicator` | API shell | Material progress semantics with platform-tuned dimensions | Cupertino activity-indicator rendering is not implemented |
 | `MdAboutDialog` | API shell | About metadata surface and license callback | No built-in dialog route or complete Flutter license flow |

@@ -57,30 +57,38 @@
         <Border Background="{TemplateBinding Background}" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
                 BorderThickness="1" CornerRadius="16">
           <Border Margin="1" Background="{TemplateBinding Background}" CornerRadius="15" ClipToBounds="True">
-            <Grid RowDefinitions="56,*,64">
+            <Grid RowDefinitions="56,Auto,*,64">
             <Border Padding="16,0" Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
                     BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,0,0,1">
-              <ContentPresenter VerticalAlignment="Center" Content="{TemplateBinding Header}" Foreground="{TemplateBinding Foreground}" />
+              <Grid ColumnDefinitions="*,Auto">
+                <ContentPresenter VerticalAlignment="Center" Content="{TemplateBinding Header}" Foreground="{TemplateBinding Foreground}" />
+                <ContentPresenter Grid.Column="1" VerticalAlignment="Center" Content="{TemplateBinding Actions}" Foreground="{TemplateBinding Foreground}" />
+              </Grid>
             </Border>
-            <ListBox Grid.Row="1" Theme="{StaticResource MdFlutterListBoxTheme}"
+            <Grid x:Name="PART_ColumnHeaders" Grid.Row="1" Margin="16,0" MinHeight="48" IsVisible="False" />
+            <ListBox Grid.Row="2" Theme="{StaticResource MdFlutterListBoxTheme}"
                      ItemsSource="{TemplateBinding PageItems}" ItemTemplate="{TemplateBinding ItemTemplate}"
                      ItemContainerTheme="{StaticResource MdDataTableGeneratedRowTheme}"
                      Background="Transparent" BorderThickness="0" />
-            <Border Grid.Row="2" Padding="12,0" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,1,0,0">
-              <Grid ColumnDefinitions="*,Auto,92,Auto,Auto" ColumnSpacing="6">
+            <Border Grid.Row="3" Padding="12,0" BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="0,1,0,0">
+              <Grid ColumnDefinitions="*,Auto,92,Auto,Auto,Auto,Auto" ColumnSpacing="6">
                 <TextBlock VerticalAlignment="Center" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                            Text="{TemplateBinding PageLabel}" />
                 <TextBlock Grid.Column="1" Margin="8,0" VerticalAlignment="Center" FontSize="12"
                            Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" Text="Rows per page" />
                 <md:MdComboBox Grid.Column="2" MinWidth="84" MinHeight="48" ItemsSource="{TemplateBinding AvailableRowsPerPage}"
                                SelectedItem="{TemplateBinding RowsPerPage, Mode=TwoWay}" />
-                <md:MdIconButton x:Name="PART_PreviousPageButton" Grid.Column="3" Icon="{DynamicResource Md.Icon.ChevronLeft}"
+                <Button x:Name="PART_FirstPageButton" Grid.Column="3" Content="«" IsVisible="{TemplateBinding ShowFirstLastButtons}"
+                        AutomationProperties.Name="First page" />
+                <md:MdIconButton x:Name="PART_PreviousPageButton" Grid.Column="4" Icon="{DynamicResource Md.Icon.ChevronLeft}"
                                  AutomationProperties.Name="Previous page" />
-                <md:MdIconButton x:Name="PART_NextPageButton" Grid.Column="4" Icon="{DynamicResource Md.Icon.ChevronRight}"
+                <md:MdIconButton x:Name="PART_NextPageButton" Grid.Column="5" Icon="{DynamicResource Md.Icon.ChevronRight}"
                                  AutomationProperties.Name="Next page" />
+                <Button x:Name="PART_LastPageButton" Grid.Column="6" Content="»" IsVisible="{TemplateBinding ShowFirstLastButtons}"
+                        AutomationProperties.Name="Last page" />
               </Grid>
             </Border>
-              <Border x:Name="PART_LoadingLayer" Grid.RowSpan="3" Background="{DynamicResource Md.Sys.Color.Scrim.Standard.Brush}" IsVisible="False">
+              <Border x:Name="PART_LoadingLayer" Grid.RowSpan="4" Background="{DynamicResource Md.Sys.Color.Scrim.Standard.Brush}" IsVisible="False">
                 <md:MdCircularProgressIndicator HorizontalAlignment="Center" VerticalAlignment="Center" IsIndeterminate="True" />
               </Border>
             </Grid>
@@ -88,6 +96,8 @@
         </Border>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:first-page /template/ Button#PART_FirstPageButton"><Setter Property="IsEnabled" Value="False" /></Style>
+    <Style Selector="^:last-page /template/ Button#PART_LastPageButton"><Setter Property="IsEnabled" Value="False" /></Style>
     <Style Selector="^:first-page /template/ md|MdIconButton#PART_PreviousPageButton"><Setter Property="IsEnabled" Value="False" /></Style>
     <Style Selector="^:last-page /template/ md|MdIconButton#PART_NextPageButton"><Setter Property="IsEnabled" Value="False" /></Style>
     <Style Selector="^:loading /template/ Border#PART_LoadingLayer"><Setter Property="IsVisible" Value="True" /></Style>

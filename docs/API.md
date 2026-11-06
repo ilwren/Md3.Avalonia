@@ -1381,6 +1381,25 @@ Every public enum and its members are listed below. To print the current member 
 | `MdTransferLayoutMode` | `Auto` · `Standard` · `Compact` |
 | `MdVisibilityTransition` | `Fade` · `ExpandVertical` · `ExpandHorizontal` · `Scale` · `SlideAndFade` |
 
+### Paginated table column headers
+
+`MdPaginatedDataTable.Columns` is an observable collection of `MdPaginatedDataColumn`
+(`Label`, `Tooltip`, `IsNumeric`, `IsSortable`). The default template displays equal-width
+headers when columns are present. Numeric alignment applies to the header only; use a matching
+layout in `ItemTemplate` for row cells. No generated cell model is provided.
+
+Activating a sortable header (or calling `RequestSort(index)`) sets the two-way
+`SortColumnIndex` / `SortAscending` properties and raises `SortRequested` and, if executable,
+`SortRequestedCommand` with `MdPaginatedDataTableSortEventArgs`. A new column starts ascending;
+repeated activation toggles direction. The host must reorder or reload `ItemsSource`: the table
+does not sort automatically. Assign a new `ItemsSource` after reordering: in-place collection
+changes are not currently observed. `ItemsSource` must contain the full list, even when
+`TotalItemCount` is set; this control does not accept a standalone server-side page. Column indexes
+refer to the current collection; when changing its order, the host should update or clear
+`SortColumnIndex`. `Actions` supplies trailing header
+content and `ShowFirstLastButtons` enables optional first/last navigation. Existing tables without
+columns keep their `ItemTemplate`-based list rows.
+
 ## Events and event arguments
 
 Components raise ordinary Avalonia routed or CLR events. These argument types are public so
@@ -1389,7 +1408,8 @@ handlers can be written without casting:
 | Event argument | Raised by |
 |---|---|
 | `MdSearchResultCommittedEventArgs` | `MdSearchView.ResultCommitted` — carries the committed result |
-| `MdDataTableSortEventArgs` | `MdDataTable` / `MdPaginatedDataTable` column sorting |
+| `MdDataTableSortEventArgs` | `MdDataTable` column sorting |
+| `MdPaginatedDataTableSortEventArgs` | `MdPaginatedDataTable.SortRequested` — column, index and direction |
 | `MdPageChangedEventArgs` | `MdPaginatedDataTable` page navigation |
 | `MdReorderEventArgs` | `MdReorderableList` drag completion |
 | `MdDismissRequestedEventArgs` | `MdDismissible` swipe-to-dismiss |

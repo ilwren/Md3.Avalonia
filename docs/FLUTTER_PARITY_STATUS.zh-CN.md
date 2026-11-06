@@ -24,7 +24,7 @@ Md3.Avalonia 使用 Avalonia 控件、属性与生命周期。相似的类型名
 | `MdFocusTraversalGroup` | 实现子集 | 视觉顺序、`TabIndex`、几何阅读顺序、循环和跳过模式 | 使用 Avalonia 焦点原语，不接收 Flutter `FocusTraversalPolicy` 对象 |
 | `MdKeyboardAvoidingHost` | 实现子集 | 订阅 Avalonia `TopLevel.InputPane`、应用遮挡高度并滚动聚焦内容 | 未报告遮挡的浮动键盘不会触发避让 |
 | `MdSimpleDialog` | 部分实现 | 遮罩、Escape、焦点约束/恢复、可选列表和取消操作 | 必须放在铺满宿主的浮层中；不是 Navigator route 或 `showDialog<T>` 的复刻 |
-| `MdPaginatedDataTable` | API 骨架 | 基于列表行的基础分页 | 没有 Flutter 的完整列/单元格/表头排序模型，不应描述为 DataTable parity |
+| `MdPaginatedDataTable` | 已实现子集 | 列表行分页、可选等宽列头、由宿主处理的排序请求、表头操作槽位和首末页导航 | 行与单元格对齐仍由宿主的 `ItemTemplate` 提供；没有自动生成单元格、行选择 API 或自动排序，不是完整 DataTable parity |
 | `MdAdaptiveSwitch` | API 骨架 | Material switch 行为与平台尺寸选择 | 未实现 Cupertino 的绘制与动画 |
 | `MdAdaptiveProgressIndicator` | API 骨架 | Material 进度语义与平台化尺寸 | 未实现 Cupertino activity indicator 绘制 |
 | `MdAboutDialog` | API 骨架 | 应用元数据界面与许可回调 | 不包含内置 dialog route 或完整 Flutter 许可流程 |

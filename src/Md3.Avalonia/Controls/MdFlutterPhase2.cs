@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
@@ -22,6 +23,11 @@ namespace Md3.Avalonia.Controls;
 public sealed class MdPaginatedDataTable : TemplatedControl
 {
     public static readonly StyledProperty<object?> HeaderProperty = AvaloniaProperty.Register<MdPaginatedDataTable, object?>(nameof(Header));
+    public static readonly StyledProperty<object?> ActionsProperty = AvaloniaProperty.Register<MdPaginatedDataTable, object?>(nameof(Actions));
+    public static readonly StyledProperty<bool> ShowFirstLastButtonsProperty = AvaloniaProperty.Register<MdPaginatedDataTable, bool>(nameof(ShowFirstLastButtons));
+    public static readonly StyledProperty<int?> SortColumnIndexProperty = AvaloniaProperty.Register<MdPaginatedDataTable, int?>(nameof(SortColumnIndex), defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
+    public static readonly StyledProperty<bool> SortAscendingProperty = AvaloniaProperty.Register<MdPaginatedDataTable, bool>(nameof(SortAscending), true, defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
+    public static readonly StyledProperty<ICommand?> SortRequestedCommandProperty = AvaloniaProperty.Register<MdPaginatedDataTable, ICommand?>(nameof(SortRequestedCommand));
     public static readonly StyledProperty<IEnumerable?> ItemsSourceProperty = AvaloniaProperty.Register<MdPaginatedDataTable, IEnumerable?>(nameof(ItemsSource));
     public static readonly StyledProperty<IDataTemplate?> ItemTemplateProperty = AvaloniaProperty.Register<MdPaginatedDataTable, IDataTemplate?>(nameof(ItemTemplate));
     public static readonly StyledProperty<int> PageIndexProperty = AvaloniaProperty.Register<MdPaginatedDataTable, int>(nameof(PageIndex), defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
@@ -35,6 +41,11 @@ public sealed class MdPaginatedDataTable : TemplatedControl
 
     private IReadOnlyList<object?> _pageItems = Array.Empty<object?>();
     private string _pageLabel = "0 of 0";
+    private readonly HashSet<MdPaginatedDataColumn> _observedColumns = new();
+    private bool _observingColumns;
+    private Grid? _columnHeaders;
+    private Button? _firstButton;
+    private Button? _lastButton;
     private Button? _previousButton;
     private Button? _nextButton;
 
@@ -45,11 +56,29 @@ public sealed class MdPaginatedDataTable : TemplatedControl
         RowsPerPageProperty.Changed.AddClassHandler<MdPaginatedDataTable>((control, _) => control.OnRowsPerPageChanged());
         TotalItemCountProperty.Changed.AddClassHandler<MdPaginatedDataTable>((control, _) => control.RebuildPage());
         IsLoadingProperty.Changed.AddClassHandler<MdPaginatedDataTable>((control, _) => control.UpdatePseudoClasses());
+        SortColumnIndexProperty.Changed.AddClassHandler<MdPaginatedDataTable>((control, _) => control.RefreshColumnSortIndicators());
+        SortAscendingProperty.Changed.AddClassHandler<MdPaginatedDataTable>((control, _) => control.RefreshColumnSortIndicators());
     }
 
-    public MdPaginatedDataTable() => RebuildPage();
+    public MdPaginatedDataTable()
+    {
+        Columns.CollectionChanged += (_, _) => OnColumnsChanged();
+        RebuildPage();
+    }
 
     public object? Header { get => GetValue(HeaderProperty); set => SetValue(HeaderProperty, value); }
+    /// <summary>Optional trailing content in the card header.</summary>
+    public object? Actions { get => GetValue(ActionsProperty); set => SetValue(ActionsProperty, value); }
+    /// <summary>Shows the first and last page buttons in the default template.</summary>
+    public bool ShowFirstLastButtons { get => GetValue(ShowFirstLastButtonsProperty); set => SetValue(ShowFirstLastButtonsProperty, value); }
+    /// <summary>Header descriptors. The item template still supplies the row cells.</summary>
+    public ObservableCollection<MdPaginatedDataColumn> Columns { get; } = new();
+    /// <summary>The zero-based sorted column, or null when no sort is displayed. The host owns the data ordering.</summary>
+    public int? SortColumnIndex { get => GetValue(SortColumnIndexProperty); set => SetValue(SortColumnIndexProperty, value); }
+    /// <summary>The direction shown on the sorted header.</summary>
+    public bool SortAscending { get => GetValue(SortAscendingProperty); set => SetValue(SortAscendingProperty, value); }
+    /// <summary>Command receiving <see cref="MdPaginatedDataTableSortEventArgs"/> when a sortable header is activated.</summary>
+    public ICommand? SortRequestedCommand { get => GetValue(SortRequestedCommandProperty); set => SetValue(SortRequestedCommandProperty, value); }
     public IEnumerable? ItemsSource { get => GetValue(ItemsSourceProperty); set => SetValue(ItemsSourceProperty, value); }
     public IDataTemplate? ItemTemplate { get => GetValue(ItemTemplateProperty); set => SetValue(ItemTemplateProperty, value); }
     public int PageIndex { get => GetValue(PageIndexProperty); set => SetValue(PageIndexProperty, value); }
@@ -63,10 +92,26 @@ public sealed class MdPaginatedDataTable : TemplatedControl
     public int FirstRowIndex => PageIndex * Math.Max(1, RowsPerPage);
 
     public event EventHandler<MdPageChangedEventArgs>? PageChanged;
+    /// <summary>Raised on sortable header activation. The host must reorder or reload the data.</summary>
+    public event EventHandler<MdPaginatedDataTableSortEventArgs>? SortRequested;
 
     public void NextPage() => SetPage(PageIndex + 1);
     public void PreviousPage() => SetPage(PageIndex - 1);
     public void FirstPage() => SetPage(0);
+    public void LastPage() => SetPage(GetPageCount() - 1);
+
+    /// <summary>Requests a sort if the index identifies a sortable column. Does not sort ItemsSource.</summary>
+    public void RequestSort(int columnIndex)
+    {
+        if (columnIndex < 0 || columnIndex >= Columns.Count || !Columns[columnIndex].IsSortable) return;
+        var column = Columns[columnIndex];
+        var ascending = SortColumnIndex != columnIndex || !SortAscending;
+        SetCurrentValue(SortColumnIndexProperty, columnIndex);
+        SetCurrentValue(SortAscendingProperty, ascending);
+        var args = new MdPaginatedDataTableSortEventArgs(columnIndex, column, ascending);
+        if (SortRequestedCommand?.CanExecute(args) == true) SortRequestedCommand.Execute(args);
+        SortRequested?.Invoke(this, args);
+    }
 
     public void SetPage(int pageIndex)
     {
@@ -87,15 +132,104 @@ public sealed class MdPaginatedDataTable : TemplatedControl
     {
         if (_previousButton is not null) _previousButton.Click -= OnPrevious;
         if (_nextButton is not null) _nextButton.Click -= OnNext;
+        if (_firstButton is not null) _firstButton.Click -= OnFirst;
+        if (_lastButton is not null) _lastButton.Click -= OnLast;
+        if (_columnHeaders is not null) _columnHeaders.Children.Clear();
         base.OnApplyTemplate(e);
+        _columnHeaders = e.NameScope.Find<Grid>("PART_ColumnHeaders");
+        _firstButton = e.NameScope.Find<Button>("PART_FirstPageButton");
+        _lastButton = e.NameScope.Find<Button>("PART_LastPageButton");
+        if (_firstButton is not null) _firstButton.Click += OnFirst;
+        if (_lastButton is not null) _lastButton.Click += OnLast;
+        RebuildColumnHeaders();
         _previousButton = e.NameScope.Find<Button>("PART_PreviousPageButton");
         _nextButton = e.NameScope.Find<Button>("PART_NextPageButton");
         if (_previousButton is not null) _previousButton.Click += OnPrevious;
         if (_nextButton is not null) _nextButton.Click += OnNext;
     }
 
+    private void OnFirst(object? sender, RoutedEventArgs e) => FirstPage();
+    private void OnLast(object? sender, RoutedEventArgs e) => LastPage();
     private void OnPrevious(object? sender, RoutedEventArgs e) => PreviousPage();
     private void OnNext(object? sender, RoutedEventArgs e) => NextPage();
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        _observingColumns = true;
+        OnColumnsChanged();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        _observingColumns = false;
+        foreach (var column in _observedColumns) column.PropertyChanged -= OnColumnPropertyChanged;
+        _observedColumns.Clear();
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    private void OnColumnsChanged()
+    {
+        foreach (var column in _observedColumns) column.PropertyChanged -= OnColumnPropertyChanged;
+        _observedColumns.Clear();
+        if (_observingColumns)
+        {
+            foreach (var column in Columns)
+            {
+                if (_observedColumns.Add(column)) column.PropertyChanged += OnColumnPropertyChanged;
+            }
+        }
+        RebuildColumnHeaders();
+    }
+
+    private void OnColumnPropertyChanged(object? sender, PropertyChangedEventArgs e) => RebuildColumnHeaders();
+
+    private void RebuildColumnHeaders()
+    {
+        if (_columnHeaders is null) return;
+        _columnHeaders.Children.Clear();
+        _columnHeaders.ColumnDefinitions.Clear();
+        _columnHeaders.IsVisible = Columns.Count > 0;
+        for (var index = 0; index < Columns.Count; index++)
+        {
+            var column = Columns[index];
+            _columnHeaders.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+            var text = GetColumnHeaderText(column, index);
+            Control header;
+            if (column.IsSortable)
+            {
+                var capturedIndex = index;
+                var button = new Button { Content = text, HorizontalAlignment = column.IsNumeric ? HorizontalAlignment.Right : HorizontalAlignment.Left };
+                button.Click += (_, _) => RequestSort(capturedIndex);
+                header = button;
+            }
+            else
+            {
+                header = new TextBlock { Text = text, VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = column.IsNumeric ? HorizontalAlignment.Right : HorizontalAlignment.Left };
+            }
+            if (column.Tooltip is not null) ToolTip.SetTip(header, column.Tooltip);
+            Grid.SetColumn(header, index);
+            _columnHeaders.Children.Add(header);
+        }
+    }
+
+    private string GetColumnHeaderText(MdPaginatedDataColumn column, int index)
+    {
+        var text = column.Label ?? string.Empty;
+        return SortColumnIndex == index ? text + (SortAscending ? " ↑" : " ↓") : text;
+    }
+
+    private void RefreshColumnSortIndicators()
+    {
+        if (_columnHeaders is null) return;
+        for (var index = 0; index < Math.Min(Columns.Count, _columnHeaders.Children.Count); index++)
+        {
+            var text = GetColumnHeaderText(Columns[index], index);
+            if (_columnHeaders.Children[index] is Button button) button.Content = text;
+            else if (_columnHeaders.Children[index] is TextBlock label) label.Text = text;
+        }
+    }
 
     private void OnRowsPerPageChanged()
     {
