@@ -42,6 +42,7 @@ The following packages are **not dependencies** and none of their Dart source, a
 | animated_tree_view 2.3.0 | Nested tree nodes, expansion, indentation utilities and RTL behavior | MIT | https://pub.dev/packages/animated_tree_view/versions/2.3.0 |
 | chips_input_autocomplete 1.2.2 | Dynamic/removable tags, suggestions, limits and validation behavior | MIT | https://pub.dev/packages/chips_input_autocomplete/versions/1.2.2 |
 | smooth_page_indicator 3.0.0 | Page count, fractional position, slide/worm-style markers, orientation and page requests | MIT | https://github.com/Milad-Akarie/smooth_page_indicator/blob/bb6402dd2d94dc8f44ec3f13b580d7148354884e/README.md |
+| readmore 3.0.0 | Expand/collapse plain text with a collapsed line or character limit | MIT | https://github.com/jonataslaw/readmore/blob/d6c6c5fc44a34139465bd4ea4c7868ce9834174f/README.md |
 | auto_size_text 3.0.0 | Bounded text fitting, minimum size, step granularity and line limit | MIT | https://github.com/simc/auto_size_text/blob/2178f0821132636bc4f0dea1bc4d40a889d8249b/README.md |
 | audio_video_progress_bar 2.0.2 | Host-owned playback, elapsed/total labels, buffered segment and seek requests | MIT | https://github.com/suragch/audio_video_progress_bar/blob/a8d21089c529d3872002863eaf8917ef0937e72f/README.md |
 

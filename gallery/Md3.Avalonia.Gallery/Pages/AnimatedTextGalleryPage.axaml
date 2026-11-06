@@ -30,6 +30,16 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Expandable text" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Long text can be collapsed by line or character count, then expanded with a separate button." />
+        <md:MdCard Padding="20" HorizontalAlignment="Left">
+          <eco:MdExpandableText Width="300" CollapsedLines="2"
+              Text="Material components help organize information and actions. Expand this paragraph to read the rest of the example, and collapse it when you are done." />
+        </md:MdCard>
+        <gallery:CodeExample XamlCode="&lt;eco:MdExpandableText Text=&quot;{Binding Description}&quot; CollapsedLines=&quot;2&quot; /&gt;" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdAnimatedText Text=&quot;{Binding Headline}&quot; Effect=&quot;Typewriter&quot; Duration=&quot;0:0:1.4&quot; /&gt;" />
       </StackPanel>

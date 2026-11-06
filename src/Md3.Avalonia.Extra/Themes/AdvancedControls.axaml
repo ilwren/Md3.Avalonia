@@ -4,6 +4,27 @@
                     xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
                     xmlns:md="using:Md3.Avalonia.Controls">
 
+  <!-- The text and the separately focusable toggle share the parent's type and color roles. -->
+  <ControlTheme x:Key="{x:Type eco:MdExpandableText}" TargetType="eco:MdExpandableText">
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Padding="{TemplateBinding Padding}">
+          <StackPanel>
+            <TextBlock x:Name="PART_Text" Text="{TemplateBinding DisplayText}"
+                       FontFamily="{TemplateBinding FontFamily}" FontSize="{TemplateBinding FontSize}"
+                       FontWeight="{TemplateBinding FontWeight}" FontStyle="{TemplateBinding FontStyle}"
+                       FontStretch="{TemplateBinding FontStretch}" Foreground="{TemplateBinding Foreground}"
+                       TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxLines="{TemplateBinding DisplayMaxLines}" />
+            <md:MdButton x:Name="PART_Toggle" Content="{TemplateBinding ToggleLabel}"
+                         IsVisible="{TemplateBinding CanExpand}" HorizontalAlignment="Left"
+                         Variant="Text" Size="ExtraSmall" />
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
   <!-- Auto-sizing text is a plain-text control, scoped to Extra and the on-surface role. -->
   <ControlTheme x:Key="{x:Type eco:MdAutoSizeText}" TargetType="eco:MdAutoSizeText">
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />

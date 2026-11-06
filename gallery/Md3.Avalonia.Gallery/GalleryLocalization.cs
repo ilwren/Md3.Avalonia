@@ -366,6 +366,9 @@ internal static class GalleryLocalization
         ["Tabs organize peer content across screens and views while retaining native selection and keyboard navigation."]="标签用于在不同界面与视图之间组织同级内容，同时保留原生选择与键盘导航。",
         ["Tap any setting item or toggle a switch to interact."]="点击任意设置项或切换开关即可交互。",
         ["Temporary surfaces expose a concise list of choices with optional leading and trailing content."]="临时表面以简洁列表呈现选项，并可选带头部与尾部内容。",
+        ["Expandable text"]="可展开文本",
+        ["Long text can be collapsed by line or character count, then expanded with a separate button."]="长文本可以按行数或字符数折叠，再用独立按钮展开。",
+        ["Material components help organize information and actions. Expand this paragraph to read the rest of the example, and collapse it when you are done."]="Material 组件帮助组织信息和操作。展开此段落以阅读示例的其余内容，阅读完成后可以将其收起。",
         ["Auto-size text"]="自适应字号文本",
         ["The text shrinks within a bounded area without changing the requested font size."]="文本在有限区域内缩小，同时保持请求的字号不变。",
         ["Text that reveals itself. Each effect runs over a fixed duration rather than a per-character tick, so the total time is predictable."]="逐字显现的文本。每个动效按固定时长运行，而不是逐字符步进，因此总时长可预期。",
@@ -577,6 +580,11 @@ internal static class GalleryLocalization
             {
                 var original = Originals.GetValue(content, _ => new Original(label)).Value;
                 content.Content = Translate(original, culture);
+            }
+            if (element is MdExpandableText expandable && expandable.Text is { } expandableText)
+            {
+                var original = Originals.GetValue(expandable, _ => new Original(expandableText)).Value;
+                expandable.Text = Translate(original, culture);
             }
             if (element is TextBox input && input.PlaceholderText is { } placeholder)
             {

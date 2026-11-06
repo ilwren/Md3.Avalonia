@@ -1382,6 +1382,34 @@ Every public enum and its members are listed below. To print the current member 
 | `MdVisibilityTransition` | `Fade` · `ExpandVertical` · `ExpandHorizontal` · `Scale` · `SlideAndFade` |
 
 
+
+## Expandable text (Extra)
+
+`MdExpandableText` shows plain `Text` with a separate Material text button when content exceeds
+its collapsed limit. `TrimMode` is `Lines` (default) or `Characters`. Line mode wraps text and
+uses `CollapsedLines` (default 2, coerced to 1–1000); line overflow is recalculated after layout
+at the actual text-part width. Character mode uses `CollapsedCharacters` (default 100, minimum 1)
+Unicode text elements and appends an ellipsis after the retained elements. It never splits a
+combining sequence or extended emoji grapheme. `IsExpanded` is two-way by default and remains
+host-owned when text or width changes; it is not reset when the toggle becomes unnecessary.
+`CanExpand`, `DisplayText`, `DisplayMaxLines` and `ToggleLabel` are read-only presentation state.
+The button uses localized Expand/Collapse labels unless `ExpandLabel`/`CollapseLabel` override them.
+
+The default template has `PART_Text` (`TextBlock`) and `PART_Toggle` (`Button`). The line-overflow
+calculation uses the actual text part's width, wrapping, typeface, line height, letter spacing and
+font features. A replacement template must supply these parts and bind them to the presentation
+properties; `CanExpand` in line mode is meaningful after arrange. An externally constrained height
+can clip even expanded content and is not itself an expansion trigger. The button supplies standard
+Avalonia keyboard and button automation semantics; it is not an inline link. This is a plain-text
+subset: rich spans, selection, URL/hashtag/mention annotations, animation and exact Flutter parity
+are not implemented.
+
+```xml
+<eco:MdExpandableText Text="{Binding Description}" CollapsedLines="2"
+                      IsExpanded="{Binding IsDescriptionExpanded}" />
+<eco:MdExpandableText Text="{Binding Summary}" TrimMode="Characters" CollapsedCharacters="80" />
+```
+
 ## Auto-size text (Extra)
 
 `MdAutoSizeText` displays plain `Text` and uses Avalonia text shaping to fit the available

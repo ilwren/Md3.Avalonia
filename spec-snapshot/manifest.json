@@ -113,6 +113,14 @@
       "license": "MIT",
       "disposition": "Documentation-only behavioral reference for independently implemented MdPageIndicator; no Dart source or assets copied."
     },
+    "readmore": {
+      "version": "3.0.0",
+      "repository": "https://github.com/jonataslaw/readmore",
+      "commit": "d6c6c5fc44a34139465bd4ea4c7868ce9834174f",
+      "documentation": "https://github.com/jonataslaw/readmore/blob/d6c6c5fc44a34139465bd4ea4c7868ce9834174f/README.md",
+      "license": "MIT",
+      "note": "Public documentation, metadata and license only; independent Avalonia implementation."
+    },
     "auto_size_text": {
       "version": "3.0.0",
       "repository": "https://github.com/simc/auto_size_text",
