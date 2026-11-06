@@ -109,7 +109,7 @@ public sealed class MdStep : HeaderedContentControl
         {
             if (connector is null) continue;
             if (_connectorBrush is not null) connector.Background = _connectorBrush;
-            else connector.ClearValue(Visual.BackgroundProperty);
+            else connector.ClearValue(Border.BackgroundProperty);
         }
         if (_connector is not null) _connector.Width = _connectorThickness;
         if (_hConnector is not null) _hConnector.Height = _connectorThickness;
