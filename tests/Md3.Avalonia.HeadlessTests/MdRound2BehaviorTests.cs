@@ -176,7 +176,8 @@ public sealed class MdRound2BehaviorTests
     public void Baseline_Surface_Tokens_Match_The_M3_2023_Values()
     {
         // The 2023 baseline moved light surface/background/bright to #FEF7FF (from the old
-        // #FFFBFE) and dark surface-bright to #36343B.
+        // #FFFBFE). Dark surface-bright is neutral24 #3B383E: the earlier #36343B here is neutral22,
+        // which Material uses for surface-container-highest (see the M3 baseline palette).
         var theme = new MaterialTheme();
         Assert.True(theme.TryGetResource("Md.Sys.Color.Surface", ThemeVariant.Light, out var surface));
         Assert.Equal(global::Avalonia.Media.Color.Parse("#FEF7FF"), Assert.IsType<global::Avalonia.Media.Color>(surface));
@@ -187,7 +188,7 @@ public sealed class MdRound2BehaviorTests
         Assert.True(theme.TryGetResource("Md.Sys.Color.Surface", ThemeVariant.Dark, out var darkSurface));
         Assert.Equal(global::Avalonia.Media.Color.Parse("#141218"), Assert.IsType<global::Avalonia.Media.Color>(darkSurface));
         Assert.True(theme.TryGetResource("Md.Sys.Color.SurfaceBright", ThemeVariant.Dark, out var darkBright));
-        Assert.Equal(global::Avalonia.Media.Color.Parse("#36343B"), Assert.IsType<global::Avalonia.Media.Color>(darkBright));
+        Assert.Equal(global::Avalonia.Media.Color.Parse("#3B383E"), Assert.IsType<global::Avalonia.Media.Color>(darkBright));
     }
 
     [Fact]

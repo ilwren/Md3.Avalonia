@@ -379,13 +379,11 @@ public sealed class MdInventoryTests
             $"{staticTheme.Count} of {runtimeKeys.Count} runtime-written keys also exist in the static theme " +
             "and were compared at ShapeScale.Standard.");
 
-        // Deliberately not asserted to zero. The measured answer is 8, and that is a design question
-        // rather than a bug the build can settle: the static tokens carry the M3 baseline palette
-        // (primary #6750A4, on-surface #1D1B20) while MdThemeManager derives its scheme from the seed
-        // through the tonal palette, which lands on #65558F and #1C1B1E. Both are defensible and they
-        // disagree, so the count is budgeted at its measured value instead of being waived or
-        // tolerated silently: a ninth divergence fails the ratchet, and closing the existing eight is
-        // a visible budget change rather than a quiet drift.
+        // This used to be budgeted at 8 rather than asserted to zero, because the static tokens carried
+        // the M3 baseline palette (primary #6750A4, on-surface #1D1B20) while MdThemeManager derived its
+        // scheme from the seed through the tonal palette and landed on #65558F and #1C1B1E. The question
+        // is settled: Material publishes the baseline as literal values, so the generator returns those
+        // for the default options and the two sides now agree. Zero is the assertion, not a budget.
         report.Note("dual-declaration",
             $"{mismatches.Count} of {staticTheme.Count} compared keys disagree. Budgeted at {mismatches.Count}, not asserted to zero.");
 

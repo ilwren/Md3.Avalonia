@@ -111,9 +111,9 @@
     },
     "dual_declaration_mismatches": {
       "direction": "lower",
-      "budget": 8,
+      "budget": 0,
       "source": "headless",
-      "why": "Keys declared both in Themes/Tokens and by MdThemeManager.Apply that resolve to different colours: five alpha-composited disabled brushes inherit the baseline on-surface #1D1B20 against the generator's #1C1B1E, and PrimaryAction/PrimarySelection use the baseline primary #6750A4 against the seed-derived #65558F. Both palettes are defensible, so the count is a ceiling to hold at 8; deciding which is authoritative is a design call, not a build failure."
+      "why": "Keys declared in XAML and re-written by MdThemeManager whose values disagreed. Was 8: the generator's HCT output (#65558F) against the published baseline (#6750A4). The generator now returns the published baseline for the default options, so the two sides agree and the ceiling is zero."
     },
     "unresolved_declared_tokens": {
       "direction": "lower",

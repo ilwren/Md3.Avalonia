@@ -15,19 +15,28 @@ namespace Md3.Avalonia.HeadlessTests;
 public sealed class MdDynamicThemeTests
 {
     [Fact]
-    public void Baseline_Seed_Matches_Golden_Hct_Vectors()
+    public void Baseline_Seed_Matches_The_Published_M3_Baseline()
     {
+        // The default options describe the M3 baseline, so the generator has to return the published
+        // scheme, not a tone-mapped approximation of it. This test used to pin the HCT output for the
+        // same seed (#65558F and friends), which locked in a result that disagreed with the static theme
+        // and with every published baseline table.
         var light = MdThemeGenerator.Generate(new MdThemeOptions(), dark: false);
         var dark = MdThemeGenerator.Generate(new MdThemeOptions(), dark: true);
 
-        Assert.Equal("#65558F", Hex(light["Primary"]));
-        Assert.Equal("#E9DDFF", Hex(light["PrimaryContainer"]));
-        Assert.Equal("#FDF8FD", Hex(light["Surface"]));
-        Assert.Equal("#CFBDFE", Hex(dark["Primary"]));
-        Assert.Equal("#4D3D75", Hex(dark["PrimaryContainer"]));
-        Assert.Equal("#141316", Hex(dark["Surface"]));
+        Assert.Equal("#6750A4", Hex(light["Primary"]));
+        Assert.Equal("#EADDFF", Hex(light["PrimaryContainer"]));
+        Assert.Equal("#FEF7FF", Hex(light["Surface"]));
+        Assert.Equal("#D0BCFF", Hex(dark["Primary"]));
+        Assert.Equal("#4F378B", Hex(dark["PrimaryContainer"]));
+        Assert.Equal("#141218", Hex(dark["Surface"]));
         Assert.Equal(49, light.Count);
         Assert.Equal(49, dark.Count);
+
+        // The other branch has to stay reachable: a different seed is still generated, not clamped to
+        // the baseline table.
+        var other = MdThemeGenerator.Generate(new MdThemeOptions { SeedColor = "#006A6A" }, dark: false);
+        Assert.NotEqual(light["Primary"], other["Primary"]);
     }
 
     [Fact]
