@@ -8,6 +8,7 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
+using Md3.Avalonia.Localization;
 
 namespace Md3.Avalonia.Extra.Controls;
 
@@ -66,7 +67,6 @@ public sealed class MdMediaProgressBar : RangeBase
         SmallChange = 5;
         LargeChange = 30;
         PseudoClasses.Set(":read-only", IsReadOnly);
-        AutomationProperties.SetName(this, "Media progress");
         GotFocus += (_, _) => InvalidateVisual();
         LostFocus += (_, _) => InvalidateVisual();
     }
@@ -243,6 +243,7 @@ internal sealed class MdMediaProgressBarAutomationPeer(MdMediaProgressBar owner)
     public double LargeChange => Media.LargeChange;
     public double SmallChange => Media.SmallChange;
     public void SetValue(double value) { EnsureEnabled(); Media.RequestSeek(value); }
+    protected override string? GetNameCore() => AutomationProperties.GetName(Media) ?? MdLocalization.GetString("MediaProgress", Media);
     protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Slider;
     protected override bool IsControlElementCore() => true;
     protected override bool IsContentElementCore() => true;

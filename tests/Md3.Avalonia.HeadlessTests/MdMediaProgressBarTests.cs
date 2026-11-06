@@ -1,5 +1,7 @@
+using System.Globalization;
 using System.Runtime.InteropServices;
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
 using Avalonia.Controls;
@@ -10,6 +12,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Md3.Avalonia.Extra.Controls;
+using Md3.Avalonia.Localization;
 using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
@@ -115,7 +118,12 @@ public sealed class MdMediaProgressBarTests
             bar.FlowDirection = FlowDirection.RightToLeft;
             window.KeyPress(Key.Right, RawInputModifiers.None, PhysicalKey.ArrowRight, null);
             Assert.Equal(20, bar.Value);
-            var range = Assert.IsAssignableFrom<IRangeValueProvider>(ControlAutomationPeer.CreatePeerForElement(bar).GetProvider<IRangeValueProvider>());
+            var peer = ControlAutomationPeer.CreatePeerForElement(bar);
+            MdLocalization.SetCulture(bar, CultureInfo.GetCultureInfo("zh-CN"));
+            Assert.Equal("媒体进度", peer.GetName());
+            AutomationProperties.SetName(bar, "Custom player");
+            Assert.Equal("Custom player", peer.GetName());
+            var range = Assert.IsAssignableFrom<IRangeValueProvider>(peer.GetProvider<IRangeValueProvider>());
             Assert.Equal(100, range.Maximum);
             range.SetValue(70);
             Assert.Equal(70, bar.Value);
