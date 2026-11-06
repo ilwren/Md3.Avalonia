@@ -58,16 +58,29 @@ jobs:
           emulator-boot-timeout: 900
           disable-animations: true
           script: |
-            adb devices -l
-            adb install artifacts/android/*.apk
-            adb shell monkey -p io.arena.md3avalonia.gallery -c android.intent.category.LAUNCHER 1
+            # The emulator does boot here (a boot timeout would abort before this script), so the
+            # failure is inside these commands. Annotate each one: job logs are unreadable from
+            # the agent sandbox, annotations are not.
+            echo "::notice::diag::devices=$(adb devices -l | tr '\n' ' ')"
+            find artifacts/android -name '*.apk' 2>/dev/null | while read -r f; do
+              echo "::notice::diag::apk $f $(wc -c < "$f") bytes"
+            done
+            apk=$(find artifacts/android -name '*.apk' 2>/dev/null | head -1)
+            if [ -n "$apk" ]; then
+              adb install "$apk" || echo "::warning::diag::adb install failed"
+            else
+              echo "::warning::diag::no apk under artifacts/android"
+            fi
+            adb shell monkey -p io.arena.md3avalonia.gallery -c android.intent.category.LAUNCHER 1 \
+              || echo "::warning::diag::monkey launch failed"
             sleep 20
             mkdir -p artifacts/android-test
             python3 scripts/collect-android-perf.py \
               --package io.arena.md3avalonia.gallery \
               --apk artifacts/android \
               --output-dir artifacts/android-test \
-              --summary --github
+              --summary --github || echo "::warning::diag::collector exited non-zero"
+            echo "::notice::diag::evidence=$(ls artifacts/android-test | tr '\n' ' ')"
 
       - name: Verify what the collector wrote
         if: always()
