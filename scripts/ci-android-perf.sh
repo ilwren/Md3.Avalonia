@@ -13,7 +13,9 @@ set +e
 PACKAGE="${1:-io.arena.md3avalonia.gallery}"
 APK_DIR="${2:-artifacts/android}"
 OUT_DIR="${3:-artifacts/android-test}"
-LOG="${LOG:-/tmp/ci-android-perf.log}"
+# Inside the evidence directory on purpose: the uploaded artifact then carries the exact
+# command sequence and exit codes for the run.
+LOG="${LOG:-$OUT_DIR/collector-run.log}"
 
 mkdir -p "$OUT_DIR"
 : > "$LOG"

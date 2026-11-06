@@ -12,9 +12,11 @@ on:
 jobs:
   maestro-android-test:
     name: Run Android UI Regressions on Emulator
-    # macOS hosted runners provide hardware acceleration for the Android Emulator. macOS 14
-    # retires on 2026-11-02, so keep this probe on the supported macOS 15 image.
-    runs-on: macos-15
+    # Not macOS: hosted macOS runners are themselves VMs ("Apple M1 (Virtual)") without nested
+    # virtualization, so Hypervisor.framework refuses to start the emulator
+    # ("HVF error: HV_UNSUPPORTED") and Android never boots there -- on either architecture.
+    # Ubuntu runners expose /dev/kvm, which is what the emulator needs.
+    runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
@@ -61,13 +63,11 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
-          # macos-15 is an Apple Silicon runner (arm64). An x86_64 system image cannot boot
-          # natively there -- the emulator has no x86 hardware acceleration to fall back on --
-          # which is why every run ended in "Timeout waiting for emulator to boot" without ever
-          # reaching Maestro or the collector.
-          arch: arm64-v8a
+          arch: x86_64
           target: google_apis
-          emulator-boot-timeout: 600
+          # Boots have been observed anywhere between a couple of minutes and "never" on shared
+          # runners; give the emulator its own generous budget instead of racing the step timeout.
+          emulator-boot-timeout: 900
           profile: pixel_6
           force-avd-creation: true
           disable-animations: true
@@ -93,14 +93,9 @@ jobs:
             kill "$watchdog_pid" 2>/dev/null || true
 
             # Performance evidence (frames, memory, cold start, APK size). Advisory only: the
-            # collector exits 0 with nulls on any failure, and the || true below covers even a
-            # crashed interpreter, so this never fails the step. Must run inside this block: the
-            # emulator only exists for the duration of this step.
-            python3 scripts/collect-android-perf.py \
-              --package io.arena.md3avalonia.gallery \
-              --apk artifacts/android \
-              --output-dir artifacts/android-test \
-              --summary --github || true
+            # helper records each command, never aborts, and the collector exits 0 with nulls on
+            # any failure. Must run inside this block: the emulator only exists for this step.
+            bash scripts/ci-android-perf.sh io.arena.md3avalonia.gallery artifacts/android artifacts/android-test || true
 
             # Merge real Headless and Android execution into the non-certifying evidence schema.
             python3 scripts/run-spec-verification.py \
@@ -123,5 +118,6 @@ jobs:
             artifacts/android-test/framestats.txt
             artifacts/android-test/meminfo.txt
             artifacts/android-test/displayed.txt
+            artifacts/android-test/collector-run.log
             artifacts/verification/dotnet-test.log
           if-no-files-found: warn
