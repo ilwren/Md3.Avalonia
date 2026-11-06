@@ -4,6 +4,15 @@
                     xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
                     xmlns:md="using:Md3.Avalonia.Controls">
 
+  <!-- An independently implemented page indicator; only this control receives these defaults. -->
+  <ControlTheme x:Key="{x:Type eco:MdPageIndicator}" TargetType="eco:MdPageIndicator">
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="ActiveBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="InactiveBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
+    <Style Selector="^:non-interactive"><Setter Property="Focusable" Value="False" /></Style>
+  </ControlTheme>
+
   <!-- Extra controls are self-contained: these scoped collection templates avoid any
        dependency on Avalonia's global FluentTheme. -->
   <ControlTheme x:Key="{x:Type eco:MdBeforeAfter}" TargetType="eco:MdBeforeAfter">

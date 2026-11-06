@@ -104,6 +104,17 @@
     "api_docs": "https://api-docs.avaloniaui.net/"
   },
 
+  "ecosystem_research": {
+    "smooth_page_indicator": {
+      "version": "3.0.0",
+      "repository": "https://github.com/Milad-Akarie/smooth_page_indicator",
+      "commit": "bb6402dd2d94dc8f44ec3f13b580d7148354884e",
+      "documentation": "https://github.com/Milad-Akarie/smooth_page_indicator/blob/bb6402dd2d94dc8f44ec3f13b580d7148354884e/README.md",
+      "license": "MIT",
+      "disposition": "Documentation-only behavioral reference for independently implemented MdPageIndicator; no Dart source or assets copied."
+    }
+  },
+
   "claim_policy": {
     "source_scan_is_compliance_evidence": false,
     "headless_test_is_platform_test": false,

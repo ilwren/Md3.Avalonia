@@ -41,5 +41,6 @@ The following packages are **not dependencies** and none of their Dart source, a
 | flutter_pinput 1.0.3 | Fixed-length PIN/OTP entry, paste, masking, visual states and completion behavior | MIT | https://pub.dev/packages/flutter_pinput/versions/1.0.3 |
 | animated_tree_view 2.3.0 | Nested tree nodes, expansion, indentation utilities and RTL behavior | MIT | https://pub.dev/packages/animated_tree_view/versions/2.3.0 |
 | chips_input_autocomplete 1.2.2 | Dynamic/removable tags, suggestions, limits and validation behavior | MIT | https://pub.dev/packages/chips_input_autocomplete/versions/1.2.2 |
+| smooth_page_indicator 3.0.0 | Page count, fractional position, slide/worm-style markers, orientation and page requests | MIT | https://github.com/Milad-Akarie/smooth_page_indicator/blob/bb6402dd2d94dc8f44ec3f13b580d7148354884e/README.md |
 
 The frozen review and clean-room dispositions are recorded in `spec-snapshot/manifest.json`.

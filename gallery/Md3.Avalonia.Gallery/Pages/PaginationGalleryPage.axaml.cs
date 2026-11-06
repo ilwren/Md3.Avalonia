@@ -176,6 +176,7 @@ public partial class PaginationGalleryPage : UserControl
         if (!_initialized || _syncing) return;
         _syncing = true;
         DotsCarousel.SelectedIndex = DotsPager.SelectedPageIndex;
+        CarouselIndicator.PagePosition = DotsPager.SelectedPageIndex;
         _syncing = false;
         DotsStatus.Text = L($"Slide {DotsPager.SelectedPageIndex + 1} of 3", $"第 {DotsPager.SelectedPageIndex + 1} 张，共 3 张");
     }
@@ -185,8 +186,15 @@ public partial class PaginationGalleryPage : UserControl
         if (!_initialized || _syncing || DotsCarousel.SelectedIndex < 0) return;
         _syncing = true;
         DotsPager.SelectedPageIndex = DotsCarousel.SelectedIndex;
+        CarouselIndicator.PagePosition = DotsCarousel.SelectedIndex;
         _syncing = false;
         DotsStatus.Text = L($"Slide {DotsCarousel.SelectedIndex + 1} of 3", $"第 {DotsCarousel.SelectedIndex + 1} 张，共 3 张");
+    }
+
+    private void CarouselIndicatorRequested(object? sender, int index)
+    {
+        if (!_initialized || _syncing) return;
+        DotsPager.SelectedPageIndex = index;
     }
 
     private void VerticalDotsPagerChanged(object? sender, PipsPagerSelectedIndexChangedEventArgs e)

@@ -1381,6 +1381,22 @@ Every public enum and its members are listed below. To print the current member 
 | `MdTransferLayoutMode` | `Auto` · `Standard` · `Compact` |
 | `MdVisibilityTransition` | `Fade` · `ExpandVertical` · `ExpandHorizontal` · `Scale` · `SlideAndFade` |
 
+### Page indicator (Extra)
+
+`MdPageIndicator` is an independent page-position indicator for carousels and similar hosts.
+Set `PageCount` and the zero-based `PagePosition`; fractional positions move the marker between
+adjacent pages. `Effect` selects `Slide` or `Worm`, and `Orientation` supports horizontal or
+vertical layouts. Horizontal layout respects RTL. `DotSize`, `DotSpacing`, `ActiveBrush` and
+`InactiveBrush` can be customized; theme defaults use Material color roles.
+
+When `IsInteractive` is true, pointer, keyboard and automation requests set the two-way
+`PagePosition` and raise `PageRequested` with an integer index. The host must navigate its own
+carousel; there is no direct controller attachment. Set `IsInteractive` false for display-only
+use. This control does not start animations or timers: a host may feed it continuous scroll
+positions or explicitly animate the property, and remains responsible for Reduced/None motion
+policy. It does not implement the source package's other effects or scrolling-dot virtualization.
+`PageCount` is limited to 1000 and the indicator is intended for modest page counts.
+
 ### Paginated table column headers
 
 `MdPaginatedDataTable.Columns` is an observable collection of `MdPaginatedDataColumn`

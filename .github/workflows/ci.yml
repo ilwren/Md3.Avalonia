@@ -235,6 +235,9 @@ jobs:
       - name: Probe paginated table column tests
         run: scripts/probe-tests.sh MdPaginatedDataTableColumnTests table-columns.trx
 
+      - name: Probe page indicator tests
+        run: scripts/probe-tests.sh MdPageIndicatorTests page-indicator.trx
+
       # The markdown and hex editor tests fail on a font no runner has, and the gallery tests fail
       # the same way beside them - but the markdown class passes when it runs alone, so the font is
       # not the cause: something earlier in the suite leaves the process unable to shape text. The
