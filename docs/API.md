@@ -1391,7 +1391,7 @@ When the laid-out text exceeds its bounded width, it repeats horizontally at con
 (default 40 DIP/s, coerced to 0–10000) with `Gap` between copies (default 24 DIP, coerced to
 0–10000). `Direction` is `Auto` (left for LTR, right for RTL), `Left` or `Right` in physical
 coordinates. `PauseAfterRound` holds the starting position after each cycle (default zero, capped
-at one hour). `IsAnimating` reports the active render loop, including the round pause.
+at one hour). `IsRunning` reports the active render loop, including the round pause.
 
 `IsActive=false`, zero speed, no overflow, invisibility, detachment, or the inherited `Reduced` or
 `None` motion scheme stops and resets scrolling; the static view uses `FallbackTrimming` (default

@@ -32,7 +32,7 @@ public sealed class MdMarqueeTests
         var window = Show(marquee);
         try
         {
-            Assert.True(marquee.IsAnimating);
+            Assert.True(marquee.IsRunning);
             // Reset after initial frame scheduling so these steps have a deterministic origin.
             marquee.Speed = 101;
             marquee.Speed = 100;
@@ -62,34 +62,34 @@ public sealed class MdMarqueeTests
         var window = Show(parent);
         try
         {
-            Assert.True(marquee.IsAnimating);
+            Assert.True(marquee.IsRunning);
             marquee.Advance(0.5);
             Assert.True(marquee.ScrollOffset > 0);
             parent.IsVisible = false;
-            Assert.False(marquee.IsAnimating);
+            Assert.False(marquee.IsRunning);
             Assert.Equal(0, marquee.ScrollOffset);
             parent.IsVisible = true;
             Dispatcher.UIThread.RunJobs();
-            Assert.True(marquee.IsAnimating);
+            Assert.True(marquee.IsRunning);
             MdMotion.SetScheme(parent, MdMotionScheme.Reduced);
-            Assert.False(marquee.IsAnimating);
+            Assert.False(marquee.IsRunning);
             MdMotion.SetScheme(parent, MdMotionScheme.None);
-            Assert.False(marquee.IsAnimating);
+            Assert.False(marquee.IsRunning);
             MdMotion.SetScheme(parent, MdMotionScheme.Standard);
-            Assert.True(marquee.IsAnimating);
+            Assert.True(marquee.IsRunning);
             marquee.IsActive = false;
-            Assert.False(marquee.IsAnimating);
+            Assert.False(marquee.IsRunning);
             marquee.IsActive = true;
-            Assert.True(marquee.IsAnimating);
+            Assert.True(marquee.IsRunning);
             window.Content = null;
             Dispatcher.UIThread.RunJobs();
-            Assert.False(marquee.IsAnimating);
+            Assert.False(marquee.IsRunning);
             window.Content = parent;
             Dispatcher.UIThread.RunJobs();
-            Assert.True(marquee.IsAnimating);
+            Assert.True(marquee.IsRunning);
         }
         finally { window.Close(); }
-        Assert.False(marquee.IsAnimating);
+        Assert.False(marquee.IsRunning);
     }
 
     [AvaloniaFact]
@@ -99,24 +99,24 @@ public sealed class MdMarqueeTests
         var window = Show(marquee);
         try
         {
-            Assert.True(marquee.IsAnimating);
+            Assert.True(marquee.IsRunning);
             marquee.Text = "short";
             Dispatcher.UIThread.RunJobs();
-            Assert.False(marquee.IsAnimating);
+            Assert.False(marquee.IsRunning);
             marquee.Text = LongText;
             Dispatcher.UIThread.RunJobs();
-            Assert.True(marquee.IsAnimating);
+            Assert.True(marquee.IsRunning);
             marquee.Width = 700;
             Dispatcher.UIThread.RunJobs();
-            Assert.False(marquee.IsAnimating);
+            Assert.False(marquee.IsRunning);
             marquee.Width = 120;
             Dispatcher.UIThread.RunJobs();
-            Assert.True(marquee.IsAnimating);
+            Assert.True(marquee.IsRunning);
             marquee.Speed = 0;
-            Assert.False(marquee.IsAnimating);
+            Assert.False(marquee.IsRunning);
             marquee.Speed = double.NaN;
             Assert.Equal(40, marquee.Speed);
-            Assert.True(marquee.IsAnimating);
+            Assert.True(marquee.IsRunning);
             marquee.Gap = -1;
             Assert.Equal(0, marquee.Gap);
             marquee.PauseAfterRound = TimeSpan.FromSeconds(-1);
@@ -133,7 +133,7 @@ public sealed class MdMarqueeTests
         var window = Show(marquee);
         try
         {
-            Assert.True(marquee.IsAnimating);
+            Assert.True(marquee.IsRunning);
             marquee.Speed = 41;
             marquee.Speed = 40;
             var start = marquee.GetOrigins();
@@ -171,7 +171,7 @@ public sealed class MdMarqueeTests
             MdMotion.SetScheme(marquee, MdMotionScheme.Reduced);
             Dispatcher.UIThread.RunJobs();
             var fallback = PixelsWithin(window, marquee);
-            Assert.False(marquee.IsAnimating);
+            Assert.False(marquee.IsRunning);
             Assert.Contains(fallback, p => (p & 0x00ff00u) < 0x004000u && ((p & 0xffu) > 200 || ((p >> 16) & 0xffu) > 200));
         }
         finally { window.Close(); }

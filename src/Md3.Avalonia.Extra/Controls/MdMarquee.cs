@@ -40,8 +40,8 @@ public sealed class MdMarquee : TemplatedControl
         nameof(PauseAfterRound), coerce: static (_, value) => value < TimeSpan.Zero ? TimeSpan.Zero : value > TimeSpan.FromHours(1) ? TimeSpan.FromHours(1) : value);
     public static readonly StyledProperty<TextTrimming> FallbackTrimmingProperty = AvaloniaProperty.Register<MdMarquee, TextTrimming>(
         nameof(FallbackTrimming), TextTrimming.CharacterEllipsis);
-    public static readonly DirectProperty<MdMarquee, bool> IsAnimatingProperty =
-        AvaloniaProperty.RegisterDirect<MdMarquee, bool>(nameof(IsAnimating), owner => owner.IsAnimating);
+    public static readonly DirectProperty<MdMarquee, bool> IsRunningProperty =
+        AvaloniaProperty.RegisterDirect<MdMarquee, bool>(nameof(IsRunning), owner => owner.IsRunning);
 
     private readonly List<(Visual Visual, EventHandler<AvaloniaPropertyChangedEventArgs> Handler)> _ancestors = [];
     private TextLayout? _layout;
@@ -51,7 +51,7 @@ public sealed class MdMarquee : TemplatedControl
     private double _viewportHeight;
     private double _offset;
     private double _pauseRemaining;
-    private bool _isAnimating;
+    private bool _isRunning;
     private bool _attached;
     private bool _frameRequested;
     private bool _lastFrameValid;
@@ -83,7 +83,7 @@ public sealed class MdMarquee : TemplatedControl
     /// <summary>Trimming used when motion is inactive or not permitted.</summary>
     public TextTrimming FallbackTrimming { get => GetValue(FallbackTrimmingProperty); set => SetValue(FallbackTrimmingProperty, value); }
     /// <summary>Whether the render loop is active, including pauses between rounds.</summary>
-    public bool IsAnimating => _isAnimating;
+    public bool IsRunning => _isRunning;
 
     protected override bool BypassFlowDirectionPolicies => true;
 
@@ -148,7 +148,7 @@ public sealed class MdMarquee : TemplatedControl
         var clip = new Rect(Padding.Left, Padding.Top, _viewportWidth, _viewportHeight);
         using (context.PushClip(clip))
         {
-            if (!IsAnimating)
+            if (!IsRunning)
             {
                 using var fallback = new TextLayout(_line, Typeface(), FontSize, Foreground, TextAlignment.Start,
                     TextWrapping.NoWrap, FallbackTrimming, flowDirection: FlowDirection, maxWidth: _viewportWidth, maxLines: 1);
@@ -191,7 +191,7 @@ public sealed class MdMarquee : TemplatedControl
         var shouldRun = IsActive && Speed > 0 && _line.Length > 0 && _viewportWidth > 0 && _viewportHeight > 0 &&
                         _textWidth > _viewportWidth + 0.01 && IsEffectivelyVisible && _attached &&
                         scheme != MdMotionScheme.None && scheme != MdMotionScheme.Reduced && TopLevel.GetTopLevel(this) is not null;
-        if (SetAndRaise(IsAnimatingProperty, ref _isAnimating, shouldRun)) InvalidateVisual();
+        if (SetAndRaise(IsRunningProperty, ref _isRunning, shouldRun)) InvalidateVisual();
         if (shouldRun) RequestFrame();
         else
         {
@@ -213,7 +213,7 @@ public sealed class MdMarquee : TemplatedControl
     {
         if (generation != _generation) return;
         _frameRequested = false;
-        if (!IsAnimating) return;
+        if (!IsRunning) return;
         if (_lastFrameValid)
         {
             // A minimized or stalled top-level must not jump through whole rounds on its return.
@@ -228,7 +228,7 @@ public sealed class MdMarquee : TemplatedControl
     // The same deterministic time-step routine is exercised by the headless tests.
     internal void Advance(double seconds)
     {
-        if (!IsAnimating || !double.IsFinite(seconds) || seconds <= 0) return;
+        if (!IsRunning || !double.IsFinite(seconds) || seconds <= 0) return;
         var distance = _textWidth + Gap;
         if (distance <= 0 || Speed <= 0) return;
         if (_pauseRemaining > 0)
