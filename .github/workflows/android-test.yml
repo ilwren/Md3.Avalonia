@@ -17,7 +17,7 @@ jobs:
     # ("HVF error: HV_UNSUPPORTED") and Android never boots there -- on either architecture.
     # Ubuntu runners expose /dev/kvm, which is what the emulator needs.
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: Checkout repository
@@ -60,11 +60,12 @@ jobs:
         # Emulator startup is infrastructure-dependent on hosted macOS runners. Keep the
         # regression evidence available without blocking the package and desktop release checks.
         #
-        # Five minutes was not enough for boot + Maestro + collection on this image: every run
-        # hit the step timeout inside Maestro and uploaded nothing. Eighteen minutes leaves the
-        # reported emulator boot (3-5 min) plus a bounded Maestro run plus collection.
+        # Five minutes was never enough for boot + Maestro + collection: every run hit the step
+        # timeout inside Maestro and uploaded nothing. Boot alone has been observed at six
+        # minutes; collection needs its own minute or two after that, and the watchdog gives
+        # Maestro at most seven.
         continue-on-error: true
-        timeout-minutes: 18
+        timeout-minutes: 30
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34

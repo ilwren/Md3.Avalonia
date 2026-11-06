@@ -40,13 +40,48 @@ EOF
 }
 trap flush_log EXIT
 
+# adb answering is not the same as Android being up: an emulator mid-boot accepts the
+# connection while the package and activity managers still refuse calls ("Failure calling
+# service package: Broken pipe", "Unable to connect to activity manager"), so an install here
+# would fail and the run would report n/a for every metric.
+wait_boot() {
+  local waited=0
+  step adb wait-for-device
+  while [ "$waited" -lt 300 ]; do
+    if [ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ]; then
+      echo "boot_completed after ${waited}s" >>"$LOG"
+      # boot_completed lands slightly before the package manager answers.
+      in_pm=0
+      while [ "$in_pm" -lt 30 ]; do
+        adb shell pm list packages >/dev/null 2>&1 && break
+        sleep 2
+        in_pm=$((in_pm + 2))
+      done
+      return 0
+    fi
+    sleep 5
+    waited=$((waited + 5))
+  done
+  echo "boot_completed not seen within 300s" >>"$LOG"
+  echo "::warning::android perf: the emulator never finished booting; metrics will be n/a"
+  return 1
+}
+
 step adb devices -l
+wait_boot
 step adb shell getprop ro.product.model
 step adb shell getprop ro.build.version.sdk
 
 apk=$(ls "$APK_DIR"/*.apk 2>/dev/null | head -1)
 if [ -n "$apk" ]; then
-  step adb install -r "$apk"
+  # A streamed install can still race the package service; retry instead of giving up and
+  # reporting an uninstalled package.
+  installed=1
+  for attempt in 1 2 3; do
+    step adb install -r "$apk" && { installed=0; break; }
+    sleep 10
+  done
+  [ "$installed" -ne 0 ] && echo "::warning::android perf: adb install failed after 3 attempts"
 else
   echo "no APK under $APK_DIR" >>"$LOG"
   echo "::warning::android perf: no APK under $APK_DIR; nothing to launch"
