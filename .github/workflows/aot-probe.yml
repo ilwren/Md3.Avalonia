@@ -28,9 +28,15 @@ jobs:
       # in that native process and verifies its template, filtering, selection and confirmation.
       - name: Publish, verify and smoke the native AOT gallery
         run: |
-          # tee must not hide a failed publish, native-binary check, or smoke scenario.
-          set -euo pipefail
+          # Capture both sides of the pipe: tee must not hide a failed publish or smoke.
+          set -uo pipefail
           bash scripts/publish-gallery-aot.sh --rid linux-x64 --output /tmp/aot-out --smoke-scenario file-system-picker 2>&1 | tee /tmp/aot.log
+          statuses=("${PIPESTATUS[@]}")
+          if (( statuses[0] != 0 || statuses[1] != 0 )); then
+            python3 scripts/summarize-aot-failure.py /tmp/aot.log
+            exit 1
+          fi
+          set -e
           {
             echo "### AOT publish output"
             ls -la /tmp/aot-out | sed -n '1,20p' | sed 's/^/    /'
