@@ -102,6 +102,9 @@ public sealed class MdEmojiPicker : TemplatedControl
         MdLocalization.CultureProperty.Changed.AddClassHandler<MdEmojiPicker>((c, _) => c.Rebuild());
     }
 
+    /// <summary>Creates a picker with a small, replaceable example catalog.</summary>
+    public MdEmojiPicker() => Rebuild();
+
     /// <summary>Optional replacement catalog. Null uses 16 curated examples; an empty sequence displays no items.</summary>
     public IEnumerable<MdEmojiItem>? ItemsSource { get => GetValue(ItemsSourceProperty); set => SetValue(ItemsSourceProperty, value); }
     /// <summary>Last selected text. Programmatic assignment does not add recents or emit selection.</summary>

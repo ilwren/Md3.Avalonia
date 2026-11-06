@@ -15,6 +15,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Extra.Controls;
+using Md3.Avalonia.Gallery.Pages;
 using Md3.Avalonia.Localization;
 using Xunit;
 
@@ -22,6 +23,15 @@ namespace Md3.Avalonia.HeadlessTests;
 
 public sealed class MdEmojiPickerTests
 {
+    [AvaloniaFact]
+    public void Default_Results_Are_Available_Before_Attachment()
+    {
+        var picker = new MdEmojiPicker();
+        Assert.Equal(16, picker.ResultCount);
+        picker.SearchText = "laugh";
+        Assert.Equal("😂", Assert.Single(picker.VisibleItems).Emoji);
+    }
+
     [AvaloniaFact]
     public void Search_Categories_And_Localized_Accessible_Names_Work()
     {
@@ -164,6 +174,22 @@ public sealed class MdEmojiPickerTests
             Dispatcher.UIThread.RunJobs();
             Assert.Equal(3, picker.ResultCount);
             Assert.NotNull(ButtonNamed(picker, "Gamma"));
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Gallery_Choice_Reaches_The_Host_Readout()
+    {
+        var page = new ColorPickerGalleryPage { Width = 680 };
+        MdLocalization.SetCulture(page, CultureInfo.GetCultureInfo("en-US"));
+        var window = Show(page);
+        try
+        {
+            var picker = page.GetVisualDescendants().OfType<MdEmojiPicker>().Single();
+            Click(picker, "Grinning face");
+            var readout = page.GetVisualDescendants().OfType<TextBlock>().Single(text => text.Name == "EmojiSelection");
+            Assert.Equal("😀", readout.Text);
         }
         finally { window.Close(); }
     }
