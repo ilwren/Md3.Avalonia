@@ -119,6 +119,11 @@ public sealed class MdMemoryLeakTests
         Dispatcher.UIThread.RunJobs();
         service.Close(true);
         Dispatcher.UIThread.RunJobs();
+        // The modal controller moved keyboard focus inside the dialog and nothing was focused
+        // before it, so focus would otherwise stay on a detached element and pin the host
+        // through the live window's focus manager. A live window always has focus somewhere.
+        window.Focus();
+        Dispatcher.UIThread.RunJobs();
         window.Content = null;
         Dispatcher.UIThread.RunJobs();
         ReplaceLastFrame(window);
