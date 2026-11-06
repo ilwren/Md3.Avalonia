@@ -131,7 +131,8 @@ jobs:
           status=0
           : > /tmp/restore.log
           for proj in gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj \
-                      tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj; do
+                      tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
+                      tests/Md3.Avalonia.Benchmarks/Md3.Avalonia.Benchmarks.csproj; do
             name="$(basename "$proj" .csproj)"
             echo "=== dotnet restore $proj ==="
             if dotnet restore "$proj" --nologo >> /tmp/restore.log 2>&1; then
@@ -176,6 +177,13 @@ jobs:
           scripts/ci-build.sh \
             tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
             "Headless tests"
+
+      - name: Build benchmarks
+        shell: bash
+        run: |
+          scripts/ci-build.sh \
+            tests/Md3.Avalonia.Benchmarks/Md3.Avalonia.Benchmarks.csproj \
+            "Benchmarks"
 
       # The markdown and hex editor tests ask for Consolas, which no runner has, so whether they pass
       # depends on which libSkiaSharp the test output carries: Avalonia's build enumerates system
