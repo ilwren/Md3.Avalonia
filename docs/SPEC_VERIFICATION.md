@@ -36,7 +36,7 @@ Two rules keep the oracle honest:
 | Layer | Where | Needs | What it proves |
 | --- | --- | --- | --- |
 | **L0** static lint | `scripts/lint-design-tokens.py` | Python only (~0.2 s) | No literal colours in shipped themes; every `{DynamicResource Md.*}` resolves; no broken `ResourceInclude`; token text matches the oracle. |
-| **L1** token conformance | `Spec/MdTokenConformanceTests.cs` | headless session | Values the *resource system actually hands a control* match the oracle, through the real 58-dictionary merge, in both theme variants. |
+| **L1** token conformance | `Spec/MdTokenConformanceTests.cs`, `Spec/MdBaselineColorTests.cs` | headless session | Values the *resource system actually hands a control* match the oracle, through the real 58-dictionary merge, in both theme variants. The colour scheme is additionally compared role by role against the published M3 baseline, in the static theme and in the generator's output. |
 | **L2** geometry & targets | `Spec/MdGeometryConformanceTests.cs` | headless session | Arranged bounds and corner radii of template parts match the oracle, and every interactive control offers a 48×48dp hit-testable target. |
 | **L3** visual goldens | `Spec/MdVisualGoldenTests.cs` | headless session | Pixels did not change unintentionally — the only layer that catches regressions nobody predicted. |
 | **L5** motion | `Spec/MdMotionConformanceTests.cs` | partly none, partly headless | Spring physics match an independent integration; published durations really are the settling points they claim to be; the runtime integrator and the closed form agree. |
@@ -148,6 +148,29 @@ and `budget`. Moving a budget is therefore a visible diff, and only one directio
 
 `contrast_failures` is the one entry above with no ceiling even though it measures zero: contrast
 remediation is out of scope for this round, so the number is recorded and nothing gates on it.
+
+### The colour scheme is the published one, not an approximation of it
+
+Material fixes the baseline scheme as 49 named roles with literal values, and `material-web` ships them
+as tokens (`tokens/versions/v0_192/_md-sys-color.scss` over `_md-ref-palette.scss`, pinned in
+`spec-snapshot/manifest.json`). `MdBaselineScheme` is that table transcribed, and `MdBaselineColorTests`
+compares three things against it on every run: the static theme in both variants, the generator's output
+for the default options, and the structure (every role ships a `.Brush`; the 12 fixed roles are
+identical across variants).
+
+The third comparison exists because the generator and the theme used to disagree. `MdThemeOptions`
+defaults to `#6750A4` with tonal spot and standard contrast, which *is* the baseline, but running that
+seed through HCT returns `#65558F`: tone mapping snaps each role to the tone grid, and it does not
+round-trip the colour it started from. So a default application repainted every accent away from the
+specification it claimed to implement, and the disagreement showed up only as eight budgeted
+`dual_declaration_mismatches`. It is now zero, and the ceiling is zero. Any other seed, variant or
+contrast level still goes through HCT; only the exact baseline request is served from the table.
+
+One structural limit worth stating: `spec-snapshot/tokens.json` keys a value by token name, so it cannot
+hold a light value and a dark value for the same role, and 36 of the 49 roles legitimately have both.
+The baseline is therefore asserted in C# rather than added to the oracle file — adding the light values
+alone would have made the oracle a half-truth and inflated `oracle_coverage_ratio` without measuring
+anything new.
 
 ### L4: the template contract
 

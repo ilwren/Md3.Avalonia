@@ -323,6 +323,39 @@
         "MdThemedTextTests.Localized_Chrome_Follows_The_Inherited_Culture"
       ],
       "verification_status": "not_run"
+    },
+    {
+      "id": "COLOR-BASELINE-001",
+      "component": "MaterialTheme, MdThemeManager",
+      "variant": "light, dark",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://github.com/material-components/material-web/blob/main/tokens/versions/v0_192/_md-sys-color.scss",
+      "assertion": "All 49 published M3 baseline colour roles resolve, in both theme variants, to the literal values Material publishes; the fixed roles are identical across variants; every role ships a brush.",
+      "automated_evidence": [
+        "MdBaselineColorTests.The_Static_Theme_Is_The_Published_M3_Baseline_Scheme",
+        "MdBaselineColorTests.Every_Colour_Role_Has_A_Brush_And_The_Fixed_Roles_Do_Not_Vary_By_Variant",
+        "MdBaselineColorTests.Only_The_Variant_Dependent_Roles_Differ_Between_Light_And_Dark"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "COLOR-BASELINE-002",
+      "component": "MdThemeGenerator, MdThemeManager",
+      "variant": "default options",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://github.com/material-components/material-web/blob/main/tokens/versions/v0_192/_md-sys-color.scss",
+      "assertion": "Requesting the default options (the M3 source colour, tonal spot, standard contrast) produces the published baseline scheme rather than a tone-mapped approximation of it, and the runtime apply agrees with the static theme; a different seed still generates a different scheme.",
+      "automated_evidence": [
+        "MdBaselineColorTests.The_Runtime_Generator_Reproduces_The_Baseline_For_The_Default_Options",
+        "MdDynamicThemeTests.Baseline_Seed_Matches_The_Published_M3_Baseline"
+      ],
+      "verification_status": "not_run"
     }
   ]
 }
