@@ -320,7 +320,8 @@ def write_fake_adb(bin_dir: Path, state_dir: Path) -> None:
 class EndToEndTests(unittest.TestCase):
     """Runs the collector as a command against a fake device."""
 
-    def run_collector(self, extra_args=(), with_adb=True, installed=PACKAGE, crashed=False):
+    def run_collector(self, extra_args=(), with_adb=True, installed=PACKAGE, crashed=False,
+                      crash_text=None):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name)
@@ -333,6 +334,8 @@ class EndToEndTests(unittest.TestCase):
         env["PATH"] = (f"{bin_dir}{os.pathsep}{env.get('PATH', '')}" if with_adb else "/usr/bin:/bin")
         if with_adb:
             write_fake_adb(bin_dir, state_dir)
+            if crash_text is not None:
+                (state_dir / "crash.txt").write_text(crash_text, encoding="utf-8")
             if crashed:
                 # The process died on launch: no frame summary, no process section, a crash log.
                 (state_dir / "gfxinfo.txt").write_text(
@@ -423,19 +426,13 @@ class EndToEndTests(unittest.TestCase):
         self.assertEqual(report["raw"]["crash"], "crash.txt")
 
     def test_unrelated_crash_is_not_blamed_on_the_app(self):
-        tmp = tempfile.TemporaryDirectory()
-        self.addCleanup(tmp.cleanup)
-        bin_dir, state_dir = pathlib.Path(tmp.name) / "bin", pathlib.Path(tmp.name) / "state"
-        bin_dir.mkdir()
-        state_dir.mkdir()
-        write_fake_adb(bin_dir, state_dir)
-        (state_dir / "crash.txt").write_text(
-            "F libc : Fatal signal 6 (SIGABRT) in tid 3912 (bt_stack_manage), pid 3660 "
-            "(droid.bluetooth)\n", encoding="utf-8")
-        proc, out_dir, report, _ = self.run_collector()
+        # A fresh emulator's crash buffer is full of droid.bluetooth SIGABRTs; they must not be
+        # reported as the app crashing, and must not distort the evidence.
+        proc, out_dir, report, _ = self.run_collector(
+            crash_text="F libc : Fatal signal 6 (SIGABRT) in tid 3912 (bt_stack_manage), "
+                       "pid 3660 (droid.bluetooth)\n")
         self.assertEqual(proc.returncode, 0, proc.stderr)
         self.assertFalse(any("crash" in w for w in report["warnings"]), report["warnings"])
-        # ...and the unrelated crash is still preserved verbatim in the evidence.
         self.assertIn("droid.bluetooth", (out_dir / "crash.txt").read_text())
 
     def test_package_not_installed_is_advisory(self):
