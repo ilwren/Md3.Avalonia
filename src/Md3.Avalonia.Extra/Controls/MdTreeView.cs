@@ -19,6 +19,7 @@ using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Primitives;
 
 namespace Md3.Avalonia.Extra.Controls;
 
