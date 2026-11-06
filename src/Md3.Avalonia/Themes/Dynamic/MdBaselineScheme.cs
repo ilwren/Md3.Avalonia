@@ -74,8 +74,8 @@ public static class MdBaselineScheme
         ["InverseSurface"] = 0xFF322F35u,
         ["InverseOnSurface"] = 0xFFF5EFF7u,
         ["InversePrimary"] = 0xFFD0BCFFu,
-        ["Scrim"] = 0xFF000u,
-        ["Shadow"] = 0xFF000u,
+        ["Scrim"] = 0xFF000000u,
+        ["Shadow"] = 0xFF000000u,
         ["SurfaceTint"] = 0xFF6750A4u,
     };
 
@@ -127,8 +127,8 @@ public static class MdBaselineScheme
         ["InverseSurface"] = 0xFFE6E0E9u,
         ["InverseOnSurface"] = 0xFF322F35u,
         ["InversePrimary"] = 0xFF6750A4u,
-        ["Scrim"] = 0xFF000u,
-        ["Shadow"] = 0xFF000u,
+        ["Scrim"] = 0xFF000000u,
+        ["Shadow"] = 0xFF000000u,
         ["SurfaceTint"] = 0xFFD0BCFFu,
     };
     /// <summary>The baseline color roles for the requested variant, in ARGB.</summary>

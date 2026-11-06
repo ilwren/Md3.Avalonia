@@ -34,6 +34,12 @@ public sealed class MdBaselineColorTests
 {
     private const string Layer = "L1_tokens";
 
+    /// <summary>
+    /// Roles Material gives the same value in both variants for a different reason than "fixed": a
+    /// scrim and a shadow are black on a light surface and black on a dark one.
+    /// </summary>
+    private static readonly string[] VariantInvariantRoles = ["Scrim", "Shadow"];
+
     private static readonly string[] FixedRoles =
     [
         "PrimaryFixed", "PrimaryFixedDim", "OnPrimaryFixed", "OnPrimaryFixedVariant",
@@ -193,9 +199,9 @@ public sealed class MdBaselineColorTests
     /// </summary>
     /// <remarks>
     /// <c>spec-snapshot/tokens.json</c> keys a role by name, so it cannot hold two values for one name;
-    /// that is why the baseline is not an oracle file and why this check lives here. The 12 fixed roles
-    /// are identical by definition, and the 37 variant-dependent ones are not - the two lists together
-    /// cover all 49, so a role cannot drift into the wrong group unnoticed.
+    /// that is why the baseline is not an oracle file and why this check lives here. The 49 roles split
+    /// into 12 fixed, 2 that are black in both variants and 35 that Material gives two values to, so a
+    /// role cannot drift from one group into another unnoticed.
     /// </remarks>
     [Fact]
     public void Only_The_Variant_Dependent_Roles_Differ_Between_Light_And_Dark()
@@ -205,13 +211,19 @@ public sealed class MdBaselineColorTests
         Assert.Equal(light.Keys.OrderBy(k => k, StringComparer.Ordinal), dark.Keys.OrderBy(k => k, StringComparer.Ordinal));
 
         var differing = light.Where(pair => pair.Value != dark[pair.Key]).Select(pair => pair.Key).ToList();
-        var fixedSet = FixedRoles.ToHashSet(StringComparer.Ordinal);
-        Assert.Equal(light.Count - fixedSet.Count, differing.Count);
-        foreach (var role in FixedRoles)
+
+        // 49 roles split three ways: the 12 fixed ones never change, Scrim and Shadow are black in both
+        // variants because a scrim over dark content and one over light content are the same black, and
+        // the remaining 35 are the ones Material actually gives two values to.
+        Assert.Equal(FixedRoles.Length + VariantInvariantRoles.Length - FixedRoles.Intersect(VariantInvariantRoles).Count(),
+            FixedRoles.Concat(VariantInvariantRoles).Distinct(StringComparer.Ordinal).Count());
+        foreach (var role in FixedRoles.Concat(VariantInvariantRoles))
         {
             Assert.DoesNotContain(role, differing);
         }
 
+        Assert.Equal(light.Count - FixedRoles.Length - VariantInvariantRoles.Length, differing.Count);
+        Assert.Equal(35, differing.Count);
         Assert.Equal(FixedRoles.Length, FixedRoles.Distinct(StringComparer.Ordinal).Count());
         Assert.Equal(12, FixedRoles.Length);
         Assert.Equal(49, light.Count);
