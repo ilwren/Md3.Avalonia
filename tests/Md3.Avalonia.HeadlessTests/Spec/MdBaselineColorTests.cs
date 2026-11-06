@@ -1,3 +1,4 @@
+using System.Linq;
 using Avalonia;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
@@ -93,12 +94,19 @@ public sealed class MdBaselineColorTests
                 if (!generated.TryGetValue(role, out var actual))
                 {
                     mismatches.Add($"{role}: the generator does not produce it");
+                    report.Check($"{(dark ? "dark" : "light")}/{role}", false, "the generator does not produce it");
                     continue;
                 }
 
                 if (actual != FromArgb(expected))
                 {
                     mismatches.Add($"{role}: generated {Hex(actual)}, baseline {Hex(FromArgb(expected))}");
+                    report.Check($"{(dark ? "dark" : "light")}/{role}", false,
+                        $"generated {Hex(actual)}, baseline {Hex(FromArgb(expected))}");
+                }
+                else
+                {
+                    report.Pass($"{(dark ? "dark" : "light")}/{role}");
                 }
             }
         }
@@ -140,10 +148,15 @@ public sealed class MdBaselineColorTests
             foreach (var role in MdBaselineScheme.Roles(dark).Keys)
             {
                 var brushKey = $"Md.Sys.Color.{role}.Brush";
-                if (!application.TryGetResource(brushKey, variant, out var brush) || brush is not IBrush)
+                var present = application.TryGetResource(brushKey, variant, out var brush) && brush is IBrush;
+                if (!present)
                 {
                     failures.Add($"{brushKey} is missing; a control can only use the role if it ships a brush");
                 }
+
+                // One check per brush, not one per file: a layer that reports nothing to assert is an
+                // unconditional pass, and the harness rejects that as evidence.
+                report.Check($"{variant}/{brushKey}", present, $"{variant} has no brush for {role}");
             }
         }
 
@@ -151,11 +164,14 @@ public sealed class MdBaselineColorTests
         {
             var light = MdBaselineScheme.Roles(dark: false)[role];
             var darkValue = MdBaselineScheme.Roles(dark: true)[role];
-            if (light != darkValue)
+            var stays = light == darkValue;
+            if (!stays)
             {
                 failures.Add($"{role} differs between light and dark ({light:x8} vs {darkValue:x8}); " +
                              "a fixed role is fixed across variants by definition");
             }
+
+            report.Check($"fixed/{role}", stays, $"{role} changes between light and dark");
         }
 
         foreach (var failure in failures)
@@ -172,8 +188,34 @@ public sealed class MdBaselineColorTests
         report.Complete();
     }
 
+    /// <summary>
+    /// The two variants must disagree exactly where Material says they do and nowhere else.
+    /// </summary>
+    /// <remarks>
+    /// <c>spec-snapshot/tokens.json</c> keys a role by name, so it cannot hold two values for one name;
+    /// that is why the baseline is not an oracle file and why this check lives here. The 12 fixed roles
+    /// are identical by definition, and the 37 variant-dependent ones are not - the two lists together
+    /// cover all 49, so a role cannot drift into the wrong group unnoticed.
+    /// </remarks>
+    [Fact]
+    public void Only_The_Variant_Dependent_Roles_Differ_Between_Light_And_Dark()
+    {
+        var light = MdBaselineScheme.Roles(dark: false);
+        var dark = MdBaselineScheme.Roles(dark: true);
+        Assert.Equal(light.Keys.OrderBy(k => k, StringComparer.Ordinal), dark.Keys.OrderBy(k => k, StringComparer.Ordinal));
+
+        var differing = light.Where(pair => pair.Value != dark[pair.Key]).Select(pair => pair.Key).ToList();
+        var fixedSet = FixedRoles.ToHashSet(StringComparer.Ordinal);
+        Assert.Equal(light.Count - fixedSet.Count, differing.Count);
+        Assert.Empty(differing.Where(fixedSet.Contains));
+        Assert.Equal(FixedRoles.Length, FixedRoles.Distinct(StringComparer.Ordinal).Count());
+        Assert.Equal(12, FixedRoles.Length);
+        Assert.Equal(49, light.Count);
+    }
+
     private static Color FromArgb(uint argb) =>
         Color.FromArgb((byte)(argb >> 24), (byte)(argb >> 16), (byte)(argb >> 8), (byte)argb);
 
     private static string Hex(Color color) => $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+
 }
