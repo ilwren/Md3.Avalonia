@@ -9,6 +9,7 @@ on:
     paths:
       - '.github/workflows/aot-probe.yml'
       - 'scripts/publish-gallery-aot.sh'
+      - 'scripts/summarize-aot-failure.py'
       - 'src/**'
       - 'gallery/**'
 
@@ -30,13 +31,14 @@ jobs:
         run: |
           # Capture both sides of the pipe: tee must not hide a failed publish or smoke.
           set -uo pipefail
+          set +e
           bash scripts/publish-gallery-aot.sh --rid linux-x64 --output /tmp/aot-out --smoke-scenario file-system-picker 2>&1 | tee /tmp/aot.log
           statuses=("${PIPESTATUS[@]}")
+          set -e
           if (( statuses[0] != 0 || statuses[1] != 0 )); then
             python3 scripts/summarize-aot-failure.py /tmp/aot.log
             exit 1
           fi
-          set -e
           {
             echo "### AOT publish output"
             ls -la /tmp/aot-out | sed -n '1,20p' | sed 's/^/    /'
