@@ -538,7 +538,7 @@ public class MdContainerTransform : TemplatedControl
         if (_container is null) return;
         var progress = _morph is null ? (IsExpanded ? 1d : 0d) : Math.Clamp(_morph.Progress, 0, 1);
         var elevation = ClosedElevation + (OpenElevation - ClosedElevation) * progress;
-        _container.BoxShadows = ElevationShadow(elevation);
+        _container.BoxShadow = ElevationShadow(elevation);
     }
 
     /// <summary>

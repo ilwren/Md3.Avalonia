@@ -463,17 +463,17 @@ public sealed class MdMotionApiExpansionTests
         var container = Part<Border>(transform, "PART_Container");
 
         // The shadow derives from the interpolated elevation.
-        var closedShadow = Assert.Single(container.BoxShadows);
+        var closedShadow = Assert.Single(container.BoxShadow);
         Assert.Equal(2 * 0.5, closedShadow.OffsetY, 6);
         Assert.Equal(2 * 2 + 2, closedShadow.Blur, 6);
         transform.Toggle();
         Dispatcher.UIThread.RunJobs();
-        var openShadow = Assert.Single(container.BoxShadows);
+        var openShadow = Assert.Single(container.BoxShadow);
         Assert.Equal(8 * 0.5, openShadow.OffsetY, 6);
         Assert.Equal(8 * 2 + 2, openShadow.Blur, 6);
 
         transform.OpenElevation = 0;
-        Assert.Empty(container.BoxShadows);
+        Assert.Empty(container.BoxShadow);
 
         // A mid-flight redirect keeps the current progress and scales the travel by what is
         // left instead of restarting a full-length animation. The progress is parked while the
