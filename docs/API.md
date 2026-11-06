@@ -1384,6 +1384,40 @@ Every public enum and its members are listed below. To print the current member 
 
 
 
+
+## Confetti burst (Extra)
+
+`MdConfetti` is a non-interactive decorative overlay. After it is attached, visible and arranged,
+call `Burst()` to start a finite burst; the method returns false when emission is suppressed.
+A new burst replaces the previous one. `Stop()` cancels and clears it; `Completed` is raised only
+for natural completion. `IsRunning` reports the current burst. `Reduced` and `None` motion suppress
+emission and cancel a running burst; hiding, zero-size layout or detachment also cancels it. It
+never restarts automatically. The render-frame callback uses no perpetual dispatcher timer, and
+long frame gaps are capped at 100 ms. The overlay does not hit-test and has no automation content;
+applications must provide any meaningful success message separately.
+
+`ParticleCount` (default 48, 0–500), `ParticleSize` (8 DIP, 1–40), `Speed` (160 DIP/s,
+0–2000), `DirectionDegrees` (-90 is up; 0 right; 90 down), `SpreadDegrees` (100, 0–360),
+`Gravity` (150 DIP/s², positive down), `Drag` (0.5 per second), `Duration` (2.5 s, 0.1–30 s)
+and normalized `Origin` (0.5, 0.8) are captured when `Burst()` is called. Drag exponentially damps
+the initial launch velocity; gravity remains a separate constant acceleration. A nullable `Seed`
+allows repeatable bursts for testing; null chooses a fresh seed. `PrimaryBrush`, `SecondaryBrush`
+and `TertiaryBrush` remain live and default to the matching Material roles. The current particles
+are clipped to the bounds and their initial origin is not relocated on resize.
+
+This subset emits a single bounded burst, not a continuous stream or a looping controller. Custom
+paths, arbitrary palette collections, emitter frequency, particle interactions, sound, haptics and
+pixel/API parity with Flutter are not implemented.
+
+```xml
+<Grid ClipToBounds="True">
+  <md:MdButton Content="Celebrate" Click="OnCelebrate" />
+  <eco:MdConfetti x:Name="Celebration" ParticleCount="48" />
+</Grid>
+```
+
+Call `Celebration.Burst()` from the host's click handler after layout.
+
 ## Scrolling text (Extra)
 
 `MdMarquee` renders single-line plain `Text`; line separators are replaced by spaces for display.

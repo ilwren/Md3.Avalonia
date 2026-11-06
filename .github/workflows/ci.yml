@@ -250,6 +250,9 @@ jobs:
       - name: Probe marquee tests
         run: scripts/probe-tests.sh MdMarqueeTests marquee.trx
 
+      - name: Probe confetti tests
+        run: scripts/probe-tests.sh MdConfettiTests confetti.trx
+
       # The markdown and hex editor tests fail on a font no runner has, and the gallery tests fail
       # the same way beside them - but the markdown class passes when it runs alone, so the font is
       # not the cause: something earlier in the suite leaves the process unable to shape text. The

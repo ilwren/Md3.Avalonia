@@ -113,6 +113,14 @@
       "license": "MIT",
       "disposition": "Documentation-only behavioral reference for independently implemented MdPageIndicator; no Dart source or assets copied."
     },
+    "confetti": {
+      "version": "0.7.0",
+      "repository": "https://github.com/funwithflutter/flutter_confetti",
+      "commit": "736dd344a4f6a9d38a45d937964544e1bb741c7e",
+      "documentation": "https://github.com/funwithflutter/flutter_confetti/blob/736dd344a4f6a9d38a45d937964544e1bb741c7e/README.md",
+      "license": "MIT",
+      "note": "Public documentation, metadata and license only; independent Avalonia implementation. Repository metadata reports 0.7.0 despite the merge message mentioning 0.8.0."
+    },
     "marquee": {
       "version": "2.3.0",
       "repository": "https://github.com/MarcelGarus/marquee",

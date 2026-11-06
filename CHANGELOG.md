@@ -4,6 +4,8 @@
 
 ### Added
 
+- Added Extra `MdConfetti`: a finite, non-interactive particle burst with directional physics, theme brushes, render-frame lifecycle and reduced-motion suppression.
+
 - Added Extra `MdMarquee` for horizontal single-line overflow scrolling with direction, speed, gap, round pauses, RTL, full-text automation and a static reduced-motion fallback.
 
 - Added Extra `MdExpandableText`: collapsed plain-text line or Unicode-text-element limits, a localized keyboard-accessible toggle and bindable expansion state.

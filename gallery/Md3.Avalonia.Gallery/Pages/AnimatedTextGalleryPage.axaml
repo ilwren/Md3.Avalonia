@@ -52,6 +52,18 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Celebration particles" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Trigger a finite burst; reduced motion skips the decorative particles." />
+        <md:MdCard Padding="20" HorizontalAlignment="Left">
+          <Grid Width="340" Height="160" ClipToBounds="True" Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}">
+            <md:MdButton Content="Celebrate" HorizontalAlignment="Center" VerticalAlignment="Center" Click="OnCelebrate" />
+            <eco:MdConfetti x:Name="ConfettiOverlay" />
+          </Grid>
+        </md:MdCard>
+        <gallery:CodeExample XamlCode="&lt;eco:MdConfetti x:Name=&quot;Celebration&quot; /&gt;" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdAnimatedText Text=&quot;{Binding Headline}&quot; Effect=&quot;Typewriter&quot; Duration=&quot;0:0:1.4&quot; /&gt;" />
       </StackPanel>

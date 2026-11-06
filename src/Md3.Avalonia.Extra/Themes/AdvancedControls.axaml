@@ -4,6 +4,15 @@
                     xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
                     xmlns:md="using:Md3.Avalonia.Controls">
 
+  <!-- Decorative burst: scoped Material roles, no hit-test surface. -->
+  <ControlTheme x:Key="{x:Type eco:MdConfetti}" TargetType="eco:MdConfetti">
+    <Setter Property="PrimaryBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="SecondaryBrush" Value="{DynamicResource Md.Sys.Color.Secondary.Brush}" />
+    <Setter Property="TertiaryBrush" Value="{DynamicResource Md.Sys.Color.Tertiary.Brush}" />
+    <Setter Property="IsHitTestVisible" Value="False" />
+    <Setter Property="ClipToBounds" Value="True" />
+  </ControlTheme>
+
   <!-- Marquee renders its own text; only its scoped foreground and clipping are themed. -->
   <ControlTheme x:Key="{x:Type eco:MdMarquee}" TargetType="eco:MdMarquee">
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />

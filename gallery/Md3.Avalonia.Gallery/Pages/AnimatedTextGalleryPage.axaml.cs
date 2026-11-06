@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 
 namespace Md3.Avalonia.Gallery.Pages;
 
@@ -6,5 +7,5 @@ public partial class AnimatedTextGalleryPage : UserControl
 {
     public AnimatedTextGalleryPage() => InitializeComponent();
 
-    // Declarative: Effect and Duration are the whole surface.
+    private void OnCelebrate(object? sender, RoutedEventArgs e) => ConfettiOverlay.Burst();
 }
