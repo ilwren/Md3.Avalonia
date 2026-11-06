@@ -4,6 +4,19 @@
                     xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
                     xmlns:md="using:Md3.Avalonia.Controls">
 
+  <!-- Media timeline colors use Material roles; playback and buffering remain host-owned. -->
+  <ControlTheme x:Key="{x:Type eco:MdMediaProgressBar}" TargetType="eco:MdMediaProgressBar">
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="PlayedBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
+    <Setter Property="BufferedBrush" Value="{DynamicResource Md.Sys.Color.Secondary.Brush}" />
+    <Setter Property="TrackBrush" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" />
+    <Setter Property="LabelBrush" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Style Selector="^:read-only"><Setter Property="Focusable" Value="False" /></Style>
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
+  </ControlTheme>
+
   <!-- An independently implemented page indicator; only this control receives these defaults. -->
   <ControlTheme x:Key="{x:Type eco:MdPageIndicator}" TargetType="eco:MdPageIndicator">
     <Setter Property="Focusable" Value="True" />

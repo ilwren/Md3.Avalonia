@@ -16,6 +16,7 @@
         <TextBlock Classes="h2" Text="Scrubbing" />
         <TextBlock Classes="body" TextWrapping="Wrap" Text="Drag anywhere to seek, or focus the waveform and use the arrow keys, Home and End. Position is two-way bindable, so a player view model drives the playhead during playback and receives seeks back." />
         <eco:MdWaveform x:Name="Waveform" Height="96" HorizontalAlignment="Stretch" />
+        <eco:MdMediaProgressBar x:Name="MediaProgress" SeekRequested="SeekMedia" HorizontalAlignment="Stretch" />
         <WrapPanel Orientation="Horizontal">
           <md:MdButton x:Name="Playback" Variant="Filled" Click="TogglePlayback" Margin="0,0,24,8" />
           <TextBlock x:Name="PositionReadout" Classes="body" VerticalAlignment="Center" Margin="0,0,0,8" />

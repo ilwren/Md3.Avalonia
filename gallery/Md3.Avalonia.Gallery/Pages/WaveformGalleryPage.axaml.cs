@@ -1,4 +1,5 @@
 using System;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -12,6 +13,7 @@ public partial class WaveformGalleryPage : UserControl
     // rather than a slide, which is what makes the two-way binding legible.
     private readonly DispatcherTimer _playback = new() { Interval = TimeSpan.FromMilliseconds(50) };
     private DemoTrack.Track _track;
+    private bool _syncingProgress;
 
     public WaveformGalleryPage()
     {
@@ -37,6 +39,9 @@ public partial class WaveformGalleryPage : UserControl
             return;
         }
 
+        MediaProgress.Maximum = _track.Duration.TotalSeconds;
+        MediaProgress.BufferedSeconds = _track.Duration.TotalSeconds * 0.75; // Demonstration, not a network buffer.
+        Waveform.PropertyChanged += OnWaveformPropertyChanged;
         UpdateReadout();
         _playback.Tick += (_, _) => Advance();
     }
@@ -67,6 +72,22 @@ public partial class WaveformGalleryPage : UserControl
         // sweep takes as long as the recording does.
         var next = Waveform.PlayheadPosition + _playback.Interval / duration;
         Waveform.PlayheadPosition = next >= 1 ? 0 : next;
+    }
+
+    private void OnWaveformPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property != MdWaveform.PlayheadPositionProperty || _syncingProgress) return;
+        _syncingProgress = true;
+        if (!MediaProgress.IsScrubbing)
+            MediaProgress.Value = _track.Duration.TotalSeconds * Waveform.PlayheadPosition;
+        _syncingProgress = false;
+        UpdateReadout();
+    }
+
+    private void SeekMedia(object? sender, double seconds)
+    {
+        if (_syncingProgress || _track.Duration <= TimeSpan.Zero) return;
+        Waveform.PlayheadPosition = seconds / _track.Duration.TotalSeconds;
         UpdateReadout();
     }
 

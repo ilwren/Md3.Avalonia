@@ -112,6 +112,14 @@
       "documentation": "https://github.com/Milad-Akarie/smooth_page_indicator/blob/bb6402dd2d94dc8f44ec3f13b580d7148354884e/README.md",
       "license": "MIT",
       "disposition": "Documentation-only behavioral reference for independently implemented MdPageIndicator; no Dart source or assets copied."
+    },
+    "audio_video_progress_bar": {
+      "version": "2.0.2",
+      "repository": "https://github.com/suragch/audio_video_progress_bar",
+      "commit": "a8d21089c529d3872002863eaf8917ef0937e72f",
+      "documentation": "https://github.com/suragch/audio_video_progress_bar/blob/a8d21089c529d3872002863eaf8917ef0937e72f/README.md",
+      "license": "MIT",
+      "disposition": "Documentation-only behavioral reference for independently implemented MdMediaProgressBar; no Dart source or assets copied."
     }
   },
 

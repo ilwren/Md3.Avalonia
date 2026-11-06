@@ -4,6 +4,8 @@
 
 ### Added
 
+- Added Extra `MdMediaProgressBar`, a host-driven media timeline with buffered and played segments, configurable time labels, pointer/keyboard/automation seeking and RTL. Playback and decoding remain the host's responsibility.
+
 - Added the independently implemented Extra `MdPageIndicator`: host-driven fractional page position, slide/worm markers, horizontal/vertical and RTL layouts, and pointer, keyboard and automation page requests. Paging and animation remain host-owned.
 
 - `MdPaginatedDataTable` now supports observable equal-width column headers with host-handled sort requests, trailing header actions, and optional first/last page buttons. Rows remain `ItemTemplate`-based; this is not yet a generated cell or selection model.

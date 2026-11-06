@@ -1381,6 +1381,21 @@ Every public enum and its members are listed below. To print the current member 
 | `MdTransferLayoutMode` | `Auto` · `Standard` · `Compact` |
 | `MdVisibilityTransition` | `Fade` · `ExpandVertical` · `ExpandHorizontal` · `Scale` · `SlideAndFade` |
 
+### Media progress bar (Extra)
+
+`MdMediaProgressBar` is a media timeline; it does not play or decode media. The inherited `Value`
+(two-way) is elapsed seconds and `Maximum` is total seconds (with the default `Minimum` of zero).
+`BufferedSeconds` supplies the buffered end; its painted segment is clamped to the range. The host
+should use a finite, non-negative duration, update playback progress itself, and suspend updates to
+`Value` while `IsScrubbing` is true. `SeekRequested` reports seconds on pointer release or on each
+keyboard/automation seek, but not on programmatic changes; capture loss cancels the seek event.
+
+`LabelPlacement` supports `Below`, `Sides` and `Hidden`; `ShowRemainingTime` replaces the total
+label with a remaining-time label. `FormatTimestamp` formats m:ss or h:mm:ss. The default theme
+supplies separate played, buffered, track and label brushes. `IsReadOnly` suppresses seeking and
+the tab stop. There is no independent playback timer or animated smoothing; the host controls
+updates, including any Reduced/None motion policy.
+
 ### Page indicator (Extra)
 
 `MdPageIndicator` is an independent page-position indicator for carousels and similar hosts.
