@@ -177,6 +177,20 @@ jobs:
             tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
             "Headless tests"
 
+      # Keep the recently expanded motion and paginated-table paths independently diagnosable,
+      # including the existing lifecycle suite whose outgoing-content contract changed.
+      - name: Probe motion API expansion tests
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdMotionApiExpansionTests motion-api.trx
+
+      - name: Probe motion lifecycle tests
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdMotionLifecycleTests motion-lifecycle.trx
+
+      - name: Probe paginated table column tests
+        continue-on-error: true
+        run: scripts/probe-tests.sh MdPaginatedDataTableColumnTests table-columns.trx
+
       # The markdown and hex editor tests ask for Consolas, which no runner has, so whether they pass
       # depends on which libSkiaSharp the test output carries: Avalonia's build enumerates system
       # fonts and falls back to a family that exists, while the NoDependencies build ScottPlot pulls
