@@ -98,6 +98,14 @@
     "api_docs": "https://api-docs.avaloniaui.net/"
   },
   "ecosystem_research": {
+    "emoji_picker_flutter": {
+      "version": "4.5.4",
+      "repository": "https://github.com/Fintasys/emoji_picker_flutter",
+      "commit": "6b74e4e5b7f43560aaac72e84f19c9771fe55841",
+      "documentation": "https://github.com/Fintasys/emoji_picker_flutter/blob/6b74e4e5b7f43560aaac72e84f19c9771fe55841/README.md",
+      "license": "MIT",
+      "note": "Documentation, metadata and license only; independent picker implementation, no source, dataset or font copied."
+    },
     "smooth_page_indicator": {
       "version": "3.0.0",
       "repository": "https://github.com/Milad-Akarie/smooth_page_indicator",

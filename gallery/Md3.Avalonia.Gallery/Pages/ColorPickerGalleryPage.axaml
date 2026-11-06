@@ -12,6 +12,14 @@
                    Text="A custom Material-styled color workflow built from official surface, text field, connected button, slider, state, and accessibility guidance. Material 3 and Flutter do not define a first-party ColorPicker component." />
       </StackPanel>
 
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Emoji picker" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Search a small sample, filter by category, and choose an emoji. The host decides where to insert it." />
+        <extra:MdEmojiPicker x:Name="EmojiPicker" MaxWidth="480" HorizontalAlignment="Left" EmojiSelected="OnEmojiSelected" />
+        <TextBlock x:Name="EmojiSelection" Classes="body" Text="No emoji selected" />
+        <gallery:CodeExample XamlCode="&lt;extra:MdEmojiPicker EmojiSelected=&quot;OnEmojiSelected&quot; /&gt;" />
+      </StackPanel>
+
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Choose a source color" HorizontalAlignment="Center" />
         <TextBlock Classes="body" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="680" HorizontalAlignment="Center"

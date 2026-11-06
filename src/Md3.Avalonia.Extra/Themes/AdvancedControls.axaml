@@ -4,6 +4,24 @@
                     xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
                     xmlns:md="using:Md3.Avalonia.Controls">
 
+  <!-- Searchable emoji selection, using native text and scoped Material buttons. -->
+  <ControlTheme x:Key="{x:Type eco:MdEmojiPicker}" TargetType="eco:MdEmojiPicker">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Padding="12" CornerRadius="16" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+          <StackPanel Spacing="8">
+            <md:MdTextBox x:Name="PART_Search" />
+            <WrapPanel x:Name="PART_Categories" />
+            <md:MdScrollViewer MaxHeight="240" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+              <WrapPanel x:Name="PART_Items" />
+            </md:MdScrollViewer>
+            <TextBlock x:Name="PART_Status" TextWrapping="Wrap" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+          </StackPanel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
   <!-- A standalone integer wheel, scoped to Material color roles. -->
   <ControlTheme x:Key="{x:Type eco:MdWheelPicker}" TargetType="eco:MdWheelPicker">
     <Setter Property="Focusable" Value="True" />

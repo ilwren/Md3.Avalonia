@@ -5,6 +5,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Md3.Avalonia.Themes.Dynamic;
+using Md3.Avalonia.Extra.Controls;
 
 namespace Md3.Avalonia.Gallery.Pages;
 
@@ -17,6 +18,8 @@ public partial class ColorPickerGalleryPage : UserControl
         InitializeComponent();
         UpdatePreview(_currentColor);
     }
+
+    private void OnEmojiSelected(object? sender, MdEmojiItem item) => EmojiSelection.Text = item.Emoji;
 
     private void OnColorChanged(object? sender, Color color)
     {

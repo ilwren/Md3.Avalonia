@@ -72,7 +72,7 @@
 | marquee 2.3.0 | 1.07k | MIT | 无限滚动文本（方向/时长/曲线/轮次停顿）→ `MdMarquee`（Motion and visual extras） | 目录空白；Reduced/None 动效方案下的静止回退有现成纪律 |
 | numberpicker 2.1.2 | 688 | BSD-2-Clause | 滚轮数字/小数选择 → `MdWheelPicker`（Pickers） | `MdTimeDial` 是钟面，滚轮选择器是空白；也是 `MdDatePicker` 内部可复用的部件 |
 | drag_and_drop_lists 0.4.2 | 457 | BSD-3-Clause | 两级列表跨列表拖拽（看板式）→ `MdDragAndDropBoard`（Lists and interaction patterns） | `MdReorderableList` 仅覆盖单列表；跨列表 + 列表自身重排是空白 |
-| emoji_picker_flutter 4.5.4 | 662 | BSD-2-Clause | 表情选择器（分类/搜索/肤色/最近使用）→ `MdEmojiPicker`（Selection and transfer） | `MdColorPicker` 同族的「选择器」空白；需自备 emoji 数据集与字体策略 |
+| emoji_picker_flutter 4.5.4 | 662 | MIT（2026-11-06 固定快照复核） | 表情选择器（分类/搜索/肤色/最近使用）→ `MdEmojiPicker`（Selection and transfer） | `MdColorPicker` 同族的「选择器」空白；需自备 emoji 数据集与字体策略 |
 | audio_video_progress_bar 2.0.3 | 445 | MIT | 媒体进度条（已缓冲段、seek、时间标签位置）→ `MdMediaProgressBar`（与 `MdWaveform` 同属媒体面） | 目录空白；与 `MdWaveform` 的播放头/scrub 纪律天然衔接 |
 
 ### 4.2 B 档：模式成立，先做差距分析或排后

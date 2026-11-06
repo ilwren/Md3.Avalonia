@@ -250,6 +250,9 @@ jobs:
       - name: Probe marquee tests
         run: scripts/probe-tests.sh MdMarqueeTests marquee.trx
 
+      - name: Probe emoji picker tests
+        run: scripts/probe-tests.sh MdEmojiPicker emoji-picker.trx
+
       - name: Probe wheel picker tests
         run: scripts/probe-tests.sh MdWheelPicker wheel-picker.trx
 

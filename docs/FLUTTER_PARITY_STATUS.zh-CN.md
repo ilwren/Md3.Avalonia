@@ -32,6 +32,7 @@ Md3.Avalonia 使用 Avalonia 控件、属性与生命周期。相似的类型名
 | `MdSharedAxis`, `MdFadeThrough`（Extra） | 实现子集 | 对模板、ViewModel 与 `Control` 内容执行带平移/缩放的分段入场与保留退出 | `Control` 退出时展示冻结的 `MdVisualSnapshot` 图像——不含实时绑定、命中测试或无障碍树；无法截取快照时跳过退出阶段，仅执行新内容入场 |
 | `MdStepper` | 实现子集 | 垂直与水平（`Orientation`）步骤流、每步 `State` 样式、索引导航和 `ActiveStepChanged`；`ControlsBuilder`、`StepIconBuilder`、`ConnectorBrush`/`ConnectorThickness` | 不承诺 Flutter `controlsStep`/`currentStep` 的动画时序一致；水平内容布局更简化；builder 在导航时重建，不会在每步状态变化时重跑 |
 | `MdDraggableScrollableSheet` | 实现子集 | 拖拽手柄改尺寸、吸附点与轻弹吸附、`ExtentChanged`/`AnimationCompleted`、`ShouldCloseOnMinExtent`/`MinExtentReached`、`SnapAnimationDuration`、`MdDraggableScrollableController` | 不承诺 Flutter 滚动物理或 `ScrollController` 注入一致性；最小尺寸收起请求以事件形式上报，由宿主决定是否关闭 |
+| `MdEmojiPicker`（Extra） | 实现子集 | 可替换的小型示例集、搜索、类别、内存最近使用、双向选择和无障碍按钮 | 独立实现；不含完整 Unicode/CLDR 数据、肤色选择、持久化、字体可用性检测、插入或虚拟化网格 |
 | `MdWheelPicker`（Extra） | 实现子集 | 有界整数步长、居中选中、指针拖动与点击行、聚焦后滚轮、键盘和数值范围自动化 | 独立实现；不含小数、循环、水平布局、惯性、自定义条目模板或 Flutter 滚动物理一致性 |
 | `MdConfetti`（Extra） | 实现子集 | 有界一次性粒子、方向/散布、速度、重力/阻尼、主题画刷、渲染帧生命周期和减少动效抑制 | 参考公开文档独立实现；不含持续发射、循环控制器、自定义路径、任意调色板、声音或触觉反馈 |
 | `MdMarquee`（Extra） | 实现子集 | 水平溢出滚动、方向、速度、间距、轮间暂停、RTL、减少动效静止回退及完整文本无障碍 | 参考公开文档独立实现；不含垂直滚动、有限循环、加减速曲线、富文本及文本交互 |

@@ -4,6 +4,8 @@
 
 ### Added
 
+- Added Extra `MdEmojiPicker` with a small replaceable sample, category/search filters, accessible names, bounded in-memory recents and host-owned text insertion.
+
 - Added Extra `MdWheelPicker`, a bounded integer wheel with stepped values, touch/pointer, keyboard, mouse-wheel and range automation support.
 
 - Added Extra `MdConfetti`: a finite, non-interactive particle burst with directional physics, theme brushes, render-frame lifecycle and reduced-motion suppression.

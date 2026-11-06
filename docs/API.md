@@ -1385,6 +1385,38 @@ Every public enum and its members are listed below. To print the current member 
 
 
 
+## Emoji picker (Extra)
+
+`MdEmojiPicker` displays a small manually curated set of 16 examples. Set `ItemsSource` to a
+collection of `MdEmojiItem(Emoji, Name, Category, Keywords, ChineseName)` to replace it; null
+restores the sample and an empty collection means no results. The text can be a multi-scalar sequence;
+the picker does not validate Unicode or ship a comprehensive catalog. An observable collection is
+monitored while attached; change it on the UI thread. Entries are immutable. For non-observable
+sources, replace the source to refresh. Platform font availability and color-glyph rendering vary;
+`EmojiFontFamily` optionally selects a host-provided font, with no font bundled by the control.
+
+`SearchText` filters text, both names, keywords and category by case-insensitive substring.
+`SelectedCategory` is an exact host-defined category key (null/empty = all); `IsRecentView` shows
+recent entries instead. Category identifiers `Faces`, `Hands`, `Symbols`, `Celebration` and `Nature`
+are localized in the category bar; other identifiers are shown verbatim. Search matches both English
+and optional Chinese item names. Buttons expose a human-readable accessible name and keyboard Tab/
+Enter operation. Hosts should provide localized names for their own entries.
+
+Each user choice updates two-way `SelectedEmoji` and raises `EmojiSelected`, including repeated
+choices. Programmatic changes do not raise that event or add to recents. The host inserts or copies
+the returned text; the picker does not manipulate text fields or the clipboard. `RecentEmoji` is a
+most-recent-first, deduplicated per-instance snapshot, limited by `RecentLimit` (24, 0–100);
+`ClearRecents()` empties it. Recents are not persisted and only entries still in the catalog appear
+in the recent view. Search also applies to the recent view.
+
+`MaxVisibleItems` (120, 1–500) limits realized buttons; `ResultCount` counts all matches and the UI
+reports truncation. This is not a virtualized catalog. No skin-tone chooser, automatic font coverage
+check, history persistence, text insertion, or Flutter API/visual parity is provided.
+
+```xml
+<eco:MdEmojiPicker ItemsSource="{Binding EmojiItems}" EmojiSelected="OnEmojiSelected" />
+```
+
 ## Integer wheel picker (Extra)
 
 `MdWheelPicker` selects a bounded integer using five visible rows. `Minimum` (default 0),
