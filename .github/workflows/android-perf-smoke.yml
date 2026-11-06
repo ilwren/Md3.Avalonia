@@ -1,0 +1,73 @@
+# TEMPORARY verification workflow for scripts/collect-android-perf.py. It exercises the
+# collector end to end on a real emulator (install, launch, collect, upload) without the
+# Maestro scenario, which currently cannot finish inside the regression workflow's
+# five-minute emulator step under degraded macOS capacity. DELETE AFTER IT GOES GREEN.
+name: Android Perf Collector Smoke (TEMPORARY)
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/android-perf-smoke.yml'
+
+jobs:
+  collector-smoke:
+    name: Collector smoke on emulator
+    runs-on: macos-15
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup .NET SDK & Workloads
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install Android Workload
+        run: dotnet workload install android
+
+      - name: Build Android Gallery APK
+        run: |
+          dotnet publish gallery/Md3.Avalonia.Gallery.Android/Md3.Avalonia.Gallery.Android.csproj \
+            -c Release \
+            -f net10.0-android \
+            -p:AndroidPackageFormat=apk \
+            -o artifacts/android/
+
+      - name: Install, launch and collect
+        timeout-minutes: 8
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_6
+          force-avd-creation: true
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: |
+            adb install artifacts/android/*.apk
+            adb shell monkey -p io.arena.md3avalonia.gallery -c android.intent.category.LAUNCHER 1
+            sleep 20
+            mkdir -p artifacts/android-test
+            python3 scripts/collect-android-perf.py \
+              --package io.arena.md3avalonia.gallery \
+              --apk artifacts/android \
+              --output-dir artifacts/android-test \
+              --summary --github
+            ls -la artifacts/android-test/
+            python3 -c "import json; d = json.load(open('artifacts/android-test/android-perf.json')); assert d['package']; print('smoke: json valid, warnings =', d['warnings'])"
+
+      - name: Upload smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-perf-smoke
+          path: artifacts/android-test/
+          if-no-files-found: warn
