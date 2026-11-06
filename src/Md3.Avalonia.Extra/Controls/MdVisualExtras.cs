@@ -426,7 +426,10 @@ public sealed class MdAnimatedText : TemplatedControl
 public enum MdSpinKitKind { RotatingPlain, ThreeBounce, Wave, FadingCircle, ChasingDots }
 
 /// <summary>Extra loading indicators for applications that need non-Material SpinKit-like motion.</summary>
-[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
+/// <remarks>
+/// It draws its animation in code and its ControlTheme is deliberately empty, so it declares no
+/// template parts - naming one here would be a contract the template does not honour.
+/// </remarks>
 public sealed class MdSpinKit : Control
 {
     public static readonly StyledProperty<MdSpinKitKind> KindProperty = AvaloniaProperty.Register<MdSpinKit, MdSpinKitKind>(nameof(Kind), MdSpinKitKind.RotatingPlain);
