@@ -12,6 +12,8 @@ namespace Md3.Avalonia.Controls;
 /// keyboard activation, focus and automation without imposing a global Button style.
 /// </summary>
 [PseudoClasses(":elevated", ":filled", ":outlined", ":interactive", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_StateLayer", typeof(Border))]
 public sealed class MdCard : Button
 {
     private Border? _stateLayer;

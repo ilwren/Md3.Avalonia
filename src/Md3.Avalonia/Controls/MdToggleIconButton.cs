@@ -9,6 +9,10 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>A Material 3 icon toggle button with separate selected and unselected icon slots.</summary>
 [PseudoClasses(":standard", ":filled", ":tonal", ":outlined", ":xsmall", ":small", ":medium", ":large", ":xlarge", ":narrow", ":default-width", ":wide", ":round", ":square", ":has-selected-icon", ":selected-shape-morph", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_Icon", typeof(Viewbox))]
+[TemplatePart("PART_SelectedIcon", typeof(Viewbox))]
+[TemplatePart("PART_StateLayer", typeof(Border))]
 public class MdToggleIconButton : ToggleButton
 {
     private Border? _container;

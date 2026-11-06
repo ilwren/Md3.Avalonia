@@ -6,6 +6,10 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>Chooses a navigation bar, rail, or drawer from the available width.</summary>
 [PseudoClasses(":bar", ":rail", ":drawer")]
+[TemplatePart("PART_Bar", typeof(ContentPresenter))]
+[TemplatePart("PART_Content", typeof(ContentPresenter))]
+[TemplatePart("PART_Drawer", typeof(ContentPresenter))]
+[TemplatePart("PART_Rail", typeof(ContentPresenter))]
 public sealed class MdNavigationSuite : ContentControl
 {
     public static readonly StyledProperty<MdNavigationSuiteMode> ModeProperty = AvaloniaProperty.Register<MdNavigationSuite, MdNavigationSuiteMode>(nameof(Mode));

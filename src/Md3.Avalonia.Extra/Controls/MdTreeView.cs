@@ -17,6 +17,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
+using Avalonia.Controls.Metadata;
 
 namespace Md3.Avalonia.Extra.Controls;
 
@@ -61,6 +62,8 @@ public sealed record MdTreeRow(
     bool IsExpanded,
     double ExpansionAngle,
     bool ShowGuide);
+[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
+[TemplatePart("PART_Toggle", typeof(ToggleButton))]
 
 /// <summary>
 /// A Material hierarchical list with arbitrary depth, selection, keyboard traversal, RTL-aware

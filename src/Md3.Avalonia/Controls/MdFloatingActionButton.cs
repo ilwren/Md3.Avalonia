@@ -7,6 +7,8 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>A Material 3 floating action button for the screen's primary action.</summary>
 [PseudoClasses(":small", ":regular", ":medium", ":large", ":primary-container", ":secondary-container", ":tertiary-container", ":primary", ":secondary", ":tertiary", ":left", ":right")]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_StateLayer", typeof(Border))]
 public class MdFloatingActionButton : Button
 {
     public static readonly StyledProperty<object?> IconProperty = AvaloniaProperty.Register<MdFloatingActionButton, object?>(nameof(Icon));

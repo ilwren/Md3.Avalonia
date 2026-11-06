@@ -13,9 +13,9 @@ using Md3.Avalonia.Motion;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>Anchors a Material menu to arbitrary trigger content.</summary>
+[PseudoClasses(":open", ":closed", ":present", ":reduced-motion", ":no-motion")]
 [TemplatePart("PART_Popup", typeof(Popup))]
 [TemplatePart("PART_MenuSurface", typeof(Border))]
-[PseudoClasses(":open", ":closed", ":present", ":reduced-motion", ":no-motion")]
 public sealed class MdMenuAnchor : ContentControl, IMdPopupOwner, IMdPopupPresenceOwner
 {
     public static readonly StyledProperty<object?> MenuProperty =

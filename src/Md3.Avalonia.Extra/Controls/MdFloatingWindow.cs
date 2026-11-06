@@ -8,6 +8,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Extra.Controls;
 
@@ -33,6 +34,12 @@ namespace Md3.Avalonia.Extra.Controls;
 /// </para>
 /// </remarks>
 [PseudoClasses(":present", ":dragging", ":resizing", ":minimized")]
+[TemplatePart("PART_CloseButton", typeof(MdIconButton))]
+[TemplatePart("PART_ContentHost", typeof(ContentPresenter))]
+[TemplatePart("PART_MinimizeButton", typeof(MdIconButton))]
+[TemplatePart("PART_ResizeGrip", typeof(Border))]
+[TemplatePart("PART_Root", typeof(Border))]
+[TemplatePart("PART_TitleBar", typeof(Grid))]
 public sealed class MdFloatingWindow : ContentControl
 {
     private readonly MdPresenceController _presence;

@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
@@ -30,6 +31,9 @@ public enum MdPaginationDisplayMode
 /// </para>
 /// </remarks>
 [PseudoClasses(":numbers", ":dots")]
+[TemplatePart("PART_NextButton", typeof(MdIconButton))]
+[TemplatePart("PART_PipsPagerList", typeof(ListBox))]
+[TemplatePart("PART_PreviousButton", typeof(MdIconButton))]
 public class MdPagination : PipsPager
 {
     public static readonly StyledProperty<MdPaginationDisplayMode> DisplayModeProperty =

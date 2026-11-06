@@ -16,6 +16,12 @@ namespace Md3.Avalonia.Controls;
     ":xsmall", ":small", ":medium", ":large", ":xlarge",
     ":round", ":square", ":has-leading-icon", ":has-trailing-icon",
     ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_ContentPresenter", typeof(ContentPresenter))]
+[TemplatePart("PART_FocusIndicator", typeof(Border))]
+[TemplatePart("PART_LeadingIcon", typeof(Viewbox))]
+[TemplatePart("PART_StateLayer", typeof(Border))]
+[TemplatePart("PART_TrailingIcon", typeof(Viewbox))]
 public class MdButton : Button
 {
     private Border? _container;

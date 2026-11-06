@@ -3,11 +3,17 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A segment in a single- or multi-select Material segmented button group.</summary>
 [PseudoClasses(":has-icon", ":has-selected-icon", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Icon", typeof(MdSymbolPresenter))]
+[TemplatePart("PART_IconHost", typeof(Grid))]
+[TemplatePart("PART_Root", typeof(Border))]
+[TemplatePart("PART_SelectedIcon", typeof(MdSymbolPresenter))]
+[TemplatePart("PART_State", typeof(Border))]
 public sealed class MdSegmentedButton : ListBoxItem
 {
     public static readonly StyledProperty<object?> IconProperty = AvaloniaProperty.Register<MdSegmentedButton, object?>(nameof(Icon));

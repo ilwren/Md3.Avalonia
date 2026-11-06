@@ -7,6 +7,7 @@ using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
@@ -17,6 +18,26 @@ namespace Md3.Avalonia.Controls;
 [PseudoClasses(
     ":filled", ":outlined", ":md-error", ":has-label", ":no-label", ":has-value", ":no-value",
     ":has-leading-icon", ":has-supporting-text", ":has-error-text", ":popup-present", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_ActiveIndicator", typeof(Border))]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_ContentGrid", typeof(Grid))]
+[TemplatePart("PART_DropDownIcon", typeof(Grid))]
+[TemplatePart("PART_DropDownToggle", typeof(ToggleButton))]
+[TemplatePart("PART_EditableTextBox", typeof(TextBox))]
+[TemplatePart("PART_ErrorText", typeof(ContentPresenter))]
+[TemplatePart("PART_FieldHost", typeof(Grid))]
+[TemplatePart("PART_FocusOutline", typeof(MdOutlinedFieldBorder))]
+[TemplatePart("PART_InputRow", typeof(Grid))]
+[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
+[TemplatePart("PART_Label", typeof(ContentPresenter))]
+[TemplatePart("PART_LeadingIcon", typeof(Viewbox))]
+[TemplatePart("PART_MenuSurface", typeof(Border))]
+[TemplatePart("PART_Outline", typeof(MdOutlinedFieldBorder))]
+[TemplatePart("PART_Placeholder", typeof(TextBlock))]
+[TemplatePart("PART_Popup", typeof(Popup))]
+[TemplatePart("PART_SelectionBox", typeof(ContentControl))]
+[TemplatePart("PART_SupportingRow", typeof(Grid))]
+[TemplatePart("PART_SupportingText", typeof(ContentPresenter))]
 public class MdComboBox : ComboBox, IMdPopupOwner, IMdPopupPresenceOwner
 {
 

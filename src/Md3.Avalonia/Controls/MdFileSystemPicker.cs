@@ -12,6 +12,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Localization;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
@@ -25,6 +26,7 @@ namespace Md3.Avalonia.Controls;
 /// Hosts should start it in an application-accessible directory and request any required platform
 /// permissions themselves.
 /// </remarks>
+[PseudoClasses(":file-mode", ":folder-mode", ":multiple", ":compact", ":powerline-breadcrumb", ":editing-path", ":loading", ":empty", ":error")]
 [TemplatePart("PART_PathBox", typeof(MdTextBox))]
 [TemplatePart("PART_BreadcrumbHost", typeof(ItemsControl))]
 [TemplatePart("PART_ItemsHost", typeof(MdList))]
@@ -36,7 +38,19 @@ namespace Md3.Avalonia.Controls;
 [TemplatePart("PART_RefreshButton", typeof(MdIconButton))]
 [TemplatePart("PART_ConfirmButton", typeof(MdButton))]
 [TemplatePart("PART_CancelButton", typeof(MdButton))]
-[PseudoClasses(":file-mode", ":folder-mode", ":multiple", ":compact", ":powerline-breadcrumb", ":editing-path", ":loading", ":empty", ":error")]
+[TemplatePart("PART_BreadcrumbScroller", typeof(ScrollViewer))]
+[TemplatePart("PART_CompactOptions", typeof(MdCheckBox))]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_EmptyState", typeof(StackPanel))]
+[TemplatePart("PART_ErrorState", typeof(StackPanel))]
+[TemplatePart("PART_FileListSurface", typeof(Border))]
+[TemplatePart("PART_FileModeLabel", typeof(TextBlock))]
+[TemplatePart("PART_FolderModeLabel", typeof(TextBlock))]
+[TemplatePart("PART_LoadingState", typeof(StackPanel))]
+[TemplatePart("PART_OpenEntryButton", typeof(MdIconButton))]
+[TemplatePart("PART_PathSegmentButton", typeof(Button))]
+[TemplatePart("PART_QuickAccess", typeof(Border))]
+[TemplatePart("PART_Title", typeof(TextBlock))]
 public sealed class MdFileSystemPicker : TemplatedControl
 {
     public static readonly StyledProperty<MdFileSystemPickerMode> ModeProperty =

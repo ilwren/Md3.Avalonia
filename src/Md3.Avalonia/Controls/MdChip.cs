@@ -7,6 +7,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
@@ -15,6 +16,14 @@ namespace Md3.Avalonia.Controls;
 /// two-way IsChecked property; input chips can raise RemoveRequested and execute RemoveCommand.
 /// </summary>
 [PseudoClasses(":assist", ":filter", ":input", ":suggestion", ":has-leading-icon", ":has-trailing-icon", ":removable", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_LeadingHost", typeof(Grid))]
+[TemplatePart("PART_LeadingIcon", typeof(ContentPresenter))]
+[TemplatePart("PART_RemoveButton", typeof(MdIconButton))]
+[TemplatePart("PART_SelectedIcon", typeof(MdIcon))]
+[TemplatePart("PART_StateLayer", typeof(Border))]
+[TemplatePart("PART_TrailingHost", typeof(Grid))]
+[TemplatePart("PART_TrailingIcon", typeof(ContentPresenter))]
 public class MdChip : ToggleButton
 {
     public static readonly StyledProperty<MdChipVariant> VariantProperty =

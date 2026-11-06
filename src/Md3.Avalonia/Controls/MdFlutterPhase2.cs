@@ -14,11 +14,15 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A Material card-backed, host-sortable paginated data table.</summary>
 [PseudoClasses(":first-page", ":last-page", ":empty")]
+[TemplatePart("PART_LoadingLayer", typeof(Border))]
+[TemplatePart("PART_NextPageButton", typeof(MdIconButton))]
+[TemplatePart("PART_PreviousPageButton", typeof(MdIconButton))]
 public sealed class MdPaginatedDataTable : TemplatedControl
 {
     public static readonly StyledProperty<object?> HeaderProperty = AvaloniaProperty.Register<MdPaginatedDataTable, object?>(nameof(Header));
@@ -186,6 +190,7 @@ public sealed class MdPageChangedEventArgs(int pageIndex, int firstRowIndex, int
 
 /// <summary>A list whose item order can be changed by pointer drag, keyboard alternatives, commands, or direct calls.</summary>
 [PseudoClasses(":reordering", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
 public sealed class MdReorderableList : ListBox
 {
     public static readonly StyledProperty<ICommand?> ReorderCommandProperty = AvaloniaProperty.Register<MdReorderableList, ICommand?>(nameof(ReorderCommand));
@@ -469,6 +474,10 @@ public sealed class MdReorderEventArgs(int oldIndex, int newIndex) : EventArgs
 
 /// <summary>A Material image/content tile with optional overlay header and footer bars.</summary>
 [PseudoClasses(":has-header", ":has-footer", ":activated", ":favorite")]
+[TemplatePart("PART_ActivatedOutline", typeof(Border))]
+[TemplatePart("PART_FavoriteIndicator", typeof(Border))]
+[TemplatePart("PART_Focus", typeof(Border))]
+[TemplatePart("PART_State", typeof(Border))]
 public sealed class MdGridTile : Button
 {
     public static readonly StyledProperty<object?> HeaderProperty = AvaloniaProperty.Register<MdGridTile, object?>(nameof(Header));
@@ -505,6 +514,8 @@ public sealed class MdGridTile : Button
 
 /// <summary>A one- or two-line overlay used in an <see cref="MdGridTile"/>.</summary>
 [PseudoClasses(":has-subtitle", ":has-leading", ":has-trailing", ":interactive", ":pressed")]
+[TemplatePart("PART_Focus", typeof(Border))]
+[TemplatePart("PART_State", typeof(Border))]
 public sealed class MdGridTileBar : ContentControl
 {
     public static readonly StyledProperty<object?> LeadingProperty = AvaloniaProperty.Register<MdGridTileBar, object?>(nameof(Leading));
@@ -599,6 +610,10 @@ public enum MdDismissDirection { Horizontal, StartToEnd, EndToStart }
 
 /// <summary>A swipe-dismiss surface with command, event, confirmation, and direct-operation paths.</summary>
 [PseudoClasses(":dragging", ":confirming", ":dismissed", ":collapsing", ":present", ":start", ":end", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_EndBackground", typeof(ContentPresenter))]
+[TemplatePart("PART_Foreground", typeof(Border))]
+[TemplatePart("PART_Root", typeof(Border))]
+[TemplatePart("PART_StartBackground", typeof(ContentPresenter))]
 public sealed class MdDismissible : ContentControl
 {
     public static readonly StyledProperty<object?> BackgroundContentProperty = AvaloniaProperty.Register<MdDismissible, object?>(nameof(BackgroundContent));

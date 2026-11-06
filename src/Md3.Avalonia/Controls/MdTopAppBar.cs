@@ -6,6 +6,12 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>A Material 3 top app bar with small and expressive flexible configurations.</summary>
 [PseudoClasses(":small", ":medium-flexible", ":large-flexible", ":centered", ":scrolled", ":has-subtitle")]
+[TemplatePart("PART_Layout", typeof(Grid))]
+[TemplatePart("PART_Leading", typeof(ContentPresenter))]
+[TemplatePart("PART_Subtitle", typeof(ContentPresenter))]
+[TemplatePart("PART_Title", typeof(ContentPresenter))]
+[TemplatePart("PART_TitleHost", typeof(StackPanel))]
+[TemplatePart("PART_Trailing", typeof(ContentPresenter))]
 public sealed class MdTopAppBar : ContentControl
 {
     public static readonly StyledProperty<MdTopAppBarVariant> VariantProperty =

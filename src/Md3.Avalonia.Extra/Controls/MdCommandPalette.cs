@@ -31,6 +31,8 @@ public sealed record MdCommandItem(string Title, ICommand Command, object? Param
 
 /// <summary>A keyboard-first searchable command surface with real shortcut routing.</summary>
 [PseudoClasses(":open", ":present", ":empty", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Backdrop", typeof(Grid))]
+[TemplatePart("PART_Surface", typeof(Border))]
 public sealed class MdCommandPalette : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable?> ItemsSourceProperty = AvaloniaProperty.Register<MdCommandPalette, IEnumerable?>(nameof(ItemsSource));

@@ -13,10 +13,12 @@ using Md3.Avalonia.Motion;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>Hosts modal or standard Material bottom/side sheet content without a platform-specific window.</summary>
+[PseudoClasses(":open", ":closed", ":present", ":modal", ":standard", ":bottom", ":left", ":right", ":dragging", ":reduced-motion", ":no-motion")]
 [TemplatePart("PART_Scrim", typeof(Control))]
 [TemplatePart("PART_DragHandle", typeof(Control))]
 [TemplatePart("PART_Surface", typeof(Border))]
-[PseudoClasses(":open", ":closed", ":present", ":modal", ":standard", ":bottom", ":left", ":right", ":dragging", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Layer", typeof(Grid))]
+[TemplatePart("PART_MainContent", typeof(ContentPresenter))]
 public sealed class MdSheetHost : ContentControl
 {
     public static readonly StyledProperty<object?> SheetContentProperty =

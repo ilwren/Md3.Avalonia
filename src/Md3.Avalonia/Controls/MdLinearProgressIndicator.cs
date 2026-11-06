@@ -6,8 +6,10 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
+using Avalonia.Controls.Metadata;
 
 namespace Md3.Avalonia.Controls;
+[TemplatePart("PART_Indicator", typeof(Border))]
 
 /// <summary>A determinate or indeterminate Material linear progress indicator with flat or wavy shape.
 /// The indeterminate state runs the M3 disjoint two-segment sweep.</summary>

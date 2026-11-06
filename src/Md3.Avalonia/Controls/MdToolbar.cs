@@ -7,6 +7,10 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>A docked or floating Material toolbar for frequently used page actions.</summary>
 [PseudoClasses(":docked", ":floating", ":standard", ":vibrant", ":horizontal", ":vertical", ":compact", ":has-leading", ":has-trailing")]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_Layout", typeof(StackPanel))]
+[TemplatePart("PART_Leading", typeof(ContentPresenter))]
+[TemplatePart("PART_Trailing", typeof(ContentPresenter))]
 public sealed class MdToolbar : ItemsControl
 {
     public static readonly StyledProperty<MdToolbarMode> ModeProperty =

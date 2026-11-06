@@ -19,6 +19,8 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>Coordinates a draggable bottom sheet that resizes before its nested scroller consumes input.</summary>
 [PseudoClasses(":dragging", ":minimum", ":maximum", ":animating", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_DragHandle", typeof(Border))]
+[TemplatePart("PART_Surface", typeof(Border))]
 public sealed class MdDraggableScrollableSheet : ContentControl
 {
     public static readonly StyledProperty<double> MinimumExtentProperty = AvaloniaProperty.Register<MdDraggableScrollableSheet, double>(nameof(MinimumExtent), 0.25);

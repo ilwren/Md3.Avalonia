@@ -9,6 +9,8 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>A compact Material 3 action button with an icon-only visual.</summary>
 [PseudoClasses(":standard", ":filled", ":tonal", ":outlined", ":xsmall", ":small", ":medium", ":large", ":xlarge", ":narrow", ":default-width", ":wide", ":round", ":square", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_StateLayer", typeof(Border))]
 public class MdIconButton : Button
 {
     private Border? _container;

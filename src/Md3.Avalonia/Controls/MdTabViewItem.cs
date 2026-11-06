@@ -5,11 +5,17 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A Material tab header paired with lazily presented page content.</summary>
 [PseudoClasses(":has-icon", ":has-badge", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Badge", typeof(ContentPresenter))]
+[TemplatePart("PART_HeaderPresenter", typeof(ContentPresenter))]
+[TemplatePart("PART_Icon", typeof(MdSymbolPresenter))]
+[TemplatePart("PART_Indicator", typeof(Border))]
+[TemplatePart("PART_State", typeof(Border))]
 public sealed class MdTabViewItem : TabItem
 {
     private Border? _indicator;

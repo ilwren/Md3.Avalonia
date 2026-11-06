@@ -3,11 +3,17 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A Material switch with native ToggleButton command, keyboard and automation semantics.</summary>
 [PseudoClasses(":show-icons", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_CheckedIcon", typeof(MdIcon))]
+[TemplatePart("PART_Thumb", typeof(Border))]
+[TemplatePart("PART_ThumbState", typeof(Border))]
+[TemplatePart("PART_Track", typeof(Border))]
+[TemplatePart("PART_UncheckedIcon", typeof(MdIcon))]
 public class MdSwitch : ToggleButton
 {
     private Border? _track;

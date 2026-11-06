@@ -5,11 +5,16 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Md3.Avalonia.Motion;
+using Avalonia.Controls.Shapes;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A Material slider retaining Avalonia Slider value, keyboard, pointer and range behavior.</summary>
 [PseudoClasses(":value-indicator", ":stop-indicator", ":dragging", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_StopIndicator", typeof(Ellipse))]
+[TemplatePart("PART_Thumb", typeof(MdSliderThumb))]
+[TemplatePart("PART_Track", typeof(Track))]
 public sealed class MdSlider : Slider
 {
     public static readonly StyledProperty<bool> ShowValueIndicatorProperty =

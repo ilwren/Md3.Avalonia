@@ -6,6 +6,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Threading;
 using Md3.Avalonia.Motion;
 using Avalonia.Interactivity;
+using Avalonia.Controls.Shapes;
 
 namespace Md3.Avalonia.Controls;
 
@@ -13,6 +14,9 @@ namespace Md3.Avalonia.Controls;
 /// An expandable Android Material 3 settings card that reveals nested settings items when expanded.
 /// </summary>
 [PseudoClasses(":expanded")]
+[TemplatePart("PART_ContentArea", typeof(Border))]
+[TemplatePart("PART_ExpanderChevron", typeof(Path))]
+[TemplatePart("PART_HeaderButton", typeof(ToggleButton))]
 public class MdSettingsExpander : ItemsControl
 {
     public static readonly StyledProperty<object?> HeaderProperty =

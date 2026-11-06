@@ -7,6 +7,10 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>A Material 3 basic or full-screen dialog surface hosted by <see cref="MdDialogHost"/>.</summary>
 [PseudoClasses(":basic", ":full-screen", ":has-icon", ":has-headline", ":has-actions")]
+[TemplatePart("PART_Actions", typeof(ContentPresenter))]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_Headline", typeof(ContentPresenter))]
+[TemplatePart("PART_Icon", typeof(ContentPresenter))]
 public sealed class MdDialog : ContentControl
 {
     public static readonly StyledProperty<MdDialogVariant> VariantProperty =

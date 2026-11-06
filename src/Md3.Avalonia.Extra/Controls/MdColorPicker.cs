@@ -16,6 +16,7 @@ using Avalonia.Media;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Localization;
 using Md3.Avalonia.Themes.Dynamic;
+using Md3.Avalonia.Extra.Controls;
 
 namespace Md3.Avalonia.Extra.Controls;
 
@@ -32,6 +33,16 @@ public enum MdColorPickerMode
 /// tonal swatches, HSV sliders, live HEX input/binding, and alpha-channel support.
 /// </summary>
 [PseudoClasses(":palette", ":spectrum", ":presets", ":palette-panel-visible", ":spectrum-panel-visible", ":presets-panel-visible", ":mode-selector-visible")]
+[TemplatePart("PART_AlphaSection", typeof(StackPanel))]
+[TemplatePart("PART_ContentScrollViewer", typeof(ScrollViewer))]
+[TemplatePart("PART_ModeSelector", typeof(MdConnectedButtonGroup))]
+[TemplatePart("PART_PaletteModeButton", typeof(MdButton))]
+[TemplatePart("PART_PaletteSection", typeof(StackPanel))]
+[TemplatePart("PART_PresetsModeButton", typeof(MdButton))]
+[TemplatePart("PART_PresetsSection", typeof(StackPanel))]
+[TemplatePart("PART_PreviewPanel", typeof(Border))]
+[TemplatePart("PART_SpectrumModeButton", typeof(MdButton))]
+[TemplatePart("PART_SpectrumSection", typeof(StackPanel))]
 public class MdColorPicker : TemplatedControl
 {
     public static readonly StyledProperty<Color> SelectedColorProperty =
@@ -608,6 +619,9 @@ public class MdColorPicker : TemplatedControl
         public void Execute(object? parameter) => execute(parameter);
     }
 }
+[TemplatePart("PART_DropDownButton", typeof(Button))]
+[TemplatePart("PART_Picker", typeof(MdColorPicker))]
+[TemplatePart("PART_Popup", typeof(Popup))]
 
 /// <summary>
 /// A compact Material 3 button that displays the current color swatch and opens a popover color picker.

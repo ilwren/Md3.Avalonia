@@ -23,10 +23,11 @@ namespace Md3.Avalonia.Controls;
 /// <item><description>pure bindings: two-way <see cref="IsOpen"/> with <see cref="Dialog"/>.</description></item>
 /// </list>
 /// </summary>
+[PseudoClasses(":open", ":closed", ":present", ":full-screen-dialog", ":reduced-motion", ":no-motion")]
 [TemplatePart("PART_Scrim", typeof(Control))]
 [TemplatePart("PART_Overlay", typeof(Control))]
 [TemplatePart("PART_DialogPresenter", typeof(ContentPresenter))]
-[PseudoClasses(":open", ":closed", ":present", ":full-screen-dialog", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_MainContent", typeof(ContentPresenter))]
 public sealed class MdDialogHost : ContentControl, IMdDialogService
 {
     public static readonly StyledProperty<object?> DialogProperty =

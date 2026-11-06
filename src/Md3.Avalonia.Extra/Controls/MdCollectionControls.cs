@@ -30,6 +30,13 @@ public enum MdSlidableActionPaneMotion
 /// <summary>A start/end swipe-action container with RTL-aware panes, velocity settling, and keyboard alternatives.</summary>
 [PseudoClasses(":dragging", ":start-open", ":end-open", ":rtl", ":has-start-actions", ":has-end-actions",
     ":start-action-over", ":end-action-over", ":start-action-pressed", ":end-action-pressed", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_EndActionState", typeof(Border))]
+[TemplatePart("PART_EndActions", typeof(ContentPresenter))]
+[TemplatePart("PART_EndPane", typeof(Border))]
+[TemplatePart("PART_Foreground", typeof(Border))]
+[TemplatePart("PART_StartActionState", typeof(Border))]
+[TemplatePart("PART_StartActions", typeof(ContentPresenter))]
+[TemplatePart("PART_StartPane", typeof(Border))]
 public sealed class MdSlidableItem : ContentControl
 {
     public static readonly StyledProperty<object?> StartActionsProperty = AvaloniaProperty.Register<MdSlidableItem, object?>(nameof(StartActions));

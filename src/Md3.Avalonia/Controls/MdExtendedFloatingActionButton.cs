@@ -7,6 +7,9 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>A Material 3 Expressive extended FAB with icon and descriptive label.</summary>
 [PseudoClasses(":small", ":medium", ":large", ":primary-container", ":secondary-container", ":tertiary-container", ":primary", ":secondary", ":tertiary", ":has-icon")]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_Icon", typeof(Viewbox))]
+[TemplatePart("PART_StateLayer", typeof(Border))]
 public class MdExtendedFloatingActionButton : Button
 {
     public static readonly StyledProperty<object?> IconProperty = AvaloniaProperty.Register<MdExtendedFloatingActionButton, object?>(nameof(Icon));

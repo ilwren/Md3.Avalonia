@@ -6,11 +6,15 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A persistent Material banner with leading, content and action slots.</summary>
 [PseudoClasses(":open", ":closed", ":present", ":actions-below", ":inline-actions", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Actions", typeof(ContentPresenter))]
+[TemplatePart("PART_DismissButton", typeof(MdIconButton))]
+[TemplatePart("PART_Root", typeof(Border))]
 public sealed class MdBanner : ContentControl
 {
     public static readonly StyledProperty<object?> LeadingContentProperty =

@@ -6,12 +6,21 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A floating Material search field that preserves native TextBox editing, IME and selection.</summary>
-[TemplatePart("PART_ClearButton", typeof(Button))]
 [PseudoClasses(":empty", ":has-text", ":has-leading", ":has-trailing", ":clear-visible")]
+[TemplatePart("PART_ClearButton", typeof(Button))]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_DefaultLeading", typeof(MdIcon))]
+[TemplatePart("PART_Leading", typeof(ContentPresenter))]
+[TemplatePart("PART_Placeholder", typeof(TextBlock))]
+[TemplatePart("PART_ScrollViewer", typeof(ScrollViewer))]
+[TemplatePart("PART_StateLayer", typeof(Border))]
+[TemplatePart("PART_TextPresenter", typeof(TextPresenter))]
+[TemplatePart("PART_Trailing", typeof(ContentPresenter))]
 public sealed class MdSearchBar : TextBox
 {
     public static readonly StyledProperty<object?> LeadingContentProperty =

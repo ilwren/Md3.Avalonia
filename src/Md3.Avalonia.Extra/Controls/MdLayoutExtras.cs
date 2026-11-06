@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Md3.Avalonia.Motion;
+using Avalonia.Controls.Metadata;
 
 namespace Md3.Avalonia.Extra.Controls;
 
@@ -194,6 +195,7 @@ public class MdWaterfallPanel : Panel
         return index;
     }
 }
+[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
 
 /// <summary>
 /// An items control whose panel is a <see cref="MdWaterfallPanel"/>, for a masonry feed bound to a

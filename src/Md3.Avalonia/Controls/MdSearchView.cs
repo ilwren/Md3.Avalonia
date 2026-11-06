@@ -14,8 +14,8 @@ using Md3.Avalonia.Motion;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>An expandable Material search results surface paired with an arbitrary search-bar header.</summary>
-[TemplatePart("PART_Results", typeof(ContentPresenter))]
 [PseudoClasses(":open", ":closed", ":present", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Results", typeof(ContentPresenter))]
 public sealed class MdSearchView : ContentControl
 {
     public static readonly StyledProperty<object?> HeaderProperty =

@@ -11,9 +11,10 @@ using Md3.Avalonia.Motion;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>Hosts a standard or modal Material navigation drawer beside application content.</summary>
+[PseudoClasses(":open", ":closed", ":present", ":modal", ":standard", ":left", ":right", ":reduced-motion", ":no-motion")]
 [TemplatePart("PART_Scrim", typeof(Border))]
 [TemplatePart("PART_Drawer", typeof(Border))]
-[PseudoClasses(":open", ":closed", ":present", ":modal", ":standard", ":left", ":right", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_MainContent", typeof(ContentPresenter))]
 public sealed class MdNavigationDrawer : ContentControl
 {
     public static readonly StyledProperty<object?> DrawerContentProperty =

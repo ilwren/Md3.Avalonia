@@ -30,6 +30,11 @@ public sealed record MdTagEntry(string Value, ICommand RemoveCommand);
 /// direct collection APIs.
 /// </summary>
 [PseudoClasses(":empty", ":has-suggestions", ":md-error", ":limit-reached")]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_Error", typeof(TextBlock))]
+[TemplatePart("PART_Input", typeof(MdTextBox))]
+[TemplatePart("PART_Suggestion", typeof(MdSuggestionChip))]
+[TemplatePart("PART_Suggestions", typeof(ItemsControl))]
 public sealed class MdTagInput : TemplatedControl
 {
     public static readonly StyledProperty<IList<string>?> TagsSourceProperty =

@@ -9,6 +9,8 @@ namespace Md3.Avalonia.Controls;
 /// A container that groups related <see cref="MdSettingsCard"/> items in an Android Material 3 styled card container.
 /// </summary>
 [PseudoClasses(":has-header", ":has-description")]
+[TemplatePart("PART_DescriptionPresenter", typeof(ContentPresenter))]
+[TemplatePart("PART_HeaderPresenter", typeof(ContentPresenter))]
 public class MdSettingsGroup : ItemsControl
 {
     public static readonly StyledProperty<object?> HeaderProperty =

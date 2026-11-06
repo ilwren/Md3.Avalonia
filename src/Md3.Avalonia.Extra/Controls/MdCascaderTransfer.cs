@@ -27,6 +27,7 @@ public sealed record MdCascaderItem(object? Value, string Label, IReadOnlyList<M
 
 /// <summary>Hierarchical single-path selection with keyboard traversal and MVVM-friendly selected path.</summary>
 [PseudoClasses(":open", ":closed", ":present", ":has-value", ":has-label", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Arrow", typeof(Path))]
 public sealed class MdCascader : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwner
 {
     public static readonly StyledProperty<IEnumerable<MdCascaderItem>?> ItemsSourceProperty = AvaloniaProperty.Register<MdCascader, IEnumerable<MdCascaderItem>?>(nameof(ItemsSource));

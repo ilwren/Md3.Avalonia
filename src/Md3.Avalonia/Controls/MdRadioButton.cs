@@ -9,6 +9,10 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>A Material 3 radio button preserving Avalonia grouping, command and automation behavior.</summary>
 [PseudoClasses(":md-error", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Dot", typeof(Border))]
+[TemplatePart("PART_InteractiveArea", typeof(Grid))]
+[TemplatePart("PART_OuterCircle", typeof(Border))]
+[TemplatePart("PART_StateLayer", typeof(Border))]
 public sealed class MdRadioButton : RadioButton
 {
     private Border? _stateLayer;

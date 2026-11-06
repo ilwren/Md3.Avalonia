@@ -10,6 +10,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
@@ -18,6 +19,21 @@ namespace Md3.Avalonia.Controls;
 /// SelectedTime, IsOpen, Hour and Minute all support two-way binding.
 /// </summary>
 [PseudoClasses(":dial", ":input", ":twenty-four-hour", ":has-value", ":hour-dial", ":minute-dial", ":popup-present", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_AnchorButton", typeof(Button))]
+[TemplatePart("PART_CancelButton", typeof(MdButton))]
+[TemplatePart("PART_ClockFace", typeof(MdTimeDial))]
+[TemplatePart("PART_ConfirmButton", typeof(MdButton))]
+[TemplatePart("PART_DialPanel", typeof(StackPanel))]
+[TemplatePart("PART_DisplayText", typeof(TextBlock))]
+[TemplatePart("PART_HourDialHost", typeof(Button))]
+[TemplatePart("PART_HourInput", typeof(MdTextBox))]
+[TemplatePart("PART_InputPanel", typeof(Grid))]
+[TemplatePart("PART_InputPeriodButton", typeof(MdButton))]
+[TemplatePart("PART_MinuteDialHost", typeof(Button))]
+[TemplatePart("PART_MinuteInput", typeof(MdTextBox))]
+[TemplatePart("PART_PeriodButton", typeof(MdButton))]
+[TemplatePart("PART_Popup", typeof(Popup))]
+[TemplatePart("PART_Surface", typeof(Border))]
 public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwner
 {
     public static readonly StyledProperty<TimeSpan?> SelectedTimeProperty =

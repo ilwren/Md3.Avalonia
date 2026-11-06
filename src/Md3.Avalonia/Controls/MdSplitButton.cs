@@ -2,11 +2,15 @@ using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A two-part Material 3 button with primary action and dropdown action.</summary>
 [PseudoClasses(":filled", ":tonal", ":outlined", ":elevated", ":xsmall", ":small", ":medium", ":large", ":xlarge", ":has-leading-icon", ":rtl")]
+[TemplatePart("PART_PrimaryButton", typeof(MdButton))]
+[TemplatePart("PART_Root", typeof(Grid))]
+[TemplatePart("PART_TrailingButton", typeof(MdToggleIconButton))]
 public class MdSplitButton : ContentControl
 {
     public static readonly StyledProperty<MdToggleButtonVariant> VariantProperty = AvaloniaProperty.Register<MdSplitButton, MdToggleButtonVariant>(nameof(Variant), MdToggleButtonVariant.Filled);

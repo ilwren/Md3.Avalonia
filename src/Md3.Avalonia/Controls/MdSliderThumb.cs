@@ -8,6 +8,9 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>Template part used by <see cref="MdSlider"/> to carry Material value-indicator state.</summary>
 [PseudoClasses(":show-value", ":dragging", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Handle", typeof(Border))]
+[TemplatePart("PART_ThumbStateLayer", typeof(Border))]
+[TemplatePart("PART_ThumbValue", typeof(Canvas))]
 public sealed class MdSliderThumb : Thumb
 {
     public static readonly StyledProperty<bool> ShowValueIndicatorProperty =

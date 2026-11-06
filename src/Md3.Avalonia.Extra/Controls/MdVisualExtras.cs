@@ -10,6 +10,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
+using Avalonia.Controls.Shapes;
 
 namespace Md3.Avalonia.Extra.Controls;
 
@@ -17,6 +18,13 @@ public enum MdComparisonOrientation { Horizontal, Vertical }
 
 /// <summary>Reveals two pieces of content through a draggable before/after divider.</summary>
 [PseudoClasses(":dragging", ":horizontal", ":vertical", ":non-interactive")]
+[TemplatePart("PART_AfterClip", typeof(Border))]
+[TemplatePart("PART_ChevronLeft", typeof(Path))]
+[TemplatePart("PART_ChevronRight", typeof(Path))]
+[TemplatePart("PART_Divider", typeof(Border))]
+[TemplatePart("PART_Thumb", typeof(Border))]
+[TemplatePart("PART_ThumbGlyphs", typeof(Grid))]
+[TemplatePart("PART_ThumbState", typeof(Border))]
 public sealed class MdBeforeAfter : TemplatedControl
 {
     public static readonly StyledProperty<object?> BeforeProperty = AvaloniaProperty.Register<MdBeforeAfter, object?>(nameof(Before));
@@ -362,6 +370,7 @@ public enum MdAnimatedTextEffect { Typewriter, Fade, Pop, None }
 
 /// <summary>Small, provider-free animated text control inspired by common Flutter animated-text widgets.</summary>
 [PseudoClasses(":playing", ":complete")]
+[TemplatePart("PART_Text", typeof(TextBlock))]
 public sealed class MdAnimatedText : TemplatedControl
 {
     public static readonly StyledProperty<string?> TextProperty = AvaloniaProperty.Register<MdAnimatedText, string?>(nameof(Text));
@@ -414,6 +423,7 @@ public sealed class MdAnimatedText : TemplatedControl
 }
 
 public enum MdSpinKitKind { RotatingPlain, ThreeBounce, Wave, FadingCircle, ChasingDots }
+[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
 
 /// <summary>Extra loading indicators for applications that need non-Material SpinKit-like motion.</summary>
 public sealed class MdSpinKit : Control

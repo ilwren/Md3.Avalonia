@@ -12,6 +12,8 @@ using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.VisualTree;
+using Avalonia.Controls.Shapes;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
@@ -219,6 +221,9 @@ public static class MdWindowPlatformAdapterResolver
 
 /// <summary>Material borderless window host with replaceable platform adapter and Android-safe no-op behavior.</summary>
 [PseudoClasses(":active", ":inactive", ":maximized", ":custom-chrome", ":native-frame")]
+[TemplatePart("PART_ContentPresenter", typeof(ContentPresenter))]
+[TemplatePart("PART_DefaultTitleBar", typeof(MdWindowTitleBar))]
+[TemplatePart("PART_WindowFrame", typeof(Border))]
 public class MdBorderlessWindow : MdWindow
 {
     public static readonly StyledProperty<bool> IsCustomChromeEnabledProperty = AvaloniaProperty.Register<MdBorderlessWindow, bool>(nameof(IsCustomChromeEnabled), true);
@@ -357,6 +362,8 @@ public class MdBorderlessWindow : MdWindow
 
 /// <summary>Hit-test-aware drag region and caption-button host for MdBorderlessWindow.</summary>
 [PseudoClasses(":active", ":inactive")]
+[TemplatePart("PART_MaximizeGlyph", typeof(Path))]
+[TemplatePart("PART_RestoreGlyph", typeof(Path))]
 public sealed class MdWindowTitleBar : ContentControl
 {
     public static readonly StyledProperty<object?> LeadingContentProperty = AvaloniaProperty.Register<MdWindowTitleBar, object?>(nameof(LeadingContent));

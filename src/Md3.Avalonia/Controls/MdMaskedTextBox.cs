@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
+using Avalonia.Controls.Presenters;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
@@ -32,6 +34,20 @@ public enum MdMaskedTextBoxVariant
 [PseudoClasses(
     ":filled", ":outlined", ":md-error", ":has-label", ":no-label", ":has-prefix",
     ":has-supporting-text", ":has-error-text", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_ActiveIndicator", typeof(Border))]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_ContentGrid", typeof(Grid))]
+[TemplatePart("PART_ErrorText", typeof(ContentPresenter))]
+[TemplatePart("PART_FieldHost", typeof(Grid))]
+[TemplatePart("PART_FocusOutline", typeof(MdOutlinedFieldBorder))]
+[TemplatePart("PART_InputRow", typeof(Grid))]
+[TemplatePart("PART_Label", typeof(ContentPresenter))]
+[TemplatePart("PART_Outline", typeof(MdOutlinedFieldBorder))]
+[TemplatePart("PART_Prefix", typeof(TextBlock))]
+[TemplatePart("PART_ScrollViewer", typeof(ScrollViewer))]
+[TemplatePart("PART_SupportingRow", typeof(Grid))]
+[TemplatePart("PART_SupportingText", typeof(ContentPresenter))]
+[TemplatePart("PART_TextPresenter", typeof(TextPresenter))]
 public class MdMaskedTextBox : MaskedTextBox
 {
     /// <summary>

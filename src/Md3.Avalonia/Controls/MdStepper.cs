@@ -8,6 +8,7 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
 using Avalonia.Threading;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
@@ -22,6 +23,8 @@ namespace Md3.Avalonia.Controls;
 /// </para>
 /// </remarks>
 [PseudoClasses(":vertical", ":horizontal", ":first-step", ":last-step")]
+[TemplatePart("PART_CancelButton", typeof(MdButton))]
+[TemplatePart("PART_ContinueButton", typeof(MdButton))]
 public sealed class MdStepper : ItemsControl
 {
     public static readonly StyledProperty<int> ActiveStepProperty =

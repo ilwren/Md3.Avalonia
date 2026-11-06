@@ -9,6 +9,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
@@ -28,6 +29,28 @@ namespace Md3.Avalonia.Controls;
     ":has-trailing-icon", ":has-prefix", ":has-suffix", ":has-supporting-text",
     ":has-error-text", ":show-counter", ":show-clear-button", ":password", ":has-end-action", ":multiline",
     ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_ActiveIndicator", typeof(Border))]
+[TemplatePart("PART_CharacterCounter", typeof(TextBlock))]
+[TemplatePart("PART_ClearButton", typeof(MdIconButton))]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_ContentGrid", typeof(Grid))]
+[TemplatePart("PART_EndActions", typeof(StackPanel))]
+[TemplatePart("PART_ErrorText", typeof(ContentPresenter))]
+[TemplatePart("PART_FieldHost", typeof(Grid))]
+[TemplatePart("PART_FocusOutline", typeof(MdOutlinedFieldBorder))]
+[TemplatePart("PART_InputRow", typeof(Grid))]
+[TemplatePart("PART_Label", typeof(ContentPresenter))]
+[TemplatePart("PART_LeadingIcon", typeof(Viewbox))]
+[TemplatePart("PART_Outline", typeof(MdOutlinedFieldBorder))]
+[TemplatePart("PART_PasswordButton", typeof(MdToggleIconButton))]
+[TemplatePart("PART_Placeholder", typeof(TextBlock))]
+[TemplatePart("PART_Prefix", typeof(TextBlock))]
+[TemplatePart("PART_ScrollViewer", typeof(MdScrollViewer))]
+[TemplatePart("PART_Suffix", typeof(TextBlock))]
+[TemplatePart("PART_SupportingRow", typeof(Grid))]
+[TemplatePart("PART_SupportingText", typeof(ContentPresenter))]
+[TemplatePart("PART_TextPresenter", typeof(TextPresenter))]
+[TemplatePart("PART_TrailingIcon", typeof(Viewbox))]
 public class MdTextBox : TextBox
 {
     public static readonly StyledProperty<MdTextBoxVariant> VariantProperty =

@@ -16,6 +16,9 @@ namespace Md3.Avalonia.Controls;
 /// selected visual through a second transition host when tabs are changed rapidly.
 /// </summary>
 [PseudoClasses(":scrollable", ":fixed", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
+[TemplatePart("PART_SelectedContentHost", typeof(ContentPresenter))]
+[TemplatePart("PART_TabStripBorder", typeof(Border))]
 public sealed class MdTabView : TabControl
 {
     public static readonly StyledProperty<bool> IsScrollableProperty =
