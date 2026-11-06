@@ -471,7 +471,7 @@ public sealed class MdGeometryConformanceTests
         });
 
         // A menu's container corner is 4dp; the item inside it is a 48dp row.
-        cases.Add(new MdGeometryCase("MdMenu/Container", new MdMenu(), ["PART_Container"])
+        cases.Add(new MdGeometryCase("MdMenu/Container", new MdMenu(), ["PART_Surface"])
         {
             CornerKey = "Md.Comp.Menu.Container.Shape",
             RequiresTouchTarget = false
