@@ -133,9 +133,21 @@ public sealed class MdAutoSizeTextTests
             var pinned = GCHandle.Alloc(pixels, GCHandleType.Pinned);
             try { frame.CopyPixels(new PixelRect(0, 0, frame.PixelSize.Width, frame.PixelSize.Height), pinned.AddrOfPinnedObject(), pixels.Length * 4, frame.PixelSize.Width * 4); }
             finally { pinned.Free(); }
-            // Red glyphs on a white background: regardless of BGRA/RGBA byte order, exactly one
-            // color channel remains near zero while the other red/blue channel is saturated.
-            Assert.Contains(pixels, p => ((p & 0x00ff00u) < 0x004000u) && ((p & 0xffu) > 200 || ((p >> 16) & 0xffu) > 200));
+            // Only inspect the control's own rectangle, not window chrome. Red glyphs on white
+            // have little green regardless of whether the frame is BGRA or RGBA.
+            var origin = text.TranslatePoint(new Point(0, 0), window)!.Value;
+            var left = Math.Max(0, (int)origin.X);
+            var top = Math.Max(0, (int)origin.Y);
+            var right = Math.Min(frame.PixelSize.Width, (int)Math.Ceiling(origin.X + text.Bounds.Width));
+            var bottom = Math.Min(frame.PixelSize.Height, (int)Math.Ceiling(origin.Y + text.Bounds.Height));
+            var found = false;
+            for (var y = top; y < bottom && !found; y++)
+                for (var x = left; x < right && !found; x++)
+                {
+                    var p = pixels[y * frame.PixelSize.Width + x];
+                    found = (p & 0x00ff00u) < 0x004000u && ((p & 0xffu) > 200 || ((p >> 16) & 0xffu) > 200);
+                }
+            Assert.True(found, "Expected red text pixels inside the control bounds.");
         }
         finally { window.Close(); }
     }
