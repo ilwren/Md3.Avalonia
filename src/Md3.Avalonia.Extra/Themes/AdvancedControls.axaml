@@ -4,6 +4,17 @@
                     xmlns:infra="using:Md3.Avalonia.Extra.Infrastructure"
                     xmlns:md="using:Md3.Avalonia.Controls">
 
+  <!-- A standalone integer wheel, scoped to Material color roles. -->
+  <ControlTheme x:Key="{x:Type eco:MdWheelPicker}" TargetType="eco:MdWheelPicker">
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="FontSize" Value="18" />
+    <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
+    <Setter Property="SelectionBrush" Value="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}" />
+    <Setter Property="SelectionForeground" Value="{DynamicResource Md.Sys.Color.OnSecondaryContainer.Brush}" />
+    <Style Selector="^:disabled"><Setter Property="Opacity" Value="0.38" /></Style>
+  </ControlTheme>
+
   <!-- Decorative burst: scoped Material roles, no hit-test surface. -->
   <ControlTheme x:Key="{x:Type eco:MdConfetti}" TargetType="eco:MdConfetti">
     <Setter Property="PrimaryBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />

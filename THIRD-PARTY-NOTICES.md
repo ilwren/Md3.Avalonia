@@ -42,6 +42,7 @@ The following packages are **not dependencies** and none of their Dart source, a
 | animated_tree_view 2.3.0 | Nested tree nodes, expansion, indentation utilities and RTL behavior | MIT | https://pub.dev/packages/animated_tree_view/versions/2.3.0 |
 | chips_input_autocomplete 1.2.2 | Dynamic/removable tags, suggestions, limits and validation behavior | MIT | https://pub.dev/packages/chips_input_autocomplete/versions/1.2.2 |
 | smooth_page_indicator 3.0.0 | Page count, fractional position, slide/worm-style markers, orientation and page requests | MIT | https://github.com/Milad-Akarie/smooth_page_indicator/blob/bb6402dd2d94dc8f44ec3f13b580d7148354884e/README.md |
+| numberpicker 2.1.2 | Bounded numeric wheel selection | BSD-2-Clause | https://github.com/MarcinusX/NumberPicker/blob/566ab314da385d76df0405c990bd4d5ad6562dcc/README.md |
 | confetti 0.7.0 | Finite particle burst, direction, gravity, damping and color customization | MIT | https://github.com/funwithflutter/flutter_confetti/blob/736dd344a4f6a9d38a45d937964544e1bb741c7e/README.md |
 | marquee 2.3.0 | Overflowing text scrolling, direction, speed, gap and pause between rounds | MIT | https://github.com/MarcelGarus/marquee/blob/06a6cb1072f151a4053d17e8f613765b797daf69/README.md |
 | readmore 3.0.0 | Expand/collapse plain text with a collapsed line or character limit | MIT | https://github.com/jonataslaw/readmore/blob/d6c6c5fc44a34139465bd4ea4c7868ce9834174f/README.md |

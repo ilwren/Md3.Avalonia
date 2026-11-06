@@ -1385,6 +1385,30 @@ Every public enum and its members are listed below. To print the current member 
 
 
 
+## Integer wheel picker (Extra)
+
+`MdWheelPicker` selects a bounded integer using five visible rows. `Minimum` (default 0),
+`Maximum` (100), `Step` (1, coerced to at least 1) and two-way `Value` define a discrete grid
+anchored at the minimum. Values clamp to the bounds and snap to the nearest grid point, with ties
+rounding upwards. If the maximum is off-grid, the last selectable value is below it. Set a suitable
+maximum before increasing the minimum above the default; bounds coerce against one another.
+
+Tap a row or drag vertically; Up/Down, Page Up/Down and Home/End operate from the keyboard. The
+mouse wheel only changes the value while the control has keyboard focus and yields at a boundary.
+`ValueChanged` fires for actual user/automation changes, not programmatic assignments. `IsReadOnly`
+keeps the value inspectable but disallows interaction. The localized spinner automation peer reports
+its reachable maximum and allows setting values on the same grid; applications should supply a
+context-specific `AutomationProperties.Name`. `ItemHeight` is coerced to 32–100 DIP. Material
+`Foreground`, `SelectionBrush` and `SelectionForeground` are scoped to the Extra theme.
+
+This first subset is vertical, integer-only and snaps immediately; it does not offer decimal input,
+wrapping, inertia, animation, arbitrary item templates, or Flutter scroll-physics parity.
+
+```xml
+<eco:MdWheelPicker Minimum="0" Maximum="30" Step="5" Value="{Binding Quantity}"
+                   AutomationProperties.Name="Quantity" />
+```
+
 ## Confetti burst (Extra)
 
 `MdConfetti` is a non-interactive decorative overlay. After it is attached, visible and arranged,

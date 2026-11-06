@@ -4,6 +4,8 @@
 
 ### Added
 
+- Added Extra `MdWheelPicker`, a bounded integer wheel with stepped values, touch/pointer, keyboard, mouse-wheel and range automation support.
+
 - Added Extra `MdConfetti`: a finite, non-interactive particle burst with directional physics, theme brushes, render-frame lifecycle and reduced-motion suppression.
 
 - Added Extra `MdMarquee` for horizontal single-line overflow scrolling with direction, speed, gap, round pauses, RTL, full-text automation and a static reduced-motion fallback.

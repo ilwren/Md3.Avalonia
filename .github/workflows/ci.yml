@@ -250,6 +250,9 @@ jobs:
       - name: Probe marquee tests
         run: scripts/probe-tests.sh MdMarqueeTests marquee.trx
 
+      - name: Probe wheel picker tests
+        run: scripts/probe-tests.sh MdWheelPickerTests wheel-picker.trx
+
       - name: Probe confetti tests
         run: scripts/probe-tests.sh MdConfettiTests confetti.trx
 

@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:eco="using:Md3.Avalonia.Extra.Controls"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.PickerGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -48,6 +49,13 @@
             <TextBlock x:Name="TwentyFourHourTimeValue" Classes="body" Opacity="0.78" />
           </StackPanel>
         </WrapPanel>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Number wheel" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Drag or tap a row, or focus the wheel and use the arrow keys or mouse wheel. Values snap to integer steps." />
+        <eco:MdWheelPicker x:Name="NumberWheel" Width="120" HorizontalAlignment="Left" Minimum="0" Maximum="30" Step="5" Value="10" />
+        <gallery:CodeExample XamlCode="&lt;eco:MdWheelPicker Minimum=&quot;0&quot; Maximum=&quot;30&quot; Step=&quot;5&quot; Value=&quot;{Binding Quantity}&quot; /&gt;" />
       </StackPanel>
 
       <Border Padding="20" CornerRadius="20" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">

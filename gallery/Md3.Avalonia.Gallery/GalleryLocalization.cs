@@ -366,6 +366,8 @@ internal static class GalleryLocalization
         ["Tabs organize peer content across screens and views while retaining native selection and keyboard navigation."]="标签用于在不同界面与视图之间组织同级内容，同时保留原生选择与键盘导航。",
         ["Tap any setting item or toggle a switch to interact."]="点击任意设置项或切换开关即可交互。",
         ["Temporary surfaces expose a concise list of choices with optional leading and trailing content."]="临时表面以简洁列表呈现选项，并可选带头部与尾部内容。",
+        ["Number wheel"]="数字滚轮",
+        ["Drag or tap a row, or focus the wheel and use the arrow keys or mouse wheel. Values snap to integer steps."]="拖动或点击行，也可聚焦滚轮后使用方向键或鼠标滚轮。数值按整数步长取整。",
         ["Celebration particles"]="庆祝粒子",
         ["Trigger a finite burst; reduced motion skips the decorative particles."]="触发一次有限时长的粒子爆发；减少动效时跳过装饰粒子。",
         ["Celebrate"]="庆祝",
