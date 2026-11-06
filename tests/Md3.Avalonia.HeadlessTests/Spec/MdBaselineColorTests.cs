@@ -281,8 +281,15 @@ public sealed class MdBaselineColorTests
             string.Join(", ", singleVariant));
     }
 
-    private static bool Compare(double[] expected, uint argb)
+    private static bool Compare(double[]? expected, uint argb)
     {
+        if (expected is null)
+        {
+            // ValueFor never returns null for the light variant; a null here means the oracle entry is
+            // malformed, and saying so beats a NullReferenceException in a comparison helper.
+            return false;
+        }
+
         var color = FromArgb(argb);
         return expected.Length == 4
                && (int)expected[0] == color.R

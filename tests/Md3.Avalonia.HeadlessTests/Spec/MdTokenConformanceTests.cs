@@ -238,8 +238,8 @@ public sealed class MdTokenConformanceTests
 
         if (kind == MdOracleKind.Color && resolved is ISolidColorBrush brush)
         {
-            var color = brush.Color;
-            return new double[] { color.R, color.G, color.B, color.A };
+            var brushColor = brush.Color;
+            return new double[] { brushColor.R, brushColor.G, brushColor.B, brushColor.A };
         }
 
         return null;
