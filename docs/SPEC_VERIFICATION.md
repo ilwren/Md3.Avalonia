@@ -133,9 +133,9 @@ and `budget`. Moving a budget is therefore a visible diff, and only one directio
 | `oracle_families` | component families with at least one oracle value | 19 |
 | `measured_controls` / `measured_cases` | controls and cases the L2 matrix lays out | 14 / 43 |
 | `armed_goldens` | committed L3 baselines | 0 |
-| `undeclared_template_parts` | `PART_*` names with no `[TemplatePart]` | 470 |
-| `templates_without_part_contract` | themed controls whose template has no contract at all | 97 |
-| `templates_with_a_part_contract` | themes whose every named part is declared | 12 |
+| `undeclared_template_parts` | `PART_*` names with no `[TemplatePart]` | 64 |
+| `templates_without_part_contract` | themed controls whose template has no contract at all | 19 |
+| `templates_with_a_part_contract` | themes whose target type declares its parts | 103 |
 | `variant_asymmetric_tokens` | tokens declared in one theme variant only | 0 |
 | `tokens_outside_the_core_theme` | `Md.*` keys in sibling theme packages | 52 |
 | `unmeasured_themed_controls` | themed controls with no L2 geometry case | 144 |
@@ -148,6 +148,25 @@ and `budget`. Moving a budget is therefore a visible diff, and only one directio
 
 `contrast_failures` is the one entry above with no ceiling even though it measures zero: contrast
 remediation is out of scope for this round, so the number is recorded and nothing gates on it.
+
+### L4: the template contract
+
+`undeclared_template_parts` started at 470 and is now 64. Every `PART_*` name a `ControlTheme`
+contains on one of this repository's own controls is a `[TemplatePart]` on the class that theme
+targets, with the element type read from the template. That is what makes a part name part of the
+public surface: before, a rename on either side was caught by nothing, and no consumer could
+discover `PART_SupportingText` existed short of reading the AXAML.
+
+The 64 that remain name parts of framework types this repository re-themes (`Button`,
+`ListBoxItem`, `TextBox`, `Window`, `DataGridCell`, `Thumb`). A framework type cannot carry our
+attribute, so this is the boundary of the technique rather than a backlog, and the gate keeps
+matching templates against declarations in the other direction so an attribute that promises a part
+its template does not deliver still fails.
+
+Reading those numbers needed the scanner fixed first. It ran a text window from one `<ControlTheme>`
+to the next, so after a self-closing theme it swallowed the following templates and attributed their
+part names to the wrong control: 39 phantom gaps, and it hid one real omission (`MdFadeThrough`).
+The scan now walks the parsed document.
 
 ### L2c: the chrome a theme draws follows the culture
 

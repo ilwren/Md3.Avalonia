@@ -153,21 +153,21 @@
     },
     "undeclared_template_parts": {
       "direction": "lower",
-      "budget": 470,
+      "budget": 64,
       "source": "headless",
-      "why": "PART_* names that exist only inside a ControlTheme. Ceiling: adding [TemplatePart] to a type lowers it, and a new template may not raise it."
+      "why": "A PART_* name a ControlTheme contains but the type it targets does not declare. Was 470; 432 names are now [TemplatePart] declarations on the classes the themes target. The 64 that remain belong to framework types this repository re-themes - Button, ListBoxItem, TextBox, Window, DataGridCell - and a framework type cannot carry our attribute, so this is a boundary of the technique, not a backlog. Any new name on one of our own controls raises it."
     },
     "templates_without_part_contract": {
       "direction": "lower",
-      "budget": 97,
+      "budget": 19,
       "source": "headless",
-      "why": "Themed controls whose template names parts but whose type declares no [TemplatePart] at all."
+      "why": "A themed control whose template names at least one part while the type declares none. Was 97. The remainder is the framework-type boundary above."
     },
     "templates_with_a_part_contract": {
       "direction": "higher",
-      "budget": 12,
+      "budget": 103,
       "source": "headless",
-      "why": "Control themes whose every named part is also declared through [TemplatePart]. Raising it is the whole point of the L4 template-coverage report; a drop means a theme gained a part nobody declared."
+      "why": "Themes whose target type declares at least one [TemplatePart]. Was 12 before the mechanical pass; every part name our own controls use is now declared, so this tracks the count of themed types rather than a gap."
     },
     "variant_asymmetric_tokens": {
       "direction": "lower",
