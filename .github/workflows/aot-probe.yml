@@ -28,11 +28,13 @@ jobs:
       # in that native process and verifies its template, filtering, selection and confirmation.
       - name: Publish, verify and smoke the native AOT gallery
         run: |
+          # tee must not hide a failed publish, native-binary check, or smoke scenario.
+          set -euo pipefail
           bash scripts/publish-gallery-aot.sh --rid linux-x64 --output /tmp/aot-out --smoke-scenario file-system-picker 2>&1 | tee /tmp/aot.log
           {
             echo "### AOT publish output"
-            ls -la /tmp/aot-out | head -20 | sed 's/^/    /'
-          } >> $GITHUB_STEP_SUMMARY
+            ls -la /tmp/aot-out | sed -n '1,20p' | sed 's/^/    /'
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Count trim and AOT diagnostics
         if: always()
         run: |
