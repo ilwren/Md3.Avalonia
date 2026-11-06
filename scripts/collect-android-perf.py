@@ -29,9 +29,11 @@ import sys
 import time
 from pathlib import Path
 
-ADB_TIMEOUT = 60
-PROBE_BUDGET_SECONDS = 60
-PROBE_POLL_SECONDS = 3
+# Kept tight on purpose: this runs inside the emulator step's five-minute budget, so the
+# collector must never be the reason evidence goes missing.
+ADB_TIMEOUT = 45
+PROBE_BUDGET_SECONDS = 40
+PROBE_POLL_SECONDS = 2
 
 
 def run(cmd: list[str], timeout: int = ADB_TIMEOUT) -> tuple[int, str]:
