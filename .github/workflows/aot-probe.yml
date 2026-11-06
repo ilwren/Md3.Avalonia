@@ -25,14 +25,14 @@ jobs:
       - name: Install the native toolchain ILC links against
         run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev xvfb libx11-6 libice6 libsm6 libfontconfig1
       # The script is the single source of truth for the AOT publish: it asserts the output is a
-      # native executable with no managed app assembly beside it, then opens the file-system picker
-      # in that native process and verifies its template, filtering, selection and confirmation.
+      # native executable with no managed app assembly beside it, then exercises both the file-system
+      # picker and emoji picker in separate native processes, checking their real selection paths.
       - name: Publish, verify and smoke the native AOT gallery
         run: |
           # Capture both sides of the pipe: tee must not hide a failed publish or smoke.
           set -uo pipefail
           set +e
-          bash scripts/publish-gallery-aot.sh --rid linux-x64 --output /tmp/aot-out --smoke-scenario file-system-picker 2>&1 | tee /tmp/aot.log
+          bash scripts/publish-gallery-aot.sh --rid linux-x64 --output /tmp/aot-out --smoke-scenario file-system-picker,emoji-picker 2>&1 | tee /tmp/aot.log
           statuses=("${PIPESTATUS[@]}")
           set -e
           if (( statuses[0] != 0 || statuses[1] != 0 )); then

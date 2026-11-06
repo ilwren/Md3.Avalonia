@@ -186,10 +186,11 @@ public sealed class MdEmojiPickerTests
         var window = Show(page);
         try
         {
+            page.RunEmojiNativeAotSmoke();
             var picker = page.GetVisualDescendants().OfType<MdEmojiPicker>().Single();
-            Click(picker, "Grinning face");
             var readout = page.GetVisualDescendants().OfType<TextBlock>().Single(text => text.Name == "EmojiSelection");
-            Assert.Equal("😀", readout.Text);
+            Assert.Equal("😊", picker.SelectedEmoji);
+            Assert.Equal("😊", readout.Text);
         }
         finally { window.Close(); }
     }

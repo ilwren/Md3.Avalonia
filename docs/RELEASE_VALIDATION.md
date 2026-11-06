@@ -18,6 +18,7 @@ Automated baseline date: 2026-10-12
 | Dynamic color | golden seed vectors, arbitrary seed/variant, contrast pairs, JSON round-trip | Pass |
 | Trim analysis | CI/package build with `EnableTrimAnalyzer` on the six `0.4.5-preview.1` baseline packages | 0 IL2xxx warnings; every suppression carries a written justification |
 | Native AOT file-system picker | `bash scripts/publish-gallery-aot.sh --rid linux-x64 --smoke-scenario file-system-picker` | Native executable stays alive and its in-process scenario verifies the real Gallery page, picker template, directory filtering, selection and path confirmation before writing the required success marker |
+| Native AOT emoji picker | `bash scripts/publish-gallery-aot.sh --rid linux-x64 --smoke-scenario emoji-picker` | Native Gallery loads the real emoji picker, filters a sample and verifies selection, recents and the Gallery host callback; a success marker is required |
 | Trim escape hatches | `MdTrimmingTests` | Selector delegates on `MdDataGrid`, `MdAsyncSelect` and `MdSearchView` return without reflection; `IsTrimmable` present on shipped assemblies |
 | Responsive Gallery | 599/600/839/840/1199/1200/1599/1600 boundary behavior | Pass |
 | Visual directions/themes | LTR/RTL, Light/Dark, Standard/Medium/High | Render without exception |

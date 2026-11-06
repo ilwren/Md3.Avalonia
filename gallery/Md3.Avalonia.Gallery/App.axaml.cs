@@ -10,6 +10,7 @@ using Md3.Avalonia.Themes;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using Md3.Avalonia.Gallery.Pages;
 
 namespace Md3.Avalonia.Gallery;
@@ -51,27 +52,37 @@ public partial class App : Application
         IClassicDesktopStyleApplicationLifetime desktop,
         MainWindow window)
     {
-        const string scenarioName = "file-system-picker";
         var scenario = Environment.GetEnvironmentVariable("MD3_GALLERY_AOT_SMOKE_SCENARIO");
         if (string.IsNullOrEmpty(scenario)) return;
 
         var markerPath = Environment.GetEnvironmentVariable("MD3_GALLERY_AOT_SMOKE_MARKER");
-        if (!string.Equals(scenario, scenarioName, StringComparison.Ordinal) || string.IsNullOrWhiteSpace(markerPath))
+        if (scenario is not ("file-system-picker" or "emoji-picker") || string.IsNullOrWhiteSpace(markerPath))
             throw new InvalidOperationException("The native-AOT smoke scenario or marker path is invalid.");
 
         window.Opened += async (_, _) =>
         {
             try
             {
-                if (!window.NavigateToIndexedPage("File-system picker") ||
-                    window.CurrentPage is not FileSystemPickerGalleryPage page)
+                if (scenario == "file-system-picker")
                 {
-                    throw new InvalidOperationException("The native-AOT Gallery could not open the file-system picker page.");
+                    if (!window.NavigateToIndexedPage("File-system picker") ||
+                        window.CurrentPage is not FileSystemPickerGalleryPage pickerPage)
+                        throw new InvalidOperationException("The native-AOT Gallery could not open the file-system picker page.");
+                    await pickerPage.RunNativeAotSmokeAsync();
                 }
-
-                await page.RunNativeAotSmokeAsync();
-                File.WriteAllText(markerPath, $"{scenarioName}: passed{Environment.NewLine}");
-                Trace.TraceInformation("Native-AOT smoke scenario passed: {0}", scenarioName);
+                else
+                {
+                    if (!window.NavigateToIndexedPage("Color picker") || window.CurrentPage is not ColorPickerGalleryPage colorPage)
+                        throw new InvalidOperationException("The native-AOT Gallery could not open the color picker page.");
+                    // Let the shell attach its new page before exercising real template parts.
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        window.UpdateLayout();
+                        colorPage.RunEmojiNativeAotSmoke();
+                    }, DispatcherPriority.Loaded);
+                }
+                File.WriteAllText(markerPath, $"{scenario}: passed{Environment.NewLine}");
+                Trace.TraceInformation("Native-AOT smoke scenario passed: {0}", scenario);
             }
             catch (Exception exception)
             {

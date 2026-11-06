@@ -1,5 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Automation;
+using Avalonia.VisualTree;
+using Md3.Avalonia.Localization;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -20,6 +23,22 @@ public partial class ColorPickerGalleryPage : UserControl
     }
 
     private void OnEmojiSelected(object? sender, MdEmojiItem item) => EmojiSelection.Text = item.Emoji;
+
+    /// <summary>Exercises the real emoji picker page and host callback in a published native executable.</summary>
+    internal void RunEmojiNativeAotSmoke()
+    {
+        MdLocalization.SetCulture(EmojiPicker, System.Globalization.CultureInfo.GetCultureInfo("en-US"));
+        EmojiPicker.ApplyTemplate();
+        EmojiPicker.SearchText = "smile";
+        var button = EmojiPicker.GetVisualDescendants().OfType<Md3.Avalonia.Controls.MdButton>()
+            .SingleOrDefault(control => AutomationProperties.GetName(control) == "Smiling face")
+            ?? throw new InvalidOperationException("The AOT emoji picker did not realize its filtered entry.");
+        button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        if (EmojiPicker.SelectedEmoji != "😊" || EmojiSelection.Text != "😊" ||
+            EmojiPicker.RecentEmoji.Count != 1 || EmojiPicker.RecentEmoji[0] != "😊")
+            throw new InvalidOperationException("The AOT emoji selection did not reach the host and recents.");
+    }
+
 
     private void OnColorChanged(object? sender, Color color)
     {

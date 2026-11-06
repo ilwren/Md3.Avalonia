@@ -10,7 +10,7 @@ Usage:
                                  [--output /absolute/or/relative/path]
                                  [--configuration Release]
                                  [--smoke]
-                                 [--smoke-scenario file-system-picker]
+                                 [--smoke-scenario file-system-picker,emoji-picker]
                                  [--keep-intermediate]
 
 The publish asserts what an AOT publish must produce: a native executable for the
@@ -18,8 +18,8 @@ target RID and no managed copy of the app assembly beside it. Compiling says alm
 nothing about native AOT - it fails at runtime on reflection that was trimmed away -
 so --smoke starts the binary under xvfb (Linux only, requires xvfb-run and the X
 libraries) and passes only if the window is still alive when the timeout fires.
---smoke-scenario additionally requires the native process to execute that scenario
-and write its success marker; it implies --smoke.
+--smoke-scenario additionally requires each named scenario to execute in a separate
+native process and write its success marker; comma-separate names to run both. It implies --smoke.
 
 Native linking needs the platform toolchain: clang + zlib on Linux, the MSVC or
 Xcode toolchain on Windows/macOS. A .NET 10 SDK is required.
@@ -74,9 +74,19 @@ while (($#)); do
 done
 
 if [[ "$OUTPUT" != /* ]]; then OUTPUT="$ROOT/$OUTPUT"; fi
-if [[ -n "$SMOKE_SCENARIO" && "$SMOKE_SCENARIO" != "file-system-picker" ]]; then
-  echo "error: unsupported --smoke-scenario '$SMOKE_SCENARIO'" >&2
-  exit 2
+SMOKE_SCENARIOS=("")
+if [[ -n "$SMOKE_SCENARIO" ]]; then
+  if [[ "$SMOKE_SCENARIO" == ,* || "$SMOKE_SCENARIO" == *, || "$SMOKE_SCENARIO" == *,,* ]]; then
+    echo "error: empty --smoke-scenario name" >&2
+    exit 2
+  fi
+  IFS=',' read -r -a SMOKE_SCENARIOS <<< "$SMOKE_SCENARIO"
+  for scenario in "${SMOKE_SCENARIOS[@]}"; do
+    if [[ "$scenario" != "file-system-picker" && "$scenario" != "emoji-picker" ]]; then
+      echo "error: unsupported --smoke-scenario '$scenario'" >&2
+      exit 2
+    fi
+  done
 fi
 
 command -v dotnet >/dev/null 2>&1 || { echo "error: dotnet was not found in PATH" >&2; exit 1; }
@@ -133,32 +143,34 @@ if ((SMOKE)); then
     echo "note: --smoke is only implemented on Linux; skipping" >&2
   else
     command -v xvfb-run >/dev/null 2>&1 || { echo "error: --smoke requires xvfb-run" >&2; exit 1; }
-    MARKER="$OUTPUT/smoke-scenario.ok"
-    rm -f "$MARKER" "$MARKER.failed"
-    echo "Smoke-running the native binary for 25 s under xvfb${SMOKE_SCENARIO:+ (scenario: $SMOKE_SCENARIO)} ..."
-    set +e
-    MD3_GALLERY_AOT_SMOKE_SCENARIO="$SMOKE_SCENARIO" \
-      MD3_GALLERY_AOT_SMOKE_MARKER="$MARKER" \
-      xvfb-run -a timeout 25 "$BIN" > "$OUTPUT/smoke.log" 2>&1
-    CODE=$?
-    set -e
-    tail -20 "$OUTPUT/smoke.log" || true
-    # 124 = still running when the timeout fired, which is a pass: the themes, the compiled
-    # XAML and the icon font all resolved at runtime.
-    if [[ "$CODE" != "124" ]]; then
-      [[ -f "$MARKER.failed" ]] && { echo "scenario failure:" >&2; cat "$MARKER.failed" >&2; }
-      echo "error: the AOT binary exited on its own with code $CODE" >&2
-      exit 1
-    fi
-    if [[ -n "$SMOKE_SCENARIO" ]]; then
-      if [[ ! -s "$MARKER" ]] || ! grep -Fxq "$SMOKE_SCENARIO: passed" "$MARKER"; then
+    for scenario in "${SMOKE_SCENARIOS[@]}"; do
+      MARKER="$OUTPUT/smoke-scenario.ok"
+      LOG="$OUTPUT/smoke${scenario:+-$scenario}.log"
+      rm -f "$MARKER" "$MARKER.failed"
+      echo "Smoke-running the native binary for 25 s under xvfb${scenario:+ (scenario: $scenario)} ..."
+      set +e
+      MD3_GALLERY_AOT_SMOKE_SCENARIO="$scenario" \
+        MD3_GALLERY_AOT_SMOKE_MARKER="$MARKER" \
+        xvfb-run -a timeout 25 "$BIN" > "$LOG" 2>&1
+      CODE=$?
+      set -e
+      tail -20 "$LOG" || true
+      # 124 = still running at timeout. An early exit is a failure, even exit code 0.
+      if [[ "$CODE" != "124" ]]; then
         [[ -f "$MARKER.failed" ]] && { echo "scenario failure:" >&2; cat "$MARKER.failed" >&2; }
-        echo "error: native AOT scenario '$SMOKE_SCENARIO' did not produce its success marker" >&2
+        echo "error: the AOT binary exited on its own with code $CODE" >&2
         exit 1
       fi
-      echo "smoke scenario: $SMOKE_SCENARIO passed inside the native process"
-    fi
-    echo "smoke: window still alive after 25 s - runtime AOT OK"
+      if [[ -n "$scenario" ]]; then
+        if [[ ! -s "$MARKER" ]] || ! grep -Fxq "$scenario: passed" "$MARKER"; then
+          [[ -f "$MARKER.failed" ]] && { echo "scenario failure:" >&2; cat "$MARKER.failed" >&2; }
+          echo "error: native AOT scenario '$scenario' did not produce its success marker" >&2
+          exit 1
+        fi
+        echo "smoke scenario: $scenario passed inside the native process"
+      fi
+      echo "smoke: window still alive after 25 s - runtime AOT OK"
+    done
   fi
 fi
 
