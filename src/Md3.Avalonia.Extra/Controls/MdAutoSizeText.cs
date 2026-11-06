@@ -35,7 +35,7 @@ public sealed class MdAutoSizeText : TemplatedControl
     static MdAutoSizeText()
     {
         AffectsMeasure<MdAutoSizeText>(TextProperty, MinFontSizeProperty, StepGranularityProperty, MaxLinesProperty,
-            TextWrappingProperty, FontFamilyProperty, FontSizeProperty, FontWeightProperty, FontStyleProperty,
+            TextWrappingProperty, TextTrimmingProperty, TextAlignmentProperty, FontFamilyProperty, FontSizeProperty, FontWeightProperty, FontStyleProperty,
             FontStretchProperty, FlowDirectionProperty, PaddingProperty);
         AffectsRender<MdAutoSizeText>(TextProperty, TextWrappingProperty, TextTrimmingProperty, TextAlignmentProperty,
             MaxLinesProperty, ForegroundProperty, FontFamilyProperty, FontSizeProperty, FontWeightProperty,

@@ -88,6 +88,13 @@ public sealed class MdAutoSizeTextTests
             text.StepGranularity = 0;
             Assert.Equal(12, text.MinFontSize);
             Assert.Equal(0.1, text.StepGranularity);
+            text.Measure(new Size(120, 50));
+            Assert.True(text.IsMeasureValid);
+            text.TextAlignment = TextAlignment.Center;
+            Assert.False(text.IsMeasureValid);
+            text.Measure(new Size(120, 50));
+            text.TextTrimming = TextTrimming.WordEllipsis;
+            Assert.False(text.IsMeasureValid);
         }
         finally { window.Close(); }
     }
