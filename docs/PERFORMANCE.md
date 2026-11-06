@@ -117,6 +117,12 @@ python3 scripts/collect-android-perf.py --package io.arena.md3avalonia.gallery \
   --apk artifacts/android --output-dir /tmp/android-perf --summary --github
 ```
 
+The collector itself is covered by `scripts/test-collect-android-perf.py`, which runs it as a real
+process against a fake `adb` answering with recorded `dumpsys` output: parsers (including the
+Android 12 rename of "Number Frame dead" to "Number Frame deadline missed"), the cold-start probe,
+the written evidence files and the annotations, all with no device attached. Run it after touching
+the collector; CI runs it in the static-check job.
+
 For ad-hoc inspection without the collector:
 
 ```bash

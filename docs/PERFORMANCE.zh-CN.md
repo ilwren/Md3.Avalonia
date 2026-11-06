@@ -108,6 +108,11 @@ python3 scripts/collect-android-perf.py --package io.arena.md3avalonia.gallery \
   --apk artifacts/android --output-dir /tmp/android-perf --summary --github
 ```
 
+采集器本身由 `scripts/test-collect-android-perf.py` 覆盖：把真实进程跑在一个假的 `adb` 上，用录制
+好的 `dumpsys` 输出喂给它，验证解析（含 Android 12 起 "Number Frame dead" 改名为
+"Number Frame deadline missed"）、冷启动探测、落盘证据文件和 annotations，全程不需要设备。改完采集器
+跑一遍即可；CI 的静态检查任务也会跑。
+
 不用采集器、临时看一眼：
 
 ```bash

@@ -74,7 +74,13 @@ def parse_gfxinfo_summary(text: str) -> dict:
     gfx["slowUiThread"] = first_int(r"Number Slow UI thread:\s*(\d+)")
     gfx["slowBitmapUploads"] = first_int(r"Number Slow bitmap uploads:\s*(\d+)")
     gfx["slowIssueDrawCommands"] = first_int(r"Number Slow issue draw commands:\s*(\d+)")
-    gfx["frameDead"] = first_int(r"Number Frame dead:\s*(\d+)")
+    # Android 12+ renamed the counter to "Number Frame deadline missed"; older releases
+    # and the legacy block still say "Number Frame dead". Prefer the current name so a
+    # modern device does not report null here.
+    frame_dead = first_int(r"Number Frame deadline missed:\s*(\d+)")
+    if frame_dead is None:
+        frame_dead = first_int(r"Number Frame dead:\s*(\d+)")
+    gfx["frameDead"] = frame_dead
     return gfx
 
 
@@ -88,17 +94,22 @@ def parse_meminfo(text: str) -> dict:
     # Main table: "    TOTAL      123456   ..." (Pss Total first). The App Summary
     # fallback reads "TOTAL PSS: 123456" on newer releases.
     mem["totalPssKb"] = first_int(r"^\s*TOTAL\s+(\d+)\s+\d+\s+\d+") or first_int(r"TOTAL PSS:\s*(\d+)")
-    mem["nativePssKb"] = first_int(r"Native Heap\s+(\d+)")
-    mem["dalvikPssKb"] = first_int(r"Dalvik Heap\s+(\d+)")
+    # The process table writes "Native Heap    35120"; the App Summary writes
+    # "Native Heap:    35120". Both are the same number, so accept either spelling.
+    mem["nativePssKb"] = first_int(r"Native Heap:?\s+(\d+)")
+    mem["dalvikPssKb"] = (first_int(r"Dalvik Heap:?\s+(\d+)")
+                          or first_int(r"Java Heap:?\s+(\d+)"))
     return mem
 
 
 def parse_displayed_ms(line: str) -> int | None:
-    match = re.search(r":\s*\+(?:(\d+)s)?(\d+)ms", line)
-    if not match:
+    """Read the "+1s234ms" / "+812ms" / "+2s" tail of an ActivityTaskManager Displayed line."""
+    match = re.search(r":\s*\+(?:(\d+)s)?(?:(\d+)ms)?\s*$", line)
+    if not match or (match.group(1) is None and match.group(2) is None):
         return None
     seconds = int(match.group(1)) if match.group(1) else 0
-    return seconds * 1000 + int(match.group(2))
+    millis = int(match.group(2)) if match.group(2) else 0
+    return seconds * 1000 + millis
 
 
 def displayed_lines(logcat: str, package: str) -> list[str]:

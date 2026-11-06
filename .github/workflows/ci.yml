@@ -63,6 +63,12 @@ jobs:
         # on because prose coverage is complete: a new page that ships untranslated now fails.
         run: python3 scripts/check-gallery-localization.py --strict
 
+      - name: Test the Android performance collector
+        # The emulator job cannot be relied on to produce evidence on every run, so the
+        # collector's parsers, evidence files and annotations are covered here instead: a real
+        # process, a fake `adb` answering with recorded dumpsys output, no device required.
+        run: python3 scripts/test-collect-android-perf.py
+
       - name: Check the specification oracle against pinned upstream sources
         # Network-dependent and advisory by design: upstream moving is a re-baselining
         # decision for a human, not a build failure. --soft keeps it off the critical path.

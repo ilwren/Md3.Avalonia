@@ -52,8 +52,12 @@ jobs:
       - name: Run Maestro Tests on Android Emulator (API 34)
         # Emulator startup is infrastructure-dependent on hosted macOS runners. Keep the
         # regression evidence available without blocking the package and desktop release checks.
+        #
+        # Five minutes was not enough for boot + Maestro + collection on this image: every run
+        # hit the step timeout inside Maestro and uploaded nothing. Eighteen minutes leaves the
+        # reported emulator boot (3-5 min) plus a bounded Maestro run plus collection.
         continue-on-error: true
-        timeout-minutes: 5
+        timeout-minutes: 18
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -73,7 +77,14 @@ jobs:
 
             # These are product UI regressions, not a Material/Flutter certification.
             mkdir -p artifacts/android-test
-            maestro test --format junit --output artifacts/android-test/maestro-results.xml tests/maestro/
+            # Bound Maestro: a flow that hangs used to consume the whole step, and then the
+            # collector below never ran, so a timeout produced no performance evidence at all.
+            maestro test --format junit --output artifacts/android-test/maestro-results.xml tests/maestro/ &
+            maestro_pid=$!
+            ( sleep 420; kill -9 "$maestro_pid" 2>/dev/null ) &
+            watchdog_pid=$!
+            wait "$maestro_pid" || echo "maestro exited non-zero (see maestro-results.xml)"
+            kill "$watchdog_pid" 2>/dev/null || true
 
             # Performance evidence (frames, memory, cold start, APK size). Advisory only: the
             # collector exits 0 with nulls on any failure, and the || true below covers even a
