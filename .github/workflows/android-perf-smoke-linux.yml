@@ -1,18 +1,19 @@
-# TEMPORARY verification workflow for scripts/collect-android-perf.py. It exercises the
-# collector end to end on a real emulator (install, launch, collect, upload) without the
-# Maestro scenario, which currently cannot finish inside the regression workflow's
-# five-minute emulator step under degraded macOS capacity. DELETE AFTER IT GOES GREEN.
-name: Android Perf Collector Smoke (TEMPORARY)
+# TEMPORARY verification workflow for scripts/collect-android-perf.py. Same idea as the
+# (already removed) macOS smoke: install, launch, collect, upload — but on ubuntu-latest,
+# because macOS runner capacity is degraded and no emulator step of any branch can currently
+# finish there. The Android side (API 34, x86_64, Pixel 6, swiftshader) is identical, which is
+# what the collector's parsing is verified against. DELETE AFTER IT GOES GREEN.
+name: Android Perf Collector Smoke Linux (TEMPORARY)
 
 on:
   pull_request:
     paths:
-      - '.github/workflows/android-perf-smoke.yml'
+      - '.github/workflows/android-perf-smoke-linux.yml'
 
 jobs:
-  collector-smoke:
-    name: Collector smoke on emulator
-    runs-on: macos-15
+  collector-smoke-linux:
+    name: Collector smoke on Linux emulator
+    runs-on: ubuntu-latest
     timeout-minutes: 25
 
     steps:
@@ -42,7 +43,7 @@ jobs:
             -o artifacts/android/
 
       - name: Install, launch and collect
-        timeout-minutes: 8
+        timeout-minutes: 14
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -50,7 +51,7 @@ jobs:
           profile: pixel_6
           force-avd-creation: true
           disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
           script: |
             adb install artifacts/android/*.apk
             adb shell monkey -p io.arena.md3avalonia.gallery -c android.intent.category.LAUNCHER 1
@@ -68,6 +69,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: android-perf-smoke
+          name: android-perf-smoke-linux
           path: artifacts/android-test/
           if-no-files-found: warn
