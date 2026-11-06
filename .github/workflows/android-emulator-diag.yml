@@ -58,38 +58,7 @@ jobs:
           emulator-boot-timeout: 900
           disable-animations: true
           script: |
-            # The emulator does boot here (a boot timeout would abort before this script). The
-            # wrapper shell aborts on the first non-zero command, so run everything through a
-            # helper that records the exit code, then mirror the log into annotations -- job logs
-            # are unreadable from the agent sandbox, annotations are not.
-            set +e
-            LOG=/tmp/diag.log
-            : > "$LOG"
-            step() { echo "=== $*" >> "$LOG"; "$@" >> "$LOG" 2>&1; echo "exit=$? :: $*" >> "$LOG"; }
-            step adb devices -l
-            step sh -c 'ls -la .; ls -la artifacts; ls -la artifacts/android'
-            apk=$(ls artifacts/android/*.apk 2>/dev/null | head -1)
-            echo "apk=$apk" >> "$LOG"
-            if [ -n "$apk" ]; then
-              step adb install "$apk"
-            fi
-            step adb shell monkey -p io.arena.md3avalonia.gallery -c android.intent.category.LAUNCHER 1
-            sleep 20
-            mkdir -p artifacts/android-test
-            step python3 scripts/collect-android-perf.py \
-              --package io.arena.md3avalonia.gallery \
-              --apk artifacts/android \
-              --output-dir artifacts/android-test \
-              --summary --github
-            step sh -c 'ls -la artifacts/android-test'
-            python3 - <<'EOF'
-            import pathlib
-            lines = pathlib.Path("/tmp/diag.log").read_text(errors="replace").splitlines()
-            for index in range(0, len(lines), 30):
-              chunk = " | ".join(lines[index:index + 30])[:3800]
-              print(f"::warning::diag::log{index // 30}: {chunk}")
-            EOF
-            exit 0
+            bash scripts/ci-android-perf.sh || true
 
       - name: Verify what the collector wrote
         if: always()
