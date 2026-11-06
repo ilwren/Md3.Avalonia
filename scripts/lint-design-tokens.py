@@ -477,6 +477,43 @@ def rule_dual_declaration(lint: Lint) -> None:
     lint.metrics["runtime_written_keys"] = len(cs_keys)
 
 
+def _compare_variant(entry: dict, kind: str, expected_raw, variant: str,
+                     values: dict[str, dict[str, tuple[str, str, int]]]) -> dict | None:
+    """One declared value against one variant's expected value; None when it agrees.
+
+    The variant has to be named in the finding, because "Primary is wrong" and "Primary is wrong in
+    dark mode only" are different defects and the report should not have to be read alongside the
+    oracle file to tell them apart.
+    """
+    key = entry["key"]
+    by_variant = values.get(key, {})
+    label = f"{key} ({variant})"
+    declaration = by_variant.get(variant.capitalize())
+    if declaration is None:
+        if not entry.get("required", True):
+            return None
+        return {
+            "key": label, "kind": "missing", "confidence": entry.get("confidence", "medium"),
+            "expected": parse_color(expected_raw), "actual": None,
+            "detail": f"no {variant} declaration found in Themes/Tokens",
+        }
+
+    declared_kind, raw, lineno = declaration
+    if kind != "color":
+        return None
+
+    actual = parse_color(raw)
+    expected = parse_color(expected_raw)
+    if actual is not None and expected is not None and actual == expected:
+        return None
+
+    return {
+        "key": label, "kind": "mismatch", "confidence": entry.get("confidence", "medium"),
+        "expected": expected, "actual": actual,
+        "detail": f"declared at Themes/Tokens line {lineno} as <{declared_kind}>{raw}</{declared_kind}>",
+    }
+
+
 def rule_token_values(
     lint: Lint,
     oracle: dict,
@@ -504,6 +541,25 @@ def rule_token_values(
         kind = entry["type"]
         confidence = entry.get("confidence", "medium")
         required = entry.get("required", True)
+
+        # An entry states either one value or one per theme variant. 35 of Material's 49 colour roles
+        # genuinely differ between light and dark, and an oracle that can only hold one of them has to
+        # either ignore dark mode or record the light value and call the comparison complete.
+        variants = entry.get("variants")
+        if variants is not None:
+            if kind != "color" or set(variants) != {"light", "dark"}:
+                lint.add(
+                    "R7 token-value/high", "error", "spec-snapshot/tokens.json", 0,
+                    f"token '{key}' declares 'variants', which is only valid on a colour entry naming "
+                    f"both 'light' and 'dark'",
+                )
+                continue
+            for variant_key in ("light", "dark"):
+                gap = _compare_variant(entry, kind, variants[variant_key], variant_key, values)
+                if gap is not None:
+                    gaps.append(gap)
+            continue
+
         expected = entry["value"]
 
         from_cs = key in (values_cs or {})

@@ -229,6 +229,68 @@ public sealed class MdBaselineColorTests
         Assert.Equal(49, light.Count);
     }
 
+    /// <summary>
+    /// The oracle now carries the baseline too, with both variants where they differ. This checks the
+    /// two sources of truth agree, so a transcription error cannot hide in the one the other does not
+    /// read.
+    /// </summary>
+    [Fact]
+    public void The_Oracle_Carries_The_Baseline_For_Both_Variants()
+    {
+        var oracle = MdSpecOracle.Load();
+        var light = MdBaselineScheme.Roles(dark: false);
+        var dark = MdBaselineScheme.Roles(dark: true);
+
+        var missing = new List<string>();
+        var wrong = new List<string>();
+        var singleVariant = new List<string>();
+
+        foreach (var (role, value) in light)
+        {
+            var key = $"Md.Sys.Color.{role}";
+            if (!oracle.ByKey.TryGetValue(key, out var token) || token.Kind != MdOracleKind.Color)
+            {
+                missing.Add(key);
+                continue;
+            }
+
+            if (!Compare(token.ValueFor(dark: false), value))
+            {
+                wrong.Add($"{key} (light)");
+            }
+
+            var differs = value != dark[role];
+            if (differs != token.HasVariantSplit)
+            {
+                // Either the oracle forgot the dark value, or it split a role the baseline says is
+                // identical in both variants. Both make the comparison silent rather than failing.
+                singleVariant.Add($"{key}: baseline differs={differs}, oracle has a split={token.HasVariantSplit}");
+                continue;
+            }
+
+            if (differs && !Compare(token.ValueFor(dark: true), dark[role]))
+            {
+                wrong.Add($"{key} (dark)");
+            }
+        }
+
+        Assert.True(missing.Count == 0, "roles the oracle does not carry: " + string.Join(", ", missing));
+        Assert.True(wrong.Count == 0, "roles where the oracle disagrees with the baseline: " + string.Join(", ", wrong));
+        Assert.True(singleVariant.Count == 0,
+            "roles where the oracle and the baseline disagree about whether light and dark differ: " +
+            string.Join(", ", singleVariant));
+    }
+
+    private static bool Compare(double[] expected, uint argb)
+    {
+        var color = FromArgb(argb);
+        return expected.Length == 4
+               && (int)expected[0] == color.R
+               && (int)expected[1] == color.G
+               && (int)expected[2] == color.B
+               && (int)expected[3] == color.A;
+    }
+
     private static Color FromArgb(uint argb) =>
         Color.FromArgb((byte)(argb >> 24), (byte)(argb >> 16), (byte)(argb >> 8), (byte)argb);
 

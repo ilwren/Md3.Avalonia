@@ -81,9 +81,9 @@
     },
     "oracle_coverage_ratio": {
       "direction": "higher",
-      "budget": 0.2462,
+      "budget": 0.3299,
       "source": "lint",
-      "why": "oracle entries / declared keys. Unchanged: the 49 baseline colour roles are asserted against the published table by MdBaselineColorTests, but they are deliberately NOT oracle entries, because spec-snapshot/tokens.json keys a value by token and the two variants legitimately disagree on 36 of them. Adding the light values alone would have made the oracle a half-truth and inflated this ratio without measuring anything new."
+      "why": "oracle entries / declared keys. Was 0.2462. The 49 published M3 baseline colour roles are oracle entries, and the 35 that differ between variants now carry both values, so dark mode is measured rather than assumed. The oracle grew a 'variants' shape instead of storing the light value under the bare key, because that would have compared dark #D0BCFF against light #6750A4."
     },
     "oracle_families": {
       "direction": "higher",

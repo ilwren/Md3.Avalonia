@@ -7,7 +7,8 @@ internal enum MdOracleKind
 {
     Double,
     Corner,
-    Thickness
+    Thickness,
+    Color
 }
 
 /// <summary>One expected value, traced back to a pinned external source.</summary>
@@ -23,8 +24,23 @@ internal sealed record MdOracleToken(
     double[] Value,
     string Confidence,
     bool Required,
-    string Source)
+    string Source,
+    double[]? DarkValue = null)
 {
+    /// <summary>
+    /// The expected value for a variant, or null when the token does not constrain that variant.
+    /// </summary>
+    /// <remarks>
+    /// Material gives 35 of its 49 colour roles a different value per variant, so an oracle that can
+    /// only hold one number per key either has to ignore dark mode or record the light value and call
+    /// the comparison complete. <c>DarkValue</c> is null when the two variants agree, which is also a
+    /// fact worth checking: <see cref="HasVariantSplit"/> distinguishes "same in both" from "dark not
+    /// stated".
+    /// </remarks>
+    public double[]? ValueFor(bool dark) => dark ? DarkValue ?? Value : Value;
+
+    public bool HasVariantSplit => DarkValue is not null;
+
     public bool IsHighConfidence => string.Equals(Confidence, "high", StringComparison.OrdinalIgnoreCase);
 
     public string Describe() => Kind == MdOracleKind.Double
@@ -119,6 +135,12 @@ internal sealed class MdSpecOracle
         return ToleranceDip;
     }
 
+    /// <summary>Four 0-255 components, or null when the JSON is not a colour.</summary>
+    private static double[]? ReadColor(JsonElement element) =>
+        element.ValueKind == JsonValueKind.Array
+            ? element.EnumerateArray().Select(v => v.GetDouble()).ToArray() is { Length: 4 } parts ? parts : null
+            : null;
+
     private static MdSpecOracle LoadCore()
     {
         var path = Path.Combine(MdSpecPaths.SpecSnapshotDirectory, "tokens.json");
@@ -148,6 +170,7 @@ internal sealed class MdSpecOracle
                     "double" => MdOracleKind.Double,
                     "corner" => MdOracleKind.Corner,
                     "thickness" => MdOracleKind.Thickness,
+                    "color" => MdOracleKind.Color,
                     _ => (MdOracleKind?)null
                 };
 
@@ -156,7 +179,28 @@ internal sealed class MdSpecOracle
                     continue;
                 }
 
-                var valueElement = item.GetProperty("value");
+                // A colour may carry one value or a per-variant pair; every other kind is scalar.
+                double[]? darkValue = null;
+                JsonElement valueElement;
+                if (item.TryGetProperty("variants", out var variants))
+                {
+                    if (kind != MdOracleKind.Color
+                        || !variants.TryGetProperty("light", out var lightElement)
+                        || !variants.TryGetProperty("dark", out var darkElement))
+                    {
+                        throw new global::System.IO.InvalidDataException(
+                            $"{key}: 'variants' is only valid on a colour entry and must name both 'light' and 'dark'");
+                    }
+
+                    valueElement = lightElement;
+                    darkValue = ReadColor(darkElement)
+                        ?? throw new global::System.IO.InvalidDataException($"{key}: the dark variant is not a four-component colour");
+                }
+                else
+                {
+                    valueElement = item.GetProperty("value");
+                }
+
                 double[] value;
                 if (valueElement.ValueKind == JsonValueKind.Array)
                 {
@@ -187,7 +231,8 @@ internal sealed class MdSpecOracle
                     value,
                     item.TryGetProperty("confidence", out var confidence) ? confidence.GetString() ?? "medium" : "medium",
                     !item.TryGetProperty("required", out var required) || required.ValueKind != JsonValueKind.False,
-                    item.TryGetProperty("source", out var source) ? source.GetString() ?? "unknown" : "unknown"));
+                    item.TryGetProperty("source", out var source) ? source.GetString() ?? "unknown" : "unknown",
+                    darkValue));
             }
         }
 
