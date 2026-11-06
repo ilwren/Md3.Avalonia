@@ -89,6 +89,43 @@ public sealed class MdConfettiTests
     }
 
     [AvaloniaFact]
+    public void Completion_Handler_Can_Start_A_New_Burst_Without_Inheriting_The_Old_Frame_Clock()
+    {
+        var confetti = Create();
+        confetti.Duration = TimeSpan.FromSeconds(0.1);
+        var window = Show(confetti);
+        try
+        {
+            // Drive the real frame callback with deterministic timestamps, including a large
+            // gap across generations. Scheduled headless callbacks do not run until pumped.
+            var type = typeof(MdConfetti);
+            var generation = type.GetField("_generation", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+            var onFrame = type.GetMethod("OnFrame", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+            void Frame(double seconds, int value) => onFrame.Invoke(confetti, [TimeSpan.FromSeconds(seconds), value]);
+            var completed = 0;
+            confetti.Completed += (_, _) =>
+            {
+                completed++;
+                if (completed == 1) Assert.True(confetti.Burst());
+            };
+            Assert.True(confetti.Burst());
+            var oldGeneration = (int)generation.GetValue(confetti)!;
+            Frame(0, oldGeneration);
+            Frame(0.1, oldGeneration);
+            Assert.Equal(1, completed);
+            Assert.True(confetti.IsRunning);
+            var newGeneration = (int)generation.GetValue(confetti)!;
+            Assert.NotEqual(oldGeneration, newGeneration);
+            Frame(20, newGeneration);
+            Assert.Equal(1, completed);
+            Assert.Equal(0, confetti.ElapsedSeconds);
+            Frame(20.05, newGeneration);
+            Assert.True(confetti.ElapsedSeconds > 0);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
     public void Reduced_Motion_Hiding_And_Detachment_Cancel_Without_Auto_Restart()
     {
         var confetti = Create();

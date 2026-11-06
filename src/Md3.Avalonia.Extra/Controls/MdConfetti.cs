@@ -187,6 +187,9 @@ public sealed class MdConfetti : Control
         _frameRequested = false;
         if (!IsRunning || !_attached || !IsEffectivelyVisible || !MotionAllowed) { Stop(); return; }
         if (_lastFrameValid) Advance(Math.Clamp((timestamp - _lastFrame).TotalSeconds, 0, 0.1));
+        // Completion handlers can synchronously start a new burst. This frame belongs to the
+        // old generation and must not overwrite the new burst's timing or frame request.
+        if (generation != _generation) return;
         _lastFrame = timestamp;
         _lastFrameValid = true;
         if (IsRunning) RequestFrame();
