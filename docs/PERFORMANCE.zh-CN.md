@@ -108,6 +108,10 @@ python3 scripts/collect-android-perf.py --package io.arena.md3avalonia.gallery \
   --apk artifacts/android --output-dir /tmp/android-perf --summary --github
 ```
 
+这些证据只有在托管 runner 真的启动了模拟器时才存在。当前的 macOS 镜像经常起不来：模拟器步骤会
+警告 "Timeout waiting for emulator to boot" 且不上传任何文件，而工作流因为该步骤是建议性质仍报
+success。看到没有 `android-perf.json` 时，请理解为"这次没有 runner"，而不是"没有数据"。
+
 采集器本身由 `scripts/test-collect-android-perf.py` 覆盖：把真实进程跑在一个假的 `adb` 上，用录制
 好的 `dumpsys` 输出喂给它，验证解析（含 Android 12 起 "Number Frame dead" 改名为
 "Number Frame deadline missed"）、冷启动探测、落盘证据文件和 annotations，全程不需要设备。改完采集器

@@ -117,6 +117,11 @@ python3 scripts/collect-android-perf.py --package io.arena.md3avalonia.gallery \
   --apk artifacts/android --output-dir /tmp/android-perf --summary --github
 ```
 
+That evidence exists only when the hosted runner boots an emulator. On the current macOS image
+it often does not: the emulator step warns "Timeout waiting for emulator to boot" and uploads no
+files, while the run still reports success because the step is advisory. Treat a missing
+`android-perf.json` as "no runner", not as "no data".
+
 The collector itself is covered by `scripts/test-collect-android-perf.py`, which runs it as a real
 process against a fake `adb` answering with recorded `dumpsys` output: parsers (including the
 Android 12 rename of "Number Frame dead" to "Number Frame deadline missed"), the cold-start probe,
