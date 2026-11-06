@@ -54,6 +54,52 @@ public sealed class MdMediaProgressBarTests
     }
 
     [AvaloniaFact]
+    public void Pointer_Respects_Rtl_And_Empty_Range()
+    {
+        var bar = CreateBar();
+        bar.FlowDirection = FlowDirection.RightToLeft;
+        var window = Show(bar);
+        try
+        {
+            var count = 0;
+            bar.SeekRequested += (_, _) => count++;
+            var left = bar.TranslatePoint(new Point(10, 20), window)!.Value;
+            window.MouseMove(left, RawInputModifiers.None);
+            window.MouseDown(left, MouseButton.Left, RawInputModifiers.None);
+            window.MouseUp(left, MouseButton.Left, RawInputModifiers.None);
+            Assert.Equal(100, bar.Value, 3);
+            Assert.Equal(1, count);
+            bar.Maximum = 0;
+            window.MouseDown(left, MouseButton.Left, RawInputModifiers.None);
+            window.MouseUp(left, MouseButton.Left, RawInputModifiers.None);
+            Assert.False(bar.IsScrubbing);
+            Assert.Equal(1, count);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Capture_Loss_Cancels_A_Pending_Seek()
+    {
+        var bar = CreateBar();
+        var window = Show(bar);
+        try
+        {
+            var count = 0;
+            bar.SeekRequested += (_, _) => count++;
+            var middle = bar.TranslatePoint(new Point(120, 20), window)!.Value;
+            window.MouseMove(middle, RawInputModifiers.None);
+            window.MouseDown(middle, MouseButton.Left, RawInputModifiers.None);
+            Assert.True(bar.IsScrubbing);
+            window.Content = null;
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(bar.IsScrubbing);
+            Assert.Equal(0, count);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
     public void Keyboard_Automation_ReadOnly_And_Rtl_Use_Seconds()
     {
         var bar = CreateBar();
