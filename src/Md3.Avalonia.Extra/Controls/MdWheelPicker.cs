@@ -47,6 +47,7 @@ public sealed class MdWheelPicker : TemplatedControl
         MaximumProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) => { c.CoerceValue(MinimumProperty); c.CoerceValue(ValueProperty); });
         StepProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) => c.CoerceValue(ValueProperty));
         IsReadOnlyProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) => { if (c.IsReadOnly) c.CancelPointer(); });
+        IsEffectivelyEnabledProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) => { if (!c.IsEffectivelyEnabled) c.CancelPointer(); });
     }
 
     public MdWheelPicker()
@@ -219,12 +220,33 @@ public sealed class MdWheelPicker : TemplatedControl
 
 internal sealed class MdWheelPickerAutomationPeer : ControlAutomationPeer, IRangeValueProvider
 {
+    private int _minimum;
+    private int _maximum;
+    private bool _readOnly;
+
     public MdWheelPickerAutomationPeer(MdWheelPicker owner) : base(owner)
     {
+        _minimum = owner.Minimum;
+        _maximum = owner.LastValue;
+        _readOnly = owner.IsReadOnly;
         owner.PropertyChanged += (_, e) =>
         {
             if (e.Property == MdWheelPicker.ValueProperty)
                 RaisePropertyChangedEvent(RangeValuePatternIdentifiers.ValueProperty, Convert.ToDouble(e.OldValue), Convert.ToDouble(e.NewValue));
+            if (e.Property == MdWheelPicker.MinimumProperty || e.Property == MdWheelPicker.MaximumProperty || e.Property == MdWheelPicker.StepProperty)
+            {
+                var minimum = owner.Minimum;
+                var maximum = owner.LastValue;
+                if (_minimum != minimum) RaisePropertyChangedEvent(RangeValuePatternIdentifiers.MinimumProperty, (double)_minimum, (double)minimum);
+                if (_maximum != maximum) RaisePropertyChangedEvent(RangeValuePatternIdentifiers.MaximumProperty, (double)_maximum, (double)maximum);
+                _minimum = minimum;
+                _maximum = maximum;
+            }
+            if (e.Property == MdWheelPicker.IsReadOnlyProperty && _readOnly != owner.IsReadOnly)
+            {
+                RaisePropertyChangedEvent(RangeValuePatternIdentifiers.IsReadOnlyProperty, _readOnly, owner.IsReadOnly);
+                _readOnly = owner.IsReadOnly;
+            }
         };
     }
 
