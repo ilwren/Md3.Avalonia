@@ -321,7 +321,7 @@ public sealed class MdDraggableScrollableSheet : ContentControl
                 : CreateHeightTransitions();
     }
 
-    private Avalonia.Animation.Transitions? CreateHeightTransitions()
+    private Transitions? CreateHeightTransitions()
     {
         if (SnapAnimationDuration is { } custom)
         {
