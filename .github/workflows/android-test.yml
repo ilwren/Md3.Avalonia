@@ -50,6 +50,11 @@ jobs:
             -f net10.0-android \
             -p:AndroidPackageFormat=apk \
             -o artifacts/android/
+          # Job logs are not always retrievable, so state what was produced as an annotation:
+          # the install step depends on this path and silently did nothing when it did not match.
+          find artifacts -name '*.apk' -o -name '*.aab' | head -20 | while read -r f; do
+            echo "::notice::android apk: $f ($(wc -c < "$f") bytes)"
+          done
 
       - name: Run Maestro Tests on Android Emulator (API 34)
         # Emulator startup is infrastructure-dependent on hosted macOS runners. Keep the
@@ -73,18 +78,24 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           script: |
-            # Install the APK and retain logcat even when a regression flow fails.
-            adb install artifacts/android/*.apk
-            adb logcat -c
-            trap 'mkdir -p artifacts/android-test; adb logcat -d > artifacts/android-test/logcat.txt || true' EXIT
+            # The action runs this block under `sh -e`: the first failing command would abort
+            # everything after it, which is how earlier runs lost their evidence. Neutralise that
+            # and let scripts/ci-android-perf.sh report failures as annotations instead.
+            set +e
+
+            mkdir -p artifacts/android-test
+            trap 'adb logcat -d > artifacts/android-test/logcat.txt 2>/dev/null || true' EXIT
+            adb logcat -c 2>/dev/null || true
+
+            # Collect first, with the app freshly launched: the emulator only lives for this step,
+            # and a Maestro flow that hangs must not cost the frame/memory evidence.
+            bash scripts/ci-android-perf.sh io.arena.md3avalonia.gallery artifacts/android artifacts/android-test || true
 
             curl -Ls "https://get.maestro.mobile.dev" | bash
             export PATH="$PATH:$HOME/.maestro/bin"
 
-            # These are product UI regressions, not a Material/Flutter certification.
-            mkdir -p artifacts/android-test
-            # Bound Maestro: a flow that hangs used to consume the whole step, and then the
-            # collector below never ran, so a timeout produced no performance evidence at all.
+            # These are product UI regressions, not a Material/Flutter certification. Bounded by a
+            # watchdog so a hanging flow cannot consume the whole step.
             maestro test --format junit --output artifacts/android-test/maestro-results.xml tests/maestro/ &
             maestro_pid=$!
             ( sleep 420; kill -9 "$maestro_pid" 2>/dev/null ) &
@@ -92,15 +103,11 @@ jobs:
             wait "$maestro_pid" || echo "maestro exited non-zero (see maestro-results.xml)"
             kill "$watchdog_pid" 2>/dev/null || true
 
-            # Performance evidence (frames, memory, cold start, APK size). Advisory only: the
-            # helper records each command, never aborts, and the collector exits 0 with nulls on
-            # any failure. Must run inside this block: the emulator only exists for this step.
-            bash scripts/ci-android-perf.sh io.arena.md3avalonia.gallery artifacts/android artifacts/android-test || true
-
             # Merge real Headless and Android execution into the non-certifying evidence schema.
             python3 scripts/run-spec-verification.py \
               --android-junit artifacts/android-test/maestro-results.xml
             cp docs/reports/test-spec-execution-results.json artifacts/android-test/verification-results.json
+            exit 0
 
       - name: Upload Android Regression Evidence
         if: always()
