@@ -95,9 +95,9 @@ public sealed class MdSlideToConfirm : TemplatedControl
     /// <summary>Raised once per confirmation, whether from pointer, keyboard, automation or Confirm().</summary>
     public event EventHandler? Confirmed;
 
-    internal string DisplayLabel => IsConfirmed
-        ? ConfirmedText ?? MdLocalization.GetString("SlideConfirmed", this)
-        : Text ?? MdLocalization.GetString("SlideToConfirm", this);
+    internal string ActionLabel => Text ?? MdLocalization.GetString("SlideToConfirm", this);
+    internal string CompletionLabel => ConfirmedText ?? MdLocalization.GetString("SlideConfirmed", this);
+    internal string DisplayLabel => IsConfirmed ? CompletionLabel : ActionLabel;
 
     /// <summary>Confirms immediately if enabled and not already confirmed; returns whether it fired.</summary>
     public bool Confirm()
@@ -111,7 +111,12 @@ public sealed class MdSlideToConfirm : TemplatedControl
     }
 
     /// <summary>Resets the one-shot state without raising Confirmed.</summary>
-    public void Reset() => SetCurrentValue(IsConfirmedProperty, false);
+    public void Reset()
+    {
+        EndPointer();
+        SetCurrentValue(IsConfirmedProperty, false);
+        if (!IsConfirmed) _spring.SnapTo(0);
+    }
 
     private void SyncConfirmed()
     {
@@ -267,19 +272,30 @@ internal sealed class MdSlideToConfirmAutomationPeer : ControlAutomationPeer, II
 {
     private readonly MdSlideToConfirm _control;
     private string? _name;
+    private string? _status;
     public MdSlideToConfirmAutomationPeer(MdSlideToConfirm owner) : base(owner)
     {
         _control = owner;
         _name = GetNameCore();
+        _status = GetItemStatusCore();
         owner.PropertyChanged += (_, e) =>
         {
-            if (e.Property == MdSlideToConfirm.TextProperty || e.Property == MdSlideToConfirm.ConfirmedTextProperty ||
-                e.Property == MdSlideToConfirm.IsConfirmedProperty || e.Property == MdLocalization.CultureProperty)
+            if (e.Property == MdSlideToConfirm.TextProperty || e.Property == MdLocalization.CultureProperty ||
+                e.Property == AutomationProperties.NameProperty || e.Property == AutomationProperties.LabeledByProperty)
             {
                 var name = GetNameCore();
                 if (name != _name) RaisePropertyChangedEvent(AutomationElementIdentifiers.NameProperty, _name, name);
                 _name = name;
             }
+            if (e.Property == MdSlideToConfirm.ConfirmedTextProperty || e.Property == MdSlideToConfirm.IsConfirmedProperty ||
+                e.Property == MdLocalization.CultureProperty)
+            {
+                var status = GetItemStatusCore();
+                if (status != _status) RaisePropertyChangedEvent(AutomationElementIdentifiers.ItemStatusProperty, _status, status);
+                _status = status;
+            }
+            // The base peer already reports explicit ItemStatus changes.
+            if (e.Property == AutomationProperties.ItemStatusProperty) _status = GetItemStatusCore();
         };
     }
 
@@ -292,7 +308,12 @@ internal sealed class MdSlideToConfirmAutomationPeer : ControlAutomationPeer, II
     protected override string? GetNameCore()
     {
         var name = base.GetNameCore();
-        return string.IsNullOrWhiteSpace(name) ? _control.DisplayLabel : name;
+        return string.IsNullOrWhiteSpace(name) ? _control.ActionLabel : name;
+    }
+    protected override string? GetItemStatusCore()
+    {
+        var status = base.GetItemStatusCore();
+        return !string.IsNullOrWhiteSpace(status) ? status : _control.IsConfirmed ? _control.CompletionLabel : null;
     }
     protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Button;
     protected override bool IsControlElementCore() => true;

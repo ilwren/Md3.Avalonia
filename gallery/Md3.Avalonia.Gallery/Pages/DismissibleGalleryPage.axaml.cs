@@ -1,4 +1,6 @@
 using Avalonia.Controls;
+using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Interactivity;
 
 namespace Md3.Avalonia.Gallery.Pages;
@@ -20,7 +22,11 @@ public partial class DismissibleGalleryPage : UserControl
 
     internal void RunSlideNativeAotSmoke()
     {
-        if (!SlideDemo.Confirm() || !SlideDemo.IsConfirmed ||
+        var peer = ControlAutomationPeer.CreatePeerForElement(SlideDemo);
+        var invoke = peer.GetProvider<IInvokeProvider>() ??
+            throw new InvalidOperationException("Slide confirmation automation invoke is missing.");
+        invoke.Invoke();
+        if (!SlideDemo.IsConfirmed || string.IsNullOrWhiteSpace(peer.GetItemStatus()) ||
             SlideStatus.Text != L("Confirmation received.", "已收到确认。") || SlideDemo.Confirm())
             throw new InvalidOperationException("Slide confirmation or Gallery callback failed.");
         ResetSlide(null, new RoutedEventArgs());

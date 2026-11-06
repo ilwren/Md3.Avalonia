@@ -4,6 +4,8 @@
 
 ### Added
 
+- Added Extra `MdSlideToConfirm`, a one-shot drag-to-confirm action with RTL, reduced-motion fallback, keyboard and accessible Invoke alternatives.
+
 - Added Extra `MdEmojiPicker` with a small replaceable sample, category/search filters, accessible names, bounded in-memory recents and host-owned text insertion.
 
 - Added Extra `MdWheelPicker`, a bounded integer wheel with stepped values, touch/pointer, keyboard, mouse-wheel and range automation support.

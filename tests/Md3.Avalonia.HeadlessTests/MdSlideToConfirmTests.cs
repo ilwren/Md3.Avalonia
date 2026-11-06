@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
@@ -9,6 +10,7 @@ using Avalonia.Data;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -123,12 +125,13 @@ public sealed class MdSlideToConfirmTests
             Assert.Equal("滑动以确认", peer.GetName());
             var invoke = Assert.IsAssignableFrom<IInvokeProvider>(peer.GetProvider<IInvokeProvider>());
             invoke.Invoke();
-            Assert.Equal("已确认", peer.GetName());
+            Assert.Equal("滑动以确认", peer.GetName());
+            Assert.Equal("已确认", peer.GetItemStatus());
             Assert.Equal(1, count);
             Assert.Throws<InvalidOperationException>(() => invoke.Invoke());
             slide.Reset();
             slide.IsEnabled = false;
-            Assert.ThrowsAny<Exception>(() => invoke.Invoke());
+            Assert.Throws<ElementNotEnabledException>(() => invoke.Invoke());
             Assert.Equal(1, count);
             slide.IsEnabled = true;
             AutomationProperties.SetName(slide, "Transfer funds");
@@ -168,6 +171,39 @@ public sealed class MdSlideToConfirmTests
             Assert.False(slide.IsDragging);
             Assert.Equal(0, slide.Progress);
             Assert.False(slide.IsSettling);
+            Assert.False(slide.IsConfirmed);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Capture_Loss_And_Reset_Cancel_Only_The_Active_Gesture()
+    {
+        var slide = Create();
+        MdMotion.SetScheme(slide, MdMotionScheme.None);
+        IPointer? active = null;
+        slide.AddHandler(InputElement.PointerPressedEvent, (_, e) => active = e.Pointer, RoutingStrategies.Bubble, true);
+        var window = Show(slide);
+        try
+        {
+            Down(window, slide, 32);
+            Move(window, slide, 180);
+            Assert.True(slide.IsDragging);
+            using var other = new Pointer(Pointer.GetNextFreeId(), PointerType.Touch, false);
+            slide.RaiseEvent(new PointerCaptureLostEventArgs(slide, other));
+            Assert.True(slide.IsDragging); // an unrelated finger cannot cancel the owner
+            Assert.NotNull(active);
+            active!.Capture(null);
+            Assert.False(slide.IsDragging);
+            Assert.Equal(0, slide.Progress);
+            Up(window, slide, 248);
+            Assert.False(slide.IsConfirmed);
+            Down(window, slide, 32);
+            Move(window, slide, 180);
+            slide.Reset(); // even when already unconfirmed, abort a pending drag
+            Assert.False(slide.IsDragging);
+            Assert.Equal(0, slide.Progress);
+            Up(window, slide, 248);
             Assert.False(slide.IsConfirmed);
         }
         finally { window.Close(); }
@@ -215,6 +251,39 @@ public sealed class MdSlideToConfirmTests
         slide.Reset();
         Assert.True(slide.Confirm());
         Assert.Equal(1, count);
+    }
+
+    [AvaloniaFact]
+    public void Rendered_Thumb_Moves_From_Start_To_End_When_Confirmed()
+    {
+        var slide = Create();
+        slide.TrackBrush = Brushes.Blue;
+        slide.ProgressBrush = Brushes.Blue;
+        slide.ThumbBrush = Brushes.Red;
+        var window = Show(slide);
+        try
+        {
+            uint Pixel(double x, double y)
+            {
+                Dispatcher.UIThread.RunJobs();
+                var frame = window.CaptureRenderedFrame();
+                Assert.NotNull(frame);
+                var size = frame!.PixelSize;
+                var pixels = new uint[size.Width * size.Height];
+                var pinned = GCHandle.Alloc(pixels, GCHandleType.Pinned);
+                try { frame.CopyPixels(new PixelRect(0, 0, size.Width, size.Height), pinned.AddrOfPinnedObject(), pixels.Length * 4, size.Width * 4); }
+                finally { pinned.Free(); }
+                var point = slide.TranslatePoint(new Point(x, y), window)!.Value;
+                return pixels[(int)point.Y * size.Width + (int)point.X];
+            }
+            var start = Pixel(32, 23); // away from the arrow
+            var end = Pixel(248, 23);
+            Assert.NotEqual(start, end);
+            Assert.True(slide.Confirm());
+            Assert.Equal(start, Pixel(248, 23));
+            Assert.Equal(end, Pixel(32, 23));
+        }
+        finally { window.Close(); }
     }
 
     [AvaloniaFact]

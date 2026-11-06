@@ -1385,6 +1385,32 @@ Every public enum and its members are listed below. To print the current member 
 
 
 
+## Slide to confirm (Extra)
+
+`MdSlideToConfirm` is a one-shot action, not a range slider. Press its thumb, drag from logical
+start toward end, and release at or beyond `Threshold` (default 0.8, coerced to 0.1–1; non-finite
+values use 0.8). Clicking the track does not confirm. An incomplete gesture springs back according
+to inherited `MdMotion.Scheme`; Reduced and None snap immediately. The completed state and reset
+also move immediately. Direction follows `FlowDirection`. Capture loss, disabling, direction changes
+and detachment cancel an active gesture.
+
+Each successful pointer release, Enter/Space, automation Invoke or explicit `Confirm()` sets
+`IsConfirmed` and raises `Confirmed` once; further attempts return false or, for automation, reject
+Invoke until `Reset()` is called. `IsConfirmed` is two-way bindable; host changes synchronize the
+visual without raising the event. `Progress` and `IsDragging` are read-only. `Text` and
+`ConfirmedText` default to localized English/Chinese strings; set an action-specific label, or use
+`AutomationProperties.Name` for a distinct accessible name. The peer exposes a button with Invoke, retaining the action name and reporting completion via item status.
+Track, progress, thumb and arrow brushes use scoped Material resources and can be overridden.
+
+This control is **not a security boundary**: keyboard, automation and `Confirm()` deliberately do not
+require dragging. The host owns authorization, validation, asynchronous work and any extra consent.
+No command, async busy state, arbitrary template, haptics or Flutter API/visual parity is provided.
+
+```xml
+<eco:MdSlideToConfirm Text="Submit order" IsConfirmed="{Binding Submitted}"
+                      Confirmed="OnOrderConfirmed" />
+```
+
 ## Emoji picker (Extra)
 
 `MdEmojiPicker` displays a small manually curated set of 16 examples. Set `ItemsSource` to a

@@ -25,8 +25,8 @@ jobs:
       - name: Install the native toolchain ILC links against
         run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev xvfb libx11-6 libice6 libsm6 libfontconfig1
       # The script is the single source of truth for the AOT publish: it asserts the output is a
-      # native executable with no managed app assembly beside it, then exercises both the file-system
-      # picker and emoji picker in separate native processes, checking their real selection paths.
+      # native executable with no managed app assembly beside it, then exercises the file-system
+      # picker, emoji picker and slide-confirm automation action in separate native processes.
       - name: Publish, verify and smoke the native AOT gallery
         run: |
           # Capture both sides of the pipe: tee must not hide a failed publish or smoke.

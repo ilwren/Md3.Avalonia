@@ -154,6 +154,14 @@
       "license": "MIT",
       "disposition": "Documentation-only behavioral reference for independently implemented MdMediaProgressBar; no Dart source or assets copied."
     },
+    "slide_to_act": {
+      "version": "2.0.2",
+      "repository": "https://github.com/muhammadtalhasultan/flutter-slide-to-act",
+      "commit": "36deeafa3810d8bb88f2e533aa365b59f177b54a",
+      "documentation": "https://github.com/muhammadtalhasultan/flutter-slide-to-act/blob/36deeafa3810d8bb88f2e533aa365b59f177b54a/README.md",
+      "license": "MIT",
+      "note": "Public documentation, metadata and license only; independently implemented slide confirmation, no Dart source or assets copied."
+    },
     "numberpicker": {
       "version": "2.1.2",
       "repository": "https://github.com/MarcinusX/NumberPicker",
