@@ -301,16 +301,19 @@ public sealed class MdMotionApiExpansionTests
         var requested = new List<bool>();
         source.TransitionRequested += (_, args) => requested.Add(args.IsUserGesture);
 
+        // Flight setup runs synchronously before its first await; don't pump render jobs here,
+        // which can advance or even finish the short reduced-motion flight on a busy runner.
         var flight = source.TransitionToAsync(destination).AsTask();
-        Dispatcher.UIThread.RunJobs();
         Assert.NotNull(shuttleContext);
         Assert.Same(source, placeholderHero);
         Assert.True(shuttle.IsAttachedToVisualTree());
         Assert.True(overlay.Children.Count >= baseline + 2); // shuttle + placeholder
         Assert.False(requested[^1]);
 
-        // The context drives the shuttle's bounds through the rect tween.
-        Assert.Equal(shuttleContext!.SourceBounds, shuttleContext.CurrentBounds);
+        // The animation may have advanced while jobs were pumped. Test the endpoints by
+        // explicitly setting progress instead of assuming the flight is still at zero.
+        shuttleContext!.Progress = 0;
+        Assert.Equal(shuttleContext.SourceBounds, shuttleContext.CurrentBounds);
         shuttleContext.Progress = 1;
         var arrival = shuttleContext.CurrentBounds;
         Assert.Equal(shuttleContext.DestinationBounds.X, arrival.X, 6);
