@@ -50,6 +50,41 @@ public sealed class MdGalleryMobileSearchTests
     }
 
     [AvaloniaFact]
+    public void Home_And_Drawer_Share_The_Query_When_Results_Exceed_The_Home_Limit()
+    {
+        var shell = new AndroidGalleryView();
+        var host = new Window { Width = 390, Height = 780, Content = shell };
+        host.Show();
+        try
+        {
+            var home = shell.FindControl<MdSearchBar>("HomeSearch")!;
+            var drawerSearch = shell.FindControl<MdSearchBar>("DrawerSearch")!;
+            var items = shell.FindControl<StackPanel>("MobileNavigationItems")!;
+            var results = shell.FindControl<StackPanel>("HomeSearchResults")!;
+            var status = shell.FindControl<TextBlock>("HomeSearchStatus")!;
+            home.Text = "a";
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal("a", drawerSearch.Text);
+            Assert.Equal(8, results.Children.OfType<MdButton>().Count());
+            Assert.Contains("Open the menu", status.Text ?? string.Empty);
+            Assert.True(items.Children.OfType<MdButton>().Count(button => button.IsVisible) > 8);
+
+            drawerSearch.Text = "mdrevealhost";
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal("mdrevealhost", home.Text);
+            Assert.Equal("Motion", Assert.Single(results.Children.OfType<MdButton>()).Content);
+            Assert.Equal("Motion", Assert.Single(items.Children.OfType<MdButton>(), button => button.IsVisible).Content);
+
+            drawerSearch.Text = "";
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal("", home.Text);
+            Assert.Empty(results.Children);
+            Assert.All(items.Children.OfType<MdButton>(), button => Assert.True(button.IsVisible));
+        }
+        finally { host.Close(); }
+    }
+
+    [AvaloniaFact]
     public void Drawer_Filters_Sections_And_Enter_Navigates_Then_Clear_Restores_Them()
     {
         var shell = new AndroidGalleryView();

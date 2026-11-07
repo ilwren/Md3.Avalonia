@@ -237,7 +237,9 @@ public partial class AndroidGalleryView : UserControl
     private void DrawerSearchChanged(object? sender, TextChangedEventArgs e)
     {
         if (DrawerSearch is null || DrawerSearchStatus is null) return;
-        var query = DrawerSearch.Text?.Trim() ?? string.Empty;
+        var text = DrawerSearch.Text ?? string.Empty;
+        if (HomeSearch is not null && HomeSearch.Text != text) HomeSearch.Text = text;
+        var query = text.Trim();
         var matches = SearchEntries(query);
         var matched = matches.ToHashSet();
         foreach (var entry in _galleryIndex)
@@ -253,7 +255,9 @@ public partial class AndroidGalleryView : UserControl
     private void HomeSearchChanged(object? sender, TextChangedEventArgs e)
     {
         if (HomeSearch is null || HomeSearchResults is null || HomeSearchStatus is null) return;
-        var query = HomeSearch.Text?.Trim() ?? string.Empty;
+        var text = HomeSearch.Text ?? string.Empty;
+        if (DrawerSearch is not null && DrawerSearch.Text != text) DrawerSearch.Text = text;
+        var query = text.Trim();
         HomeSearchResults.Children.Clear();
         HomeSearchStatus.IsVisible = query.Length > 0;
         if (query.Length == 0) return;

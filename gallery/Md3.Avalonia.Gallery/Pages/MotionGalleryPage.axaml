@@ -117,7 +117,7 @@
           <Border Width="120" Height="48" HorizontalAlignment="Left" VerticalAlignment="Top" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
           <Border Width="260" Height="120" HorizontalAlignment="Left" VerticalAlignment="Top" Opacity="0.5" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" />
         </extra:MdMorphPanel>
-        <gallery:CodeExample XamlCode="&lt;extra:MdRevealHost Fraction=&quot;{Binding Reveal}&quot;&gt;...&lt;/extra:MdRevealHost&gt;&#10;&lt;extra:MdMorphPanel Progress=&quot;{Binding Progress}&quot;&gt;...&lt;/extra:MdMorphPanel&gt;" />
+        <gallery:CodeExample XamlCode="&lt;extra:MdRevealHost Axis=&quot;Vertical&quot; Fraction=&quot;{Binding Reveal}&quot;&gt;&#10;  &lt;Border Width=&quot;240&quot; Height=&quot;96&quot; Background=&quot;{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}&quot; /&gt;&#10;&lt;/extra:MdRevealHost&gt;&#10;&lt;extra:MdMorphPanel Progress=&quot;{Binding Progress}&quot;&gt;&#10;  &lt;Border Width=&quot;120&quot; Height=&quot;48&quot; Background=&quot;{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}&quot; /&gt;&#10;  &lt;Border Width=&quot;240&quot; Height=&quot;96&quot; Opacity=&quot;0.5&quot; Background=&quot;{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}&quot; /&gt;&#10;&lt;/extra:MdMorphPanel&gt;" />
       </StackPanel>
 
       <!-- Usage Example -->
