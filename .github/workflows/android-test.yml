@@ -70,14 +70,19 @@ jobs:
         with:
           api-level: 34
           arch: x86_64
-          target: google_apis
+          # ATD (Automated Test Device) images are the CI-oriented variant: no Play Store, no
+          # Chrome, fewer always-on services. The stock google_apis image kept killing its own
+          # system_server on these runners ("FATAL EXCEPTION IN SYSTEM PROCESS ... Lost network
+          # stack", then DeadSystemException in every app), which took the package manager down
+          # mid-install. ATD is roughly 40% lighter and is what Google recommends for CI.
+          target: google_atd
           # Boots have been observed anywhere between a couple of minutes and "never" on shared
           # runners; give the emulator its own generous budget instead of racing the step timeout.
           emulator-boot-timeout: 900
           profile: pixel_6
           force-avd-creation: true
           disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
           script: |
             # The action runs this block under `sh -e`: the first failing command would abort
             # everything after it, which is how earlier runs lost their evidence. Neutralise that
