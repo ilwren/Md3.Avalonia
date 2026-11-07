@@ -151,26 +151,41 @@ def parse_surfaceflinger_latency(text: str) -> dict:
     return result
 
 
+def rank_app_surface_layers(listing: str, package: str) -> list[str]:
+    """The app's SurfaceFlinger layers, most-likely-to-carry-frames first.
+
+    An emulator lists several layers for one app: the wallpaper-ish
+    "Background for SurfaceView[...]" layer, the "SurfaceView[...]" layer the GL renderer actually
+    presents from, and a BLAST buffer for the activity. Ranking matters because reading the wrong
+    one reports zero frames for a UI that is drawing fine.
+    """
+    candidates = [line.strip() for line in listing.splitlines() if package in line and line.strip()]
+
+    def score(layer: str) -> int:
+        if layer.startswith("Background for"):
+            return 0          # wallpaper/composition layer: never carries the app's frames
+        if layer.startswith("SurfaceView["):
+            return 100        # the EGL surface of a GL-drawing app such as Avalonia
+        if "SurfaceView[" in layer:
+            return 50
+        if layer.startswith("BLAST"):
+            return 20
+        return 10
+
+    ranked = sorted(candidates, key=score, reverse=True)
+    return [layer for layer in ranked if score(layer) > 0]
+
+
 def pick_app_surface_layer(listing: str, package: str) -> str | None:
-    """Choose the SurfaceFlinger layer that carries the app's rendered frames."""
-    candidates = [line.strip() for line in listing.splitlines()
-                  if package in line and line.strip()]
-    if not candidates:
-        return None
-    # A GL-drawing app publishes through a SurfaceView-backed layer; prefer that over incidental
-    # layers such as the activity's own (empty) BLAST buffer.
-    for needle in ("SurfaceView", "BLAST", "crc64"):
-        for candidate in candidates:
-            if needle in candidate:
-                return candidate
-    return candidates[0]
+    ranked = rank_app_surface_layers(listing, package)
+    return ranked[0] if ranked else None
 
 
 def parse_meminfo(text: str) -> dict:
     mem: dict = {"totalPssKb": None, "nativePssKb": None, "dalvikPssKb": None}
-    sf: dict = {"refreshPeriodMs": None, "framesPresented": None, "p50IntervalMs": None,
-                "p90IntervalMs": None, "p99IntervalMs": None, "maxIntervalMs": None,
-                "slowFramesPct": None}
+    sf: dict = {"layer": None, "refreshPeriodMs": None, "framesPresented": None,
+                "p50IntervalMs": None, "p90IntervalMs": None, "p99IntervalMs": None,
+                "maxIntervalMs": None, "slowFramesPct": None}
 
     def first_int(pattern: str) -> int | None:
         match = re.search(pattern, text, re.M)
@@ -264,9 +279,9 @@ def main() -> int:
         "missedVsync", "highInputLatency", "slowUiThread",
         "slowBitmapUploads", "slowIssueDrawCommands", "frameDead")}
     mem: dict = {"totalPssKb": None, "nativePssKb": None, "dalvikPssKb": None}
-    sf: dict = {"refreshPeriodMs": None, "framesPresented": None, "p50IntervalMs": None,
-                "p90IntervalMs": None, "p99IntervalMs": None, "maxIntervalMs": None,
-                "slowFramesPct": None}
+    sf: dict = {"layer": None, "refreshPeriodMs": None, "framesPresented": None,
+                "p50IntervalMs": None, "p90IntervalMs": None, "p99IntervalMs": None,
+                "maxIntervalMs": None, "slowFramesPct": None}
     device: dict = {"model": None, "sdk": None}
     initial_displayed_ms: int | None = None
     cold_start_displayed_ms: int | None = None
@@ -319,18 +334,27 @@ def main() -> int:
                 # SurfaceFlinger sees frames the platform renderer never counts (see
                 # parse_surfaceflinger_latency).
                 code, layers = run(adb + ["shell", "dumpsys", "SurfaceFlinger", "--list"])
-                layer = pick_app_surface_layer(layers, package) if code == 0 else None
-                if layer:
-                    code, latency = run(adb + ["shell", "dumpsys", "SurfaceFlinger",
-                                               "--latency", layer])
-                    (out_dir / "surfaceflinger.txt").write_text(latency, encoding="utf-8")
-                    if code == 0:
-                        sf = parse_surfaceflinger_latency(latency)
-                        if not sf["framesPresented"]:
-                            warnings.append("SurfaceFlinger reported no presented frames for "
-                                            f"layer {layer!r}")
-                    else:
+                ranked = rank_app_surface_layers(layers, package) if code == 0 else []
+                if ranked:
+                    best_layer, best_latency = None, ""
+                    for candidate in ranked[:3]:
+                        code, latency = run(adb + ["shell", "dumpsys", "SurfaceFlinger",
+                                                   "--latency", candidate])
+                        if code != 0:
+                            continue
+                        candidate_sf = parse_surfaceflinger_latency(latency)
+                        if best_layer is None or (candidate_sf["framesPresented"] or 0) > (sf["framesPresented"] or 0):
+                            best_layer, best_latency, sf = candidate, latency, candidate_sf
+                        if (candidate_sf["framesPresented"] or 0) > 0:
+                            break
+                    if best_layer is None:
                         warnings.append("dumpsys SurfaceFlinger --latency failed")
+                    else:
+                        sf["layer"] = best_layer
+                        (out_dir / "surfaceflinger.txt").write_text(best_latency, encoding="utf-8")
+                        if not sf["framesPresented"]:
+                            warnings.append("SurfaceFlinger presented no frames on any app layer: "
+                                            "the UI never reached the screen")
                 else:
                     warnings.append("no SurfaceFlinger layer matched the package; frame timeline "
                                     "unavailable")

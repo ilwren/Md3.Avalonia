@@ -248,10 +248,17 @@ class SurfaceFlingerTests(unittest.TestCase):
             self.assertIsNone(sf["p90IntervalMs"])
             self.assertIn("framesPresented", sf)
 
-    def test_layer_choice_prefers_the_surfaceview(self):
+    def test_layer_choice_skips_the_background_layer(self):
+        # An emulator lists "Background for SurfaceView[...]" first; it never presents frames.
         layer = collector.pick_app_surface_layer(SF_LIST, PACKAGE)
-        self.assertIn("SurfaceView[", layer)
+        self.assertTrue(layer.startswith("SurfaceView["), layer)
+        self.assertNotIn("Background for", layer)
         self.assertIsNone(collector.pick_app_surface_layer("unrelated\n", PACKAGE))
+
+    def test_ranking_puts_the_drawing_layer_first(self):
+        ranked = collector.rank_app_surface_layers(SF_LIST, PACKAGE)
+        self.assertTrue(ranked[0].startswith("SurfaceView["))
+        self.assertFalse(any(layer.startswith("Background for") for layer in ranked))
 
 
 class AmStartParsingTests(unittest.TestCase):
@@ -299,6 +306,7 @@ class ApkResolutionTests(unittest.TestCase):
 # activity layer plus the SurfaceView the GL renderer actually presents from.
 SF_LIST = (
     "com.android.systemui.ImageWallpaper\n"
+    "Background for SurfaceView[io.arena.md3avalonia.gallery/crc64a06d4c86ac145abe.MainActivity]#103\n"
     "SurfaceView[io.arena.md3avalonia.gallery/crc64a06d4c86ac145abe.MainActivity]#0\n"
     "io.arena.md3avalonia.gallery/crc64a06d4c86ac145abe.MainActivity#0\n"
 )
