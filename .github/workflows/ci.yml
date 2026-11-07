@@ -292,6 +292,10 @@ jobs:
         continue-on-error: true
         run: scripts/probe-tests.sh MdMarkdownThemeTests markdown.trx
 
+      - name: Probe mobile Gallery search and primitive demos
+        continue-on-error: true
+        run: scripts/probe-tests.sh 'FullyQualifiedName~MdGalleryMobileSearchTests|FullyQualifiedName~MdGalleryPrimitivesTests' gallery-mobile-primitives.trx
+
       - name: Probe the gallery tests alone
         continue-on-error: true
         run: scripts/probe-tests.sh MdGallery gallery.trx
