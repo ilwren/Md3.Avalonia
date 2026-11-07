@@ -7,6 +7,8 @@
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Headless.XUnit" />
+    <!-- Vendor investigation only; never referenced by the Gallery or distributable packages. -->
+    <PackageReference Include="Sortable.Avalonia" />
     <!-- Tests build Dock layouts in C#; the theme package itself only needs Dock.Avalonia. -->
     <PackageReference Include="Dock.Model.Avalonia" />
     <PackageReference Include="Avalonia.Skia" />

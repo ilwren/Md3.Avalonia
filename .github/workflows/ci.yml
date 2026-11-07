@@ -250,6 +250,12 @@ jobs:
       - name: Probe marquee tests
         run: scripts/probe-tests.sh MdMarqueeTests marquee.trx
 
+      - name: Check Sortable probe package metadata
+        run: python3 scripts/check-sortable-probe-package.py "$HOME/.nuget/packages/sortable.avalonia/2.3.1/sortable.avalonia.nuspec"
+
+      - name: Probe Sortable vendor investigation tests
+        run: scripts/probe-tests.sh SortableVendorProbe sortable-vendor.trx
+
       - name: Probe slide confirmation tests
         run: scripts/probe-tests.sh MdSlideToConfirm slide-confirm.trx
 
