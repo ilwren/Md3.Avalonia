@@ -70,7 +70,7 @@ public partial class BorderlessWindowGalleryPage : UserControl
         var maximize = new MdWindowCaptionButton { Kind = MdCaptionButtonKind.MaximizeRestore, Content = "□", Width = 48, Height = 40 };
         var close = new MdCaptionButton { Kind = MdCaptionButtonKind.Close, Content = "×", Width = 48, Height = 40 };
         var actions = new StackPanel { Orientation = Orientation.Horizontal, Children = { minimize, maximize, close } };
-        var clientBar = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), Background = this.FindResource("Md.Sys.Color.SurfaceContainerHigh.Brush") as Avalonia.Media.IBrush };
+        var clientBar = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), Background = this.FindResource("Md.Sys.Color.SurfaceContainerHigh.Brush") as global::Avalonia.Media.IBrush };
         Grid.SetColumn(actions, 1);
         clientBar.Children.Add(dragRegion);
         clientBar.Children.Add(actions);
