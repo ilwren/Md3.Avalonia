@@ -172,6 +172,51 @@ The baseline is therefore asserted in C# rather than added to the oracle file â€
 alone would have made the oracle a half-truth and inflated `oracle_coverage_ratio` without measuring
 anything new.
 
+### The oracle cannot catch a value that is wrong in both places
+
+Every token in `spec-snapshot/tokens.json` was transcribed by hand from Material's pages, and every one of
+them is compared against the theme on each run. That is a real check, and it has one blind spot that no
+amount of coverage fixes: if a number is transcribed wrong into the oracle *and* into the theme, the two
+agree with each other, the layer passes, and the library ships the wrong number with a green report saying
+it matches the specification.
+
+`spec-snapshot/component-tokens.json` closes that, by taking the oracle out of the loop. It is a
+machine-produced dump of Material Web's own token files at the pinned commit - 55 `_md-comp-*.scss` files,
+307 values - and it holds only what the specification states as a number: a px literal, or an `md-sys-shape`
+step resolved against `_md-sys-shape.scss`. Colours and type-scale references are deliberately absent,
+because a second copy of the colour scheme would drift from `MdBaselineScheme`, and the type scale is
+already covered.
+
+`MdComponentTokenTests` then compares 49 of this library's `Md.Comp.*` keys against it at runtime, through
+the same theme merge the application uses. The mapping is the interesting part and it lives in the snapshot
+rather than in the test: Material ships one file per variant (`fab-primary-small`) where this library ships
+one token per size (`Fab.Small.*`), and its names are more specific (`container-height` for what this library
+calls `Size`). Every key with no counterpart is listed as a measured queue of 220, not silently skipped, and
+the three that are out of reach on purpose say why in `excluded_by_design`.
+
+The first run found one real divergence - a large FAB icon at 32dp where `fab-primary-large.icon-size` is
+36px - and then produced eleven findings that were the test's own fault, in three waves:
+
+- shape values were compared as scalars, because the snapshot stores a shape as its number *and* the step
+  it came from, and the theme resolves it as a `CornerRadius`;
+- border widths read as "not declared at all", because this library authors them as a `Thickness` (one
+  value per edge) where Material states one number. A *uniform* quad is that number; a non-uniform one is a
+  real difference, and the check now says which;
+- and the shape check itself was wrong twice. It first demanded that anything Material calls `corner-full`
+  hold the 999 step, which flagged three tokens that were fine - a 6dp dot badge rounds at 3, a 16dp badge
+  at 8, a 40dp state layer at 20: exactly half the box, which *is* full. Then it fell back to a "at least
+  28" threshold for the tokens it had no box for, which is the scale's largest fixed step and not a
+  property of any control: a 40dp round button rounds at 20 and is still a circle. The invariant that
+  survives is the real one - a full-shape token must be at least as round as the box it rounds - and every
+  such token is now paired with its box.
+
+That sequence is worth recording because it is the shape of the whole exercise: a check that measures the
+wrong invariant produces findings that look like defects, and "fixing" them would have made the library
+worse (a dot badge with a 999dp radius is the same circle; a badge whose radius changed from 3 to 999 is a
+cosmetic change nobody asked for). The rule applied throughout - never widen a gate, never round a value to
+make a comparison pass, and check the meaning rather than the number - is what turned those eleven findings
+into one.
+
 ### The geometry metric measured the wrong tree, and then it halved
 
 `hardcoded_geometry` is the largest number in the table and for a long time it was also the least
