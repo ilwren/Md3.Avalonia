@@ -56,12 +56,12 @@
                        Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
             <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
               <TextBlock Text="{Binding Author}"
-                         FontSize="12"
+                         FontSize="{DynamicResource Md.Sys.TypeScale.LabelMedium.Size}"
                          Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
               <TextBlock Text="·"
-                         FontSize="12"
+                         FontSize="{DynamicResource Md.Sys.TypeScale.LabelMedium.Size}"
                          Foreground="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
-              <TextBlock FontSize="12"
+              <TextBlock FontSize="{DynamicResource Md.Sys.TypeScale.LabelMedium.Size}"
                          Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}">
                 <TextBlock.Text>
                   <Binding Path="Date" Converter="{StaticResource MdCommitGraphDateConverter}" />
@@ -69,19 +69,19 @@
               </TextBlock>
               <Border IsVisible="{Binding Tag, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                       Background="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}"
-                      CornerRadius="4"
+                      CornerRadius="{DynamicResource Md.Sys.Shape.Corner.ExtraSmall}"
                       Padding="6,1"
                       Margin="4,0,0,0"
                       VerticalAlignment="Center">
                 <TextBlock Text="{Binding Tag}"
-                           FontSize="11"
+                           FontSize="{DynamicResource Md.Sys.TypeScale.LabelSmall.Size}"
                            Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
               </Border>
             </StackPanel>
           </StackPanel>
           <TextBlock Grid.Column="1"
                      VerticalAlignment="Center"
-                     FontSize="12"
+                     FontSize="{DynamicResource Md.Sys.TypeScale.LabelMedium.Size}"
                      FontFamily="Cascadia Mono,Consolas,Menlo,DejaVu Sans Mono,Liberation Mono,Noto Sans Mono,monospace"
                      Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                      Text="{Binding ShortId}" />

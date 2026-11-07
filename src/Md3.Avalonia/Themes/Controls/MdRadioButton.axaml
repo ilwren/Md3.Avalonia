@@ -9,7 +9,7 @@
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="HorizontalContentAlignment" Value="Left" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
-    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdRadioButton">
@@ -25,7 +25,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Background="{TemplateBinding StateLayerBrush}"
-                    CornerRadius="20"
+                    CornerRadius="{DynamicResource Md.Sys.Shape.Corner.LargeIncreased}"
                     IsHitTestVisible="False"
                     Opacity="0" />
             <md:MdRipplePresenter Width="{DynamicResource Md.Comp.RadioButton.StateLayer.Size}"

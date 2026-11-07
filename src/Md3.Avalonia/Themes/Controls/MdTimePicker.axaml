@@ -9,12 +9,12 @@
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="Button">
-        <Border Background="{TemplateBinding Background}" CornerRadius="16" ClipToBounds="True">
+        <Border Background="{TemplateBinding Background}" CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Large}" ClipToBounds="True">
           <Grid>
             <Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" Opacity="0" />
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                               Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"
-                              FontSize="45" />
+                              FontSize="{DynamicResource Md.Sys.TypeScale.DisplayMedium.Size}" />
           </Grid>
         </Border>
       </ControlTemplate>
@@ -44,10 +44,10 @@
             <Grid ColumnDefinitions="*,Auto">
               <StackPanel Grid.Column="0" HorizontalAlignment="Left" Spacing="1">
                 <ContentPresenter Content="{TemplateBinding Label}"
-                                  FontSize="12"
+                                  FontSize="{DynamicResource Md.Sys.TypeScale.LabelMedium.Size}"
                                   Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
                 <TextBlock x:Name="PART_DisplayText"
-                           FontSize="16"
+                           FontSize="{DynamicResource Md.Sys.TypeScale.BodyLarge.Size}"
                            Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
                            Text="{TemplateBinding DisplayText}" />
               </StackPanel>
@@ -70,11 +70,11 @@
                     Padding="24"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
                     BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}"
-                    CornerRadius="28"
+                    CornerRadius="{DynamicResource Md.Sys.Shape.Corner.ExtraLarge}"
                     ClipToBounds="True" Opacity="0"
                     RenderTransform="scale(0.9) translate(0px,-8px)" RenderTransformOrigin="50%,0%">
               <StackPanel Spacing="20">
-                <TextBlock FontSize="12" FontWeight="Medium"
+                <TextBlock FontSize="{DynamicResource Md.Sys.TypeScale.LabelMedium.Size}" FontWeight="Medium"
                            Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                            Text="{TemplateBinding HeaderText}" />
 
@@ -87,7 +87,7 @@
                             Theme="{StaticResource MdClockFieldButtonTheme}"
                             Content="{TemplateBinding HourText}" />
                     <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
-                               FontSize="45" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" Text=":" />
+                               FontSize="{DynamicResource Md.Sys.TypeScale.DisplayMedium.Size}" Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}" Text=":" />
                     <Button x:Name="PART_MinuteDialHost" Grid.Column="2"
                             AutomationProperties.Name="Edit minute on clock face"
                             Theme="{StaticResource MdClockFieldButtonTheme}"
@@ -109,7 +109,7 @@
                   <md:MdTextBox x:Name="PART_HourInput" Grid.Column="0" Label="Hour" MaxLength="2"
                                 HorizontalContentAlignment="Center"
                                 Text="{TemplateBinding HourText}" Variant="Outlined" />
-                  <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="28" Text=":" />
+                  <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="{DynamicResource Md.Sys.TypeScale.HeadlineMedium.Size}" Text=":" />
                   <md:MdTextBox x:Name="PART_MinuteInput" Grid.Column="2" Label="Minute" MaxLength="2"
                                 HorizontalContentAlignment="Center"
                                 Text="{TemplateBinding MinuteText}" Variant="Outlined" />

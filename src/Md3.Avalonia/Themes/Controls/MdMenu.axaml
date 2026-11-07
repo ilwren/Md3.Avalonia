@@ -18,9 +18,9 @@
               <ContentPresenter x:Name="PART_Leading" Grid.Column="0" Width="24" Height="24" VerticalAlignment="Center"
                                 Content="{TemplateBinding LeadingContent}" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" IsVisible="False" />
               <ContentPresenter Grid.Column="1" VerticalAlignment="Center" Content="{TemplateBinding Content}"
-                                ContentTemplate="{TemplateBinding ContentTemplate}" FontSize="14" Foreground="{TemplateBinding Foreground}" />
+                                ContentTemplate="{TemplateBinding ContentTemplate}" FontSize="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" Foreground="{TemplateBinding Foreground}" />
               <ContentPresenter x:Name="PART_Trailing" Grid.Column="2" VerticalAlignment="Center" Content="{TemplateBinding TrailingContent}"
-                                FontSize="12" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" IsVisible="False" />
+                                FontSize="{DynamicResource Md.Sys.TypeScale.BodySmall.Size}" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" IsVisible="False" />
             </Grid>
             <Border x:Name="PART_StateLayer" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" IsHitTestVisible="False" Opacity="0" />
             <md:MdRipplePresenter RippleBrush="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />

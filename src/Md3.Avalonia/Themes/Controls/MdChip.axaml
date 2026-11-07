@@ -44,7 +44,7 @@
                                 VerticalAlignment="Center"
                                 Content="{TemplateBinding Content}"
                                 ContentTemplate="{TemplateBinding ContentTemplate}"
-                                FontSize="14"
+                                FontSize="{DynamicResource Md.Sys.TypeScale.LabelLarge.Size}"
                                 FontWeight="Medium"
                                 Foreground="{TemplateBinding Foreground}" />
               <Grid x:Name="PART_TrailingHost" Grid.Column="2" IsVisible="False">

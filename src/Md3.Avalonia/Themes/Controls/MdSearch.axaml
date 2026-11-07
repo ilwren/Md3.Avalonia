@@ -4,14 +4,14 @@
   <ControlTheme x:Key="MdSearchInternalButtonTheme" TargetType="Button">
     <Setter Property="Width" Value="40" /><Setter Property="Height" Value="40" /><Setter Property="Background" Value="Transparent" /><Setter Property="Cursor" Value="Hand" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" /><Setter Property="FocusAdorner" Value="{x:Null}" />
-    <Setter Property="Template"><ControlTemplate TargetType="Button"><Border x:Name="PART_State" Background="{TemplateBinding Background}" CornerRadius="20"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" /></Border></ControlTemplate></Setter>
+    <Setter Property="Template"><ControlTemplate TargetType="Button"><Border x:Name="PART_State" Background="{TemplateBinding Background}" CornerRadius="{DynamicResource Md.Sys.Shape.Corner.LargeIncreased}"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" /></Border></ControlTemplate></Setter>
     <Style Selector="^:pointerover /template/ Border#PART_State"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHighest.Brush}" /></Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdSearchBar}" TargetType="md:MdSearchBar">
     <Setter Property="MinHeight" Value="56" /><Setter Property="MinWidth" Value="240" /><Setter Property="Padding" Value="16,0" />
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" /><Setter Property="PlaceholderForeground" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-    <Setter Property="CornerRadius" Value="28" /><Setter Property="BorderThickness" Value="0" /><Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.ExtraLarge}" /><Setter Property="BorderThickness" Value="0" /><Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="SelectionBrush" Value="{DynamicResource Md.Sys.Color.PrimarySelection.Brush}" /><Setter Property="CaretBrush" Value="{DynamicResource Md.Sys.Color.Primary.Brush}" />
     <Setter Property="Cursor" Value="IBeam" />
     <Setter Property="Template">
@@ -49,7 +49,7 @@
     <Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="VerticalContentAlignment" Value="Stretch" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdSearchView">
-        <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="28" ClipToBounds="True">
+        <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}" CornerRadius="{DynamicResource Md.Sys.Shape.Corner.ExtraLarge}" ClipToBounds="True">
           <Grid RowDefinitions="Auto,*">
             <ContentPresenter Grid.Row="0" Margin="8" Content="{TemplateBinding Header}" />
             <ContentPresenter x:Name="PART_Results" Grid.Row="1" Margin="16" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" IsVisible="False" Opacity="0" RenderTransform="translate(0px,-12px)" />

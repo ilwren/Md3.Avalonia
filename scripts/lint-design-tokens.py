@@ -178,6 +178,17 @@ def iter_all_axaml() -> list[Path]:
     return [p for p in out if "/obj/" not in p.as_posix() and "/bin/" not in p.as_posix()]
 
 
+def _theme_axaml() -> list[Path]:
+    """Every theme file the library ships, across all packages.
+
+    The sibling packages (Extra, DataGrid, PropertyGrid, Markdown, AvaloniaEdit, InkCanvas) author
+    control themes exactly like the core package does, so a literal there is the same gap.
+    """
+    out = {p for p in (REPO / "src").glob("Md3.Avalonia*/Themes/*.axaml")}
+    out |= set((REPO / "src/Md3.Avalonia/Themes/Controls").glob("*.axaml"))
+    return sorted(p for p in out if "/obj/" not in p.as_posix() and "/bin/" not in p.as_posix())
+
+
 # ---------------------------------------------------------------------------
 # Value parsing (mirrors Avalonia's shorthand expansion)
 # ---------------------------------------------------------------------------
@@ -395,7 +406,10 @@ def rule_includes(lint: Lint) -> None:
 
 
 def rule_hardcoded_geometry(lint: Lint) -> None:
-    for path in sorted((REPO / "src/Md3.Avalonia/Themes/Controls").glob("*.axaml")):
+    # Every shipped theme, not only the core package's Controls folder: the sibling packages are
+    # the same kind of artefact, and until this rule reached them a quarter of the literals below
+    # were invisible to the metric, which made the gap look smaller than it is.
+    for path in _theme_axaml():
         r = rel(path)
         for lineno, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
             for setter_attr, direct_attr, raw in RE_GEOMETRY.findall(line):

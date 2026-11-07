@@ -63,9 +63,9 @@
     },
     "hardcoded_geometry": {
       "direction": "lower",
-      "budget": 279,
+      "budget": 269,
       "source": "lint",
-      "why": "279 themable geometry literals inside Themes/Controls/*.axaml. Each one is a visual value the oracle cannot audit and a consumer cannot retarget. This is the single largest measurable gap between the library and its token-first design requirement."
+      "why": "Themable geometry literals in every theme the library ships (src/Md3.Avalonia*/Themes/*.axaml, 269 now). Each one is a visual value the oracle cannot audit and a consumer cannot retarget, and it is the largest measurable gap between the library and its token-first design requirement. Two things happened in one round, and the second one is the honest part: the rule used to scan only the core package's Controls folder, so every literal in Extra, DataGrid, PropertyGrid, Markdown, AvaloniaEdit and InkCanvas was invisible to the metric. The rule now covers every shipped theme, which on its own would have raised the number; against that corrected measurement 218 literals became tokens, and the net figure fell from a comparable 474 to 269. Every FontSize that has a step of the published M3 type scale now resolves through Md.Sys.TypeScale.*.Size - including the 15 rows of MdText's type-scale classes, size and line height both - and every CornerRadius whose number is on the M3 shape scale through Md.Sys.Shape.Corner.*. The substitution was checked value by value against the declared tokens, and any that would have moved a pixel was reverted, which is why 13/10/18/20-ish sizes and derived radii such as an inset ring or a per-corner quad are still literals: rounding those to the nearest token is a design change, not a refactor, and it does not belong in a commit that claims none. What is left is MinHeight/MinWidth and those derived radii."
     },
     "hardcoded_ui_text": {
       "direction": "lower",

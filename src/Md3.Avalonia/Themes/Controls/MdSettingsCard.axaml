@@ -9,10 +9,10 @@
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
     <Setter Property="BorderThickness" Value="0" />
-    <Setter Property="CornerRadius" Value="16" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.Large}" />
     <!-- Default title size. It lives here, not on the presenter, so an author setting FontSize on
          the card actually wins: a literal on the presenter would outrank every outside value. -->
-    <Setter Property="FontSize" Value="16" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.TitleMedium.Size}" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Template">
@@ -44,7 +44,7 @@
                       Height="40"
                       VerticalAlignment="Center"
                       Background="{TemplateBinding IconBackground}"
-                      CornerRadius="20"
+                      CornerRadius="{DynamicResource Md.Sys.Shape.Corner.LargeIncreased}"
                       IsVisible="False">
                 <Viewbox Width="22" Height="22" HorizontalAlignment="Center" VerticalAlignment="Center">
                   <md:MdSymbolPresenter x:Name="PART_IconPresenter"
@@ -140,7 +140,7 @@
   <ControlTheme x:Key="{x:Type md:MdSettingsGroup}" TargetType="md:MdSettingsGroup">
     <Setter Property="Margin" Value="0,0,0,16" />
     <!-- Default group-label size, overridable from the outside. See the card theme above. -->
-    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdSettingsGroup">
         <StackPanel Spacing="8">
@@ -155,7 +155,7 @@
 
           <!-- Group Card Container -->
           <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
-                  CornerRadius="20"
+                  CornerRadius="{DynamicResource Md.Sys.Shape.Corner.LargeIncreased}"
                   ClipToBounds="True">
             <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
           </Border>
@@ -164,7 +164,7 @@
           <ContentPresenter x:Name="PART_DescriptionPresenter"
                             Margin="16,0,16,0"
                             Content="{TemplateBinding Description}"
-                            FontSize="12"
+                            FontSize="{DynamicResource Md.Sys.TypeScale.BodySmall.Size}"
                             Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                             IsVisible="False"
                             TextWrapping="Wrap" />
@@ -188,11 +188,11 @@
   <ControlTheme x:Key="{x:Type md:MdSettingsExpander}" TargetType="md:MdSettingsExpander">
     <Setter Property="Margin" Value="0,0,0,12" />
     <!-- Default title size, overridable from the outside. See the card theme above. -->
-    <Setter Property="FontSize" Value="16" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.TitleMedium.Size}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdSettingsExpander">
         <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}"
-                CornerRadius="20"
+                CornerRadius="{DynamicResource Md.Sys.Shape.Corner.LargeIncreased}"
                 ClipToBounds="True">
           <StackPanel>
             <!-- Header Toggle Bar -->
@@ -216,7 +216,7 @@
                        the card edge while the cards inside the expanded area were inset 32. -->
                   <Grid Background="Transparent" Margin="{TemplateBinding Padding}">
                     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16" VerticalAlignment="Center">
-                      <Border Width="40" Height="40" CornerRadius="20"
+                      <Border Width="40" Height="40" CornerRadius="{DynamicResource Md.Sys.Shape.Corner.LargeIncreased}"
                               Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}"
                               IsVisible="{Binding $parent[md:MdSettingsExpander].Icon, Converter={x:Static ObjectConverters.IsNotNull}}">
                         <Viewbox Width="22" Height="22" HorizontalAlignment="Center" VerticalAlignment="Center">

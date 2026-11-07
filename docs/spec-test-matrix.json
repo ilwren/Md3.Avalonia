@@ -356,6 +356,22 @@
         "MdDynamicThemeTests.Baseline_Seed_Matches_The_Published_M3_Baseline"
       ],
       "verification_status": "not_run"
+    },
+    {
+      "id": "GEOMETRY-TOKENS-001",
+      "component": "Every shipped control theme (Md3.Avalonia and its sibling packages)",
+      "variant": "light, dark, all density/size variants",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://m3.material.io/styles/shape/corner-radius-scale",
+      "assertion": "No shipped theme authors a font size or a corner radius as a bare number when the number is a step of the published M3 type or shape scale: each resolves through Md.Sys.TypeScale.*.Size or Md.Sys.Shape.Corner.*, so the value is auditable against the specification oracle and retargetable by a consumer. The lint rule covers every package, not only the core one, and the count of remaining literals is a measured budget that can only go down.",
+      "automated_evidence": [
+        "scripts/lint-design-tokens.py",
+        "spec-snapshot/conformance-budget.json"
+      ],
+      "verification_status": "not_run"
     }
   ]
 }

@@ -16,7 +16,7 @@
     <Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.Small.Icon.LabelSpace}" />
     <Setter Property="MinWidth" Value="48" />
     <Setter Property="MinHeight" Value="48" />
-    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.LabelLarge.Size}" />
     <Setter Property="FontWeight" Value="Medium" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -137,7 +137,7 @@
       <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.XSmall.Shape.Round}" />
       <Setter Property="IconSize" Value="{DynamicResource Md.Comp.Button.XSmall.Icon.Size}" />
       <Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.XSmall.Icon.LabelSpace}" />
-      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.LabelLarge.Size}" />
       <Setter Property="FontWeight" Value="Medium" />
     </Style>
 
@@ -147,7 +147,7 @@
       <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Small.Shape.Round}" />
       <Setter Property="IconSize" Value="{DynamicResource Md.Comp.Button.Small.Icon.Size}" />
       <Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.Small.Icon.LabelSpace}" />
-      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.LabelLarge.Size}" />
       <Setter Property="FontWeight" Value="Medium" />
     </Style>
 
@@ -157,7 +157,7 @@
       <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Medium.Shape.Round}" />
       <Setter Property="IconSize" Value="{DynamicResource Md.Comp.Button.Medium.Icon.Size}" />
       <Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.Medium.Icon.LabelSpace}" />
-      <Setter Property="FontSize" Value="16" />
+      <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.TitleMedium.Size}" />
       <Setter Property="FontWeight" Value="Medium" />
     </Style>
 
@@ -167,7 +167,7 @@
       <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.Large.Shape.Round}" />
       <Setter Property="IconSize" Value="{DynamicResource Md.Comp.Button.Large.Icon.Size}" />
       <Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.Large.Icon.LabelSpace}" />
-      <Setter Property="FontSize" Value="24" />
+      <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.HeadlineSmall.Size}" />
       <Setter Property="FontWeight" Value="Normal" />
       <Setter Property="MinHeight" Value="96" />
     </Style>
@@ -178,7 +178,7 @@
       <Setter Property="ContainerCornerRadius" Value="{DynamicResource Md.Comp.Button.XLarge.Shape.Round}" />
       <Setter Property="IconSize" Value="{DynamicResource Md.Comp.Button.XLarge.Icon.Size}" />
       <Setter Property="IconSpacing" Value="{DynamicResource Md.Comp.Button.XLarge.Icon.LabelSpace}" />
-      <Setter Property="FontSize" Value="32" />
+      <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.HeadlineLarge.Size}" />
       <Setter Property="FontWeight" Value="Normal" />
       <Setter Property="MinHeight" Value="136" />
     </Style>

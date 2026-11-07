@@ -30,7 +30,7 @@
                 BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="18" ClipToBounds="True">
           <Grid>
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}"
-                              FontSize="14" Foreground="{TemplateBinding Foreground}" />
+                              FontSize="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" Foreground="{TemplateBinding Foreground}" />
             <Border x:Name="PART_State" Background="{TemplateBinding Foreground}" CornerRadius="18" IsHitTestVisible="False" Opacity="0" />
             <Border x:Name="PART_Focus" Margin="2" BorderBrush="{DynamicResource Md.Sys.Color.Primary.Brush}"
                     BorderThickness="2" CornerRadius="16" IsHitTestVisible="False" IsVisible="False" />
@@ -58,9 +58,9 @@
             <Grid ColumnDefinitions="*,Auto">
               <StackPanel Grid.Column="0" HorizontalAlignment="Left" Spacing="1">
                 <ContentPresenter Content="{TemplateBinding Label}"
-                                  FontSize="12"
+                                  FontSize="{DynamicResource Md.Sys.TypeScale.BodySmall.Size}"
                                   Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-                <TextBlock x:Name="PART_DisplayText" FontSize="16"
+                <TextBlock x:Name="PART_DisplayText" FontSize="{DynamicResource Md.Sys.TypeScale.BodyLarge.Size}"
                            Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
                            Text="{TemplateBinding DisplayText}" />
               </StackPanel>
@@ -90,15 +90,15 @@
                     DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                     Background="{DynamicResource Md.Sys.Color.SurfaceContainerHigh.Brush}"
                     BoxShadow="{DynamicResource Md.Sys.Elevation.Level3}"
-                    CornerRadius="28"
+                    CornerRadius="{DynamicResource Md.Sys.Shape.Corner.ExtraLarge}"
                     ClipToBounds="True" Opacity="0"
                     RenderTransform="scale(0.9) translate(0px,-8px)" RenderTransformOrigin="50%,0%">
               <StackPanel Spacing="12">
-                <TextBlock FontSize="12"
+                <TextBlock FontSize="{DynamicResource Md.Sys.TypeScale.BodySmall.Size}"
                            FontWeight="Medium"
                            Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                            Text="{Binding HeaderText}" />
-                <TextBlock FontSize="28"
+                <TextBlock FontSize="{DynamicResource Md.Sys.TypeScale.HeadlineMedium.Size}"
                            Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
                            Text="{Binding DisplayText}" />
                 <Grid ColumnDefinitions="48,*,48">
@@ -109,7 +109,7 @@
                   <TextBlock x:Name="PART_MonthHeader" Grid.Column="1"
                              HorizontalAlignment="Center"
                              VerticalAlignment="Center"
-                             FontSize="16"
+                             FontSize="{DynamicResource Md.Sys.TypeScale.BodyLarge.Size}"
                              FontWeight="Medium"
                              Foreground="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
                              Text="{Binding MonthText}" />

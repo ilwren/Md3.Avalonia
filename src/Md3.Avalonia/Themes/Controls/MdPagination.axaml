@@ -14,7 +14,7 @@
     <Setter Property="Template">
       <ControlTemplate x:CompileBindings="False" TargetType="ListBoxItem">
         <Grid Background="Transparent">
-          <Border x:Name="PART_Section" CornerRadius="8" Background="Transparent">
+          <Border x:Name="PART_Section" CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Small}" Background="Transparent">
             <TextBlock x:Name="PART_PageLabel" HorizontalAlignment="Center" VerticalAlignment="Center"
                        FontSize="13" Foreground="{TemplateBinding Foreground}" Text="{Binding}" />
           </Border>
@@ -40,7 +40,7 @@
     <Setter Property="Template">
       <ControlTemplate TargetType="ListBoxItem">
         <Grid Background="Transparent">
-          <Border x:Name="PART_Dot" Width="8" Height="8" CornerRadius="4" VerticalAlignment="Center"
+          <Border x:Name="PART_Dot" Width="8" Height="8" CornerRadius="{DynamicResource Md.Sys.Shape.Corner.ExtraSmall}" VerticalAlignment="Center"
                   Background="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}">
             <Border.Transitions>
               <Transitions>

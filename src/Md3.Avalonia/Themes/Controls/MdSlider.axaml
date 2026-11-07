@@ -18,7 +18,7 @@
       <ControlTemplate TargetType="md:MdSliderThumb">
         <Canvas Width="4" Height="44">
           <Border x:Name="PART_ThumbStateLayer" Canvas.Left="-18" Canvas.Top="2" Width="40" Height="40"
-                  Background="{DynamicResource Md.Sys.Color.Primary.Brush}" CornerRadius="20"
+                  Background="{DynamicResource Md.Sys.Color.Primary.Brush}" CornerRadius="{DynamicResource Md.Sys.Shape.Corner.LargeIncreased}"
                   IsHitTestVisible="False" Opacity="0" RenderTransform="scale(0.8)" RenderTransformOrigin="50%,50%" />
           <Border x:Name="PART_Handle" Width="4" Height="44" Background="{TemplateBinding Background}" CornerRadius="2" />
           <Canvas x:Name="PART_ThumbValue" Canvas.Left="-22" Canvas.Top="-60" Width="48" Height="58"
@@ -26,7 +26,7 @@
             <Path Width="48" Height="58" Data="{StaticResource Md.Comp.Slider.ValueIndicator.Shape}"
                   Fill="{DynamicResource Md.Sys.Color.InverseSurface.Brush}" Stretch="Fill" />
             <TextBlock Canvas.Top="13" Width="48" HorizontalAlignment="Center" TextAlignment="Center"
-                       FontSize="14" FontWeight="Medium"
+                       FontSize="{DynamicResource Md.Sys.TypeScale.LabelLarge.Size}" FontWeight="Medium"
                        Foreground="{DynamicResource Md.Sys.Color.InverseOnSurface.Brush}"
                        Text="{TemplateBinding DisplayValue}" />
           </Canvas>

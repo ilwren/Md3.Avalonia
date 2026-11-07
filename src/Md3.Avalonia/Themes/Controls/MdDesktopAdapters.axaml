@@ -8,7 +8,7 @@
   <ControlTheme x:Key="MdVerticalScrollThumbTheme" TargetType="Thumb">
     <Setter Property="Width" Value="12" />
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.ExtraSmall}" />
     <Setter Property="Template">
       <ControlTemplate>
         <Grid Background="Transparent">
@@ -30,7 +30,7 @@
   <ControlTheme x:Key="MdHorizontalScrollThumbTheme" TargetType="Thumb">
     <Setter Property="Height" Value="12" />
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
-    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.ExtraSmall}" />
     <Setter Property="Template">
       <ControlTemplate>
         <Grid Background="Transparent">
@@ -149,7 +149,7 @@
     <Setter Property="Focusable" Value="False" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Border Background="Transparent" CornerRadius="12" ClipToBounds="True">
+        <Border Background="Transparent" CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Medium}" ClipToBounds="True">
           <Grid>
             <Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" Opacity="0" />
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -298,7 +298,7 @@
 
   <ControlTheme x:Key="{x:Type md:MdSurface}" TargetType="md:MdSurface">
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
-    <Setter Property="CornerRadius" Value="12" /><Setter Property="Template"><ControlTemplate><Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" BoxShadow="{TemplateBinding Elevation}" CornerRadius="{TemplateBinding CornerRadius}"><ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" /></Border></ControlTemplate></Setter>
+    <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.Medium}" /><Setter Property="Template"><ControlTemplate><Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" BoxShadow="{TemplateBinding Elevation}" CornerRadius="{TemplateBinding CornerRadius}"><ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" /></Border></ControlTemplate></Setter>
     <Style Selector="^:lowest"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.Surface.Brush}" /></Style>
     <Style Selector="^:low"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" /></Style>
     <Style Selector="^:container"><Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" /></Style>
@@ -309,21 +309,21 @@
 
   <ControlTheme x:Key="{x:Type md:MdText}" TargetType="md:MdText">
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
-    <Style Selector="^:display-large"><Setter Property="FontSize" Value="57" /><Setter Property="LineHeight" Value="64" /></Style>
-    <Style Selector="^:display-medium"><Setter Property="FontSize" Value="45" /><Setter Property="LineHeight" Value="52" /></Style>
-    <Style Selector="^:display-small"><Setter Property="FontSize" Value="36" /><Setter Property="LineHeight" Value="44" /></Style>
-    <Style Selector="^:headline-large"><Setter Property="FontSize" Value="32" /><Setter Property="LineHeight" Value="40" /></Style>
-    <Style Selector="^:headline-medium"><Setter Property="FontSize" Value="28" /><Setter Property="LineHeight" Value="36" /></Style>
-    <Style Selector="^:headline-small"><Setter Property="FontSize" Value="24" /><Setter Property="LineHeight" Value="32" /></Style>
-    <Style Selector="^:title-large"><Setter Property="FontSize" Value="22" /><Setter Property="LineHeight" Value="28" /></Style>
-    <Style Selector="^:title-medium"><Setter Property="FontSize" Value="16" /><Setter Property="LineHeight" Value="24" /><Setter Property="FontWeight" Value="Medium" /></Style>
-    <Style Selector="^:title-small"><Setter Property="FontSize" Value="14" /><Setter Property="LineHeight" Value="20" /><Setter Property="FontWeight" Value="Medium" /></Style>
-    <Style Selector="^:body-large"><Setter Property="FontSize" Value="16" /><Setter Property="LineHeight" Value="24" /></Style>
-    <Style Selector="^:body-medium"><Setter Property="FontSize" Value="14" /><Setter Property="LineHeight" Value="20" /></Style>
-    <Style Selector="^:body-small"><Setter Property="FontSize" Value="12" /><Setter Property="LineHeight" Value="16" /></Style>
-    <Style Selector="^:label-large"><Setter Property="FontSize" Value="14" /><Setter Property="LineHeight" Value="20" /><Setter Property="FontWeight" Value="Medium" /></Style>
-    <Style Selector="^:label-medium"><Setter Property="FontSize" Value="12" /><Setter Property="LineHeight" Value="16" /><Setter Property="FontWeight" Value="Medium" /></Style>
-    <Style Selector="^:label-small"><Setter Property="FontSize" Value="11" /><Setter Property="LineHeight" Value="16" /><Setter Property="FontWeight" Value="Medium" /></Style>
+    <Style Selector="^:display-large"><Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.DisplayLarge.Size}" /><Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.DisplayLarge.LineHeight}" /></Style>
+    <Style Selector="^:display-medium"><Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.DisplayMedium.Size}" /><Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.DisplayMedium.LineHeight}" /></Style>
+    <Style Selector="^:display-small"><Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.DisplaySmall.Size}" /><Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.DisplaySmall.LineHeight}" /></Style>
+    <Style Selector="^:headline-large"><Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.HeadlineLarge.Size}" /><Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.HeadlineLarge.LineHeight}" /></Style>
+    <Style Selector="^:headline-medium"><Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.HeadlineMedium.Size}" /><Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.HeadlineMedium.LineHeight}" /></Style>
+    <Style Selector="^:headline-small"><Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.HeadlineSmall.Size}" /><Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.HeadlineSmall.LineHeight}" /></Style>
+    <Style Selector="^:title-large"><Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.TitleLarge.Size}" /><Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.TitleLarge.LineHeight}" /></Style>
+    <Style Selector="^:title-medium"><Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.TitleMedium.Size}" /><Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.TitleMedium.LineHeight}" /><Setter Property="FontWeight" Value="Medium" /></Style>
+    <Style Selector="^:title-small"><Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.TitleSmall.Size}" /><Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.TitleSmall.LineHeight}" /><Setter Property="FontWeight" Value="Medium" /></Style>
+    <Style Selector="^:body-large"><Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyLarge.Size}" /><Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.BodyLarge.LineHeight}" /></Style>
+    <Style Selector="^:body-medium"><Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" /><Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.BodyMedium.LineHeight}" /></Style>
+    <Style Selector="^:body-small"><Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.BodySmall.Size}" /><Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.BodySmall.LineHeight}" /></Style>
+    <Style Selector="^:label-large"><Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.LabelLarge.Size}" /><Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.LabelLarge.LineHeight}" /><Setter Property="FontWeight" Value="Medium" /></Style>
+    <Style Selector="^:label-medium"><Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.LabelMedium.Size}" /><Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.LabelMedium.LineHeight}" /><Setter Property="FontWeight" Value="Medium" /></Style>
+    <Style Selector="^:label-small"><Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.LabelSmall.Size}" /><Setter Property="LineHeight" Value="{DynamicResource Md.Sys.TypeScale.LabelSmall.LineHeight}" /><Setter Property="FontWeight" Value="Medium" /></Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type md:MdStateLayer}" TargetType="md:MdStateLayer">
@@ -467,7 +467,7 @@
             </Grid>
             <StackPanel Grid.Column="1" Margin="12,0" VerticalAlignment="Center">
               <ContentPresenter Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" />
-              <ContentPresenter Content="{TemplateBinding Subtitle}" FontSize="11"
+              <ContentPresenter Content="{TemplateBinding Subtitle}" FontSize="{DynamicResource Md.Sys.TypeScale.LabelSmall.Size}"
                                 Foreground="{TemplateBinding Foreground}" Opacity="0.7" />
             </StackPanel>
             <ContentPresenter Grid.Column="2" VerticalAlignment="Center"
@@ -537,7 +537,7 @@
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.ExtraSmall}" />
     <Setter Property="Padding" Value="0,8" />
     <Setter Property="Template">
       <ControlTemplate>
@@ -591,7 +591,7 @@
                    Placement="RightEdgeAlignedTop">
               <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}"
                       BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}"
-                      BorderThickness="1" CornerRadius="4">
+                      BorderThickness="1" CornerRadius="{DynamicResource Md.Sys.Shape.Corner.ExtraSmall}">
                 <ItemsPresenter Name="PART_ItemsPresenter" Margin="0,8" />
               </Border>
             </Popup>

@@ -31,7 +31,7 @@
                               Margin="0,0,0,16"
                               HorizontalAlignment="Left"
                               Content="{TemplateBinding Headline}"
-                              FontSize="24"
+                              FontSize="{DynamicResource Md.Sys.TypeScale.HeadlineSmall.Size}"
                               Foreground="{TemplateBinding Foreground}"
                               IsVisible="False" />
             <ContentPresenter Grid.Row="2"
@@ -39,7 +39,7 @@
                               VerticalAlignment="Stretch"
                               Content="{TemplateBinding Content}"
                               ContentTemplate="{TemplateBinding ContentTemplate}"
-                              FontSize="14"
+                              FontSize="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}"
                               Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" />
             <ContentPresenter x:Name="PART_Actions"
                               Grid.Row="3"

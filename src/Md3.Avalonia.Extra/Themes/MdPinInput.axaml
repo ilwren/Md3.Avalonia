@@ -33,10 +33,10 @@
     <Setter Property="Template">
       <ControlTemplate TargetType="eco:MdPinCellPresenter">
         <Border x:Name="PART_Cell" Background="{DynamicResource Md.Sys.Color.Surface.Brush}"
-                BorderBrush="{DynamicResource Md.Sys.Color.Outline.Brush}" BorderThickness="1" CornerRadius="8">
+                BorderBrush="{DynamicResource Md.Sys.Color.Outline.Brush}" BorderThickness="1" CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Small}">
           <Grid>
             <TextBlock Text="{Binding Cell.DisplayText, RelativeSource={RelativeSource TemplatedParent}}"
-                       HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" FontWeight="SemiBold" />
+                       HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="{DynamicResource Md.Sys.TypeScale.TitleLarge.Size}" FontWeight="SemiBold" />
             <Border x:Name="PART_Caret" Width="2" Height="25" HorizontalAlignment="Center" VerticalAlignment="Center"
                     Background="{DynamicResource Md.Sys.Color.Primary.Brush}" CornerRadius="1" IsVisible="False" />
           </Grid>

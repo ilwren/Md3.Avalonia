@@ -10,7 +10,7 @@
         <StackPanel Spacing="4">
           <Border x:Name="PART_Container" MinHeight="64" Padding="8,4"
                   Background="{DynamicResource Md.Sys.Color.Surface.Brush}"
-                  BorderBrush="{DynamicResource Md.Sys.Color.Outline.Brush}" BorderThickness="1" CornerRadius="8">
+                  BorderBrush="{DynamicResource Md.Sys.Color.Outline.Brush}" BorderThickness="1" CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Small}">
             <WrapPanel VerticalAlignment="Center">
               <ItemsControl Theme="{StaticResource EcoItemsHostTheme}" ItemsSource="{TemplateBinding Entries}" VerticalAlignment="Center">
                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
@@ -26,7 +26,7 @@
                             ErrorText="{TemplateBinding ValidationMessage}" IsError="False" Variant="Filled" />
             </WrapPanel>
           </Border>
-          <TextBlock x:Name="PART_Error" IsVisible="False" Margin="12,0" FontSize="12"
+          <TextBlock x:Name="PART_Error" IsVisible="False" Margin="12,0" FontSize="{DynamicResource Md.Sys.TypeScale.BodySmall.Size}"
                      Foreground="{DynamicResource Md.Sys.Color.Error.Brush}" Text="{TemplateBinding ValidationMessage}" />
           <ItemsControl x:Name="PART_Suggestions" Theme="{StaticResource EcoItemsHostTheme}" IsVisible="False"
                         ItemsSource="{TemplateBinding FilteredSuggestions}" Margin="4,2,4,0">
