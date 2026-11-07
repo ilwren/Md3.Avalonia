@@ -1,0 +1,1631 @@
+{
+ "schema_version": 1,
+ "purpose": "Frozen transcription of the Material Web component token tables: every value the specification states as a literal number, px or an md-sys-shape step. Colours and type-scale references are deliberately excluded, because a second copy of the colour scheme would drift from MdBaselineScheme. L1 token conformance uses this to check the library's Md.Comp.* values against the specification rather than trusting that they were transcribed correctly.",
+ "retrieved_at": "2026-11-07",
+ "repository": "https://github.com/material-components/material-web",
+ "repository_commit": "d872455c4be56022da2095349b30ef46e0b55bc3",
+ "token_root": "tokens/versions/v0_192",
+ "note": "Component names are Material Web's. The mapping from a Material Web token name to this library's Md.Comp.* key is not one-to-one (Material Web ships one file per variant, this library ships one token per size), so the consumer works from an explicit alias table and reports every library token that has no counterpart as unverified rather than guessing.",
+ "shape_values": {
+  "corner-none": 0,
+  "corner-extra-small": 4,
+  "corner-small": 8,
+  "corner-medium": 12,
+  "corner-large": 16,
+  "corner-extra-large": 28,
+  "corner-full": 999,
+  "corner-extra-small-top": [
+   4,
+   4,
+   0,
+   0
+  ],
+  "corner-large-top": [
+   16,
+   16,
+   0,
+   0
+  ],
+  "corner-large-end": [
+   0,
+   16,
+   16,
+   0
+  ],
+  "corner-large-start": [
+   16,
+   0,
+   0,
+   16
+  ],
+  "corner-extra-large-top": [
+   28,
+   28,
+   0,
+   0
+  ]
+ },
+ "components": {
+  "assist-chip": {
+   "file": "_md-comp-assist-chip.scss",
+   "tokens": {
+    "container-height": {
+     "value": 32
+    },
+    "container-shape": {
+     "value": 8,
+     "shape": "corner-small"
+    },
+    "flat-outline-width": {
+     "value": 1
+    },
+    "with-icon-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "badge": {
+   "file": "_md-comp-badge.scss",
+   "tokens": {
+    "large-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "large-size": {
+     "value": 16
+    },
+    "shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "size": {
+     "value": 6
+    }
+   }
+  },
+  "banner": {
+   "file": "_md-comp-banner.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "desktop-with-single-line-container-height": {
+     "value": 52
+    },
+    "desktop-with-three-lines-container-height": {
+     "value": 90
+    },
+    "desktop-with-two-lines-with-image-container-height": {
+     "value": 72
+    },
+    "mobile-with-single-line-container-height": {
+     "value": 54
+    },
+    "mobile-with-two-lines-container-height": {
+     "value": 112
+    },
+    "mobile-with-two-lines-with-image-container-height": {
+     "value": 120
+    },
+    "with-image-image-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "with-image-image-size": {
+     "value": 40
+    }
+   }
+  },
+  "carousel-item": {
+   "file": "_md-comp-carousel-item.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 28,
+     "shape": "corner-extra-large"
+    }
+   }
+  },
+  "checkbox": {
+   "file": "_md-comp-checkbox.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 2
+    },
+    "container-size": {
+     "value": 18
+    },
+    "icon-size": {
+     "value": 18
+    },
+    "selected-disabled-container-outline-width": {
+     "value": 0
+    },
+    "selected-focus-outline-width": {
+     "value": 0
+    },
+    "selected-hover-outline-width": {
+     "value": 0
+    },
+    "selected-outline-width": {
+     "value": 0
+    },
+    "selected-pressed-outline-width": {
+     "value": 0
+    },
+    "state-layer-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "state-layer-size": {
+     "value": 40
+    },
+    "unselected-disabled-outline-width": {
+     "value": 2
+    },
+    "unselected-focus-outline-width": {
+     "value": 2
+    },
+    "unselected-hover-outline-width": {
+     "value": 2
+    },
+    "unselected-outline-width": {
+     "value": 2
+    },
+    "unselected-pressed-outline-width": {
+     "value": 2
+    }
+   }
+  },
+  "circular-progress-indicator": {
+   "file": "_md-comp-circular-progress-indicator.scss",
+   "tokens": {
+    "active-indicator-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "active-indicator-width": {
+     "value": 4
+    },
+    "size": {
+     "value": 48
+    }
+   }
+  },
+  "data-table": {
+   "file": "_md-comp-data-table.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 4,
+     "shape": "corner-extra-small"
+    },
+    "footer-container-height": {
+     "value": 52
+    },
+    "header-container-height": {
+     "value": 56
+    },
+    "outline-width": {
+     "value": 1
+    },
+    "row-item-container-height": {
+     "value": 52
+    },
+    "row-item-outline-width": {
+     "value": 1
+    }
+   }
+  },
+  "date-picker-docked": {
+   "file": "_md-comp-date-picker-docked.scss",
+   "tokens": {
+    "container-height": {
+     "value": 456
+    },
+    "container-shape": {
+     "value": 16,
+     "shape": "corner-large"
+    },
+    "container-width": {
+     "value": 360
+    },
+    "date-container-height": {
+     "value": 48
+    },
+    "date-container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "date-container-width": {
+     "value": 48
+    },
+    "date-state-layer-height": {
+     "value": 40
+    },
+    "date-state-layer-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "date-state-layer-width": {
+     "value": 40
+    },
+    "date-today-container-outline-width": {
+     "value": 1
+    },
+    "header-height": {
+     "value": 64
+    },
+    "menu-button-container-height": {
+     "value": 40
+    },
+    "menu-button-container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "menu-button-icon-size": {
+     "value": 18
+    },
+    "menu-list-item-container-height": {
+     "value": 48
+    },
+    "menu-list-item-selected-leading-icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "dialog": {
+   "file": "_md-comp-dialog.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 28,
+     "shape": "corner-extra-large"
+    },
+    "with-icon-icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "divider": {
+   "file": "_md-comp-divider.scss",
+   "tokens": {
+    "thickness": {
+     "value": 1
+    }
+   }
+  },
+  "elevated-button": {
+   "file": "_md-comp-elevated-button.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "with-icon-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "elevated-card": {
+   "file": "_md-comp-elevated-card.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 12,
+     "shape": "corner-medium"
+    },
+    "icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "extended-fab-primary": {
+   "file": "_md-comp-extended-fab-primary.scss",
+   "tokens": {
+    "container-height": {
+     "value": 56
+    },
+    "container-shape": {
+     "value": 16,
+     "shape": "corner-large"
+    },
+    "icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "fab-primary-large": {
+   "file": "_md-comp-fab-primary-large.scss",
+   "tokens": {
+    "container-height": {
+     "value": 96
+    },
+    "container-shape": {
+     "value": 28,
+     "shape": "corner-extra-large"
+    },
+    "container-width": {
+     "value": 96
+    },
+    "icon-size": {
+     "value": 36
+    }
+   }
+  },
+  "fab-primary-small": {
+   "file": "_md-comp-fab-primary-small.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "container-shape": {
+     "value": 12,
+     "shape": "corner-medium"
+    },
+    "container-width": {
+     "value": 40
+    },
+    "icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "fab-primary": {
+   "file": "_md-comp-fab-primary.scss",
+   "tokens": {
+    "container-height": {
+     "value": 56
+    },
+    "container-shape": {
+     "value": 16,
+     "shape": "corner-large"
+    },
+    "container-width": {
+     "value": 56
+    },
+    "icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "filled-button": {
+   "file": "_md-comp-filled-button.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "with-icon-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "filled-card": {
+   "file": "_md-comp-filled-card.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 12,
+     "shape": "corner-medium"
+    },
+    "icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "filled-icon-button": {
+   "file": "_md-comp-filled-icon-button.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "container-width": {
+     "value": 40
+    },
+    "icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "filled-select": {
+   "file": "_md-comp-filled-select.scss",
+   "tokens": {
+    "menu-cascading-menu-indicator-icon-size": {
+     "value": 24
+    },
+    "menu-container-shape": {
+     "value": 4,
+     "shape": "corner-extra-small"
+    },
+    "menu-divider-height": {
+     "value": 1
+    },
+    "menu-list-item-container-height": {
+     "value": 48
+    },
+    "menu-list-item-with-leading-icon-leading-icon-size": {
+     "value": 24
+    },
+    "menu-list-item-with-trailing-icon-trailing-icon-size": {
+     "value": 24
+    },
+    "text-field-active-indicator-height": {
+     "value": 1
+    },
+    "text-field-container-shape": {
+     "value": [
+      4,
+      4,
+      0,
+      0
+     ],
+     "shape": "corner-extra-small-top"
+    },
+    "text-field-disabled-active-indicator-height": {
+     "value": 1
+    },
+    "text-field-focus-active-indicator-height": {
+     "value": 2
+    },
+    "text-field-hover-active-indicator-height": {
+     "value": 1
+    },
+    "text-field-leading-icon-size": {
+     "value": 24
+    },
+    "text-field-trailing-icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "filled-text-field": {
+   "file": "_md-comp-filled-text-field.scss",
+   "tokens": {
+    "active-indicator-height": {
+     "value": 1
+    },
+    "container-shape": {
+     "value": [
+      4,
+      4,
+      0,
+      0
+     ],
+     "shape": "corner-extra-small-top"
+    },
+    "disabled-active-indicator-height": {
+     "value": 1
+    },
+    "focus-active-indicator-height": {
+     "value": 2
+    },
+    "hover-active-indicator-height": {
+     "value": 1
+    },
+    "leading-icon-size": {
+     "value": 24
+    },
+    "trailing-icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "filled-tonal-button": {
+   "file": "_md-comp-filled-tonal-button.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "with-icon-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "filter-chip": {
+   "file": "_md-comp-filter-chip.scss",
+   "tokens": {
+    "container-height": {
+     "value": 32
+    },
+    "container-shape": {
+     "value": 8,
+     "shape": "corner-small"
+    },
+    "flat-selected-outline-width": {
+     "value": 0
+    },
+    "flat-unselected-outline-width": {
+     "value": 1
+    },
+    "with-icon-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "icon-button": {
+   "file": "_md-comp-icon-button.scss",
+   "tokens": {
+    "icon-size": {
+     "value": 24
+    },
+    "state-layer-height": {
+     "value": 40
+    },
+    "state-layer-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "state-layer-width": {
+     "value": 40
+    }
+   }
+  },
+  "input-chip": {
+   "file": "_md-comp-input-chip.scss",
+   "tokens": {
+    "container-height": {
+     "value": 32
+    },
+    "container-shape": {
+     "value": 8,
+     "shape": "corner-small"
+    },
+    "selected-outline-width": {
+     "value": 0
+    },
+    "unselected-outline-width": {
+     "value": 1
+    },
+    "with-avatar-avatar-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "with-avatar-avatar-size": {
+     "value": 24
+    },
+    "with-leading-icon-leading-icon-size": {
+     "value": 18
+    },
+    "with-trailing-icon-trailing-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "linear-progress-indicator": {
+   "file": "_md-comp-linear-progress-indicator.scss",
+   "tokens": {
+    "active-indicator-height": {
+     "value": 4
+    },
+    "active-indicator-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "track-height": {
+     "value": 4
+    },
+    "track-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    }
+   }
+  },
+  "list": {
+   "file": "_md-comp-list.scss",
+   "tokens": {
+    "divider-leading-space": {
+     "value": 16
+    },
+    "divider-trailing-space": {
+     "value": 16
+    },
+    "list-item-container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "list-item-large-leading-video-height": {
+     "value": 69
+    },
+    "list-item-leading-avatar-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "list-item-leading-avatar-size": {
+     "value": 40
+    },
+    "list-item-leading-icon-size": {
+     "value": 24
+    },
+    "list-item-leading-image-height": {
+     "value": 56
+    },
+    "list-item-leading-image-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "list-item-leading-image-width": {
+     "value": 56
+    },
+    "list-item-leading-space": {
+     "value": 16
+    },
+    "list-item-leading-video-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "list-item-leading-video-width": {
+     "value": 100
+    },
+    "list-item-one-line-container-height": {
+     "value": 56
+    },
+    "list-item-small-leading-video-height": {
+     "value": 56
+    },
+    "list-item-three-line-container-height": {
+     "value": 88
+    },
+    "list-item-trailing-icon-size": {
+     "value": 24
+    },
+    "list-item-trailing-space": {
+     "value": 16
+    },
+    "list-item-two-line-container-height": {
+     "value": 72
+    }
+   }
+  },
+  "menu": {
+   "file": "_md-comp-menu.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 4,
+     "shape": "corner-extra-small"
+    }
+   }
+  },
+  "navigation-bar": {
+   "file": "_md-comp-navigation-bar.scss",
+   "tokens": {
+    "active-indicator-height": {
+     "value": 32
+    },
+    "active-indicator-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "active-indicator-width": {
+     "value": 64
+    },
+    "container-height": {
+     "value": 80
+    },
+    "container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "navigation-drawer": {
+   "file": "_md-comp-navigation-drawer.scss",
+   "tokens": {
+    "active-indicator-height": {
+     "value": 56
+    },
+    "active-indicator-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "active-indicator-width": {
+     "value": 336
+    },
+    "bottom-container-shape": {
+     "value": [
+      16,
+      16,
+      0,
+      0
+     ],
+     "shape": "corner-large-top"
+    },
+    "container-shape": {
+     "value": [
+      0,
+      16,
+      16,
+      0
+     ],
+     "shape": "corner-large-end"
+    },
+    "container-width": {
+     "value": 360
+    },
+    "icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "navigation-rail": {
+   "file": "_md-comp-navigation-rail.scss",
+   "tokens": {
+    "active-indicator-height": {
+     "value": 32
+    },
+    "active-indicator-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "active-indicator-width": {
+     "value": 56
+    },
+    "container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "container-width": {
+     "value": 80
+    },
+    "icon-size": {
+     "value": 24
+    },
+    "no-label-active-indicator-height": {
+     "value": 56
+    },
+    "no-label-active-indicator-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    }
+   }
+  },
+  "outlined-button": {
+   "file": "_md-comp-outlined-button.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "outline-width": {
+     "value": 1
+    },
+    "with-icon-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "outlined-card": {
+   "file": "_md-comp-outlined-card.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 12,
+     "shape": "corner-medium"
+    },
+    "icon-size": {
+     "value": 24
+    },
+    "outline-width": {
+     "value": 1
+    }
+   }
+  },
+  "outlined-icon-button": {
+   "file": "_md-comp-outlined-icon-button.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "container-width": {
+     "value": 40
+    },
+    "icon-size": {
+     "value": 24
+    },
+    "unselected-outline-width": {
+     "value": 1
+    }
+   }
+  },
+  "outlined-segmented-button": {
+   "file": "_md-comp-outlined-segmented-button.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "outline-width": {
+     "value": 1
+    },
+    "shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "with-icon-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "outlined-select": {
+   "file": "_md-comp-outlined-select.scss",
+   "tokens": {
+    "menu-cascading-menu-indicator-icon-size": {
+     "value": 24
+    },
+    "menu-container-shape": {
+     "value": 4,
+     "shape": "corner-extra-small"
+    },
+    "menu-divider-height": {
+     "value": 1
+    },
+    "menu-list-item-container-height": {
+     "value": 48
+    },
+    "menu-list-item-with-leading-icon-leading-icon-size": {
+     "value": 24
+    },
+    "menu-list-item-with-trailing-icon-trailing-icon-size": {
+     "value": 24
+    },
+    "text-field-container-shape": {
+     "value": 4,
+     "shape": "corner-extra-small"
+    },
+    "text-field-disabled-outline-width": {
+     "value": 1
+    },
+    "text-field-focus-outline-width": {
+     "value": 2
+    },
+    "text-field-hover-outline-width": {
+     "value": 1
+    },
+    "text-field-leading-icon-size": {
+     "value": 24
+    },
+    "text-field-outline-width": {
+     "value": 1
+    },
+    "text-field-trailing-icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "outlined-text-field": {
+   "file": "_md-comp-outlined-text-field.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 4,
+     "shape": "corner-extra-small"
+    },
+    "disabled-outline-width": {
+     "value": 1
+    },
+    "focus-outline-width": {
+     "value": 2
+    },
+    "hover-outline-width": {
+     "value": 1
+    },
+    "leading-icon-size": {
+     "value": 24
+    },
+    "outline-width": {
+     "value": 1
+    },
+    "trailing-icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "plain-tooltip": {
+   "file": "_md-comp-plain-tooltip.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 4,
+     "shape": "corner-extra-small"
+    }
+   }
+  },
+  "primary-navigation-tab": {
+   "file": "_md-comp-primary-navigation-tab.scss",
+   "tokens": {
+    "active-indicator-height": {
+     "value": 3
+    },
+    "container-height": {
+     "value": 48
+    },
+    "container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "with-icon-and-label-text-container-height": {
+     "value": 64
+    },
+    "with-icon-icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "radio-button": {
+   "file": "_md-comp-radio-button.scss",
+   "tokens": {
+    "icon-size": {
+     "value": 20
+    },
+    "state-layer-size": {
+     "value": 40
+    }
+   }
+  },
+  "rich-tooltip": {
+   "file": "_md-comp-rich-tooltip.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 12,
+     "shape": "corner-medium"
+    }
+   }
+  },
+  "search-bar": {
+   "file": "_md-comp-search-bar.scss",
+   "tokens": {
+    "avatar-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "avatar-size": {
+     "value": 30
+    },
+    "container-height": {
+     "value": 56
+    },
+    "container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    }
+   }
+  },
+  "secondary-navigation-tab": {
+   "file": "_md-comp-secondary-navigation-tab.scss",
+   "tokens": {
+    "active-indicator-height": {
+     "value": 2
+    },
+    "container-height": {
+     "value": 48
+    },
+    "container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "with-icon-icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "sheet-bottom": {
+   "file": "_md-comp-sheet-bottom.scss",
+   "tokens": {
+    "docked-container-shape": {
+     "value": [
+      28,
+      28,
+      0,
+      0
+     ],
+     "shape": "corner-extra-large-top"
+    },
+    "docked-drag-handle-height": {
+     "value": 4
+    },
+    "docked-drag-handle-width": {
+     "value": 32
+    },
+    "docked-minimized-container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    }
+   }
+  },
+  "sheet-floating": {
+   "file": "_md-comp-sheet-floating.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 28,
+     "shape": "corner-extra-large"
+    }
+   }
+  },
+  "sheet-side": {
+   "file": "_md-comp-sheet-side.scss",
+   "tokens": {
+    "detached-container-shape": {
+     "value": 16,
+     "shape": "corner-large"
+    },
+    "docked-container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "docked-container-width": {
+     "value": 256
+    },
+    "docked-modal-container-shape": {
+     "value": [
+      16,
+      0,
+      0,
+      16
+     ],
+     "shape": "corner-large-start"
+    }
+   }
+  },
+  "slider": {
+   "file": "_md-comp-slider.scss",
+   "tokens": {
+    "active-track-height": {
+     "value": 4
+    },
+    "active-track-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "handle-height": {
+     "value": 20
+    },
+    "handle-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "handle-width": {
+     "value": 20
+    },
+    "inactive-track-height": {
+     "value": 4
+    },
+    "inactive-track-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "label-container-height": {
+     "value": 28
+    },
+    "state-layer-size": {
+     "value": 40
+    },
+    "with-overlap-handle-outline-width": {
+     "value": 1
+    },
+    "with-tick-marks-container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "with-tick-marks-container-size": {
+     "value": 2
+    }
+   }
+  },
+  "snackbar": {
+   "file": "_md-comp-snackbar.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 4,
+     "shape": "corner-extra-small"
+    },
+    "icon-size": {
+     "value": 24
+    },
+    "with-single-line-container-height": {
+     "value": 48
+    },
+    "with-two-lines-container-height": {
+     "value": 68
+    }
+   }
+  },
+  "suggestion-chip": {
+   "file": "_md-comp-suggestion-chip.scss",
+   "tokens": {
+    "container-height": {
+     "value": 32
+    },
+    "container-shape": {
+     "value": 8,
+     "shape": "corner-small"
+    },
+    "flat-outline-width": {
+     "value": 1
+    },
+    "with-leading-icon-leading-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "switch": {
+   "file": "_md-comp-switch.scss",
+   "tokens": {
+    "handle-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "pressed-handle-height": {
+     "value": 28
+    },
+    "pressed-handle-width": {
+     "value": 28
+    },
+    "selected-handle-height": {
+     "value": 24
+    },
+    "selected-handle-width": {
+     "value": 24
+    },
+    "selected-icon-size": {
+     "value": 16
+    },
+    "state-layer-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "state-layer-size": {
+     "value": 40
+    },
+    "track-height": {
+     "value": 32
+    },
+    "track-outline-width": {
+     "value": 2
+    },
+    "track-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "track-width": {
+     "value": 52
+    },
+    "unselected-handle-height": {
+     "value": 16
+    },
+    "unselected-handle-width": {
+     "value": 16
+    },
+    "unselected-icon-size": {
+     "value": 16
+    },
+    "with-icon-handle-height": {
+     "value": 24
+    },
+    "with-icon-handle-width": {
+     "value": 24
+    }
+   }
+  },
+  "text-button": {
+   "file": "_md-comp-text-button.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "with-icon-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "time-picker": {
+   "file": "_md-comp-time-picker.scss",
+   "tokens": {
+    "clock-dial-container-size": {
+     "value": 256
+    },
+    "clock-dial-selector-center-container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "clock-dial-selector-center-container-size": {
+     "value": 8
+    },
+    "clock-dial-selector-handle-container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "clock-dial-selector-handle-container-size": {
+     "value": 48
+    },
+    "clock-dial-selector-track-container-width": {
+     "value": 2
+    },
+    "clock-dial-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "container-shape": {
+     "value": 28,
+     "shape": "corner-extra-large"
+    },
+    "period-selector-container-shape": {
+     "value": 8,
+     "shape": "corner-small"
+    },
+    "period-selector-horizontal-container-height": {
+     "value": 38
+    },
+    "period-selector-horizontal-container-width": {
+     "value": 216
+    },
+    "period-selector-outline-width": {
+     "value": 1
+    },
+    "period-selector-vertical-container-height": {
+     "value": 80
+    },
+    "period-selector-vertical-container-width": {
+     "value": 52
+    },
+    "time-selector-24h-vertical-container-width": {
+     "value": 114
+    },
+    "time-selector-container-height": {
+     "value": 80
+    },
+    "time-selector-container-shape": {
+     "value": 8,
+     "shape": "corner-small"
+    },
+    "time-selector-container-width": {
+     "value": 96
+    }
+   }
+  },
+  "top-app-bar-large": {
+   "file": "_md-comp-top-app-bar-large.scss",
+   "tokens": {
+    "container-height": {
+     "value": 152
+    },
+    "container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "leading-icon-size": {
+     "value": 24
+    },
+    "trailing-icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "top-app-bar-medium": {
+   "file": "_md-comp-top-app-bar-medium.scss",
+   "tokens": {
+    "container-height": {
+     "value": 112
+    },
+    "container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "leading-icon-size": {
+     "value": 24
+    },
+    "trailing-icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "top-app-bar-small": {
+   "file": "_md-comp-top-app-bar-small.scss",
+   "tokens": {
+    "container-height": {
+     "value": 64
+    },
+    "container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "leading-icon-size": {
+     "value": 24
+    },
+    "trailing-icon-size": {
+     "value": 24
+    }
+   }
+  }
+ },
+ "mapping": {
+  "note": "Every library Md.Comp.* key that can be checked against a Material Web token, and which one. The pairing is by meaning, not by name: Material Web ships one file per variant (fab-primary-small) where this library ships one token per size (Fab.Small.*), and its names are more specific (container-height vs Size). A library key with no entry here is unverified, and the test says so rather than inventing a comparison. The entries whose names differ across the two vocabularies are the interesting ones: that is where a transcription error would hide.",
+  "excluded_by_design": {
+   "Md.Comp.NavigationBar.Flexible.Container.Height": "Material Web's baseline navigation bar is 80px and v0_192 has no flexible/horizontal variant; 64 is a rail-era value this library's own docs promise. Copying 80 would be wrong, not a fix.",
+   "Md.Comp.Badge.Large.MinWidth": "Material Web states large-size 16px and no minimum width; this library needs 16 as a floor for a two-digit count. Only the height is comparable.",
+   "Md.Comp.Badge.Large.Padding": "Material Web states no padding token for the badge."
+  },
+  "pairs": [
+   {
+    "library": "Md.Comp.Fab.Small.Size",
+    "component": "fab-primary-small",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.Fab.Small.IconSize",
+    "component": "fab-primary-small",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.Fab.Small.Shape",
+    "component": "fab-primary-small",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Fab.Regular.Size",
+    "component": "fab-primary",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.Fab.Regular.IconSize",
+    "component": "fab-primary",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.Fab.Regular.Shape",
+    "component": "fab-primary",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Fab.Large.Size",
+    "component": "fab-primary-large",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.Fab.Large.IconSize",
+    "component": "fab-primary-large",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.Fab.Large.Shape",
+    "component": "fab-primary-large",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.ExtendedFab.Small.Shape",
+    "component": "extended-fab-primary",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.CheckBox.StateLayer.Shape",
+    "component": "checkbox",
+    "token": "state-layer-shape"
+   },
+   {
+    "library": "Md.Comp.CheckBox.StateLayer.Size",
+    "component": "checkbox",
+    "token": "state-layer-size"
+   },
+   {
+    "library": "Md.Comp.CheckBox.Container.Size",
+    "component": "checkbox",
+    "token": "container-size"
+   },
+   {
+    "library": "Md.Comp.CheckBox.Container.Shape",
+    "component": "checkbox",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.CheckBox.Icon.Size",
+    "component": "checkbox",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.CheckBox.Container.OutlineWidth",
+    "component": "checkbox",
+    "token": "unselected-outline-width"
+   },
+   {
+    "library": "Md.Comp.TextField.Filled.Container.Shape",
+    "component": "filled-text-field",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.TextField.Outlined.Container.Shape",
+    "component": "outlined-text-field",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.TextField.Outline.Width",
+    "component": "outlined-text-field",
+    "token": "outline-width"
+   },
+   {
+    "library": "Md.Comp.TextField.Outline.FocusWidth",
+    "component": "outlined-text-field",
+    "token": "focus-outline-width"
+   },
+   {
+    "library": "Md.Comp.TextField.Indicator.Width",
+    "component": "filled-text-field",
+    "token": "active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.TextField.Indicator.FocusWidth",
+    "component": "filled-text-field",
+    "token": "focus-active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.TextField.Icon.Size",
+    "component": "filled-text-field",
+    "token": "leading-icon-size"
+   },
+   {
+    "library": "Md.Comp.Divider.Thickness",
+    "component": "divider",
+    "token": "thickness"
+   },
+   {
+    "library": "Md.Comp.Menu.Container.Shape",
+    "component": "menu",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Dialog.Container.Shape",
+    "component": "dialog",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Snackbar.Container.Shape",
+    "component": "snackbar",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Badge.Small.Size",
+    "component": "badge",
+    "token": "size"
+   },
+   {
+    "library": "Md.Comp.Badge.Small.Shape",
+    "component": "badge",
+    "token": "shape"
+   },
+   {
+    "library": "Md.Comp.Badge.Large.Shape",
+    "component": "badge",
+    "token": "large-shape"
+   },
+   {
+    "library": "Md.Comp.Badge.Large.Height",
+    "component": "badge",
+    "token": "large-size"
+   },
+   {
+    "library": "Md.Comp.NavigationBar.Container.Height",
+    "component": "navigation-bar",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.NavigationDrawer.Container.Width",
+    "component": "navigation-drawer",
+    "token": "container-width"
+   },
+   {
+    "library": "Md.Comp.RadioButton.StateLayer.Size",
+    "component": "radio-button",
+    "token": "state-layer-size"
+   },
+   {
+    "library": "Md.Comp.RadioButton.Icon.Size",
+    "component": "radio-button",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.Switch.Track.Width",
+    "component": "switch",
+    "token": "track-width"
+   },
+   {
+    "library": "Md.Comp.Switch.Track.Height",
+    "component": "switch",
+    "token": "track-height"
+   },
+   {
+    "library": "Md.Comp.Switch.Handle.Selected.Size",
+    "component": "switch",
+    "token": "selected-handle-width"
+   },
+   {
+    "library": "Md.Comp.Switch.Handle.Unselected.Size",
+    "component": "switch",
+    "token": "unselected-handle-width"
+   },
+   {
+    "library": "Md.Comp.Chip.Container.Height",
+    "component": "assist-chip",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.Chip.Container.Shape",
+    "component": "assist-chip",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Card.Container.Shape",
+    "component": "filled-card",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Button.Small.Container.Height",
+    "component": "filled-button",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.IconSize",
+    "component": "icon-button",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.Height",
+    "component": "icon-button",
+    "token": "state-layer-height"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.DefaultWidth",
+    "component": "icon-button",
+    "token": "state-layer-width"
+   },
+   {
+    "library": "Md.Comp.Chip.Icon.Size",
+    "component": "assist-chip",
+    "token": "with-icon-icon-size"
+   }
+  ],
+  "full_shape_pairs": [
+   {
+    "library": "Md.Comp.Button.Small.Shape.Round",
+    "expect": "Full"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.RoundShape",
+    "expect": "Full"
+   },
+   {
+    "library": "Md.Comp.Badge.Small.Shape",
+    "expect": "Full"
+   },
+   {
+    "library": "Md.Comp.Badge.Large.Shape",
+    "expect": "Full"
+   },
+   {
+    "library": "Md.Comp.CheckBox.StateLayer.Shape",
+    "expect": "Full"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.RoundShape",
+    "expect": "Full"
+   }
+  ]
+ }
+}

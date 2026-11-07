@@ -49,6 +49,7 @@ TITLES = {
     "L1-baseline-colors": "L1 the static theme is the published M3 baseline",
     "L1-baseline-generator": "L1 the generator reproduces the baseline",
     "L1-baseline-structure": "L1 every baseline role has a brush",
+    "L1-component-tokens": "L1 component tokens vs the Material Web tables",
     "conformance-ratchet": "Conformance budget (quantified backlog)",
 }
 

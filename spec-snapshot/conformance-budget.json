@@ -216,6 +216,12 @@
       "budget": 1,
       "source": "headless",
       "why": "Controls whose implicit theme sets properties but no template and whose instance has no content. Legitimate for hit targets and spacing elements; worth watching because a control that lost its template looks exactly the same."
+    },
+    "component_tokens_without_a_specification_counterpart": {
+      "direction": "lower",
+      "budget": 220,
+      "source": "headless",
+      "why": "Declared Md.Comp.* keys that no Material Web token can be compared with, either because the specification states no value for them or because no mapping has been written. 49 keys are checked today, and the first time the check ran three of those 49 disagreed with Material (a large FAB icon at 32 instead of 36, and two badges plus a checkbox state layer hard-coded to 3/8/20 where the specification says corner-full). That is the class of defect this entry exists to shrink: a token transcribed wrong into both the oracle and the theme agrees with itself and disagrees with Material."
     }
   }
 }
