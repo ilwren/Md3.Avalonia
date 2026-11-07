@@ -38,6 +38,15 @@ public partial class MotionGalleryPage : UserControl
         _timer.Start();
     }
 
+    private void PrimitiveProgressChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property != RangeBase.ValueProperty || sender is not MdSlider slider) return;
+        if (ReferenceEquals(slider, RevealFractionSlider) && RevealDemo is not null)
+            RevealDemo.Fraction = slider.Value;
+        else if (ReferenceEquals(slider, MorphProgressSlider) && MorphPanelDemo is not null)
+            MorphPanelDemo.Progress = slider.Value;
+    }
+
     private void SwitchTransitionContent(object? sender, RoutedEventArgs e)
     {
         var showSecond = Equals(FadeThroughDemo.Content, "First view") || Equals(FadeThroughDemo.Content, "第一个视图");

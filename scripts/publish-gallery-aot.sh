@@ -10,7 +10,7 @@ Usage:
                                  [--output /absolute/or/relative/path]
                                  [--configuration Release]
                                  [--smoke]
-                                 [--smoke-scenario file-system-picker,emoji-picker,slide-confirm]
+                                 [--smoke-scenario file-system-picker,emoji-picker,slide-confirm,dedicated-controls]
                                  [--keep-intermediate]
 
 The publish asserts what an AOT publish must produce: a native executable for the
@@ -82,7 +82,7 @@ if [[ -n "$SMOKE_SCENARIO" ]]; then
   fi
   IFS=',' read -r -a SMOKE_SCENARIOS <<< "$SMOKE_SCENARIO"
   for scenario in "${SMOKE_SCENARIOS[@]}"; do
-    if [[ "$scenario" != "file-system-picker" && "$scenario" != "emoji-picker" && "$scenario" != "slide-confirm" ]]; then
+    if [[ "$scenario" != "file-system-picker" && "$scenario" != "emoji-picker" && "$scenario" != "slide-confirm" && "$scenario" != "dedicated-controls" ]]; then
       echo "error: unsupported --smoke-scenario '$scenario'" >&2
       exit 2
     fi

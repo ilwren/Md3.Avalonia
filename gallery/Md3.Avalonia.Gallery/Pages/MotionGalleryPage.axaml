@@ -101,6 +101,25 @@
         </extra:MdAnimatedVisibility>
       </StackPanel>
 
+      <StackPanel Spacing="12" MaxWidth="520" HorizontalAlignment="Stretch">
+        <TextBlock Classes="h2" Text="Layout motion primitives" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Move the sliders to control the reveal fraction and interpolated size directly. The morph panel changes layout size only; it does not cross-fade its children." />
+        <TextBlock Classes="body" Text="Reveal fraction" />
+        <md:MdSlider x:Name="RevealFractionSlider" Minimum="0" Maximum="1" Value="0.5" PropertyChanged="PrimitiveProgressChanged" />
+        <extra:MdRevealHost x:Name="RevealDemo" Axis="Vertical" Fraction="0.5" HorizontalAlignment="Left">
+          <Border Width="260" Height="96" Padding="12" Background="{DynamicResource Md.Sys.Color.SecondaryContainer.Brush}">
+            <TextBlock Text="Content is clipped, not squashed." TextWrapping="Wrap" />
+          </Border>
+        </extra:MdRevealHost>
+        <TextBlock Classes="body" Text="Morph progress" />
+        <md:MdSlider x:Name="MorphProgressSlider" Minimum="0" Maximum="1" Value="0.5" PropertyChanged="PrimitiveProgressChanged" />
+        <extra:MdMorphPanel x:Name="MorphPanelDemo" Progress="0.5" HorizontalAlignment="Left">
+          <Border Width="120" Height="48" HorizontalAlignment="Left" VerticalAlignment="Top" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}" />
+          <Border Width="260" Height="120" HorizontalAlignment="Left" VerticalAlignment="Top" Opacity="0.5" Background="{DynamicResource Md.Sys.Color.TertiaryContainer.Brush}" />
+        </extra:MdMorphPanel>
+        <gallery:CodeExample XamlCode="&lt;extra:MdRevealHost Fraction=&quot;{Binding Reveal}&quot;&gt;...&lt;/extra:MdRevealHost&gt;&#10;&lt;extra:MdMorphPanel Progress=&quot;{Binding Progress}&quot;&gt;...&lt;/extra:MdMorphPanel&gt;" />
+      </StackPanel>
+
       <!-- Usage Example -->
       <StackPanel Spacing="12" MaxWidth="520" HorizontalAlignment="Stretch">
         <TextBlock Classes="h2" Text="Content transitions" />
@@ -113,7 +132,7 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
-        <gallery:ApiNotes Control="MdContainerTransform, MdAnimatedVisibility, MdFadeThrough, MdSharedAxis"
+        <gallery:ApiNotes Control="MdContainerTransform, MdAnimatedVisibility, MdFadeThrough, MdSharedAxis, MdRevealHost, MdMorphPanel"
                         Members="IsExpanded, ClosedContent, OpenContent, ClosedCornerRadius, OpenCornerRadius, Duration, IsContentVisible, Transition">
           <gallery:ApiNotes.Notes>
             <TextBlock Classes="body" TextWrapping="Wrap" Text="MdContainerTransform morphs between the two contents it is given, interpolating the corner radius from ClosedCornerRadius to OpenCornerRadius so the trigger and the expanded surface read as one container. MdAnimatedVisibility is the same motion for an expand or collapse, and Transition picks the scheme - shared axis, fade through or the spring variants." />

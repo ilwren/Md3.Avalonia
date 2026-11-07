@@ -8,7 +8,7 @@
     <Border BorderBrush="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" BorderThickness="1" CornerRadius="16" ClipToBounds="True">
       <Grid RowDefinitions="Auto,*">
         <md:MdWindowTitleBar Content="Material application" ShowIcon="False" />
-        <Border Grid.Row="1" Height="220" Padding="24" Background="{DynamicResource Md.Sys.Color.Surface.Brush}"><StackPanel Spacing="12"><TextBlock Classes="h2" Text="Chrome preview" /><TextBlock Text="Open the real secondary window to validate dragging, double-click maximize/restore, caption actions, resize grips, and theme behavior." TextWrapping="Wrap" /><md:MdButton Content="Open borderless demo window" Variant="Filled" HorizontalAlignment="Left" Click="OpenDemoWindow" /></StackPanel></Border>
+        <Border Grid.Row="1" Height="220" Padding="24" Background="{DynamicResource Md.Sys.Color.Surface.Brush}"><StackPanel Spacing="12"><TextBlock Classes="h2" Text="Chrome preview" /><TextBlock Text="Open the real secondary window to validate dragging, double-click maximize/restore, caption actions, resize grips, and theme behavior." TextWrapping="Wrap" /><md:MdButton x:Name="OpenDemoButton" Content="Open borderless demo window" Variant="Filled" HorizontalAlignment="Left" Click="OpenDemoWindow" /></StackPanel></Border>
       </Grid>
     </Border>
     <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
@@ -21,6 +21,12 @@
             <TextBlock Classes="body" TextWrapping="Wrap" Text="The window keeps the platform's resize frame, shadow and corner treatment; MdWindowTitleBar draws only the caption. LeadingContent and TrailingContent are yours to fill, Subtitle is the second line, and ShowCaptionButtons with the per-button Show*Button and Is*ButtonEnabled properties decide which buttons exist and which of them are live." />
           </gallery:ApiNotes.Notes>
         </gallery:ApiNotes>
+    <StackPanel Spacing="10">
+      <TextBlock Classes="h2" Text="Custom window parts" />
+      <TextBlock Classes="body" TextWrapping="Wrap" Text="The real secondary window includes a draggable client region, caption actions and a bottom-right resize grip. These actions require a desktop window; Android does not support them." />
+      <gallery:ApiNotes Control="MdWindowDragRegion, MdWindowResizeGrip, MdCaptionButton, MdWindowCaptionButton" Members="Edge, Kind" />
+      <gallery:CodeExample XamlCode="&lt;md:MdWindowDragRegion&gt;...&lt;/md:MdWindowDragRegion&gt;&#10;&lt;md:MdCaptionButton Kind=&quot;Close&quot; Content=&quot;×&quot; /&gt;&#10;&lt;md:MdWindowResizeGrip Edge=&quot;SouthEast&quot; /&gt;" />
+    </StackPanel>
     <StackPanel Spacing="10"><TextBlock Classes="h2" Text="Usage" /><gallery:CodeExample XamlCode="&lt;md:MdBorderlessWindow Title=&quot;My app&quot;&gt;&#10;  &lt;views:Shell /&gt;&#10;&lt;/md:MdBorderlessWindow&gt;" CSharpCode="var window = new MdBorderlessWindow { Title = &quot;My app&quot; };&#10;window.PlatformAdapter = myOptionalNativeAdapter;&#10;window.SystemMenuRequested += (_, point) =&gt; ShowFallbackMenu(point);&#10;window.Show();" /></StackPanel>
   </StackPanel>
 </UserControl>

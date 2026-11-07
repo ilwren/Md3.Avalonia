@@ -3,6 +3,13 @@ using System.Diagnostics;
 using System.IO;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
+using Avalonia.LogicalTree;
+using Avalonia.VisualTree;
+using System.Linq;
+using System.Threading.Tasks;
+using Md3.Avalonia.Extra.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using LiveChartsCore;
@@ -56,7 +63,7 @@ public partial class App : Application
         if (string.IsNullOrEmpty(scenario)) return;
 
         var markerPath = Environment.GetEnvironmentVariable("MD3_GALLERY_AOT_SMOKE_MARKER");
-        if (scenario is not ("file-system-picker" or "emoji-picker" or "slide-confirm") || string.IsNullOrWhiteSpace(markerPath))
+        if (scenario is not ("file-system-picker" or "emoji-picker" or "slide-confirm" or "dedicated-controls") || string.IsNullOrWhiteSpace(markerPath))
             throw new InvalidOperationException("The native-AOT smoke scenario or marker path is invalid.");
 
         window.Opened += async (_, _) =>
@@ -69,6 +76,10 @@ public partial class App : Application
                         window.CurrentPage is not FileSystemPickerGalleryPage pickerPage)
                         throw new InvalidOperationException("The native-AOT Gallery could not open the file-system picker page.");
                     await pickerPage.RunNativeAotSmokeAsync();
+                }
+                else if (scenario == "dedicated-controls")
+                {
+                    await RunDedicatedControlsNativeAotSmokeAsync(window);
                 }
                 else if (scenario == "slide-confirm")
                 {
@@ -108,6 +119,60 @@ public partial class App : Application
                 desktop.Shutdown();
             }
         };
+    }
+
+    // Exercise the actual dedicated index entries in a published native process. Keeping this
+    // separate from the older color/dismissible smoke catches trimming and navigation regressions
+    // specific to these pages, including the type-based language switch.
+    internal static async Task RunDedicatedControlsNativeAotSmokeAsync(MainWindow window)
+    {
+        await CheckDedicatedPage<AutoSizeTextDemoPage, MdAutoSizeText>(window, "Auto-size text");
+        await CheckDedicatedPage<ConfettiDemoPage, MdConfetti>(window, "Confetti");
+        await CheckDedicatedPage<EmojiPickerDemoPage, MdEmojiPicker>(window, "Emoji picker");
+        await CheckDedicatedPage<ExpandableTextDemoPage, MdExpandableText>(window, "Expandable text");
+        await CheckDedicatedPage<MarqueeDemoPage, MdMarquee>(window, "Marquee");
+        await CheckDedicatedPage<MediaProgressDemoPage, MdMediaProgressBar>(window, "Media progress bar");
+        await CheckDedicatedPage<PageIndicatorDemoPage, MdPageIndicator>(window, "Page indicator");
+        await CheckDedicatedPage<SlideToConfirmDemoPage, MdSlideToConfirm>(window, "Slide to confirm");
+        await CheckDedicatedPage<WheelPickerDemoPage, MdWheelPicker>(window, "Wheel picker");
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            var selector = window.FindControl<ComboBox>("LanguageSelector") ?? throw new InvalidOperationException("Language selector was not found.");
+            selector.SelectedIndex = 1;
+            if (window.CurrentPage is not WheelPickerDemoPage page ||
+                !page.GetLogicalDescendants().OfType<MdWheelPicker>().Any())
+                throw new InvalidOperationException("The dedicated page could not be recreated after switching language.");
+            selector.SelectedIndex = 0;
+        }, DispatcherPriority.Loaded);
+    }
+
+    private static async Task CheckDedicatedPage<TPage, TControl>(MainWindow window, string title)
+        where TPage : Control where TControl : Control
+    {
+        if (!window.NavigateToIndexedPage(title) || window.CurrentPage is not TPage page)
+            throw new InvalidOperationException($"Could not open the dedicated {title} page.");
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            window.UpdateLayout();
+            var control = page.GetLogicalDescendants().OfType<TControl>().SingleOrDefault();
+            if (control is null || !control.IsAttachedToVisualTree() || control.Bounds.Width <= 0 || control.Bounds.Height <= 0)
+                throw new InvalidOperationException($"The {title} demo control was not laid out in the visual tree.");
+            if (control is MdSlideToConfirm slide)
+            {
+                var peer = ControlAutomationPeer.CreatePeerForElement(slide);
+                var invoke = peer.GetProvider<IInvokeProvider>() ?? throw new InvalidOperationException("Slide confirmation automation is missing.");
+                invoke.Invoke();
+                if (!slide.IsConfirmed) throw new InvalidOperationException("Slide confirmation did not complete.");
+            }
+            if (control is MdWheelPicker wheel)
+            {
+                var peer = ControlAutomationPeer.CreatePeerForElement(wheel);
+                var range = peer.GetProvider<IRangeValueProvider>() ?? throw new InvalidOperationException("Wheel automation is missing.");
+                range.SetValue(15);
+                if (wheel.Value != 15) throw new InvalidOperationException("Wheel picker did not change value.");
+            }
+        }, DispatcherPriority.Loaded);
     }
 
     /// <summary>

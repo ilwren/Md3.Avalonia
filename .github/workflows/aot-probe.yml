@@ -26,13 +26,13 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev xvfb libx11-6 libice6 libsm6 libfontconfig1
       # The script is the single source of truth for the AOT publish: it asserts the output is a
       # native executable with no managed app assembly beside it, then exercises the file-system
-      # picker, emoji picker and slide-confirm automation action in separate native processes.
+      # picker, emoji picker, slide-confirm, and dedicated controls in separate native processes.
       - name: Publish, verify and smoke the native AOT gallery
         run: |
           # Capture both sides of the pipe: tee must not hide a failed publish or smoke.
           set -uo pipefail
           set +e
-          bash scripts/publish-gallery-aot.sh --rid linux-x64 --output /tmp/aot-out --smoke-scenario file-system-picker,emoji-picker,slide-confirm 2>&1 | tee /tmp/aot.log
+          bash scripts/publish-gallery-aot.sh --rid linux-x64 --output /tmp/aot-out --smoke-scenario file-system-picker,emoji-picker,slide-confirm,dedicated-controls 2>&1 | tee /tmp/aot.log
           statuses=("${PIPESTATUS[@]}")
           set -e
           if (( statuses[0] != 0 || statuses[1] != 0 )); then

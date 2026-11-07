@@ -11,6 +11,7 @@ public partial class BorderlessWindowGalleryPage : UserControl
     public BorderlessWindowGalleryPage()
     {
         InitializeComponent();
+        OpenDemoButton.IsEnabled = !OperatingSystem.IsAndroid() && !OperatingSystem.IsIOS();
         var adapter = MdWindowPlatformAdapterResolver.Resolve();
         AdapterStatus.Text = GalleryLocalization.Choose(
             $"Resolved {adapter.Platform}; capabilities: {adapter.Capabilities}.",
@@ -18,6 +19,12 @@ public partial class BorderlessWindowGalleryPage : UserControl
     }
 
     private void OpenDemoWindow(object? sender, RoutedEventArgs e)
+    {
+        var window = CreateDemoWindow();
+        if (TopLevel.GetTopLevel(this) is Window owner) window.Show(owner); else window.Show();
+    }
+
+    internal MdBorderlessWindow CreateDemoWindow()
     {
         var window = new MdBorderlessWindow
         {
@@ -54,7 +61,32 @@ public partial class BorderlessWindowGalleryPage : UserControl
             MaxWidth = 520,
             TextAlignment = global::Avalonia.Media.TextAlignment.Center
         });
-        window.Content = body;
-        if (TopLevel.GetTopLevel(this) is Window owner) window.Show(owner); else window.Show();
+        var dragRegion = new MdWindowDragRegion
+        {
+            Padding = new Thickness(12),
+            Content = new TextBlock { Text = GalleryLocalization.Choose("Drag this client region", "拖动此客户区"), VerticalAlignment = VerticalAlignment.Center }
+        };
+        var minimize = new MdCaptionButton { Kind = MdCaptionButtonKind.Minimize, Content = "−", Width = 48, Height = 40 };
+        var maximize = new MdWindowCaptionButton { Kind = MdCaptionButtonKind.MaximizeRestore, Content = "□", Width = 48, Height = 40 };
+        var close = new MdCaptionButton { Kind = MdCaptionButtonKind.Close, Content = "×", Width = 48, Height = 40 };
+        var actions = new StackPanel { Orientation = Orientation.Horizontal, Children = { minimize, maximize, close } };
+        var clientBar = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), Background = this.FindResource("Md.Sys.Color.SurfaceContainerHigh.Brush") as Avalonia.Media.IBrush };
+        Grid.SetColumn(actions, 1);
+        clientBar.Children.Add(dragRegion);
+        clientBar.Children.Add(actions);
+        var grip = new MdWindowResizeGrip { Width = 28, Height = 28, Edge = WindowEdge.SouthEast,
+            HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Bottom };
+        var gripArea = new Grid { Width = 28, Height = 28, HorizontalAlignment = HorizontalAlignment.Right };
+        gripArea.Children.Add(new TextBlock { Text = "◢", HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center, IsHitTestVisible = false });
+        gripArea.Children.Add(grip);
+        var layout = new Grid { RowDefinitions = new RowDefinitions("Auto,*,Auto") };
+        Grid.SetRow(body, 1);
+        Grid.SetRow(gripArea, 2);
+        layout.Children.Add(clientBar);
+        layout.Children.Add(body);
+        layout.Children.Add(gripArea);
+        window.Content = layout;
+        return window;
     }
 }

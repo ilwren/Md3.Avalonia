@@ -13,7 +13,7 @@
                          DrawerWidth="320">
     <md:MdNavigationDrawer.DrawerContent>
       <Border Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
-        <Grid RowDefinitions="72,*">
+        <Grid RowDefinitions="72,Auto,Auto,*">
           <Grid Margin="12,8" ColumnDefinitions="48,*,Auto" ColumnSpacing="10">
             <Image Grid.Column="0" Width="44" Height="44" Stretch="Uniform"
                    Source="avares://Md3.Avalonia.Gallery/Assets/logo-128.png"
@@ -29,7 +29,11 @@
                              AutomationProperties.Name="Close navigation"
                              Click="CloseNavigation" />
           </Grid>
-          <md:MdScrollViewer Grid.Row="1"
+          <md:MdSearchBar x:Name="DrawerSearch" Grid.Row="1" Margin="12,0,12,8"
+                          PlaceholderText="Search components" AutomationProperties.Name="Search components"
+                          TextChanged="DrawerSearchChanged" SearchSubmitted="DrawerSearchSubmitted" />
+          <TextBlock x:Name="DrawerSearchStatus" Grid.Row="2" Margin="16,0,16,4" IsVisible="False" TextWrapping="Wrap" />
+          <md:MdScrollViewer Grid.Row="3"
                              VerticalScrollBarVisibility="Auto"
                              HorizontalScrollBarVisibility="Disabled">
             <StackPanel x:Name="MobileNavigationItems" Margin="12,4,12,28" Spacing="4" />
@@ -67,7 +71,11 @@
                                AutomationProperties.Name="Favorite" />
             </WrapPanel>
             <md:MdTextBox Label="Outlined text field" Text="Avalonia on Android" ShowClearButton="True"/>
-            <md:MdSearchBar PlaceholderText="Search components"/>
+            <md:MdSearchBar x:Name="HomeSearch" PlaceholderText="Search components"
+                            AutomationProperties.Name="Search components" TextChanged="HomeSearchChanged"
+                            SearchSubmitted="HomeSearchSubmitted" />
+            <TextBlock x:Name="HomeSearchStatus" IsVisible="False" TextWrapping="Wrap" />
+            <StackPanel x:Name="HomeSearchResults" Spacing="4" />
             <StackPanel Spacing="4">
               <md:MdSwitch Content="Dynamic color" IsChecked="True"/>
               <md:MdCheckBox Content="Touch target and state layer" IsChecked="True"/>

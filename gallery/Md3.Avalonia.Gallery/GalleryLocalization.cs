@@ -62,6 +62,11 @@ internal static class GalleryLocalization
         ["The safe area follows platform insets when available, with a minimum padding on every edge. Desktop and headless platforms may report no inset."]="安全区域在平台提供内边距时跟随其变化，并为每条边设置最小内边距。桌面和无头平台可能不报告内边距。",
         ["MdDatePickerDialog and MdTimePickerDialog are preconfigured modal and dial variants of these pickers."]="MdDatePickerDialog 和 MdTimePickerDialog 是这些选择器预配置的模态和表盘变体。",
         ["MdRichTextEditor is a compatibility name for MdRichEditor; both use the same adapter API."]="MdRichTextEditor 是 MdRichEditor 的兼容名称，两者使用相同的适配器 API。",
+        ["Layout motion primitives"]="布局动效基础部件", ["Reveal fraction"]="展开比例", ["Morph progress"]="形变进度",
+        ["Move the sliders to control the reveal fraction and interpolated size directly. The morph panel changes layout size only; it does not cross-fade its children."]="拖动滑块直接控制展开比例和插值尺寸。形变面板只改变布局尺寸，不会交叉淡化子元素。",
+        ["Content is clipped, not squashed."]="内容会被裁剪，不会被压缩。",
+        ["Custom window parts"]="自定义窗口部件",
+        ["The real secondary window includes a draggable client region, caption actions and a bottom-right resize grip. These actions require a desktop window; Android does not support them."]="实际的次级窗口包含可拖动的客户区、标题栏操作和右下角缩放手柄。这些操作需要桌面窗口；Android 不支持。",
         // Ecosystem Waves A–F
         ["Flutter ecosystem"]="Flutter 生态控件", ["Wave A · Overlay, commands and density"]="Wave A · 浮层、命令与密度",
         ["Open one transient surface, then scroll to verify it dismisses."]="打开一个临时浮层，然后滚动以验证其自动关闭。", ["Compact density is scoped to this information row only."]="紧凑密度仅应用于此信息行。",
@@ -665,6 +670,6 @@ internal static class GalleryLocalization
     public static string Choose(string english, string chinese) =>
         CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "zh" ? chinese : english;
 
-    private static string Translate(string source, CultureInfo culture) =>
+    internal static string Translate(string source, CultureInfo culture) =>
         culture.TwoLetterISOLanguageName == "zh" && Zh.TryGetValue(source, out var value) ? value : source;
 }

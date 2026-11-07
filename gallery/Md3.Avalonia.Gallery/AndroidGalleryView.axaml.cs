@@ -21,6 +21,8 @@ namespace Md3.Avalonia.Gallery;
 public partial class AndroidGalleryView : UserControl
 {
     private readonly List<MobileGalleryEntry> _galleryIndex = [];
+    private readonly List<TextBlock> _sectionHeaders = [];
+    private TextBlock? _currentSection;
     private object? _overviewPage;
     private string? _currentPageTitle;
     private Control? _currentPage;
@@ -93,6 +95,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Expansion panels", () => new ExpansionPanelGalleryPage());
         AddPage("Form validation", () => new FormValidationGalleryPage());
         AddPage("Grid tiles", () => new GridTileGalleryPage());
+        AddPage("Grid splitter", () => new GridSplitterGalleryPage());
         AddPage("Lists", () => new ListGalleryPage());
         AddPage("Loading", () => new LoadingGalleryPage());
         AddPage("Progress", () => new ProgressGalleryPage());
@@ -190,19 +193,22 @@ public partial class AndroidGalleryView : UserControl
 
     private void AddSection(string title)
     {
-        MobileNavigationItems.Children.Add(new TextBlock
+        var header = new TextBlock
         {
             Text = title,
             Margin = new Thickness(16, 16, 16, 4),
             FontSize = 12,
             FontWeight = global::Avalonia.Media.FontWeight.SemiBold,
             Foreground = this.FindResource("Md.Sys.Color.OnSurfaceVariant.Brush") as global::Avalonia.Media.IBrush
-        });
+        };
+        _currentSection = header;
+        _sectionHeaders.Add(header);
+        MobileNavigationItems.Children.Add(header);
     }
 
     private void AddPage(string title, Func<object?> factory)
     {
-        var entry = new MobileGalleryEntry(title, factory);
+        var entry = new MobileGalleryEntry(title, factory) { SectionHeader = _currentSection };
         _galleryIndex.Add(entry);
         var button = new MdButton
         {
@@ -217,6 +223,63 @@ public partial class AndroidGalleryView : UserControl
         AutomationProperties.SetName(button, title);
         button.Click += NavigateFromDrawer;
         MobileNavigationItems.Children.Add(button);
+    }
+
+    // Match the same vocabulary as desktop, including class names and Chinese aliases. Exact
+    // titles rank first for Enter; alphabetical ordering keeps the compact home list predictable.
+    private List<MobileGalleryEntry> SearchEntries(string query) => _galleryIndex
+        .Where(entry => GallerySearchTerms.Matches(entry.Title, query, entry.NavigationButton?.Content?.ToString()))
+        .OrderBy(entry => string.Equals(entry.Title, query.Trim(), StringComparison.OrdinalIgnoreCase) ? 0 :
+            entry.Title.StartsWith(query.Trim(), StringComparison.OrdinalIgnoreCase) ? 1 : 2)
+        .ThenBy(entry => entry.Title, StringComparer.OrdinalIgnoreCase)
+        .ToList();
+
+    private void DrawerSearchChanged(object? sender, TextChangedEventArgs e)
+    {
+        if (DrawerSearch is null || DrawerSearchStatus is null) return;
+        var query = DrawerSearch.Text?.Trim() ?? string.Empty;
+        var matches = SearchEntries(query);
+        var matched = matches.ToHashSet();
+        foreach (var entry in _galleryIndex)
+            if (entry.NavigationButton is { } button) button.IsVisible = matched.Contains(entry);
+        foreach (var header in _sectionHeaders)
+            header.IsVisible = matches.Any(entry => ReferenceEquals(entry.SectionHeader, header));
+        DrawerSearchStatus.IsVisible = query.Length > 0;
+        DrawerSearchStatus.Text = matches.Count == 0
+            ? GalleryLocalization.Choose("No matching components.", "没有匹配的组件。")
+            : GalleryLocalization.Choose($"{matches.Count} matching pages", $"找到 {matches.Count} 个页面");
+    }
+
+    private void HomeSearchChanged(object? sender, TextChangedEventArgs e)
+    {
+        if (HomeSearch is null || HomeSearchResults is null || HomeSearchStatus is null) return;
+        var query = HomeSearch.Text?.Trim() ?? string.Empty;
+        HomeSearchResults.Children.Clear();
+        HomeSearchStatus.IsVisible = query.Length > 0;
+        if (query.Length == 0) return;
+        var matches = SearchEntries(query);
+        const int limit = 8;
+        HomeSearchStatus.Text = matches.Count == 0
+            ? GalleryLocalization.Choose("No matching components.", "没有匹配的组件。")
+            : matches.Count > limit
+                ? GalleryLocalization.Choose($"Showing {limit} of {matches.Count} pages. Open the menu for all results.", $"显示 {matches.Count} 个页面中的前 {limit} 个；打开菜单查看全部结果。")
+                : GalleryLocalization.Choose($"{matches.Count} matching pages", $"找到 {matches.Count} 个页面");
+        foreach (var entry in matches.Take(limit))
+        {
+            var button = new MdButton { Content = entry.Title, Tag = entry, Variant = MdButtonVariant.Text,
+                HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Left };
+            button.Click += NavigateFromDrawer;
+            HomeSearchResults.Children.Add(button);
+        }
+    }
+
+    private void DrawerSearchSubmitted(object? sender, string query) => NavigateSearchResult(query);
+    private void HomeSearchSubmitted(object? sender, string query) => NavigateSearchResult(query);
+
+    private void NavigateSearchResult(string query)
+    {
+        if (string.IsNullOrWhiteSpace(query)) return;
+        if (SearchEntries(query).FirstOrDefault() is { } entry) Navigate(entry);
     }
 
     private void NavigateFromDrawer(object? sender, RoutedEventArgs e)
@@ -387,6 +450,7 @@ public partial class AndroidGalleryView : UserControl
     private sealed record MobileGalleryEntry(string Title, Func<object?> Factory)
     {
         public MdButton? NavigationButton { get; set; }
+        public TextBlock? SectionHeader { get; init; }
     }
 
     private readonly record struct MobileControlSizeState(
