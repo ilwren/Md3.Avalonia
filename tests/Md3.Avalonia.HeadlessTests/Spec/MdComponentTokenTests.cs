@@ -141,11 +141,15 @@ public sealed class MdComponentTokenTests
         // Each is exactly half its box, which IS full. What the specification constrains is the shape,
         // not the number, so the check is that a full-shape token's radius covers half the box it rounds.
         // A radius smaller than that leaves square corners on a control Material draws as a circle.
+        // Every token Material calls corner-full, paired with the box it rounds. The pairing is what
+        // makes the check meaningful: "999" is not the invariant, "at least half the box" is.
         var roundTokens = new (string Key, string Size)[]
         {
             ("Md.Comp.Badge.Small.Shape", "Md.Comp.Badge.Small.Size"),
             ("Md.Comp.Badge.Large.Shape", "Md.Comp.Badge.Large.Height"),
-            ("Md.Comp.CheckBox.StateLayer.Shape", "Md.Comp.CheckBox.StateLayer.Size")
+            ("Md.Comp.CheckBox.StateLayer.Shape", "Md.Comp.CheckBox.StateLayer.Size"),
+            ("Md.Comp.Button.Small.Shape.Round", "Md.Comp.Button.Small.Container.Height"),
+            ("Md.Comp.IconButton.Small.RoundShape", "Md.Comp.IconButton.Small.Height")
         };
 
         foreach (var (key, sizeKey) in roundTokens)
@@ -166,6 +170,10 @@ public sealed class MdComponentTokenTests
                 $"[{string.Join(", ", corners)}]; a radius under half the box leaves square corners.");
         }
 
+        // The rest of the full-shape tokens have no single box to compare against (a round button's
+        // radius tracks whichever size variant is active), so the stateable invariant is the weaker one:
+        // the radius is symmetric, rather than a squashed quad pretending to be a circle. The pair list
+        // comes from the snapshot so that adding a shape to the mapping is a one-line change.
         foreach (var pair in tables.FullShapePairs)
         {
             if (!TryResolve(application, pair.Library, out var resolved) || resolved.Kind != ResolvedKind.Corner)
@@ -174,16 +182,12 @@ public sealed class MdComponentTokenTests
                 continue;
             }
 
-            // No size to compare against here, so the stateable invariant is that the token is a single
-            // symmetric radius rather than a squashed quad, and that it is at least the M3 shape scale's
-            // largest fixed step - anything smaller cannot round a control Material draws as a circle.
             var corners = resolved.Corners!;
-            var symmetric = corners.Distinct().Count() == 1;
             report.Check(
                 $"{pair.Library} (= {pair.Expect})",
-                symmetric && corners[0] >= 28,
-                $"Material states {pair.Expect}; the token resolves to [{string.Join(", ", corners)}], " +
-                "which is either asymmetric or too small to round a circular container");
+                corners.Distinct().Count() == 1,
+                $"Material states {pair.Expect}, so all four corners must match; the token resolves to " +
+                $"[{string.Join(", ", corners)}]");
         }
     }
 
