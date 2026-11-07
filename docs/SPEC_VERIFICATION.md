@@ -125,11 +125,11 @@ and `budget`. Moving a budget is therefore a visible diff, and only one directio
 
 | metric | meaning | today |
 | --- | --- | ---: |
-| `hardcoded_geometry` | themable literals inside `Themes/Controls/*.axaml` | 279 |
+| `hardcoded_geometry` | themable literals inside every shipped `Themes/*.axaml` | 269 |
 | `hardcoded_ui_text` | English authored in a shipped template, bypassing `MdLocalization` | 0 |
-| `orphan_tokens` | declared tokens nothing references | 84 |
+| `orphan_tokens` | declared tokens nothing references | 73 |
 | `dual_declaration_keys` | keys declared in both XAML and `MdThemeManager` | 27 |
-| `oracle_coverage_ratio` | oracle entries ÷ declared keys | 0.2462 |
+| `oracle_coverage_ratio` | oracle entries ÷ declared keys | 0.3299 |
 | `oracle_families` | component families with at least one oracle value | 19 |
 | `measured_controls` / `measured_cases` | controls and cases the L2 matrix lays out | 14 / 43 |
 | `armed_goldens` | committed L3 baselines | 0 |
@@ -171,6 +171,41 @@ hold a light value and a dark value for the same role, and 36 of the 49 roles le
 The baseline is therefore asserted in C# rather than added to the oracle file — adding the light values
 alone would have made the oracle a half-truth and inflated `oracle_coverage_ratio` without measuring
 anything new.
+
+### The geometry metric measured the wrong tree, and then it halved
+
+`hardcoded_geometry` is the largest number in the table and for a long time it was also the least
+honest one. `rule_hardcoded_geometry` globbed `src/Md3.Avalonia/Themes/Controls/*.axaml`, one folder
+of one package. The sibling packages author control themes exactly the same way - `Md3.Avalonia.Extra`
+alone had 198 literals - and every one of them was outside the measurement. The metric said 279
+because it was not looking at the other 195.
+
+The rule now walks every `src/Md3.Avalonia*/Themes/*.axaml`, which is the artefact the requirement is
+actually about. On the old tree that correction reads 474, so the first thing the fix does is make the
+number worse, and that is the correct direction: a metric that flatters the tree cannot be burnt down,
+it can only be believed. Against the corrected measurement, 218 literals became tokens:
+
+- every `FontSize` whose value is a step of the published type scale resolves through
+  `Md.Sys.TypeScale.*.Size`, including `MdText`'s 15 type-scale classes, where the matching
+  `.LineHeight` replaced the literal line height too;
+- every `CornerRadius` whose value is on the M3 shape scale (4, 8, 12, 16, 20, 28) resolves through
+  `Md.Sys.Shape.Corner.*`;
+- both the attribute form and the `Setter ... Value=` form, in all seven packages.
+
+`hardcoded_geometry` is now 269 and the budget is 269. What is still literal is deliberate and each
+case is a different bug:
+
+- **values with no token**: `MinHeight="56"`, `MinWidth="160"`, the width of a dialog. No `Md.Comp.*`
+  measurement exists for most of these, so there is nothing to point at until one does;
+- **derived values**: an inset ring is one step inside its parent (18 outside, 16 inside), and a
+  per-corner quad (`0,16,16,0`) composes two steps. Rounding either to the nearest token changes
+  pixels, so they stay numbers;
+- **values off the scale**: 13, 10, 9, 17, 18, 22. Several of those *are* design decisions worth
+  revisiting (a 13dp label is not a Material step), but replacing them with the nearest step is a
+  visual change, and a commit that claims "no visual change" must not contain one.
+
+That last rule was enforced mechanically rather than by eye: the substitution was replayed against
+`SystemTokens.axaml` and every literal/token pair whose numbers differed was reverted. Fifteen were.
 
 ### L4: the template contract
 
@@ -293,7 +328,8 @@ The bootstrap inventory is real output, not a placeholder. From `scripts/lint-de
 - **3 medium-confidence divergences**, including `Md.Comp.Fab.Medium.Shape` at 24dp against an
   expected 20dp.
 - **105 orphan tokens** that are declared and never referenced.
-- **267 hard-coded geometry literals** inside `Themes/Controls/*.axaml`.
+- **267 hard-coded geometry literals** inside `Themes/Controls/*.axaml` (recounted later across
+  every package: the real first-run figure was 474 - see "The geometry metric measured the wrong tree").
 - **0 errors** — the repository already has a clean baseline for literal colours, unresolved
   resource keys, and broken resource includes, so those three rules are armed as hard failures from
   day one and will catch the next regression.
