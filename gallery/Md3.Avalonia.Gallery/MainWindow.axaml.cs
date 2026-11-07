@@ -22,7 +22,7 @@ public partial class MainWindow : Window
     private readonly GalleryIndexEntry[] _galleryIndex;
     private readonly Dictionary<Control, ResponsiveSizeState> _responsiveSizeStates = [];
     private CultureInfo _culture = CultureInfo.GetCultureInfo("en-US");
-    private Type? _currentPageType;
+    private Func<Control>? _currentPageFactory;
     private MdButton? _currentNavigationButton;
     private MdButton? _currentTopNavigationButton;
     private bool _usesModalNavigation;
@@ -209,7 +209,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
         // The shell observes handled events only to chain at an inner scroller's boundary.
         PageScroll.AddHandler(InputElement.PointerWheelChangedEvent, OnPagePointerWheel,
             RoutingStrategies.Bubble, handledEventsToo: true);
-        Navigate(new ComponentsOverviewGalleryPage(), ComponentsOverviewNav, ComponentsTopNav);
+        Navigate(() => new ComponentsOverviewGalleryPage(), ComponentsOverviewNav, ComponentsTopNav);
         Dispatcher.UIThread.Post(() =>
         {
             GalleryLocalization.Apply(this, _culture);
@@ -232,145 +232,145 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
     {
         var entry = _galleryIndex.FirstOrDefault(candidate => string.Equals(candidate.Title, title, StringComparison.Ordinal));
         if (entry is null) return false;
-        Navigate(entry.Factory(), entry.Button, ComponentsTopNav);
+        Navigate(entry.Factory, entry.Button, ComponentsTopNav);
         return true;
     }
 
-    private void ShowGetStarted(object? s, RoutedEventArgs e) => Navigate(new GettingStartedGalleryPage(), null, GetStartedTopNav);
-    private void ShowDevelop(object? s, RoutedEventArgs e) => Navigate(new DeveloperGalleryPage(), null, DevelopTopNav);
-    private void ShowFoundations(object? s, RoutedEventArgs e) => Navigate(new ThemeResourcesGalleryPage(), ThemeResourcesNav, FoundationsTopNav);
-    private void ShowStyles(object? s, RoutedEventArgs e) => Navigate(new StylesGalleryPage(), null, StylesTopNav);
-    private void ShowComponents(object? s, RoutedEventArgs e) => Navigate(new ComponentsOverviewGalleryPage(), ComponentsOverviewNav, ComponentsTopNav);
+    private void ShowGetStarted(object? s, RoutedEventArgs e) => Navigate(() => new GettingStartedGalleryPage(), null, GetStartedTopNav);
+    private void ShowDevelop(object? s, RoutedEventArgs e) => Navigate(() => new DeveloperGalleryPage(), null, DevelopTopNav);
+    private void ShowFoundations(object? s, RoutedEventArgs e) => Navigate(() => new ThemeResourcesGalleryPage(), ThemeResourcesNav, FoundationsTopNav);
+    private void ShowStyles(object? s, RoutedEventArgs e) => Navigate(() => new StylesGalleryPage(), null, StylesTopNav);
+    private void ShowComponents(object? s, RoutedEventArgs e) => Navigate(() => new ComponentsOverviewGalleryPage(), ComponentsOverviewNav, ComponentsTopNav);
 
-    private void ShowAndroidSettings(object? s, RoutedEventArgs e) => Navigate(new AndroidSettingsSamplePage(), AndroidSettingsNav);
-    private void ShowClock(object? s, RoutedEventArgs e) => Navigate(new ClockSamplePage(), ClockNav);
-    private void ShowTasks(object? s, RoutedEventArgs e) => Navigate(new TasksSamplePage(), TasksNav);
+    private void ShowAndroidSettings(object? s, RoutedEventArgs e) => Navigate(() => new AndroidSettingsSamplePage(), AndroidSettingsNav);
+    private void ShowClock(object? s, RoutedEventArgs e) => Navigate(() => new ClockSamplePage(), ClockNav);
+    private void ShowTasks(object? s, RoutedEventArgs e) => Navigate(() => new TasksSamplePage(), TasksNav);
 
-    private void ShowButtons(object? s, RoutedEventArgs e) => Navigate(new ButtonGalleryPage(), ButtonNav);
-    private void ShowIconButtons(object? s, RoutedEventArgs e) => Navigate(new IconButtonGalleryPage(), IconButtonNav);
-    private void ShowFabs(object? s, RoutedEventArgs e) => Navigate(new FabGalleryPage(), FabNav);
-    private void ShowAppBars(object? s, RoutedEventArgs e) => Navigate(new AppBarGalleryPage(), AppBarNav);
-    private void ShowBadges(object? s, RoutedEventArgs e) => Navigate(new BadgeGalleryPage(), BadgeNav);
-    private void ShowBreadcrumbs(object? s, RoutedEventArgs e) => Navigate(new BreadcrumbGalleryPage(), BreadcrumbNav);
-    private void ShowTextFields(object? s, RoutedEventArgs e) => Navigate(new TextBoxGalleryPage(), TextFieldNav);
-    private void ShowCheckBoxes(object? s, RoutedEventArgs e) => Navigate(new CheckBoxGalleryPage(), CheckBoxNav);
-    private void ShowRadioButtons(object? s, RoutedEventArgs e) => Navigate(new RadioButtonGalleryPage(), RadioButtonNav);
-    private void ShowComboBoxes(object? s, RoutedEventArgs e) => Navigate(new ComboBoxGalleryPage(), ComboBoxNav);
-    private void ShowCarousel(object? s, RoutedEventArgs e) => Navigate(new CarouselGalleryPage(), CarouselNav);
-    private void ShowCards(object? s, RoutedEventArgs e) => Navigate(new CardGalleryPage(), CardNav);
-    private void ShowChips(object? s, RoutedEventArgs e) => Navigate(new ChipGalleryPage(), ChipNav);
-    private void ShowPickers(object? s, RoutedEventArgs e) => Navigate(new PickerGalleryPage(), PickerNav);
-    private void ShowFileSystemPicker(object? s, RoutedEventArgs e) => Navigate(new FileSystemPickerGalleryPage(), FileSystemPickerNav);
-    private void ShowColorPicker(object? s, RoutedEventArgs e) => Navigate(new ColorPickerGalleryPage(), ColorPickerNav);
-    private void ShowDialogs(object? s, RoutedEventArgs e) => Navigate(new DialogGalleryPage(), DialogNav);
-    private void ShowDivider(object? s, RoutedEventArgs e) => Navigate(new DividerGalleryPage(), DividerNav);
-    private void ShowLists(object? s, RoutedEventArgs e) => Navigate(new ListGalleryPage(), ListNav);
-    private void ShowLoading(object? s, RoutedEventArgs e) => Navigate(new LoadingGalleryPage(), LoadingNav);
-    private void ShowProgress(object? s, RoutedEventArgs e) => Navigate(new ProgressGalleryPage(), ProgressNav);
-    private void ShowMenus(object? s, RoutedEventArgs e) => Navigate(new MenuGalleryPage(), MenuNav);
-    private void ShowNavigationBar(object? s, RoutedEventArgs e) => Navigate(new NavigationBarGalleryPage(), NavigationBarNav);
-    private void ShowNavigationDrawer(object? s, RoutedEventArgs e) => Navigate(new NavigationDrawerGalleryPage(), NavigationDrawerNav);
-    private void ShowAdaptive(object? s, RoutedEventArgs e) => Navigate(new AdaptiveGalleryPage(), AdaptiveNav);
+    private void ShowButtons(object? s, RoutedEventArgs e) => Navigate(() => new ButtonGalleryPage(), ButtonNav);
+    private void ShowIconButtons(object? s, RoutedEventArgs e) => Navigate(() => new IconButtonGalleryPage(), IconButtonNav);
+    private void ShowFabs(object? s, RoutedEventArgs e) => Navigate(() => new FabGalleryPage(), FabNav);
+    private void ShowAppBars(object? s, RoutedEventArgs e) => Navigate(() => new AppBarGalleryPage(), AppBarNav);
+    private void ShowBadges(object? s, RoutedEventArgs e) => Navigate(() => new BadgeGalleryPage(), BadgeNav);
+    private void ShowBreadcrumbs(object? s, RoutedEventArgs e) => Navigate(() => new BreadcrumbGalleryPage(), BreadcrumbNav);
+    private void ShowTextFields(object? s, RoutedEventArgs e) => Navigate(() => new TextBoxGalleryPage(), TextFieldNav);
+    private void ShowCheckBoxes(object? s, RoutedEventArgs e) => Navigate(() => new CheckBoxGalleryPage(), CheckBoxNav);
+    private void ShowRadioButtons(object? s, RoutedEventArgs e) => Navigate(() => new RadioButtonGalleryPage(), RadioButtonNav);
+    private void ShowComboBoxes(object? s, RoutedEventArgs e) => Navigate(() => new ComboBoxGalleryPage(), ComboBoxNav);
+    private void ShowCarousel(object? s, RoutedEventArgs e) => Navigate(() => new CarouselGalleryPage(), CarouselNav);
+    private void ShowCards(object? s, RoutedEventArgs e) => Navigate(() => new CardGalleryPage(), CardNav);
+    private void ShowChips(object? s, RoutedEventArgs e) => Navigate(() => new ChipGalleryPage(), ChipNav);
+    private void ShowPickers(object? s, RoutedEventArgs e) => Navigate(() => new PickerGalleryPage(), PickerNav);
+    private void ShowFileSystemPicker(object? s, RoutedEventArgs e) => Navigate(() => new FileSystemPickerGalleryPage(), FileSystemPickerNav);
+    private void ShowColorPicker(object? s, RoutedEventArgs e) => Navigate(() => new ColorPickerGalleryPage(), ColorPickerNav);
+    private void ShowDialogs(object? s, RoutedEventArgs e) => Navigate(() => new DialogGalleryPage(), DialogNav);
+    private void ShowDivider(object? s, RoutedEventArgs e) => Navigate(() => new DividerGalleryPage(), DividerNav);
+    private void ShowLists(object? s, RoutedEventArgs e) => Navigate(() => new ListGalleryPage(), ListNav);
+    private void ShowLoading(object? s, RoutedEventArgs e) => Navigate(() => new LoadingGalleryPage(), LoadingNav);
+    private void ShowProgress(object? s, RoutedEventArgs e) => Navigate(() => new ProgressGalleryPage(), ProgressNav);
+    private void ShowMenus(object? s, RoutedEventArgs e) => Navigate(() => new MenuGalleryPage(), MenuNav);
+    private void ShowNavigationBar(object? s, RoutedEventArgs e) => Navigate(() => new NavigationBarGalleryPage(), NavigationBarNav);
+    private void ShowNavigationDrawer(object? s, RoutedEventArgs e) => Navigate(() => new NavigationDrawerGalleryPage(), NavigationDrawerNav);
+    private void ShowAdaptive(object? s, RoutedEventArgs e) => Navigate(() => new AdaptiveGalleryPage(), AdaptiveNav);
     private void ShowNotifications(object? s, RoutedEventArgs e) =>
-        Navigate(new NotificationsGalleryPage(), s as MdButton ?? NotificationsNav);
-    private void ShowSearch(object? s, RoutedEventArgs e) => Navigate(new SearchGalleryPage(), SearchNav);
-    private void ShowSettingsCard(object? s, RoutedEventArgs e) => Navigate(new SettingsCardGalleryPage(), SettingsCardNav);
-    private void ShowSheets(object? s, RoutedEventArgs e) => Navigate(new SheetGalleryPage(), SheetNav);
-    private void ShowSlider(object? s, RoutedEventArgs e) => Navigate(new SliderGalleryPage(), SliderNav);
-    private void ShowAutoComplete(object? s, RoutedEventArgs e) => Navigate(new AutoCompleteGalleryPage(), AutoCompleteNav);
-    private void ShowDateRangePicker(object? s, RoutedEventArgs e) => Navigate(new DateRangePickerGalleryPage(), DateRangePickerNav);
-    private void ShowRangeSlider(object? s, RoutedEventArgs e) => Navigate(new RangeSliderGalleryPage(), RangeSliderNav);
-    private void ShowResponsiveContent(object? s, RoutedEventArgs e) => Navigate(new ResponsiveContentGalleryPage(), ResponsiveContentNav);
-    private void ShowScrollViewer(object? s, RoutedEventArgs e) => Navigate(new ScrollViewerGalleryPage(), ScrollViewerNav);
-    private void ShowSegmentedButton(object? s, RoutedEventArgs e) => Navigate(new SegmentedButtonGalleryPage(), SegmentedButtonNav);
-    private void ShowSurface(object? s, RoutedEventArgs e) => Navigate(new SurfaceGalleryPage(), SurfaceNav);
-    private void ShowSnackbar(object? s, RoutedEventArgs e) => Navigate(new SnackbarGalleryPage(), SnackbarNav);
-    private void ShowSwitch(object? s, RoutedEventArgs e) => Navigate(new SwitchGalleryPage(), SwitchNav);
-    private void ShowTabs(object? s, RoutedEventArgs e) => Navigate(new TabGalleryPage(), TabNav);
-    private void ShowToolbars(object? s, RoutedEventArgs e) => Navigate(new ToolbarGalleryPage(), ToolbarNav);
-    private void ShowTooltips(object? s, RoutedEventArgs e) => Navigate(new TooltipGalleryPage(), TooltipNav);
-    private void ShowAutoSizeText(object? s, RoutedEventArgs e) => Navigate(new AutoSizeTextDemoPage(), AutoSizeTextNav);
-    private void ShowConfetti(object? s, RoutedEventArgs e) => Navigate(new ConfettiDemoPage(), ConfettiNav);
-    private void ShowEmojiPicker(object? s, RoutedEventArgs e) => Navigate(new EmojiPickerDemoPage(), EmojiPickerNav);
-    private void ShowExpandableText(object? s, RoutedEventArgs e) => Navigate(new ExpandableTextDemoPage(), ExpandableTextNav);
-    private void ShowMarquee(object? s, RoutedEventArgs e) => Navigate(new MarqueeDemoPage(), MarqueeNav);
-    private void ShowMediaProgress(object? s, RoutedEventArgs e) => Navigate(new MediaProgressDemoPage(), MediaProgressNav);
-    private void ShowPageIndicator(object? s, RoutedEventArgs e) => Navigate(new PageIndicatorDemoPage(), PageIndicatorNav);
-    private void ShowSlideToConfirm(object? s, RoutedEventArgs e) => Navigate(new SlideToConfirmDemoPage(), SlideToConfirmNav);
-    private void ShowWheelPicker(object? s, RoutedEventArgs e) => Navigate(new WheelPickerDemoPage(), WheelPickerNav);
-    private void ShowAnimatedText(object? s, RoutedEventArgs e) => Navigate(new AnimatedTextGalleryPage(), AnimatedTextNav);
-    private void ShowAnimationSequence(object? s, RoutedEventArgs e) => Navigate(new AnimationSequenceGalleryPage(), AnimationSequenceNav);
-    private void ShowAsyncSelect(object? s, RoutedEventArgs e) => Navigate(new AsyncSelectGalleryPage(), AsyncSelectNav);
-    private void ShowAvatar(object? s, RoutedEventArgs e) => Navigate(new AvatarGalleryPage(), AvatarNav);
-    private void ShowBeforeAfter(object? s, RoutedEventArgs e) => Navigate(new BeforeAfterGalleryPage(), BeforeAfterNav);
-    private void ShowCalendar(object? s, RoutedEventArgs e) => Navigate(new CalendarGalleryPage(), CalendarNav);
-    private void ShowCascader(object? s, RoutedEventArgs e) => Navigate(new CascaderGalleryPage(), CascaderNav);
-    private void ShowChart(object? s, RoutedEventArgs e) => Navigate(new ChartGalleryPage(), ChartNav);
-    private void ShowChatView(object? s, RoutedEventArgs e) => Navigate(new ChatViewGalleryPage(), ChatNav);
-    private void ShowCommandPalette(object? s, RoutedEventArgs e) => Navigate(new CommandPaletteGalleryPage(), CommandPaletteNav);
-    private void ShowDataGrid(object? s, RoutedEventArgs e) => Navigate(new DataGridGalleryPage(), DataGridNav);
-    private void ShowDensity(object? s, RoutedEventArgs e) => Navigate(new DensityGalleryPage(), DensityNav);
-    private void ShowHoverCard(object? s, RoutedEventArgs e) => Navigate(new HoverCardGalleryPage(), HoverCardNav);
-    private void ShowMasonry(object? s, RoutedEventArgs e) => Navigate(new MasonryPanelGalleryPage(), MasonryNav);
-    private void ShowPagedItems(object? s, RoutedEventArgs e) => Navigate(new PagedItemsGalleryPage(), PagedItemsNav);
-    private void ShowPinInput(object? s, RoutedEventArgs e) => Navigate(new PinInputGalleryPage(), PinInputNav);
-    private void ShowPopover(object? s, RoutedEventArgs e) => Navigate(new PopoverGalleryPage(), PopoverNav);
-    private void ShowRating(object? s, RoutedEventArgs e) => Navigate(new RatingGalleryPage(), RatingNav);
-    private void ShowResultView(object? s, RoutedEventArgs e) => Navigate(new ResultViewGalleryPage(), ResultViewNav);
-    private void ShowRichEditor(object? s, RoutedEventArgs e) => Navigate(new RichEditorGalleryPage(), RichEditorNav);
-    private void ShowDock(object? s, RoutedEventArgs e) => Navigate(new DockGalleryPage(), DockNav);
-    private void ShowDraggableTabs(object? s, RoutedEventArgs e) => Navigate(new DraggableTabsGalleryPage(), DraggableTabsNav);
+        Navigate(() => new NotificationsGalleryPage(), s as MdButton ?? NotificationsNav);
+    private void ShowSearch(object? s, RoutedEventArgs e) => Navigate(() => new SearchGalleryPage(), SearchNav);
+    private void ShowSettingsCard(object? s, RoutedEventArgs e) => Navigate(() => new SettingsCardGalleryPage(), SettingsCardNav);
+    private void ShowSheets(object? s, RoutedEventArgs e) => Navigate(() => new SheetGalleryPage(), SheetNav);
+    private void ShowSlider(object? s, RoutedEventArgs e) => Navigate(() => new SliderGalleryPage(), SliderNav);
+    private void ShowAutoComplete(object? s, RoutedEventArgs e) => Navigate(() => new AutoCompleteGalleryPage(), AutoCompleteNav);
+    private void ShowDateRangePicker(object? s, RoutedEventArgs e) => Navigate(() => new DateRangePickerGalleryPage(), DateRangePickerNav);
+    private void ShowRangeSlider(object? s, RoutedEventArgs e) => Navigate(() => new RangeSliderGalleryPage(), RangeSliderNav);
+    private void ShowResponsiveContent(object? s, RoutedEventArgs e) => Navigate(() => new ResponsiveContentGalleryPage(), ResponsiveContentNav);
+    private void ShowScrollViewer(object? s, RoutedEventArgs e) => Navigate(() => new ScrollViewerGalleryPage(), ScrollViewerNav);
+    private void ShowSegmentedButton(object? s, RoutedEventArgs e) => Navigate(() => new SegmentedButtonGalleryPage(), SegmentedButtonNav);
+    private void ShowSurface(object? s, RoutedEventArgs e) => Navigate(() => new SurfaceGalleryPage(), SurfaceNav);
+    private void ShowSnackbar(object? s, RoutedEventArgs e) => Navigate(() => new SnackbarGalleryPage(), SnackbarNav);
+    private void ShowSwitch(object? s, RoutedEventArgs e) => Navigate(() => new SwitchGalleryPage(), SwitchNav);
+    private void ShowTabs(object? s, RoutedEventArgs e) => Navigate(() => new TabGalleryPage(), TabNav);
+    private void ShowToolbars(object? s, RoutedEventArgs e) => Navigate(() => new ToolbarGalleryPage(), ToolbarNav);
+    private void ShowTooltips(object? s, RoutedEventArgs e) => Navigate(() => new TooltipGalleryPage(), TooltipNav);
+    private void ShowAutoSizeText(object? s, RoutedEventArgs e) => Navigate(() => new AutoSizeTextDemoPage(), AutoSizeTextNav);
+    private void ShowConfetti(object? s, RoutedEventArgs e) => Navigate(() => new ConfettiDemoPage(), ConfettiNav);
+    private void ShowEmojiPicker(object? s, RoutedEventArgs e) => Navigate(() => new EmojiPickerDemoPage(), EmojiPickerNav);
+    private void ShowExpandableText(object? s, RoutedEventArgs e) => Navigate(() => new ExpandableTextDemoPage(), ExpandableTextNav);
+    private void ShowMarquee(object? s, RoutedEventArgs e) => Navigate(() => new MarqueeDemoPage(), MarqueeNav);
+    private void ShowMediaProgress(object? s, RoutedEventArgs e) => Navigate(() => new MediaProgressDemoPage(), MediaProgressNav);
+    private void ShowPageIndicator(object? s, RoutedEventArgs e) => Navigate(() => new PageIndicatorDemoPage(), PageIndicatorNav);
+    private void ShowSlideToConfirm(object? s, RoutedEventArgs e) => Navigate(() => new SlideToConfirmDemoPage(), SlideToConfirmNav);
+    private void ShowWheelPicker(object? s, RoutedEventArgs e) => Navigate(() => new WheelPickerDemoPage(), WheelPickerNav);
+    private void ShowAnimatedText(object? s, RoutedEventArgs e) => Navigate(() => new AnimatedTextGalleryPage(), AnimatedTextNav);
+    private void ShowAnimationSequence(object? s, RoutedEventArgs e) => Navigate(() => new AnimationSequenceGalleryPage(), AnimationSequenceNav);
+    private void ShowAsyncSelect(object? s, RoutedEventArgs e) => Navigate(() => new AsyncSelectGalleryPage(), AsyncSelectNav);
+    private void ShowAvatar(object? s, RoutedEventArgs e) => Navigate(() => new AvatarGalleryPage(), AvatarNav);
+    private void ShowBeforeAfter(object? s, RoutedEventArgs e) => Navigate(() => new BeforeAfterGalleryPage(), BeforeAfterNav);
+    private void ShowCalendar(object? s, RoutedEventArgs e) => Navigate(() => new CalendarGalleryPage(), CalendarNav);
+    private void ShowCascader(object? s, RoutedEventArgs e) => Navigate(() => new CascaderGalleryPage(), CascaderNav);
+    private void ShowChart(object? s, RoutedEventArgs e) => Navigate(() => new ChartGalleryPage(), ChartNav);
+    private void ShowChatView(object? s, RoutedEventArgs e) => Navigate(() => new ChatViewGalleryPage(), ChatNav);
+    private void ShowCommandPalette(object? s, RoutedEventArgs e) => Navigate(() => new CommandPaletteGalleryPage(), CommandPaletteNav);
+    private void ShowDataGrid(object? s, RoutedEventArgs e) => Navigate(() => new DataGridGalleryPage(), DataGridNav);
+    private void ShowDensity(object? s, RoutedEventArgs e) => Navigate(() => new DensityGalleryPage(), DensityNav);
+    private void ShowHoverCard(object? s, RoutedEventArgs e) => Navigate(() => new HoverCardGalleryPage(), HoverCardNav);
+    private void ShowMasonry(object? s, RoutedEventArgs e) => Navigate(() => new MasonryPanelGalleryPage(), MasonryNav);
+    private void ShowPagedItems(object? s, RoutedEventArgs e) => Navigate(() => new PagedItemsGalleryPage(), PagedItemsNav);
+    private void ShowPinInput(object? s, RoutedEventArgs e) => Navigate(() => new PinInputGalleryPage(), PinInputNav);
+    private void ShowPopover(object? s, RoutedEventArgs e) => Navigate(() => new PopoverGalleryPage(), PopoverNav);
+    private void ShowRating(object? s, RoutedEventArgs e) => Navigate(() => new RatingGalleryPage(), RatingNav);
+    private void ShowResultView(object? s, RoutedEventArgs e) => Navigate(() => new ResultViewGalleryPage(), ResultViewNav);
+    private void ShowRichEditor(object? s, RoutedEventArgs e) => Navigate(() => new RichEditorGalleryPage(), RichEditorNav);
+    private void ShowDock(object? s, RoutedEventArgs e) => Navigate(() => new DockGalleryPage(), DockNav);
+    private void ShowDraggableTabs(object? s, RoutedEventArgs e) => Navigate(() => new DraggableTabsGalleryPage(), DraggableTabsNav);
 
-    private void ShowMarkdown(object? s, RoutedEventArgs e) => Navigate(new MarkdownGalleryPage(), MarkdownNav);
+    private void ShowMarkdown(object? s, RoutedEventArgs e) => Navigate(() => new MarkdownGalleryPage(), MarkdownNav);
 
-    private void ShowLiveCharts(object? s, RoutedEventArgs e) => Navigate(new LiveChartsGalleryPage(), LiveChartsNav);
+    private void ShowLiveCharts(object? s, RoutedEventArgs e) => Navigate(() => new LiveChartsGalleryPage(), LiveChartsNav);
 
-    private void ShowScottPlot(object? s, RoutedEventArgs e) => Navigate(new ScottPlotGalleryPage(), ScottPlotNav);
+    private void ShowScottPlot(object? s, RoutedEventArgs e) => Navigate(() => new ScottPlotGalleryPage(), ScottPlotNav);
 
-    private void ShowPropertyGrid(object? s, RoutedEventArgs e) => Navigate(new PropertyGridGalleryPage(), PropertyGridNav);
-    private void ShowNodifyM(object? s, RoutedEventArgs e) => Navigate(new NodifyMGalleryPage(), NodifyMNav);
-    private void ShowMapsui(object? s, RoutedEventArgs e) => Navigate(new MapsuiGalleryPage(), MapsuiNav);
-    private void ShowTextEditor(object? s, RoutedEventArgs e) => Navigate(new TextEditorGalleryPage(), TextEditorNav);
-    private void ShowHexEditor(object? s, RoutedEventArgs e) => Navigate(new HexEditorGalleryPage(), HexEditorNav);
-    private void ShowSkeleton(object? s, RoutedEventArgs e) => Navigate(new SkeletonGalleryPage(), SkeletonNav);
-    private void ShowSlidableItem(object? s, RoutedEventArgs e) => Navigate(new SlidableItemGalleryPage(), SlidableNav);
-    private void ShowSpinKit(object? s, RoutedEventArgs e) => Navigate(new SpinKitGalleryPage(), SpinKitNav);
-    private void ShowStaggeredPanel(object? s, RoutedEventArgs e) => Navigate(new StaggeredPanelGalleryPage(), StaggeredPanelNav);
-    private void ShowTagInput(object? s, RoutedEventArgs e) => Navigate(new TagInputGalleryPage(), TagInputNav);
-    private void ShowTimeline(object? s, RoutedEventArgs e) => Navigate(new TimelineGalleryPage(), TimelineNav);
-    private void ShowTransfer(object? s, RoutedEventArgs e) => Navigate(new TransferGalleryPage(), TransferNav);
-    private void ShowTreeView(object? s, RoutedEventArgs e) => Navigate(new TreeViewGalleryPage(), TreeViewNav);
-    private void ShowWaterfall(object? s, RoutedEventArgs e) => Navigate(new WaterfallGalleryPage(), WaterfallNav);
-    private void ShowWaveform(object? s, RoutedEventArgs e) => Navigate(new WaveformGalleryPage(), WaveformNav);
-    private void ShowFloatingWindow(object? s, RoutedEventArgs e) => Navigate(new FloatingWindowGalleryPage(), FloatingWindowNav);
-    private void ShowSignaturePad(object? s, RoutedEventArgs e) => Navigate(new SignaturePadGalleryPage(), SignaturePadNav);
-    private void ShowBorderlessWindows(object? s, RoutedEventArgs e) => Navigate(new BorderlessWindowGalleryPage(), BorderlessWindowNav);
-    private void ShowNumeric(object? s, RoutedEventArgs e) => Navigate(new NumericGalleryPage(), NumericNav);
-    private void ShowThemeResources(object? s, RoutedEventArgs e) => Navigate(new ThemeResourcesGalleryPage(), ThemeResourcesNav);
-    private void ShowSymbols(object? s, RoutedEventArgs e) => Navigate(new SymbolGalleryPage(), SymbolsNav);
-    private void ShowMotion(object? s, RoutedEventArgs e) => Navigate(new MotionGalleryPage(), MotionNav);
-    private void ShowBanner(object? s, RoutedEventArgs e) => Navigate(new BannerGalleryPage(), BannerNav);
-    private void ShowDataTable(object? s, RoutedEventArgs e) => Navigate(new DataTableGalleryPage(), DataTableNav);
-    private void ShowPaginatedTable(object? s, RoutedEventArgs e) => Navigate(new PaginatedDataTableGalleryPage(), PaginatedTableNav);
-    private void ShowDismissible(object? s, RoutedEventArgs e) => Navigate(new DismissibleGalleryPage(), DismissibleNav);
-    private void ShowExpansionPanels(object? s, RoutedEventArgs e) => Navigate(new ExpansionPanelGalleryPage(), ExpansionPanelNav);
-    private void ShowGridTiles(object? s, RoutedEventArgs e) => Navigate(new GridTileGalleryPage(), GridTileNav);
-    private void ShowGridSplitter(object? s, RoutedEventArgs e) => Navigate(new GridSplitterGalleryPage(), GridSplitterNav);
-    private void ShowRefresh(object? s, RoutedEventArgs e) => Navigate(new RefreshIndicatorGalleryPage(), RefreshNav);
-    private void ShowReorderableList(object? s, RoutedEventArgs e) => Navigate(new ReorderableListGalleryPage(), ReorderableListNav);
-    private void ShowStepper(object? s, RoutedEventArgs e) => Navigate(new StepperGalleryPage(), StepperNav);
-    private void ShowCommitGraph(object? s, RoutedEventArgs e) => Navigate(new CommitGraphGalleryPage(), CommitGraphNav);
-    private void ShowContributionGrid(object? s, RoutedEventArgs e) => Navigate(new ContributionGridGalleryPage(), ContributionGridNav);
-    private void ShowMaskedTextBox(object? s, RoutedEventArgs e) => Navigate(new MaskedTextBoxGalleryPage(), MaskedTextBoxNav);
-    private void ShowPagination(object? s, RoutedEventArgs e) => Navigate(new PaginationGalleryPage(), PaginationNav);
-    private void ShowFormValidation(object? s, RoutedEventArgs e) => Navigate(new FormValidationGalleryPage(), FormValidationNav);
-    private void ShowSimpleDialog(object? s, RoutedEventArgs e) => Navigate(new SimpleDialogGalleryPage(), SimpleDialogNav);
-    private void ShowAboutDialog(object? s, RoutedEventArgs e) => Navigate(new AboutDialogGalleryPage(), AboutDialogNav);
-    private void ShowPickerRestore(object? s, RoutedEventArgs e) => Navigate(new PickerRestorationGalleryPage(), PickerRestoreNav);
-    private void ShowDraggableSheet(object? s, RoutedEventArgs e) => Navigate(new DraggableSheetGalleryPage(), DraggableSheetNav);
-    private void ShowKeyboardAvoid(object? s, RoutedEventArgs e) => Navigate(new KeyboardAvoidanceGalleryPage(), KeyboardAvoidNav);
-    private void ShowAdaptiveControls(object? s, RoutedEventArgs e) => Navigate(new AdaptiveControlsGalleryPage(), AdaptiveControlsNav);
-    private void ShowFocusHero(object? s, RoutedEventArgs e) => Navigate(new FocusShortcutHeroGalleryPage(), FocusHeroNav);
+    private void ShowPropertyGrid(object? s, RoutedEventArgs e) => Navigate(() => new PropertyGridGalleryPage(), PropertyGridNav);
+    private void ShowNodifyM(object? s, RoutedEventArgs e) => Navigate(() => new NodifyMGalleryPage(), NodifyMNav);
+    private void ShowMapsui(object? s, RoutedEventArgs e) => Navigate(() => new MapsuiGalleryPage(), MapsuiNav);
+    private void ShowTextEditor(object? s, RoutedEventArgs e) => Navigate(() => new TextEditorGalleryPage(), TextEditorNav);
+    private void ShowHexEditor(object? s, RoutedEventArgs e) => Navigate(() => new HexEditorGalleryPage(), HexEditorNav);
+    private void ShowSkeleton(object? s, RoutedEventArgs e) => Navigate(() => new SkeletonGalleryPage(), SkeletonNav);
+    private void ShowSlidableItem(object? s, RoutedEventArgs e) => Navigate(() => new SlidableItemGalleryPage(), SlidableNav);
+    private void ShowSpinKit(object? s, RoutedEventArgs e) => Navigate(() => new SpinKitGalleryPage(), SpinKitNav);
+    private void ShowStaggeredPanel(object? s, RoutedEventArgs e) => Navigate(() => new StaggeredPanelGalleryPage(), StaggeredPanelNav);
+    private void ShowTagInput(object? s, RoutedEventArgs e) => Navigate(() => new TagInputGalleryPage(), TagInputNav);
+    private void ShowTimeline(object? s, RoutedEventArgs e) => Navigate(() => new TimelineGalleryPage(), TimelineNav);
+    private void ShowTransfer(object? s, RoutedEventArgs e) => Navigate(() => new TransferGalleryPage(), TransferNav);
+    private void ShowTreeView(object? s, RoutedEventArgs e) => Navigate(() => new TreeViewGalleryPage(), TreeViewNav);
+    private void ShowWaterfall(object? s, RoutedEventArgs e) => Navigate(() => new WaterfallGalleryPage(), WaterfallNav);
+    private void ShowWaveform(object? s, RoutedEventArgs e) => Navigate(() => new WaveformGalleryPage(), WaveformNav);
+    private void ShowFloatingWindow(object? s, RoutedEventArgs e) => Navigate(() => new FloatingWindowGalleryPage(), FloatingWindowNav);
+    private void ShowSignaturePad(object? s, RoutedEventArgs e) => Navigate(() => new SignaturePadGalleryPage(), SignaturePadNav);
+    private void ShowBorderlessWindows(object? s, RoutedEventArgs e) => Navigate(() => new BorderlessWindowGalleryPage(), BorderlessWindowNav);
+    private void ShowNumeric(object? s, RoutedEventArgs e) => Navigate(() => new NumericGalleryPage(), NumericNav);
+    private void ShowThemeResources(object? s, RoutedEventArgs e) => Navigate(() => new ThemeResourcesGalleryPage(), ThemeResourcesNav);
+    private void ShowSymbols(object? s, RoutedEventArgs e) => Navigate(() => new SymbolGalleryPage(), SymbolsNav);
+    private void ShowMotion(object? s, RoutedEventArgs e) => Navigate(() => new MotionGalleryPage(), MotionNav);
+    private void ShowBanner(object? s, RoutedEventArgs e) => Navigate(() => new BannerGalleryPage(), BannerNav);
+    private void ShowDataTable(object? s, RoutedEventArgs e) => Navigate(() => new DataTableGalleryPage(), DataTableNav);
+    private void ShowPaginatedTable(object? s, RoutedEventArgs e) => Navigate(() => new PaginatedDataTableGalleryPage(), PaginatedTableNav);
+    private void ShowDismissible(object? s, RoutedEventArgs e) => Navigate(() => new DismissibleGalleryPage(), DismissibleNav);
+    private void ShowExpansionPanels(object? s, RoutedEventArgs e) => Navigate(() => new ExpansionPanelGalleryPage(), ExpansionPanelNav);
+    private void ShowGridTiles(object? s, RoutedEventArgs e) => Navigate(() => new GridTileGalleryPage(), GridTileNav);
+    private void ShowGridSplitter(object? s, RoutedEventArgs e) => Navigate(() => new GridSplitterGalleryPage(), GridSplitterNav);
+    private void ShowRefresh(object? s, RoutedEventArgs e) => Navigate(() => new RefreshIndicatorGalleryPage(), RefreshNav);
+    private void ShowReorderableList(object? s, RoutedEventArgs e) => Navigate(() => new ReorderableListGalleryPage(), ReorderableListNav);
+    private void ShowStepper(object? s, RoutedEventArgs e) => Navigate(() => new StepperGalleryPage(), StepperNav);
+    private void ShowCommitGraph(object? s, RoutedEventArgs e) => Navigate(() => new CommitGraphGalleryPage(), CommitGraphNav);
+    private void ShowContributionGrid(object? s, RoutedEventArgs e) => Navigate(() => new ContributionGridGalleryPage(), ContributionGridNav);
+    private void ShowMaskedTextBox(object? s, RoutedEventArgs e) => Navigate(() => new MaskedTextBoxGalleryPage(), MaskedTextBoxNav);
+    private void ShowPagination(object? s, RoutedEventArgs e) => Navigate(() => new PaginationGalleryPage(), PaginationNav);
+    private void ShowFormValidation(object? s, RoutedEventArgs e) => Navigate(() => new FormValidationGalleryPage(), FormValidationNav);
+    private void ShowSimpleDialog(object? s, RoutedEventArgs e) => Navigate(() => new SimpleDialogGalleryPage(), SimpleDialogNav);
+    private void ShowAboutDialog(object? s, RoutedEventArgs e) => Navigate(() => new AboutDialogGalleryPage(), AboutDialogNav);
+    private void ShowPickerRestore(object? s, RoutedEventArgs e) => Navigate(() => new PickerRestorationGalleryPage(), PickerRestoreNav);
+    private void ShowDraggableSheet(object? s, RoutedEventArgs e) => Navigate(() => new DraggableSheetGalleryPage(), DraggableSheetNav);
+    private void ShowKeyboardAvoid(object? s, RoutedEventArgs e) => Navigate(() => new KeyboardAvoidanceGalleryPage(), KeyboardAvoidNav);
+    private void ShowAdaptiveControls(object? s, RoutedEventArgs e) => Navigate(() => new AdaptiveControlsGalleryPage(), AdaptiveControlsNav);
+    private void ShowFocusHero(object? s, RoutedEventArgs e) => Navigate(() => new FocusShortcutHeroGalleryPage(), FocusHeroNav);
 
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {
@@ -508,8 +508,9 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
         else NavigationMenuButton.Focus();
     }
 
-    private void Navigate(Control page, MdButton? selected, MdButton? selectedTopNavigation = null)
+    private void Navigate(Func<Control> factory, MdButton? selected, MdButton? selectedTopNavigation = null)
     {
+        var page = factory();
         foreach (var pair in _responsiveSizeStates)
         {
             pair.Key.Width = pair.Value.Width;
@@ -545,7 +546,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             : ReferenceEquals(selected, ThemeResourcesNav) || ReferenceEquals(selected, SymbolsNav) || ReferenceEquals(selected, MotionNav)
                 ? FoundationsTopNav
                 : ComponentsTopNav;
-        _currentPageType = page.GetType();
+        _currentPageFactory = factory;
         _currentNavigationButton = selected;
         // The M3 site has hierarchical primary and contextual navigation, but only the actual
         // destination receives an active indicator. A contextual leaf therefore clears the
@@ -577,7 +578,7 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
     {
         var match = _galleryIndex.FirstOrDefault(entry => entry.Matches(query));
         if (match is null) return;
-        Navigate(match.Factory(), match.Button);
+        Navigate(match.Factory, match.Button);
         GallerySearch.Text = match.Title;
     }
 
@@ -661,8 +662,10 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
         // Recreate the active page after changing CurrentUICulture. This updates data-bound
         // option collections and runtime-created content that are not present in the visual tree
         // when the localization walker runs (closed popups, dialog pages, and virtualized rows).
-        if (_currentPageType is { } pageType && Activator.CreateInstance(pageType) is Control localizedPage)
-            Navigate(localizedPage, _currentNavigationButton, _currentTopNavigationButton);
+        // The factory is rooted by ordinary code, unlike Activator.CreateInstance(Type): native
+        // AOT can trim reflection metadata even for constructors called directly elsewhere.
+        if (_currentPageFactory is { } factory)
+            Navigate(factory, _currentNavigationButton, _currentTopNavigationButton);
         else if (PageHost.Content is Control page)
             GalleryLocalization.Apply(page, _culture);
     }
