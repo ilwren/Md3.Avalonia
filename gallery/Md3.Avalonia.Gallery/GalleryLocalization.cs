@@ -52,6 +52,8 @@ internal static class GalleryLocalization
         ["Slide to confirm"]="滑动确认", ["Drag the handle to the end, or focus it and press Enter or Space. Reset allows another confirmation."]="将手柄拖到末端，或聚焦后按回车键或空格键。重置后可再次确认。",
         ["Waiting for confirmation."]="等待确认。",
 
+        ["Confetti"]="庆祝粒子", ["Marquee"]="滚动文本", ["Media progress bar"]="媒体进度条",
+        ["Page indicator"]="页面指示器", ["Wheel picker"]="数字滚轮",
         // Ecosystem Waves A–F
         ["Flutter ecosystem"]="Flutter 生态控件", ["Wave A · Overlay, commands and density"]="Wave A · 浮层、命令与密度",
         ["Open one transient surface, then scroll to verify it dismisses."]="打开一个临时浮层，然后滚动以验证其自动关闭。", ["Compact density is scoped to this information row only."]="紧凑密度仅应用于此信息行。",
@@ -234,7 +236,7 @@ internal static class GalleryLocalization
         ["1 · Reference"]="1 · 引用",
         ["2 · Install the opt-in resources"]="2 · 安装可选资源",
         ["3 · Build a screen"]="3 · 构建一个界面",
-        ["110 indexed pages. Every entry below opens its own page; MdGalleryIndexTests fails the build if any of them stops resolving."]="110 个已索引页面。下列每一项都会打开自己的页面；任一页面无法解析时 MdGalleryIndexTests 会让构建失败。",
+        ["Every entry below opens its own page; MdGalleryIndexTests fails the build if any of them stops resolving."]="下列每一项都会打开自己的页面；任一页面无法解析时 MdGalleryIndexTests 会让构建失败。",
         ["A Material banner carries a persistent message with up to two actions. It stays until an action is taken rather than timing out like a snackbar."]="Material 横幅承载持续存在的消息，最多带两个操作。它会一直保留直到用户处理，而不像 Snackbar 那样超时消失。",
         ["A Material data table with sortable column headers. Sorting is reported to the host, which owns the ordering of ItemsSource."]="带可排序列头的 Material 数据表格。排序结果上报给宿主，由宿主负责 ItemsSource 的排列。",
         ["A Material text field with a stepper. The increment and decrement targets are centred on the field's input row, so they stay aligned when supporting text adds height underneath."]="带步进器的 Material 文本框。增减按钮以输入框的输入行为中心，因此在下方出现辅助文本增加高度时仍保持对齐。",

@@ -43,6 +43,8 @@ public partial class MainWindow : Window
         _navigationButtons =
         [
             ComponentsOverviewNav, AndroidSettingsNav, ClockNav, TasksNav,
+            AutoSizeTextNav, ConfettiNav, EmojiPickerNav, ExpandableTextNav, MarqueeNav,
+            MediaProgressNav, PageIndicatorNav, SlideToConfirmNav, WheelPickerNav,
             ButtonNav, IconButtonNav, FabNav, AppBarNav, BadgeNav, BreadcrumbNav, TextFieldNav,
             CheckBoxNav, RadioButtonNav, ComboBoxNav, CarouselNav, CardNav, ChipNav, PickerNav, FileSystemPickerNav, ColorPickerNav,
             DialogNav, DividerNav, ListNav, LoadingNav, ProgressNav, MenuNav, NavigationBarNav,
@@ -116,6 +118,15 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
             Entry("Tabs", "tabs tab view", TabNav, () => new TabGalleryPage()),
             Entry("Toolbars", "toolbar dock floating", ToolbarNav, () => new ToolbarGalleryPage()),
             Entry("Tooltips", "tooltip rich plain", TooltipNav, () => new TooltipGalleryPage()),
+            Entry("Auto-size text", "autosize text fit shrink mdautosizetext", AutoSizeTextNav, () => new AutoSizeTextDemoPage()),
+            Entry("Confetti", "confetti particles burst celebrate mdconfetti", ConfettiNav, () => new ConfettiDemoPage()),
+            Entry("Emoji picker", "emoji search faces emoticon mdemojipicker", EmojiPickerNav, () => new EmojiPickerDemoPage()),
+            Entry("Expandable text", "expandable text read more collapse mdexpandabletext", ExpandableTextNav, () => new ExpandableTextDemoPage()),
+            Entry("Marquee", "marquee scrolling text announcement mdmarquee", MarqueeNav, () => new MarqueeDemoPage()),
+            Entry("Media progress bar", "media progress bar audio seek scrub mdmediaprogressbar", MediaProgressNav, () => new MediaProgressDemoPage()),
+            Entry("Page indicator", "page indicator dots worm mdpageindicator", PageIndicatorNav, () => new PageIndicatorDemoPage()),
+            Entry("Slide to confirm", "slide confirm drag mdslidetoconfirm", SlideToConfirmNav, () => new SlideToConfirmDemoPage()),
+            Entry("Wheel picker", "wheel picker integer number spinner mdwheelpicker", WheelPickerNav, () => new WheelPickerDemoPage()),
             Entry("Animated text", "animated text typewriter fade reveal effect duration", AnimatedTextNav, () => new AnimatedTextGalleryPage()),
             Entry("Animation sequence", "animation sequence stagger item delay replay entrance", AnimationSequenceNav, () => new AnimationSequenceGalleryPage()),
             Entry("Async select", "async select autocomplete query suggestion remote lookup", AsyncSelectNav, () => new AsyncSelectGalleryPage()),
@@ -278,6 +289,15 @@ ScottPlotNav, PropertyGridNav, NodifyMNav, MapsuiNav,
     private void ShowTabs(object? s, RoutedEventArgs e) => Navigate(new TabGalleryPage(), TabNav);
     private void ShowToolbars(object? s, RoutedEventArgs e) => Navigate(new ToolbarGalleryPage(), ToolbarNav);
     private void ShowTooltips(object? s, RoutedEventArgs e) => Navigate(new TooltipGalleryPage(), TooltipNav);
+    private void ShowAutoSizeText(object? s, RoutedEventArgs e) => Navigate(new AutoSizeTextDemoPage(), AutoSizeTextNav);
+    private void ShowConfetti(object? s, RoutedEventArgs e) => Navigate(new ConfettiDemoPage(), ConfettiNav);
+    private void ShowEmojiPicker(object? s, RoutedEventArgs e) => Navigate(new EmojiPickerDemoPage(), EmojiPickerNav);
+    private void ShowExpandableText(object? s, RoutedEventArgs e) => Navigate(new ExpandableTextDemoPage(), ExpandableTextNav);
+    private void ShowMarquee(object? s, RoutedEventArgs e) => Navigate(new MarqueeDemoPage(), MarqueeNav);
+    private void ShowMediaProgress(object? s, RoutedEventArgs e) => Navigate(new MediaProgressDemoPage(), MediaProgressNav);
+    private void ShowPageIndicator(object? s, RoutedEventArgs e) => Navigate(new PageIndicatorDemoPage(), PageIndicatorNav);
+    private void ShowSlideToConfirm(object? s, RoutedEventArgs e) => Navigate(new SlideToConfirmDemoPage(), SlideToConfirmNav);
+    private void ShowWheelPicker(object? s, RoutedEventArgs e) => Navigate(new WheelPickerDemoPage(), WheelPickerNav);
     private void ShowAnimatedText(object? s, RoutedEventArgs e) => Navigate(new AnimatedTextGalleryPage(), AnimatedTextNav);
     private void ShowAnimationSequence(object? s, RoutedEventArgs e) => Navigate(new AnimationSequenceGalleryPage(), AnimationSequenceNav);
     private void ShowAsyncSelect(object? s, RoutedEventArgs e) => Navigate(new AsyncSelectGalleryPage(), AsyncSelectNav);

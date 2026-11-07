@@ -123,6 +123,15 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Tooltips", () => new TooltipGalleryPage());
 
         AddSection("Extra controls");
+        AddPage("Auto-size text", () => new AutoSizeTextDemoPage());
+        AddPage("Confetti", () => new ConfettiDemoPage());
+        AddPage("Emoji picker", () => new EmojiPickerDemoPage());
+        AddPage("Expandable text", () => new ExpandableTextDemoPage());
+        AddPage("Marquee", () => new MarqueeDemoPage());
+        AddPage("Media progress bar", () => new MediaProgressDemoPage());
+        AddPage("Page indicator", () => new PageIndicatorDemoPage());
+        AddPage("Slide to confirm", () => new SlideToConfirmDemoPage());
+        AddPage("Wheel picker", () => new WheelPickerDemoPage());
         AddPage("Animated text", () => new AnimatedTextGalleryPage());
         AddPage("Animation sequence", () => new AnimationSequenceGalleryPage());
         AddPage("Async select", () => new AsyncSelectGalleryPage());
