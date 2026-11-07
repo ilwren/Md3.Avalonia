@@ -63,6 +63,12 @@ jobs:
         # on because prose coverage is complete: a new page that ships untranslated now fails.
         run: python3 scripts/check-gallery-localization.py --strict
 
+      - name: Test the Android performance collector
+        # The emulator job cannot be relied on to produce evidence on every run, so the
+        # collector's parsers, evidence files and annotations are covered here instead: a real
+        # process, a fake `adb` answering with recorded dumpsys output, no device required.
+        run: python3 scripts/test-collect-android-perf.py
+
       - name: Check the specification oracle against pinned upstream sources
         # Network-dependent and advisory by design: upstream moving is a re-baselining
         # decision for a human, not a build failure. --soft keeps it off the critical path.
@@ -131,7 +137,8 @@ jobs:
           status=0
           : > /tmp/restore.log
           for proj in gallery/Md3.Avalonia.Gallery.Desktop/Md3.Avalonia.Gallery.Desktop.csproj \
-                      tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj; do
+                      tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
+                      tests/Md3.Avalonia.Benchmarks/Md3.Avalonia.Benchmarks.csproj; do
             name="$(basename "$proj" .csproj)"
             echo "=== dotnet restore $proj ==="
             if dotnet restore "$proj" --nologo >> /tmp/restore.log 2>&1; then
@@ -176,6 +183,13 @@ jobs:
           scripts/ci-build.sh \
             tests/Md3.Avalonia.HeadlessTests/Md3.Avalonia.HeadlessTests.csproj \
             "Headless tests"
+
+      - name: Build benchmarks
+        shell: bash
+        run: |
+          scripts/ci-build.sh \
+            tests/Md3.Avalonia.Benchmarks/Md3.Avalonia.Benchmarks.csproj \
+            "Benchmarks"
 
       # The markdown and hex editor tests ask for Consolas, which no runner has, so whether they pass
       # depends on which libSkiaSharp the test output carries: Avalonia's build enumerates system
