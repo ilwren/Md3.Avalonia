@@ -595,3 +595,54 @@ Be precise about what a green run does **not** mean.
   reports them as such rather than pretending otherwise.
 - **`bootstrap` mode fails nothing.** Until the policy is flipped to `enforce`, a green CI run means
   "the harness ran and wrote a report", not "the library conforms". The report is the deliverable.
+
+## 8. Families with no specification counterpart
+
+The coverage queue cannot reach zero by design. Material Web v0_192 states almost no layout tokens — across
+its 55 component files the only space keys are `list-item-leading-space`, `list-item-trailing-space`,
+`divider-leading-space` and `divider-trailing-space` — so every library token whose value is a padding, a
+margin, an offset or a gap has no counterpart to be checked against, by construction, not because the mapping
+is unfinished. Those keys stay in the queue because the queue means "nothing asserts this", which remains true.
+
+Beyond layout, whole component families have no v0_192 token table at all, and the Expressive size ladder this
+library implements is not stated by v0_192 (which ships one 40dp button and one extended-fab size). Rather than
+invent pairs that would report a design decision as a defect, these families are recorded as unmodelled in
+`spec-snapshot/component-tokens.json` (`mapping.excluded_by_design`) and are deliberately not paired:
+
+- **IconButton** — v0_192 states the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired)
+  and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the
+  Medium/Large/XLarge/XSmall ladder are this library's Expressive scale, unstated by v0_192.
+- **Button** — v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the
+  32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are
+  this library's own scale.
+- **ExtendedFab** — v0_192 states one extended-fab size (56dp / shape 16 / icon 24); ExtendedFab.Small is paired.
+  ExtendedFab.Medium (80/28/16/26) and ExtendedFab.Large (96/32/20/28) are Expressive steps with no v0_192
+  counterpart; there is no medium or large extended-fab in the specification.
+- **Fab** — v0_192 states fab-primary-small 40dp, fab-primary 56dp and fab-primary-large 96dp; there is no
+  medium FAB, so Fab.Medium (80/24/28) has no counterpart. Fab.Target.Size 48 has no counterpart either: v0_192
+  states no target-size (hit-target) token for any component.
+- **CheckBox, RadioButton, Chip** — their Target.* keys (48dp) share the same finding: v0_192 states no
+  target-size token. Hit targets are a platform concern handled by Avalonia, not a Material specification token.
+- **NavigationRail** — Container.Width is 96dp here where Material states 80dp; the difference is deliberate
+  (this library's own docs promise 96dp), not a defect.
+- **BottomAppBar** — Height 80dp has no counterpart: v0_192's bottom-app-bar states no height token.
+- **FileSystemPicker, GridSplitter, Toolbar, Dropdown, ConnectedButtonGroup, ButtonGroup, SplitButton, FabMenu**
+  — v0_192 ships no token table for any of these, so none of their keys can be paired.
+
+Two design decisions behind the exclusions are recorded explicitly:
+
+1. **Fab.Medium = 80dp / shape 24 / icon 28.** Material Web's single FAB is 56dp / 16 / 24; v0_192 adds only a
+   40dp small and a 96dp large. The library's 80dp Medium is an Expressive step between them, not a v0_192 value,
+   so Fab.Medium.* is excluded rather than forced against the wrong spec row.
+2. **Hit targets (Fab.Target.Size 48, CheckBox.Target.Size, RadioButton.Target.Size, Chip.Target.Height).**
+   Material Web v0_192 states no target-size token for any component. The 48dp hit target is a platform
+   concern (pointer/touch hit-box sizing) that Avalonia handles, not a token the specification defines. All four
+   are excluded with a single, shared reason.
+
+### What would shrink the queue
+
+Only adding a genuine pair — a library key matched to a Material Web token with an equal measured value — lowers
+the queue. The Expressive ladders, the hit targets, the padding/margin families and the table-less components above
+have no such token in v0_192, so they are expected to remain. The budget for
+`component_tokens_without_a_specification_counterpart` is set to the measured queue (201) and is a ratchet: it may
+only move down when a new, value-verified pair is added.

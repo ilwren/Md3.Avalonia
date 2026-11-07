@@ -219,9 +219,9 @@
     },
     "component_tokens_without_a_specification_counterpart": {
       "direction": "lower",
-      "budget": 203,
+      "budget": 201,
       "source": "headless",
-      "why": "Declared Md.Comp.* keys that no Material Web token can be compared with. 77 of 280 are checked, up from 63. This round covered the text-field family: the ComboBox's filled and outlined container shapes, its outline and underline widths, its leading icon and its three font sizes, plus the text field's own input, resting-label, floating-label and supporting font sizes. Those last ones needed the snapshot to be fixed first - the specification states them as a reference to the published type scale (map.get($deps,'md-sys-typescale','body-large-size')) rather than as px, and the collector only kept literals, so 56 tokens were invisible to the layer. They are now resolved through the same scale the theme uses and keep the step name in the snapshot. The queue cannot reach zero: Material Web states almost no layout tokens (four space keys across 55 component files), so the library tokens whose value is a padding, margin, offset or gap have no counterpart by construction."
+      "why": "Declared Md.Comp.* keys that no Material Web token can be compared with. 79 of 280 are checked, up from 77. This round added ExtendedFab.Small.Height (56dp) and ExtendedFab.Small.IconSize (24dp) against extended-fab-primary (container-height 56, icon-size 24), and recorded the rest of the queue as deliberately unmodelled: the IconButton/Button/Medium/Large Expressive size ladders that Material Web v0_192 does not state (it ships one 40dp button and one extended-fab size); FileSystemPicker, GridSplitter, Toolbar, Dropdown, ConnectedButtonGroup, ButtonGroup, SplitButton and FabMenu, for which v0_192 ships no token table at all; Fab/CheckBox/RadioButton/Chip hit-target tokens (Material states no target-size token; hit targets are a platform concern); Fab.Medium (no medium FAB exists in v0_192); NavigationRail.Container.Width (this library deliberately uses 96dp where Material states 80dp); BottomAppBar.Height (v0_192 states no bottom-app-bar height token); and every padding/margin/offset/gap token, which have no counterpart by construction because Material Web states almost no layout tokens across its 55 component files."
     }
   }
 }
