@@ -15,6 +15,15 @@
   <ItemGroup>
     <PackageReference Include="Avalonia.Android" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
-    <ProjectReference Include="../Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" />
+    <ProjectReference Include="../Md3.Avalonia.Gallery/Md3.Avalonia.Gallery.csproj" AdditionalProperties="IncludeAndroidTarget=true" />
   </ItemGroup>
+  <!-- A generic net10.0 asset compiles on Android but uses the desktop backend. Fail the build
+       if project resolution ever silently selects it instead of the Android-specific asset. -->
+  <Target Name="VerifyAndroidNotificationBackend" AfterTargets="ResolveReferences">
+    <ItemGroup>
+      <_NotificationReference Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.Filename)' == 'Md3.Avalonia.Notifications'" />
+    </ItemGroup>
+    <Error Condition="'@(_NotificationReference)' == ''" Text="The Android notification assembly was not resolved." />
+    <Error Condition="!$([System.String]::Copy('@(_NotificationReference)').Contains('net10.0-android'))" Text="Android Gallery must resolve the Android-specific notification assembly, not the generic desktop backend: @(_NotificationReference)" />
+  </Target>
 </Project>

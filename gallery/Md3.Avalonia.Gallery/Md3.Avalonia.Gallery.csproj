@@ -2,6 +2,9 @@
   <PropertyGroup>
     <TargetFrameworks>net10.0</TargetFrameworks>
     <TargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net10.0;net10.0-windows10.0.19041.0</TargetFrameworks>
+    <!-- The Android host opts in so its notification dependency resolves the Android asset,
+         without requiring an Android workload for ordinary desktop development. -->
+    <TargetFrameworks Condition="'$(IncludeAndroidTarget)' == 'true'">net10.0;net10.0-android</TargetFrameworks>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <RootNamespace>Md3.Avalonia.Gallery</RootNamespace>
   </PropertyGroup>
