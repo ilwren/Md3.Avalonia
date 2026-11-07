@@ -88,16 +88,27 @@ public sealed class MdComponentTokenTests
                 return;
             }
 
-            // A single number in Material, a quad in the theme: corner radii and border widths are both
-            // authored that way. Uniform is the equivalent value; anything else is a real difference.
+            // A single number in Material, a quad in the theme: corner radii and border widths are
+            // authored that way, and there are two legitimate shapes for it.
+            //
+            //   uniform  - a corner radius, or an all-round border. The quad must be that number four
+            //              times.
+            //   one edge - an underline. Material states 'active-indicator-height: 1px' for a filled text
+            //              field, and a theme that draws it as Thickness(0,0,0,1) has implemented exactly
+            //              that: the rule exists on the bottom edge and nowhere else. Demanding 1,1,1,1
+            //              there would be a false failure that "fixing" would turn into a boxed field.
             var quad = actual.Corners!;
+            var expectedValue = wanted.Number!.Value;
             var uniform = quad.All(step => Math.Abs(step - quad[0]) < 0.0001);
+            var oneEdge = quad.Any(step => step > 0.0001) &&
+                          quad.Where(step => step > 0.0001).All(step => Math.Abs(step - expectedValue) < 0.0001);
+
             report.Check(
                 subject,
-                uniform && Math.Abs(quad[0] - wanted.Number!.Value) < 0.0001,
-                $"Material states a single value ({wanted.Number:0.####}); the theme declares this key per " +
-                $"edge as [{string.Join(", ", quad)}], which is " +
-                (uniform ? "uniform but a different value" : "not even uniform"));
+                (uniform && Math.Abs(quad[0] - expectedValue) < 0.0001) || oneEdge,
+                $"Material states a single value ({expectedValue:0.####}); the theme declares this key per " +
+                $"edge as [{string.Join(", ", quad)}], which is neither uniform nor a single non-zero edge " +
+                "at that value");
             return;
         }
 

@@ -219,9 +219,9 @@
     },
     "component_tokens_without_a_specification_counterpart": {
       "direction": "lower",
-      "budget": 217,
+      "budget": 203,
       "source": "headless",
-      "why": "Declared Md.Comp.* keys that no Material Web token can be compared with. 63 keys are checked, up from 49: this round added 11 tokens the templates had been spelling as bare literals while Material states their value - the navigation bar and rail active indicators (64/32 and 56/32), the tab indicator heights (3 and 2), the slider state layer (40), the sheet drag handle (32x4) and the list item (56dp one-line, 16dp leading space) - plus four icon-button and three app-bar heights that were already declared. The queue is 217 of 280 and cannot reach zero: Material Web states almost no layout tokens, so the 57 library tokens whose value is a padding, margin, offset or gap have no counterpart by construction. "
+      "why": "Declared Md.Comp.* keys that no Material Web token can be compared with. 77 of 280 are checked, up from 63. This round covered the text-field family: the ComboBox's filled and outlined container shapes, its outline and underline widths, its leading icon and its three font sizes, plus the text field's own input, resting-label, floating-label and supporting font sizes. Those last ones needed the snapshot to be fixed first - the specification states them as a reference to the published type scale (map.get($deps,'md-sys-typescale','body-large-size')) rather than as px, and the collector only kept literals, so 56 tokens were invisible to the layer. They are now resolved through the same scale the theme uses and keep the step name in the snapshot. The queue cannot reach zero: Material Web states almost no layout tokens (four space keys across 55 component files), so the library tokens whose value is a padding, margin, offset or gap have no counterpart by construction."
     }
   }
 }

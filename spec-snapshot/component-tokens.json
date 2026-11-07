@@ -80,6 +80,10 @@
     },
     "size": {
      "value": 6
+    },
+    "large-label-text-size": {
+     "value": 11.0,
+     "typescale": "label-small"
     }
    }
   },
@@ -114,6 +118,10 @@
     },
     "with-image-image-size": {
      "value": 40
+    },
+    "supporting-text-size": {
+     "value": 14.0,
+     "typescale": "body-medium"
     }
    }
   },
@@ -213,6 +221,18 @@
     },
     "row-item-outline-width": {
      "value": 1
+    },
+    "footer-supporting-text-size": {
+     "value": 14.0,
+     "typescale": "body-medium"
+    },
+    "header-headline-size": {
+     "value": 14.0,
+     "typescale": "title-small"
+    },
+    "row-item-label-text-size": {
+     "value": 14.0,
+     "typescale": "body-medium"
     }
    }
   },
@@ -270,6 +290,22 @@
     },
     "menu-list-item-selected-leading-icon-size": {
      "value": 24
+    },
+    "date-label-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "menu-button-label-text-size": {
+     "value": 14.0,
+     "typescale": "label-large"
+    },
+    "menu-list-item-label-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "weekdays-label-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
     }
    }
   },
@@ -282,6 +318,18 @@
     },
     "with-icon-icon-size": {
      "value": 24
+    },
+    "action-label-text-size": {
+     "value": 14.0,
+     "typescale": "label-large"
+    },
+    "headline-size": {
+     "value": 24.0,
+     "typescale": "headline-small"
+    },
+    "supporting-text-size": {
+     "value": 14.0,
+     "typescale": "body-medium"
     }
    }
   },
@@ -401,6 +449,10 @@
     },
     "with-icon-icon-size": {
      "value": 18
+    },
+    "label-text-size": {
+     "value": 14.0,
+     "typescale": "label-large"
     }
    }
   },
@@ -482,6 +534,26 @@
     },
     "text-field-trailing-icon-size": {
      "value": 24
+    },
+    "menu-list-item-label-text-size": {
+     "value": 14.0,
+     "typescale": "label-large"
+    },
+    "text-field-input-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "text-field-label-text-populated-size": {
+     "value": 12.0,
+     "typescale": "body-small"
+    },
+    "text-field-label-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "text-field-supporting-text-size": {
+     "value": 12.0,
+     "typescale": "body-small"
     }
    }
   },
@@ -514,6 +586,22 @@
     },
     "trailing-icon-size": {
      "value": 24
+    },
+    "input-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "label-text-populated-size": {
+     "value": 12.0,
+     "typescale": "body-small"
+    },
+    "label-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "supporting-text-size": {
+     "value": 12.0,
+     "typescale": "body-small"
     }
    }
   },
@@ -684,6 +772,26 @@
     },
     "list-item-two-line-container-height": {
      "value": 72
+    },
+    "list-item-label-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "list-item-leading-avatar-label-size": {
+     "value": 16.0,
+     "typescale": "title-medium"
+    },
+    "list-item-overline-size": {
+     "value": 11.0,
+     "typescale": "label-small"
+    },
+    "list-item-supporting-text-size": {
+     "value": 14.0,
+     "typescale": "body-medium"
+    },
+    "list-item-trailing-supporting-text-size": {
+     "value": 11.0,
+     "typescale": "label-small"
     }
    }
   },
@@ -718,6 +826,10 @@
     },
     "icon-size": {
      "value": 24
+    },
+    "label-text-size": {
+     "value": 12.0,
+     "typescale": "label-medium"
     }
    }
   },
@@ -757,6 +869,18 @@
     },
     "icon-size": {
      "value": 24
+    },
+    "headline-size": {
+     "value": 14.0,
+     "typescale": "title-small"
+    },
+    "label-text-size": {
+     "value": 14.0,
+     "typescale": "label-large"
+    },
+    "large-badge-label-size": {
+     "value": 14.0,
+     "typescale": "label-large"
     }
    }
   },
@@ -789,6 +913,10 @@
     "no-label-active-indicator-shape": {
      "value": 999,
      "shape": "corner-full"
+    },
+    "label-text-size": {
+     "value": 12.0,
+     "typescale": "label-medium"
     }
    }
   },
@@ -934,6 +1062,22 @@
     },
     "trailing-icon-size": {
      "value": 24
+    },
+    "input-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "label-text-populated-size": {
+     "value": 12.0,
+     "typescale": "body-small"
+    },
+    "label-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "supporting-text-size": {
+     "value": 12.0,
+     "typescale": "body-small"
     }
    }
   },
@@ -943,6 +1087,10 @@
     "container-shape": {
      "value": 4,
      "shape": "corner-extra-small"
+    },
+    "supporting-text-size": {
+     "value": 12.0,
+     "typescale": "body-small"
     }
    }
   },
@@ -964,6 +1112,10 @@
     },
     "with-icon-icon-size": {
      "value": 24
+    },
+    "with-label-text-label-text-size": {
+     "value": 14.0,
+     "typescale": "title-small"
     }
    }
   },
@@ -984,6 +1136,18 @@
     "container-shape": {
      "value": 12,
      "shape": "corner-medium"
+    },
+    "action-label-text-size": {
+     "value": 14.0,
+     "typescale": "label-large"
+    },
+    "subhead-size": {
+     "value": 14.0,
+     "typescale": "title-small"
+    },
+    "supporting-text-size": {
+     "value": 14.0,
+     "typescale": "body-medium"
     }
    }
   },
@@ -1003,6 +1167,14 @@
     "container-shape": {
      "value": 999,
      "shape": "corner-full"
+    },
+    "input-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "supporting-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
     }
    }
   },
@@ -1021,6 +1193,10 @@
     },
     "with-icon-icon-size": {
      "value": 24
+    },
+    "label-text-size": {
+     "value": 14.0,
+     "typescale": "title-small"
     }
    }
   },
@@ -1079,6 +1255,10 @@
       16
      ],
      "shape": "corner-large-start"
+    },
+    "docked-headline-size": {
+     "value": 22.0,
+     "typescale": "title-large"
     }
    }
   },
@@ -1124,6 +1304,10 @@
     },
     "with-tick-marks-container-size": {
      "value": 2
+    },
+    "label-label-text-size": {
+     "value": 12.0,
+     "typescale": "label-medium"
     }
    }
   },
@@ -1142,6 +1326,14 @@
     },
     "with-two-lines-container-height": {
      "value": 68
+    },
+    "action-label-text-size": {
+     "value": 14.0,
+     "typescale": "label-large"
+    },
+    "supporting-text-size": {
+     "value": 14.0,
+     "typescale": "body-medium"
     }
    }
   },
@@ -1299,6 +1491,26 @@
     },
     "time-selector-container-width": {
      "value": 96
+    },
+    "clock-dial-label-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "headline-size": {
+     "value": 12.0,
+     "typescale": "label-medium"
+    },
+    "period-selector-label-text-size": {
+     "value": 16.0,
+     "typescale": "title-medium"
+    },
+    "time-selector-label-text-size": {
+     "value": 57.0,
+     "typescale": "display-large"
+    },
+    "time-selector-separator-size": {
+     "value": 57.0,
+     "typescale": "display-large"
     }
    }
   },
@@ -1317,6 +1529,10 @@
     },
     "trailing-icon-size": {
      "value": 24
+    },
+    "headline-size": {
+     "value": 28.0,
+     "typescale": "headline-medium"
     }
    }
   },
@@ -1335,6 +1551,10 @@
     },
     "trailing-icon-size": {
      "value": 24
+    },
+    "headline-size": {
+     "value": 24.0,
+     "typescale": "headline-small"
     }
    }
   },
@@ -1353,6 +1573,10 @@
     },
     "trailing-icon-size": {
      "value": 24
+    },
+    "headline-size": {
+     "value": 22.0,
+     "typescale": "title-large"
     }
    }
   }
@@ -1370,28 +1594,74 @@
    "Md.Comp.Button.Large.Icon.Size": "Same Expressive scale; see Md.Comp.Button.Medium.Icon.Size.",
    "Md.Comp.Button.XLarge.Icon.Size": "Same Expressive scale; see Md.Comp.Button.Medium.Icon.Size.",
    "Md.Comp.Button.XSmall.Icon.Size": "Same Expressive scale; see Md.Comp.Button.Medium.Icon.Size.",
-   "Md.Comp.MenuItem.Container.Height": "This library has no Md.Comp.MenuItem.* key at all; its menu items are Md.Comp.ComboBox.MenuItem.* and are 72dp two-line rows. Material's 48dp is the single-line item. The absence of the token is the finding, and it is tracked by the coverage queue rather than faked into a pass."
+   "Md.Comp.MenuItem.Container.Height": "This library has no Md.Comp.MenuItem.* key at all; its menu items are Md.Comp.ComboBox.MenuItem.* and are 72dp two-line rows. Material's 48dp is the single-line item. The absence of the token is the finding, and it is tracked by the coverage queue rather than faked into a pass.",
+   "Md.Comp.ComboBox.Menu.Shape": "0,0,4,4 rounds only the two bottom corners, because this token shapes the dropdown that hangs below a text field and must not separate from it. Material's menu-container-shape (corner-extra-small, 4 all round) describes a free-standing menu. Same step, different surface; comparing them would flag a deliberate attachment as a defect."
   },
   "pairs": [
    {
-    "library": "Md.Comp.Fab.Small.Size",
-    "component": "fab-primary-small",
+    "library": "Md.Comp.Chip.Container.Height",
+    "component": "assist-chip",
     "token": "container-height"
    },
    {
-    "library": "Md.Comp.Fab.Small.IconSize",
-    "component": "fab-primary-small",
-    "token": "icon-size"
-   },
-   {
-    "library": "Md.Comp.Fab.Small.Shape",
-    "component": "fab-primary-small",
+    "library": "Md.Comp.Chip.Container.Shape",
+    "component": "assist-chip",
     "token": "container-shape"
    },
    {
-    "library": "Md.Comp.Fab.Regular.Size",
-    "component": "fab-primary",
-    "token": "container-height"
+    "library": "Md.Comp.Chip.Icon.Size",
+    "component": "assist-chip",
+    "token": "with-icon-icon-size"
+   },
+   {
+    "library": "Md.Comp.Badge.Large.Height",
+    "component": "badge",
+    "token": "large-size"
+   },
+   {
+    "library": "Md.Comp.Badge.Small.Size",
+    "component": "badge",
+    "token": "size"
+   },
+   {
+    "library": "Md.Comp.CheckBox.Container.OutlineWidth",
+    "component": "checkbox",
+    "token": "unselected-outline-width"
+   },
+   {
+    "library": "Md.Comp.CheckBox.Container.Shape",
+    "component": "checkbox",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.CheckBox.Container.Size",
+    "component": "checkbox",
+    "token": "container-size"
+   },
+   {
+    "library": "Md.Comp.CheckBox.Icon.Size",
+    "component": "checkbox",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.CheckBox.StateLayer.Size",
+    "component": "checkbox",
+    "token": "state-layer-size"
+   },
+   {
+    "library": "Md.Comp.Dialog.Container.Shape",
+    "component": "dialog",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Divider.Thickness",
+    "component": "divider",
+    "token": "thickness"
+   },
+   {
+    "library": "Md.Comp.ExtendedFab.Small.Shape",
+    "component": "extended-fab-primary",
+    "token": "container-shape"
    },
    {
     "library": "Md.Comp.Fab.Regular.IconSize",
@@ -1404,8 +1674,8 @@
     "token": "container-shape"
    },
    {
-    "library": "Md.Comp.Fab.Large.Size",
-    "component": "fab-primary-large",
+    "library": "Md.Comp.Fab.Regular.Size",
+    "component": "fab-primary",
     "token": "container-height"
    },
    {
@@ -1419,154 +1689,24 @@
     "token": "container-shape"
    },
    {
-    "library": "Md.Comp.ExtendedFab.Small.Shape",
-    "component": "extended-fab-primary",
-    "token": "container-shape"
-   },
-   {
-    "library": "Md.Comp.CheckBox.StateLayer.Size",
-    "component": "checkbox",
-    "token": "state-layer-size"
-   },
-   {
-    "library": "Md.Comp.CheckBox.Container.Size",
-    "component": "checkbox",
-    "token": "container-size"
-   },
-   {
-    "library": "Md.Comp.CheckBox.Container.Shape",
-    "component": "checkbox",
-    "token": "container-shape"
-   },
-   {
-    "library": "Md.Comp.CheckBox.Icon.Size",
-    "component": "checkbox",
-    "token": "icon-size"
-   },
-   {
-    "library": "Md.Comp.CheckBox.Container.OutlineWidth",
-    "component": "checkbox",
-    "token": "unselected-outline-width"
-   },
-   {
-    "library": "Md.Comp.TextField.Filled.Container.Shape",
-    "component": "filled-text-field",
-    "token": "container-shape"
-   },
-   {
-    "library": "Md.Comp.TextField.Outlined.Container.Shape",
-    "component": "outlined-text-field",
-    "token": "container-shape"
-   },
-   {
-    "library": "Md.Comp.TextField.Outline.Width",
-    "component": "outlined-text-field",
-    "token": "outline-width"
-   },
-   {
-    "library": "Md.Comp.TextField.Outline.FocusWidth",
-    "component": "outlined-text-field",
-    "token": "focus-outline-width"
-   },
-   {
-    "library": "Md.Comp.TextField.Indicator.Width",
-    "component": "filled-text-field",
-    "token": "active-indicator-height"
-   },
-   {
-    "library": "Md.Comp.TextField.Indicator.FocusWidth",
-    "component": "filled-text-field",
-    "token": "focus-active-indicator-height"
-   },
-   {
-    "library": "Md.Comp.TextField.Icon.Size",
-    "component": "filled-text-field",
-    "token": "leading-icon-size"
-   },
-   {
-    "library": "Md.Comp.Divider.Thickness",
-    "component": "divider",
-    "token": "thickness"
-   },
-   {
-    "library": "Md.Comp.Menu.Container.Shape",
-    "component": "menu",
-    "token": "container-shape"
-   },
-   {
-    "library": "Md.Comp.Dialog.Container.Shape",
-    "component": "dialog",
-    "token": "container-shape"
-   },
-   {
-    "library": "Md.Comp.Snackbar.Container.Shape",
-    "component": "snackbar",
-    "token": "container-shape"
-   },
-   {
-    "library": "Md.Comp.Badge.Small.Size",
-    "component": "badge",
-    "token": "size"
-   },
-   {
-    "library": "Md.Comp.Badge.Large.Height",
-    "component": "badge",
-    "token": "large-size"
-   },
-   {
-    "library": "Md.Comp.NavigationBar.Container.Height",
-    "component": "navigation-bar",
+    "library": "Md.Comp.Fab.Large.Size",
+    "component": "fab-primary-large",
     "token": "container-height"
    },
    {
-    "library": "Md.Comp.NavigationDrawer.Container.Width",
-    "component": "navigation-drawer",
-    "token": "container-width"
-   },
-   {
-    "library": "Md.Comp.RadioButton.StateLayer.Size",
-    "component": "radio-button",
-    "token": "state-layer-size"
-   },
-   {
-    "library": "Md.Comp.RadioButton.Icon.Size",
-    "component": "radio-button",
+    "library": "Md.Comp.Fab.Small.IconSize",
+    "component": "fab-primary-small",
     "token": "icon-size"
    },
    {
-    "library": "Md.Comp.Switch.Track.Width",
-    "component": "switch",
-    "token": "track-width"
+    "library": "Md.Comp.Fab.Small.Shape",
+    "component": "fab-primary-small",
+    "token": "container-shape"
    },
    {
-    "library": "Md.Comp.Switch.Track.Height",
-    "component": "switch",
-    "token": "track-height"
-   },
-   {
-    "library": "Md.Comp.Switch.Handle.Selected.Size",
-    "component": "switch",
-    "token": "selected-handle-width"
-   },
-   {
-    "library": "Md.Comp.Switch.Handle.Unselected.Size",
-    "component": "switch",
-    "token": "unselected-handle-width"
-   },
-   {
-    "library": "Md.Comp.Chip.Container.Height",
-    "component": "assist-chip",
+    "library": "Md.Comp.Fab.Small.Size",
+    "component": "fab-primary-small",
     "token": "container-height"
-   },
-   {
-    "library": "Md.Comp.Chip.Container.Shape",
-    "component": "assist-chip",
-    "token": "container-shape"
-   },
-   {
-    "library": "Md.Comp.Card.Container.Shape",
-    "component": "filled-card",
-    "token": "container-shape"
    },
    {
     "library": "Md.Comp.Button.Small.Container.Height",
@@ -1574,29 +1714,9 @@
     "token": "container-height"
    },
    {
-    "library": "Md.Comp.IconButton.Small.IconSize",
-    "component": "icon-button",
-    "token": "icon-size"
-   },
-   {
-    "library": "Md.Comp.IconButton.Small.Height",
-    "component": "icon-button",
-    "token": "state-layer-height"
-   },
-   {
-    "library": "Md.Comp.IconButton.Small.DefaultWidth",
-    "component": "icon-button",
-    "token": "state-layer-width"
-   },
-   {
-    "library": "Md.Comp.Chip.Icon.Size",
-    "component": "assist-chip",
-    "token": "with-icon-icon-size"
-   },
-   {
-    "library": "Md.Comp.IconButton.Small.Height",
-    "component": "filled-icon-button",
-    "token": "container-height"
+    "library": "Md.Comp.Card.Container.Shape",
+    "component": "filled-card",
+    "token": "container-shape"
    },
    {
     "library": "Md.Comp.IconButton.Small.DefaultWidth",
@@ -1604,24 +1724,119 @@
     "token": "container-width"
    },
    {
+    "library": "Md.Comp.IconButton.Small.Height",
+    "component": "filled-icon-button",
+    "token": "container-height"
+   },
+   {
     "library": "Md.Comp.IconButton.Small.IconSize",
     "component": "filled-icon-button",
     "token": "icon-size"
    },
    {
-    "library": "Md.Comp.AppBar.Small.Height",
-    "component": "top-app-bar-small",
-    "token": "container-height"
+    "library": "Md.Comp.ComboBox.Filled.Container.Shape",
+    "component": "filled-select",
+    "token": "text-field-container-shape"
    },
    {
-    "library": "Md.Comp.AppBar.MediumFlexible.Height",
-    "component": "top-app-bar-medium",
-    "token": "container-height"
+    "library": "Md.Comp.ComboBox.Icon.Size",
+    "component": "filled-select",
+    "token": "text-field-leading-icon-size"
    },
    {
-    "library": "Md.Comp.AppBar.LargeFlexible.LargeHeight",
-    "component": "top-app-bar-large",
-    "token": "container-height"
+    "library": "Md.Comp.ComboBox.Indicator.FocusWidth",
+    "component": "filled-select",
+    "token": "text-field-focus-active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.ComboBox.Indicator.Width",
+    "component": "filled-select",
+    "token": "text-field-active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.ComboBox.Input.FontSize",
+    "component": "filled-select",
+    "token": "text-field-input-text-size"
+   },
+   {
+    "library": "Md.Comp.ComboBox.Label.FontSize",
+    "component": "filled-select",
+    "token": "text-field-label-text-size"
+   },
+   {
+    "library": "Md.Comp.ComboBox.Supporting.FontSize",
+    "component": "filled-select",
+    "token": "text-field-supporting-text-size"
+   },
+   {
+    "library": "Md.Comp.TextField.Filled.Container.Shape",
+    "component": "filled-text-field",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.TextField.Icon.Size",
+    "component": "filled-text-field",
+    "token": "leading-icon-size"
+   },
+   {
+    "library": "Md.Comp.TextField.Indicator.FocusWidth",
+    "component": "filled-text-field",
+    "token": "focus-active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.TextField.Indicator.Width",
+    "component": "filled-text-field",
+    "token": "active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.TextField.Input.FontSize",
+    "component": "filled-text-field",
+    "token": "input-text-size"
+   },
+   {
+    "library": "Md.Comp.TextField.Label.Floating.FontSize",
+    "component": "filled-text-field",
+    "token": "label-text-populated-size"
+   },
+   {
+    "library": "Md.Comp.TextField.Label.Resting.FontSize",
+    "component": "filled-text-field",
+    "token": "label-text-size"
+   },
+   {
+    "library": "Md.Comp.TextField.Supporting.FontSize",
+    "component": "filled-text-field",
+    "token": "supporting-text-size"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.DefaultWidth",
+    "component": "icon-button",
+    "token": "state-layer-width"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.Height",
+    "component": "icon-button",
+    "token": "state-layer-height"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.IconSize",
+    "component": "icon-button",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.List.Item.LeadingSpace",
+    "component": "list",
+    "token": "list-item-leading-space"
+   },
+   {
+    "library": "Md.Comp.List.Item.MinHeight",
+    "component": "list",
+    "token": "list-item-one-line-container-height"
+   },
+   {
+    "library": "Md.Comp.Menu.Container.Shape",
+    "component": "menu",
+    "token": "container-shape"
    },
    {
     "library": "Md.Comp.NavigationBar.ActiveIndicator.Height",
@@ -1634,6 +1849,16 @@
     "token": "active-indicator-width"
    },
    {
+    "library": "Md.Comp.NavigationBar.Container.Height",
+    "component": "navigation-bar",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.NavigationDrawer.Container.Width",
+    "component": "navigation-drawer",
+    "token": "container-width"
+   },
+   {
     "library": "Md.Comp.NavigationRail.ActiveIndicator.Height",
     "component": "navigation-rail",
     "token": "active-indicator-height"
@@ -1644,14 +1869,34 @@
     "token": "active-indicator-width"
    },
    {
-    "library": "Md.Comp.List.Item.MinHeight",
-    "component": "list",
-    "token": "list-item-one-line-container-height"
+    "library": "Md.Comp.ComboBox.Outline.FocusWidth",
+    "component": "outlined-select",
+    "token": "text-field-focus-outline-width"
    },
    {
-    "library": "Md.Comp.List.Item.LeadingSpace",
-    "component": "list",
-    "token": "list-item-leading-space"
+    "library": "Md.Comp.ComboBox.Outline.Width",
+    "component": "outlined-select",
+    "token": "text-field-outline-width"
+   },
+   {
+    "library": "Md.Comp.ComboBox.Outlined.Container.Shape",
+    "component": "outlined-select",
+    "token": "text-field-container-shape"
+   },
+   {
+    "library": "Md.Comp.TextField.Outline.FocusWidth",
+    "component": "outlined-text-field",
+    "token": "focus-outline-width"
+   },
+   {
+    "library": "Md.Comp.TextField.Outline.Width",
+    "component": "outlined-text-field",
+    "token": "outline-width"
+   },
+   {
+    "library": "Md.Comp.TextField.Outlined.Container.Shape",
+    "component": "outlined-text-field",
+    "token": "container-shape"
    },
    {
     "library": "Md.Comp.Tabs.Primary.Indicator.Height",
@@ -1659,14 +1904,24 @@
     "token": "active-indicator-height"
    },
    {
+    "library": "Md.Comp.RadioButton.Icon.Size",
+    "component": "radio-button",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.RadioButton.StateLayer.Size",
+    "component": "radio-button",
+    "token": "state-layer-size"
+   },
+   {
     "library": "Md.Comp.Tabs.Secondary.Indicator.Height",
     "component": "secondary-navigation-tab",
     "token": "active-indicator-height"
    },
    {
-    "library": "Md.Comp.Slider.StateLayer.Size",
-    "component": "slider",
-    "token": "state-layer-size"
+    "library": "Md.Comp.Sheet.DragHandle.Height",
+    "component": "sheet-bottom",
+    "token": "docked-drag-handle-height"
    },
    {
     "library": "Md.Comp.Sheet.DragHandle.Width",
@@ -1674,9 +1929,49 @@
     "token": "docked-drag-handle-width"
    },
    {
-    "library": "Md.Comp.Sheet.DragHandle.Height",
-    "component": "sheet-bottom",
-    "token": "docked-drag-handle-height"
+    "library": "Md.Comp.Slider.StateLayer.Size",
+    "component": "slider",
+    "token": "state-layer-size"
+   },
+   {
+    "library": "Md.Comp.Snackbar.Container.Shape",
+    "component": "snackbar",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Switch.Handle.Selected.Size",
+    "component": "switch",
+    "token": "selected-handle-width"
+   },
+   {
+    "library": "Md.Comp.Switch.Handle.Unselected.Size",
+    "component": "switch",
+    "token": "unselected-handle-width"
+   },
+   {
+    "library": "Md.Comp.Switch.Track.Height",
+    "component": "switch",
+    "token": "track-height"
+   },
+   {
+    "library": "Md.Comp.Switch.Track.Width",
+    "component": "switch",
+    "token": "track-width"
+   },
+   {
+    "library": "Md.Comp.AppBar.LargeFlexible.LargeHeight",
+    "component": "top-app-bar-large",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.AppBar.MediumFlexible.Height",
+    "component": "top-app-bar-medium",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.AppBar.Small.Height",
+    "component": "top-app-bar-small",
+    "token": "container-height"
    }
   ],
   "full_shape_pairs": [
@@ -1742,5 +2037,6 @@
     "time-picker"
    ]
   }
- }
+ },
+ "_typescale_note": "Font sizes the specification states as a reference to the published type scale (map.get($deps,'md-sys-typescale','body-large-size')) rather than as a literal. Each is resolved through the same published scale the theme uses and keeps a 'typescale' field naming the step, so the provenance survives the resolution."
 }

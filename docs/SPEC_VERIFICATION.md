@@ -125,11 +125,11 @@ and `budget`. Moving a budget is therefore a visible diff, and only one directio
 
 | metric | meaning | today |
 | --- | --- | ---: |
-| `hardcoded_geometry` | themable literals inside every shipped `Themes/*.axaml` | 269 |
+| `hardcoded_geometry` | themable literals inside every shipped `Themes/*.axaml` | 268 |
 | `hardcoded_ui_text` | English authored in a shipped template, bypassing `MdLocalization` | 0 |
 | `orphan_tokens` | declared tokens nothing references | 73 |
 | `dual_declaration_keys` | keys declared in both XAML and `MdThemeManager` | 27 |
-| `oracle_coverage_ratio` | oracle entries ÷ declared keys | 0.3299 |
+| `oracle_coverage_ratio` | oracle entries ÷ declared keys | 0.3423 |
 | `oracle_families` | component families with at least one oracle value | 19 |
 | `measured_controls` / `measured_cases` | controls and cases the L2 matrix lays out | 14 / 43 |
 | `armed_goldens` | committed L3 baselines | 0 |
@@ -216,6 +216,36 @@ worse (a dot badge with a 999dp radius is the same circle; a badge whose radius 
 cosmetic change nobody asked for). The rule applied throughout - never widen a gate, never round a value to
 make a comparison pass, and check the meaning rather than the number - is what turned those eleven findings
 into one.
+
+#### The snapshot was only half the specification
+
+The component-token layer started as "307 literal values across 55 files", and that phrasing hid a
+coverage bug of exactly the kind the layer exists to catch elsewhere: Material states a great many
+values as a *reference* to the published type scale rather than as a number -
+
+```scss
+'input-text-size': map.get($deps, 'md-sys-typescale', 'body-large-size'),
+```
+
+- and the collector only kept `if($exclude-hardcoded-values, null, 16px)`. So 56 font-size tokens were
+invisible: not compared, not counted as missing, simply absent from both the snapshot and the report.
+A Checkbox that had forgotten to set its label size would have passed every layer in this repository.
+
+The snapshot now resolves those references through the same published scale the theme uses (the 15 steps
+in `Md.Sys.TypeScale.*.Size`) and keeps the step name beside the value, so the provenance survives the
+resolution and a later change to the scale is visibly a re-baseline rather than a silent drift. That is
+what let the text-field and combo-box font sizes be checked at all, and all seven agreed on the first run.
+
+Two findings from the same round are worth recording because both are the check being wrong rather than
+the library:
+
+- a filled text field's underline is stated as `active-indicator-height: 1px` and authored here as
+  `Thickness(0, 0, 0, 1)`. The comparison was demanding a uniform quad and would have "fixed" a correct
+  underline into a boxed field. A single non-zero edge equal to the stated value is now accepted as the
+  same property; a *non*-uniform quad with more than one distinct non-zero edge still fails;
+- the combo box's dropdown is `0,0,4,4` - round at the bottom only, because it attaches to the field -
+  while Material's `menu-container-shape` is 4 all round. Same step, different surface, so the pair was
+  removed and the reason recorded in `excluded_by_design` rather than left as a passing coincidence.
 
 ### The geometry metric measured the wrong tree, and then it halved
 
