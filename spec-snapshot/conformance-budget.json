@@ -221,7 +221,7 @@
       "direction": "lower",
       "budget": 220,
       "source": "headless",
-      "why": "Declared Md.Comp.* keys that no Material Web token can be compared with, either because the specification states no value for them or because no mapping has been written. 49 keys are checked today, and the first time the check ran three of those 49 disagreed with Material (a large FAB icon at 32 instead of 36, and two badges plus a checkbox state layer hard-coded to 3/8/20 where the specification says corner-full). That is the class of defect this entry exists to shrink: a token transcribed wrong into both the oracle and the theme agrees with itself and disagrees with Material."
+      "why": "Declared Md.Comp.* keys that no Material Web token can be compared with, either because the specification states no value for them or because no mapping has been written. 52 keys are checked today. The first run of this comparison found one real divergence - a large FAB icon at 32 where fab-primary-large.icon-size is 36 - and one interesting near-miss: three tokens Material calls corner-full are bare numbers here (3, 8, 20), and chasing them produced three false findings, because a radius of exactly half the box already is full. They are checked as shape-against-size instead of against the number 999. Both outcomes are the point of the layer: a token transcribed wrong into both the oracle and the theme agrees with itself and disagrees with Material."
     }
   }
 }

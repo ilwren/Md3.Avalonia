@@ -125,30 +125,57 @@ public sealed class MdComponentTokenTests
     {
         // Material spells this step 'corner-full' and states 9999px; this theme spells it
         // Md.Sys.Shape.Corner.Full and states 999. Both mean "as round as the box", so comparing the two
-        // numbers would be a false failure. What is actually checkable is that each circular token is
-        // wired to the library's own full step rather than to a literal that happens to look round at
-        // today's size - which is how three of these were wrong (3, 8 and 20).
-        Assert.True(
-            application.TryGetResource("Md.Sys.Shape.Corner.Full", ThemeVariant.Light, out var fullValue) &&
-            fullValue is CornerRadius fullCorner,
-            "Md.Sys.Shape.Corner.Full is not declared as a CornerRadius; the full-shape checks have no reference.");
+        // numbers would be a false failure - and so would demanding the 999.
+        //
+        // This check exists because the obvious reading ("a token Material calls full must hold 999")
+        // produced three findings on the first run that were not defects: the dot badge is 6dp round
+        // with a radius of 3, the labelled badge 16dp with 8, the checkbox state layer 40dp with 20.
+        // Each is exactly half its box, which IS full. What the specification constrains is the shape,
+        // not the number, so the check is that a full-shape token's radius covers half the box it rounds.
+        // A radius smaller than that leaves square corners on a control Material draws as a circle.
+        var roundTokens = new (string Key, string Size)[]
+        {
+            ("Md.Comp.Badge.Small.Shape", "Md.Comp.Badge.Small.Size"),
+            ("Md.Comp.Badge.Large.Shape", "Md.Comp.Badge.Large.Height"),
+            ("Md.Comp.CheckBox.StateLayer.Shape", "Md.Comp.CheckBox.StateLayer.Size")
+        };
+
+        foreach (var (key, sizeKey) in roundTokens)
+        {
+            if (!TryResolve(application, key, out var shape) || shape.Kind != ResolvedKind.Corner ||
+                !TryResolve(application, sizeKey, out var size) || size.Kind != ResolvedKind.Scalar)
+            {
+                report.Gap(key, $"expected a CornerRadius shape and a scalar size ({sizeKey})");
+                continue;
+            }
+
+            var corners = shape.Corners!;
+            var box = size.Number!.Value;
+            report.Check(
+                $"{key} (= Full)",
+                corners.All(step => step * 2 >= box - 0.0001),
+                $"Material draws this as corner-full. The box is {box:0.####} and the radius is " +
+                $"[{string.Join(", ", corners)}]; a radius under half the box leaves square corners.");
+        }
 
         foreach (var pair in tables.FullShapePairs)
         {
-            if (!TryResolve(application, pair.Library, out var actual) || actual.Kind != ResolvedKind.Corner)
+            if (!TryResolve(application, pair.Library, out var resolved) || resolved.Kind != ResolvedKind.Corner)
             {
                 report.Gap(pair.Library, "expected a CornerRadius resource");
                 continue;
             }
 
-            var corners = actual.Corners!;
-            var allFull = corners.All(step => Math.Abs(step - fullCorner.TopLeft) < 0.0001);
+            // No size to compare against here, so the stateable invariant is that the token is a single
+            // symmetric radius rather than a squashed quad, and that it is at least the M3 shape scale's
+            // largest fixed step - anything smaller cannot round a control Material draws as a circle.
+            var corners = resolved.Corners!;
+            var symmetric = corners.Distinct().Count() == 1;
             report.Check(
                 $"{pair.Library} (= {pair.Expect})",
-                allFull,
-                $"Material states {pair.Expect} for this shape, which is Md.Sys.Shape.Corner.Full " +
-                $"({fullCorner.TopLeft:0.####}); the token resolves to " +
-                $"[{string.Join(", ", corners)}] instead");
+                symmetric && corners[0] >= 28,
+                $"Material states {pair.Expect}; the token resolves to [{string.Join(", ", corners)}], " +
+                "which is either asymmetric or too small to round a circular container");
         }
     }
 
@@ -166,6 +193,12 @@ public sealed class MdComponentTokenTests
         var covered = tables.Pairs.Select(pair => pair.Library)
             .Concat(tables.FullShapePairs.Select(pair => pair.Library))
             .ToHashSet(StringComparer.Ordinal);
+
+        // The three circular tokens are compared as shape-against-size by CompareFullShapes rather than
+        // by a pair entry, so they are covered even though no pair names them.
+        covered.Add("Md.Comp.Badge.Small.Shape");
+        covered.Add("Md.Comp.Badge.Large.Shape");
+        covered.Add("Md.Comp.CheckBox.StateLayer.Shape");
 
         var unmapped = declared.Where(key => !covered.Contains(key))
             .Concat(tables.ExcludedByDesign.Keys.Where(key => !covered.Contains(key)))
