@@ -233,6 +233,9 @@ public sealed class MdComponentTokenTests
     /// <remarks>
     /// Read from the source rather than from the merged application, because the question is what the
     /// library declares, and a key that fails to merge is a different (and separately measured) defect.
+    /// The <c>Themes/Tokens</c> folders are where the library declares its tokens; a key that appears only
+    /// inline in a control theme (a local shape, a local size) is not a declared token and would inflate
+    /// this queue with entries the specification was never going to have a counterpart for.
     /// </remarks>
     private static IReadOnlyList<string> DeclaredComponentKeys()
     {
@@ -241,7 +244,8 @@ public sealed class MdComponentTokenTests
         foreach (var file in Directory.EnumerateFiles(Path.Combine(root, "src"), "*.axaml", SearchOption.AllDirectories))
         {
             if (file.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}", StringComparison.Ordinal) ||
-                file.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
+                file.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}", StringComparison.Ordinal) ||
+                !file.Contains($"{Path.DirectorySeparatorChar}Themes{Path.DirectorySeparatorChar}Tokens{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
             {
                 continue;
             }
