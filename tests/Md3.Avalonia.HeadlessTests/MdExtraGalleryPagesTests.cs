@@ -87,27 +87,27 @@ public sealed class MdExtraGalleryPagesTests
             window.NavigateToIndexedPage("Wheel picker");
             var wheel = window.CurrentPage!.GetLogicalDescendants().OfType<MdWheelPicker>().Single();
             Range(wheel).SetValue(15);
-            Assert.Contains(window.CurrentPage.GetLogicalDescendants().OfType<TextBlock>(), text => text.Text == "Selected: 15");
+            Assert.Contains(window.CurrentPage!.GetLogicalDescendants().OfType<TextBlock>(), text => text.Text == "Selected: 15");
 
             window.NavigateToIndexedPage("Page indicator");
             var dots = window.CurrentPage!.GetLogicalDescendants().OfType<MdPageIndicator>().Single();
             Range(dots).SetValue(2);
-            Assert.Contains(window.CurrentPage.GetLogicalDescendants().OfType<TextBlock>(), text => text.Text == "Page 3 of 4");
+            Assert.Contains(window.CurrentPage!.GetLogicalDescendants().OfType<TextBlock>(), text => text.Text == "Page 3 of 4");
 
             window.NavigateToIndexedPage("Media progress bar");
             var media = window.CurrentPage!.GetLogicalDescendants().OfType<MdMediaProgressBar>().Single();
             Range(media).SetValue(60);
-            Assert.Contains(window.CurrentPage.GetLogicalDescendants().OfType<TextBlock>(), text => text.Text == "Seek position: 60 seconds");
+            Assert.Contains(window.CurrentPage!.GetLogicalDescendants().OfType<TextBlock>(), text => text.Text == "Seek position: 60 seconds");
 
             window.NavigateToIndexedPage("Slide to confirm");
             var slide = window.CurrentPage!.GetLogicalDescendants().OfType<MdSlideToConfirm>().Single();
             var peer = ControlAutomationPeer.CreatePeerForElement(slide);
             Assert.IsAssignableFrom<IInvokeProvider>(peer.GetProvider<IInvokeProvider>()).Invoke();
-            Assert.Contains(window.CurrentPage.GetLogicalDescendants().OfType<TextBlock>(), text => text.Text == "Confirmation received.");
-            var reset = window.CurrentPage.GetLogicalDescendants().OfType<MdButton>().Single(button => Equals(button.Content, "Reset"));
+            Assert.Contains(window.CurrentPage!.GetLogicalDescendants().OfType<TextBlock>(), text => text.Text == "Confirmation received.");
+            var reset = window.CurrentPage!.GetLogicalDescendants().OfType<MdButton>().Single(button => Equals(button.Content, "Reset"));
             reset.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Assert.False(slide.IsConfirmed);
-            Assert.Contains(window.CurrentPage.GetLogicalDescendants().OfType<TextBlock>(), text => text.Text == "Waiting for confirmation.");
+            Assert.Contains(window.CurrentPage!.GetLogicalDescendants().OfType<TextBlock>(), text => text.Text == "Waiting for confirmation.");
         }
         finally { window.Close(); }
     }
@@ -122,7 +122,7 @@ public sealed class MdExtraGalleryPagesTests
             window.NavigateToIndexedPage("Auto-size text");
             var autoText = window.CurrentPage!.GetLogicalDescendants().OfType<MdAutoSizeText>().Single();
             var box = Assert.IsType<Border>(autoText.Parent);
-            var narrow = window.CurrentPage.GetLogicalDescendants().OfType<MdButton>().Single(b => Equals(b.Content, "Narrow"));
+            var narrow = window.CurrentPage!.GetLogicalDescendants().OfType<MdButton>().Single(b => Equals(b.Content, "Narrow"));
             narrow.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Assert.Equal(150, box.Width);
 
@@ -132,13 +132,13 @@ public sealed class MdExtraGalleryPagesTests
             var picker = window.CurrentPage!.GetLogicalDescendants().OfType<MdEmojiPicker>().Single();
             var emoji = picker.GetVisualDescendants().OfType<MdButton>().Single(b => AutomationProperties.GetName(b) == "Grinning face");
             emoji.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            Assert.Contains(window.CurrentPage.GetLogicalDescendants().OfType<TextBlock>(), text => text.Text == "😀");
+            Assert.Contains(window.CurrentPage!.GetLogicalDescendants().OfType<TextBlock>(), text => text.Text == "😀");
 
             window.NavigateToIndexedPage("Confetti");
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
             var confetti = window.CurrentPage!.GetLogicalDescendants().OfType<MdConfetti>().Single();
-            var celebrate = window.CurrentPage.GetLogicalDescendants().OfType<MdButton>().Single(b => Equals(b.Content, "Celebrate"));
+            var celebrate = window.CurrentPage!.GetLogicalDescendants().OfType<MdButton>().Single(b => Equals(b.Content, "Celebrate"));
             celebrate.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Assert.True(confetti.IsRunning);
         }
@@ -160,7 +160,7 @@ public sealed class MdExtraGalleryPagesTests
                 languages.SelectedIndex = 1;
                 Assert.IsType(demo.Page, window.CurrentPage);
                 Assert.Contains(window.CurrentPage!.GetLogicalDescendants(), child => demo.Control.IsInstanceOfType(child));
-                Assert.Contains(window.CurrentPage.GetLogicalDescendants().OfType<TextBlock>(), block => !string.IsNullOrEmpty(block.Text) && block.Text.Any(c => c >= '\u4e00' && c <= '\u9fff'));
+                Assert.Contains(window.CurrentPage!.GetLogicalDescendants().OfType<TextBlock>(), block => !string.IsNullOrEmpty(block.Text) && block.Text.Any(c => c >= '\u4e00' && c <= '\u9fff'));
             }
             languages.SelectedIndex = 0;
         }
@@ -179,15 +179,15 @@ public sealed class MdExtraGalleryPagesTests
 
             window.NavigateToIndexedPage("Skeleton");
             var group = window.CurrentPage!.GetLogicalDescendants().OfType<MdSkeletonGroup>().Single();
-            var toggle = window.CurrentPage.GetLogicalDescendants().OfType<MdButton>().Single(b => Equals(b.Content, "Toggle loading"));
+            var toggle = window.CurrentPage!.GetLogicalDescendants().OfType<MdButton>().Single(b => Equals(b.Content, "Toggle loading"));
             toggle.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Assert.False(group.IsLoading);
             Assert.All(group.Children.OfType<MdSkeleton>(), skeleton => Assert.False(skeleton.IsLoading));
 
             window.NavigateToIndexedPage("Motion");
             var fade = window.CurrentPage!.GetLogicalDescendants().OfType<MdFadeThrough>().Single();
-            var axis = window.CurrentPage.GetLogicalDescendants().OfType<MdSharedAxis>().Single();
-            var swap = window.CurrentPage.GetLogicalDescendants().OfType<MdButton>().Single(b => Equals(b.Content, "Switch content"));
+            var axis = window.CurrentPage!.GetLogicalDescendants().OfType<MdSharedAxis>().Single();
+            var swap = window.CurrentPage!.GetLogicalDescendants().OfType<MdButton>().Single(b => Equals(b.Content, "Switch content"));
             swap.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Assert.Equal("Second view", fade.Content);
             Assert.Equal("Second view", axis.Content);
@@ -196,7 +196,7 @@ public sealed class MdExtraGalleryPagesTests
             Assert.Single(window.CurrentPage!.GetLogicalDescendants().OfType<MdSafeArea>());
             window.NavigateToIndexedPage("Date and time pickers");
             Assert.Single(window.CurrentPage!.GetLogicalDescendants().OfType<MdDatePickerDialog>());
-            Assert.Single(window.CurrentPage.GetLogicalDescendants().OfType<MdTimePickerDialog>());
+            Assert.Single(window.CurrentPage!.GetLogicalDescendants().OfType<MdTimePickerDialog>());
             window.NavigateToIndexedPage("Rich editor");
             Assert.Single(window.CurrentPage!.GetLogicalDescendants().OfType<MdRichTextEditor>());
         }
