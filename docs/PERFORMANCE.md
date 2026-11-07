@@ -102,7 +102,8 @@ layout/render timings and the visual tree.
 Android is collected automatically: after the Maestro scenario, the Android workflow runs
 `scripts/collect-android-perf.py`, which captures frame stats (`dumpsys gfxinfo` summary plus
 the raw `framestats` table), memory (`dumpsys meminfo`), cold start (the ActivityManager
-`Displayed` line for a force-stop + launcher relaunch) and APK size into
+`Displayed` line for a force-stop + relaunch, falling back to the `am start -W` timings when
+the image never logs one) and APK size into
 `artifacts/android-test/android-perf.json`. A `crash.txt` dump rides along with it: when the app
 dies on launch every metric is empty, and the crash buffer is the only thing that explains why.
 The JSON, the raw dumps and a rendered

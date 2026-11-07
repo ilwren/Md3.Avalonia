@@ -227,6 +227,19 @@ class DisplayedParsingTests(unittest.TestCase):
         self.assertEqual(collector.displayed_lines(log, PACKAGE), [])
 
 
+class AmStartParsingTests(unittest.TestCase):
+    AM_START = ("Starting: Intent { cmp=io.arena.md3avalonia.gallery/.MainActivity }\n"
+                "Status: ok\nLaunchState: COLD\nTotalTime: 2145\nWaitTime: 2210\n")
+
+    def test_timings(self):
+        self.assertEqual(collector.parse_am_start_ms(self.AM_START),
+                         {"waitTimeMs": 2210, "totalTimeMs": 2145})
+
+    def test_failed_start_is_all_none(self):
+        self.assertEqual(collector.parse_am_start_ms("Error: Activity not started"),
+                         {"waitTimeMs": None, "totalTimeMs": None})
+
+
 class ApkResolutionTests(unittest.TestCase):
     def test_directory_prefers_largest_apk(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -296,6 +309,15 @@ elif args[:1] == ["logcat"]:
         print((STATE / "logcat-initial.txt").read_text(), end="")
     else:
         print((STATE / "logcat-cold.txt").read_text(), end="")
+elif args[:4] == ["shell", "cmd", "package", "resolve-activity"]:
+    print("priority=0")
+    print("{package}/.MainActivity")
+elif args[:4] == ["shell", "am", "start", "-W"]:
+    print("Starting: Intent {{ cmp={package}/.MainActivity }}")
+    print("Status: ok")
+    print("LaunchState: COLD")
+    print("TotalTime: 2145")
+    print("WaitTime: 2210")
 elif args[:3] == ["shell", "am", "force-stop"]:
     print("")
 elif args[:2] == ["shell", "monkey"]:
@@ -374,6 +396,9 @@ class EndToEndTests(unittest.TestCase):
         # Cold start comes from the *second* Displayed line, not the pre-existing launch.
         self.assertEqual(report["startup"]["initialDisplayedMs"], 1234)
         self.assertEqual(report["startup"]["coldStartDisplayedMs"], 812)
+        self.assertEqual(report["startup"]["coldStartSource"], "logcat Displayed")
+        self.assertEqual(report["startup"]["activity"], f"{PACKAGE}/.MainActivity")
+        self.assertEqual(report["startup"]["totalTimeMs"], 2145)
         self.assertEqual(report["warnings"], [])
 
         for name in ("gfxinfo.txt", "framestats.txt", "meminfo.txt", "displayed.txt",
@@ -381,7 +406,7 @@ class EndToEndTests(unittest.TestCase):
             self.assertTrue((out_dir / name).is_file(), f"{name} missing")
         self.assertEqual(report["raw"], {"gfxinfo": "gfxinfo.txt", "framestats": "framestats.txt",
                                         "meminfo": "meminfo.txt", "displayed": "displayed.txt",
-                                        "crash": "crash.txt"})
+                                        "crash": "crash.txt", "amstart": "amstart.txt"})
         self.assertIn("Displayed io.arena.md3avalonia.gallery", (out_dir / "displayed.txt").read_text())
 
         # Annotations and step summary are what a reviewer actually reads.

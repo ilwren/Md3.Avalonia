@@ -155,6 +155,7 @@ jobs:
             artifacts/android-test/framestats.txt
             artifacts/android-test/meminfo.txt
             artifacts/android-test/displayed.txt
+            artifacts/android-test/amstart.txt
             artifacts/android-test/crash.txt
             artifacts/android-test/collector-run.log
             artifacts/verification/dotnet-test.log

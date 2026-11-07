@@ -87,25 +87,35 @@ else
   echo "::warning::android perf: no APK under $APK_DIR; nothing to launch"
 fi
 
-# monkey is the only launcher that does not need the generated activity's JNI name.
-step adb shell monkey -p "$PACKAGE" -c android.intent.category.LAUNCHER 1
+# Launch deterministically. `monkey` only fires an intent: on an image whose launcher is a
+# placeholder (ATD's FallbackHome) the app can end up alive but never focused, which is how a
+# previous run reported "first frame" while gfxinfo still said "Total frames rendered: 0".
+activity=$(adb shell cmd package resolve-activity --brief \
+  -c android.intent.category.LAUNCHER "$PACKAGE" 2>/dev/null | tail -1 | tr -d '\r')
+echo "activity=$activity" >>"$LOG"
+if [ -n "$activity" ]; then
+  step adb shell am start -W -n "$activity"
+else
+  step adb shell monkey -p "$PACKAGE" -c android.intent.category.LAUNCHER 1
+fi
 
-# A cold .NET startup on a swiftshader emulator is slow -- minutes, not seconds -- and asking for
-# frame stats before the first frame simply returns an empty dump. Warm the app up until gfxinfo
-# reports frames, then let the collector measure.
+# A cold .NET startup on a swiftshader emulator is slow -- a minute or more -- and asking for
+# frame stats before the first frame returns an empty dump with sentinel percentiles.
+# "Total frames rendered: 0" still matches a naive grep, so require a non-zero count.
+frames_of() {
+  adb shell dumpsys gfxinfo "$PACKAGE" 2>/dev/null \
+    | sed -n 's/.*Total frames rendered: \([0-9]\{1,\}\).*/\1/p' | head -1
+}
 warm=0
-while [ "$warm" -lt 180 ]; do
-  if adb shell dumpsys gfxinfo "$PACKAGE" 2>/dev/null | grep -q "Total frames rendered"; then
-    echo "first frame after ${warm}s" >>"$LOG"
-    break
-  fi
+frames=0
+while [ "$warm" -lt 240 ]; do
+  frames=$(frames_of)
+  [ -n "$frames" ] && [ "$frames" -gt 0 ] && { echo "drew $frames frame(s) after ${warm}s" >>"$LOG"; break; }
   sleep 10
   warm=$((warm + 10))
 done
-[ "$warm" -ge 180 ] && echo "::warning::android perf: no frame after 180s; the app may still be starting"
+echo "::notice::android perf: frames=$frames after ${warm}s warm-up, focus=$(adb shell dumpsys window 2>/dev/null | grep -m1 mCurrentFocus | tr -d '\r')"
 
-# A dead process is the difference between "no data" and "the app crashed": say which.
-step adb shell pidof "$PACKAGE"
 pid=$(adb shell pidof "$PACKAGE" 2>/dev/null | tr -d '\r')
 step sh -c "adb shell dumpsys window 2>/dev/null | grep -i -m2 'mCurrentFocus\|mFocusedApp'"
 if [ -n "$pid" ]; then

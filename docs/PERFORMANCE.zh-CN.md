@@ -96,7 +96,7 @@ dotnet-gcdump collect -p <pid> -o after.gcdump
 Android 侧是自动采集的：Maestro 场景跑完后，Android 工作流会跑
 `scripts/collect-android-perf.py`，抓取帧统计（`dumpsys gfxinfo` 摘要 + 原始 `framestats` 表）、
 内存（`dumpsys meminfo`）、冷启动（force-stop + 从 Launcher 重启后的 ActivityManager
-`Displayed` 行）和 APK 体积，写入 `artifacts/android-test/android-perf.json`；同时会附带一份 `crash.txt`——app 在启动时崩溃的话所有指标
+`Displayed` 行，取不到时退回 `am start -W` 的计时）和 APK 体积，写入 `artifacts/android-test/android-perf.json`；同时会附带一份 `crash.txt`——app 在启动时崩溃的话所有指标
 都是空，只有崩溃缓冲区能解释原因。JSON、原始 dump
 和渲染好的 `android-perf.md` 表格都会进 `android-ui-regression-evidence` 产物，关键数字还会镜像
 到 annotations 和 step summary。采集是建议性质的——任何失败都变成带 warning 的 null，绝不会挂红

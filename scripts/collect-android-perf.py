@@ -112,6 +112,29 @@ def parse_displayed_ms(line: str) -> int | None:
     return seconds * 1000 + millis
 
 
+def parse_am_start_ms(text: str) -> dict:
+    """Read the timings an `am start -W` prints: TotalTime is the activity's own startup,
+    WaitTime adds the launcher's dispatch. Empty (or a failed start) yields nulls."""
+    result = {"waitTimeMs": None, "totalTimeMs": None}
+    for key, pattern in (("waitTimeMs", r"WaitTime:\s*(\d+)"), ("totalTimeMs", r"TotalTime:\s*(\d+)")):
+        match = re.search(pattern, text)
+        if match:
+            result[key] = int(match.group(1))
+    return result
+
+
+def resolve_launcher_activity(adb: list[str], package: str) -> str | None:
+    """The component `monkey` would launch, so the collector can start it deterministically."""
+    code, out = run(adb + ["shell", "cmd", "package", "resolve-activity", "--brief",
+                           "-c", "android.intent.category.LAUNCHER", package])
+    if code != 0:
+        return None
+    for line in reversed([line.strip() for line in out.splitlines() if line.strip()]):
+        if "/" in line and not line.startswith("priority"):
+            return line
+    return None
+
+
 def displayed_lines(logcat: str, package: str) -> list[str]:
     return [line for line in logcat.splitlines()
             if "Displayed" in line and f"{package}/" in line]
@@ -159,6 +182,8 @@ def main() -> int:
     device: dict = {"model": None, "sdk": None}
     initial_displayed_ms: int | None = None
     cold_start_displayed_ms: int | None = None
+    startup: dict = {"activity": None, "waitTimeMs": None, "totalTimeMs": None,
+                     "coldStartSource": None}
     displayed_count = 0
 
     if shutil.which("adb") is None:
@@ -223,12 +248,27 @@ def main() -> int:
                 if args.no_cold_start:
                     warnings.append("cold-start probe skipped by --no-cold-start")
                 else:
+                    activity = resolve_launcher_activity(adb, package)
+                    if activity:
+                        startup["activity"] = activity
                     run(adb + ["shell", "am", "force-stop", package])
                     time.sleep(2)
-                    code, monkey = run(adb + ["shell", "monkey", "-p", package,
-                                              "-c", "android.intent.category.LAUNCHER", "1"])
-                    if code != 0 or "No activities found" in monkey:
-                        warnings.append("monkey could not launch the launcher activity; no cold-start sample")
+                    if activity:
+                        # `am start -W` blocks until the activity is drawn and reports its own
+                        # timings. monkey only fires an intent, so on an image whose launcher is a
+                        # placeholder nothing ends up focused and no `Displayed` line appears.
+                        code, launch = run(adb + ["shell", "am", "start", "-W", "-n", activity])
+                        (out_dir / "amstart.txt").write_text(launch, encoding="utf-8")
+                        timings = parse_am_start_ms(launch)
+                        startup["waitTimeMs"] = timings["waitTimeMs"]
+                        startup["totalTimeMs"] = timings["totalTimeMs"]
+                        launched = code == 0 and "Error" not in launch
+                    else:
+                        code, monkey = run(adb + ["shell", "monkey", "-p", package,
+                                                  "-c", "android.intent.category.LAUNCHER", "1"])
+                        launched = code == 0 and "No activities found" not in monkey
+                    if not launched:
+                        warnings.append("could not launch the launcher activity; no cold-start sample")
                     else:
                         deadline = time.time() + PROBE_BUDGET_SECONDS
                         probe_lines: list[str] = []
@@ -244,8 +284,14 @@ def main() -> int:
                         if displayed_count > len(before):
                             (out_dir / "displayed.txt").write_text("\n".join(probe_lines) + "\n", encoding="utf-8")
                             cold_start_displayed_ms = parse_displayed_ms(probe_lines[-1])
+                            startup["coldStartSource"] = "logcat Displayed"
                             if cold_start_displayed_ms is None:
                                 warnings.append(f"could not parse the Displayed line: {probe_lines[-1][:160]}")
+                        elif startup["totalTimeMs"] is not None:
+                            # The `am start -W` timing is the same measurement the Displayed line
+                            # reports; keep it rather than shipping a null.
+                            cold_start_displayed_ms = startup["totalTimeMs"]
+                            startup["coldStartSource"] = "am start -W TotalTime"
                         else:
                             warnings.append("no fresh Displayed line appeared within the probe budget")
 
@@ -268,6 +314,10 @@ def main() -> int:
         "startup": {
             "initialDisplayedMs": initial_displayed_ms,
             "coldStartDisplayedMs": cold_start_displayed_ms,
+            "coldStartSource": startup["coldStartSource"],
+            "activity": startup["activity"],
+            "waitTimeMs": startup["waitTimeMs"],
+            "totalTimeMs": startup["totalTimeMs"],
             "displayedLinesSeen": displayed_count,
         },
         "raw": {
@@ -276,6 +326,7 @@ def main() -> int:
             "meminfo": "meminfo.txt" if (out_dir / "meminfo.txt").exists() else None,
             "displayed": "displayed.txt" if (out_dir / "displayed.txt").exists() else None,
             "crash": "crash.txt" if (out_dir / "crash.txt").exists() else None,
+            "amstart": "amstart.txt" if (out_dir / "amstart.txt").exists() else None,
         },
         "warnings": warnings,
     }
