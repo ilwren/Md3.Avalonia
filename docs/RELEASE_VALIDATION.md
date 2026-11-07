@@ -61,6 +61,12 @@ Keep these scenarios in the headless suite; a generic focused-control drag or a 
 
 Picker stale-field behavior and Cascader label/dropdown clipping have headless/CI coverage, but their actual desktop appearance still requires manual confirmation. The SimpleDialog black scrim must still be checked against the full native window, and the NumericBox wheel contract must still be checked with real desktop event routing. Do not infer desktop sign-off from any of these headless results.
 
+The Gallery's custom window-parts example also needs a physical desktop check: drag the client
+region, use each caption action, and resize from the marked bottom-right grip. The headless test
+exercises the parts' adapter calls with targeted routed events; headless hit-testing reported the
+outer `PART_WindowFrame` instead of the nested region and therefore does **not** establish that
+real platform pointer hit-testing works. Record the OS, window system, scaling and result below.
+
 ## Manual platform matrix — not signed in this environment
 
 Do not mark an item complete without recording device/OS, assistive technology version, tester and date. The System notifications item is a follow-up gate for the new `0.4.6-preview.1` Notifications package; it is not evidence from the historical `0.4.5-preview.1` release.
