@@ -5,6 +5,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Extra.Controls;
 using Md3.Avalonia.Gallery;
@@ -54,6 +55,11 @@ public sealed class MdGalleryPrimitivesTests
 
             // Headless hit-testing needs a rendered/settled frame, just like the other Gallery
             // pointer tests. These send real mouse input, not routed-event shortcuts.
+            var diagnostic = string.Join(" | ", drag.GetSelfAndVisualAncestors().OfType<Control>()
+                .Select(c => $"{c.GetType().Name}#{c.Name}:bounds={c.Bounds},visible={c.IsVisible},effective={c.IsEffectivelyVisible},hit={c.IsHitTestVisible},clip={c.ClipToBounds}"));
+            var point = drag.TranslatePoint(new Point(drag.Bounds.Width / 2, drag.Bounds.Height / 2), window)!.Value;
+            var hits = window.GetVisualsAt(point).ToArray();
+            Assert.True(hits.Any(v => ReferenceEquals(v, drag) || drag.GetSelfAndVisualDescendants().Contains(v)), $"point={point} hits={string.Join(",", hits.Select(x => x.GetType().Name))}; ancestors={diagnostic}");
             PointerInput.Click(drag);
             Assert.Equal(1, adapter.Moves);
             PointerInput.Click(grip);
