@@ -85,7 +85,11 @@ jobs:
           cores: 4
           force-avd-creation: true
           disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot -memory 4096
+          # `-gpu off` makes the guest fall back to software rendering instead of proxying GL to the
+          # host. On this runner the host-GL path left the system ANR-ing ("Application Not
+          # Responding: system") with SurfaceFlinger presenting zero frames for the app, i.e. the
+          # UI never reached the screen at all.
+          emulator-options: -no-window -gpu off -noaudio -no-boot-anim -no-snapshot -memory 4096
           script: |
             # The action runs this block under `sh -e`: the first failing command would abort
             # everything after it, which is how earlier runs lost their evidence. Neutralise that

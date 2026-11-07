@@ -108,7 +108,7 @@ frames_of() {
 }
 warm=0
 frames=0
-while [ "$warm" -lt 240 ]; do
+while [ "$warm" -lt 300 ]; do
   frames=$(frames_of)
   [ -n "$frames" ] && [ "$frames" -gt 0 ] && { echo "drew $frames frame(s) after ${warm}s" >>"$LOG"; break; }
   sleep 10
