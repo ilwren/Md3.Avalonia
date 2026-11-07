@@ -5,9 +5,17 @@
     <!-- The Android host opts in so its notification dependency resolves the Android asset,
          without requiring an Android workload for ordinary desktop development. -->
     <TargetFrameworks Condition="'$(IncludeAndroidTarget)' == 'true'">net10.0;net10.0-android</TargetFrameworks>
+    <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net10.0-android'">23</SupportedOSPlatformVersion>
+    <!-- Android's implicit global usings collide with Avalonia types such as Application and
+         Orientation. Preserve only the ordinary .NET SDK usings in the shared Gallery. -->
+    <ImplicitUsings Condition="'$(TargetFramework)' == 'net10.0-android'">disable</ImplicitUsings>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <RootNamespace>Md3.Avalonia.Gallery</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
+    <Using Include="System;System.Collections.Generic;System.IO;System.Linq;System.Net.Http;System.Threading;System.Threading.Tasks" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" />
