@@ -66,7 +66,7 @@ public sealed class MdGalleryMobileSearchTests
             Dispatcher.UIThread.RunJobs();
             var visible = items.Children.OfType<MdButton>().Where(button => button.IsVisible).ToArray();
             Assert.Equal("Wheel picker", Assert.Single(visible).Content);
-            Assert.Single(items.Children.OfType<TextBlock>().Where(header => header.IsVisible));
+            Assert.Single(items.Children.OfType<TextBlock>(), header => header.IsVisible);
             Assert.True(status.IsVisible);
             Assert.True(search.Focus());
             host.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);
@@ -78,8 +78,8 @@ public sealed class MdGalleryMobileSearchTests
             drawer.IsOpen = true;
             search.Text = "never matched 12345";
             Dispatcher.UIThread.RunJobs();
-            Assert.Empty(items.Children.OfType<MdButton>().Where(button => button.IsVisible));
-            Assert.Empty(items.Children.OfType<TextBlock>().Where(header => header.IsVisible));
+            Assert.DoesNotContain(items.Children.OfType<MdButton>(), button => button.IsVisible);
+            Assert.DoesNotContain(items.Children.OfType<TextBlock>(), header => header.IsVisible);
             Assert.Equal("No matching components.", status.Text);
             search.Text = "";
             Dispatcher.UIThread.RunJobs();
