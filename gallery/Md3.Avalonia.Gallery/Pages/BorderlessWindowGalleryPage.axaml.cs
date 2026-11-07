@@ -63,8 +63,14 @@ public partial class BorderlessWindowGalleryPage : UserControl
         });
         var dragRegion = new MdWindowDragRegion
         {
-            Padding = new Thickness(12),
-            Content = new TextBlock { Text = GalleryLocalization.Choose("Drag this client region", "拖动此客户区"), VerticalAlignment = VerticalAlignment.Center }
+            HorizontalContentAlignment = HorizontalAlignment.Stretch,
+            VerticalContentAlignment = VerticalAlignment.Stretch,
+            Content = new Border
+            {
+                Padding = new Thickness(12),
+                Background = this.FindResource("Md.Sys.Color.SurfaceContainerHigh.Brush") as global::Avalonia.Media.IBrush,
+                Child = new TextBlock { Text = GalleryLocalization.Choose("Drag this client region", "拖动此客户区"), VerticalAlignment = VerticalAlignment.Center }
+            }
         };
         var minimize = new MdCaptionButton { Kind = MdCaptionButtonKind.Minimize, Content = "−", Width = 48, Height = 40 };
         var maximize = new MdWindowCaptionButton { Kind = MdCaptionButtonKind.MaximizeRestore, Content = "□", Width = 48, Height = 40 };
