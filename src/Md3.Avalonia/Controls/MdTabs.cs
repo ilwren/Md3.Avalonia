@@ -11,6 +11,8 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>A fixed or horizontally scrollable Material tab row retaining native ListBox selection.</summary>
 [PseudoClasses(":primary", ":secondary", ":fixed", ":scrollable", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_ScrollViewer", typeof(ScrollViewer))]
+[TemplatePart("PART_SelectionIndicator", typeof(Border))]
 public sealed class MdTabs : ListBox
 {
     public static readonly AttachedProperty<MdTabVariant> VariantProperty =

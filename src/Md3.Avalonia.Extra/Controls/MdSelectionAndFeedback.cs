@@ -653,6 +653,7 @@ internal sealed class MdCalendarAutomationPeer(MdCalendar owner) : ControlAutoma
 }
 
 public enum MdResultKind { Information, Success, Warning, Error, Empty }
+
 /// <summary>Standardized result/empty/error surface with a real primary action command.</summary>
 [PseudoClasses(":information", ":success", ":warning", ":error", ":empty")]
 public sealed class MdResultView : ContentControl

@@ -74,7 +74,7 @@
                                 Margin="0,6,0,0"
                                 IsHitTestVisible="False">
                         <TextBlock Text="{TemplateBinding LessLabel}"
-                                   FontSize="11" VerticalAlignment="Center" Margin="0,0,2,0" />
+                                   FontSize="{DynamicResource Md.Sys.TypeScale.LabelSmall.Size}" VerticalAlignment="Center" Margin="0,0,2,0" />
                         <Border Width="10" Height="10" CornerRadius="2" VerticalAlignment="Center"
                                 Background="{DynamicResource Md.ContributionGrid.Level.Brush.0}" />
                         <Border Width="10" Height="10" CornerRadius="2" VerticalAlignment="Center"
@@ -86,7 +86,7 @@
                         <Border Width="10" Height="10" CornerRadius="2" VerticalAlignment="Center"
                                 Background="{DynamicResource Md.ContributionGrid.Level.Brush.4}" />
                         <TextBlock Text="{TemplateBinding MoreLabel}"
-                                   FontSize="11" VerticalAlignment="Center" Margin="2,0,0,0" />
+                                   FontSize="{DynamicResource Md.Sys.TypeScale.LabelSmall.Size}" VerticalAlignment="Center" Margin="2,0,0,0" />
                     </StackPanel>
                 </Grid>
             </ControlTemplate>

@@ -4,6 +4,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Md3.Avalonia.Motion;
+using Avalonia.Controls.Metadata;
+using Avalonia.Controls.Presenters;
 
 namespace Md3.Avalonia.Extra.Controls;
 
@@ -205,6 +207,7 @@ public class MdWaterfallPanel : Panel
 /// without reaching into an <c>ItemsPanelTemplate</c>. Replacing <c>ItemsPanel</c> with something
 /// else is supported and simply leaves these four properties unused.
 /// </remarks>
+[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
 public class MdWaterfall : ItemsControl
 {
     public static readonly StyledProperty<int> ColumnsProperty =

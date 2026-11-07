@@ -9,6 +9,7 @@ using Avalonia.Media;
 using DotNetCampus.Inking;
 using DotNetCampus.Inking.Contexts;
 using SkiaSharp;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
@@ -37,6 +38,10 @@ namespace Md3.Avalonia.Controls;
 /// </para>
 /// </remarks>
 [PseudoClasses(":empty", ":erasing")]
+[TemplatePart("PART_Baseline", typeof(Border))]
+[TemplatePart("PART_Canvas", typeof(Control))]
+[TemplatePart("PART_ClearButton", typeof(MdIconButton))]
+[TemplatePart("PART_Placeholder", typeof(TextBlock))]
 public sealed class MdSignaturePad : TemplatedControl
 {
     private InkCanvas? _canvas;

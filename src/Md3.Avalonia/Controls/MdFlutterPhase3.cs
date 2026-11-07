@@ -14,6 +14,8 @@ using Avalonia.LogicalTree;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 
 namespace Md3.Avalonia.Controls;
 
@@ -79,6 +81,8 @@ public sealed class MdFormSubmittedEventArgs(bool isValid) : EventArgs { public 
 /// <summary>A validation/decorator field. Set <see cref="Validator"/> for direct use or bind ErrorText from a view model.</summary>
 [PseudoClasses(":valid", ":invalid", ":touched")]
 [PseudoClasses(":valid", ":invalid", ":touched", ":has-supporting-text")]
+[TemplatePart("PART_Error", typeof(TextBlock))]
+[TemplatePart("PART_Supporting", typeof(ContentPresenter))]
 public class MdFormField : ContentControl
 {
     public static readonly StyledProperty<object?> ValueProperty = AvaloniaProperty.Register<MdFormField, object?>(nameof(Value), defaultBindingMode: global::Avalonia.Data.BindingMode.TwoWay);
@@ -194,6 +198,7 @@ public class MdFormField : ContentControl
 }
 
 /// <summary>A Material dropdown combined with <see cref="MdFormField"/> validation semantics.</summary>
+[TemplatePart("PART_Editor", typeof(MdComboBox))]
 public sealed class MdDropdownFormField : MdFormField
 {
     public static readonly StyledProperty<object?> LabelProperty = AvaloniaProperty.Register<MdDropdownFormField, object?>(nameof(Label));
@@ -217,6 +222,12 @@ public sealed class MdDropdownFormField : MdFormField
 
 /// <summary>A compact option dialog surface with a selectable item list.</summary>
 [PseudoClasses(":open", ":present", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_CancelButton", typeof(MdButton))]
+[TemplatePart("PART_ItemsHost", typeof(ListBox))]
+[TemplatePart("PART_Overlay", typeof(Grid))]
+[TemplatePart("PART_Scrim", typeof(Border))]
+[TemplatePart("PART_Surface", typeof(Border))]
+[TemplatePart("PART_Title", typeof(ContentPresenter))]
 public sealed class MdSimpleDialog : TemplatedControl
 {
     public static readonly StyledProperty<object?> TitleProperty = AvaloniaProperty.Register<MdSimpleDialog, object?>(nameof(Title));
@@ -467,6 +478,11 @@ public sealed record MdLicenseEntry(string Package, string License, string Text,
 /// <c>Effective…</c> properties the control template binds to.
 /// </remarks>
 [PseudoClasses(":has-icon", ":has-version", ":has-legalese")]
+[TemplatePart("PART_Icon", typeof(ContentPresenter))]
+[TemplatePart("PART_Layout", typeof(Grid))]
+[TemplatePart("PART_Legalese", typeof(TextBlock))]
+[TemplatePart("PART_TextColumn", typeof(StackPanel))]
+[TemplatePart("PART_Version", typeof(TextBlock))]
 public sealed class MdAboutDialog : ContentControl
 {
     public static readonly StyledProperty<object?> ApplicationIconProperty = AvaloniaProperty.Register<MdAboutDialog, object?>(nameof(ApplicationIcon));
@@ -565,6 +581,8 @@ public sealed class MdAboutDialog : ContentControl
 
 /// <summary>A searchable, selectable license list suitable for dialog or routed-page presentation.</summary>
 [PseudoClasses(":compact")]
+[TemplatePart("PART_CompactLayout", typeof(Grid))]
+[TemplatePart("PART_WideLayout", typeof(Grid))]
 public sealed class MdLicensePage : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable<MdLicenseEntry>?> LicensesProperty = AvaloniaProperty.Register<MdLicensePage, IEnumerable<MdLicenseEntry>?>(nameof(Licenses));

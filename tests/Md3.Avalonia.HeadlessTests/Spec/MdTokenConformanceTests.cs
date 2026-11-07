@@ -39,59 +39,16 @@ public sealed class MdTokenConformanceTests
         var application = Application.Current!;
         application.RequestedThemeVariant = ThemeVariant.Light;
 
+        // A colour token that states both variants is compared twice, once per variant, and the two
+        // checks are named apart: 'Primary' and 'Primary (dark)'. Everything else is compared once, in
+        // the light variant, which is what the resource system resolves by default.
         foreach (var token in oracle.Tokens)
         {
-            if (!application.TryGetResource(token.Key, ThemeVariant.Light, out var resolved) || resolved is null)
-            {
-                if (token.Required)
-                {
-                    report.Gap(
-                        token.Key,
-                        $"not defined by the merged theme; the oracle ({token.Source}) expects {token.Describe()}",
-                        token.IsHighConfidence);
-                }
+            CompareToken(application, oracle, token, dark: false, report);
 
-                continue;
-            }
-
-            var actual = Flatten(resolved, token.Kind);
-            if (actual is null)
+            if (token.HasVariantSplit)
             {
-                report.Gap(
-                    token.Key,
-                    $"resolved to {resolved.GetType().Name}, which cannot be compared against a '{token.Kind}' oracle entry",
-                    token.IsHighConfidence);
-                continue;
-            }
-
-            if (actual.Length != token.Value.Length)
-            {
-                report.Gap(
-                    token.Key,
-                    $"resolved to a {actual.Length}-component value but the oracle entry has " +
-                    $"{token.Value.Length}; the oracle 'type' and the declared resource type disagree",
-                    token.IsHighConfidence);
-                continue;
-            }
-
-            var tolerance = oracle.ToleranceFor(token);
-            var worst = 0d;
-            for (var i = 0; i < token.Value.Length; i++)
-            {
-                worst = Math.Max(worst, Math.Abs(token.Value[i] - actual[i]));
-            }
-
-            if (worst <= tolerance)
-            {
-                report.Pass(token.Key);
-            }
-            else
-            {
-                report.Gap(
-                    token.Key,
-                    $"resolved to {Describe(actual, token.Kind)}, the oracle ({token.Source}) expects " +
-                    $"{token.Describe()} (worst delta {worst:0.####} > {tolerance:0.####})",
-                    token.IsHighConfidence);
+                CompareToken(application, oracle, token, dark: true, report);
             }
         }
 
@@ -99,6 +56,78 @@ public sealed class MdTokenConformanceTests
         ReportReferenceTypeface(application, report);
 
         report.Complete();
+    }
+
+    /// <summary>
+    /// Compares one token against the value the oracle expects in <paramref name="dark"/>.
+    /// </summary>
+    /// <remarks>
+    /// The variant is part of the subject name when the oracle states one, because "Primary is wrong"
+    /// and "Primary is wrong in dark mode only" are different bugs and the report has to be able to say
+    /// which one happened.
+    /// </remarks>
+    private static void CompareToken(
+        Application application, MdSpecOracle oracle, MdOracleToken token, bool dark, MdSpecReport report)
+    {
+        var subject = dark ? $"{token.Key} (dark)" : token.Key;
+        var variant = dark ? ThemeVariant.Dark : ThemeVariant.Light;
+        var expected = token.ValueFor(dark) ?? token.Value;
+        var expectedDescription = Describe(expected, token.Kind);
+
+        if (!application.TryGetResource(token.Key, variant, out var resolved) || resolved is null)
+        {
+            if (token.Required)
+            {
+                report.Gap(
+                    subject,
+                    $"{variant} does not define it; the oracle ({token.Source}) expects {expectedDescription}",
+                    token.IsHighConfidence);
+            }
+
+            return;
+        }
+
+        var actual = Flatten(resolved, token.Kind);
+        if (actual is null)
+        {
+            report.Gap(
+                subject,
+                $"resolved to {resolved.GetType().Name}, which cannot be compared against a '{token.Kind}' oracle entry",
+                token.IsHighConfidence);
+            return;
+        }
+
+        if (actual.Length != expected.Length)
+        {
+            report.Gap(
+                subject,
+                $"resolved to a {actual.Length}-component value but the oracle entry has " +
+                $"{expected.Length}; the oracle 'type' and the declared resource type disagree",
+                token.IsHighConfidence);
+            return;
+        }
+
+        // Exact for colours: the oracle holds authored bytes, so a difference is a wrong value rather
+        // than accumulated rounding.
+        var tolerance = token.Kind == MdOracleKind.Color ? 0d : oracle.ToleranceFor(token);
+        var worst = 0d;
+        for (var i = 0; i < expected.Length; i++)
+        {
+            worst = Math.Max(worst, Math.Abs(expected[i] - actual[i]));
+        }
+
+        if (worst <= tolerance)
+        {
+            report.Pass(subject);
+        }
+        else
+        {
+            report.Gap(
+                subject,
+                $"resolved to {Describe(actual, token.Kind)}, the oracle ({token.Source}) expects " +
+                $"{expectedDescription} (worst delta {worst:0.####} > {tolerance:0.####})",
+                token.IsHighConfidence);
+        }
     }
 
     /// <summary>
@@ -201,10 +230,30 @@ public sealed class MdTokenConformanceTests
             return new[] { thickness.Left, thickness.Top, thickness.Right, thickness.Bottom };
         }
 
+        // Colours are compared as bytes, exactly, with no tolerance: the oracle holds authored values.
+        if (kind == MdOracleKind.Color && resolved is Color color)
+        {
+            return new double[] { color.R, color.G, color.B, color.A };
+        }
+
+        if (kind == MdOracleKind.Color && resolved is ISolidColorBrush brush)
+        {
+            var brushColor = brush.Color;
+            return new double[] { brushColor.R, brushColor.G, brushColor.B, brushColor.A };
+        }
+
         return null;
     }
 
-    private static string Describe(double[] values, MdOracleKind kind) => kind == MdOracleKind.Double
-        ? values[0].ToString("0.####")
-        : "[" + string.Join(", ", values.Select(v => v.ToString("0.####"))) + "]";
+    private static string Describe(double[] values, MdOracleKind kind)
+    {
+        if (kind == MdOracleKind.Color)
+        {
+            return $"#{(int)values[0]:X2}{(int)values[1]:X2}{(int)values[2]:X2}";
+        }
+
+        return kind == MdOracleKind.Double
+            ? values[0].ToString("0.####")
+            : "[" + string.Join(", ", values.Select(v => v.ToString("0.####"))) + "]";
+    }
 }

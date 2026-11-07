@@ -9,6 +9,8 @@ namespace Md3.Avalonia.Extra.Controls;
 
 /// <summary>A clean-room Material avatar composition inspired by common Flutter UI-kit behavior.</summary>
 [PseudoClasses(":image", ":initials", ":content")]
+[TemplatePart("PART_Image", typeof(Image))]
+[TemplatePart("PART_Initials", typeof(TextBlock))]
 public sealed class MdAvatar : ContentControl
 {
     public static readonly StyledProperty<IImage?> ImageProperty = AvaloniaProperty.Register<MdAvatar, IImage?>(nameof(Image));

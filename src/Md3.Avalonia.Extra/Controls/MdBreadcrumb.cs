@@ -74,6 +74,8 @@ public class MdBreadcrumbItem : AvaloniaObject
 /// overflow collapsing, MVVM commands, and direct selection APIs aligned with Flutter navigation patterns.
 /// </summary>
 [PseudoClasses(":wrap-overflow", ":scroll-overflow", ":collapse-overflow", ":powerline")]
+[TemplatePart("PART_BreadcrumbScrollViewer", typeof(ScrollViewer))]
+[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
 public sealed class MdBreadcrumb : ListBox
 {
     private bool _invoking;

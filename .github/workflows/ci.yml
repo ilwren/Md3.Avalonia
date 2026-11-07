@@ -63,6 +63,26 @@ jobs:
         # on because prose coverage is complete: a new page that ships untranslated now fails.
         run: python3 scripts/check-gallery-localization.py --strict
 
+      - name: Check the conformance budget (quantified backlog)
+        # L0 only in this job: the headless metrics the same budget lists are measured in
+        # build-and-test, which runs this script again with --strict once the suite has reported.
+        run: python3 scripts/check-conformance-ratchet.py --allow-not-measured
+
+      - name: Verify the specification harness contract
+        # Source-only: validates the pinned provenance, that every requirement in the matrix names
+        # evidence that exists, AXAML well-formedness and the parity claim boundaries. The script
+        # exits 2 when its checks passed but runtime verification did not run in this job, which is
+        # exactly the state this step is in, so 2 is reported and accepted rather than failed.
+        shell: bash
+        run: |
+          status=0
+          python3 scripts/run-spec-verification.py --source-only || status=$?
+          if [ "$status" -eq 2 ]; then
+            echo "::notice title=spec-verification::Static harness checks passed; runtime behaviour is measured by the test job."
+            exit 0
+          fi
+          exit "$status"
+
       - name: Check the specification oracle against pinned upstream sources
         # Network-dependent and advisory by design: upstream moving is a re-baselining
         # decision for a human, not a build failure. --soft keeps it off the critical path.
@@ -357,6 +377,13 @@ jobs:
       - name: Summarize headless test results
         if: always() && steps.tests.outcome != 'skipped'
         run: python3 scripts/report-test-results.py
+
+      - name: Check the conformance budget against the measured run
+        # --strict makes a metric the run could not measure a failure. That is the point: a budget
+        # entry with no measurement behind it is an unverified claim, and this job is the only one
+        # that can produce the number.
+        if: always() && steps.tests.outcome != 'skipped'
+        run: python3 scripts/check-conformance-ratchet.py --strict
 
       - name: Publish specification conformance reports
         if: always()

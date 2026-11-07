@@ -4,11 +4,20 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A selectable destination within <see cref="MdNavigationRail"/>.</summary>
 [PseudoClasses(":has-selected-icon", ":has-badge", ":expanded", ":collapsed", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Badge", typeof(ContentPresenter))]
+[TemplatePart("PART_Icon", typeof(MdSymbolPresenter))]
+[TemplatePart("PART_Indicator", typeof(Border))]
+[TemplatePart("PART_ItemLayout", typeof(StackPanel))]
+[TemplatePart("PART_Label", typeof(ContentPresenter))]
+[TemplatePart("PART_Root", typeof(Border))]
+[TemplatePart("PART_SelectedIcon", typeof(MdSymbolPresenter))]
+[TemplatePart("PART_State", typeof(Border))]
 public sealed class MdNavigationRailItem : ListBoxItem
 {
     public static readonly StyledProperty<object?> IconProperty = AvaloniaProperty.Register<MdNavigationRailItem, object?>(nameof(Icon));

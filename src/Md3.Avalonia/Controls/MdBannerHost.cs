@@ -21,9 +21,9 @@ namespace Md3.Avalonia.Controls;
 /// to <see cref="Service"/>. Two-way <see cref="IsOpen"/> and <see cref="Banner"/> remain available
 /// for binding-driven surfaces.
 /// </remarks>
+[PseudoClasses(":open", ":closed", ":present")]
 [TemplatePart("PART_MainContent", typeof(ContentPresenter))]
 [TemplatePart("PART_BannerPresenter", typeof(ContentPresenter))]
-[PseudoClasses(":open", ":closed", ":present")]
 public sealed class MdBannerHost : ContentControl, IMdBannerService
 {
     public static readonly StyledProperty<object?> BannerProperty =

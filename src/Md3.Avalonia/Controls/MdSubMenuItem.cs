@@ -8,11 +8,17 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Avalonia.Controls.Presenters;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A command-capable Material menu item that opens a keyboard-accessible cascading submenu.</summary>
 [PseudoClasses(":submenu-open", ":rtl")]
+[TemplatePart("PART_Leading", typeof(ContentPresenter))]
+[TemplatePart("PART_Row", typeof(Border))]
+[TemplatePart("PART_StateLayer", typeof(Border))]
+[TemplatePart("PART_SubmenuPopup", typeof(Popup))]
+[TemplatePart("PART_Trailing", typeof(ContentPresenter))]
 public sealed class MdSubMenuItem : MdMenuItem
 {
     public static readonly StyledProperty<object?> SubmenuProperty =

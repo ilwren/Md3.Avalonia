@@ -7,7 +7,8 @@
     "test. Medium-confidence findings remain advisory. This repository currently uses enforce mode.",
     "",
     "A waiver records a deliberate divergence. Its reason is mandatory and is included in generated",
-    "reports so readers do not need to diff this file to understand the decision."
+    "reports so readers do not need to diff this file to understand the decision.",
+    "L4_inventory is the structural layer: it measures how much of the library is measured at all (declared tokens vs the merged dictionary, themed types vs the L2 geometry matrix, template parts vs the [TemplatePart] contract, colour roles vs WCAG in every generator configuration). Its findings are advisory by construction - a finding means 'nothing asserts this', not 'this is wrong against Material' - but two of its checks are invariants and do gate an enforcing run: a template must realise the parts it names, and a declared token must resolve through the real merge."
   ],
   "mode": "enforce",
   "layers": {
@@ -22,6 +23,9 @@
       "autoAcceptMissingBaseline": true
     },
     "L5_motion": {
+      "enabled": true
+    },
+    "L4_inventory": {
       "enabled": true
     }
   },

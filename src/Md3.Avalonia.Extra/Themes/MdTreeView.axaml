@@ -12,12 +12,12 @@
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate TargetType="ToggleButton">
-        <Border x:Name="PART_Surface" Background="{TemplateBinding Background}" CornerRadius="20" ClipToBounds="True">
+        <Border x:Name="PART_Surface" Background="{TemplateBinding Background}" CornerRadius="{DynamicResource Md.Sys.Shape.Corner.LargeIncreased}" ClipToBounds="True">
           <Grid>
             <!-- The state layer has to fill the 40 DIP circle. It used to sit inside a centred
                  grid, so it was sized by the 16 DIP glyph and painted a small square instead. -->
             <Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
-                    CornerRadius="20" IsHitTestVisible="False" Opacity="0" />
+                    CornerRadius="{DynamicResource Md.Sys.Shape.Corner.LargeIncreased}" IsHitTestVisible="False" Opacity="0" />
             <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
           </Grid>
         </Border>
@@ -33,11 +33,11 @@
     <Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="ListBoxItem">
-        <Border x:Name="PART_Row" Background="{TemplateBinding Background}" CornerRadius="12" ClipToBounds="True">
+        <Border x:Name="PART_Row" Background="{TemplateBinding Background}" CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Medium}" ClipToBounds="True">
           <Grid>
             <ContentPresenter Margin="{TemplateBinding Padding}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" />
-            <Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" CornerRadius="12" IsHitTestVisible="False" Opacity="0" />
+            <Border x:Name="PART_State" Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}" CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Medium}" IsHitTestVisible="False" Opacity="0" />
           </Grid>
         </Border>
       </ControlTemplate>
@@ -82,10 +82,10 @@
             </Path>
           </ToggleButton>
           <StackPanel Grid.Column="1" Margin="8,0,12,0" VerticalAlignment="Center">
-            <TextBlock Text="{Binding Node.Label}" FontSize="14" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+            <TextBlock Text="{Binding Node.Label}" FontSize="{DynamicResource Md.Sys.TypeScale.BodyMedium.Size}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
             <!-- A ContentPresenter replaces its own DataContext with Content. Bind this arbitrary row data on
                  a ContentControl instead, so string data cannot retarget the row's compiled MdTreeRow bindings. -->
-            <ContentControl Content="{Binding Node.Data}" TextElement.FontSize="11" Opacity="0.68" />
+            <ContentControl Content="{Binding Node.Data}" TextElement.FontSize="{DynamicResource Md.Sys.TypeScale.LabelSmall.Size}" Opacity="0.68" />
           </StackPanel>
         </Grid>
       </DataTemplate>

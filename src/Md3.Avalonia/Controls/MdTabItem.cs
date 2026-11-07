@@ -2,11 +2,21 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Templates;
+using Md3.Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A selectable Material tab with optional icon, badge, and header slots.</summary>
 [PseudoClasses(":primary", ":secondary", ":has-icon", ":has-badge", ":inline", ":shared-indicator")]
+[TemplatePart("PART_Badge", typeof(ContentPresenter))]
+[TemplatePart("PART_ContentLayout", typeof(StackPanel))]
+[TemplatePart("PART_Icon", typeof(MdSymbolPresenter))]
+[TemplatePart("PART_Label", typeof(ContentPresenter))]
+[TemplatePart("PART_PrimaryIndicator", typeof(Border))]
+[TemplatePart("PART_Root", typeof(Border))]
+[TemplatePart("PART_SecondaryIndicator", typeof(Border))]
+[TemplatePart("PART_StateLayer", typeof(Border))]
 public sealed class MdTabItem : ListBoxItem
 {
     public static readonly StyledProperty<object?> HeaderProperty =

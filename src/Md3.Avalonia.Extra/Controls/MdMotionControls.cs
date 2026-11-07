@@ -10,6 +10,7 @@ using Avalonia.Media.Transformation;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Extra.Controls;
 
 namespace Md3.Avalonia.Extra.Controls;
 
@@ -284,6 +285,8 @@ public sealed class MdMorphPanel : Panel
 /// from the opposite side, which is the Material shared-axis choreography.
 /// </summary>
 [PseudoClasses(":x-axis", ":y-axis", ":z-axis", ":forward", ":backward")]
+[TemplatePart("PART_Content", typeof(ContentPresenter))]
+[TemplatePart("PART_OutgoingContent", typeof(ContentPresenter))]
 public class MdSharedAxis : ContentControl
 {
     public static readonly StyledProperty<MdSharedAxisKind> AxisProperty =
@@ -358,6 +361,8 @@ public class MdSharedAxis : ContentControl
 /// <see cref="Duration"/>; the incoming content then fades and scales in over the remaining 70%,
 /// which is Material's fade-through timing for unrelated content.
 /// </summary>
+[TemplatePart("PART_Content", typeof(ContentPresenter))]
+[TemplatePart("PART_OutgoingContent", typeof(ContentPresenter))]
 public class MdFadeThrough : ContentControl
 {
     public static readonly StyledProperty<TimeSpan> DurationProperty =
@@ -393,6 +398,10 @@ public class MdFadeThrough : ContentControl
 /// Material's 30/70 split. The outgoing content stays mounted until its fade completes.
 /// </summary>
 [PseudoClasses(":expanded", ":collapsed")]
+[TemplatePart("PART_ClosedContent", typeof(ContentPresenter))]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_Morph", typeof(MdMorphPanel))]
+[TemplatePart("PART_OpenContent", typeof(ContentPresenter))]
 public class MdContainerTransform : TemplatedControl
 {
     public static readonly StyledProperty<bool> IsExpandedProperty =
@@ -500,6 +509,8 @@ public enum MdVisibilityTransition
 /// phase, so hiding never snaps.
 /// </summary>
 [PseudoClasses(":visible", ":hidden")]
+[TemplatePart("PART_Content", typeof(ContentPresenter))]
+[TemplatePart("PART_Reveal", typeof(MdRevealHost))]
 public class MdAnimatedVisibility : ContentControl
 {
     public static readonly StyledProperty<bool> IsContentVisibleProperty =

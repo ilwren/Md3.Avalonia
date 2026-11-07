@@ -1,11 +1,14 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
+using Avalonia.Controls.Presenters;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A Material 3 notification, count or status badge.</summary>
 [PseudoClasses(":dot", ":label")]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_Content", typeof(ContentPresenter))]
 public sealed class MdBadge : ContentControl
 {
     public static readonly StyledProperty<MdBadgeVariant> VariantProperty =

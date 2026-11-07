@@ -9,6 +9,10 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>A Material 3 Expressive selection button backed by Avalonia ToggleButton.</summary>
 [PseudoClasses(":elevated", ":filled", ":tonal", ":outlined", ":xsmall", ":small", ":medium", ":large", ":xlarge", ":round", ":square", ":has-leading-icon", ":has-trailing-icon", ":selected-shape-morph", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_LeadingIcon", typeof(Viewbox))]
+[TemplatePart("PART_StateLayer", typeof(Border))]
+[TemplatePart("PART_TrailingIcon", typeof(Viewbox))]
 public class MdToggleButton : ToggleButton
 {
     private Border? _container;

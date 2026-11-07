@@ -5,10 +5,11 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
+using Avalonia.Controls.Metadata;
 
 namespace Md3.Avalonia.Controls;
-
 /// <summary>A determinate or indeterminate Material circular progress indicator.</summary>
+[TemplatePart("PART_Indicator", typeof(Border))]
 public sealed class MdCircularProgressIndicator : ProgressBar
 {
     public static readonly StyledProperty<double> SizeProperty =

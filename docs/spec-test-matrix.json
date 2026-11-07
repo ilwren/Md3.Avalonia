@@ -1,12 +1,13 @@
 {
   "schema_version": 1,
-  "baseline": "spec-baseline-manifest.json",
-  "updated_at": "2026-10-02",
+  "baseline": "spec-snapshot/manifest.json",
+  "updated_at": "2026-11-05",
   "status_definitions": {
     "not_run": "Implementation and/or test exists, but no result from the current revision has been recorded.",
     "passed": "The named automated evidence passed on the named platform for the current revision.",
     "failed": "The named automated evidence failed on the named platform for the current revision.",
-    "excluded": "The API is experimental or an API shell and is excluded from parity totals."
+    "excluded": "The API is experimental or an API shell and is excluded from parity totals.",
+    "not_applicable": "The named evidence exists and is exercised, but the platform this entry names has no job in this repository. Nothing is claimed about it: it is neither a pass nor a silent gap, and the keyboard/assistive-technology sign-off it refers to is tracked manually in docs/RELEASE_VALIDATION.md."
   },
   "requirements": [
     {
@@ -120,7 +121,7 @@
       "automated_evidence": [
         "MdP0AccessibilityAndKeyboardTests.Time_Dial_Exposes_Range_And_Invokable_Virtual_Values"
       ],
-      "verification_status": "not_run"
+      "verification_status": "not_applicable"
     },
     {
       "id": "RANGE-AUTOMATION-001",
@@ -137,7 +138,7 @@
         "MdP0AccessibilityAndKeyboardTests.Range_Slider_Exposes_Two_Independent_Range_Thumbs",
         "MdP0AccessibilityAndKeyboardTests.Range_Slider_Keyboard_Switches_Thumbs_And_Honors_Rtl"
       ],
-      "verification_status": "not_run"
+      "verification_status": "not_applicable"
     },
     {
       "id": "FLUTTER-FOCUS-001",
@@ -175,16 +176,17 @@
     {
       "id": "EXTRA-MOTION-001",
       "component": "MdSharedAxis, MdFadeThrough, MdContainerTransform, MdAnimatedVisibility",
-      "variant": "Preview shells",
+      "variant": "Implemented subset",
       "platforms": [
         "all"
       ],
       "source": "https://m3.material.io/styles/motion/overview",
-      "assertion": "Incomplete choreography is marked experimental and excluded from parity claims.",
+      "assertion": "The four M3 transitions are implemented and are no longer marked experimental; MdExperimentalAttribute must not be re-applied to them. No parity percentage is claimed for them.",
       "automated_evidence": [
-        "MdP0AccessibilityAndKeyboardTests.Incomplete_Motion_APIs_Are_Explicitly_Experimental"
+        "MdP0AccessibilityAndKeyboardTests.Completed_Motion_APIs_No_Longer_Claim_To_Be_Experimental",
+        "MdMotionLifecycleTests"
       ],
-      "verification_status": "excluded"
+      "verification_status": "not_run"
     },
     {
       "id": "FLUTTER-PARITY-001",
@@ -199,6 +201,208 @@
         "docs/FLUTTER_PARITY_STATUS.md"
       ],
       "verification_status": "excluded"
+    },
+    {
+      "id": "TEMPLATE-PART-CONTRACT-001",
+      "component": "All templated controls",
+      "variant": "Template contract",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://github.com/AvaloniaUI/Avalonia/wiki/Control-templates",
+      "assertion": "Every PART_* a control declares with [TemplatePart] is named by the ControlTheme that targets that type, so a rename on either side fails the build instead of leaving OnApplyTemplate with a null field.",
+      "automated_evidence": [
+        "MdTemplateSourceTests.Declared_Template_Parts_Exist_In_Their_Template"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "TEMPLATE-PART-RUNTIME-001",
+      "component": "All templated controls",
+      "variant": "Template contract",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://github.com/AvaloniaUI/Avalonia/wiki/Control-templates",
+      "assertion": "Each sampled control, once themed and attached, exposes at runtime every PART_* name its template declares - including parts realised by a nested theme such as MdSliderThumb's PART_Handle.",
+      "automated_evidence": [
+        "MdInventoryTests.Control_Templates_Expose_The_Parts_They_Name"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "TOKEN-RESOLUTION-001",
+      "component": "Theme resources",
+      "variant": "Light and Dark",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://m3.material.io/foundations/design-tokens/overview",
+      "assertion": "Every Md.* key declared by a shipped dictionary or written by the theme generator resolves through the merged application resources in both light and dark, so no control binds a key that silently falls back.",
+      "automated_evidence": [
+        "MdInventoryTests.Every_Declared_Token_Resolves_In_Both_Theme_Variants"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "TOKEN-DUAL-DECLARATION-001",
+      "component": "Theme resources",
+      "variant": "Static theme vs MdThemeManager",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://m3.material.io/foundations/design-tokens/overview",
+      "assertion": "A key declared both in Themes/Tokens/*.axaml and reassigned by MdThemeManager.Apply resolves identically on both paths at ShapeScale.Standard, where the scale factor is exactly one.",
+      "automated_evidence": [
+        "MdInventoryTests.Dual_Declared_Tokens_Agree_Between_Xaml_And_The_Runtime_Generator"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "LOCALIZATION-TABLE-001",
+      "component": "MdLocalization",
+      "variant": "en, zh",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://m3.material.io/foundations/content-design/global-writing",
+      "assertion": "No culture table defines a key twice in its initialiser, every culture covers the English key set exactly, {0}-style placeholders agree between languages, and the runtime dictionary equals the parsed source table.",
+      "automated_evidence": [
+        "MdLocalizationSourceTests.No_Culture_Table_Defines_A_Key_Twice",
+        "MdLocalizationSourceTests.Every_Culture_Can_Render_Every_English_Key_With_The_Same_Placeholders",
+        "MdLocalizationSourceTests.The_Runtime_Table_Matches_The_Source_Table"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "TOKEN-VARIANT-SYMMETRY-001",
+      "component": "Theme resources",
+      "variant": "Light vs Dark",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://m3.material.io/foundations/design-tokens/overview",
+      "assertion": "Every themed ResourceDictionary declares the same Md.* keys in its Light and Dark blocks, so no control binds a key that resolves in one variant and falls back to a property default in the other.",
+      "automated_evidence": [
+        "MdInventoryTests.Both_Theme_Variants_Declare_The_Same_Keys"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "CONTROL-CONSTRUCTION-001",
+      "component": "All themed controls",
+      "variant": "Every type",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://m3.material.io/components",
+      "assertion": "Every themed Md* control with a public parameterless constructor can be created, have its ControlTheme applied and lay out a realised visual tree in both the light theme the suite runs in, so a template that throws or a part that is never received fails with the control's own name.",
+      "automated_evidence": [
+        "MdControlConstructionTests.Every_Themed_Control_Can_Be_Built_Themed_And_Laid_Out"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "LOCALIZATION-THEMED-TEXT-001",
+      "component": "MdTimePicker, MdPaginatedDataTable, MdColorPicker",
+      "variant": "en, zh-Hans",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://m3.material.io/foundations/content-design/global-writing",
+      "assertion": "Chrome a shipped theme draws - the dial hint, the rows-per-page label and the colour picker's section headings and channel labels - is provided by localized properties and changes when the inherited MdLocalization.Culture changes, instead of being authored in the ControlTemplate.",
+      "automated_evidence": [
+        "MdThemedTextTests.Localized_Chrome_Follows_The_Inherited_Culture"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "COLOR-BASELINE-001",
+      "component": "MaterialTheme, MdThemeManager",
+      "variant": "light, dark",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://github.com/material-components/material-web/blob/main/tokens/versions/v0_192/_md-sys-color.scss",
+      "assertion": "All 49 published M3 baseline colour roles resolve, in both theme variants, to the literal values Material publishes; the fixed roles are identical across variants; every role ships a brush.",
+      "automated_evidence": [
+        "MdBaselineColorTests.The_Static_Theme_Is_The_Published_M3_Baseline_Scheme",
+        "MdBaselineColorTests.Every_Colour_Role_Has_A_Brush_And_The_Fixed_Roles_Do_Not_Vary_By_Variant",
+        "MdBaselineColorTests.Only_The_Variant_Dependent_Roles_Differ_Between_Light_And_Dark"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "COLOR-BASELINE-002",
+      "component": "MdThemeGenerator, MdThemeManager",
+      "variant": "default options",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://github.com/material-components/material-web/blob/main/tokens/versions/v0_192/_md-sys-color.scss",
+      "assertion": "Requesting the default options (the M3 source colour, tonal spot, standard contrast) produces the published baseline scheme rather than a tone-mapped approximation of it, and the runtime apply agrees with the static theme; a different seed still generates a different scheme.",
+      "automated_evidence": [
+        "MdBaselineColorTests.The_Runtime_Generator_Reproduces_The_Baseline_For_The_Default_Options",
+        "MdDynamicThemeTests.Baseline_Seed_Matches_The_Published_M3_Baseline"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "GEOMETRY-TOKENS-001",
+      "component": "Every shipped control theme (Md3.Avalonia and its sibling packages)",
+      "variant": "light, dark, all density/size variants",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://m3.material.io/styles/shape/corner-radius-scale",
+      "assertion": "No shipped theme authors a font size or a corner radius as a bare number when the number is a step of the published M3 type or shape scale: each resolves through Md.Sys.TypeScale.*.Size or Md.Sys.Shape.Corner.*, so the value is auditable against the specification oracle and retargetable by a consumer. The lint rule covers every package, not only the core one, and the count of remaining literals is a measured budget that can only go down.",
+      "automated_evidence": [
+        "scripts/lint-design-tokens.py",
+        "spec-snapshot/conformance-budget.json"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "COMPONENT-TOKENS-001",
+      "component": "every component with Md.Comp.* tokens",
+      "variant": "default",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://github.com/material-components/material-web/blob/main/tokens/versions/v0_192",
+      "assertion": "A component token that Material Web states as a number is the number the theme resolves at runtime. The comparison uses a frozen machine-produced dump of the Material Web token tables rather than the same hand-transcribed entries tokens.json already holds, so a value transcribed wrong into both the oracle and the theme is caught: the two would agree with each other and disagree with Material. Where Material states corner-full the theme must use its own full step, and every token with no specification counterpart is listed as a measured queue rather than silently skipped.",
+      "automated_evidence": [
+        "MdComponentTokenTests.Component_Tokens_Match_The_Material_Web_Tables",
+        "spec-snapshot/component-tokens.json"
+      ],
+      "verification_status": "not_run"
+    },
+    {
+      "id": "COMPONENT-TOKENS-002",
+      "component": "MdNavigationBar, MdNavigationRail, MdTabs, MdSlider, MdSheet, MdListItem",
+      "variant": "default",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://github.com/material-components/material-web/blob/main/tokens/versions/v0_192",
+      "assertion": "Geometry the specification states explicitly is declared as a token and consumed by the template, rather than spelled as a bare literal inside the control theme: the navigation bar and rail active indicators (64x32 and 56x32), the primary and secondary tab indicator heights (3 and 2), the slider state layer (40), the sheet drag handle (32x4) and the list item height and leading space (56, 16). Each is checked against the frozen Material Web tables at runtime; a literal that happens to hold the right number is not the same property, because it cannot be retargeted or audited.",
+      "automated_evidence": [
+        "MdComponentTokenTests.Component_Tokens_Match_The_Material_Web_Tables"
+      ],
+      "verification_status": "not_run"
     }
   ]
 }

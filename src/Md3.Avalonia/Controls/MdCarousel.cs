@@ -8,6 +8,8 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 
 namespace Md3.Avalonia.Controls;
 
@@ -18,6 +20,8 @@ namespace Md3.Avalonia.Controls;
 /// selection promotes a compact card to the focal keyline.
 /// </summary>
 [PseudoClasses(":multi-browse", ":hero", ":center-aligned", ":uncontained", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
+[TemplatePart("PART_ScrollViewer", typeof(MdScrollViewer))]
 public sealed class MdCarousel : ListBox
 {
     public static readonly StyledProperty<MdCarouselVariant> VariantProperty =

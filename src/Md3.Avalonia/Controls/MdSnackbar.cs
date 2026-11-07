@@ -13,9 +13,10 @@ using Md3.Avalonia.Motion;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A transient Material status message with optional action and dismiss affordance.</summary>
+[PseudoClasses(":open", ":closed", ":present", ":has-action", ":dismissible", ":reduced-motion", ":no-motion")]
 [TemplatePart("PART_ActionButton", typeof(Button))]
 [TemplatePart("PART_DismissButton", typeof(Button))]
-[PseudoClasses(":open", ":closed", ":present", ":has-action", ":dismissible", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Container", typeof(Border))]
 public sealed class MdSnackbar : ContentControl
 {
     public static readonly StyledProperty<bool> IsOpenProperty =

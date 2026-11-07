@@ -33,14 +33,14 @@
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="4">
           <Border x:Name="PART_ItemSurface"
                   Background="{TemplateBinding Background}"
-                  CornerRadius="16">
+                  CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Large}">
             <Grid VerticalAlignment="Center">
               <!-- The state layer is a sibling of the padded content rather than its child. As a
                    child it was laid out inside Padding, so hover and press painted a lozenge
                    inset by 8 DIP on every side instead of the rounded chip the pointer is over. -->
               <Border x:Name="PART_StateLayer"
                       Background="{DynamicResource Md.Sys.Color.OnSurface.Brush}"
-                      CornerRadius="16"
+                      CornerRadius="{DynamicResource Md.Sys.Shape.Corner.Large}"
                       Opacity="0"
                       IsHitTestVisible="False" />
               <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center"
@@ -59,7 +59,7 @@
           <ContentPresenter x:Name="PART_Separator"
                             Content="{Binding Separator, RelativeSource={RelativeSource AncestorType=eco:MdBreadcrumb}}"
                             ContentTemplate="{Binding SeparatorTemplate, RelativeSource={RelativeSource AncestorType=eco:MdBreadcrumb}}"
-                            TextElement.FontSize="16"
+                            TextElement.FontSize="{DynamicResource Md.Sys.TypeScale.BodyLarge.Size}"
                             Margin="2,0,4,0"
                             VerticalAlignment="Center"
                             Foreground="{DynamicResource Md.Sys.Color.OutlineVariant.Brush}" />

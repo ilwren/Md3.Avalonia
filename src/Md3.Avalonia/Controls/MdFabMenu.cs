@@ -12,11 +12,14 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>An M3 FAB menu for two to six related actions with reversible expand/collapse motion.</summary>
 [PseudoClasses(":opening", ":open", ":closing", ":closed", ":primary", ":secondary", ":tertiary", ":left", ":right", ":expand-up", ":expand-down", ":invalid-item-count", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_MenuItems", typeof(ItemsPresenter))]
+[TemplatePart("PART_Trigger", typeof(MdToggleIconButton))]
 public class MdFabMenu : ItemsControl
 {
     private ItemsPresenter? _menuItems;

@@ -13,18 +13,27 @@ internal static class MdVisualTreeQuery
     /// Shows <paramref name="content"/> in a single window and pumps the dispatcher so that
     /// templates are applied and layout has run.
     /// </summary>
+    /// <param name="themeVariant">
+    /// Variant to request before showing, or <see langword="null"/> to leave the application's
+    /// current variant alone. A goldens scene that renders the dark variant needs the latter:
+    /// forcing Light here would silently make the dark scene a copy of the light one.
+    /// </param>
     /// <remarks>
     /// The whole conformance matrix is deliberately hosted in ONE window. Avalonia's headless
     /// platform owns a single process-wide dispatcher and compositor, so each additional
     /// show/close cycle is pure overhead; batching a few dozen controls into one layout pass is
     /// roughly an order of magnitude cheaper than one window per case.
     /// </remarks>
-    public static IDisposable Show(Control content, double width = 1000, double height = 800)
+    public static IDisposable Show(
+        Control content,
+        double width = 1000,
+        double height = 800,
+        ThemeVariant? themeVariant = null)
     {
         var application = Application.Current;
-        if (application is not null)
+        if (application is not null && themeVariant is not null)
         {
-            application.RequestedThemeVariant = ThemeVariant.Light;
+            application.RequestedThemeVariant = themeVariant;
         }
 
         var window = new Window

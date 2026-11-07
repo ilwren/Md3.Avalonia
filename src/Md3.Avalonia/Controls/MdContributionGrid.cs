@@ -11,6 +11,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
@@ -40,6 +41,9 @@ public sealed record MdContributionMonthLabel(string Text, int WeekIndex);
 /// state because the interaction target is the individual day.
 /// </remarks>
 [PseudoClasses(":has-selection")]
+[TemplatePart("PART_Cells", typeof(ContributionCellsHost))]
+[TemplatePart("PART_DayLabels", typeof(Canvas))]
+[TemplatePart("PART_MonthLabels", typeof(Canvas))]
 public class MdContributionGrid : TemplatedControl
 {
     public static readonly StyledProperty<IReadOnlyList<MdContributionDay>> DaysProperty =

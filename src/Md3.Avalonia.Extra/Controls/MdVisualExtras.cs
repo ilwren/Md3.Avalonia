@@ -10,6 +10,8 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
+using Avalonia.Controls.Shapes;
+using Avalonia.Controls.Presenters;
 
 namespace Md3.Avalonia.Extra.Controls;
 
@@ -17,6 +19,13 @@ public enum MdComparisonOrientation { Horizontal, Vertical }
 
 /// <summary>Reveals two pieces of content through a draggable before/after divider.</summary>
 [PseudoClasses(":dragging", ":horizontal", ":vertical", ":non-interactive")]
+[TemplatePart("PART_AfterClip", typeof(Border))]
+[TemplatePart("PART_ChevronLeft", typeof(global::Avalonia.Controls.Shapes.Path))]
+[TemplatePart("PART_ChevronRight", typeof(global::Avalonia.Controls.Shapes.Path))]
+[TemplatePart("PART_Divider", typeof(Border))]
+[TemplatePart("PART_Thumb", typeof(Border))]
+[TemplatePart("PART_ThumbGlyphs", typeof(Grid))]
+[TemplatePart("PART_ThumbState", typeof(Border))]
 public sealed class MdBeforeAfter : TemplatedControl
 {
     public static readonly StyledProperty<object?> BeforeProperty = AvaloniaProperty.Register<MdBeforeAfter, object?>(nameof(Before));
@@ -362,6 +371,7 @@ public enum MdAnimatedTextEffect { Typewriter, Fade, Pop, None }
 
 /// <summary>Small, provider-free animated text control inspired by common Flutter animated-text widgets.</summary>
 [PseudoClasses(":playing", ":complete")]
+[TemplatePart("PART_Text", typeof(TextBlock))]
 public sealed class MdAnimatedText : TemplatedControl
 {
     public static readonly StyledProperty<string?> TextProperty = AvaloniaProperty.Register<MdAnimatedText, string?>(nameof(Text));
@@ -416,6 +426,10 @@ public sealed class MdAnimatedText : TemplatedControl
 public enum MdSpinKitKind { RotatingPlain, ThreeBounce, Wave, FadingCircle, ChasingDots }
 
 /// <summary>Extra loading indicators for applications that need non-Material SpinKit-like motion.</summary>
+/// <remarks>
+/// It draws its animation in code and its ControlTheme is deliberately empty, so it declares no
+/// template parts - naming one here would be a contract the template does not honour.
+/// </remarks>
 public sealed class MdSpinKit : Control
 {
     public static readonly StyledProperty<MdSpinKitKind> KindProperty = AvaloniaProperty.Register<MdSpinKit, MdSpinKitKind>(nameof(Kind), MdSpinKitKind.RotatingPlain);

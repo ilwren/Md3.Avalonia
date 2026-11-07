@@ -1,11 +1,17 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
+using Avalonia.Controls.Presenters;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A Material list item with headline, supporting text, and leading/trailing slots.</summary>
 [PseudoClasses(":has-supporting-text", ":has-leading", ":has-trailing")]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_Leading", typeof(ContentPresenter))]
+[TemplatePart("PART_StateLayer", typeof(Border))]
+[TemplatePart("PART_Supporting", typeof(ContentPresenter))]
+[TemplatePart("PART_Trailing", typeof(ContentPresenter))]
 public sealed class MdListItem : ListBoxItem
 {
     public static readonly StyledProperty<object?> HeadlineProperty =

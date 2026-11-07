@@ -7,11 +7,15 @@ using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
+using Avalonia.Controls.Shapes;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A Flutter-style Material expansion panel with two-way expanded state.</summary>
 [PseudoClasses(":expanded", ":collapsed", ":content-present", ":header-tappable", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_ExpandIcon", typeof(global::Avalonia.Controls.Shapes.Path))]
+[TemplatePart("PART_ExpandedContent", typeof(ContentPresenter))]
+[TemplatePart("PART_HeaderButton", typeof(Button))]
 public sealed class MdExpansionPanel : HeaderedContentControl
 {
     public static readonly StyledProperty<bool> IsExpandedProperty =

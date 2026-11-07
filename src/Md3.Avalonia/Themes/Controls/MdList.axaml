@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:md="using:Md3.Avalonia.Controls">
   <ControlTheme x:Key="MdListGeneratedItemTheme" TargetType="ListBoxItem">
-    <Setter Property="MinHeight" Value="56" />
+    <Setter Property="MinHeight" Value="{DynamicResource Md.Comp.List.Item.MinHeight}" />
     <Setter Property="Padding" Value="16,8" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
@@ -43,7 +43,7 @@
               <ContentPresenter x:Name="PART_Leading" Grid.Column="0" Width="40" Height="40" VerticalAlignment="Center"
                                 Content="{TemplateBinding LeadingContent}" Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" IsVisible="False" />
               <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                <ContentPresenter Content="{TemplateBinding Headline}" FontSize="16" Foreground="{TemplateBinding Foreground}" />
+                <ContentPresenter Content="{TemplateBinding Headline}" FontSize="{DynamicResource Md.Sys.TypeScale.BodyLarge.Size}" Foreground="{TemplateBinding Foreground}" />
                 <ContentPresenter x:Name="PART_Supporting" Content="{TemplateBinding SupportingText}" FontSize="14"
                                   Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" IsVisible="False" />
               </StackPanel>

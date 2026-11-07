@@ -5,7 +5,7 @@
     <Setter Property="MinWidth" Value="220" />
     <Setter Property="Padding" Value="0,8" />
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainer.Brush}" />
-    <Setter Property="Template"><ControlTemplate TargetType="ContextMenu"><Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}" CornerRadius="4" ClipToBounds="True"><ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"><ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" /></ScrollViewer></Border></ControlTemplate></Setter>
+    <Setter Property="Template"><ControlTemplate TargetType="ContextMenu"><Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" BoxShadow="{DynamicResource Md.Sys.Elevation.Level2}" CornerRadius="{DynamicResource Md.Sys.Shape.Corner.ExtraSmall}" ClipToBounds="True"><ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"><ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" /></ScrollViewer></Border></ControlTemplate></Setter>
   </ControlTheme>
   <ControlTheme x:Key="MdTextContextMenuItemTheme" TargetType="MenuItem">
     <Setter Property="MinHeight" Value="48" /><Setter Property="Padding" Value="16,0" /><Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" /><Setter Property="Background" Value="Transparent" />
@@ -14,7 +14,7 @@
         <Border x:Name="PART_Row" MinHeight="{TemplateBinding MinHeight}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
             <ContentPresenter VerticalAlignment="Center" Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" Foreground="{TemplateBinding Foreground}" />
-            <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="12"
+            <TextBlock Grid.Column="1" VerticalAlignment="Center" FontSize="{DynamicResource Md.Sys.TypeScale.BodySmall.Size}"
                        Foreground="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}"
                        Text="{TemplateBinding InputGesture}" />
           </Grid>

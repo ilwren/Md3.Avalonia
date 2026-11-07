@@ -1,5 +1,6 @@
 using Avalonia.Automation.Peers;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
@@ -10,6 +11,7 @@ namespace Md3.Avalonia.Controls;
 /// A Material 3 menu surface with roving focus, disabled-item skipping, Home/End, type-ahead,
 /// activation and Escape dismissal behavior.
 /// </summary>
+[TemplatePart("PART_Surface", typeof(Border))]
 public sealed class MdMenu : ItemsControl
 {
     private string _typeAhead = string.Empty;

@@ -14,6 +14,8 @@ namespace Md3.Avalonia.Extra.Controls;
 
 /// <summary>A provider-neutral transient popover with safe native-popup fallback and focus return.</summary>
 [PseudoClasses(":open", ":closed", ":popup-present", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Popup", typeof(Popup))]
+[TemplatePart("PART_Surface", typeof(Border))]
 public class MdPopover : TemplatedControl
 {
     public static readonly StyledProperty<object?> AnchorProperty = AvaloniaProperty.Register<MdPopover, object?>(nameof(Anchor));

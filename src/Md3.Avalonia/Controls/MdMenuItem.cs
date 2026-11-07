@@ -2,11 +2,16 @@ using Avalonia;
 using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
+using Avalonia.Controls.Presenters;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A command-capable Material menu row with leading, label and trailing slots.</summary>
 [PseudoClasses(":selected", ":has-leading", ":has-trailing")]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_Leading", typeof(ContentPresenter))]
+[TemplatePart("PART_StateLayer", typeof(Border))]
+[TemplatePart("PART_Trailing", typeof(ContentPresenter))]
 public class MdMenuItem : Button
 {
     public static readonly StyledProperty<object?> LeadingContentProperty =

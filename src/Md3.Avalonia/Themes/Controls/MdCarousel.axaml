@@ -4,7 +4,7 @@
   <ControlTheme x:Key="MdCarouselItemTheme" TargetType="ListBoxItem">
     <Setter Property="Background" Value="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
-    <Setter Property="CornerRadius" Value="28" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.ExtraLarge}" />
     <Setter Property="Padding" Value="0" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />

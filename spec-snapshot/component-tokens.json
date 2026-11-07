@@ -1,0 +1,2199 @@
+{
+ "schema_version": 1,
+ "purpose": "Frozen transcription of the Material Web component token tables: every value the specification states as a literal number, px or an md-sys-shape step. Colours and type-scale references are deliberately excluded, because a second copy of the colour scheme would drift from MdBaselineScheme. L1 token conformance uses this to check the library's Md.Comp.* values against the specification rather than trusting that they were transcribed correctly.",
+ "retrieved_at": "2026-11-07",
+ "repository": "https://github.com/material-components/material-web",
+ "repository_commit": "d872455c4be56022da2095349b30ef46e0b55bc3",
+ "token_root": "tokens/versions/v0_192",
+ "note": "Component names are Material Web's. The mapping from a Material Web token name to this library's Md.Comp.* key is not one-to-one (Material Web ships one file per variant, this library ships one token per size), so the consumer works from an explicit alias table and reports every library token that has no counterpart as unverified rather than guessing.",
+ "shape_values": {
+  "corner-none": 0,
+  "corner-extra-small": 4,
+  "corner-small": 8,
+  "corner-medium": 12,
+  "corner-large": 16,
+  "corner-extra-large": 28,
+  "corner-full": 999,
+  "corner-extra-small-top": [
+   4,
+   4,
+   0,
+   0
+  ],
+  "corner-large-top": [
+   16,
+   16,
+   0,
+   0
+  ],
+  "corner-large-end": [
+   0,
+   16,
+   16,
+   0
+  ],
+  "corner-large-start": [
+   16,
+   0,
+   0,
+   16
+  ],
+  "corner-extra-large-top": [
+   28,
+   28,
+   0,
+   0
+  ]
+ },
+ "components": {
+  "assist-chip": {
+   "file": "_md-comp-assist-chip.scss",
+   "tokens": {
+    "container-height": {
+     "value": 32
+    },
+    "container-shape": {
+     "value": 8,
+     "shape": "corner-small"
+    },
+    "flat-outline-width": {
+     "value": 1
+    },
+    "with-icon-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "badge": {
+   "file": "_md-comp-badge.scss",
+   "tokens": {
+    "large-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "large-size": {
+     "value": 16
+    },
+    "shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "size": {
+     "value": 6
+    },
+    "large-label-text-size": {
+     "value": 11.0,
+     "typescale": "label-small"
+    }
+   }
+  },
+  "banner": {
+   "file": "_md-comp-banner.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "desktop-with-single-line-container-height": {
+     "value": 52
+    },
+    "desktop-with-three-lines-container-height": {
+     "value": 90
+    },
+    "desktop-with-two-lines-with-image-container-height": {
+     "value": 72
+    },
+    "mobile-with-single-line-container-height": {
+     "value": 54
+    },
+    "mobile-with-two-lines-container-height": {
+     "value": 112
+    },
+    "mobile-with-two-lines-with-image-container-height": {
+     "value": 120
+    },
+    "with-image-image-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "with-image-image-size": {
+     "value": 40
+    },
+    "supporting-text-size": {
+     "value": 14.0,
+     "typescale": "body-medium"
+    }
+   }
+  },
+  "carousel-item": {
+   "file": "_md-comp-carousel-item.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 28,
+     "shape": "corner-extra-large"
+    }
+   }
+  },
+  "checkbox": {
+   "file": "_md-comp-checkbox.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 2
+    },
+    "container-size": {
+     "value": 18
+    },
+    "icon-size": {
+     "value": 18
+    },
+    "selected-disabled-container-outline-width": {
+     "value": 0
+    },
+    "selected-focus-outline-width": {
+     "value": 0
+    },
+    "selected-hover-outline-width": {
+     "value": 0
+    },
+    "selected-outline-width": {
+     "value": 0
+    },
+    "selected-pressed-outline-width": {
+     "value": 0
+    },
+    "state-layer-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "state-layer-size": {
+     "value": 40
+    },
+    "unselected-disabled-outline-width": {
+     "value": 2
+    },
+    "unselected-focus-outline-width": {
+     "value": 2
+    },
+    "unselected-hover-outline-width": {
+     "value": 2
+    },
+    "unselected-outline-width": {
+     "value": 2
+    },
+    "unselected-pressed-outline-width": {
+     "value": 2
+    }
+   }
+  },
+  "circular-progress-indicator": {
+   "file": "_md-comp-circular-progress-indicator.scss",
+   "tokens": {
+    "active-indicator-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "active-indicator-width": {
+     "value": 4
+    },
+    "size": {
+     "value": 48
+    }
+   }
+  },
+  "data-table": {
+   "file": "_md-comp-data-table.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 4,
+     "shape": "corner-extra-small"
+    },
+    "footer-container-height": {
+     "value": 52
+    },
+    "header-container-height": {
+     "value": 56
+    },
+    "outline-width": {
+     "value": 1
+    },
+    "row-item-container-height": {
+     "value": 52
+    },
+    "row-item-outline-width": {
+     "value": 1
+    },
+    "footer-supporting-text-size": {
+     "value": 14.0,
+     "typescale": "body-medium"
+    },
+    "header-headline-size": {
+     "value": 14.0,
+     "typescale": "title-small"
+    },
+    "row-item-label-text-size": {
+     "value": 14.0,
+     "typescale": "body-medium"
+    }
+   }
+  },
+  "date-picker-docked": {
+   "file": "_md-comp-date-picker-docked.scss",
+   "tokens": {
+    "container-height": {
+     "value": 456
+    },
+    "container-shape": {
+     "value": 16,
+     "shape": "corner-large"
+    },
+    "container-width": {
+     "value": 360
+    },
+    "date-container-height": {
+     "value": 48
+    },
+    "date-container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "date-container-width": {
+     "value": 48
+    },
+    "date-state-layer-height": {
+     "value": 40
+    },
+    "date-state-layer-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "date-state-layer-width": {
+     "value": 40
+    },
+    "date-today-container-outline-width": {
+     "value": 1
+    },
+    "header-height": {
+     "value": 64
+    },
+    "menu-button-container-height": {
+     "value": 40
+    },
+    "menu-button-container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "menu-button-icon-size": {
+     "value": 18
+    },
+    "menu-list-item-container-height": {
+     "value": 48
+    },
+    "menu-list-item-selected-leading-icon-size": {
+     "value": 24
+    },
+    "date-label-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "menu-button-label-text-size": {
+     "value": 14.0,
+     "typescale": "label-large"
+    },
+    "menu-list-item-label-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "weekdays-label-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    }
+   }
+  },
+  "dialog": {
+   "file": "_md-comp-dialog.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 28,
+     "shape": "corner-extra-large"
+    },
+    "with-icon-icon-size": {
+     "value": 24
+    },
+    "action-label-text-size": {
+     "value": 14.0,
+     "typescale": "label-large"
+    },
+    "headline-size": {
+     "value": 24.0,
+     "typescale": "headline-small"
+    },
+    "supporting-text-size": {
+     "value": 14.0,
+     "typescale": "body-medium"
+    }
+   }
+  },
+  "divider": {
+   "file": "_md-comp-divider.scss",
+   "tokens": {
+    "thickness": {
+     "value": 1
+    }
+   }
+  },
+  "elevated-button": {
+   "file": "_md-comp-elevated-button.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "with-icon-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "elevated-card": {
+   "file": "_md-comp-elevated-card.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 12,
+     "shape": "corner-medium"
+    },
+    "icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "extended-fab-primary": {
+   "file": "_md-comp-extended-fab-primary.scss",
+   "tokens": {
+    "container-height": {
+     "value": 56
+    },
+    "container-shape": {
+     "value": 16,
+     "shape": "corner-large"
+    },
+    "icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "fab-primary-large": {
+   "file": "_md-comp-fab-primary-large.scss",
+   "tokens": {
+    "container-height": {
+     "value": 96
+    },
+    "container-shape": {
+     "value": 28,
+     "shape": "corner-extra-large"
+    },
+    "container-width": {
+     "value": 96
+    },
+    "icon-size": {
+     "value": 36
+    }
+   }
+  },
+  "fab-primary-small": {
+   "file": "_md-comp-fab-primary-small.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "container-shape": {
+     "value": 12,
+     "shape": "corner-medium"
+    },
+    "container-width": {
+     "value": 40
+    },
+    "icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "fab-primary": {
+   "file": "_md-comp-fab-primary.scss",
+   "tokens": {
+    "container-height": {
+     "value": 56
+    },
+    "container-shape": {
+     "value": 16,
+     "shape": "corner-large"
+    },
+    "container-width": {
+     "value": 56
+    },
+    "icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "filled-button": {
+   "file": "_md-comp-filled-button.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "with-icon-icon-size": {
+     "value": 18
+    },
+    "label-text-size": {
+     "value": 14.0,
+     "typescale": "label-large"
+    }
+   }
+  },
+  "filled-card": {
+   "file": "_md-comp-filled-card.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 12,
+     "shape": "corner-medium"
+    },
+    "icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "filled-icon-button": {
+   "file": "_md-comp-filled-icon-button.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "container-width": {
+     "value": 40
+    },
+    "icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "filled-select": {
+   "file": "_md-comp-filled-select.scss",
+   "tokens": {
+    "menu-cascading-menu-indicator-icon-size": {
+     "value": 24
+    },
+    "menu-container-shape": {
+     "value": 4,
+     "shape": "corner-extra-small"
+    },
+    "menu-divider-height": {
+     "value": 1
+    },
+    "menu-list-item-container-height": {
+     "value": 48
+    },
+    "menu-list-item-with-leading-icon-leading-icon-size": {
+     "value": 24
+    },
+    "menu-list-item-with-trailing-icon-trailing-icon-size": {
+     "value": 24
+    },
+    "text-field-active-indicator-height": {
+     "value": 1
+    },
+    "text-field-container-shape": {
+     "value": [
+      4,
+      4,
+      0,
+      0
+     ],
+     "shape": "corner-extra-small-top"
+    },
+    "text-field-disabled-active-indicator-height": {
+     "value": 1
+    },
+    "text-field-focus-active-indicator-height": {
+     "value": 2
+    },
+    "text-field-hover-active-indicator-height": {
+     "value": 1
+    },
+    "text-field-leading-icon-size": {
+     "value": 24
+    },
+    "text-field-trailing-icon-size": {
+     "value": 24
+    },
+    "menu-list-item-label-text-size": {
+     "value": 14.0,
+     "typescale": "label-large"
+    },
+    "text-field-input-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "text-field-label-text-populated-size": {
+     "value": 12.0,
+     "typescale": "body-small"
+    },
+    "text-field-label-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "text-field-supporting-text-size": {
+     "value": 12.0,
+     "typescale": "body-small"
+    }
+   }
+  },
+  "filled-text-field": {
+   "file": "_md-comp-filled-text-field.scss",
+   "tokens": {
+    "active-indicator-height": {
+     "value": 1
+    },
+    "container-shape": {
+     "value": [
+      4,
+      4,
+      0,
+      0
+     ],
+     "shape": "corner-extra-small-top"
+    },
+    "disabled-active-indicator-height": {
+     "value": 1
+    },
+    "focus-active-indicator-height": {
+     "value": 2
+    },
+    "hover-active-indicator-height": {
+     "value": 1
+    },
+    "leading-icon-size": {
+     "value": 24
+    },
+    "trailing-icon-size": {
+     "value": 24
+    },
+    "input-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "label-text-populated-size": {
+     "value": 12.0,
+     "typescale": "body-small"
+    },
+    "label-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "supporting-text-size": {
+     "value": 12.0,
+     "typescale": "body-small"
+    }
+   }
+  },
+  "filled-tonal-button": {
+   "file": "_md-comp-filled-tonal-button.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "with-icon-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "filter-chip": {
+   "file": "_md-comp-filter-chip.scss",
+   "tokens": {
+    "container-height": {
+     "value": 32
+    },
+    "container-shape": {
+     "value": 8,
+     "shape": "corner-small"
+    },
+    "flat-selected-outline-width": {
+     "value": 0
+    },
+    "flat-unselected-outline-width": {
+     "value": 1
+    },
+    "with-icon-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "icon-button": {
+   "file": "_md-comp-icon-button.scss",
+   "tokens": {
+    "icon-size": {
+     "value": 24
+    },
+    "state-layer-height": {
+     "value": 40
+    },
+    "state-layer-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "state-layer-width": {
+     "value": 40
+    }
+   }
+  },
+  "input-chip": {
+   "file": "_md-comp-input-chip.scss",
+   "tokens": {
+    "container-height": {
+     "value": 32
+    },
+    "container-shape": {
+     "value": 8,
+     "shape": "corner-small"
+    },
+    "selected-outline-width": {
+     "value": 0
+    },
+    "unselected-outline-width": {
+     "value": 1
+    },
+    "with-avatar-avatar-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "with-avatar-avatar-size": {
+     "value": 24
+    },
+    "with-leading-icon-leading-icon-size": {
+     "value": 18
+    },
+    "with-trailing-icon-trailing-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "linear-progress-indicator": {
+   "file": "_md-comp-linear-progress-indicator.scss",
+   "tokens": {
+    "active-indicator-height": {
+     "value": 4
+    },
+    "active-indicator-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "track-height": {
+     "value": 4
+    },
+    "track-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    }
+   }
+  },
+  "list": {
+   "file": "_md-comp-list.scss",
+   "tokens": {
+    "divider-leading-space": {
+     "value": 16
+    },
+    "divider-trailing-space": {
+     "value": 16
+    },
+    "list-item-container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "list-item-large-leading-video-height": {
+     "value": 69
+    },
+    "list-item-leading-avatar-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "list-item-leading-avatar-size": {
+     "value": 40
+    },
+    "list-item-leading-icon-size": {
+     "value": 24
+    },
+    "list-item-leading-image-height": {
+     "value": 56
+    },
+    "list-item-leading-image-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "list-item-leading-image-width": {
+     "value": 56
+    },
+    "list-item-leading-space": {
+     "value": 16
+    },
+    "list-item-leading-video-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "list-item-leading-video-width": {
+     "value": 100
+    },
+    "list-item-one-line-container-height": {
+     "value": 56
+    },
+    "list-item-small-leading-video-height": {
+     "value": 56
+    },
+    "list-item-three-line-container-height": {
+     "value": 88
+    },
+    "list-item-trailing-icon-size": {
+     "value": 24
+    },
+    "list-item-trailing-space": {
+     "value": 16
+    },
+    "list-item-two-line-container-height": {
+     "value": 72
+    },
+    "list-item-label-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "list-item-leading-avatar-label-size": {
+     "value": 16.0,
+     "typescale": "title-medium"
+    },
+    "list-item-overline-size": {
+     "value": 11.0,
+     "typescale": "label-small"
+    },
+    "list-item-supporting-text-size": {
+     "value": 14.0,
+     "typescale": "body-medium"
+    },
+    "list-item-trailing-supporting-text-size": {
+     "value": 11.0,
+     "typescale": "label-small"
+    }
+   }
+  },
+  "menu": {
+   "file": "_md-comp-menu.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 4,
+     "shape": "corner-extra-small"
+    }
+   }
+  },
+  "navigation-bar": {
+   "file": "_md-comp-navigation-bar.scss",
+   "tokens": {
+    "active-indicator-height": {
+     "value": 32
+    },
+    "active-indicator-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "active-indicator-width": {
+     "value": 64
+    },
+    "container-height": {
+     "value": 80
+    },
+    "container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "icon-size": {
+     "value": 24
+    },
+    "label-text-size": {
+     "value": 12.0,
+     "typescale": "label-medium"
+    }
+   }
+  },
+  "navigation-drawer": {
+   "file": "_md-comp-navigation-drawer.scss",
+   "tokens": {
+    "active-indicator-height": {
+     "value": 56
+    },
+    "active-indicator-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "active-indicator-width": {
+     "value": 336
+    },
+    "bottom-container-shape": {
+     "value": [
+      16,
+      16,
+      0,
+      0
+     ],
+     "shape": "corner-large-top"
+    },
+    "container-shape": {
+     "value": [
+      0,
+      16,
+      16,
+      0
+     ],
+     "shape": "corner-large-end"
+    },
+    "container-width": {
+     "value": 360
+    },
+    "icon-size": {
+     "value": 24
+    },
+    "headline-size": {
+     "value": 14.0,
+     "typescale": "title-small"
+    },
+    "label-text-size": {
+     "value": 14.0,
+     "typescale": "label-large"
+    },
+    "large-badge-label-size": {
+     "value": 14.0,
+     "typescale": "label-large"
+    }
+   }
+  },
+  "navigation-rail": {
+   "file": "_md-comp-navigation-rail.scss",
+   "tokens": {
+    "active-indicator-height": {
+     "value": 32
+    },
+    "active-indicator-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "active-indicator-width": {
+     "value": 56
+    },
+    "container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "container-width": {
+     "value": 80
+    },
+    "icon-size": {
+     "value": 24
+    },
+    "no-label-active-indicator-height": {
+     "value": 56
+    },
+    "no-label-active-indicator-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "label-text-size": {
+     "value": 12.0,
+     "typescale": "label-medium"
+    }
+   }
+  },
+  "outlined-button": {
+   "file": "_md-comp-outlined-button.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "outline-width": {
+     "value": 1
+    },
+    "with-icon-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "outlined-card": {
+   "file": "_md-comp-outlined-card.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 12,
+     "shape": "corner-medium"
+    },
+    "icon-size": {
+     "value": 24
+    },
+    "outline-width": {
+     "value": 1
+    }
+   }
+  },
+  "outlined-icon-button": {
+   "file": "_md-comp-outlined-icon-button.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "container-width": {
+     "value": 40
+    },
+    "icon-size": {
+     "value": 24
+    },
+    "unselected-outline-width": {
+     "value": 1
+    }
+   }
+  },
+  "outlined-segmented-button": {
+   "file": "_md-comp-outlined-segmented-button.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "outline-width": {
+     "value": 1
+    },
+    "shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "with-icon-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "outlined-select": {
+   "file": "_md-comp-outlined-select.scss",
+   "tokens": {
+    "menu-cascading-menu-indicator-icon-size": {
+     "value": 24
+    },
+    "menu-container-shape": {
+     "value": 4,
+     "shape": "corner-extra-small"
+    },
+    "menu-divider-height": {
+     "value": 1
+    },
+    "menu-list-item-container-height": {
+     "value": 48
+    },
+    "menu-list-item-with-leading-icon-leading-icon-size": {
+     "value": 24
+    },
+    "menu-list-item-with-trailing-icon-trailing-icon-size": {
+     "value": 24
+    },
+    "text-field-container-shape": {
+     "value": 4,
+     "shape": "corner-extra-small"
+    },
+    "text-field-disabled-outline-width": {
+     "value": 1
+    },
+    "text-field-focus-outline-width": {
+     "value": 2
+    },
+    "text-field-hover-outline-width": {
+     "value": 1
+    },
+    "text-field-leading-icon-size": {
+     "value": 24
+    },
+    "text-field-outline-width": {
+     "value": 1
+    },
+    "text-field-trailing-icon-size": {
+     "value": 24
+    }
+   }
+  },
+  "outlined-text-field": {
+   "file": "_md-comp-outlined-text-field.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 4,
+     "shape": "corner-extra-small"
+    },
+    "disabled-outline-width": {
+     "value": 1
+    },
+    "focus-outline-width": {
+     "value": 2
+    },
+    "hover-outline-width": {
+     "value": 1
+    },
+    "leading-icon-size": {
+     "value": 24
+    },
+    "outline-width": {
+     "value": 1
+    },
+    "trailing-icon-size": {
+     "value": 24
+    },
+    "input-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "label-text-populated-size": {
+     "value": 12.0,
+     "typescale": "body-small"
+    },
+    "label-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "supporting-text-size": {
+     "value": 12.0,
+     "typescale": "body-small"
+    }
+   }
+  },
+  "plain-tooltip": {
+   "file": "_md-comp-plain-tooltip.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 4,
+     "shape": "corner-extra-small"
+    },
+    "supporting-text-size": {
+     "value": 12.0,
+     "typescale": "body-small"
+    }
+   }
+  },
+  "primary-navigation-tab": {
+   "file": "_md-comp-primary-navigation-tab.scss",
+   "tokens": {
+    "active-indicator-height": {
+     "value": 3
+    },
+    "container-height": {
+     "value": 48
+    },
+    "container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "with-icon-and-label-text-container-height": {
+     "value": 64
+    },
+    "with-icon-icon-size": {
+     "value": 24
+    },
+    "with-label-text-label-text-size": {
+     "value": 14.0,
+     "typescale": "title-small"
+    }
+   }
+  },
+  "radio-button": {
+   "file": "_md-comp-radio-button.scss",
+   "tokens": {
+    "icon-size": {
+     "value": 20
+    },
+    "state-layer-size": {
+     "value": 40
+    }
+   }
+  },
+  "rich-tooltip": {
+   "file": "_md-comp-rich-tooltip.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 12,
+     "shape": "corner-medium"
+    },
+    "action-label-text-size": {
+     "value": 14.0,
+     "typescale": "label-large"
+    },
+    "subhead-size": {
+     "value": 14.0,
+     "typescale": "title-small"
+    },
+    "supporting-text-size": {
+     "value": 14.0,
+     "typescale": "body-medium"
+    }
+   }
+  },
+  "search-bar": {
+   "file": "_md-comp-search-bar.scss",
+   "tokens": {
+    "avatar-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "avatar-size": {
+     "value": 30
+    },
+    "container-height": {
+     "value": 56
+    },
+    "container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "input-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "supporting-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    }
+   }
+  },
+  "secondary-navigation-tab": {
+   "file": "_md-comp-secondary-navigation-tab.scss",
+   "tokens": {
+    "active-indicator-height": {
+     "value": 2
+    },
+    "container-height": {
+     "value": 48
+    },
+    "container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "with-icon-icon-size": {
+     "value": 24
+    },
+    "label-text-size": {
+     "value": 14.0,
+     "typescale": "title-small"
+    }
+   }
+  },
+  "sheet-bottom": {
+   "file": "_md-comp-sheet-bottom.scss",
+   "tokens": {
+    "docked-container-shape": {
+     "value": [
+      28,
+      28,
+      0,
+      0
+     ],
+     "shape": "corner-extra-large-top"
+    },
+    "docked-drag-handle-height": {
+     "value": 4
+    },
+    "docked-drag-handle-width": {
+     "value": 32
+    },
+    "docked-minimized-container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    }
+   }
+  },
+  "sheet-floating": {
+   "file": "_md-comp-sheet-floating.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 28,
+     "shape": "corner-extra-large"
+    }
+   }
+  },
+  "sheet-side": {
+   "file": "_md-comp-sheet-side.scss",
+   "tokens": {
+    "detached-container-shape": {
+     "value": 16,
+     "shape": "corner-large"
+    },
+    "docked-container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "docked-container-width": {
+     "value": 256
+    },
+    "docked-modal-container-shape": {
+     "value": [
+      16,
+      0,
+      0,
+      16
+     ],
+     "shape": "corner-large-start"
+    },
+    "docked-headline-size": {
+     "value": 22.0,
+     "typescale": "title-large"
+    }
+   }
+  },
+  "slider": {
+   "file": "_md-comp-slider.scss",
+   "tokens": {
+    "active-track-height": {
+     "value": 4
+    },
+    "active-track-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "handle-height": {
+     "value": 20
+    },
+    "handle-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "handle-width": {
+     "value": 20
+    },
+    "inactive-track-height": {
+     "value": 4
+    },
+    "inactive-track-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "label-container-height": {
+     "value": 28
+    },
+    "state-layer-size": {
+     "value": 40
+    },
+    "with-overlap-handle-outline-width": {
+     "value": 1
+    },
+    "with-tick-marks-container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "with-tick-marks-container-size": {
+     "value": 2
+    },
+    "label-label-text-size": {
+     "value": 12.0,
+     "typescale": "label-medium"
+    }
+   }
+  },
+  "snackbar": {
+   "file": "_md-comp-snackbar.scss",
+   "tokens": {
+    "container-shape": {
+     "value": 4,
+     "shape": "corner-extra-small"
+    },
+    "icon-size": {
+     "value": 24
+    },
+    "with-single-line-container-height": {
+     "value": 48
+    },
+    "with-two-lines-container-height": {
+     "value": 68
+    },
+    "action-label-text-size": {
+     "value": 14.0,
+     "typescale": "label-large"
+    },
+    "supporting-text-size": {
+     "value": 14.0,
+     "typescale": "body-medium"
+    }
+   }
+  },
+  "suggestion-chip": {
+   "file": "_md-comp-suggestion-chip.scss",
+   "tokens": {
+    "container-height": {
+     "value": 32
+    },
+    "container-shape": {
+     "value": 8,
+     "shape": "corner-small"
+    },
+    "flat-outline-width": {
+     "value": 1
+    },
+    "with-leading-icon-leading-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "switch": {
+   "file": "_md-comp-switch.scss",
+   "tokens": {
+    "handle-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "pressed-handle-height": {
+     "value": 28
+    },
+    "pressed-handle-width": {
+     "value": 28
+    },
+    "selected-handle-height": {
+     "value": 24
+    },
+    "selected-handle-width": {
+     "value": 24
+    },
+    "selected-icon-size": {
+     "value": 16
+    },
+    "state-layer-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "state-layer-size": {
+     "value": 40
+    },
+    "track-height": {
+     "value": 32
+    },
+    "track-outline-width": {
+     "value": 2
+    },
+    "track-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "track-width": {
+     "value": 52
+    },
+    "unselected-handle-height": {
+     "value": 16
+    },
+    "unselected-handle-width": {
+     "value": 16
+    },
+    "unselected-icon-size": {
+     "value": 16
+    },
+    "with-icon-handle-height": {
+     "value": 24
+    },
+    "with-icon-handle-width": {
+     "value": 24
+    }
+   }
+  },
+  "text-button": {
+   "file": "_md-comp-text-button.scss",
+   "tokens": {
+    "container-height": {
+     "value": 40
+    },
+    "container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "with-icon-icon-size": {
+     "value": 18
+    }
+   }
+  },
+  "time-picker": {
+   "file": "_md-comp-time-picker.scss",
+   "tokens": {
+    "clock-dial-container-size": {
+     "value": 256
+    },
+    "clock-dial-selector-center-container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "clock-dial-selector-center-container-size": {
+     "value": 8
+    },
+    "clock-dial-selector-handle-container-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "clock-dial-selector-handle-container-size": {
+     "value": 48
+    },
+    "clock-dial-selector-track-container-width": {
+     "value": 2
+    },
+    "clock-dial-shape": {
+     "value": 999,
+     "shape": "corner-full"
+    },
+    "container-shape": {
+     "value": 28,
+     "shape": "corner-extra-large"
+    },
+    "period-selector-container-shape": {
+     "value": 8,
+     "shape": "corner-small"
+    },
+    "period-selector-horizontal-container-height": {
+     "value": 38
+    },
+    "period-selector-horizontal-container-width": {
+     "value": 216
+    },
+    "period-selector-outline-width": {
+     "value": 1
+    },
+    "period-selector-vertical-container-height": {
+     "value": 80
+    },
+    "period-selector-vertical-container-width": {
+     "value": 52
+    },
+    "time-selector-24h-vertical-container-width": {
+     "value": 114
+    },
+    "time-selector-container-height": {
+     "value": 80
+    },
+    "time-selector-container-shape": {
+     "value": 8,
+     "shape": "corner-small"
+    },
+    "time-selector-container-width": {
+     "value": 96
+    },
+    "clock-dial-label-text-size": {
+     "value": 16.0,
+     "typescale": "body-large"
+    },
+    "headline-size": {
+     "value": 12.0,
+     "typescale": "label-medium"
+    },
+    "period-selector-label-text-size": {
+     "value": 16.0,
+     "typescale": "title-medium"
+    },
+    "time-selector-label-text-size": {
+     "value": 57.0,
+     "typescale": "display-large"
+    },
+    "time-selector-separator-size": {
+     "value": 57.0,
+     "typescale": "display-large"
+    }
+   }
+  },
+  "top-app-bar-large": {
+   "file": "_md-comp-top-app-bar-large.scss",
+   "tokens": {
+    "container-height": {
+     "value": 152
+    },
+    "container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "leading-icon-size": {
+     "value": 24
+    },
+    "trailing-icon-size": {
+     "value": 24
+    },
+    "headline-size": {
+     "value": 28.0,
+     "typescale": "headline-medium"
+    }
+   }
+  },
+  "top-app-bar-medium": {
+   "file": "_md-comp-top-app-bar-medium.scss",
+   "tokens": {
+    "container-height": {
+     "value": 112
+    },
+    "container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "leading-icon-size": {
+     "value": 24
+    },
+    "trailing-icon-size": {
+     "value": 24
+    },
+    "headline-size": {
+     "value": 24.0,
+     "typescale": "headline-small"
+    }
+   }
+  },
+  "top-app-bar-small": {
+   "file": "_md-comp-top-app-bar-small.scss",
+   "tokens": {
+    "container-height": {
+     "value": 64
+    },
+    "container-shape": {
+     "value": 0,
+     "shape": "corner-none"
+    },
+    "leading-icon-size": {
+     "value": 24
+    },
+    "trailing-icon-size": {
+     "value": 24
+    },
+    "headline-size": {
+     "value": 22.0,
+     "typescale": "title-large"
+    }
+   }
+  }
+ },
+ "mapping": {
+  "note": "Every library Md.Comp.* key that can be checked against a Material Web token, and which one. The pairing is by meaning, not by name: Material Web ships one file per variant (fab-primary-small) where this library ships one token per size (Fab.Small.*), and its names are more specific (container-height vs Size). A library key with no entry here is unverified, and the test says so rather than inventing a comparison. The entries whose names differ across the two vocabularies are the interesting ones: that is where a transcription error would hide. Three tokens Material calls corner-full are listed under 'full_shape_pairs' instead of here, because their radius is half their own box rather than the 9999px step, and comparing the number would be a false failure. Material Web states almost no layout tokens: across its 55 component files the only space/padding keys are list-item-leading-space, list-item-trailing-space, divider-leading-space and divider-trailing-space. A library token whose value is a padding, a margin, an offset or a gap therefore has no counterpart to be checked against, by construction - not because the mapping is unfinished. Those keys stay in the coverage queue because the queue means 'nothing asserts this', which stays true.",
+  "excluded_by_design": {
+   "Md.Comp.NavigationBar.Flexible.Container.Height": "Material Web's baseline navigation bar is 80px and v0_192 has no flexible/horizontal variant; 64 is a rail-era value this library's own docs promise. Copying 80 would be wrong, not a fix.",
+   "Md.Comp.Badge.Large.MinWidth": "Material Web states large-size 16px and no minimum width; this library needs 16 as a floor for a two-digit count. Only the height is comparable.",
+   "Md.Comp.Badge.Large.Padding": "Material Web states no padding token for the badge.",
+   "Md.Comp.Button.Medium.Container.Height": "Material Web states one button size (40dp); M3 Expressive defines the 32/40/56/96/136 scale this library implements, and the 56dp 'Medium' is that scale's middle step, not Material Web's single filled button. Comparing them would report a design decision as a defect.",
+   "Md.Comp.Button.XSmall.Container.Height": "Same: 32dp is the Expressive XSmall step, and Material Web's 40dp is its only button height.",
+   "Md.Comp.Button.Medium.Icon.Size": "Material Web's with-icon-icon-size is 18dp for the single size it defines; this library's icon follows the Expressive size scale (20/20/24/32/40). Intentional.",
+   "Md.Comp.Button.Small.Icon.Size": "Same Expressive scale; see Md.Comp.Button.Medium.Icon.Size.",
+   "Md.Comp.Button.Large.Icon.Size": "Same Expressive scale; see Md.Comp.Button.Medium.Icon.Size.",
+   "Md.Comp.Button.XLarge.Icon.Size": "Same Expressive scale; see Md.Comp.Button.Medium.Icon.Size.",
+   "Md.Comp.Button.XSmall.Icon.Size": "Same Expressive scale; see Md.Comp.Button.Medium.Icon.Size.",
+   "Md.Comp.MenuItem.Container.Height": "This library has no Md.Comp.MenuItem.* key at all; its menu items are Md.Comp.ComboBox.MenuItem.* and are 72dp two-line rows. Material's 48dp is the single-line item. The absence of the token is the finding, and it is tracked by the coverage queue rather than faked into a pass.",
+   "Md.Comp.ComboBox.Menu.Shape": "0,0,4,4 rounds only the two bottom corners, because this token shapes the dropdown that hangs below a text field and must not separate from it. Material's menu-container-shape (corner-extra-small, 4 all round) describes a free-standing menu. Same step, different surface; comparing them would flag a deliberate attachment as a defect.",
+   "Md.Comp.Fab.Medium.Size": "Material Web v0_192 states fab-primary-small 40dp, fab-primary 56dp and fab-primary-large 96dp; there is no medium FAB. The 80dp Medium is this library's Expressive step. No specification counterpart.",
+   "Md.Comp.Fab.Medium.Shape": "Material Web v0_192 states fab-primary-small 40dp, fab-primary 56dp and fab-primary-large 96dp; there is no medium FAB. The 24dp Medium shape is this library's Expressive step. No specification counterpart.",
+   "Md.Comp.Fab.Medium.IconSize": "Material Web v0_192 states fab-primary-small 40dp, fab-primary 56dp and fab-primary-large 96dp; there is no medium FAB. The 28dp Medium icon is this library's Expressive step. No specification counterpart.",
+   "Md.Comp.Fab.Target.Size": "Material Web v0_192 states no target-size (hit-target) token for any component; hit targets are a platform concern handled by Avalonia, not a Material specification token. No specification counterpart.",
+   "Md.Comp.CheckBox.Target.Size": "Material Web v0_192 states no target-size (hit-target) token for any component; hit targets are a platform concern handled by Avalonia, not a Material specification token. No specification counterpart.",
+   "Md.Comp.RadioButton.Target.Size": "Material Web v0_192 states no target-size (hit-target) token for any component; hit targets are a platform concern handled by Avalonia, not a Material specification token. No specification counterpart.",
+   "Md.Comp.Chip.Target.Height": "Material Web v0_192 states no target-size (hit-target) token for any component; hit targets are a platform concern handled by Avalonia, not a Material specification token. No specification counterpart.",
+   "Md.Comp.NavigationRail.Container.Width": "Material Web v0_192 navigation-rail container-width is 80dp; this library deliberately declares 96dp (its own docs promise 96). A deliberate difference, not a defect. No specification counterpart.",
+   "Md.Comp.BottomAppBar.Height": "Material Web v0_192 bottom-app-bar states no height token. No specification counterpart.",
+   "Md.Comp.ExtendedFab.Medium.Height": "Material Web v0_192 states one extended-fab size (56dp); Small is paired. The 80dp Medium is this library's Expressive step. No specification counterpart.",
+   "Md.Comp.ExtendedFab.Medium.IconSize": "Material Web v0_192 states one extended-fab size (56dp); Small is paired. The 28dp Medium icon is this library's Expressive step. No specification counterpart.",
+   "Md.Comp.ExtendedFab.Medium.IconSpace": "Material Web v0_192 states one extended-fab size (56dp); Small is paired. No icon-space token is stated for any size. No specification counterpart.",
+   "Md.Comp.ExtendedFab.Medium.Padding": "Material Web v0_192 states one extended-fab size (56dp); Small is paired. No padding token is stated for any size. No specification counterpart.",
+   "Md.Comp.ExtendedFab.Medium.Shape": "Material Web v0_192 states one extended-fab size (56dp); Small is paired. The 24dp Medium shape is this library's Expressive step. No specification counterpart.",
+   "Md.Comp.ExtendedFab.Large.Height": "Material Web v0_192 states one extended-fab size (56dp); Small is paired. The 96dp Large is this library's Expressive step. No specification counterpart.",
+   "Md.Comp.ExtendedFab.Large.IconSize": "Material Web v0_192 states one extended-fab size (56dp); Small is paired. The 32dp Large icon is this library's Expressive step. No specification counterpart.",
+   "Md.Comp.ExtendedFab.Large.IconSpace": "Material Web v0_192 states one extended-fab size (56dp); Small is paired. No icon-space token is stated for any size. No specification counterpart.",
+   "Md.Comp.ExtendedFab.Large.Padding": "Material Web v0_192 states one extended-fab size (56dp); Small is paired. No padding token is stated for any size. No specification counterpart.",
+   "Md.Comp.ExtendedFab.Large.Shape": "Material Web v0_192 states one extended-fab size (56dp); Small is paired. The 28dp Large shape is this library's Expressive step. No specification counterpart.",
+   "Md.Comp.IconButton.Large.DefaultWidth": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Large.Height": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Large.IconSize": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Large.NarrowWidth": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Large.PressedShape": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Large.RoundShape": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Large.SquareShape": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Large.WideWidth": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Medium.DefaultWidth": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Medium.Height": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Medium.IconSize": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Medium.NarrowWidth": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Medium.PressedShape": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Medium.RoundShape": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Medium.SquareShape": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Medium.WideWidth": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Small.NarrowWidth": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Small.PressedShape": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Small.SquareShape": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.Small.WideWidth": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.XLarge.DefaultWidth": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.XLarge.Height": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.XLarge.IconSize": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.XLarge.NarrowWidth": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.XLarge.PressedShape": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.XLarge.RoundShape": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.XLarge.SquareShape": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.XLarge.WideWidth": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.XSmall.DefaultWidth": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.XSmall.Height": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.XSmall.IconSize": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.XSmall.NarrowWidth": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.XSmall.PressedShape": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.XSmall.RoundShape": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.XSmall.SquareShape": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.IconButton.XSmall.WideWidth": "Material Web v0_192 states only the filled-icon-button 40dp box (Small.DefaultWidth/Height/IconSize are paired) and the icon-button state layer; the NarrowWidth/PressedShape/SquareShape/WideWidth and the Medium/Large/XLarge/XSmall ladder are this library's Expressive size scale, unstated by v0_192.",
+   "Md.Comp.Button.Large.Container.Height": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.Large.Content.Padding": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.Large.Icon.LabelSpace": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.Large.Shape.Pressed": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.Large.Shape.Round": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.Large.Shape.Square": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.Medium.Content.Padding": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.Medium.Icon.LabelSpace": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.Medium.Shape.Pressed": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.Medium.Shape.Round": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.Medium.Shape.Square": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.Small.Content.Padding": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.Small.Icon.LabelSpace": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.Small.Shape.Pressed": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.Small.Shape.Square": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.XLarge.Container.Height": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.XLarge.Content.Padding": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.XLarge.Icon.LabelSpace": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.XLarge.Shape.Pressed": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.XLarge.Shape.Round": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.XLarge.Shape.Square": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.XSmall.Content.Padding": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.XSmall.Icon.LabelSpace": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.XSmall.Shape.Pressed": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.XSmall.Shape.Round": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.Button.XSmall.Shape.Square": "Material Web v0_192 states one filled button (40dp height, corner-full shape, with-icon 18dp); the 32/40/56/96/136 Expressive ladder, content padding, icon label space, and pressed/round/square shapes are this library's own scale.",
+   "Md.Comp.FileSystemPicker.Compact.Content.Padding": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.Compact.List.Shape": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.Container.Shape": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.Content.Padding": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.Footer.Shape": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.Icon.ContainerSize": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.Icon.Shape": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.Item.ContentMinHeight": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.Item.MinHeight": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.Item.Padding": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.Item.Shape": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.List.Shape": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.Mode.Shape": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.Path.MinHeight": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.Path.Shape": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.QuickAccess.Width": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.Section.Spacing": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.Selection.Shape": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.FileSystemPicker.State.Shape": "Material Web v0_192 ships no FileSystemPicker token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.Disabled.Opacity": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.Divider.HoverOpacity": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.Divider.RestingOpacity": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.Divider.Shape": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.Divider.Thickness": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.Handle.ActiveLength": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.Handle.ActiveThickness": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.Handle.DotSize": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.Handle.DotSpacing": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.Handle.DraggedLength": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.Handle.Length": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.Handle.Shape": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.Handle.Thickness": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.Preview.Opacity": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.StateLayer.DraggedOpacity": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.StateLayer.HoverOpacity": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.StateLayer.Thickness": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.GridSplitter.Track.Thickness": "Material Web v0_192 ships no GridSplitter token table at all. No specification counterpart.",
+   "Md.Comp.Toolbar.ActionSpacing": "Material Web v0_192 ships no toolbar token table at all. No specification counterpart.",
+   "Md.Comp.Toolbar.Compact.ActionSpacing": "Material Web v0_192 ships no toolbar token table at all. No specification counterpart.",
+   "Md.Comp.Toolbar.Compact.Height": "Material Web v0_192 ships no toolbar token table at all. No specification counterpart.",
+   "Md.Comp.Toolbar.Compact.Padding": "Material Web v0_192 ships no toolbar token table at all. No specification counterpart.",
+   "Md.Comp.Toolbar.Docked.Height": "Material Web v0_192 ships no toolbar token table at all. No specification counterpart.",
+   "Md.Comp.Toolbar.Docked.Padding": "Material Web v0_192 ships no toolbar token table at all. No specification counterpart.",
+   "Md.Comp.Toolbar.Floating.Height": "Material Web v0_192 ships no toolbar token table at all. No specification counterpart.",
+   "Md.Comp.Toolbar.Floating.Padding": "Material Web v0_192 ships no toolbar token table at all. No specification counterpart.",
+   "Md.Comp.Toolbar.Floating.Shape": "Material Web v0_192 ships no toolbar token table at all. No specification counterpart.",
+   "Md.Comp.Dropdown.Attached.Shape": "Material Web v0_192 ships no dropdown token table at all. No specification counterpart.",
+   "Md.Comp.Dropdown.Padding": "Material Web v0_192 ships no dropdown token table at all. No specification counterpart.",
+   "Md.Comp.ConnectedButtonGroup.Space": "Material Web v0_192 ships no connected-button-group token table at all. No specification counterpart.",
+   "Md.Comp.ButtonGroup.Large.Space": "Material Web v0_192 ships no button-group token table at all. No specification counterpart.",
+   "Md.Comp.ButtonGroup.Medium.Space": "Material Web v0_192 ships no button-group token table at all. No specification counterpart.",
+   "Md.Comp.ButtonGroup.Small.Space": "Material Web v0_192 ships no button-group token table at all. No specification counterpart.",
+   "Md.Comp.ButtonGroup.XLarge.Space": "Material Web v0_192 ships no button-group token table at all. No specification counterpart.",
+   "Md.Comp.ButtonGroup.XSmall.Space": "Material Web v0_192 ships no button-group token table at all. No specification counterpart.",
+   "Md.Comp.SplitButton.Gap": "Material Web v0_192 ships no split-button token table at all. No specification counterpart.",
+   "Md.Comp.SplitButton.Large.TrailingWidth": "Material Web v0_192 ships no split-button token table at all. No specification counterpart.",
+   "Md.Comp.SplitButton.Medium.TrailingWidth": "Material Web v0_192 ships no split-button token table at all. No specification counterpart.",
+   "Md.Comp.SplitButton.Small.TrailingWidth": "Material Web v0_192 ships no split-button token table at all. No specification counterpart.",
+   "Md.Comp.SplitButton.XLarge.TrailingWidth": "Material Web v0_192 ships no split-button token table at all. No specification counterpart.",
+   "Md.Comp.SplitButton.XSmall.TrailingWidth": "Material Web v0_192 ships no split-button token table at all. No specification counterpart.",
+   "Md.Comp.FabMenu.CloseButton.Shape": "Material Web v0_192 ships no fab-menu token table at all. No specification counterpart.",
+   "Md.Comp.FabMenu.CloseButton.Size": "Material Web v0_192 ships no fab-menu token table at all. No specification counterpart.",
+   "Md.Comp.FabMenu.CloseButtonSpacing": "Material Web v0_192 ships no fab-menu token table at all. No specification counterpart.",
+   "Md.Comp.FabMenu.ItemSpacing": "Material Web v0_192 ships no fab-menu token table at all. No specification counterpart.",
+   "Md.Comp.FabMenu.ItemsOffset.Down": "Material Web v0_192 ships no fab-menu token table at all. No specification counterpart.",
+   "Md.Comp.FabMenu.ItemsOffset.Up": "Material Web v0_192 ships no fab-menu token table at all. No specification counterpart."
+  },
+  "pairs": [
+   {
+    "library": "Md.Comp.Chip.Container.Height",
+    "component": "assist-chip",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.Chip.Container.Shape",
+    "component": "assist-chip",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Chip.Icon.Size",
+    "component": "assist-chip",
+    "token": "with-icon-icon-size"
+   },
+   {
+    "library": "Md.Comp.Badge.Large.Height",
+    "component": "badge",
+    "token": "large-size"
+   },
+   {
+    "library": "Md.Comp.Badge.Small.Size",
+    "component": "badge",
+    "token": "size"
+   },
+   {
+    "library": "Md.Comp.CheckBox.Container.OutlineWidth",
+    "component": "checkbox",
+    "token": "unselected-outline-width"
+   },
+   {
+    "library": "Md.Comp.CheckBox.Container.Shape",
+    "component": "checkbox",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.CheckBox.Container.Size",
+    "component": "checkbox",
+    "token": "container-size"
+   },
+   {
+    "library": "Md.Comp.CheckBox.Icon.Size",
+    "component": "checkbox",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.CheckBox.StateLayer.Size",
+    "component": "checkbox",
+    "token": "state-layer-size"
+   },
+   {
+    "library": "Md.Comp.Dialog.Container.Shape",
+    "component": "dialog",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Divider.Thickness",
+    "component": "divider",
+    "token": "thickness"
+   },
+   {
+    "library": "Md.Comp.ExtendedFab.Small.Height",
+    "component": "extended-fab-primary",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.ExtendedFab.Small.IconSize",
+    "component": "extended-fab-primary",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.ExtendedFab.Small.Shape",
+    "component": "extended-fab-primary",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Fab.Regular.IconSize",
+    "component": "fab-primary",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.Fab.Regular.Shape",
+    "component": "fab-primary",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Fab.Regular.Size",
+    "component": "fab-primary",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.Fab.Large.IconSize",
+    "component": "fab-primary-large",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.Fab.Large.Shape",
+    "component": "fab-primary-large",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Fab.Large.Size",
+    "component": "fab-primary-large",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.Fab.Small.IconSize",
+    "component": "fab-primary-small",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.Fab.Small.Shape",
+    "component": "fab-primary-small",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Fab.Small.Size",
+    "component": "fab-primary-small",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.Button.Small.Container.Height",
+    "component": "filled-button",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.Card.Container.Shape",
+    "component": "filled-card",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.DefaultWidth",
+    "component": "filled-icon-button",
+    "token": "container-width"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.Height",
+    "component": "filled-icon-button",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.IconSize",
+    "component": "filled-icon-button",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.ComboBox.Filled.Container.Shape",
+    "component": "filled-select",
+    "token": "text-field-container-shape"
+   },
+   {
+    "library": "Md.Comp.ComboBox.Icon.Size",
+    "component": "filled-select",
+    "token": "text-field-leading-icon-size"
+   },
+   {
+    "library": "Md.Comp.ComboBox.Indicator.FocusWidth",
+    "component": "filled-select",
+    "token": "text-field-focus-active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.ComboBox.Indicator.Width",
+    "component": "filled-select",
+    "token": "text-field-active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.ComboBox.Input.FontSize",
+    "component": "filled-select",
+    "token": "text-field-input-text-size"
+   },
+   {
+    "library": "Md.Comp.ComboBox.Label.FontSize",
+    "component": "filled-select",
+    "token": "text-field-label-text-size"
+   },
+   {
+    "library": "Md.Comp.ComboBox.Supporting.FontSize",
+    "component": "filled-select",
+    "token": "text-field-supporting-text-size"
+   },
+   {
+    "library": "Md.Comp.TextField.Filled.Container.Shape",
+    "component": "filled-text-field",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.TextField.Icon.Size",
+    "component": "filled-text-field",
+    "token": "leading-icon-size"
+   },
+   {
+    "library": "Md.Comp.TextField.Indicator.FocusWidth",
+    "component": "filled-text-field",
+    "token": "focus-active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.TextField.Indicator.Width",
+    "component": "filled-text-field",
+    "token": "active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.TextField.Input.FontSize",
+    "component": "filled-text-field",
+    "token": "input-text-size"
+   },
+   {
+    "library": "Md.Comp.TextField.Label.Floating.FontSize",
+    "component": "filled-text-field",
+    "token": "label-text-populated-size"
+   },
+   {
+    "library": "Md.Comp.TextField.Label.Resting.FontSize",
+    "component": "filled-text-field",
+    "token": "label-text-size"
+   },
+   {
+    "library": "Md.Comp.TextField.Supporting.FontSize",
+    "component": "filled-text-field",
+    "token": "supporting-text-size"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.DefaultWidth",
+    "component": "icon-button",
+    "token": "state-layer-width"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.Height",
+    "component": "icon-button",
+    "token": "state-layer-height"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.IconSize",
+    "component": "icon-button",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.List.Item.LeadingSpace",
+    "component": "list",
+    "token": "list-item-leading-space"
+   },
+   {
+    "library": "Md.Comp.List.Item.MinHeight",
+    "component": "list",
+    "token": "list-item-one-line-container-height"
+   },
+   {
+    "library": "Md.Comp.Menu.Container.Shape",
+    "component": "menu",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.NavigationBar.ActiveIndicator.Height",
+    "component": "navigation-bar",
+    "token": "active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.NavigationBar.ActiveIndicator.Width",
+    "component": "navigation-bar",
+    "token": "active-indicator-width"
+   },
+   {
+    "library": "Md.Comp.NavigationBar.Container.Height",
+    "component": "navigation-bar",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.NavigationDrawer.Container.Width",
+    "component": "navigation-drawer",
+    "token": "container-width"
+   },
+   {
+    "library": "Md.Comp.NavigationRail.ActiveIndicator.Height",
+    "component": "navigation-rail",
+    "token": "active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.NavigationRail.ActiveIndicator.Width",
+    "component": "navigation-rail",
+    "token": "active-indicator-width"
+   },
+   {
+    "library": "Md.Comp.ComboBox.Outline.FocusWidth",
+    "component": "outlined-select",
+    "token": "text-field-focus-outline-width"
+   },
+   {
+    "library": "Md.Comp.ComboBox.Outline.Width",
+    "component": "outlined-select",
+    "token": "text-field-outline-width"
+   },
+   {
+    "library": "Md.Comp.ComboBox.Outlined.Container.Shape",
+    "component": "outlined-select",
+    "token": "text-field-container-shape"
+   },
+   {
+    "library": "Md.Comp.TextField.Outline.FocusWidth",
+    "component": "outlined-text-field",
+    "token": "focus-outline-width"
+   },
+   {
+    "library": "Md.Comp.TextField.Outline.Width",
+    "component": "outlined-text-field",
+    "token": "outline-width"
+   },
+   {
+    "library": "Md.Comp.TextField.Outlined.Container.Shape",
+    "component": "outlined-text-field",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Tabs.Primary.Indicator.Height",
+    "component": "primary-navigation-tab",
+    "token": "active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.RadioButton.Icon.Size",
+    "component": "radio-button",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.RadioButton.StateLayer.Size",
+    "component": "radio-button",
+    "token": "state-layer-size"
+   },
+   {
+    "library": "Md.Comp.Tabs.Secondary.Indicator.Height",
+    "component": "secondary-navigation-tab",
+    "token": "active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.Sheet.DragHandle.Height",
+    "component": "sheet-bottom",
+    "token": "docked-drag-handle-height"
+   },
+   {
+    "library": "Md.Comp.Sheet.DragHandle.Width",
+    "component": "sheet-bottom",
+    "token": "docked-drag-handle-width"
+   },
+   {
+    "library": "Md.Comp.Slider.StateLayer.Size",
+    "component": "slider",
+    "token": "state-layer-size"
+   },
+   {
+    "library": "Md.Comp.Snackbar.Container.Shape",
+    "component": "snackbar",
+    "token": "container-shape"
+   },
+   {
+    "library": "Md.Comp.Switch.Handle.Selected.Size",
+    "component": "switch",
+    "token": "selected-handle-width"
+   },
+   {
+    "library": "Md.Comp.Switch.Handle.Unselected.Size",
+    "component": "switch",
+    "token": "unselected-handle-width"
+   },
+   {
+    "library": "Md.Comp.Switch.Track.Height",
+    "component": "switch",
+    "token": "track-height"
+   },
+   {
+    "library": "Md.Comp.Switch.Track.Width",
+    "component": "switch",
+    "token": "track-width"
+   },
+   {
+    "library": "Md.Comp.AppBar.LargeFlexible.LargeHeight",
+    "component": "top-app-bar-large",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.AppBar.MediumFlexible.Height",
+    "component": "top-app-bar-medium",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.AppBar.Small.Height",
+    "component": "top-app-bar-small",
+    "token": "container-height"
+   }
+  ],
+  "full_shape_pairs": [
+   {
+    "library": "Md.Comp.Button.Small.Shape.Round",
+    "expect": "Full"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.RoundShape",
+    "expect": "Full"
+   },
+   {
+    "library": "Md.Comp.Badge.Small.Shape",
+    "expect": "Full"
+   },
+   {
+    "library": "Md.Comp.Badge.Large.Shape",
+    "expect": "Full"
+   },
+   {
+    "library": "Md.Comp.CheckBox.StateLayer.Shape",
+    "expect": "Full"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.RoundShape",
+    "expect": "Full"
+   }
+  ],
+  "unmodelled_spec_components": {
+   "note": "Specification component tables that no pair in the mapping touches. This is the other direction of the coverage queue: the first counts library tokens nothing can check, this counts specification tables nothing is checked against. Both are measured so the report cannot read as coverage it does not have. It is produced by subtraction, not authored, so it cannot drift from the pairs.",
+   "count": 31,
+   "components": [
+    "banner",
+    "carousel-item",
+    "circular-progress-indicator",
+    "data-table",
+    "date-picker-docked",
+    "elevated-button",
+    "elevated-card",
+    "filled-select",
+    "filled-tonal-button",
+    "filter-chip",
+    "input-chip",
+    "linear-progress-indicator",
+    "list",
+    "navigation-rail",
+    "outlined-button",
+    "outlined-card",
+    "outlined-icon-button",
+    "outlined-segmented-button",
+    "outlined-select",
+    "plain-tooltip",
+    "primary-navigation-tab",
+    "rich-tooltip",
+    "search-bar",
+    "secondary-navigation-tab",
+    "sheet-bottom",
+    "sheet-floating",
+    "sheet-side",
+    "slider",
+    "suggestion-chip",
+    "text-button",
+    "time-picker"
+   ]
+  }
+ },
+ "_typescale_note": "Font sizes the specification states as a reference to the published type scale (map.get($deps,'md-sys-typescale','body-large-size')) rather than as a literal. Each is resolved through the same published scale the theme uses and keeps a 'typescale' field naming the step, so the provenance survives the resolution."
+}

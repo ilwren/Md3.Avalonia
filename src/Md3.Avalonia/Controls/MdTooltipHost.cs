@@ -10,8 +10,8 @@ using Md3.Avalonia.Motion;
 namespace Md3.Avalonia.Controls;
 
 /// <summary>Hosts a tooltip trigger and coordinates hover, focus, long-press and direct open state.</summary>
-[TemplatePart("PART_Popup", typeof(Popup))]
 [PseudoClasses(":open", ":closed", ":present", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Popup", typeof(Popup))]
 public sealed class MdTooltipHost : ContentControl, IMdPopupPresenceOwner
 {
     public static readonly StyledProperty<MdTooltip?> TooltipProperty =

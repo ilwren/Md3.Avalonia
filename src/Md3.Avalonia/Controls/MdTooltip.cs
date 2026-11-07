@@ -3,12 +3,15 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Md3.Avalonia.Motion;
+using Avalonia.Controls.Presenters;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A Material plain or rich tooltip surface.</summary>
-[TemplatePart("PART_Surface", typeof(Border))]
 [PseudoClasses(":plain", ":rich", ":open", ":closed", ":has-title", ":has-action", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Surface", typeof(Border))]
+[TemplatePart("PART_Action", typeof(ContentPresenter))]
+[TemplatePart("PART_Title", typeof(ContentPresenter))]
 public sealed class MdTooltip : ContentControl
 {
     public static readonly StyledProperty<MdTooltipVariant> VariantProperty =

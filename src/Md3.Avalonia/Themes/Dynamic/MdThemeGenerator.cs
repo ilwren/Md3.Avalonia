@@ -83,8 +83,38 @@ public static class MdThemeGenerator
         };
 
         ApplyContrast(roles, palette, options.ContrastLevel, dark);
+
+        // The M3 baseline scheme is a fixed, published set of values (material-web,
+        // tokens/versions/v0_192/_md-sys-color.scss): primary #6750A4, surface #FEF7FF,
+        // on-surface #1D1B20. Generating it from the #6750A4 seed produces a *different* palette -
+        // #65558F against #6750A4 - because the tone mapper snaps each role to the tone grid, and
+        // an HCT round-trip through a seed does not land back on the source colour it started from.
+        // Both are legitimate Material results, but only one of them is "the baseline", so when the
+        // request is the baseline the published values win and the generator is bypassed.
+        if (IsBaseline(options, dark))
+        {
+            foreach (var (role, value) in MdBaselineScheme.Roles(dark))
+            {
+                roles[role] = value;
+            }
+
+            // Every one of the 49 published roles is in the table, including the three the generator
+            // derives (OnBackground = OnSurface, Background = Surface, SurfaceTint = Primary) and the
+            // two it hard-codes (Scrim and Shadow = black). Nothing is left to fall through.
+        }
+
         return roles.ToDictionary(pair => pair.Key, pair => ToColor(pair.Value), StringComparer.Ordinal);
     }
+
+    /// <summary>
+    /// True when the options describe Material's published baseline scheme: the M3 source colour, the
+    /// tonal-spot variant and the standard contrast level. Those three together are what
+    /// <c>MdThemeOptions</c> defaults to, so a caller who asks for nothing gets the specification.
+    /// </summary>
+    private static bool IsBaseline(MdThemeOptions options, bool dark) =>
+        string.Equals(options.SeedColor, MdBaselineScheme.SeedHex, StringComparison.OrdinalIgnoreCase)
+        && options.SchemeVariant == MdThemeSchemeVariant.TonalSpot
+        && options.ContrastLevel == MdThemeContrastLevel.Standard;
 
     /// <summary>
     /// Generates the Material 3 HCT primary tonal palette for a source color. The values are

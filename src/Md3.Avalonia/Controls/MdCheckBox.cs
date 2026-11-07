@@ -6,6 +6,7 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Media;
 using Path = Avalonia.Controls.Shapes.Path;
 using Md3.Avalonia.Motion;
+using Avalonia.Controls.Presenters;
 
 namespace Md3.Avalonia.Controls;
 
@@ -15,6 +16,13 @@ namespace Md3.Avalonia.Controls;
 /// <see cref="CheckBox"/> theme.
 /// </summary>
 [PseudoClasses(":md-error", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_CheckGlyph", typeof(global::Avalonia.Controls.Shapes.Path))]
+[TemplatePart("PART_Container", typeof(Border))]
+[TemplatePart("PART_ContentPresenter", typeof(ContentPresenter))]
+[TemplatePart("PART_FocusIndicator", typeof(Border))]
+[TemplatePart("PART_IndeterminateGlyph", typeof(Border))]
+[TemplatePart("PART_InteractiveArea", typeof(Grid))]
+[TemplatePart("PART_StateLayer", typeof(Border))]
 public class MdCheckBox : CheckBox
 {
     private Border? _stateLayer;

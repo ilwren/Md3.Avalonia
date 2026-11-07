@@ -12,6 +12,7 @@ using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Extra.Controls;
 
@@ -23,6 +24,7 @@ public sealed record MdPinCell(int Index, string DisplayText, bool IsFilled, boo
 /// IME and Android soft-keyboard behavior while the value is projected into accessible cells.
 /// </summary>
 [PseudoClasses(":complete", ":md-error", ":obscured")]
+[TemplatePart("PART_Input", typeof(MdTextBox))]
 public sealed class MdPinInput : TemplatedControl
 {
     public static readonly StyledProperty<string?> CodeProperty =
@@ -295,6 +297,8 @@ public sealed class MdPinInput : TemplatedControl
 
 /// <summary>Theme-owned presenter for one PIN cell.</summary>
 [PseudoClasses(":filled", ":active", ":md-error")]
+[TemplatePart("PART_Caret", typeof(Border))]
+[TemplatePart("PART_Cell", typeof(Border))]
 public sealed class MdPinCellPresenter : TemplatedControl
 {
     public static readonly StyledProperty<MdPinCell?> CellProperty =

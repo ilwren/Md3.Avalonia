@@ -9,6 +9,8 @@ namespace Md3.Avalonia.Controls;
 
 /// <summary>A reusable Material dropdown surface whose native popup and custom surface share one lifetime.</summary>
 [PseudoClasses(":opening", ":open", ":closing", ":closed", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_Popup", typeof(Popup))]
+[TemplatePart("PART_Surface", typeof(Border))]
 public sealed class MdDropdownMenu : ContentControl, IMdPopupOwner
 {
     public static readonly StyledProperty<bool> IsOpenProperty =

@@ -67,7 +67,7 @@
     <Setter Property="MinHeight" Value="56" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Elevation" Value="{DynamicResource Md.Sys.Elevation.Level3}" />
-    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.LabelLarge.Size}" />
     <Setter Property="FontWeight" Value="Medium" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />

@@ -10,6 +10,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
@@ -18,6 +19,21 @@ namespace Md3.Avalonia.Controls;
 /// SelectedTime, IsOpen, Hour and Minute all support two-way binding.
 /// </summary>
 [PseudoClasses(":dial", ":input", ":twenty-four-hour", ":has-value", ":hour-dial", ":minute-dial", ":popup-present", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_AnchorButton", typeof(Button))]
+[TemplatePart("PART_CancelButton", typeof(MdButton))]
+[TemplatePart("PART_ClockFace", typeof(MdTimeDial))]
+[TemplatePart("PART_ConfirmButton", typeof(MdButton))]
+[TemplatePart("PART_DialPanel", typeof(StackPanel))]
+[TemplatePart("PART_DisplayText", typeof(TextBlock))]
+[TemplatePart("PART_HourDialHost", typeof(Button))]
+[TemplatePart("PART_HourInput", typeof(MdTextBox))]
+[TemplatePart("PART_InputPanel", typeof(Grid))]
+[TemplatePart("PART_InputPeriodButton", typeof(MdButton))]
+[TemplatePart("PART_MinuteDialHost", typeof(Button))]
+[TemplatePart("PART_MinuteInput", typeof(MdTextBox))]
+[TemplatePart("PART_PeriodButton", typeof(MdButton))]
+[TemplatePart("PART_Popup", typeof(Popup))]
+[TemplatePart("PART_Surface", typeof(Border))]
 public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwner
 {
     public static readonly StyledProperty<TimeSpan?> SelectedTimeProperty =
@@ -68,6 +84,13 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         AvaloniaProperty.RegisterDirect<MdTimePicker, string>(nameof(ConfirmText), picker => picker.ConfirmText);
     public static readonly DirectProperty<MdTimePicker, string> HeaderTextProperty =
         AvaloniaProperty.RegisterDirect<MdTimePicker, string>(nameof(HeaderText), picker => picker.HeaderText);
+
+    /// <summary>
+    /// The one-line instruction shown under the dial. Localized like the rest of the picker's text,
+    /// so it follows the inherited culture instead of being written in the template.
+    /// </summary>
+    public static readonly DirectProperty<MdTimePicker, string> DialHintTextProperty =
+        AvaloniaProperty.RegisterDirect<MdTimePicker, string>(nameof(DialHintText), picker => picker.DialHintText);
     public static readonly DirectProperty<MdTimePicker, bool> IsPopupOpenProperty =
         AvaloniaProperty.RegisterDirect<MdTimePicker, bool>(nameof(IsPopupOpen), picker => picker.IsPopupOpen);
 
@@ -79,6 +102,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     private string _cancelText = "Cancel";
     private string _confirmText = "OK";
     private string _headerText = "Choose time";
+    private string _dialHintText = string.Empty;
     private string _defaultLabelText = "Time";
     private TimeSpan? _valueAtOpen;
     private bool _commitOnClose;
@@ -222,6 +246,9 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
     public string CancelText => _cancelText;
     public string ConfirmText => _confirmText;
     public string HeaderText => _headerText;
+
+    /// <summary>Instruction shown under the dial; localized, so it is never authored in XAML.</summary>
+    public string DialHintText => _dialHintText;
     public bool IsPopupOpen
     {
         get => _isPopupOpen;
@@ -607,6 +634,7 @@ public class MdTimePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwn
         SetAndRaise(CancelTextProperty, ref _cancelText, MdLocalization.GetString("Cancel", culture));
         SetAndRaise(ConfirmTextProperty, ref _confirmText, MdLocalization.GetString("OK", culture));
         SetAndRaise(HeaderTextProperty, ref _headerText, MdLocalization.GetString("ChooseTime", culture));
+        SetAndRaise(DialHintTextProperty, ref _dialHintText, MdLocalization.GetString("TimeDialHint", culture));
     }
 
     private void RefreshTextAndState()

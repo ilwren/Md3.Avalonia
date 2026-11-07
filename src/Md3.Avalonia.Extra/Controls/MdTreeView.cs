@@ -17,6 +17,9 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
+using Avalonia.Controls.Metadata;
+using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Primitives;
 
 namespace Md3.Avalonia.Extra.Controls;
 
@@ -61,12 +64,13 @@ public sealed record MdTreeRow(
     bool IsExpanded,
     double ExpansionAngle,
     bool ShowGuide);
-
 /// <summary>
 /// A Material hierarchical list with arbitrary depth, selection, keyboard traversal, RTL-aware
 /// indentation and direct expand/collapse APIs. It derives from ListBox to retain native selection
 /// and automation semantics without globally styling Avalonia's TreeView.
 /// </summary>
+[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
+[TemplatePart("PART_Toggle", typeof(ToggleButton))]
 public sealed class MdTreeView : ListBox
 {
     public static readonly StyledProperty<IEnumerable<MdTreeNode>?> RootsProperty =

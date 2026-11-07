@@ -7,6 +7,8 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 
 namespace Md3.Avalonia.Controls;
 
@@ -22,6 +24,14 @@ public enum MdSettingsCardVariant
 /// A Material 3 / Android styled preference settings card with icon, header, description, and trailing widget.
 /// </summary>
 [PseudoClasses(":has-icon", ":has-description", ":has-trailing", ":clickable", ":filled", ":elevated", ":outlined", ":flat", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_DefaultChevron", typeof(MdIcon))]
+[TemplatePart("PART_DescriptionPresenter", typeof(ContentPresenter))]
+[TemplatePart("PART_HeaderPresenter", typeof(ContentPresenter))]
+[TemplatePart("PART_IconContainer", typeof(Border))]
+[TemplatePart("PART_IconPresenter", typeof(MdSymbolPresenter))]
+[TemplatePart("PART_Root", typeof(Border))]
+[TemplatePart("PART_StateLayer", typeof(Border))]
+[TemplatePart("PART_TrailingPresenter", typeof(ContentPresenter))]
 public class MdSettingsCard : ContentControl
 {
     public static readonly StyledProperty<object?> HeaderProperty =

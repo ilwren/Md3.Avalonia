@@ -19,6 +19,8 @@ using Avalonia.Media;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Extra.Infrastructure;
 using Md3.Avalonia.Localization;
+using Md3.Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 
 namespace Md3.Avalonia.Extra.Controls;
 
@@ -45,6 +47,7 @@ public sealed record MdTimelineItem(
 
 /// <summary>Accessible vertical/horizontal timeline; semantics remain ordered as supplied.</summary>
 [PseudoClasses(":vertical", ":horizontal")]
+[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
 public sealed class MdTimeline : ItemsControl
 {
     public static readonly StyledProperty<Orientation> OrientationProperty = AvaloniaProperty.Register<MdTimeline, Orientation>(nameof(Orientation), Orientation.Vertical);
@@ -66,6 +69,18 @@ public sealed class MdTimeline : ItemsControl
 
 /// <summary>Theme-facing timeline item that projects state, position, and orientation into stable pseudo classes.</summary>
 [PseudoClasses(":vertical", ":horizontal", ":first", ":last", ":neutral", ":active", ":completed", ":error", ":progress-ring", ":has-icon")]
+[TemplatePart("PART_HAfter", typeof(Border))]
+[TemplatePart("PART_HBefore", typeof(Border))]
+[TemplatePart("PART_HIcon", typeof(ContentPresenter))]
+[TemplatePart("PART_HMarker", typeof(Border))]
+[TemplatePart("PART_HProgress", typeof(MdCircularProgressIndicator))]
+[TemplatePart("PART_Horizontal", typeof(Grid))]
+[TemplatePart("PART_VAfter", typeof(Border))]
+[TemplatePart("PART_VBefore", typeof(Border))]
+[TemplatePart("PART_VIcon", typeof(ContentPresenter))]
+[TemplatePart("PART_VMarker", typeof(Border))]
+[TemplatePart("PART_VProgress", typeof(MdCircularProgressIndicator))]
+[TemplatePart("PART_Vertical", typeof(Grid))]
 public sealed class MdTimelineItemPresenter : ContentControl
 {
     public static readonly StyledProperty<MdTimelineItem?> ItemProperty =
@@ -1216,6 +1231,20 @@ public sealed record MdChatMessage(
 
 /// <summary>Role-aware message bubble used by <see cref="MdChatView"/>.</summary>
 [PseudoClasses(":user", ":assistant", ":system", ":selected", ":failed", ":reply", ":text-content")]
+[TemplatePart("PART_AvatarHost", typeof(Border))]
+[TemplatePart("PART_AvatarIcon", typeof(MdIcon))]
+[TemplatePart("PART_AvatarInitials", typeof(TextBlock))]
+[TemplatePart("PART_Bubble", typeof(Border))]
+[TemplatePart("PART_DeliveryStatus", typeof(StackPanel))]
+[TemplatePart("PART_Failure", typeof(StackPanel))]
+[TemplatePart("PART_Footer", typeof(Grid))]
+[TemplatePart("PART_Layout", typeof(Grid))]
+[TemplatePart("PART_Reply", typeof(Border))]
+[TemplatePart("PART_RichContent", typeof(ContentPresenter))]
+[TemplatePart("PART_Sender", typeof(TextBlock))]
+[TemplatePart("PART_State", typeof(Border))]
+[TemplatePart("PART_TextContent", typeof(SelectableTextBlock))]
+[TemplatePart("PART_Time", typeof(TextBlock))]
 public sealed class MdChatMessagePresenter : ContentControl
 {
     public static readonly StyledProperty<MdChatMessage?> MessageProperty =
@@ -1231,6 +1260,8 @@ public sealed class MdChatMessagePresenter : ContentControl
         AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(SenderInitials), control => control.SenderInitials);
     public static readonly DirectProperty<MdChatMessagePresenter, string?> TextContentProperty =
         AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string?>(nameof(TextContent), control => control.TextContent);
+    public static readonly DirectProperty<MdChatMessagePresenter, string> ReplyingToTextProperty =
+        AvaloniaProperty.RegisterDirect<MdChatMessagePresenter, string>(nameof(ReplyingToText), control => control.ReplyingToText);
 
     static MdChatMessagePresenter()
     {
@@ -1239,11 +1270,18 @@ public sealed class MdChatMessagePresenter : ContentControl
         MdLocalization.CultureProperty.Changed.AddClassHandler<MdChatMessagePresenter>((presenter, _) => presenter.UpdateRole());
     }
 
-    public MdChatMessagePresenter() => UpdateRole();
+    public MdChatMessagePresenter()
+    {
+        _replyingToText = MdLocalization.GetString("ChatReplyingTo");
+        UpdateRole();
+    }
     public MdChatMessage? Message { get => GetValue(MessageProperty); set => SetValue(MessageProperty, value); }
     public bool IsSelected { get => GetValue(IsSelectedProperty); set => SetValue(IsSelectedProperty, value); }
 
     public string FormattedTime => Message?.Timestamp.LocalDateTime.ToString("t", CultureInfo.CurrentCulture) ?? string.Empty;
+
+    /// <summary>Label shown above the quoted message when the message is a reply.</summary>
+    public string ReplyingToText => _replyingToText;
     public string? TextContent => Message?.Content as string;
     public string AvatarGlyph => Message?.AvatarGlyph ?? (Message?.Role == MdChatMessageRole.Assistant ? "\uf06c" : "\ue7fd");
     public string SenderInitials
@@ -1259,6 +1297,8 @@ public sealed class MdChatMessagePresenter : ContentControl
         }
     }
 
+    private string _replyingToText = string.Empty;
+
     private void UpdateRole()
     {
         PseudoClasses.Set(":user", Message?.Role == MdChatMessageRole.User);
@@ -1272,6 +1312,10 @@ public sealed class MdChatMessagePresenter : ContentControl
         RaisePropertyChanged(AvatarGlyphProperty, string.Empty, AvatarGlyph);
         RaisePropertyChanged(SenderInitialsProperty, string.Empty, SenderInitials);
         RaisePropertyChanged(TextContentProperty, null, TextContent);
+        RaisePropertyChanged(
+            ReplyingToTextProperty,
+            _replyingToText,
+            _replyingToText = MdLocalization.GetString("ChatReplyingTo", this));
 
         var sender = Message?.Sender;
         if (string.IsNullOrWhiteSpace(sender)) sender = Message?.Role switch
@@ -1293,6 +1337,8 @@ public sealed class MdChatMessagePresenter : ContentControl
 /// quote/delete actions, and failed-message retry. Providers remain responsible for mutating their source.
 /// </summary>
 [PseudoClasses(":selection", ":quoted")]
+[TemplatePart("PART_QuotePreview", typeof(Border))]
+[TemplatePart("PART_SelectionToolbar", typeof(Border))]
 public sealed class MdChatView : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable?> MessagesSourceProperty = AvaloniaProperty.Register<MdChatView, IEnumerable?>(nameof(MessagesSource));

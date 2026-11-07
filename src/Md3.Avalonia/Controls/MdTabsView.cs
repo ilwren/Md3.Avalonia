@@ -3,9 +3,9 @@ using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.VisualTree;
+using Avalonia.Controls.Metadata;
 
 namespace Md3.Avalonia.Controls;
-
 /// <summary>
 /// The content area for an <see cref="MdTabs"/> bar: its children are the pages, matched to the
 /// bar's tabs by position, and only the selected one is shown.
@@ -31,6 +31,7 @@ namespace Md3.Avalonia.Controls;
 /// <see cref="MdTabView"/> instead when the tabs and their content sit together.
 /// </para>
 /// </remarks>
+[TemplatePart("PART_SelectedContentHost", typeof(ContentPresenter))]
 public sealed class MdTabsView : TabControl
 {
     /// <summary>The tab bar driving this content area.</summary>

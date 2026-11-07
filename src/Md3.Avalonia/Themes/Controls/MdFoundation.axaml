@@ -3,7 +3,7 @@
                     xmlns:md="using:Md3.Avalonia.Controls">
   <ControlTheme x:Key="{x:Type md:MdIcon}" TargetType="md:MdIcon">
     <Setter Property="FontFamily" Value="{DynamicResource Md.Sys.Typeface.Symbols.Rounded}" />
-    <Setter Property="FontSize" Value="24" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.HeadlineSmall.Size}" />
     <Setter Property="FontWeight" Value="Normal" />
     <Setter Property="TextAlignment" Value="Center" />
     <Setter Property="VerticalAlignment" Value="Center" />
@@ -21,7 +21,7 @@
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource Md.Sys.Color.Outline.Brush}" />
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="CornerRadius" Value="{DynamicResource Md.Sys.Shape.Corner.ExtraSmall}" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Template">

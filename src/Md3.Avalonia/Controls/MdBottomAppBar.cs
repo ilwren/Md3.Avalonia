@@ -1,11 +1,15 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
+using Avalonia.Controls.Presenters;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A baseline Material 3 bottom app bar retained for compatibility; prefer MdToolbar for new designs.</summary>
 [PseudoClasses(":fab-left", ":fab-right")]
+[TemplatePart("PART_BottomActions", typeof(ContentPresenter))]
+[TemplatePart("PART_BottomFab", typeof(ContentPresenter))]
+[TemplatePart("PART_BottomLayout", typeof(Grid))]
 public sealed class MdBottomAppBar : ContentControl
 {
     public static readonly StyledProperty<object?> ActionsProperty =

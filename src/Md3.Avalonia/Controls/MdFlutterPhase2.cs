@@ -12,12 +12,18 @@ using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A Material card-backed, host-sortable paginated data table.</summary>
 [PseudoClasses(":first-page", ":last-page", ":empty")]
+[TemplatePart("PART_LoadingLayer", typeof(Border))]
+[TemplatePart("PART_NextPageButton", typeof(MdIconButton))]
+[TemplatePart("PART_PreviousPageButton", typeof(MdIconButton))]
 public sealed class MdPaginatedDataTable : TemplatedControl
 {
     public static readonly StyledProperty<object?> HeaderProperty = AvaloniaProperty.Register<MdPaginatedDataTable, object?>(nameof(Header));
@@ -32,8 +38,12 @@ public sealed class MdPaginatedDataTable : TemplatedControl
     public static readonly DirectProperty<MdPaginatedDataTable, IReadOnlyList<object?>> PageItemsProperty = AvaloniaProperty.RegisterDirect<MdPaginatedDataTable, IReadOnlyList<object?>>(nameof(PageItems), control => control.PageItems);
     public static readonly DirectProperty<MdPaginatedDataTable, string> PageLabelProperty = AvaloniaProperty.RegisterDirect<MdPaginatedDataTable, string>(nameof(PageLabel), control => control.PageLabel);
 
+    /// <summary>The label in front of the rows-per-page selector, localized rather than authored in XAML.</summary>
+    public static readonly DirectProperty<MdPaginatedDataTable, string> RowsPerPageLabelProperty = AvaloniaProperty.RegisterDirect<MdPaginatedDataTable, string>(nameof(RowsPerPageLabel), control => control.RowsPerPageLabel);
+
     private IReadOnlyList<object?> _pageItems = Array.Empty<object?>();
     private string _pageLabel = "0 of 0";
+    private string _rowsPerPageLabel = string.Empty;
     private Button? _previousButton;
     private Button? _nextButton;
 
@@ -44,9 +54,30 @@ public sealed class MdPaginatedDataTable : TemplatedControl
         RowsPerPageProperty.Changed.AddClassHandler<MdPaginatedDataTable>((control, _) => control.OnRowsPerPageChanged());
         TotalItemCountProperty.Changed.AddClassHandler<MdPaginatedDataTable>((control, _) => control.RebuildPage());
         IsLoadingProperty.Changed.AddClassHandler<MdPaginatedDataTable>((control, _) => control.UpdatePseudoClasses());
+
+        // The rows-per-page label is localized, so it has to follow the inherited culture. Without
+        // this the label is resolved once in the constructor and then frozen for the lifetime of
+        // the control, which is exactly the defect it was pulled out of XAML to avoid.
+        MdLocalization.CultureProperty.Changed.AddClassHandler<MdPaginatedDataTable>(
+            (control, _) => control.UpdateLocalizedText());
     }
 
-    public MdPaginatedDataTable() => RebuildPage();
+    public MdPaginatedDataTable()
+    {
+        UpdateLocalizedText();
+        RebuildPage();
+    }
+
+    /// <summary>
+    /// Re-reads the localized labels. Called from the constructor and whenever the inherited
+    /// culture changes, so switching language updates the table's own chrome and not just the
+    /// text the application supplies.
+    /// </summary>
+    private void UpdateLocalizedText()
+    {
+        var culture = MdLocalization.ResolveCulture(this);
+        SetAndRaise(RowsPerPageLabelProperty, ref _rowsPerPageLabel, MdLocalization.GetString("RowsPerPage", culture));
+    }
 
     public object? Header { get => GetValue(HeaderProperty); set => SetValue(HeaderProperty, value); }
     public IEnumerable? ItemsSource { get => GetValue(ItemsSourceProperty); set => SetValue(ItemsSourceProperty, value); }
@@ -59,6 +90,9 @@ public sealed class MdPaginatedDataTable : TemplatedControl
     public ICommand? PageChangedCommand { get => GetValue(PageChangedCommandProperty); set => SetValue(PageChangedCommandProperty, value); }
     public IReadOnlyList<object?> PageItems => _pageItems;
     public string PageLabel => _pageLabel;
+
+    /// <summary>Label shown before the rows-per-page selector.</summary>
+    public string RowsPerPageLabel => _rowsPerPageLabel;
     public int FirstRowIndex => PageIndex * Math.Max(1, RowsPerPage);
 
     public event EventHandler<MdPageChangedEventArgs>? PageChanged;
@@ -157,6 +191,7 @@ public sealed class MdPageChangedEventArgs(int pageIndex, int firstRowIndex, int
 
 /// <summary>A list whose item order can be changed by pointer drag, keyboard alternatives, commands, or direct calls.</summary>
 [PseudoClasses(":reordering", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_ItemsPresenter", typeof(ItemsPresenter))]
 public sealed class MdReorderableList : ListBox
 {
     public static readonly StyledProperty<ICommand?> ReorderCommandProperty = AvaloniaProperty.Register<MdReorderableList, ICommand?>(nameof(ReorderCommand));
@@ -440,6 +475,10 @@ public sealed class MdReorderEventArgs(int oldIndex, int newIndex) : EventArgs
 
 /// <summary>A Material image/content tile with optional overlay header and footer bars.</summary>
 [PseudoClasses(":has-header", ":has-footer", ":activated", ":favorite")]
+[TemplatePart("PART_ActivatedOutline", typeof(Border))]
+[TemplatePart("PART_FavoriteIndicator", typeof(Border))]
+[TemplatePart("PART_Focus", typeof(Border))]
+[TemplatePart("PART_State", typeof(Border))]
 public sealed class MdGridTile : Button
 {
     public static readonly StyledProperty<object?> HeaderProperty = AvaloniaProperty.Register<MdGridTile, object?>(nameof(Header));
@@ -476,6 +515,8 @@ public sealed class MdGridTile : Button
 
 /// <summary>A one- or two-line overlay used in an <see cref="MdGridTile"/>.</summary>
 [PseudoClasses(":has-subtitle", ":has-leading", ":has-trailing", ":interactive", ":pressed")]
+[TemplatePart("PART_Focus", typeof(Border))]
+[TemplatePart("PART_State", typeof(Border))]
 public sealed class MdGridTileBar : ContentControl
 {
     public static readonly StyledProperty<object?> LeadingProperty = AvaloniaProperty.Register<MdGridTileBar, object?>(nameof(Leading));
@@ -570,6 +611,10 @@ public enum MdDismissDirection { Horizontal, StartToEnd, EndToStart }
 
 /// <summary>A swipe-dismiss surface with command, event, confirmation, and direct-operation paths.</summary>
 [PseudoClasses(":dragging", ":confirming", ":dismissed", ":collapsing", ":present", ":start", ":end", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_EndBackground", typeof(ContentPresenter))]
+[TemplatePart("PART_Foreground", typeof(Border))]
+[TemplatePart("PART_Root", typeof(Border))]
+[TemplatePart("PART_StartBackground", typeof(ContentPresenter))]
 public sealed class MdDismissible : ContentControl
 {
     public static readonly StyledProperty<object?> BackgroundContentProperty = AvaloniaProperty.Register<MdDismissible, object?>(nameof(BackgroundContent));

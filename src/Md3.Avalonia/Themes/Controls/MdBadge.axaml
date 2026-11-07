@@ -8,7 +8,7 @@
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
-    <Setter Property="FontSize" Value="11" />
+    <Setter Property="FontSize" Value="{DynamicResource Md.Sys.TypeScale.LabelSmall.Size}" />
     <Setter Property="FontWeight" Value="Medium" />
     <Setter Property="IsHitTestVisible" Value="False" />
     <Setter Property="Template">

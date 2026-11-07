@@ -48,6 +48,41 @@ internal sealed class MdSpecReport
 
     public int Checks { get; private set; }
 
+    /// <summary>
+    /// Numeric findings this layer wants the budget ratchet to see, written beside the markdown
+    /// report as <c>&lt;reportName&gt;.json</c>.
+    /// </summary>
+    /// <remarks>
+    /// The markdown report is for a human reading the job summary; this dictionary is for
+    /// <c>scripts/check-conformance-ratchet.py</c>. A layer that only writes prose cannot be
+    /// ratcheted, so anything the budget in <c>spec-snapshot/conformance-budget.json</c> names has
+    /// to be emitted here as well.
+    /// </remarks>
+    public Dictionary<string, double> Metrics { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>Records one budgeted measurement.</summary>
+    public void Metric(string name, double value) => Metrics[name] = value;
+
+    /// <summary>
+    /// Per-inventory member lists, written to the JSON twin beside <see cref="Metrics"/>.
+    /// </summary>
+    /// <remarks>
+    /// The count alone tells the ratchet whether a backlog grew; the member list is what makes the
+    /// report act as a work queue, and it is the only place the names of the gap survive a run whose
+    /// markdown summary is truncated to the first eight entries.
+    /// </remarks>
+    public Dictionary<string, List<string>> Inventories { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>Reports a measurement that is a gap today but must not get worse.</summary>
+    public void Inventory(string name, IEnumerable<string> subjects, string blurb)
+    {
+        var list = subjects.Distinct(StringComparer.Ordinal).OrderBy(entry => entry, StringComparer.Ordinal).ToList();
+        Inventories[name] = list;
+        Metric(name, list.Count);
+        Note(name, $"{list.Count} entr{(list.Count == 1 ? "y" : "ies")}. {blurb}" +
+                   (list.Count == 0 ? string.Empty : " First: " + string.Join(", ", list.Take(8))));
+    }
+
     public void Pass(string subject)
     {
         Checks++;
@@ -109,7 +144,8 @@ internal sealed class MdSpecReport
             : new List<MdSpecFinding>();
 
         var path = Path.Combine(MdSpecPaths.EnsureArtifactDirectory(), _reportName + ".md");
-        File.WriteAllText(path, Render(), Encoding.UTF8);
+        File.WriteAllText(path, Render(), NoBom);
+        WriteMetrics(Path.ChangeExtension(path, ".json"), blocking.Count);
 
         // A conformance layer that checked nothing would otherwise be an unconditional pass, which
         // spec-snapshot/manifest.json explicitly forbids as evidence.
@@ -128,6 +164,59 @@ internal sealed class MdSpecReport
                 $"Full report: artifacts/spec/{_reportName}.md");
         }
     }
+
+    /// <summary>
+    /// Writes the machine-readable twin of the markdown report.
+    /// </summary>
+    /// <remarks>
+    /// The counters use the same keys the markdown header uses so the digest in
+    /// <c>scripts/publish-conformance.py</c> and the ratchet read the same numbers, and the outcome
+    /// totals are emitted too so a layer that starts producing advisories is visible without
+    /// parsing prose.
+    /// </remarks>
+    private void WriteMetrics(string path, int blocking)
+    {
+        var payload = new
+        {
+            schema_version = 1,
+            report = _reportName,
+            layer = _policyLayer,
+            title = _title,
+            policy_mode = _policy.Mode,
+            checks = Checks,
+            conforming = Count(f => f.Outcome == MdSpecOutcome.Pass),
+            gaps = Count(f => f.Outcome == MdSpecOutcome.Gap),
+            advisory = Count(f => f.Outcome == MdSpecOutcome.Advisory),
+            waived = Count(f => f.Outcome == MdSpecOutcome.Waived),
+            blocking,
+            metrics = Metrics.OrderBy(pair => pair.Key, StringComparer.Ordinal)
+                .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal),
+            inventory = Inventories.OrderBy(pair => pair.Key, StringComparer.Ordinal)
+                .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal)
+        };
+
+        File.WriteAllText(
+            path,
+            System.Text.Json.JsonSerializer.Serialize(payload, new System.Text.Json.JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = null
+            }) + Environment.NewLine,
+            NoBom);
+    }
+
+    /// <summary>
+    /// UTF-8 without a byte-order mark.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="Encoding.UTF8"/> emits a BOM, which every .NET reader strips and every other
+    /// reader has to be told about. <c>scripts/check-conformance-ratchet.py</c> is the other reader,
+    /// and <c>json.loads</c> refuses a document that starts with one - so the metrics twin of every
+    /// report was unreadable to the budget while looking perfectly well formed in an editor.
+    /// </remarks>
+    private static readonly UTF8Encoding NoBom = new(encoderShouldEmitUTF8Identifier: false);
+
+    private int Count(Func<MdSpecFinding, bool> predicate) => _findings.Count(predicate);
 
     private string Render()
     {

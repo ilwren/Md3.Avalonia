@@ -7,11 +7,16 @@ using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
 /// <summary>A pull-to-refresh host inspired by Flutter's RefreshIndicator.</summary>
 [PseudoClasses(":idle", ":pulling", ":armed", ":refreshing", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_IndicatorHost", typeof(Border))]
+[TemplatePart("PART_IndicatorSurface", typeof(Border))]
+[TemplatePart("PART_PullProgress", typeof(MdCircularProgressIndicator))]
+[TemplatePart("PART_Refreshing", typeof(MdLoadingIndicator))]
 public sealed class MdRefreshIndicator : ContentControl
 {
     public static readonly StyledProperty<bool> IsRefreshingProperty =

@@ -22,6 +22,15 @@ namespace Md3.Avalonia.Controls;
 /// cancellation are inherited from Avalonia's <see cref="GridSplitter"/>.
 /// </remarks>
 [PseudoClasses(":columns", ":rows", ":dragging", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_ColumnDivider", typeof(Border))]
+[TemplatePart("PART_ColumnHandle", typeof(Border))]
+[TemplatePart("PART_ColumnStateLayer", typeof(Border))]
+[TemplatePart("PART_ColumnVisual", typeof(Grid))]
+[TemplatePart("PART_InteractionTrack", typeof(Border))]
+[TemplatePart("PART_RowDivider", typeof(Border))]
+[TemplatePart("PART_RowHandle", typeof(Border))]
+[TemplatePart("PART_RowStateLayer", typeof(Border))]
+[TemplatePart("PART_RowVisual", typeof(Grid))]
 public class MdGridSplitter : GridSplitter
 {
     /// <summary>Defines the <see cref="ShowHandle"/> property.</summary>

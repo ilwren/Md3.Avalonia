@@ -11,6 +11,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Md3.Avalonia.Localization;
 using Md3.Avalonia.Motion;
+using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Controls;
 
@@ -19,6 +20,19 @@ namespace Md3.Avalonia.Controls;
 /// on Avalonia's global DatePicker or Calendar themes and supports two-way SelectedDate binding.
 /// </summary>
 [PseudoClasses(":docked", ":modal", ":has-value", ":popup-present", ":reduced-motion", ":no-motion")]
+[TemplatePart("PART_AnchorButton", typeof(Button))]
+[TemplatePart("PART_CancelButton", typeof(MdButton))]
+[TemplatePart("PART_ConfirmButton", typeof(MdButton))]
+[TemplatePart("PART_DaysHost", typeof(MdCalendarGrid))]
+[TemplatePart("PART_DisplayText", typeof(TextBlock))]
+[TemplatePart("PART_ModalActions", typeof(StackPanel))]
+[TemplatePart("PART_MonthHeader", typeof(TextBlock))]
+[TemplatePart("PART_NextMonthButton", typeof(MdIconButton))]
+[TemplatePart("PART_OutgoingDaysHost", typeof(MdCalendarGrid))]
+[TemplatePart("PART_Popup", typeof(Popup))]
+[TemplatePart("PART_PreviousMonthButton", typeof(MdIconButton))]
+[TemplatePart("PART_Surface", typeof(Border))]
+[TemplatePart("PART_TodayButton", typeof(MdButton))]
 public class MdDatePicker : TemplatedControl, IMdPopupOwner, IMdPopupPresenceOwner
 {
     public static readonly StyledProperty<DateTimeOffset?> SelectedDateProperty =
