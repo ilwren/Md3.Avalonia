@@ -21,9 +21,12 @@
        if project resolution ever silently selects it instead of the Android-specific asset. -->
   <Target Name="VerifyAndroidNotificationBackend" AfterTargets="ResolveReferences">
     <ItemGroup>
-      <_NotificationReference Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.Filename)' == 'Md3.Avalonia.Notifications'" />
+      <_NotificationReference Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.Filename)' == 'Md3.Avalonia.Notifications' and '%(ReferenceCopyLocalPaths.Extension)' == '.dll'" />
     </ItemGroup>
-    <Error Condition="'@(_NotificationReference)' == ''" Text="The Android notification assembly was not resolved." />
-    <Error Condition="!$([System.String]::Copy('@(_NotificationReference)').Contains('net10.0-android'))" Text="Android Gallery must resolve the Android-specific notification assembly, not the generic desktop backend: @(_NotificationReference)" />
+    <PropertyGroup>
+      <_ResolvedNotificationReference>@(_NotificationReference)</_ResolvedNotificationReference>
+    </PropertyGroup>
+    <Error Condition="'$(_ResolvedNotificationReference)' == ''" Text="The Android notification assembly was not resolved." />
+    <Error Condition="!$([System.String]::Copy('$(_ResolvedNotificationReference)').Contains('net10.0-android'))" Text="Android Gallery must resolve the Android-specific notification assembly, not the generic desktop backend: @(_NotificationReference)" />
   </Target>
 </Project>
