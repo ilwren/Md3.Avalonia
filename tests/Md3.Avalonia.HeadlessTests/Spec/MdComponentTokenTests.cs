@@ -82,14 +82,22 @@ public sealed class MdComponentTokenTests
 
         if (wanted.Kind == ExpectedKind.Scalar)
         {
-            if (actual.Kind != ResolvedKind.Scalar)
+            if (actual.Kind == ResolvedKind.Scalar)
             {
-                report.Gap(subject, $"Material states a single value ({wanted.Number:0.####}) but the theme " +
-                                    "declares this key as a CornerRadius");
+                report.CheckScalar(subject, wanted.Number!.Value, actual.Number!.Value, tolerance: 0d);
                 return;
             }
 
-            report.CheckScalar(subject, wanted.Number!.Value, actual.Number!.Value, tolerance: 0d);
+            // A single number in Material, a quad in the theme: corner radii and border widths are both
+            // authored that way. Uniform is the equivalent value; anything else is a real difference.
+            var quad = actual.Corners!;
+            var uniform = quad.All(step => Math.Abs(step - quad[0]) < 0.0001);
+            report.Check(
+                subject,
+                uniform && Math.Abs(quad[0] - wanted.Number!.Value) < 0.0001,
+                $"Material states a single value ({wanted.Number:0.####}); the theme declares this key per " +
+                $"edge as [{string.Join(", ", quad)}], which is " +
+                (uniform ? "uniform but a different value" : "not even uniform"));
             return;
         }
 
@@ -112,14 +120,14 @@ public sealed class MdComponentTokenTests
     }
 
     /// <summary>
-    /// The circular shapes: Material states <c>corner-full</c>, and so must the theme.
+    /// The shapes Material calls <c>corner-full</c>, checked as shape rather than as a number.
     /// </summary>
     /// <remarks>
-    /// These are separated from the numeric pairs because "full" is not a measurement. Both vocabularies
-    /// spell it as the full corner step, so the check is that the library uses that step rather than a
-    /// hard-coded number that happens to look round at today's size. Three tokens in the library used to
-    /// be bare numbers (3, 8, 20 - the dot badge, the labelled badge and the checkbox state layer) and
-    /// two of those numbers were smaller than the control they rounded, so the control was not a circle.
+    /// "Full" is not a measurement: Material states 9999px, this theme states 999 as
+    /// <c>Md.Sys.Shape.Corner.Full</c>, and a fixed-size control states half its own box (a 6dp dot
+    /// rounds at 3). Comparing numbers here produces false failures in both directions, so the check is
+    /// the invariant that actually holds: a full-shape token must be at least as round as the box it
+    /// rounds. A radius under half the box leaves square corners on a control Material draws as a circle.
     /// </remarks>
     private static void CompareFullShapes(Application application, ComponentTables tables, MdSpecReport report)
     {
@@ -261,6 +269,15 @@ public sealed class MdComponentTokenTests
             case int number:
                 resolved = new Resolved(ResolvedKind.Scalar, number, null);
                 return true;
+            case Thickness thickness:
+                // A border width is authored as a Thickness here (one value per edge) where Material
+                // states a single number. A uniform quad compares equal to that number; a quad whose
+                // edges differ does not, and the finding says so.
+                resolved = new Resolved(
+                    ResolvedKind.Edges,
+                    null,
+                    new[] { thickness.Left, thickness.Top, thickness.Right, thickness.Bottom });
+                return true;
             case CornerRadius corner:
                 resolved = new Resolved(
                     ResolvedKind.Corner,
@@ -275,7 +292,8 @@ public sealed class MdComponentTokenTests
     private enum ResolvedKind
     {
         Scalar,
-        Corner
+        Corner,
+        Edges
     }
 
     private readonly record struct Resolved(ResolvedKind Kind, double? Number, double[]? Corners);
@@ -359,9 +377,20 @@ public sealed class MdComponentTokenTests
             }
 
             var value = tokenElement.GetProperty("value");
+
+            // A shape token is stored as the resolved number (12) plus the Material Web step it came from
+            // ('corner-medium'), and the theme resolves it as a CornerRadius, not a double. The quad is
+            // the value repeated four times, except for the composite steps ('corner-large-top' and
+            // friends), whose value is already the four-corner array.
+            var isShape = tokenElement.TryGetProperty("shape", out _);
             var expected = value.ValueKind == System.Text.Json.JsonValueKind.Array
                 ? new Expected(ExpectedKind.Corner, null, value.EnumerateArray().Select(item => item.GetDouble()).ToArray())
-                : new Expected(ExpectedKind.Scalar, value.GetDouble(), null);
+                : isShape
+                    ? new Expected(
+                        ExpectedKind.Corner,
+                        null,
+                        Enumerable.Repeat(value.GetDouble(), 4).ToArray())
+                    : new Expected(ExpectedKind.Scalar, value.GetDouble(), null);
 
             _expected[(component, token)] = expected;
             return expected;

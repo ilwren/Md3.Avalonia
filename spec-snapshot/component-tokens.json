@@ -1358,7 +1358,7 @@
   }
  },
  "mapping": {
-  "note": "Every library Md.Comp.* key that can be checked against a Material Web token, and which one. The pairing is by meaning, not by name: Material Web ships one file per variant (fab-primary-small) where this library ships one token per size (Fab.Small.*), and its names are more specific (container-height vs Size). A library key with no entry here is unverified, and the test says so rather than inventing a comparison. The entries whose names differ across the two vocabularies are the interesting ones: that is where a transcription error would hide.",
+  "note": "Every library Md.Comp.* key that can be checked against a Material Web token, and which one. The pairing is by meaning, not by name: Material Web ships one file per variant (fab-primary-small) where this library ships one token per size (Fab.Small.*), and its names are more specific (container-height vs Size). A library key with no entry here is unverified, and the test says so rather than inventing a comparison. The entries whose names differ across the two vocabularies are the interesting ones: that is where a transcription error would hide. Three tokens Material calls corner-full are listed under 'full_shape_pairs' instead of here, because their radius is half their own box rather than the 9999px step, and comparing the number would be a false failure.",
   "excluded_by_design": {
    "Md.Comp.NavigationBar.Flexible.Container.Height": "Material Web's baseline navigation bar is 80px and v0_192 has no flexible/horizontal variant; 64 is a rail-era value this library's own docs promise. Copying 80 would be wrong, not a fix.",
    "Md.Comp.Badge.Large.MinWidth": "Material Web states large-size 16px and no minimum width; this library needs 16 as a floor for a two-digit count. Only the height is comparable.",
@@ -1414,11 +1414,6 @@
     "library": "Md.Comp.ExtendedFab.Small.Shape",
     "component": "extended-fab-primary",
     "token": "container-shape"
-   },
-   {
-    "library": "Md.Comp.CheckBox.StateLayer.Shape",
-    "component": "checkbox",
-    "token": "state-layer-shape"
    },
    {
     "library": "Md.Comp.CheckBox.StateLayer.Size",
@@ -1504,16 +1499,6 @@
     "library": "Md.Comp.Badge.Small.Size",
     "component": "badge",
     "token": "size"
-   },
-   {
-    "library": "Md.Comp.Badge.Small.Shape",
-    "component": "badge",
-    "token": "shape"
-   },
-   {
-    "library": "Md.Comp.Badge.Large.Shape",
-    "component": "badge",
-    "token": "large-shape"
    },
    {
     "library": "Md.Comp.Badge.Large.Height",
