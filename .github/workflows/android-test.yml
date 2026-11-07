@@ -46,6 +46,7 @@ jobs:
           dotnet publish gallery/Md3.Avalonia.Gallery.Android/Md3.Avalonia.Gallery.Android.csproj \
             -c Release \
             -f net10.0-android \
+            -p:IncludeAndroidTarget=true \
             -p:AndroidPackageFormat=apk \
             -o artifacts/android/
 

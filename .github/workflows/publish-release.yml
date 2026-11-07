@@ -263,6 +263,7 @@ jobs:
           dotnet publish gallery/Md3.Avalonia.Gallery.Android/Md3.Avalonia.Gallery.Android.csproj \
             -c Release \
             -f net10.0-android \
+            -p:IncludeAndroidTarget=true \
             -p:Version="$RELEASE_VERSION" \
             -p:ApplicationDisplayVersion="$RELEASE_VERSION" \
             -p:ApplicationVersion="$ANDROID_VERSION_CODE" \

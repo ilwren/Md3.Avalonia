@@ -140,9 +140,8 @@ public sealed class MdGalleryMobileSearchTests
             foreach (var title in desktop.IndexedPageTitles)
             {
                 Assert.False(string.IsNullOrEmpty(GallerySearchTerms.For(title)), title);
-                // Native chrome requires a desktop lifetime. The shared Gallery currently targets
-                // net10.0, so it does not load the Notifications Android-specific backend.
-                if (title is "Borderless windows" or "Notifications") continue;
+                // Native chrome requires a desktop window lifetime.
+                if (title is "Borderless windows") continue;
                 Assert.Contains(title, mobileTitles);
             }
             Assert.True(GallerySearchTerms.Matches("Motion", "MdRevealHost"));

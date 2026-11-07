@@ -44,7 +44,9 @@ public partial class App : Application
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleView)
         {
-            singleView.MainView = new AndroidGalleryView();
+            singleView.MainView = new AndroidGalleryView(
+                GalleryPlatformIntegration.CreateAndroidNotificationService,
+                GalleryPlatformIntegration.RequestAndroidNotificationPermission);
         }
 
         base.OnFrameworkInitializationCompleted();

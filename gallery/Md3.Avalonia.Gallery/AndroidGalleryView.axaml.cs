@@ -11,6 +11,7 @@ using Avalonia.Threading;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Gallery.Pages;
 using Md3.Avalonia.Localization;
+using Md3.Avalonia.Notifications;
 
 namespace Md3.Avalonia.Gallery;
 
@@ -20,6 +21,8 @@ namespace Md3.Avalonia.Gallery;
 /// </summary>
 public partial class AndroidGalleryView : UserControl
 {
+    private readonly Func<IMdSystemNotificationService>? _notificationServiceFactory;
+    private readonly Func<Task<bool>>? _requestNotificationPermission;
     private readonly List<MobileGalleryEntry> _galleryIndex = [];
     private readonly List<TextBlock> _sectionHeaders = [];
     private TextBlock? _currentSection;
@@ -33,8 +36,12 @@ public partial class AndroidGalleryView : UserControl
     internal string? CurrentPageTitle => _currentPageTitle;
     internal MdDialogHost DialogHost => MobileDialogHost;
 
-    public AndroidGalleryView()
+    public AndroidGalleryView() : this(null, null) { }
+
+    internal AndroidGalleryView(Func<IMdSystemNotificationService>? notificationServiceFactory, Func<Task<bool>>? requestNotificationPermission)
     {
+        _notificationServiceFactory = notificationServiceFactory;
+        _requestNotificationPermission = requestNotificationPermission;
         InitializeComponent();
         _overviewPage = MobilePageHost.Content;
         AutomationProperties.SetLandmarkType(MobileDrawer, AutomationLandmarkType.Navigation);
@@ -120,6 +127,7 @@ public partial class AndroidGalleryView : UserControl
         AddPage("Responsive content", () => new ResponsiveContentGalleryPage());
         AddPage("Scrolling surface", () => new ScrollViewerGalleryPage());
         AddPage("Snackbar", () => new SnackbarGalleryPage());
+        AddPage("Notifications", () => new NotificationsGalleryPage(_notificationServiceFactory, _requestNotificationPermission));
         AddPage("Switch", () => new SwitchGalleryPage());
         AddPage("Tabs", () => new TabGalleryPage());
         AddPage("Toolbars", () => new ToolbarGalleryPage());

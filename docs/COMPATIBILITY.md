@@ -43,7 +43,7 @@ The core runtime package references only `Avalonia` and `MaterialColorUtilities`
 
 ```bash
 dotnet workload install android
-dotnet build gallery/Md3.Avalonia.Gallery.Android -c Release
+dotnet build gallery/Md3.Avalonia.Gallery.Android -c Release -p:IncludeAndroidTarget=true
 ```
 
 The host uses `ISingleViewApplicationLifetime` and `AndroidGalleryView`. Popup templates do not force `OverlayLayer`, preserving Avalonia's Android fallback behavior.

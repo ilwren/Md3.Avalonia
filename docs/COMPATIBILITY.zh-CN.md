@@ -44,7 +44,7 @@ comments: true
 
 ```bash
 dotnet workload install android
-dotnet build gallery/Md3.Avalonia.Gallery.Android -c Release
+dotnet build gallery/Md3.Avalonia.Gallery.Android -c Release -p:IncludeAndroidTarget=true
 ```
 
 该宿主使用 `ISingleViewApplicationLifetime` 与 `AndroidGalleryView`。弹层模板不会强制使用 `OverlayLayer`，以保留 Avalonia 在 Android 上的回退行为。

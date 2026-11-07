@@ -9,18 +9,30 @@ namespace Md3.Avalonia.Gallery.Pages;
 public partial class NotificationsGalleryPage : UserControl
 {
     private IMdSystemNotificationService? _notificationService;
+    private readonly Func<IMdSystemNotificationService>? _serviceFactory;
+    private readonly Func<Task<bool>>? _requestPermission;
 
     public NotificationsGalleryPage() : this(null) { }
 
-    public NotificationsGalleryPage(IMdSystemNotificationService? notificationService)
+    public NotificationsGalleryPage(IMdSystemNotificationService? notificationService) : this(notificationService, null, null) { }
+
+    internal NotificationsGalleryPage(Func<IMdSystemNotificationService>? serviceFactory, Func<Task<bool>>? requestPermission)
+        : this(null, serviceFactory, requestPermission) { }
+
+    private NotificationsGalleryPage(IMdSystemNotificationService? notificationService,
+        Func<IMdSystemNotificationService>? serviceFactory, Func<Task<bool>>? requestPermission)
     {
         _notificationService = notificationService;
+        _serviceFactory = serviceFactory;
+        _requestPermission = requestPermission;
         InitializeComponent();
         PlatformStatusText.Text = GetPlatformStatus();
         AutomationProperties.SetLiveSetting(StatusText, AutomationLiveSetting.Polite);
     }
 
-    private async void SendNotification(object? sender, RoutedEventArgs e)
+    private async void SendNotification(object? sender, RoutedEventArgs e) => await SendNotificationAsync();
+
+    internal async Task SendNotificationAsync()
     {
         var title = TitleInput.Text?.Trim();
         if (string.IsNullOrWhiteSpace(title))
@@ -34,11 +46,20 @@ public partial class NotificationsGalleryPage : UserControl
         StatusText.Text = L("Sending notification...", "正在发送通知……");
         try
         {
-            _notificationService ??= MdSystemNotificationService.CreateDefault(new MdSystemNotificationOptions
+            if (_requestPermission is not null && !await _requestPermission())
             {
-                ApplicationName = "Material Design 3 Gallery",
-                WindowsAppUserModelId = GalleryNotificationIdentity.WindowsAppUserModelId
-            });
+                StatusText.Text = L("Notifications are not permitted. Allow them in Android settings and try again.",
+                    "未获得通知权限。请在 Android 设置中允许通知，然后重试。");
+                return;
+            }
+            _notificationService ??= _serviceFactory is not null ? _serviceFactory() :
+                OperatingSystem.IsAndroid()
+                    ? throw new InvalidOperationException("The Android notification host is not configured.")
+                    : MdSystemNotificationService.CreateDefault(new MdSystemNotificationOptions
+                    {
+                        ApplicationName = "Material Design 3 Gallery",
+                        WindowsAppUserModelId = GalleryNotificationIdentity.WindowsAppUserModelId
+                    });
             await _notificationService.ShowAsync(new MdSystemNotification(title, BodyInput.Text ?? string.Empty));
             var registrationError = GalleryNotificationIdentity.WindowsRegistrationError;
             var status = L(
@@ -88,6 +109,10 @@ public partial class NotificationsGalleryPage : UserControl
                 "Windows toast registration did not run. Launch the Windows-specific Desktop Gallery build to test native notifications.",
                 "Windows Toast 注册未运行。请启动 Windows 专用 Desktop Gallery 构建以测试系统通知。");
         }
+
+        if (OperatingSystem.IsAndroid())
+            return L("Android 13 and later may ask for notification permission. Delivery also depends on app and channel settings.",
+                "Android 13 及更高版本可能请求通知权限；通知能否显示还取决于应用与通知渠道设置。");
 
         return L(
             "Native notifications are shown by the host operating system, outside this Gallery window.",
