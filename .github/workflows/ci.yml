@@ -254,7 +254,9 @@ jobs:
         run: python3 scripts/check-sortable-probe-package.py "$HOME/.nuget/packages/sortable.avalonia/2.3.1/sortable.avalonia.nuspec"
 
       - name: Probe Sortable vendor investigation tests
-        run: scripts/probe-tests.sh SortableVendorProbe sortable-vendor.trx
+        run: |
+          scripts/probe-tests.sh SortableVendorProbe sortable-vendor.trx
+          python3 scripts/check-sortable-probe-results.py tests/Md3.Avalonia.HeadlessTests/TestResults/sortable-vendor.trx
 
       - name: Probe slide confirmation tests
         run: scripts/probe-tests.sh MdSlideToConfirm slide-confirm.trx

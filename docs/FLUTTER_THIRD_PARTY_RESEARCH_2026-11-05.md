@@ -4,7 +4,7 @@
 
 数据日期 **2026-11-05**；likes 与许可证取自 pub.dev 当前页面（likes 为 pub.dev 的「likes」计数，随时间增长，接入前须按 §6 复核固定版本）。本文只做文档级调研：**不引入任何 Dart 源码、资产、截图、包名或视觉外观**，与 `THIRD-PARTY-NOTICES.md` 的 “Documentation-only ecosystem research” 约定一致。
 
-**2026-11-06 复核：** 发现 Devolutions 有分组列表控件，`grouped_list` 自研排期暂停并先评估 vendor，粘性组头差异及发布/AOT 状态待核实。详见 `docs/WHEEL_PICKER_RESEARCH_2026-11-06.md`。跨列表拖拽也发现 Avalonia Sortable，需先评估 vendor；2.4.1 依赖 12.1.3 与本仓库固定版本不同，2.3.1 需实测。`slide_to_act` 的独立子集已进入实现；详见 `docs/SLIDE_CONFIRM_RESEARCH_2026-11-06.md`。下表是当日候选快照，不代表当前排期。
+**2026-11-06 复核：** 发现 Devolutions 有分组列表控件，`grouped_list` 自研排期暂停并先评估 vendor，粘性组头差异及发布/AOT 状态待核实。详见 `docs/WHEEL_PICKER_RESEARCH_2026-11-06.md`。跨列表拖拽也发现 Avalonia Sortable，需先评估 vendor；2.4.1 依赖 12.1.3 与本仓库固定版本不同，2.3.1 存在上游已确认的泄漏及其他风险；仅测试探针与边界见 `docs/SORTABLE_VENDOR_PROBE_2026-11-07.md`。`slide_to_act` 的独立子集已进入实现；详见 `docs/SLIDE_CONFIRM_RESEARCH_2026-11-06.md`。下表是当日候选快照，不代表当前排期。
 
 ---
 

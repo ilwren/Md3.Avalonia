@@ -99,18 +99,28 @@ public sealed class SortableVendorProbeTests
     }
 
     [AvaloniaFact]
-    public void Real_Pointer_Drag_Can_Transfer_Between_Same_Group_Lists()
+    public void Real_Pointer_Drag_Can_Transfer_Between_Same_Group_Lists() => ExerciseDrag(accept: true, sameGroup: true);
+
+    [AvaloniaFact]
+    public void Real_Pointer_Drag_Can_Be_Rejected_By_Target() => ExerciseDrag(accept: false, sameGroup: true);
+
+    [AvaloniaFact]
+    public void Real_Pointer_Drag_Does_Not_Transfer_To_A_Different_Group() => ExerciseDrag(accept: true, sameGroup: false);
+
+    private static void ExerciseDrag(bool accept, bool sameGroup)
     {
         var source = new ObservableCollection<string> { "A", "B" };
         var target = new ObservableCollection<string> { "C" };
         var first = List(source);
         var second = List(target);
+        if (!sameGroup) SortableBehavior.SetGroup(second, "different");
         var drops = 0;
         SortableBehavior.SetDropCommand(second, new CallbackCommand(value =>
         {
             var drop = Assert.IsType<SortableDropEventArgs>(value);
             drops++;
-            Assert.True(drop.ApplyDropMutation());
+            drop.IsAccepted = accept;
+            Assert.Equal(accept, drop.ApplyDropMutation());
         }));
         var panel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 30, Children = { first, second } };
         var window = new Window { Width = 600, Height = 300, Content = panel };
@@ -127,9 +137,10 @@ public sealed class SortableVendorProbeTests
             window.MouseMove(to, RawInputModifiers.LeftMouseButton);
             window.MouseUp(to, MouseButton.Left, RawInputModifiers.None);
             Dispatcher.UIThread.RunJobs();
-            Assert.Equal(1, drops);
-            Assert.Equal(new[] { "B" }, source);
-            Assert.Contains("A", target);
+            Assert.Equal(sameGroup ? 1 : 0, drops);
+            Assert.Equal(accept && sameGroup ? new[] { "B" } : new[] { "A", "B" }, source);
+            if (accept && sameGroup) Assert.Contains("A", target);
+            else Assert.Equal(new[] { "C" }, target);
         }
         finally
         {
