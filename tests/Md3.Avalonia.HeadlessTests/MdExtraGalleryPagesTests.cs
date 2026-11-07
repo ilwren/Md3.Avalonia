@@ -1,3 +1,4 @@
+using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
 using Avalonia.Controls;
@@ -6,6 +7,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Extra.Controls;
 using Md3.Avalonia.Gallery;
@@ -44,6 +46,7 @@ public sealed class MdExtraGalleryPagesTests
                     search.Text = query;
                     Dispatcher.UIThread.RunJobs();
                     Assert.True(window.FindControl<MdButton>(demo.ButtonName)!.IsVisible, query);
+                    Assert.False(window.FindControl<MdButton>("AvatarNav")!.IsVisible, query);
                 }
                 search.Text = "";
                 Assert.True(window.NavigateToIndexedPage(demo.Title));
@@ -105,6 +108,39 @@ public sealed class MdExtraGalleryPagesTests
             reset.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Assert.False(slide.IsConfirmed);
             Assert.Contains(window.CurrentPage.GetLogicalDescendants().OfType<TextBlock>(), text => text.Text == "Waiting for confirmation.");
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Emoji_Selection_Auto_Size_And_Confetti_Buttons_Are_Wired()
+    {
+        var window = new MainWindow { Width = 1280, Height = 860 };
+        window.Show();
+        try
+        {
+            window.NavigateToIndexedPage("Auto-size text");
+            var autoText = window.CurrentPage!.GetLogicalDescendants().OfType<MdAutoSizeText>().Single();
+            var box = Assert.IsType<Border>(autoText.Parent);
+            var narrow = window.CurrentPage.GetLogicalDescendants().OfType<MdButton>().Single(b => Equals(b.Content, "Narrow"));
+            narrow.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.Equal(150, box.Width);
+
+            window.NavigateToIndexedPage("Emoji picker");
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var picker = window.CurrentPage!.GetLogicalDescendants().OfType<MdEmojiPicker>().Single();
+            var emoji = picker.GetVisualDescendants().OfType<MdButton>().Single(b => AutomationProperties.GetName(b) == "Grinning face");
+            emoji.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.Contains(window.CurrentPage.GetLogicalDescendants().OfType<TextBlock>(), text => text.Text == "😀");
+
+            window.NavigateToIndexedPage("Confetti");
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var confetti = window.CurrentPage!.GetLogicalDescendants().OfType<MdConfetti>().Single();
+            var celebrate = window.CurrentPage.GetLogicalDescendants().OfType<MdButton>().Single(b => Equals(b.Content, "Celebrate"));
+            celebrate.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.True(confetti.IsRunning);
         }
         finally { window.Close(); }
     }
