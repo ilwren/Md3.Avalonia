@@ -9,7 +9,7 @@ namespace Md3.Avalonia.Gallery.Components;
 /// </summary>
 /// <remarks>
 /// Built imperatively rather than with a collection binding: the members are identifiers, not
-/// content. A <see cref="DataTemplate"/> would put them through compiled bindings and through the
+/// content. A <see cref="Avalonia.Controls.Templates.DataTemplate"/> would put them through compiled bindings and through the
 /// localization walker, and both would have to be talked out of translating them.
 /// </remarks>
 public partial class ApiNotes : UserControl
