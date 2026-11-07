@@ -402,7 +402,7 @@ class EndToEndTests(unittest.TestCase):
     """Runs the collector as a command against a fake device."""
 
     def run_collector(self, extra_args=(), with_adb=True, installed=PACKAGE, crashed=False,
-                      crash_text=None):
+                      crash_text=None, gfxinfo=None):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         root = Path(tmp.name)
@@ -415,6 +415,8 @@ class EndToEndTests(unittest.TestCase):
         env["PATH"] = (f"{bin_dir}{os.pathsep}{env.get('PATH', '')}" if with_adb else "/usr/bin:/bin")
         if with_adb:
             write_fake_adb(bin_dir, state_dir)
+            if gfxinfo is not None:
+                (state_dir / "gfxinfo.txt").write_text(gfxinfo, encoding="utf-8")
             if crash_text is not None:
                 (state_dir / "crash.txt").write_text(crash_text, encoding="utf-8")
             if crashed:
@@ -525,6 +527,20 @@ class EndToEndTests(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, proc.stderr)
         self.assertFalse(any("crash" in w for w in report["warnings"]), report["warnings"])
         self.assertIn("droid.bluetooth", (out_dir / "crash.txt").read_text())
+
+    def test_zero_frames_drops_placeholder_percentiles(self):
+        # A real Android 14/ATD dump with nothing drawn: the percentages are a fixed 4950ms.
+        zero = ("** Graphics info for pid 1 [io.arena.md3avalonia.gallery] **\n"
+                "Total frames rendered: 0\nJanky frames: 0 (0.00%)\n"
+                "50th percentile: 4950ms\n90th percentile: 4950ms\n"
+                "95th percentile: 4950ms\n99th percentile: 4950ms\n")
+        proc, out_dir, report, _ = self.run_collector(gfxinfo=zero)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(report["gfx"]["totalFrames"], 0)
+        self.assertIsNone(report["gfx"]["p90Ms"])
+        self.assertTrue(any("placeholder" in w for w in report["warnings"]), report["warnings"])
+        self.assertIn("| Frame p50 / p90 / p99 | n/a / n/a / n/a |",
+                      (out_dir / "android-perf.md").read_text())
 
     def test_package_not_installed_is_advisory(self):
         proc, out_dir, report, _ = self.run_collector(installed="io.arena.md3avalonia.other")

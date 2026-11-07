@@ -324,6 +324,14 @@ def main() -> int:
                 (out_dir / "gfxinfo.txt").write_text(gfxinfo, encoding="utf-8")
                 if code == 0 and "Total frames rendered" in gfxinfo:
                     gfx = parse_gfxinfo_summary(gfxinfo)
+                    if gfx["totalFrames"] == 0:
+                        # With no frames the platform still prints percentiles -- as a fixed
+                        # placeholder (4950ms on this image). Reporting those as measurements is
+                        # worse than reporting nothing.
+                        for key in ("p50Ms", "p90Ms", "p95Ms", "p99Ms"):
+                            gfx[key] = None
+                        warnings.append("dumpsys gfxinfo counted zero frames; its percentile "
+                                        "values are placeholders and were dropped")
                 else:
                     if crash_lines:
                         warnings.append("the app was not drawing and its crash buffer is not empty "
