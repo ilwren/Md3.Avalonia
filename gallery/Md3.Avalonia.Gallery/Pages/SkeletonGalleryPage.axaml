@@ -22,6 +22,15 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Skeleton group" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The same loading control updates both placeholders together." />
+        <eco:MdSkeletonGroup x:Name="SkeletonGroup" Spacing="8" IsLoading="True">
+          <eco:MdSkeleton Height="48"><Border Padding="12"><TextBlock Text="Loaded content" /></Border></eco:MdSkeleton>
+          <eco:MdSkeleton Height="48"><Border Padding="12"><TextBlock Text="Loaded content" /></Border></eco:MdSkeleton>
+        </eco:MdSkeletonGroup>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Usage" />
         <gallery:CodeExample XamlCode="&lt;eco:MdSkeleton IsLoading=&quot;{Binding IsBusy}&quot;&gt;&#10;  &lt;Border&gt;...&lt;/Border&gt;&#10;&lt;/eco:MdSkeleton&gt;" />
       </StackPanel>

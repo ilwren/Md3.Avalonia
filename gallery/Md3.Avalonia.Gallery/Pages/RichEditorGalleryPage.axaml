@@ -31,7 +31,7 @@
       </StackPanel>
 
       <StackPanel Spacing="12">
-        <eco:MdRichEditor x:Name="RichEditor" MinHeight="220" EditorStateChanged="EditorStateChanged">
+        <eco:MdRichTextEditor x:Name="RichEditor" MinHeight="220" EditorStateChanged="EditorStateChanged">
           <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
             <md:MdTextBox x:Name="EditorText" MinHeight="150" AcceptsReturn="True" TextWrapping="Wrap"
                           Label="Rich-text source" Variant="Outlined"
@@ -41,12 +41,13 @@
               <StackPanel Spacing="6"><TextBlock FontSize="12" FontWeight="Medium" Opacity=".7" Text="LIVE RICH PREVIEW" /><StackPanel x:Name="RichPreview" /></StackPanel>
             </Border>
           </Grid>
-        </eco:MdRichEditor>
+        </eco:MdRichTextEditor>
         <TextBlock x:Name="EditorStatus" Classes="body" TextWrapping="Wrap" Text="Select source text and choose a command; the rendered preview updates immediately." />
       </StackPanel>
 
       <StackPanel Spacing="10">
-        <gallery:ApiNotes Control="MdRichEditor"
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="MdRichTextEditor is a compatibility name for MdRichEditor; both use the same adapter API." />
+        <gallery:ApiNotes Control="MdRichEditor, MdRichTextEditor"
                         Members="Styles include, Adapter, ToolbarCommands, ToolbarItems, Execute(MdRichEditorCommand), EditorStateChanged">
           <gallery:ApiNotes.Notes>
             <TextBlock Classes="body" TextWrapping="Wrap" Text="MaterialRichEditorTheme is a Styles collection, so it is included after MaterialTheme. MdRichEditor is the engine-free surface: Adapter is the only thing that touches the document, Execute() routes a command through it, and ToolbarItems is the descriptor list a toolbar binds to." />

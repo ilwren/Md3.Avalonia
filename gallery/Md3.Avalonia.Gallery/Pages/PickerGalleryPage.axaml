@@ -27,7 +27,7 @@
             <TextBlock x:Name="DockedDateValue" Classes="body" Opacity="0.78" />
           </StackPanel>
           <StackPanel Spacing="6" Margin="0,0,16,16">
-            <md:MdDatePicker x:Name="ModalDate" Label="Modal date" Mode="Modal" SelectedDate="2026-10-05" />
+            <md:MdDatePickerDialog x:Name="ModalDate" Label="Modal date" SelectedDate="2026-10-05" />
             <TextBlock x:Name="ModalDateValue" Classes="body" Opacity="0.78" />
           </StackPanel>
         </WrapPanel>
@@ -37,7 +37,7 @@
         <TextBlock Classes="h2" Text="Time picker" />
         <WrapPanel Orientation="Horizontal">
           <StackPanel Spacing="6" Margin="0,0,16,16">
-            <md:MdTimePicker x:Name="DialTime" Label="Dial time" SelectedTime="14:30:00" />
+            <md:MdTimePickerDialog x:Name="DialTime" Label="Dial time" SelectedTime="14:30:00" />
             <TextBlock x:Name="DialTimeValue" Classes="body" Opacity="0.78" />
           </StackPanel>
           <StackPanel Spacing="6" Margin="0,0,16,16">
@@ -63,7 +63,8 @@
       </Border>
 
       <StackPanel Spacing="10">
-        <gallery:ApiNotes Control="MdDatePicker / MdTimePicker"
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="MdDatePickerDialog and MdTimePickerDialog are preconfigured modal and dial variants of these pickers." />
+        <gallery:ApiNotes Control="MdDatePicker / MdTimePicker / MdDatePickerDialog / MdTimePickerDialog"
                         Members="SelectedDate, DisplayDate, MinimumDate, MaximumDate, DateFormat, Mode, SelectedTime, Hour, Minute, MinuteStep, Is24Hour">
           <gallery:ApiNotes.Notes>
             <TextBlock Classes="body" TextWrapping="Wrap" Text="DisplayDate is the month the grid opens on, independent of SelectedDate; MinimumDate and MaximumDate clamp it. Mode picks docked, modal, dial or input, MinuteStep and Is24Hour shape the time pickers, and DateFormat overrides the field's text." />

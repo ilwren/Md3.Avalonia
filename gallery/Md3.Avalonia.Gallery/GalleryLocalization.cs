@@ -54,6 +54,14 @@ internal static class GalleryLocalization
 
         ["Confetti"]="庆祝粒子", ["Marquee"]="滚动文本", ["Media progress bar"]="媒体进度条",
         ["Page indicator"]="页面指示器", ["Wheel picker"]="数字滚轮",
+        ["Avatar group"]="头像组", ["Overlapping avatars show a team as a group."]="重叠头像将团队呈现为一个整体。",
+        ["Skeleton group"]="骨架屏组", ["The same loading control updates both placeholders together."]="同一个加载控制同时更新两个占位内容。",
+        ["Content transitions"]="内容过渡", ["Switch the content to compare fade-through and shared-axis transitions."]="切换内容以比较淡入淡出与共享轴过渡。",
+        ["Switch content"]="切换内容", ["Fade through"]="淡入淡出", ["Shared axis"]="共享轴", ["First view"]="第一个视图", ["Second view"]="第二个视图",
+        ["Safe area"]="安全区域", ["Safe area content"]="安全区域内容",
+        ["The safe area follows platform insets when available, with a minimum padding on every edge. Desktop and headless platforms may report no inset."]="安全区域在平台提供内边距时跟随其变化，并为每条边设置最小内边距。桌面和无头平台可能不报告内边距。",
+        ["MdDatePickerDialog and MdTimePickerDialog are preconfigured modal and dial variants of these pickers."]="MdDatePickerDialog 和 MdTimePickerDialog 是这些选择器预配置的模态和表盘变体。",
+        ["MdRichTextEditor is a compatibility name for MdRichEditor; both use the same adapter API."]="MdRichTextEditor 是 MdRichEditor 的兼容名称，两者使用相同的适配器 API。",
         // Ecosystem Waves A–F
         ["Flutter ecosystem"]="Flutter 生态控件", ["Wave A · Overlay, commands and density"]="Wave A · 浮层、命令与密度",
         ["Open one transient surface, then scroll to verify it dismisses."]="打开一个临时浮层，然后滚动以验证其自动关闭。", ["Compact density is scoped to this information row only."]="紧凑密度仅应用于此信息行。",

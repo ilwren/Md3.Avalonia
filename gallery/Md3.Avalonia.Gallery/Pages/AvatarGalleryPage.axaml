@@ -23,7 +23,17 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
-        <gallery:ApiNotes Control="MdAvatar"
+        <TextBlock Classes="h2" Text="Avatar group" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Overlapping avatars show a team as a group." />
+        <eco:MdAvatarGroup Overlap="12" HorizontalAlignment="Left">
+          <eco:MdAvatar Initials="AL" />
+          <eco:MdAvatar Initials="M3" />
+          <eco:MdAvatar Initials="UI" />
+        </eco:MdAvatarGroup>
+      </StackPanel>
+
+      <StackPanel Spacing="10">
+        <gallery:ApiNotes Control="MdAvatar, MdAvatarGroup"
                         Members="Image, Initials, Size, Overlap">
           <gallery:ApiNotes.Notes>
             <TextBlock Classes="body" TextWrapping="Wrap" Text="Image and Initials are the two things it can show - the image wins once it loads, the initials stand in until it does. Size sets the container and its type together, and Overlap pulls a row of avatars into one surface so a group reads as a group." />

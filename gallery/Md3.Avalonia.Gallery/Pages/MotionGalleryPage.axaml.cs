@@ -38,6 +38,15 @@ public partial class MotionGalleryPage : UserControl
         _timer.Start();
     }
 
+    private void SwitchTransitionContent(object? sender, RoutedEventArgs e)
+    {
+        var showSecond = Equals(FadeThroughDemo.Content, "First view") || Equals(FadeThroughDemo.Content, "第一个视图");
+        var content = GalleryLocalization.Choose(showSecond ? "Second view" : "First view", showSecond ? "第二个视图" : "第一个视图");
+        FadeThroughDemo.Content = content;
+        SharedAxisDemo.Forward = showSecond;
+        SharedAxisDemo.Content = content;
+    }
+
     private void OnMorphClicked(object? sender, RoutedEventArgs e)
     {
         if (MorphDemo is not null)

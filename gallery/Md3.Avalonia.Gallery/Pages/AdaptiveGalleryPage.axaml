@@ -73,6 +73,17 @@
       </StackPanel>
 
       <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Safe area" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="The safe area follows platform insets when available, with a minimum padding on every edge. Desktop and headless platforms may report no inset." />
+        <Border MaxWidth="520" HorizontalAlignment="Stretch" Background="{DynamicResource Md.Sys.Color.SurfaceContainerLow.Brush}">
+          <md:MdSafeArea MinimumPadding="16">
+            <Border Padding="12" Background="{DynamicResource Md.Sys.Color.PrimaryContainer.Brush}"><TextBlock Text="Safe area content" /></Border>
+          </md:MdSafeArea>
+        </Border>
+        <gallery:CodeExample XamlCode="&lt;md:MdSafeArea MinimumPadding=&quot;16&quot;&gt;...&lt;/md:MdSafeArea&gt;" />
+      </StackPanel>
+
+      <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="Material scaffold" />
         <md:MdScaffold MaxWidth="800" Height="420" HorizontalAlignment="Stretch">
           <md:MdScaffold.TopBar><md:MdTopAppBar Title="Inbox" Variant="Small" /></md:MdScaffold.TopBar>

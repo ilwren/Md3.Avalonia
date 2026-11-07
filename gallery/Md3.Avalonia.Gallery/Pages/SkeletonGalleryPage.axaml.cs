@@ -7,5 +7,9 @@ public partial class SkeletonGalleryPage : UserControl
 {
     public SkeletonGalleryPage() => InitializeComponent();
 
-    private void ToggleSkeleton(object? sender, RoutedEventArgs e) => Skeleton.IsLoading = !Skeleton.IsLoading;
+    private void ToggleSkeleton(object? sender, RoutedEventArgs e)
+    {
+        Skeleton.IsLoading = !Skeleton.IsLoading;
+        SkeletonGroup.IsLoading = Skeleton.IsLoading;
+    }
 }

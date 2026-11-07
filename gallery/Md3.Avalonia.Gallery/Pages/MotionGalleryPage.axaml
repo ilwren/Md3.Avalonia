@@ -102,8 +102,18 @@
       </StackPanel>
 
       <!-- Usage Example -->
+      <StackPanel Spacing="12" MaxWidth="520" HorizontalAlignment="Stretch">
+        <TextBlock Classes="h2" Text="Content transitions" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Switch the content to compare fade-through and shared-axis transitions." />
+        <md:MdButton Content="Switch content" HorizontalAlignment="Left" Click="SwitchTransitionContent" />
+        <TextBlock Classes="body" Text="Fade through" />
+        <extra:MdFadeThrough x:Name="FadeThroughDemo" MinHeight="56" Content="First view" />
+        <TextBlock Classes="body" Text="Shared axis" />
+        <extra:MdSharedAxis x:Name="SharedAxisDemo" MinHeight="56" Axis="X" Content="First view" />
+      </StackPanel>
+
       <StackPanel Spacing="10">
-        <gallery:ApiNotes Control="MdContainerTransform, MdAnimatedVisibility"
+        <gallery:ApiNotes Control="MdContainerTransform, MdAnimatedVisibility, MdFadeThrough, MdSharedAxis"
                         Members="IsExpanded, ClosedContent, OpenContent, ClosedCornerRadius, OpenCornerRadius, Duration, IsContentVisible, Transition">
           <gallery:ApiNotes.Notes>
             <TextBlock Classes="body" TextWrapping="Wrap" Text="MdContainerTransform morphs between the two contents it is given, interpolating the corner radius from ClosedCornerRadius to OpenCornerRadius so the trigger and the expanded surface read as one container. MdAnimatedVisibility is the same motion for an expand or collapse, and Transition picks the scheme - shared axis, fade through or the spring variants." />
