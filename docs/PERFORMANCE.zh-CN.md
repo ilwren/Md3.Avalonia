@@ -94,13 +94,19 @@ dotnet-gcdump collect -p <pid> -o after.gcdump
 日常 UI 开发：Debug 下用 `AttachDeveloperTools()` 跑 Gallery，按 F12 看布局/渲染耗时和可视树。
 
 Android 侧是自动采集的：Maestro 场景跑完后，Android 工作流会跑
-`scripts/collect-android-perf.py`，抓取帧统计（`dumpsys gfxinfo` 摘要 + 原始 `framestats` 表）、
+`scripts/collect-android-perf.py`，抓取帧统计（`dumpsys gfxinfo` 摘要 + 原始 `framestats` 表）、SurfaceFlinger 帧时间线（见下文）、
 内存（`dumpsys meminfo`）、冷启动（force-stop + 从 Launcher 重启后的 ActivityManager
 `Displayed` 行，取不到时退回 `am start -W` 的计时）和 APK 体积，写入 `artifacts/android-test/android-perf.json`；同时会附带一份 `crash.txt`——app 在启动时崩溃的话所有指标
 都是空，只有崩溃缓冲区能解释原因。JSON、原始 dump
 和渲染好的 `android-perf.md` 表格都会进 `android-ui-regression-evidence` 产物，关键数字还会镜像
 到 annotations 和 step summary。采集是建议性质的——任何失败都变成带 warning 的 null，绝不会挂红
 步骤；数字与 swiftshader 模拟器上的 Maestro 场景强相关，所以只做横向对比，不设预算红线。
+
+帧数据故意采两份。`dumpsys gfxinfo` 只统计平台渲染器（`ThreadedRenderer`），像 Avalonia 这种自己
+用 EGL 表面直接绘制的 app 会永远报 `Total frames rendered: 0` 和哨兵百分位，哪怕跑得很流畅。
+`dumpsys SurfaceFlinger --latency <layer>` 不管谁画的都能看到每一帧，所以报告里另有
+`sf.framesPresented`、帧间隔 p50/p90/p99 以及超过 1.5 个刷新间隔的比例。平台绘制的 UI 看 `gfx`，
+我们自己的 UI 看 `sf`。
 
 连着本地真机/模拟器时可以直接跑采集器（默认用唯一在线的 `adb` 设备，多设备时传 `--serial`）：
 

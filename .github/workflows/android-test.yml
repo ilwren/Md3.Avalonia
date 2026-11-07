@@ -80,9 +80,12 @@ jobs:
           # runners; give the emulator its own generous budget instead of racing the step timeout.
           emulator-boot-timeout: 900
           profile: pixel_6
+          # Two cores and the default heap left the system itself ANR-ing ("mCurrentFocus=
+          # Application Not Responding: system") while a 213 MB .NET app tried to start.
+          cores: 4
           force-avd-creation: true
           disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot -memory 4096
           script: |
             # The action runs this block under `sh -e`: the first failing command would abort
             # everything after it, which is how earlier runs lost their evidence. Neutralise that
@@ -156,6 +159,7 @@ jobs:
             artifacts/android-test/meminfo.txt
             artifacts/android-test/displayed.txt
             artifacts/android-test/amstart.txt
+            artifacts/android-test/surfaceflinger.txt
             artifacts/android-test/crash.txt
             artifacts/android-test/collector-run.log
             artifacts/verification/dotnet-test.log

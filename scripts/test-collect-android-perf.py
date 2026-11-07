@@ -227,6 +227,33 @@ class DisplayedParsingTests(unittest.TestCase):
         self.assertEqual(collector.displayed_lines(log, PACKAGE), [])
 
 
+class SurfaceFlingerTests(unittest.TestCase):
+    def test_intervals_and_slow_frames(self):
+        sf = collector.parse_surfaceflinger_latency(SF_LATENCY)
+        self.assertEqual(sf["refreshPeriodMs"], 16.667)
+        self.assertEqual(sf["framesPresented"], 5)
+        self.assertEqual(sf["p50IntervalMs"], 16.667)
+        # Two of the four intervals are ~67ms on a 16.7ms budget.
+        self.assertEqual(sf["maxIntervalMs"], 66.667)
+        self.assertEqual(sf["slowFramesPct"], 25.0)
+
+    def test_sentinel_rows_are_not_frames(self):
+        # INT64_MAX and zeros are "never presented"; counting them would invent frames.
+        sf = collector.parse_surfaceflinger_latency(SF_LATENCY)
+        self.assertLess(sf["framesPresented"], 7)
+
+    def test_garbage_is_null_not_an_exception(self):
+        for text in ("", "not a number", "16666666\n"):
+            sf = collector.parse_surfaceflinger_latency(text)
+            self.assertIsNone(sf["p90IntervalMs"])
+            self.assertIn("framesPresented", sf)
+
+    def test_layer_choice_prefers_the_surfaceview(self):
+        layer = collector.pick_app_surface_layer(SF_LIST, PACKAGE)
+        self.assertIn("SurfaceView[", layer)
+        self.assertIsNone(collector.pick_app_surface_layer("unrelated\n", PACKAGE))
+
+
 class AmStartParsingTests(unittest.TestCase):
     AM_START = ("Starting: Intent { cmp=io.arena.md3avalonia.gallery/.MainActivity }\n"
                 "Status: ok\nLaunchState: COLD\nTotalTime: 2145\nWaitTime: 2210\n")
@@ -267,6 +294,24 @@ class ApkResolutionTests(unittest.TestCase):
             self.assertEqual(collector.resolve_apk(tmp, warnings), (None, None))
             self.assertTrue(warnings)
 
+
+# What `dumpsys SurfaceFlinger --list` returns for the Gallery on an emulator: an incidental
+# activity layer plus the SurfaceView the GL renderer actually presents from.
+SF_LIST = (
+    "com.android.systemui.ImageWallpaper\n"
+    "SurfaceView[io.arena.md3avalonia.gallery/crc64a06d4c86ac145abe.MainActivity]#0\n"
+    "io.arena.md3avalonia.gallery/crc64a06d4c86ac145abe.MainActivity#0\n"
+)
+
+SF_LATENCY = """16666666
+0\t0\t0
+1000000000\t1000000000\t1005000000
+1016666666\t1016666666\t1017000000
+1033333332\t1033333332\t1033800000
+1100000000\t1100000000\t1100500000
+1101666666\t1101666666\t1102000000
+9223372036854775807\t9223372036854775807\t9223372036854775807
+"""
 
 FAKE_ADB = '''#!{python}
 """Fake adb: answers the handful of calls the collector makes against a canned device."""
@@ -309,6 +354,10 @@ elif args[:1] == ["logcat"]:
         print((STATE / "logcat-initial.txt").read_text(), end="")
     else:
         print((STATE / "logcat-cold.txt").read_text(), end="")
+elif args[:4] == ["shell", "dumpsys", "SurfaceFlinger", "--list"]:
+    print((STATE / "sf-list.txt").read_text(), end="")
+elif args[:4] == ["shell", "dumpsys", "SurfaceFlinger", "--latency"]:
+    print((STATE / "sf-latency.txt").read_text(), end="")
 elif args[:4] == ["shell", "cmd", "package", "resolve-activity"]:
     print("priority=0")
     print("{package}/.MainActivity")
@@ -337,6 +386,8 @@ def write_fake_adb(bin_dir: Path, state_dir: Path) -> None:
     (state_dir / "logcat-initial.txt").write_text(LOGACT_PRELAUNCH, encoding="utf-8")
     (state_dir / "logcat-cold.txt").write_text(LOGACT_COLD_START, encoding="utf-8")
     (state_dir / "crash.txt").write_text("", encoding="utf-8")
+    (state_dir / "sf-list.txt").write_text(SF_LIST, encoding="utf-8")
+    (state_dir / "sf-latency.txt").write_text(SF_LATENCY, encoding="utf-8")
 
 
 class EndToEndTests(unittest.TestCase):
@@ -399,6 +450,10 @@ class EndToEndTests(unittest.TestCase):
         self.assertEqual(report["startup"]["coldStartSource"], "logcat Displayed")
         self.assertEqual(report["startup"]["activity"], f"{PACKAGE}/.MainActivity")
         self.assertEqual(report["startup"]["totalTimeMs"], 2145)
+        # Frame timeline comes from SurfaceFlinger, which is what counts frames for an app that
+        # draws through its own EGL surface.
+        self.assertEqual(report["sf"]["framesPresented"], 5)
+        self.assertEqual(report["raw"]["surfaceflinger"], "surfaceflinger.txt")
         self.assertEqual(report["warnings"], [])
 
         for name in ("gfxinfo.txt", "framestats.txt", "meminfo.txt", "displayed.txt",
@@ -406,7 +461,8 @@ class EndToEndTests(unittest.TestCase):
             self.assertTrue((out_dir / name).is_file(), f"{name} missing")
         self.assertEqual(report["raw"], {"gfxinfo": "gfxinfo.txt", "framestats": "framestats.txt",
                                         "meminfo": "meminfo.txt", "displayed": "displayed.txt",
-                                        "crash": "crash.txt", "amstart": "amstart.txt"})
+                                        "crash": "crash.txt", "amstart": "amstart.txt",
+                                        "surfaceflinger": "surfaceflinger.txt"})
         self.assertIn("Displayed io.arena.md3avalonia.gallery", (out_dir / "displayed.txt").read_text())
 
         # Annotations and step summary are what a reviewer actually reads.

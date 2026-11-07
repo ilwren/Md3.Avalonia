@@ -84,8 +84,93 @@ def parse_gfxinfo_summary(text: str) -> dict:
     return gfx
 
 
+def parse_surfaceflinger_latency(text: str) -> dict:
+    """Frames from `dumpsys SurfaceFlinger --latency <layer>`.
+
+    Needed because `dumpsys gfxinfo` only counts the platform renderer (ThreadedRenderer). An app
+    that draws through its own EGL surface -- Avalonia does -- reports "Total frames rendered: 0"
+    forever. SurfaceFlinger sees every presented frame regardless of who drew it, so this is the
+    number that stays meaningful for such an app.
+
+    Format: a refresh period in nanoseconds, then one line per frame with three timestamps
+    (desired present, actual present, frame ready). A row with a zero or INT64_MAX actual present
+    never reached the screen.
+    """
+    result: dict = {"refreshPeriodMs": None, "framesPresented": None,
+                    "p50IntervalMs": None, "p90IntervalMs": None, "p99IntervalMs": None,
+                    "maxIntervalMs": None, "slowFramesPct": None}
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    if not lines:
+        return result
+
+    try:
+        period_ns = int(lines[0])
+    except ValueError:
+        return result
+    if period_ns <= 0:
+        return result
+    result["refreshPeriodMs"] = round(period_ns / 1e6, 3)
+
+    never = {0, 2 ** 63 - 1}
+    presented: list[int] = []
+    for line in lines[1:]:
+        parts = line.split()
+        if len(parts) < 3:
+            continue
+        try:
+            actual = int(parts[1])
+        except ValueError:
+            continue
+        if actual in never:
+            continue
+        presented.append(actual)
+
+    if len(presented) < 2:
+        result["framesPresented"] = len(presented)
+        return result
+
+    presented.sort()
+    # Timestamps are monotonic within a buffer's history; drop duplicates from the same frame.
+    intervals = [(b - a) / 1e6 for a, b in zip(presented, presented[1:]) if b > a]
+    if not intervals:
+        result["framesPresented"] = len(presented)
+        return result
+    intervals.sort()
+
+    def percentile(pct: float) -> float:
+        index = min(len(intervals) - 1, max(0, round((pct / 100) * len(intervals)) - 1))
+        return round(intervals[index], 3)
+
+    result["framesPresented"] = len(presented)
+    result["p50IntervalMs"] = percentile(50)
+    result["p90IntervalMs"] = percentile(90)
+    result["p99IntervalMs"] = percentile(99)
+    result["maxIntervalMs"] = round(intervals[-1], 3)
+    slow_budget = 1.5 * (period_ns / 1e6)
+    result["slowFramesPct"] = round(100 * sum(1 for i in intervals if i > slow_budget) / len(intervals), 2)
+    return result
+
+
+def pick_app_surface_layer(listing: str, package: str) -> str | None:
+    """Choose the SurfaceFlinger layer that carries the app's rendered frames."""
+    candidates = [line.strip() for line in listing.splitlines()
+                  if package in line and line.strip()]
+    if not candidates:
+        return None
+    # A GL-drawing app publishes through a SurfaceView-backed layer; prefer that over incidental
+    # layers such as the activity's own (empty) BLAST buffer.
+    for needle in ("SurfaceView", "BLAST", "crc64"):
+        for candidate in candidates:
+            if needle in candidate:
+                return candidate
+    return candidates[0]
+
+
 def parse_meminfo(text: str) -> dict:
     mem: dict = {"totalPssKb": None, "nativePssKb": None, "dalvikPssKb": None}
+    sf: dict = {"refreshPeriodMs": None, "framesPresented": None, "p50IntervalMs": None,
+                "p90IntervalMs": None, "p99IntervalMs": None, "maxIntervalMs": None,
+                "slowFramesPct": None}
 
     def first_int(pattern: str) -> int | None:
         match = re.search(pattern, text, re.M)
@@ -179,6 +264,9 @@ def main() -> int:
         "missedVsync", "highInputLatency", "slowUiThread",
         "slowBitmapUploads", "slowIssueDrawCommands", "frameDead")}
     mem: dict = {"totalPssKb": None, "nativePssKb": None, "dalvikPssKb": None}
+    sf: dict = {"refreshPeriodMs": None, "framesPresented": None, "p50IntervalMs": None,
+                "p90IntervalMs": None, "p99IntervalMs": None, "maxIntervalMs": None,
+                "slowFramesPct": None}
     device: dict = {"model": None, "sdk": None}
     initial_displayed_ms: int | None = None
     cold_start_displayed_ms: int | None = None
@@ -227,6 +315,25 @@ def main() -> int:
                                         "(see crash.txt): " + crash_lines[-1][:160])
                     else:
                         warnings.append("dumpsys gfxinfo produced no frame summary (app may not have drawn yet)")
+
+                # SurfaceFlinger sees frames the platform renderer never counts (see
+                # parse_surfaceflinger_latency).
+                code, layers = run(adb + ["shell", "dumpsys", "SurfaceFlinger", "--list"])
+                layer = pick_app_surface_layer(layers, package) if code == 0 else None
+                if layer:
+                    code, latency = run(adb + ["shell", "dumpsys", "SurfaceFlinger",
+                                               "--latency", layer])
+                    (out_dir / "surfaceflinger.txt").write_text(latency, encoding="utf-8")
+                    if code == 0:
+                        sf = parse_surfaceflinger_latency(latency)
+                        if not sf["framesPresented"]:
+                            warnings.append("SurfaceFlinger reported no presented frames for "
+                                            f"layer {layer!r}")
+                    else:
+                        warnings.append("dumpsys SurfaceFlinger --latency failed")
+                else:
+                    warnings.append("no SurfaceFlinger layer matched the package; frame timeline "
+                                    "unavailable")
 
                 code, framestats = run(adb + ["shell", "dumpsys", "gfxinfo", package, "framestats"])
                 (out_dir / "framestats.txt").write_text(framestats, encoding="utf-8")
@@ -311,6 +418,7 @@ def main() -> int:
         "apkBytes": apk_bytes,
         "gfx": gfx,
         "mem": mem,
+        "sf": sf,
         "startup": {
             "initialDisplayedMs": initial_displayed_ms,
             "coldStartDisplayedMs": cold_start_displayed_ms,
@@ -327,6 +435,7 @@ def main() -> int:
             "displayed": "displayed.txt" if (out_dir / "displayed.txt").exists() else None,
             "crash": "crash.txt" if (out_dir / "crash.txt").exists() else None,
             "amstart": "amstart.txt" if (out_dir / "amstart.txt").exists() else None,
+            "surfaceflinger": "surfaceflinger.txt" if (out_dir / "surfaceflinger.txt").exists() else None,
         },
         "warnings": warnings,
     }
@@ -349,6 +458,8 @@ def main() -> int:
         f"| Missed vsync / slow UI thread | {cell(gfx['missedVsync'])} / {cell(gfx['slowUiThread'])} |",
         f"| PSS total / native / Dalvik | {cell(mem['totalPssKb'], ' KB')} / {cell(mem['nativePssKb'], ' KB')} / {cell(mem['dalvikPssKb'], ' KB')} |",
         f"| Cold start (Displayed) | {cell(cold_start_displayed_ms, 'ms')} (initial launch {cell(initial_displayed_ms, 'ms')}) |",
+        f"| Frames presented (SurfaceFlinger) | {cell(sf['framesPresented'])} at {cell(sf['refreshPeriodMs'], 'ms')} refresh |",
+        f"| Frame interval p50 / p90 / p99 | {cell(sf['p50IntervalMs'], 'ms')} / {cell(sf['p90IntervalMs'], 'ms')} / {cell(sf['p99IntervalMs'], 'ms')} (max {cell(sf['maxIntervalMs'], 'ms')}, slow {cell(sf['slowFramesPct'], '%')}) |",
     ]
     if warnings:
         md_lines += ["", "Warnings:"] + [f"- {w}" for w in warnings]
@@ -362,6 +473,10 @@ def main() -> int:
         print(f"::notice::Android perf [{package}]: "
               f"pss[{cell(mem['totalPssKb'], 'KB')}] coldstart[{cell(cold_start_displayed_ms, 'ms')}] "
               f"apk[{cell(None if apk_bytes is None else round(apk_bytes / 1e6, 1), 'MB')}]")
+        print(f"::notice::Android perf [{package}]: "
+              f"sf_frames[{cell(sf['framesPresented'])}] "
+              f"sf_p50/p90/p99[{cell(sf['p50IntervalMs'], 'ms')}/{cell(sf['p90IntervalMs'], 'ms')}/"
+              f"{cell(sf['p99IntervalMs'], 'ms')}] slow[{cell(sf['slowFramesPct'], '%')}]")
         for w in warnings[:5]:
             print(f"::warning::Android perf [{package}]::{w}")
 
@@ -372,7 +487,8 @@ def main() -> int:
 
     print(f"android perf: package={package} "
           f"frames={cell(gfx['totalFrames'])} janky={cell(gfx['jankyFrames'])} "
-          f"p90={cell(gfx['p90Ms'], 'ms')} pss={cell(mem['totalPssKb'], 'KB')} "
+          f"p90={cell(gfx['p90Ms'], 'ms')} sf_frames={cell(sf['framesPresented'])} "
+          f"pss={cell(mem['totalPssKb'], 'KB')} "
           f"coldstart={cell(cold_start_displayed_ms, 'ms')} apk={cell(apk_bytes, 'B')} "
           f"warnings={len(warnings)} report={out_dir / 'android-perf.json'}")
     return 0

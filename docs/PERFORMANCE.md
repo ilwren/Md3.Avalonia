@@ -101,7 +101,7 @@ layout/render timings and the visual tree.
 
 Android is collected automatically: after the Maestro scenario, the Android workflow runs
 `scripts/collect-android-perf.py`, which captures frame stats (`dumpsys gfxinfo` summary plus
-the raw `framestats` table), memory (`dumpsys meminfo`), cold start (the ActivityManager
+the raw `framestats` table), a SurfaceFlinger frame timeline (see below), memory (`dumpsys meminfo`), cold start (the ActivityManager
 `Displayed` line for a force-stop + relaunch, falling back to the `am start -W` timings when
 the image never logs one) and APK size into
 `artifacts/android-test/android-perf.json`. A `crash.txt` dump rides along with it: when the app
@@ -111,6 +111,13 @@ The JSON, the raw dumps and a rendered
 numbers are mirrored as annotations and a step summary. Collection is advisory by design — any
 failure becomes a null with a warning, never a red step — and the numbers couple to the Maestro
 scenario on a swiftshader emulator, so compare runs against each other, not against a budget.
+
+Two frame sources are collected on purpose. `dumpsys gfxinfo` only counts the platform renderer
+(`ThreadedRenderer`), so an app that draws through its own EGL surface — Avalonia does — reports
+`Total frames rendered: 0` and sentinel percentiles forever, no matter how smoothly it runs.
+`dumpsys SurfaceFlinger --latency <layer>` sees every presented frame regardless of who drew it, so
+the report carries `sf.framesPresented` plus frame-interval p50/p90/p99 and the share of intervals
+longer than 1.5 refresh periods. Read the `gfx` numbers for platform-drawn UI and `sf` for ours.
 
 Against a local device or emulator, run the collector directly (any single attached `adb`
 device; pass `--serial` when several are attached):
