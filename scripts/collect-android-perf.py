@@ -482,6 +482,8 @@ def main() -> int:
         f"| Missed vsync / slow UI thread | {cell(gfx['missedVsync'])} / {cell(gfx['slowUiThread'])} |",
         f"| PSS total / native / Dalvik | {cell(mem['totalPssKb'], ' KB')} / {cell(mem['nativePssKb'], ' KB')} / {cell(mem['dalvikPssKb'], ' KB')} |",
         f"| Cold start (Displayed) | {cell(cold_start_displayed_ms, 'ms')} (initial launch {cell(initial_displayed_ms, 'ms')}) |",
+        f"| Launch wait (`am start -W`) | {cell(startup['waitTimeMs'], 'ms')}"
+        f" (TotalTime {cell(startup['totalTimeMs'], 'ms')}, activity `{startup['activity'] or 'n/a'}`) |",
         f"| Frames presented (SurfaceFlinger) | {cell(sf['framesPresented'])} at {cell(sf['refreshPeriodMs'], 'ms')} refresh |",
         f"| Frame interval p50 / p90 / p99 | {cell(sf['p50IntervalMs'], 'ms')} / {cell(sf['p90IntervalMs'], 'ms')} / {cell(sf['p99IntervalMs'], 'ms')} (max {cell(sf['maxIntervalMs'], 'ms')}, slow {cell(sf['slowFramesPct'], '%')}) |",
     ]
@@ -498,6 +500,7 @@ def main() -> int:
               f"pss[{cell(mem['totalPssKb'], 'KB')}] coldstart[{cell(cold_start_displayed_ms, 'ms')}] "
               f"apk[{cell(None if apk_bytes is None else round(apk_bytes / 1e6, 1), 'MB')}]")
         print(f"::notice::Android perf [{package}]: "
+              f"launch_wait[{cell(startup['waitTimeMs'], 'ms')}] "
               f"sf_frames[{cell(sf['framesPresented'])}] "
               f"sf_p50/p90/p99[{cell(sf['p50IntervalMs'], 'ms')}/{cell(sf['p90IntervalMs'], 'ms')}/"
               f"{cell(sf['p99IntervalMs'], 'ms')}] slow[{cell(sf['slowFramesPct'], '%')}]")

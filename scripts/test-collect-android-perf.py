@@ -479,6 +479,8 @@ class EndToEndTests(unittest.TestCase):
         self.assertNotIn("::warning::", proc.stdout)
         self.assertIn("Android performance evidence", summary.read_text())
         self.assertIn("| Frames rendered | 1204 |", summary.read_text())
+        self.assertIn("| Launch wait (`am start -W`) | 2210ms (TotalTime 2145ms, activity "
+                      f"`{PACKAGE}/.MainActivity`) |", summary.read_text())
         markdown = (out_dir / "android-perf.md").read_text()
         self.assertIn("device Pixel 6 (SDK 34)", markdown)
 

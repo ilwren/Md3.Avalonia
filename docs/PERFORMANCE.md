@@ -119,6 +119,13 @@ Two frame sources are collected on purpose. `dumpsys gfxinfo` only counts the pl
 the report carries `sf.framesPresented` plus frame-interval p50/p90/p99 and the share of intervals
 longer than 1.5 refresh periods. Read the `gfx` numbers for platform-drawn UI and `sf` for ours.
 
+What a hosted runner can measure today, with `Google ATD` + software rendering: APK size, PSS, and
+the `am start -W` launch wait. Not frame times — the Gallery's UI never reaches the screen there
+(SurfaceFlinger presents zero frames on every app layer, and the platform itself sits in an
+Application Not Responding state while a 215 MB .NET process starts). `-gpu off` and host GL behave
+identically. Frame and cold-start numbers therefore come from a machine with working GPU
+acceleration: a developer's emulator, or a device.
+
 Against a local device or emulator, run the collector directly (any single attached `adb`
 device; pass `--serial` when several are attached):
 

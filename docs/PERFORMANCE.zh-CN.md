@@ -108,6 +108,11 @@ Android 侧是自动采集的：Maestro 场景跑完后，Android 工作流会�
 `sf.framesPresented`、帧间隔 p50/p90/p99 以及超过 1.5 个刷新间隔的比例。平台绘制的 UI 看 `gfx`，
 我们自己的 UI 看 `sf`。
 
+托管 runner 今天能测到的是：APK 体积、PSS、以及 `am start -W` 的启动等待。测不到帧时间——Gallery 的
+UI 在那台机器上根本没上屏（SurfaceFlinger 对它的每一层都报告 0 帧，而且平台自己在 215 MB 的 .NET
+进程启动期间一直处于 Application Not Responding）。`-gpu off` 与宿主 GL 表现完全一致。所以帧数据和
+冷启动数据要以有 GPU 加速的机器为准：开发者本机模拟器或真机。
+
 连着本地真机/模拟器时可以直接跑采集器（默认用唯一在线的 `adb` 设备，多设备时传 `--serial`）：
 
 ```bash
