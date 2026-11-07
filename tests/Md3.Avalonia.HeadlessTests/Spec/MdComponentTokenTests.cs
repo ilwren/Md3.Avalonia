@@ -202,6 +202,7 @@ public sealed class MdComponentTokenTests
     private static void ReportCoverage(Application application, ComponentTables tables, MdSpecReport report)
     {
         var declared = DeclaredComponentKeys();
+        var declaredSet = declared.ToHashSet(StringComparer.Ordinal);
         var covered = tables.Pairs.Select(pair => pair.Library)
             .Concat(tables.FullShapePairs.Select(pair => pair.Library))
             .ToHashSet(StringComparer.Ordinal);
@@ -212,8 +213,12 @@ public sealed class MdComponentTokenTests
         covered.Add("Md.Comp.Badge.Large.Shape");
         covered.Add("Md.Comp.CheckBox.StateLayer.Shape");
 
+        // Only keys the library actually declares belong in this queue. Intersecting the excluded list
+        // with it matters: an entry there may name a token that does not exist (Md.Comp.MenuItem.* is
+        // exactly that - the exclusion explains why the specification's 48dp has no counterpart here,
+        // and counting a key that was never declared would inflate the queue by one).
         var unmapped = declared.Where(key => !covered.Contains(key))
-            .Concat(tables.ExcludedByDesign.Keys.Where(key => !covered.Contains(key)))
+            .Concat(tables.ExcludedByDesign.Keys.Where(key => declaredSet.Contains(key) && !covered.Contains(key)))
             .Distinct(StringComparer.Ordinal)
             .OrderBy(key => key, StringComparer.Ordinal)
             .ToList();
