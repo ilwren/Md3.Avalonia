@@ -118,6 +118,27 @@ jobs:
             cp docs/reports/test-spec-execution-results.json artifacts/android-test/verification-results.json
             exit 0
 
+      # Job logs cannot be relied on (hosted-runner logs and artifacts are sometimes not
+      # retrievable), so the numbers a reviewer needs are mirrored into annotations: the parsed
+      # report, plus the head of the raw gfxinfo dump that the numbers came from.
+      - name: Summarize performance evidence
+        if: always()
+        run: |
+          python3 - <<'EOF'
+          import json, pathlib
+          report = pathlib.Path("artifacts/android-test/android-perf.json")
+          if not report.is_file():
+              print("::warning::android perf: no android-perf.json -- the emulator step produced no "
+                    "evidence (see the step's annotations for why)")
+          else:
+              data = json.loads(report.read_text())
+              print("::notice::android perf report: " + json.dumps(data)[:3000])
+              gfx = pathlib.Path("artifacts/android-test/gfxinfo.txt")
+              if gfx.is_file():
+                  head = " | ".join(gfx.read_text(errors="replace").splitlines()[:14])
+                  print("::warning::android perf gfxinfo head: " + head[:3000])
+          EOF
+
       - name: Upload Android Regression Evidence
         if: always()
         uses: actions/upload-artifact@v4

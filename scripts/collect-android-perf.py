@@ -32,7 +32,7 @@ from pathlib import Path
 # Kept tight on purpose: this runs inside the emulator step's five-minute budget, so the
 # collector must never be the reason evidence goes missing.
 ADB_TIMEOUT = 45
-PROBE_BUDGET_SECONDS = 120
+PROBE_BUDGET_SECONDS = 180
 PROBE_POLL_SECONDS = 2
 
 
