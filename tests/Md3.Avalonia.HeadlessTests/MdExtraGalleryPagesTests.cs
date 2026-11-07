@@ -67,7 +67,7 @@ public sealed class MdExtraGalleryPagesTests
                 Assert.True(shell.NavigateToPage(demo.Title), demo.Title);
                 Assert.Equal(demo.Title, shell.CurrentPageTitle);
                 var viewport = Assert.IsAssignableFrom<Control>(shell.FindControl<ContentControl>("MobilePageHost")!.Content);
-                var page = Assert.Single(viewport.GetLogicalDescendants().OfType<Control>(), child => child.GetType() == demo.Page);
+                var page = Assert.Single(viewport.GetLogicalDescendants().OfType<Control>().Prepend(viewport), child => child.GetType() == demo.Page);
                 Assert.Contains(page.GetLogicalDescendants(), child => demo.Control.IsInstanceOfType(child));
             }
         }
