@@ -4,8 +4,6 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
-using Avalonia.Interactivity;
-using Avalonia.VisualTree;
 using Avalonia.Threading;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Extra.Controls;
@@ -54,22 +52,12 @@ public sealed class MdGalleryPrimitivesTests
             Assert.Equal(WindowEdge.SouthEast, grip.Edge);
             Assert.Equal(3, window.GetLogicalDescendants().OfType<MdCaptionButton>().Count());
 
-            string? pointerSource = null;
-            window.AddHandler(InputElement.PointerPressedEvent, (_, args) => pointerSource = args.Source?.GetType().Name,
-                RoutingStrategies.Tunnel, handledEventsToo: true);
-            var dragPoint = drag.TranslatePoint(new Point(drag.Bounds.Width / 2, drag.Bounds.Height / 2), window)!.Value;
-            window.MouseMove(dragPoint, RawInputModifiers.None);
-            window.MouseDown(dragPoint, MouseButton.Left, RawInputModifiers.None);
-            window.MouseUp(dragPoint, MouseButton.Left, RawInputModifiers.None);
-            var hits = string.Join(", ", window.GetVisualsAt(dragPoint).Select(v => $"{v.GetType().Name}:{(v as Control)?.Name}"));
-            Assert.True(adapter.Moves == 1, $"move={adapter.Moves}, source={pointerSource}, point={dragPoint}, bounds={drag.Bounds}, hits={hits}");
-
-            var gripPoint = grip.TranslatePoint(new Point(grip.Bounds.Width / 2, grip.Bounds.Height / 2), window)!.Value;
-            window.MouseMove(gripPoint, RawInputModifiers.None);
-            window.MouseDown(gripPoint, MouseButton.Left, RawInputModifiers.None);
-            window.MouseUp(gripPoint, MouseButton.Left, RawInputModifiers.None);
-            hits = string.Join(", ", window.GetVisualsAt(gripPoint).Select(v => $"{v.GetType().Name}:{(v as Control)?.Name}"));
-            Assert.True(adapter.LastResize == WindowEdge.SouthEast, $"resize={adapter.LastResize}, source={pointerSource}, point={gripPoint}, bounds={grip.Bounds}, hits={hits}");
+            // Headless hit-testing needs a rendered/settled frame, just like the other Gallery
+            // pointer tests. These send real mouse input, not routed-event shortcuts.
+            PointerInput.Click(drag);
+            Assert.Equal(1, adapter.Moves);
+            PointerInput.Click(grip);
+            Assert.Equal(WindowEdge.SouthEast, adapter.LastResize);
         }
         finally { window.Close(); }
     }
