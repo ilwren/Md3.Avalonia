@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:md="using:Md3.Avalonia.Controls">
   <ControlTheme x:Key="MdListGeneratedItemTheme" TargetType="ListBoxItem">
-    <Setter Property="MinHeight" Value="56" />
+    <Setter Property="MinHeight" Value="{DynamicResource Md.Comp.List.Item.MinHeight}" />
     <Setter Property="Padding" Value="16,8" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Foreground" Value="{DynamicResource Md.Sys.Color.OnSurface.Brush}" />

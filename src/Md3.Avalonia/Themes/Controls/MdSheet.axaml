@@ -19,7 +19,7 @@
                   <Button.Template>
                     <ControlTemplate TargetType="Button">
                       <Border Background="Transparent">
-                        <Border Width="32" Height="4" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        <Border Width="{DynamicResource Md.Comp.Sheet.DragHandle.Width}" Height="{DynamicResource Md.Comp.Sheet.DragHandle.Height}" HorizontalAlignment="Center" VerticalAlignment="Center"
                                 Background="{DynamicResource Md.Sys.Color.OnSurfaceVariant.Brush}" CornerRadius="2" />
                       </Border>
                     </ControlTemplate>

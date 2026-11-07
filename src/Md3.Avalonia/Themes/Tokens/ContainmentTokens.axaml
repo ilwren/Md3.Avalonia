@@ -67,4 +67,10 @@
   -->
   <x:Double x:Key="Md.Comp.Chip.Target.Height">48</x:Double>
   <x:Double x:Key="Md.Comp.Fab.Target.Size">48</x:Double>
+  <x:Double x:Key="Md.Comp.NavigationBar.ActiveIndicator.Height">32</x:Double>
+  <x:Double x:Key="Md.Comp.NavigationBar.ActiveIndicator.Width">64</x:Double>
+  <x:Double x:Key="Md.Comp.NavigationRail.ActiveIndicator.Height">32</x:Double>
+  <x:Double x:Key="Md.Comp.NavigationRail.ActiveIndicator.Width">56</x:Double>
+  <x:Double x:Key="Md.Comp.List.Item.MinHeight">56</x:Double>
+  <x:Double x:Key="Md.Comp.List.Item.LeadingSpace">16</x:Double>
 </ResourceDictionary>

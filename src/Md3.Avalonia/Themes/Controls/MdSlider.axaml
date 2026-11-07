@@ -17,7 +17,7 @@
     <Setter Property="Template">
       <ControlTemplate TargetType="md:MdSliderThumb">
         <Canvas Width="4" Height="44">
-          <Border x:Name="PART_ThumbStateLayer" Canvas.Left="-18" Canvas.Top="2" Width="40" Height="40"
+          <Border x:Name="PART_ThumbStateLayer" Canvas.Left="-18" Canvas.Top="2" Width="{DynamicResource Md.Comp.Slider.StateLayer.Size}" Height="{DynamicResource Md.Comp.Slider.StateLayer.Size}"
                   Background="{DynamicResource Md.Sys.Color.Primary.Brush}" CornerRadius="{DynamicResource Md.Sys.Shape.Corner.LargeIncreased}"
                   IsHitTestVisible="False" Opacity="0" RenderTransform="scale(0.8)" RenderTransformOrigin="50%,50%" />
           <Border x:Name="PART_Handle" Width="4" Height="44" Background="{TemplateBinding Background}" CornerRadius="2" />

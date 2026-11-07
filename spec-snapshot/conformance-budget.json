@@ -81,9 +81,9 @@
     },
     "oracle_coverage_ratio": {
       "direction": "higher",
-      "budget": 0.3299,
+      "budget": 0.3423,
       "source": "lint",
-      "why": "oracle entries / declared keys. Was 0.2462. The 49 published M3 baseline colour roles are oracle entries, and the 35 that differ between variants now carry both values, so dark mode is measured rather than assumed. The oracle grew a 'variants' shape instead of storing the light value under the bare key, because that would have compared dark #D0BCFF against light #6750A4."
+      "why": "oracle entries / declared keys. Was 0.2462. The 49 published M3 baseline colour roles are oracle entries, and the 35 that differ between variants now carry both values, so dark mode is measured rather than assumed. The oracle grew a 'variants' shape instead of storing the light value under the bare key, because that would have compared dark #D0BCFF against light #6750A4. Raised from 0.3299 to 0.3423 because 11 component tokens Material states explicitly were added to the oracle rather than left as template literals: the navigation bar and rail indicators, the tab indicator heights, the slider state layer, the sheet drag handle and the list item height and leading space."
     },
     "oracle_families": {
       "direction": "higher",
@@ -219,9 +219,9 @@
     },
     "component_tokens_without_a_specification_counterpart": {
       "direction": "lower",
-      "budget": 220,
+      "budget": 217,
       "source": "headless",
-      "why": "Declared Md.Comp.* keys that no Material Web token can be compared with, either because the specification states no value for them or because no mapping has been written. 52 keys are checked today. The first run of this comparison found one real divergence - a large FAB icon at 32 where fab-primary-large.icon-size is 36 - and one interesting near-miss: three tokens Material calls corner-full are bare numbers here (3, 8, 20), and chasing them produced three false findings, because a radius of exactly half the box already is full. They are checked as shape-against-size instead of against the number 999. Both outcomes are the point of the layer: a token transcribed wrong into both the oracle and the theme agrees with itself and disagrees with Material."
+      "why": "Declared Md.Comp.* keys that no Material Web token can be compared with. 63 keys are checked, up from 49: this round added 11 tokens the templates had been spelling as bare literals while Material states their value - the navigation bar and rail active indicators (64/32 and 56/32), the tab indicator heights (3 and 2), the slider state layer (40), the sheet drag handle (32x4) and the list item (56dp one-line, 16dp leading space) - plus four icon-button and three app-bar heights that were already declared. The queue is 217 of 280 and cannot reach zero: Material Web states almost no layout tokens, so the 57 library tokens whose value is a padding, margin, offset or gap have no counterpart by construction. "
     }
   }
 }

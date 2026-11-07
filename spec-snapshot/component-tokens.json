@@ -1358,11 +1358,19 @@
   }
  },
  "mapping": {
-  "note": "Every library Md.Comp.* key that can be checked against a Material Web token, and which one. The pairing is by meaning, not by name: Material Web ships one file per variant (fab-primary-small) where this library ships one token per size (Fab.Small.*), and its names are more specific (container-height vs Size). A library key with no entry here is unverified, and the test says so rather than inventing a comparison. The entries whose names differ across the two vocabularies are the interesting ones: that is where a transcription error would hide. Three tokens Material calls corner-full are listed under 'full_shape_pairs' instead of here, because their radius is half their own box rather than the 9999px step, and comparing the number would be a false failure.",
+  "note": "Every library Md.Comp.* key that can be checked against a Material Web token, and which one. The pairing is by meaning, not by name: Material Web ships one file per variant (fab-primary-small) where this library ships one token per size (Fab.Small.*), and its names are more specific (container-height vs Size). A library key with no entry here is unverified, and the test says so rather than inventing a comparison. The entries whose names differ across the two vocabularies are the interesting ones: that is where a transcription error would hide. Three tokens Material calls corner-full are listed under 'full_shape_pairs' instead of here, because their radius is half their own box rather than the 9999px step, and comparing the number would be a false failure. Material Web states almost no layout tokens: across its 55 component files the only space/padding keys are list-item-leading-space, list-item-trailing-space, divider-leading-space and divider-trailing-space. A library token whose value is a padding, a margin, an offset or a gap therefore has no counterpart to be checked against, by construction - not because the mapping is unfinished. Those keys stay in the coverage queue because the queue means 'nothing asserts this', which stays true.",
   "excluded_by_design": {
    "Md.Comp.NavigationBar.Flexible.Container.Height": "Material Web's baseline navigation bar is 80px and v0_192 has no flexible/horizontal variant; 64 is a rail-era value this library's own docs promise. Copying 80 would be wrong, not a fix.",
    "Md.Comp.Badge.Large.MinWidth": "Material Web states large-size 16px and no minimum width; this library needs 16 as a floor for a two-digit count. Only the height is comparable.",
-   "Md.Comp.Badge.Large.Padding": "Material Web states no padding token for the badge."
+   "Md.Comp.Badge.Large.Padding": "Material Web states no padding token for the badge.",
+   "Md.Comp.Button.Medium.Container.Height": "Material Web states one button size (40dp); M3 Expressive defines the 32/40/56/96/136 scale this library implements, and the 56dp 'Medium' is that scale's middle step, not Material Web's single filled button. Comparing them would report a design decision as a defect.",
+   "Md.Comp.Button.XSmall.Container.Height": "Same: 32dp is the Expressive XSmall step, and Material Web's 40dp is its only button height.",
+   "Md.Comp.Button.Medium.Icon.Size": "Material Web's with-icon-icon-size is 18dp for the single size it defines; this library's icon follows the Expressive size scale (20/20/24/32/40). Intentional.",
+   "Md.Comp.Button.Small.Icon.Size": "Same Expressive scale; see Md.Comp.Button.Medium.Icon.Size.",
+   "Md.Comp.Button.Large.Icon.Size": "Same Expressive scale; see Md.Comp.Button.Medium.Icon.Size.",
+   "Md.Comp.Button.XLarge.Icon.Size": "Same Expressive scale; see Md.Comp.Button.Medium.Icon.Size.",
+   "Md.Comp.Button.XSmall.Icon.Size": "Same Expressive scale; see Md.Comp.Button.Medium.Icon.Size.",
+   "Md.Comp.MenuItem.Container.Height": "This library has no Md.Comp.MenuItem.* key at all; its menu items are Md.Comp.ComboBox.MenuItem.* and are 72dp two-line rows. Material's 48dp is the single-line item. The absence of the token is the finding, and it is tracked by the coverage queue rather than faked into a pass."
   },
   "pairs": [
    {
@@ -1584,6 +1592,91 @@
     "library": "Md.Comp.Chip.Icon.Size",
     "component": "assist-chip",
     "token": "with-icon-icon-size"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.Height",
+    "component": "filled-icon-button",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.DefaultWidth",
+    "component": "filled-icon-button",
+    "token": "container-width"
+   },
+   {
+    "library": "Md.Comp.IconButton.Small.IconSize",
+    "component": "filled-icon-button",
+    "token": "icon-size"
+   },
+   {
+    "library": "Md.Comp.AppBar.Small.Height",
+    "component": "top-app-bar-small",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.AppBar.MediumFlexible.Height",
+    "component": "top-app-bar-medium",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.AppBar.LargeFlexible.LargeHeight",
+    "component": "top-app-bar-large",
+    "token": "container-height"
+   },
+   {
+    "library": "Md.Comp.NavigationBar.ActiveIndicator.Height",
+    "component": "navigation-bar",
+    "token": "active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.NavigationBar.ActiveIndicator.Width",
+    "component": "navigation-bar",
+    "token": "active-indicator-width"
+   },
+   {
+    "library": "Md.Comp.NavigationRail.ActiveIndicator.Height",
+    "component": "navigation-rail",
+    "token": "active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.NavigationRail.ActiveIndicator.Width",
+    "component": "navigation-rail",
+    "token": "active-indicator-width"
+   },
+   {
+    "library": "Md.Comp.List.Item.MinHeight",
+    "component": "list",
+    "token": "list-item-one-line-container-height"
+   },
+   {
+    "library": "Md.Comp.List.Item.LeadingSpace",
+    "component": "list",
+    "token": "list-item-leading-space"
+   },
+   {
+    "library": "Md.Comp.Tabs.Primary.Indicator.Height",
+    "component": "primary-navigation-tab",
+    "token": "active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.Tabs.Secondary.Indicator.Height",
+    "component": "secondary-navigation-tab",
+    "token": "active-indicator-height"
+   },
+   {
+    "library": "Md.Comp.Slider.StateLayer.Size",
+    "component": "slider",
+    "token": "state-layer-size"
+   },
+   {
+    "library": "Md.Comp.Sheet.DragHandle.Width",
+    "component": "sheet-bottom",
+    "token": "docked-drag-handle-width"
+   },
+   {
+    "library": "Md.Comp.Sheet.DragHandle.Height",
+    "component": "sheet-bottom",
+    "token": "docked-drag-handle-height"
    }
   ],
   "full_shape_pairs": [
@@ -1611,6 +1704,43 @@
     "library": "Md.Comp.IconButton.Small.RoundShape",
     "expect": "Full"
    }
-  ]
+  ],
+  "unmodelled_spec_components": {
+   "note": "Specification component tables that no pair in the mapping touches. This is the other direction of the coverage queue: the first counts library tokens nothing can check, this counts specification tables nothing is checked against. Both are measured so the report cannot read as coverage it does not have. It is produced by subtraction, not authored, so it cannot drift from the pairs.",
+   "count": 31,
+   "components": [
+    "banner",
+    "carousel-item",
+    "circular-progress-indicator",
+    "data-table",
+    "date-picker-docked",
+    "elevated-button",
+    "elevated-card",
+    "filled-select",
+    "filled-tonal-button",
+    "filter-chip",
+    "input-chip",
+    "linear-progress-indicator",
+    "list",
+    "navigation-rail",
+    "outlined-button",
+    "outlined-card",
+    "outlined-icon-button",
+    "outlined-segmented-button",
+    "outlined-select",
+    "plain-tooltip",
+    "primary-navigation-tab",
+    "rich-tooltip",
+    "search-bar",
+    "secondary-navigation-tab",
+    "sheet-bottom",
+    "sheet-floating",
+    "sheet-side",
+    "slider",
+    "suggestion-chip",
+    "text-button",
+    "time-picker"
+   ]
+  }
  }
 }

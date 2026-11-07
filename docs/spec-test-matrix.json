@@ -388,6 +388,21 @@
         "spec-snapshot/component-tokens.json"
       ],
       "verification_status": "not_run"
+    },
+    {
+      "id": "COMPONENT-TOKENS-002",
+      "component": "MdNavigationBar, MdNavigationRail, MdTabs, MdSlider, MdSheet, MdListItem",
+      "variant": "default",
+      "platforms": [
+        "headless-linux",
+        "desktop"
+      ],
+      "source": "https://github.com/material-components/material-web/blob/main/tokens/versions/v0_192",
+      "assertion": "Geometry the specification states explicitly is declared as a token and consumed by the template, rather than spelled as a bare literal inside the control theme: the navigation bar and rail active indicators (64x32 and 56x32), the primary and secondary tab indicator heights (3 and 2), the slider state layer (40), the sheet drag handle (32x4) and the list item height and leading space (56, 16). Each is checked against the frozen Material Web tables at runtime; a literal that happens to hold the right number is not the same property, because it cannot be retargeted or audited.",
+      "automated_evidence": [
+        "MdComponentTokenTests.Component_Tokens_Match_The_Material_Web_Tables"
+      ],
+      "verification_status": "not_run"
     }
   ]
 }
