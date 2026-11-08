@@ -144,6 +144,10 @@ public sealed class MdGalleryMobileSearchTests
                 if (title is "Borderless windows") continue;
                 Assert.Contains(title, mobileTitles);
             }
+            Assert.True(GallerySearchTerms.Matches("Scrolling surface", "MdScrollBar"));
+            Assert.True(GallerySearchTerms.Matches("Date and time pickers", "MdTimeDial"));
+            Assert.True(GallerySearchTerms.Matches("Paginated table", "MdPaginatedDataColumn"));
+            Assert.True(GallerySearchTerms.Matches("Borderless windows", "MdWindow"));
             Assert.True(GallerySearchTerms.Matches("Motion", "MdRevealHost"));
             Assert.True(GallerySearchTerms.Matches("Borderless windows", "MdWindowResizeGrip"));
             Assert.True(GallerySearchTerms.Matches("Emoji picker", "表情选择器"));

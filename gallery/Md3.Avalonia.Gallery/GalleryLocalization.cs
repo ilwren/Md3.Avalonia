@@ -19,6 +19,16 @@ internal static class GalleryLocalization
     private static readonly ConditionalWeakTable<object, Original> ErrorOriginals = new();
     private static readonly IReadOnlyDictionary<string, string> Zh = new Dictionary<string, string>(StringComparer.Ordinal)
     {
+        ["Standalone scrollbar"]="独立滚动条",
+        ["Always"]="始终显示", ["Auto"]="自动", ["Hidden"]="隐藏", ["Hour"]="小时", ["Minute"]="分钟", ["Packages"]="软件包",
+        ["This scrollbar controls a sample value, not the scrolling surface above. Change its visibility and interaction policies below."]="此滚动条控制示例数值，而不是上方滚动区域。可在下方更改可见性和交互策略。",
+        ["Toggle interaction"]="切换交互",
+        ["Standalone time dial"]="独立时间表盘",
+        ["Choose which value to edit, then drag the clock hand or use the arrow keys."]="选择要编辑的值，然后拖动时钟指针或使用方向键。",
+        ["Open a regular Material window with native decorations. The borderless example above is a separate subclass."]="打开带原生窗口装饰的普通 Material 窗口。上方无边框示例是另一个子类。",
+        ["Material window"]="Material 窗口",
+        ["Open Material window"]="打开 Material 窗口",
+        ["Select a column header to sort."]="选择列标题进行排序。",
         ["Get started"]="开始使用", ["Develop"]="开发", ["Foundations"]="基础", ["Styles"]="样式", ["Components"]="组件",
         ["Avalonia component gallery"]="Avalonia 组件库", ["Search components"]="搜索组件", ["Language"]="语言", ["Theme"]="主题", ["Light"]="浅色", ["Dark"]="深色", ["System"]="跟随系统",
         ["COMPONENTS"]="组件", ["FOUNDATIONS"]="基础", ["Components overview"]="组件概览", ["COMMUNICATIONS"]="通讯", ["SAMPLES & APPS"]="示例应用", ["LIBRARY EXTENSIONS"]="库扩展", ["ALL COMPONENTS"]="全部组件", ["On this page"]="本页内容", ["Overview"]="概览", ["Examples"]="示例", ["Usage"]="用法", ["API"]="API",

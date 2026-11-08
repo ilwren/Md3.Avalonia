@@ -52,6 +52,19 @@
       </StackPanel>
 
       <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="Standalone time dial" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Choose which value to edit, then drag the clock hand or use the arrow keys." />
+        <md:MdTimeDial x:Name="StandaloneDial" Width="240" Height="240" HorizontalAlignment="Left" Hour="14" Minute="30" Is24Hour="True" />
+        <WrapPanel>
+          <md:MdButton x:Name="DialHourButton" Content="Hour" Variant="Text" Click="ShowDialHour" />
+          <md:MdButton x:Name="DialMinuteButton" Content="Minute" Variant="Text" Click="ShowDialMinute" />
+        </WrapPanel>
+        <TextBlock x:Name="StandaloneDialStatus" Classes="body" />
+        <gallery:ApiNotes Control="MdTimeDial" Members="Hour, Minute, ActivePart, Is24Hour" />
+        <gallery:CodeExample XamlCode="&lt;md:MdTimeDial Hour=&quot;14&quot; Minute=&quot;30&quot; Is24Hour=&quot;True&quot; ActivePart=&quot;Minute&quot; /&gt;" />
+      </StackPanel>
+
+      <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Number wheel" />
         <TextBlock Classes="body" TextWrapping="Wrap" Text="Drag or tap a row, or focus the wheel and use the arrow keys or mouse wheel. Values snap to integer steps." />
         <eco:MdWheelPicker x:Name="NumberWheel" Width="120" HorizontalAlignment="Left" Minimum="0" Maximum="30" Step="5" Value="10" />

@@ -22,6 +22,13 @@
           </gallery:ApiNotes.Notes>
         </gallery:ApiNotes>
     <StackPanel Spacing="10">
+      <TextBlock Classes="h2" Text="Material window" />
+      <TextBlock Classes="body" TextWrapping="Wrap" Text="Open a regular Material window with native decorations. The borderless example above is a separate subclass." />
+      <md:MdButton x:Name="OpenMaterialWindowButton" Content="Open Material window" Variant="Outlined" HorizontalAlignment="Left" Click="OpenMaterialWindow" />
+      <gallery:ApiNotes Control="MdWindow" Members="Title, Content, Width, Height" />
+      <gallery:CodeExample XamlCode="&lt;md:MdWindow Title=&quot;My app&quot;&gt;&#10;  &lt;views:Shell /&gt;&#10;&lt;/md:MdWindow&gt;" />
+    </StackPanel>
+    <StackPanel Spacing="10">
       <TextBlock Classes="h2" Text="Custom window parts" />
       <TextBlock Classes="body" TextWrapping="Wrap" Text="The real secondary window includes a draggable client region, caption actions and a bottom-right resize grip. These actions require a desktop window; Android does not support them." />
       <gallery:ApiNotes Control="MdWindowDragRegion, MdWindowResizeGrip, MdCaptionButton, MdWindowCaptionButton" Members="Edge, Kind" />

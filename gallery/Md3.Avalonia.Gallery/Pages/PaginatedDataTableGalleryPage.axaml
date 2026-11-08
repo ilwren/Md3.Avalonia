@@ -11,17 +11,18 @@
       </StackPanel>
 
       <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
-        <md:MdPaginatedDataTable x:Name="PagedTable" Height="310" RowsPerPage="3" PageChanged="PagedTableChanged">
-          <md:MdPaginatedDataTable.Header>
-            <Grid ColumnDefinitions="2*,*,*"><TextBlock FontWeight="Medium" Text="Package" /><TextBlock Grid.Column="1" FontWeight="Medium" Text="Platform" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" FontWeight="Medium" Text="Score" /></Grid>
-          </md:MdPaginatedDataTable.Header>
+        <md:MdPaginatedDataTable x:Name="PagedTable" Height="310" RowsPerPage="3"
+                                 Header="Packages" ShowFirstLastButtons="True"
+                                 PageChanged="PagedTableChanged" SortRequested="PagedTableSortRequested">
           <md:MdPaginatedDataTable.ItemTemplate>
             <DataTemplate x:CompileBindings="False">
-              <Grid Margin="4" ColumnDefinitions="2*,*,*"><TextBlock Text="{Binding Name}" /><TextBlock Grid.Column="1" Text="{Binding Platform}" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="{Binding Score}" /></Grid>
+              <Grid Margin="4" ColumnDefinitions="*,*,*"><TextBlock Text="{Binding Name}" /><TextBlock Grid.Column="1" Text="{Binding Platform}" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="{Binding Score}" /></Grid>
             </DataTemplate>
           </md:MdPaginatedDataTable.ItemTemplate>
         </md:MdPaginatedDataTable>
         <TextBlock x:Name="PagedStatus" Classes="body" Text="Rows 1–3" />
+        <TextBlock x:Name="SortStatus" Classes="body" Text="Select a column header to sort." TextWrapping="Wrap" />
+        <gallery:ApiNotes Control="MdPaginatedDataTable, MdPaginatedDataColumn" Members="Columns, IsSortable, IsNumeric, SortRequested, SortColumnIndex, SortAscending, ShowFirstLastButtons" />
       </StackPanel>
 
       <StackPanel Spacing="10">

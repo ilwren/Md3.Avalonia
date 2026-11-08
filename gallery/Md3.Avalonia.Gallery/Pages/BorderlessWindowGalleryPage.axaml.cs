@@ -12,6 +12,7 @@ public partial class BorderlessWindowGalleryPage : UserControl
     {
         InitializeComponent();
         OpenDemoButton.IsEnabled = !OperatingSystem.IsAndroid() && !OperatingSystem.IsIOS();
+        OpenMaterialWindowButton.IsEnabled = OpenDemoButton.IsEnabled;
         var adapter = MdWindowPlatformAdapterResolver.Resolve();
         AdapterStatus.Text = GalleryLocalization.Choose(
             $"Resolved {adapter.Platform}; capabilities: {adapter.Capabilities}.",
@@ -23,6 +24,29 @@ public partial class BorderlessWindowGalleryPage : UserControl
         var window = CreateDemoWindow();
         if (TopLevel.GetTopLevel(this) is Window owner) window.Show(owner); else window.Show();
     }
+
+    private void OpenMaterialWindow(object? sender, RoutedEventArgs e)
+    {
+        var window = CreateMaterialWindow();
+        if (TopLevel.GetTopLevel(this) is Window owner) window.Show(owner); else window.Show();
+    }
+
+    internal MdWindow CreateMaterialWindow() => new()
+    {
+        Title = GalleryLocalization.Choose("Material window", "Material 窗口"),
+        Width = 560,
+        Height = 320,
+        MinWidth = 320,
+        MinHeight = 200,
+        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+        Content = new TextBlock
+        {
+            Margin = new Thickness(32),
+            Text = GalleryLocalization.Choose("A normal window with a Material surface and native decorations.",
+                "使用 Material 表面和原生窗口装饰的普通窗口。"),
+            TextWrapping = global::Avalonia.Media.TextWrapping.Wrap
+        }
+    };
 
     internal MdBorderlessWindow CreateDemoWindow()
     {

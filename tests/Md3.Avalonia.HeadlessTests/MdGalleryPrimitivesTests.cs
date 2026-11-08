@@ -3,8 +3,10 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Extra.Controls;
 using Md3.Avalonia.Gallery;
@@ -65,6 +67,93 @@ public sealed class MdGalleryPrimitivesTests
             Assert.True(gripPress.Handled);
             Assert.Equal(WindowEdge.SouthEast, adapter.LastResize);
         }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Scrollbar_Example_Exposes_Real_Policies_And_Value()
+    {
+        var page = new ScrollViewerGalleryPage();
+        var window = new Window { Width = 900, Height = 900, Content = page };
+        window.Show();
+        try
+        {
+            var bar = page.FindControl<MdScrollBar>("StandaloneBar")!;
+            Assert.Equal(MdScrollbarThumbVisibility.Always, bar.ThumbVisibility);
+            Assert.True(bar.IsTrackVisible);
+            bar.Value = 72;
+            Assert.Contains("72", page.FindControl<TextBlock>("ScrollbarStatus")!.Text ?? "");
+            page.FindControl<MdButton>("HiddenButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.Equal(MdScrollbarThumbVisibility.Hidden, bar.ThumbVisibility);
+            page.FindControl<MdButton>("AutoButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.Equal(MdScrollbarThumbVisibility.Auto, bar.ThumbVisibility);
+            page.FindControl<MdButton>("AlwaysButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            page.FindControl<MdButton>("InteractiveButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.Equal(MdScrollbarThumbVisibility.Always, bar.ThumbVisibility);
+            Assert.False(bar.IsInteractive);
+            Assert.False(bar.IsHitTestVisible);
+            page.FindControl<MdButton>("InteractiveButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.True(bar.IsInteractive);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Time_Dial_Example_Switches_Part_And_Reports_Keyboard_Changes()
+    {
+        var page = new PickerGalleryPage();
+        var window = new Window { Width = 900, Height = 900, Content = page };
+        window.Show();
+        try
+        {
+            var dial = page.FindControl<MdTimeDial>("StandaloneDial")!;
+            Assert.True(dial.Is24Hour);
+            page.FindControl<MdButton>("DialMinuteButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.Equal(MdTimeDialPart.Minute, dial.ActivePart);
+            Assert.True(dial.Focus());
+            window.KeyPress(Key.Up, RawInputModifiers.None, PhysicalKey.ArrowUp, null);
+            Assert.Equal(31, dial.Minute);
+            Assert.Contains("14:31", page.FindControl<TextBlock>("StandaloneDialStatus")!.Text ?? "");
+            page.FindControl<MdButton>("DialHourButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.Equal(MdTimeDialPart.Hour, dial.ActivePart);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Paginated_Table_Example_Sorts_In_The_Host_And_Returns_To_First_Page()
+    {
+        var page = new PaginatedDataTableGalleryPage();
+        var window = new Window { Width = 900, Height = 900, Content = page };
+        window.Show();
+        try
+        {
+            var table = page.FindControl<MdPaginatedDataTable>("PagedTable")!;
+            Assert.Equal(3, table.Columns.Count);
+            Assert.True(table.ShowFirstLastButtons);
+            table.LastPage();
+            Assert.Equal(2, table.PageIndex);
+            var headers = table.GetVisualDescendants().OfType<Grid>().Single(x => x.Name == "PART_ColumnHeaders");
+            var score = Assert.IsType<Button>(headers.Children[2]);
+            score.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.Equal(0, table.PageIndex);
+            Assert.True(table.SortAscending);
+            Assert.Equal(86, Assert.IsType<PaginatedDataTableGalleryPage.PackageRow>(table.PageItems[0]).Score);
+            score.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Assert.False(table.SortAscending);
+            Assert.Equal(99, Assert.IsType<PaginatedDataTableGalleryPage.PackageRow>(table.PageItems[0]).Score);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Window_Page_Creates_A_Regular_Material_Window()
+    {
+        var page = new BorderlessWindowGalleryPage();
+        var window = page.CreateMaterialWindow();
+        Assert.IsType<MdWindow>(window);
+        window.Show();
+        try { Assert.IsType<TextBlock>(window.Content); }
         finally { window.Close(); }
     }
 

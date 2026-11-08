@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Md3.Avalonia.Controls;
 
 namespace Md3.Avalonia.Gallery.Pages;
@@ -18,6 +19,13 @@ public partial class PickerGalleryPage : UserControl
                 "使用 Cancel 关闭、OK 确认；输入模式有独立的确认操作。弹出状态与选中值支持双向 MVVM 绑定。");
         }
 
+        StandaloneDial.PropertyChanged += (_, e) =>
+        {
+            if (e.Property == MdTimeDial.HourProperty || e.Property == MdTimeDial.MinuteProperty ||
+                e.Property == MdTimeDial.ActivePartProperty) UpdateStandaloneDialStatus();
+        };
+        UpdateStandaloneDialStatus();
+
         // Defect #9 was reported as "the picker doesn't apply the selection". The page showed no
         // bound value anywhere, so neither outcome was observable: a committed selection and a
         // rolled-back one looked identical. Each picker now prints what it is actually bound to.
@@ -26,6 +34,15 @@ public partial class PickerGalleryPage : UserControl
         Track(DialTime, DialTimeValue, L("dial · commits on OK", "表盘 · 按 OK 提交"));
         Track(InputTime, InputTimeValue, L("input · commits on OK or Enter", "输入 · 按 OK 或回车提交"));
         Track(TwentyFourHourTime, TwentyFourHourTimeValue, L("input · 24-hour · commits on OK", "输入 · 24 小时制 · 按 OK 提交"));
+    }
+
+    private void ShowDialHour(object? sender, RoutedEventArgs e) => StandaloneDial.ActivePart = MdTimeDialPart.Hour;
+    private void ShowDialMinute(object? sender, RoutedEventArgs e) => StandaloneDial.ActivePart = MdTimeDialPart.Minute;
+    private void UpdateStandaloneDialStatus()
+    {
+        var part = StandaloneDial.ActivePart == MdTimeDialPart.Hour ? L("hour", "小时") : L("minute", "分钟");
+        StandaloneDialStatus.Text = L($"Time: {StandaloneDial.Hour:00}:{StandaloneDial.Minute:00}; editing {part}.",
+            $"时间：{StandaloneDial.Hour:00}:{StandaloneDial.Minute:00}；正在编辑{part}。");
     }
 
     private static void Track(MdDatePicker picker, TextBlock readout, string mode)

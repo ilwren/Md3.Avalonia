@@ -23,6 +23,21 @@
         </md:MdScrollViewer>
       </StackPanel>
 
+      <StackPanel Spacing="12">
+        <TextBlock Classes="h2" Text="Standalone scrollbar" />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="This scrollbar controls a sample value, not the scrolling surface above. Change its visibility and interaction policies below." />
+        <md:MdScrollBar x:Name="StandaloneBar" Orientation="Horizontal" Height="28" Minimum="0" Maximum="100" Value="35" ViewportSize="20" LargeChange="10" ThumbVisibility="Always" IsTrackVisible="True" />
+        <WrapPanel>
+          <md:MdButton x:Name="AlwaysButton" Content="Always" Variant="Text" Click="ShowAlways" />
+          <md:MdButton x:Name="AutoButton" Content="Auto" Variant="Text" Click="ShowAuto" />
+          <md:MdButton x:Name="HiddenButton" Content="Hidden" Variant="Text" Click="ShowHidden" />
+          <md:MdButton x:Name="InteractiveButton" Content="Toggle interaction" Variant="Text" Click="ToggleInteraction" />
+        </WrapPanel>
+        <TextBlock x:Name="ScrollbarStatus" Classes="body" TextWrapping="Wrap" />
+        <gallery:ApiNotes Control="MdScrollBar" Members="Value, Minimum, Maximum, ViewportSize, ThumbVisibility, IsTrackVisible, IsInteractive" />
+        <gallery:CodeExample XamlCode="&lt;md:MdScrollBar Orientation=&quot;Horizontal&quot; Minimum=&quot;0&quot; Maximum=&quot;100&quot; ThumbVisibility=&quot;Always&quot; IsTrackVisible=&quot;True&quot; /&gt;" />
+      </StackPanel>
+
       <StackPanel Spacing="10">
         <gallery:ApiNotes Control="MdScrollViewer"
                         Members="IsDragScrollingEnabled, AllowMouseDrag, DragThreshold, Friction">
