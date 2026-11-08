@@ -3,9 +3,11 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.LogicalTree;
 using Avalonia.Threading;
 using Md3.Avalonia.Controls;
 using Md3.Avalonia.Gallery;
+using Md3.Avalonia.Gallery.Pages;
 using Xunit;
 
 namespace Md3.Avalonia.HeadlessTests;
@@ -45,6 +47,38 @@ public sealed class MdGalleryMobileSearchTests
             Dispatcher.UIThread.RunJobs();
             Assert.Empty(results.Children);
             Assert.False(status.IsVisible);
+        }
+        finally { host.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void New_Examples_Are_Searchable_And_Open_In_The_Android_Shell()
+    {
+        var shell = new AndroidGalleryView();
+        var host = new Window { Width = 390, Height = 780, Content = shell };
+        host.Show();
+        try
+        {
+            var search = shell.FindControl<MdSearchBar>("HomeSearch")!;
+            var results = shell.FindControl<StackPanel>("HomeSearchResults")!;
+            var viewport = shell.FindControl<ContentControl>("MobilePageHost")!;
+            foreach (var (query, title, pageType) in new[]
+            {
+                ("MdScrollBar", "Scrolling surface", typeof(ScrollViewerGalleryPage)),
+                ("MdTimeDial", "Date and time pickers", typeof(PickerGalleryPage)),
+                ("MdPaginatedDataColumn", "Paginated table", typeof(PaginatedDataTableGalleryPage))
+            })
+            {
+                Assert.True(shell.NavigateToPage("Overview"));
+                search.Text = query;
+                Dispatcher.UIThread.RunJobs();
+                var result = Assert.Single(results.Children.OfType<MdButton>(), button => Equals(button.Content, title));
+                result.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                Assert.Equal(title, shell.CurrentPageTitle);
+                var content = Assert.IsAssignableFrom<Control>(viewport.Content);
+                Assert.Contains(new[] { content }.Concat(content.GetLogicalDescendants().OfType<Control>()),
+                    control => control.GetType() == pageType);
+            }
         }
         finally { host.Close(); }
     }
