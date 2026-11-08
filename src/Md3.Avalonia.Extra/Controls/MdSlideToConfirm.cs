@@ -323,7 +323,23 @@ internal sealed class SlideReleaseVelocity
         get
         {
             if (_samples.Count < 2) return 0;
-            var first = _samples[0];
+            // Only use the most recent direction of travel. Averaging across a reversal would
+            // make a backward release incorrectly continue forwards. Stationary tail samples
+            // remain in the interval so pausing naturally reduces the estimate.
+            var start = 0;
+            var direction = 0;
+            for (var i = _samples.Count - 2; i >= 0; i--)
+            {
+                var delta = _samples[i + 1].Progress - _samples[i].Progress;
+                var sign = Math.Abs(delta) < 0.0001 ? 0 : Math.Sign(delta);
+                if (sign != 0 && direction != 0 && sign != direction)
+                {
+                    start = i + 1;
+                    break;
+                }
+                if (sign != 0) direction = sign;
+            }
+            var first = _samples[start];
             var last = _samples[^1];
             var elapsed = last.Time - first.Time;
             if (elapsed == 0) return 0;

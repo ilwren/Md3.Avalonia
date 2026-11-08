@@ -240,7 +240,7 @@ public sealed class MdSlideToConfirmTests
         samples.Add(1050, .5);
         Assert.Equal(8, samples.Velocity); // capped at eight track lengths per second
         samples.Add(1060, .4);
-        Assert.InRange(samples.Velocity, 6.6, 6.7);
+        Assert.InRange(samples.Velocity, -8, -7.9); // the last segment reversed direction
         samples.Add(1200, .4); // a stationary pause removes old motion
         Assert.Equal(0, samples.Velocity);
         samples.Add(1210, .3);
@@ -249,6 +249,11 @@ public sealed class MdSlideToConfirmTests
         Assert.Equal(0, samples.Velocity);
         samples.Add(5, .4);
         Assert.Equal(0, samples.Velocity);
+        samples.Reset(1000, 0);
+        samples.Add(1050, .6);
+        samples.Add(1075, .5);
+        samples.Add(1100, .4);
+        Assert.InRange(samples.Velocity, -4.01, -3.99);
     }
 
     [AvaloniaFact]
