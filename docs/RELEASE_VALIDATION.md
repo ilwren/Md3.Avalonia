@@ -67,6 +67,12 @@ exercises the parts' adapter calls with targeted routed events; headless hit-tes
 outer `PART_WindowFrame` instead of the nested region and therefore does **not** establish that
 real platform pointer hit-testing works. Record the OS, window system, scaling and result below.
 
+The slide-to-confirm inertia also needs a physical mouse and touch check on desktop and Android:
+compare quick/slow drags, a pause before release, direction reversals and RTL; verify the thumb can
+be re-grabbed while returning, stays inside the track, and a below-threshold flick never confirms.
+Check that Reduced/None motion snaps and that confirming produces one immediate action. Record device,
+OS and results; timestamped headless routed-event tests do not establish physical feel or touch routing.
+
 ## Manual platform matrix — not signed in this environment
 
 Do not mark an item complete without recording device/OS, assistive technology version, tester and date. The System notifications item is a follow-up gate for the new `0.4.6-preview.1` Notifications package; it is not evidence from the historical `0.4.5-preview.1` release.

@@ -169,7 +169,9 @@ public sealed class SlideToConfirmDemoPage : ExtraControlGalleryPage
         slide.Confirmed += (_, _) => status.Text = L("Confirmation received.", "已收到确认。");
         var reset = Button(L("Reset", "重置"));
         reset.Click += (_, _) => { slide.Reset(); status.Text = L("Waiting for confirmation.", "等待确认。"); };
-        AddDemo(new StackPanel { Spacing = 12, Children = { slide, reset, status } });
+        var hint = Label(L("Try a quick flick or a slow drag. Only releasing beyond the threshold confirms.",
+            "试试快速甩动或缓慢拖动。只有松手时超过阈值才会确认。"));
+        AddDemo(new StackPanel { Spacing = 12, Children = { slide, hint, reset, status } });
     }
 }
 

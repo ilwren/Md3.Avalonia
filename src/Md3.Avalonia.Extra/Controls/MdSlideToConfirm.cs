@@ -39,6 +39,9 @@ public sealed class MdSlideToConfirm : TemplatedControl
     private double _startProgress;
     private double _progress;
     private bool _dragging;
+    private readonly SlideReleaseVelocity _releaseVelocity = new();
+    private bool _animatePointerConfirmation;
+    private double _confirmationVelocity;
 
     static MdSlideToConfirm()
     {
@@ -121,7 +124,14 @@ public sealed class MdSlideToConfirm : TemplatedControl
     private void SyncConfirmed()
     {
         EndPointer();
-        _spring.SnapTo(IsConfirmed ? 1 : 0);
+        if (IsConfirmed && _animatePointerConfirmation)
+        {
+            // Consume the flag before callbacks can re-enter and change the confirmed state.
+            _animatePointerConfirmation = false;
+            _spring.Retarget(1, MdMotionSpeed.Default, _confirmationVelocity);
+        }
+        else
+            _spring.SnapTo(IsConfirmed ? 1 : 0);
         InvalidateVisual();
     }
 
@@ -194,6 +204,7 @@ public sealed class MdSlideToConfirm : TemplatedControl
         _pointer = e.Pointer;
         _startX = point.X;
         _startProgress = Progress;
+        _releaseVelocity.Reset(e.Timestamp, Progress);
         SetAndRaise(IsDraggingProperty, ref _dragging, true);
         e.Pointer.Capture(this);
         e.Handled = true;
@@ -212,6 +223,7 @@ public sealed class MdSlideToConfirm : TemplatedControl
         base.OnPointerMoved(e);
         if (!ReferenceEquals(_pointer, e.Pointer) || !ReferenceEquals(e.Pointer.Captured, this)) return;
         UpdateDrag(e.GetPosition(this).X);
+        _releaseVelocity.Add(e.Timestamp, Progress);
         e.Handled = true;
     }
 
@@ -220,10 +232,21 @@ public sealed class MdSlideToConfirm : TemplatedControl
         base.OnPointerReleased(e);
         if (!ReferenceEquals(_pointer, e.Pointer)) return;
         UpdateDrag(e.GetPosition(this).X);
-        var commit = Progress >= Threshold;
+        _releaseVelocity.Add(e.Timestamp, Progress);
+        var velocity = _releaseVelocity.Velocity;
+        var commit = Progress >= Threshold; // Velocity affects only the animation, never the action.
         EndPointer();
-        if (commit) Confirm();
-        else _spring.Retarget(0, MdMotionSpeed.Fast);
+        if (commit)
+        {
+            _confirmationVelocity = velocity;
+            _animatePointerConfirmation = true;
+            try
+            {
+                if (!Confirm()) _spring.Retarget(0, MdMotionSpeed.Default, velocity);
+            }
+            finally { _animatePointerConfirmation = false; }
+        }
+        else _spring.Retarget(0, MdMotionSpeed.Default, velocity);
         e.Handled = true;
     }
 
@@ -266,6 +289,48 @@ public sealed class MdSlideToConfirm : TemplatedControl
     internal bool IsSettling => _spring.IsRunning;
     internal void AdvanceSettle(TimeSpan elapsed) => _spring.Advance(elapsed);
     protected override AutomationPeer OnCreateAutomationPeer() => new MdSlideToConfirmAutomationPeer(this);
+}
+
+// Recent logical-progress samples, in the pointer event clock's milliseconds. A paused pointer,
+// clock reset, or events with no elapsed time must not create a synthetic flick.
+internal sealed class SlideReleaseVelocity
+{
+    private const ulong WindowMilliseconds = 120;
+    private const int MaxSamples = 16;
+    private const double MaxVelocity = 8; // control widths per second, independent of actual size
+    private readonly List<(ulong Time, double Progress)> _samples = [];
+
+    internal void Reset(ulong timestamp, double progress)
+    {
+        _samples.Clear();
+        Add(timestamp, progress);
+    }
+
+    internal void Add(ulong timestamp, double progress)
+    {
+        if (_samples.Count > 0 && timestamp < _samples[^1].Time) _samples.Clear();
+        while (_samples.Count > 0 && timestamp - _samples[0].Time > WindowMilliseconds)
+            _samples.RemoveAt(0);
+        if (_samples.Count > 0 && timestamp == _samples[^1].Time)
+            _samples[^1] = (timestamp, progress);
+        else
+            _samples.Add((timestamp, progress));
+        if (_samples.Count > MaxSamples) _samples.RemoveAt(0);
+    }
+
+    internal double Velocity
+    {
+        get
+        {
+            if (_samples.Count < 2) return 0;
+            var first = _samples[0];
+            var last = _samples[^1];
+            var elapsed = last.Time - first.Time;
+            if (elapsed == 0) return 0;
+            return Math.Clamp((last.Progress - first.Progress) * 1000 / Math.Max(8d, elapsed),
+                -MaxVelocity, MaxVelocity);
+        }
+    }
 }
 
 internal sealed class MdSlideToConfirmAutomationPeer : ControlAutomationPeer, IInvokeProvider

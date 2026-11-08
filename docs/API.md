@@ -1389,10 +1389,13 @@ Every public enum and its members are listed below. To print the current member 
 
 `MdSlideToConfirm` is a one-shot action, not a range slider. Press its thumb, drag from logical
 start toward end, and release at or beyond `Threshold` (default 0.8, coerced to 0.1–1; non-finite
-values use 0.8). Clicking the track does not confirm. An incomplete gesture springs back according
-to inherited `MdMotion.Scheme`; Reduced and None snap immediately. The completed state and reset
-also move immediately. Direction follows `FlowDirection`. Capture loss, disabling, direction changes
-and detachment cancel an active gesture.
+values use 0.8). Clicking the track does not confirm. On release, the thumb carries its recent
+drag velocity into an interruptible spring toward the appropriate end; its visible progress stays
+within the track. Only the position at release determines confirmation: a fast flick below the
+threshold cannot confirm, even if momentum carries the thumb farther. `MdMotion.Scheme` Reduced and
+None snap immediately. Keyboard, automation and programmatic state changes remain immediate, as does
+reset. Direction follows `FlowDirection`. Capture loss, disabling, direction changes and detachment
+cancel an active gesture.
 
 Each successful pointer release, Enter/Space, automation Invoke or explicit `Confirm()` sets
 `IsConfirmed` and raises `Confirmed` once; further attempts return false or, for automation, reject

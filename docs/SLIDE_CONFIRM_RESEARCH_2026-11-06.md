@@ -8,7 +8,7 @@
 
 ## 独立设计与边界
 
-Extra `MdSlideToConfirm` 拖动手柄到阈值后**松开**才确认一次，短拖动按 Material spatial spring 回弹；Reduced/None motion 立即复位，完成和重置也立即定位。支持 RTL 逻辑方向、双向 `IsConfirmed`、`Confirmed`、可访问按钮 Invoke、Enter/Space、可设置标签/画刷与中英文默认文本。禁用、捕获丢失、方向切换或脱离视觉树会取消手势；轨道点击不会确认。宿主应提供具体的操作标签，并在需要时执行验证或额外确认。
+Extra `MdSlideToConfirm` 拖动手柄到阈值后**松开**才确认一次，短拖动继承松手速度并按 Material spatial spring 回弹；拖过阈值松手后立即确认，手柄带惯性弹簧滑至末端。惯性不会让阈值以下的手势触发确认；Reduced/None motion、键盘和程序状态变更及重置立即定位。支持 RTL 逻辑方向、双向 `IsConfirmed`、`Confirmed`、可访问按钮 Invoke、Enter/Space、可设置标签/画刷与中英文默认文本。禁用、捕获丢失、方向切换或脱离视觉树会取消手势；轨道点击不会确认。宿主应提供具体的操作标签，并在需要时执行验证或额外确认。
 
 这是可通过键盘、自动化及 `Confirm()` 直接触发的无障碍按钮替代，**不是**防误触的安全保证、权限控制或二次确认机制；宿主不得依赖强制拖动来保护危险操作。首期不提供命令、异步提交/等待状态、加载动画、haptics、任意模板、复杂图标或 Flutter API/视觉一致性。触摸设备和系统屏幕阅读器需要平台实测，headless 测试不能代替。
 

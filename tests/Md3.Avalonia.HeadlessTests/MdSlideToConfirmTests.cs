@@ -232,6 +232,131 @@ public sealed class MdSlideToConfirmTests
         finally { window.Close(); }
     }
 
+    [Fact]
+    public void Release_Velocity_Uses_Recent_Logical_Progress_And_Handles_Bad_Timestamps()
+    {
+        var samples = new SlideReleaseVelocity();
+        samples.Reset(1000, 0);
+        samples.Add(1050, .5);
+        Assert.Equal(8, samples.Velocity); // capped at eight track lengths per second
+        samples.Add(1060, .4);
+        Assert.InRange(samples.Velocity, 6.6, 6.7);
+        samples.Add(1200, .4); // a stationary pause removes old motion
+        Assert.Equal(0, samples.Velocity);
+        samples.Add(1210, .3);
+        Assert.InRange(samples.Velocity, -8, -7.9);
+        samples.Add(5, .2); // out-of-order / reset clock
+        Assert.Equal(0, samples.Velocity);
+        samples.Add(5, .4);
+        Assert.Equal(0, samples.Velocity);
+    }
+
+    [AvaloniaFact]
+    public void Flick_Momentum_Continues_Then_Returns_Without_Confirming()
+    {
+        var slide = Create();
+        MdMotion.SetScheme(slide, MdMotionScheme.Expressive);
+        var window = Show(slide);
+        try
+        {
+            using var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Touch, true);
+            Press(slide, window, pointer, 32, 1000);
+            Move(slide, window, pointer, 140, 1040);
+            Release(slide, window, pointer, 140, 1050);
+            Assert.False(slide.IsConfirmed);
+            Assert.InRange(slide.Progress, .49, .51);
+            slide.AdvanceSettle(TimeSpan.FromMilliseconds(16));
+            Assert.True(slide.Progress > .5); // continues in the release direction first
+            for (var i = 0; i < 180; i++) slide.AdvanceSettle(TimeSpan.FromMilliseconds(16));
+            Assert.Equal(0, slide.Progress);
+            Assert.False(slide.IsConfirmed);
+            Assert.False(slide.IsSettling);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Pausing_Before_Release_Drops_Momentum_And_Rtl_Uses_Logical_Direction()
+    {
+        var slide = Create();
+        slide.FlowDirection = FlowDirection.RightToLeft;
+        MdMotion.SetScheme(slide, MdMotionScheme.Expressive);
+        var window = Show(slide);
+        try
+        {
+            using var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Touch, true);
+            Press(slide, window, pointer, 248, 1000);
+            Move(slide, window, pointer, 140, 1040);
+            Release(slide, window, pointer, 140, 1050);
+            slide.AdvanceSettle(TimeSpan.FromMilliseconds(16));
+            Assert.True(slide.Progress > .5);
+            slide.Reset();
+            Press(slide, window, pointer, 248, 2000);
+            Move(slide, window, pointer, 140, 2040);
+            Release(slide, window, pointer, 140, 2200);
+            slide.AdvanceSettle(TimeSpan.FromMilliseconds(16));
+            Assert.True(slide.Progress < .5);
+            Assert.False(slide.IsConfirmed);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Confirming_Release_Animates_But_Event_Is_Immediate_And_Reset_Cancels()
+    {
+        var slide = Create();
+        MdMotion.SetScheme(slide, MdMotionScheme.Expressive);
+        var window = Show(slide);
+        try
+        {
+            var count = 0;
+            slide.Confirmed += (_, _) => count++;
+            using var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Touch, true);
+            Press(slide, window, pointer, 32, 1000);
+            Move(slide, window, pointer, 220, 1080);
+            Release(slide, window, pointer, 220, 1090);
+            Assert.True(slide.IsConfirmed);
+            Assert.Equal(1, count);
+            Assert.InRange(slide.Progress, .86, .88);
+            Assert.True(slide.IsSettling);
+            slide.AdvanceSettle(TimeSpan.FromMilliseconds(16));
+            Assert.True(slide.Progress > .87);
+            slide.Reset();
+            Assert.Equal(0, slide.Progress);
+            Assert.False(slide.IsSettling);
+            Assert.False(slide.IsConfirmed);
+            Assert.Equal(1, count);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void New_Gesture_Interrupts_Return_And_Reduced_Motion_Snaps_Completion()
+    {
+        var slide = Create();
+        MdMotion.SetScheme(slide, MdMotionScheme.Expressive);
+        var window = Show(slide);
+        try
+        {
+            using var pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Touch, true);
+            Press(slide, window, pointer, 32, 1000);
+            Move(slide, window, pointer, 140, 1040);
+            Release(slide, window, pointer, 140, 1050);
+            slide.AdvanceSettle(TimeSpan.FromMilliseconds(16));
+            var x = 32 + 216 * slide.Progress;
+            Press(slide, window, pointer, x, 1100);
+            Assert.True(slide.IsDragging);
+            Assert.False(slide.IsSettling);
+            Move(slide, window, pointer, x + 90, 1150);
+            MdMotion.SetScheme(slide, MdMotionScheme.Reduced);
+            Release(slide, window, pointer, x + 90, 1160);
+            Assert.True(slide.IsConfirmed);
+            Assert.Equal(1, slide.Progress);
+            Assert.False(slide.IsSettling);
+        }
+        finally { window.Close(); }
+    }
+
     [AvaloniaFact]
     public void Threshold_Is_Coerced_And_Host_State_Does_Not_Raise_The_Action()
     {
@@ -323,6 +448,17 @@ public sealed class MdSlideToConfirmTests
     private static void Move(Window w, MdSlideToConfirm c, double x) => w.MouseMove(At(w, c, x), RawInputModifiers.LeftMouseButton);
     private static void Up(Window w, MdSlideToConfirm c, double x) => w.MouseUp(At(w, c, x), MouseButton.Left, RawInputModifiers.None);
     private static void Drag(Window w, MdSlideToConfirm c, double from, double to) { Down(w, c, from); Move(w, c, to); Up(w, c, to); }
+
+    // Timestamped routed touch events keep velocity tests deterministic without sleeping.
+    private static void Press(MdSlideToConfirm slide, Window window, IPointer pointer, double x, ulong time) =>
+        slide.RaiseEvent(new PointerPressedEventArgs(slide, pointer, window, At(window, slide, x), time,
+            new PointerPointProperties(), KeyModifiers.None));
+    private static void Move(MdSlideToConfirm slide, Window window, IPointer pointer, double x, ulong time) =>
+        slide.RaiseEvent(new PointerEventArgs(InputElement.PointerMovedEvent, slide, pointer, window,
+            At(window, slide, x), time, new PointerPointProperties(), KeyModifiers.None));
+    private static void Release(MdSlideToConfirm slide, Window window, IPointer pointer, double x, ulong time) =>
+        slide.RaiseEvent(new PointerReleasedEventArgs(slide, pointer, window, At(window, slide, x), time,
+            new PointerPointProperties(), KeyModifiers.None, MouseButton.Left));
 
     private sealed class Model : INotifyPropertyChanged
     {
