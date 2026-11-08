@@ -325,6 +325,10 @@ public partial class AndroidGalleryView : UserControl
 
     private Control CreateMobileViewport(Control page)
     {
+        // The cached overview is already a scroll viewer and owns its own content margins.
+        // Re-wrapping it retains the old wrapper as a logical parent on the next visit and
+        // can also attempt to parent it twice when Home is selected while already on Home.
+        if (page is ScrollViewer) return page;
         page.Margin = new Thickness(16, 14, 16, 24);
         if (page is UserControl userPage &&
             (userPage.Content is ScrollViewer ||
