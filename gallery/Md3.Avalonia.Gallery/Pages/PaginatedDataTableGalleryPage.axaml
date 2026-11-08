@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="using:Md3.Avalonia.Controls"
+             xmlns:pages="using:Md3.Avalonia.Gallery.Pages"
              xmlns:gallery="using:Md3.Avalonia.Gallery.Components"
              x:Class="Md3.Avalonia.Gallery.Pages.PaginatedDataTableGalleryPage">
   <md:MdScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -12,10 +13,10 @@
 
       <StackPanel MaxWidth="820" HorizontalAlignment="Stretch" Spacing="12">
         <md:MdPaginatedDataTable x:Name="PagedTable" Height="310" RowsPerPage="3"
-                                 Header="Packages" ShowFirstLastButtons="True"
+                                 ShowFirstLastButtons="True"
                                  PageChanged="PagedTableChanged" SortRequested="PagedTableSortRequested">
           <md:MdPaginatedDataTable.ItemTemplate>
-            <DataTemplate x:CompileBindings="False">
+            <DataTemplate x:DataType="pages:PaginatedGalleryRow">
               <Grid Margin="4" ColumnDefinitions="*,*,*"><TextBlock Text="{Binding Name}" /><TextBlock Grid.Column="1" Text="{Binding Platform}" /><TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="{Binding Score}" /></Grid>
             </DataTemplate>
           </md:MdPaginatedDataTable.ItemTemplate>

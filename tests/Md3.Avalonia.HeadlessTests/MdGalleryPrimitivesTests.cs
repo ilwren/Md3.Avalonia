@@ -138,10 +138,10 @@ public sealed class MdGalleryPrimitivesTests
             score.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Assert.Equal(0, table.PageIndex);
             Assert.True(table.SortAscending);
-            Assert.Equal(86, Assert.IsType<PaginatedDataTableGalleryPage.PackageRow>(table.PageItems[0]).Score);
+            Assert.Equal(86, Assert.IsType<PaginatedGalleryRow>(table.PageItems[0]).Score);
             score.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Assert.False(table.SortAscending);
-            Assert.Equal(99, Assert.IsType<PaginatedDataTableGalleryPage.PackageRow>(table.PageItems[0]).Score);
+            Assert.Equal(99, Assert.IsType<PaginatedGalleryRow>(table.PageItems[0]).Score);
         }
         finally { window.Close(); }
     }

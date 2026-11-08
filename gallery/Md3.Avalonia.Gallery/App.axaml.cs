@@ -10,6 +10,7 @@ using Avalonia.VisualTree;
 using System.Linq;
 using System.Threading.Tasks;
 using Md3.Avalonia.Extra.Controls;
+using Md3.Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using LiveChartsCore;
@@ -136,6 +137,9 @@ public partial class App : Application
         await CheckDedicatedPage<MediaProgressDemoPage, MdMediaProgressBar>(window, "Media progress bar");
         await CheckDedicatedPage<PageIndicatorDemoPage, MdPageIndicator>(window, "Page indicator");
         await CheckDedicatedPage<SlideToConfirmDemoPage, MdSlideToConfirm>(window, "Slide to confirm");
+        await CheckDedicatedPage<ScrollViewerGalleryPage, MdScrollBar>(window, "Scrolling surface");
+        await CheckDedicatedPage<PickerGalleryPage, MdTimeDial>(window, "Date and time pickers");
+        await CheckDedicatedPage<PaginatedDataTableGalleryPage, MdPaginatedDataTable>(window, "Paginated table");
         await CheckDedicatedPage<WheelPickerDemoPage, MdWheelPicker>(window, "Wheel picker");
 
         await Dispatcher.UIThread.InvokeAsync(() =>
@@ -166,6 +170,26 @@ public partial class App : Application
                 var invoke = peer.GetProvider<IInvokeProvider>() ?? throw new InvalidOperationException("Slide confirmation automation is missing.");
                 invoke.Invoke();
                 if (!slide.IsConfirmed) throw new InvalidOperationException("Slide confirmation did not complete.");
+            }
+            if (control is MdScrollBar bar)
+            {
+                bar.Value = 72;
+                if (bar.Value != 72 || !bar.IsTrackVisible)
+                    throw new InvalidOperationException("Standalone scrollbar did not update.");
+            }
+            if (control is MdTimeDial dial)
+            {
+                dial.ActivePart = MdTimeDialPart.Minute;
+                dial.Minute = 42;
+                if (dial.Minute != 42) throw new InvalidOperationException("Standalone time dial did not update.");
+            }
+            if (control is MdPaginatedDataTable table)
+            {
+                table.RequestSort(2);
+                window.UpdateLayout();
+                if (table.PageItems.FirstOrDefault() is not PaginatedGalleryRow { Score: 86 } ||
+                    !table.GetVisualDescendants().OfType<TextBlock>().Any(text => text.Text == "86"))
+                    throw new InvalidOperationException("Paginated table sorting or compiled row binding failed.");
             }
             if (control is MdWheelPicker wheel)
             {

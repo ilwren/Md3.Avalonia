@@ -10,22 +10,23 @@ public partial class PaginatedDataTableGalleryPage : UserControl
     public PaginatedDataTableGalleryPage()
     {
         InitializeComponent();
+        PagedTable.Header = L("Packages", "软件包");
         PagedTable.Columns.Add(new MdPaginatedDataColumn { Label = L("Package", "包"), IsSortable = true });
         PagedTable.Columns.Add(new MdPaginatedDataColumn { Label = L("Platform", "平台"), IsSortable = true });
         PagedTable.Columns.Add(new MdPaginatedDataColumn { Label = L("Score", "分数"), IsNumeric = true, IsSortable = true });
         PagedTable.ItemsSource = _rows = new[]
         {
-            new PackageRow("Md3.Avalonia", L("All", "全部"), 98),
-            new PackageRow("Gallery.Desktop", L("Desktop", "桌面"), 95),
-            new PackageRow("Gallery.Android", "Android", 92),
-            new PackageRow("Theme.Tools", L("All", "全部"), 90),
-            new PackageRow("Icons", L("Optional", "可选"), 88),
-            new PackageRow("Ecosystem", L("All", "全部"), 86),
-            new PackageRow("HeadlessTests", "CI", 99)
+            new PaginatedGalleryRow("Md3.Avalonia", L("All", "全部"), 98),
+            new PaginatedGalleryRow("Gallery.Desktop", L("Desktop", "桌面"), 95),
+            new PaginatedGalleryRow("Gallery.Android", "Android", 92),
+            new PaginatedGalleryRow("Theme.Tools", L("All", "全部"), 90),
+            new PaginatedGalleryRow("Icons", L("Optional", "可选"), 88),
+            new PaginatedGalleryRow("Ecosystem", L("All", "全部"), 86),
+            new PaginatedGalleryRow("HeadlessTests", "CI", 99)
         };
     }
 
-    private PackageRow[] _rows = [];
+    private PaginatedGalleryRow[] _rows = [];
 
     // The table emits a request; the host, not the control, owns the data order.
     private void PagedTableSortRequested(object? sender, MdPaginatedDataTableSortEventArgs e)
@@ -46,8 +47,9 @@ public partial class PaginatedDataTableGalleryPage : UserControl
             : L($"Sorted by {e.Column.Label}, descending.", $"按{e.Column.Label}降序排序。");
     }
 
-    internal sealed record PackageRow(string Name, string Platform, int Score);
-
     private void PagedTableChanged(object? sender, MdPageChangedEventArgs e) =>
         PagedStatus.Text = L($"Page {e.PageIndex + 1}; first row index {e.FirstRowIndex}.", $"第 {e.PageIndex + 1} 页；首行索引 {e.FirstRowIndex}。");
 }
+
+/// <summary>Typed sample row for compiled bindings in the paginated table Gallery.</summary>
+public sealed record PaginatedGalleryRow(string Name, string Platform, int Score);
