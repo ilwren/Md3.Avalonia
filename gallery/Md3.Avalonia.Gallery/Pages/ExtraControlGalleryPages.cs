@@ -185,6 +185,8 @@ public sealed class WheelPickerDemoPage : ExtraControlGalleryPage
         status.Name = "WheelDemoStatus";
         var wheel = new MdWheelPicker { Width = 120, HorizontalAlignment = HorizontalAlignment.Left, Minimum = 0, Maximum = 30, Step = 5, Value = 10 };
         wheel.ValueChanged += (_, value) => status.Text = L($"Selected: {value}", $"已选择：{value}");
-        AddDemo(new StackPanel { Spacing = 12, Children = { wheel, status } });
+        var hint = Label(L("Flick to continue scrolling; pause before release to stop without momentum.",
+            "快速甩动可继续滚动；松手前停顿可消除惯性。"));
+        AddDemo(new StackPanel { Spacing = 12, Children = { wheel, status, hint } });
     }
 }

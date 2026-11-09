@@ -66,7 +66,7 @@
 
       <StackPanel Spacing="10">
         <TextBlock Classes="h2" Text="Number wheel" />
-        <TextBlock Classes="body" TextWrapping="Wrap" Text="Drag or tap a row, or focus the wheel and use the arrow keys or mouse wheel. Values snap to integer steps." />
+        <TextBlock Classes="body" TextWrapping="Wrap" Text="Drag or flick the wheel, tap a row, or use the keyboard or mouse wheel. Values settle on integer steps." />
         <eco:MdWheelPicker x:Name="NumberWheel" Width="120" HorizontalAlignment="Left" Minimum="0" Maximum="30" Step="5" Value="10" />
         <gallery:CodeExample XamlCode="&lt;eco:MdWheelPicker Minimum=&quot;0&quot; Maximum=&quot;30&quot; Step=&quot;5&quot; Value=&quot;{Binding Quantity}&quot; /&gt;" />
       </StackPanel>

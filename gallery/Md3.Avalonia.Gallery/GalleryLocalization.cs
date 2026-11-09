@@ -398,7 +398,7 @@ internal static class GalleryLocalization
         ["Search a small sample, filter by category, and choose an emoji. The host decides where to insert it."]="搜索少量示例、按类别筛选并选择表情；由宿主决定插入位置。",
         ["No emoji selected"]="尚未选择表情",
         ["Number wheel"]="数字滚轮",
-        ["Drag or tap a row, or focus the wheel and use the arrow keys or mouse wheel. Values snap to integer steps."]="拖动或点击行，也可聚焦滚轮后使用方向键或鼠标滚轮。数值按整数步长取整。",
+        ["Drag or flick the wheel, tap a row, or use the keyboard or mouse wheel. Values settle on integer steps."]="拖动或甩动滚轮、点击行，或使用键盘及鼠标滚轮。数值会吸附到整数步长。",
         ["Celebration particles"]="庆祝粒子",
         ["Trigger a finite burst; reduced motion skips the decorative particles."]="触发一次有限时长的粒子爆发；减少动效时跳过装饰粒子。",
         ["Celebrate"]="庆祝",

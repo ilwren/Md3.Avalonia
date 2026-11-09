@@ -67,6 +67,11 @@ exercises the parts' adapter calls with targeted routed events; headless hit-tes
 outer `PART_WindowFrame` instead of the nested region and therefore does **not** establish that
 real platform pointer hit-testing works. Record the OS, window system, scaling and result below.
 
+The integer wheel picker needs physical mouse, touch and pen validation on desktop and Android:
+check slow drag, flick, pause, reverse, boundaries, mid-flight re-grab and interference from the
+parent scroll view. Check Reduced/None motion and screen-reader value announcements. Deterministic
+headless gesture and timer tests cannot establish native touch routing or subjective feel.
+
 The slide-to-confirm inertia also needs a physical mouse and touch check on desktop and Android:
 compare quick/slow drags, a pause before release, direction reversals and RTL; verify the thumb can
 be re-grabbed while returning, stays inside the track, and a below-threshold flick never confirms.

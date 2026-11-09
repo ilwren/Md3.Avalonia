@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Diagnostics;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
@@ -9,13 +10,16 @@ using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using Avalonia.Threading;
 using Md3.Avalonia.Localization;
+using Md3.Avalonia.Motion;
 
 namespace Md3.Avalonia.Extra.Controls;
 
 /// <summary>A bounded integer wheel with a centered selection and direct manipulation.</summary>
 /// <remarks>Values are discrete steps anchored at Minimum. A Maximum that is not on the step grid
-/// is a bound, not an extra value. The control snaps immediately; it does not simulate inertia.</remarks>
+/// is a bound, not an extra value. A dragged wheel carries release velocity into a bounded
+/// deceleration and snaps to a step; Reduced and None motion snap immediately.</remarks>
 public sealed class MdWheelPicker : TemplatedControl
 {
     public static readonly StyledProperty<int> MinimumProperty = AvaloniaProperty.Register<MdWheelPicker, int>(
@@ -34,8 +38,18 @@ public sealed class MdWheelPicker : TemplatedControl
 
     private IPointer? _pointer;
     private double _startY;
-    private long _startIndex;
+    private double _startPosition;
+    private double _position;
+    private double _velocity;
+    private double _snapTarget;
     private bool _moved;
+    private bool _settingUserValue;
+    private WheelMotionPhase _motion;
+    private readonly WheelReleaseVelocity _releaseVelocity = new();
+    private readonly DispatcherTimer _motionTimer;
+    private readonly Stopwatch _motionClock = new();
+
+    private enum WheelMotionPhase { None, Inertia, Snap }
 
     static MdWheelPicker()
     {
@@ -43,17 +57,38 @@ public sealed class MdWheelPicker : TemplatedControl
             ForegroundProperty, FontFamilyProperty, FontSizeProperty, FontWeightProperty, FontStyleProperty,
             SelectionBrushProperty, SelectionForegroundProperty, FlowDirectionProperty);
         AffectsMeasure<MdWheelPicker>(ItemHeightProperty);
-        MinimumProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) => { c.CoerceValue(MaximumProperty); c.CoerceValue(ValueProperty); });
-        MaximumProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) => { c.CoerceValue(MinimumProperty); c.CoerceValue(ValueProperty); });
-        StepProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) => c.CoerceValue(ValueProperty));
-        IsReadOnlyProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) => { if (c.IsReadOnly) c.CancelPointer(); });
-        IsEffectivelyEnabledProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) => { if (!c.IsEffectivelyEnabled) c.CancelPointer(); });
+        MinimumProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) =>
+        {
+            c.CancelInteraction(); c.CoerceValue(MaximumProperty); c.CoerceValue(ValueProperty); c.SyncPosition();
+        });
+        MaximumProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) =>
+        {
+            c.CancelInteraction(); c.CoerceValue(MinimumProperty); c.CoerceValue(ValueProperty); c.SyncPosition();
+        });
+        StepProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) =>
+        {
+            c.CancelInteraction(); c.CoerceValue(ValueProperty); c.SyncPosition();
+        });
+        ItemHeightProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) => c.CancelInteraction());
+        ValueProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) =>
+        {
+            if (!c._settingUserValue) c.CancelInteraction();
+        });
+        IsReadOnlyProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) => { if (c.IsReadOnly) c.CancelInteraction(); });
+        IsEffectivelyEnabledProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) => { if (!c.IsEffectivelyEnabled) c.CancelInteraction(); });
+        MdMotion.SchemeProperty.Changed.AddClassHandler<MdWheelPicker>((c, _) =>
+        {
+            if (c._motion != WheelMotionPhase.None && !c.MotionEnabled()) c.StopMotionAndSnap();
+        });
     }
 
     public MdWheelPicker()
     {
         Focusable = true;
         ClipToBounds = true;
+        _motionTimer = new DispatcherTimer(DispatcherPriority.Render) { Interval = TimeSpan.FromMilliseconds(16) };
+        _motionTimer.Tick += OnMotionTick;
+        SyncPosition();
         GotFocus += (_, _) => InvalidateVisual();
         LostFocus += (_, _) => InvalidateVisual();
     }
@@ -100,15 +135,17 @@ public sealed class MdWheelPicker : TemplatedControl
             new RoundedRect(new Rect(0, center - rowHeight / 2, Bounds.Width, rowHeight), 8));
         using (context.PushClip(new Rect(Bounds.Size)))
         {
-            for (var offset = -2; offset <= 2; offset++)
+            // Include an extra row on each side so fractional positions do not leave gaps.
+            var centerIndex = (long)Math.Floor(_position);
+            for (var offset = -3; offset <= 3; offset++)
             {
-                var index = CurrentIndex + offset;
+                var index = centerIndex + offset;
                 if (index < 0 || index > LastIndex) continue;
                 var value = (long)Minimum + index * Step;
                 var text = new FormattedText(value.ToString(CultureInfo.CurrentCulture), CultureInfo.CurrentCulture,
                     FlowDirection, new Typeface(FontFamily, FontStyle, FontWeight), Math.Max(1, FontSize),
-                    offset == 0 ? SelectionForeground ?? Brushes.Black : Foreground ?? Brushes.Gray);
-                context.DrawText(text, new Point((Bounds.Width - text.Width) / 2, center + offset * rowHeight - text.Height / 2));
+                    index == CurrentIndex ? SelectionForeground ?? Brushes.Black : Foreground ?? Brushes.Gray);
+                context.DrawText(text, new Point((Bounds.Width - text.Width) / 2, center + (index - _position) * rowHeight - text.Height / 2));
             }
         }
         if (IsKeyboardFocusWithin)
@@ -121,34 +158,67 @@ public sealed class MdWheelPicker : TemplatedControl
         if (IsReadOnly || !IsEffectivelyEnabled) return false;
         var target = (int)((long)Minimum + Math.Clamp(index, 0, LastIndex) * Step);
         if (target == Value) return false;
-        SetCurrentValue(ValueProperty, target);
+        var previous = Value;
+        _settingUserValue = true;
+        try { SetCurrentValue(ValueProperty, target); }
+        finally { _settingUserValue = false; }
+        // A binding may have synchronously replaced/coerced the requested value.
+        if (Value != target) CancelInteraction();
+        if (Value == previous) return false;
         ValueChanged?.Invoke(this, Value);
         return true;
     }
+
+    private static long NearestIndex(double position) => (long)Math.Floor(position + 0.5);
+
+    private void SyncPosition()
+    {
+        _position = CurrentIndex;
+        InvalidateVisual();
+    }
+
+    private void SetPosition(double position)
+    {
+        _position = Math.Clamp(position, 0, (double)LastIndex);
+        InvalidateVisual();
+        RequestIndex(NearestIndex(_position));
+    }
+
+    private bool MotionEnabled() => MdMotion.Resolve(this, MdMotionKind.Spatial, MdMotionSpeed.Default).IsEnabled;
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
         if (IsReadOnly || !IsEffectivelyEnabled || _pointer is not null ||
             (e.Pointer.Type == PointerType.Mouse && !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)) return;
+        StopMotion(); // re-grab the currently displayed position, without a jump
         Focus();
         _pointer = e.Pointer;
         _startY = e.GetPosition(this).Y;
-        _startIndex = CurrentIndex;
+        _startPosition = _position;
+        _releaseVelocity.Reset(e.Timestamp, _position);
         _moved = false;
         e.Pointer.Capture(this);
         e.Handled = true;
+    }
+
+    private void UpdateDrag(double y, ulong timestamp)
+    {
+        var delta = _startY - y;
+        if (Math.Abs(delta) >= 8) _moved = true;
+        var rowHeight = Math.Min(ItemHeight, Bounds.Height / 5);
+        if (_moved && rowHeight > 0)
+        {
+            SetPosition(_startPosition + delta / rowHeight);
+            if (_pointer is not null) _releaseVelocity.Add(timestamp, _position);
+        }
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
         if (!ReferenceEquals(_pointer, e.Pointer) || !ReferenceEquals(e.Pointer.Captured, this)) return;
-        var delta = _startY - e.GetPosition(this).Y;
-        if (Math.Abs(delta) >= 8) _moved = true;
-        var rowHeight = Math.Min(ItemHeight, Bounds.Height / 5);
-        if (_moved && rowHeight > 0)
-            RequestIndex(_startIndex + (long)Math.Clamp(Math.Round(delta / rowHeight, MidpointRounding.AwayFromZero), -LastIndex, LastIndex));
+        UpdateDrag(e.GetPosition(this).Y, e.Timestamp);
         e.Handled = true;
     }
 
@@ -156,19 +226,29 @@ public sealed class MdWheelPicker : TemplatedControl
     {
         base.OnPointerReleased(e);
         if (!ReferenceEquals(_pointer, e.Pointer)) return;
-        if (!_moved)
+        UpdateDrag(e.GetPosition(this).Y, e.Timestamp);
+        if (!ReferenceEquals(_pointer, e.Pointer)) return; // host changed state during the callback
+        var moved = _moved;
+        var velocity = _releaseVelocity.Velocity;
+        CancelPointer();
+        if (!moved)
         {
             var rowHeight = Math.Min(ItemHeight, Bounds.Height / 5);
             if (rowHeight > 0)
                 RequestIndex(CurrentIndex + (long)Math.Clamp(Math.Round((e.GetPosition(this).Y - Bounds.Height / 2) / rowHeight, MidpointRounding.AwayFromZero), -2, 2));
+            SyncPosition();
         }
-        CancelPointer();
+        else StartMotion(velocity);
         e.Handled = true;
     }
 
     protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
     {
-        _pointer = null;
+        if (ReferenceEquals(_pointer, e.Pointer))
+        {
+            _pointer = null;
+            StopMotionAndSnap(); // cancellation never flings
+        }
         base.OnPointerCaptureLost(e);
     }
 
@@ -179,16 +259,107 @@ public sealed class MdWheelPicker : TemplatedControl
         if (pointer is not null && ReferenceEquals(pointer.Captured, this)) pointer.Capture(null);
     }
 
-    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    private void CancelInteraction()
     {
         CancelPointer();
+        StopMotionAndSnap();
+    }
+
+    private void StopMotion()
+    {
+        _motion = WheelMotionPhase.None;
+        _velocity = 0;
+        _motionTimer?.Stop();
+        _motionClock.Reset();
+    }
+
+    private void StopMotionAndSnap()
+    {
+        StopMotion();
+        SyncPosition();
+    }
+
+    private void StartMotion(double velocity)
+    {
+        if (!MotionEnabled() || IsReadOnly || !IsEffectivelyEnabled)
+        {
+            StopMotionAndSnap();
+            return;
+        }
+        _velocity = velocity;
+        _motion = Math.Abs(velocity) >= 0.75 ? WheelMotionPhase.Inertia : WheelMotionPhase.Snap;
+        _snapTarget = NearestIndex(_position);
+        _motionClock.Restart();
+        _motionTimer.Start();
+    }
+
+    private void OnMotionTick(object? sender, EventArgs e)
+    {
+        var elapsed = _motionClock.Elapsed;
+        _motionClock.Restart();
+        AdvanceMotion(elapsed);
+    }
+
+    // Advancing by bounded substeps keeps the snap stable under occasional delayed frames.
+    internal void AdvanceMotion(TimeSpan elapsed)
+    {
+        if (_motion == WheelMotionPhase.None || elapsed <= TimeSpan.Zero) return;
+        if (!MotionEnabled()) { StopMotionAndSnap(); return; }
+        var remaining = Math.Min(elapsed.TotalSeconds, 0.05);
+        while (remaining > 0 && _motion != WheelMotionPhase.None)
+        {
+            var dt = Math.Min(1d / 120d, remaining);
+            remaining -= dt;
+            var phase = _motion;
+            if (phase == WheelMotionPhase.Inertia)
+            {
+                const double friction = 7;
+                var decay = Math.Exp(-friction * dt);
+                var next = _position + _velocity * (1 - decay) / friction;
+                _velocity *= decay;
+                var boundary = next <= 0 || next >= LastIndex;
+                SetPosition(next);
+                if (_motion != phase) return; // a host callback can cancel or replace the motion
+                if (boundary || Math.Abs(_velocity) < 0.75)
+                {
+                    if (boundary) _velocity = 0;
+                    _snapTarget = NearestIndex(_position);
+                    _motion = WheelMotionPhase.Snap;
+                }
+            }
+            else
+            {
+                var spring = MdMotion.Resolve(this, MdMotionKind.Spatial, MdMotionSpeed.Default).Spring;
+                var damping = 2 * spring.DampingRatio * Math.Sqrt(spring.Stiffness);
+                _velocity += (spring.Stiffness * (_snapTarget - _position) - damping * _velocity) * dt;
+                SetPosition(_position + _velocity * dt);
+                if (_motion != phase) return;
+                if (Math.Abs(_snapTarget - _position) < 0.002 && Math.Abs(_velocity) < 0.025)
+                {
+                    SetPosition(_snapTarget);
+                    if (_motion == phase) StopMotionAndSnap();
+                }
+            }
+        }
+    }
+
+    internal bool IsSettling => _motion != WheelMotionPhase.None;
+    internal double VisualPosition => _position;
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        CancelInteraction();
         base.OnDetachedFromVisualTree(e);
     }
 
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
-        if (IsKeyboardFocusWithin && e.Delta.Y != 0 && RequestIndex(CurrentIndex + (e.Delta.Y > 0 ? -1 : 1)))
-            e.Handled = true;
+        if (IsKeyboardFocusWithin && e.Delta.Y != 0)
+        {
+            CancelInteraction();
+            if (RequestIndex(CurrentIndex + (e.Delta.Y > 0 ? -1 : 1))) e.Handled = true;
+            SyncPosition();
+        }
         if (!e.Handled) base.OnPointerWheelChanged(e);
     }
 
@@ -203,7 +374,9 @@ public sealed class MdWheelPicker : TemplatedControl
         else if (e.Key == Key.Home) target = 0;
         else if (e.Key == Key.End) target = LastIndex;
         else { base.OnKeyDown(e); return; }
+        CancelInteraction();
         RequestIndex(target);
+        SyncPosition();
         e.Handled = true;
     }
 
@@ -212,10 +385,49 @@ public sealed class MdWheelPicker : TemplatedControl
         if (!double.IsFinite(value) || value < Minimum || value > LastValue) throw new ArgumentOutOfRangeException(nameof(value));
         if (IsReadOnly) throw new InvalidOperationException("The wheel picker is read-only.");
         var index = (long)Math.Round((value - Minimum) / Step, MidpointRounding.AwayFromZero);
+        CancelInteraction();
         RequestIndex(index);
+        SyncPosition();
     }
 
     protected override AutomationPeer OnCreateAutomationPeer() => new MdWheelPickerAutomationPeer(this);
+}
+
+// A recent, direction-aware sample window in row indices per second. A pause, out-of-order
+// timestamps and a reversed gesture cannot accidentally reuse older momentum.
+internal sealed class WheelReleaseVelocity
+{
+    private readonly List<(ulong Time, double Position)> _samples = [];
+    internal void Reset(ulong timestamp, double position) { _samples.Clear(); Add(timestamp, position); }
+    internal void Add(ulong timestamp, double position)
+    {
+        if (_samples.Count > 0 && timestamp < _samples[^1].Time) _samples.Clear();
+        while (_samples.Count > 0 && timestamp - _samples[0].Time > 120) _samples.RemoveAt(0);
+        if (_samples.Count > 0 && timestamp == _samples[^1].Time) _samples[^1] = (timestamp, position);
+        else _samples.Add((timestamp, position));
+        if (_samples.Count > 16) _samples.RemoveAt(0);
+    }
+    internal double Velocity
+    {
+        get
+        {
+            if (_samples.Count < 2) return 0;
+            var start = 0;
+            var direction = 0;
+            for (var i = _samples.Count - 2; i >= 0; i--)
+            {
+                var delta = _samples[i + 1].Position - _samples[i].Position;
+                var sign = Math.Abs(delta) < 0.0001 ? 0 : Math.Sign(delta);
+                if (sign != 0 && direction != 0 && sign != direction) { start = i + 1; break; }
+                if (sign != 0) direction = sign;
+            }
+            var first = _samples[start];
+            var last = _samples[^1];
+            var elapsed = last.Time - first.Time;
+            if (elapsed == 0) return 0;
+            return Math.Clamp((last.Position - first.Position) * 1000 / Math.Max(8d, elapsed), -24, 24);
+        }
+    }
 }
 
 internal sealed class MdWheelPickerAutomationPeer : ControlAutomationPeer, IRangeValueProvider

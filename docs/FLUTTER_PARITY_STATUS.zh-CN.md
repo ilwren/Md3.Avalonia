@@ -34,7 +34,7 @@ Md3.Avalonia 使用 Avalonia 控件、属性与生命周期。相似的类型名
 | `MdDraggableScrollableSheet` | 实现子集 | 拖拽手柄改尺寸、吸附点与轻弹吸附、`ExtentChanged`/`AnimationCompleted`、`ShouldCloseOnMinExtent`/`MinExtentReached`、`SnapAnimationDuration`、`MdDraggableScrollableController` | 不承诺 Flutter 滚动物理或 `ScrollController` 注入一致性；最小尺寸收起请求以事件形式上报，由宿主决定是否关闭 |
 | `MdSlideToConfirm`（Extra） | 实现子集 | 逻辑方向拖动并松开后一次确认、弹簧回弹、双向状态、键盘和无障碍调用 | 独立实现；不含命令、异步等待、自定义模板或安全/授权保证 |
 | `MdEmojiPicker`（Extra） | 实现子集 | 可替换的小型示例集、搜索、类别、内存最近使用、双向选择和无障碍按钮 | 独立实现；不含完整 Unicode/CLDR 数据、肤色选择、持久化、字体可用性检测、插入或虚拟化网格 |
-| `MdWheelPicker`（Extra） | 实现子集 | 有界整数步长、居中选中、指针拖动与点击行、聚焦后滚轮、键盘和数值范围自动化 | 独立实现；不含小数、循环、水平布局、惯性、自定义条目模板或 Flutter 滚动物理一致性 |
+| `MdWheelPicker`（Extra） | 实现子集 | 有界整数步长、跟手拖动与速度惯性吸附、点击行、聚焦后滚轮、键盘和数值范围自动化 | 独立实现；不含小数、循环、水平布局、自定义条目模板或 Flutter 滚动物理一致性 |
 | `MdConfetti`（Extra） | 实现子集 | 有界一次性粒子、方向/散布、速度、重力/阻尼、主题画刷、渲染帧生命周期和减少动效抑制 | 参考公开文档独立实现；不含持续发射、循环控制器、自定义路径、任意调色板、声音或触觉反馈 |
 | `MdMarquee`（Extra） | 实现子集 | 水平溢出滚动、方向、速度、间距、轮间暂停、RTL、减少动效静止回退及完整文本无障碍 | 参考公开文档独立实现；不含垂直滚动、有限循环、加减速曲线、富文本及文本交互 |
 | `MdExpandableText`（Extra） | 实现子集 | 纯文本按行或 Unicode 文本元素折叠、独立本地化展开/收起按钮、双向状态及 RTL | 参考公开文档独立实现；不含富文本、注解、选择、行内按钮及展开动画 |

@@ -1454,16 +1454,23 @@ anchored at the minimum. Values clamp to the bounds and snap to the nearest grid
 rounding upwards. If the maximum is off-grid, the last selectable value is below it. Set a suitable
 maximum before increasing the minimum above the default; bounds coerce against one another.
 
-Tap a row or drag vertically; Up/Down, Page Up/Down and Home/End operate from the keyboard. The
-mouse wheel only changes the value while the control has keyboard focus and yields at a boundary.
+Tap a row or drag vertically; the rows follow the pointer continuously while `Value` stays on the
+integer grid. On release, recent drag velocity drives bounded deceleration followed by spring
+settling to the nearest row. Pausing before release removes momentum; a new pointer can re-grab a
+moving wheel. The selected value and `ValueChanged` update as the wheel passes rows, not only at
+the end (a frame can skip intermediate rows). Reduced/None motion snap immediately. A host value
+or range change, read-only/disabled state, lost capture or visual detachment cancels the gesture
+or motion. Up/Down, Page Up/Down and Home/End operate from the keyboard. The mouse wheel only
+changes the value while the control has keyboard focus and yields at a boundary.
 `ValueChanged` fires for actual user/automation changes, not programmatic assignments. `IsReadOnly`
 keeps the value inspectable but disallows interaction. The localized spinner automation peer reports
 its reachable maximum and allows setting values on the same grid; applications should supply a
 context-specific `AutomationProperties.Name`. `ItemHeight` is coerced to 32–100 DIP. Material
 `Foreground`, `SelectionBrush` and `SelectionForeground` are scoped to the Extra theme.
 
-This first subset is vertical, integer-only and snaps immediately; it does not offer decimal input,
-wrapping, inertia, animation, arbitrary item templates, or Flutter scroll-physics parity.
+This subset is vertical and integer-only; it does not offer decimal input, wrapping, arbitrary item
+templates, or Flutter scroll-physics parity. Physical touch and screen-reader behavior still need
+platform validation.
 
 ```xml
 <eco:MdWheelPicker Minimum="0" Maximum="30" Step="5" Value="{Binding Quantity}"
