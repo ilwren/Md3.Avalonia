@@ -1,7 +1,10 @@
+using System.ComponentModel;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
 using Avalonia.Controls;
+using Avalonia.Data;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -56,6 +59,78 @@ public sealed class MdWheelPickerInertiaTests
             Assert.Equal((double)wheel.Value, wheel.VisualPosition);
             Assert.Equal(wheel.Value, changes[^1]);
             Assert.All(changes, value => Assert.InRange(value, 0, 100));
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Fractional_Drag_Moves_Rendered_Rows_Before_The_Selected_Value_Changes()
+    {
+        var wheel = Create();
+        var window = Show(wheel);
+        try
+        {
+            using var pointer = Touch();
+            Press(wheel, window, pointer, 100, 1000);
+            Move(wheel, window, pointer, 88, 1020);
+            Assert.Equal(50, wheel.Value);
+            var first = Pixels(window);
+            Move(wheel, window, pointer, 84, 1040);
+            Assert.Equal(50, wheel.Value);
+            var second = Pixels(window);
+            Assert.False(first.SequenceEqual(second));
+            Release(wheel, window, pointer, 84, 1200);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Inertia_Updates_TwoWay_Binding_And_Host_Changes_Stop_It()
+    {
+        var model = new Model { Value = 50 };
+        var wheel = Create();
+        wheel.Bind(MdWheelPicker.ValueProperty, new Binding(nameof(Model.Value)) { Source = model, Mode = BindingMode.TwoWay });
+        var window = Show(wheel);
+        try
+        {
+            var events = 0;
+            wheel.ValueChanged += (_, _) => events++;
+            using var pointer = Touch();
+            Flick(wheel, window, pointer);
+            for (var i = 0; i < 15; i++) wheel.AdvanceMotion(TimeSpan.FromMilliseconds(16));
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(wheel.Value > 51);
+            Assert.Equal(wheel.Value, model.Value);
+            var before = events;
+            model.Value = 7;
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(7, wheel.Value);
+            Assert.Equal(7, wheel.VisualPosition);
+            Assert.False(wheel.IsSettling);
+            Assert.Equal(before, events); // host updates are not user actions
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Capture_Loss_Cancels_Only_The_Owner_Without_Flinging()
+    {
+        var wheel = Create();
+        var window = Show(wheel);
+        try
+        {
+            using var pointer = Touch();
+            using var other = Touch();
+            Press(wheel, window, pointer, 100, 1000);
+            Move(wheel, window, pointer, 46, 1040);
+            wheel.RaiseEvent(new PointerCaptureLostEventArgs(wheel, other));
+            Assert.Same(wheel, pointer.Captured);
+            pointer.Capture(null);
+            Assert.False(wheel.IsSettling);
+            Assert.Equal(wheel.Value, wheel.VisualPosition);
+            Release(wheel, window, pointer, 20, 1050);
+            Assert.False(wheel.IsSettling);
+            Assert.Equal(51, wheel.Value);
         }
         finally { window.Close(); }
     }
@@ -240,6 +315,26 @@ public sealed class MdWheelPickerInertiaTests
             Assert.Equal(detached, wheel.VisualPosition);
         }
         finally { window.Close(); }
+    }
+
+    private static uint[] Pixels(Window window)
+    {
+        Dispatcher.UIThread.RunJobs();
+        using var frame = window.CaptureRenderedFrame();
+        Assert.NotNull(frame);
+        var size = frame!.PixelSize;
+        var pixels = new uint[size.Width * size.Height];
+        var pinned = GCHandle.Alloc(pixels, GCHandleType.Pinned);
+        try { frame.CopyPixels(new PixelRect(0, 0, size.Width, size.Height), pinned.AddrOfPinnedObject(), pixels.Length * 4, size.Width * 4); }
+        finally { pinned.Free(); }
+        return pixels;
+    }
+
+    private sealed class Model : INotifyPropertyChanged
+    {
+        private int _value;
+        public int Value { get => _value; set { _value = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value))); } }
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 
     private static MdWheelPicker Create()
